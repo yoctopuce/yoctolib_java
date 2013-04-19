@@ -1,0 +1,2 @@
+- Fix module() method of all YFunction
+- Publish library to GitHub
