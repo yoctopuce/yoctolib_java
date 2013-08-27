@@ -1,7 +1,42 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/*********************************************************************
+ *
+ * $Id: YHTTPHub.java 12426 2013-08-20 13:58:34Z seb $
+ *
+ * Internal YHTTPHUB object
+ *
+ * - - - - - - - - - License information: - - - - - - - - -
+ *
+ *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ *
+ *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ *  non-exclusive license to use, modify, copy and integrate this
+ *  file into your software for the sole purpose of interfacing 
+ *  with Yoctopuce products. 
+ *
+ *  You may reproduce and distribute copies of this file in 
+ *  source or object form, as long as the sole purpose of this
+ *  code is to interface with Yoctopuce products. You must retain 
+ *  this notice in the distributed source file.
+ *
+ *  You should refer to Yoctopuce General Terms and Conditions
+ *  for additional information regarding your rights and 
+ *  obligations.
+ *
+ *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ *  WARRANTY, OR OTHERWISE.
+ *
+ *********************************************************************/
+
 package com.yoctopuce.YoctoAPI;
 
 import java.math.BigInteger;
@@ -20,10 +55,7 @@ class YHTTPHub extends YGenericHub {
 
     protected URL url;
     private NotificationThread thread;
-    private String  _http_host="";
-    private int     _http_port=4444;
-    private String  _http_user="";
-    private String  _http_pass="";
+    private HTTPParams _http_params;
     private String  _http_realm="";
     private String  _nounce="";
     private int     _nounce_count=0;
@@ -41,7 +73,7 @@ class YHTTPHub extends YGenericHub {
 
     synchronized boolean needRetryWithAuth()
     {
-        if (_http_user.length()==0 || _http_pass.length()==0)
+        if (_http_params.geUser().length()==0 || _http_params.getPass().length()==0)
             return false;
 
         if(_authRetryCount++>3){
@@ -94,7 +126,7 @@ class YHTTPHub extends YGenericHub {
             }
         }
 
-        String plaintext = _http_user+":"+_http_realm+":"+_http_pass;
+        String plaintext = _http_params.geUser()+":"+_http_realm+":"+_http_params.getPass();
         mdigest.reset();
         mdigest.update(plaintext.getBytes());
         byte[] digest = this.mdigest.digest();
@@ -108,7 +140,7 @@ class YHTTPHub extends YGenericHub {
     // Return an Authorization header for a given request
     synchronized String getAuthorization(String request) throws YAPI_Exception
     {
-        if(_http_user.length()==0 || _http_realm.length()==0)
+        if(_http_params.geUser().length()==0 || _http_realm.length()==0)
             return "";
         _nounce_count++;
         int pos = request.indexOf(' ');
@@ -136,70 +168,88 @@ class YHTTPHub extends YGenericHub {
 
          String res = String.format(
                  "Authorization: Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", qop=auth, nc=%s, cnonce=\"%s\", response=\"%s\", opaque=\"%s\"\r\n",
-                 _http_user,_http_realm,_nounce,uri,nc,cnonce,reponse,_opaque);
+                 _http_params.geUser(),_http_realm,_nounce,uri,nc,cnonce,reponse,_opaque);
         return res;
     }
 
+    private class HTTPParams{
+        private String  _host="";
+        private int     _port=4444;
+        private String  _user="";
+        private String  _pass="";
 
+        public HTTPParams(String url)
+        {
+            int pos = 0;
+            if (url.startsWith("http://")) {
+                pos =7;
+            }
 
+            int end_auth = url.indexOf('@',pos);
+            int end_user = url.indexOf(':',pos);
+            if(end_auth>0 && end_user>0 && end_user < end_auth) {
+                _user = url.substring(pos, end_user);
+                _pass = url.substring(end_user+1,end_auth);
+                pos = end_auth+1;
+            }
 
+            int end_url = url.indexOf('/',pos);
+            if (end_url<0)
+                end_url = url.length();
 
-    String getHttpHost()
-    {
-        return _http_host;
-    }
-
-    String getHttpPass()
-    {
-        return _http_pass;
-    }
-
-    int getHttpPort()
-    {
-        return _http_port;
-    }
-
-    String getHttpUser()
-    {
-        return _http_user;
-    }
-
-
-
-
-    private String _cleanRegisteredUrl(String url)
-    {
-        int pos = 0;
-        if (url.startsWith("http://")) {
-            pos =7;
+            int portpos = url.indexOf(':', pos);
+            if (portpos>0 && portpos < end_url) {
+                _host = url.substring(pos,portpos);
+                _port = Integer.parseInt(url.substring(portpos,end_url));
+            }else {
+                _host = url.substring(pos,end_url);
+            }
         }
 
-        int end_auth = url.indexOf('@',pos);
-        int end_user = url.indexOf(':',pos);
-        if(end_auth>0 && end_user>0 && end_user < end_auth) {
-            _http_user = url.substring(pos, end_user);
-            _http_pass = url.substring(end_user+1,end_auth);
-            pos = end_auth+1;
+        
+        String getHost()
+        {
+            return _host;
         }
 
-        int end_url = url.indexOf('/',pos);
-        if (end_url<0)
-            end_url = url.length();
-
-        int portpos = url.indexOf(':', pos);
-        if (portpos>0 && portpos < end_url) {
-            _http_host = url.substring(pos,portpos);
-            _http_port = Integer.parseInt(url.substring(portpos,end_url));
-        }else {
-            _http_host = url.substring(pos,end_url);
+        String getPass()
+        {
+            return _pass;
         }
-        return url;
+
+        int getPort()
+        {
+            return _port;
+        }
+
+        String geUser()
+        {
+            return _user;
+        }
+
+
+        public String getUrl()
+        {
+            StringBuilder url= new StringBuilder();
+            if(!_user.equals("")){
+                url.append(_user);
+                if(!_pass.equals("")){
+                    url.append(":");
+                    url.append(_pass);
+                }
+                url.append("@");
+            }
+            url.append(_host);
+            url.append(":");
+            url.append(_pass.toString());
+            return url.toString();
+        }
     }
 
     public YHTTPHub(int idx, String url_str) throws YAPI_Exception
     {
         super(idx);
-        _cleanRegisteredUrl(url_str);
+        _http_params =new  HTTPParams(url_str);
         try {
             mdigest = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException ex) {
@@ -213,7 +263,7 @@ class YHTTPHub extends YGenericHub {
         _notifyPos =-1;
         thread = new YHTTPHub.NotificationThread();
         thread.setupConnection(this);
-        thread.setName("Notif_"+_http_host);
+        thread.setName("Notif_"+_http_params.getHost());
         thread.start();
     }
 
@@ -245,13 +295,14 @@ class YHTTPHub extends YGenericHub {
 	@Override
     public String getRootUrl()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+	    return _http_params.getUrl();
     }
 
     @Override
     public boolean isSameRootUrl(String url)
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        HTTPParams params = new HTTPParams(url);
+        return params.getUrl().equals(_http_params.getUrl());
     }
 
     private class NotificationThread extends Thread {
@@ -259,7 +310,7 @@ class YHTTPHub extends YGenericHub {
 
         public void setupConnection(YHTTPHub hub)
         {
-            _yreq = new yHTTPRequest(hub,"Notification of "+_http_host);
+            _yreq = new yHTTPRequest(hub,"Notification of "+_http_params.getHost());
         }
 
         private void handleNetNotification(String notification_line)
@@ -398,7 +449,7 @@ class YHTTPHub extends YGenericHub {
             return;
         }
 
-        yHTTPRequest req =  new yHTTPRequest(this,"updateDeviceList "+_http_host);
+        yHTTPRequest req =  new yHTTPRequest(this,"updateDeviceList "+_http_params.getHost());
 
 
         String yreq = new String(req.RequestSync("GET /api.json\r\n",null));
@@ -411,7 +462,7 @@ class YHTTPHub extends YGenericHub {
             loadval = new JSONObject(yreq);
             if (!loadval.has("services") || !loadval.getJSONObject("services").has("whitePages")) {
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Device "
-                        + _http_host + " is not a hub");
+                        + _http_params.getHost() + " is not a hub");
             }
 
             JSONArray whitePages_json = loadval.getJSONObject("services").getJSONArray("whitePages");
@@ -454,7 +505,7 @@ class YHTTPHub extends YGenericHub {
         } catch (JSONException e) {
             throw new YAPI_Exception(YAPI.IO_ERROR,
                     "Request failed, could not parse API result for "
-                    + _http_host, e);
+                    + _http_params.getHost(), e);
         }
         updateFromWpAndYp(whitePages, yellowPages);
 
@@ -473,11 +524,23 @@ class YHTTPHub extends YGenericHub {
         if (!async) {
             return req.RequestSync(req_first_line,req_head_and_body);
         } else {
-            if(_writeProtected && !_http_user.equals("admin")){
+            if(_writeProtected && !_http_params.geUser().equals("admin")){
                 throw new YAPI_Exception(YAPI.UNAUTHORIZED,"Access denied: admin credentials required");
             }
             req.RequestAsync(req_first_line,req_head_and_body);
             return null;
         }
     }
+
+    public String getHost()
+    {
+        return _http_params.getHost();
+    }
+
+    public int getPort()
+    {
+        return _http_params.getPort();
+    }
+
+    
 }

@@ -1,47 +1,47 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 11112 2013-04-16 14:51:20Z mvuilleu $
+ * $Id: YTemperature.java 12324 2013-08-13 15:10:31Z mvuilleu $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
- * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- * 1) If you have obtained this file from www.yoctopuce.com,
- *    Yoctopuce Sarl licenses to you (hereafter Licensee) the
- *    right to use, modify, copy, and integrate this source file
- *    into your own solution for the sole purpose of interfacing
- *    a Yoctopuce product with Licensee's solution.
+ *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ *  non-exclusive license to use, modify, copy and integrate this
+ *  file into your software for the sole purpose of interfacing 
+ *  with Yoctopuce products. 
  *
- *    The use of this file and all relationship between Yoctopuce 
- *    and Licensee are governed by Yoctopuce General Terms and 
- *    Conditions.
+ *  You may reproduce and distribute copies of this file in 
+ *  source or object form, as long as the sole purpose of this
+ *  code is to interface with Yoctopuce products. You must retain 
+ *  this notice in the distributed source file.
  *
- *    THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *    WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *    WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *    FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *    EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *    INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *    COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *    SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *    LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *    CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *    BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *    WARRANTY, OR OTHERWISE.
+ *  You should refer to Yoctopuce General Terms and Conditions
+ *  for additional information regarding your rights and 
+ *  obligations.
  *
- * 2) If your intent is not to interface with Yoctopuce products,
- *    you are not entitled to use, read or create any derived
- *    material from this source file.
+ *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ *  WARRANTY, OR OTHERWISE.
  *
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
 
-  //--- (globals)
+//--- (globals)
 import java.util.ArrayList;
-  //--- (end of globals)
+//--- (end of globals)
 /**
  * YTemperature Class: Temperature function interface
  * 
@@ -81,25 +81,28 @@ public class YTemperature extends YFunction
      */
     public static final double CURRENTRAWVALUE_INVALID = YAPI.INVALID_DOUBLE;
     /**
-     * invalid resolution value
-     */
-    public static final double RESOLUTION_INVALID = YAPI.INVALID_DOUBLE;
-    /**
      * invalid calibrationParam value
      */
     public static final String CALIBRATIONPARAM_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid resolution value
+     */
+    public static final double RESOLUTION_INVALID = YAPI.INVALID_DOUBLE;
+    /**
      * invalid sensorType value
      */
-  public static final int SENSORTYPE_DIGITAL = 0;
-  public static final int SENSORTYPE_TYPE_K = 1;
-  public static final int SENSORTYPE_TYPE_E = 2;
-  public static final int SENSORTYPE_TYPE_J = 3;
-  public static final int SENSORTYPE_TYPE_N = 4;
-  public static final int SENSORTYPE_TYPE_R = 5;
-  public static final int SENSORTYPE_TYPE_S = 6;
-  public static final int SENSORTYPE_TYPE_T = 7;
-  public static final int SENSORTYPE_INVALID = -1;
+    public static final int SENSORTYPE_DIGITAL = 0;
+    public static final int SENSORTYPE_TYPE_K = 1;
+    public static final int SENSORTYPE_TYPE_E = 2;
+    public static final int SENSORTYPE_TYPE_J = 3;
+    public static final int SENSORTYPE_TYPE_N = 4;
+    public static final int SENSORTYPE_TYPE_R = 5;
+    public static final int SENSORTYPE_TYPE_S = 6;
+    public static final int SENSORTYPE_TYPE_T = 7;
+    public static final int SENSORTYPE_PT100_4WIRES = 8;
+    public static final int SENSORTYPE_PT100_3WIRES = 9;
+    public static final int SENSORTYPE_PT100_2WIRES = 10;
+    public static final int SENSORTYPE_INVALID = -1;
 
     public static final int _calibrationOffset = -32767;
     //--- (end of definitions)
@@ -386,44 +389,6 @@ public class YTemperature extends YFunction
 
     { return get_currentRawValue(); }
 
-    public int set_resolution( double  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = Long.toString(Math.round(newval*65536.0));
-        _setAttr("resolution",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    public int setResolution( double newval)  throws YAPI_Exception
-
-    { return set_resolution(newval); }
-
-    /**
-     * Returns the resolution of the measured values. The resolution corresponds to the numerical precision
-     * of the values, which is not always the same as the actual precision of the sensor.
-     * 
-     * @return a floating point number corresponding to the resolution of the measured values
-     * 
-     * @throws YAPI_Exception
-     */
-    public double get_resolution()  throws YAPI_Exception
-    {
-        String json_val = (String) _getAttr("resolution");
-        return 1.0 / Math.round(65536.0/Double.parseDouble(json_val));
-    }
-
-    /**
-     * Returns the resolution of the measured values. The resolution corresponds to the numerical precision
-     * of the values, which is not always the same as the actual precision of the sensor.
-     * 
-     * @return a floating point number corresponding to the resolution of the measured values
-     * 
-     * @throws YAPI_Exception
-     */
-    public double getResolution() throws YAPI_Exception
-
-    { return get_resolution(); }
-
     public String get_calibrationParam()  throws YAPI_Exception
     {
         String json_val = (String) _getAttr("calibrationParam");
@@ -451,7 +416,7 @@ public class YTemperature extends YFunction
      * a possible perturbation of the measure caused by an enclosure. It is possible
      * to configure up to five correction points. Correction points must be provided
      * in ascending order, and be in the range of the sensor. The device will automatically
-     * perform a lineat interpolatation of the error correction between specified
+     * perform a linear interpolation of the error correction between specified
      * points. Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      * 
@@ -481,12 +446,39 @@ public class YTemperature extends YFunction
     }
 
     /**
-     * Returns the tempeture sensor type.
+     * Returns the resolution of the measured values. The resolution corresponds to the numerical precision
+     * of the values, which is not always the same as the actual precision of the sensor.
+     * 
+     * @return a floating point number corresponding to the resolution of the measured values
+     * 
+     * @throws YAPI_Exception
+     */
+    public double get_resolution()  throws YAPI_Exception
+    {
+        String json_val = (String) _getAttr("resolution");
+        return (Integer.parseInt(json_val) > 100 ? 1.0 / Math.round(65536.0/Double.parseDouble(json_val)) : 0.001 / Math.round(67.0/Double.parseDouble(json_val)));
+    }
+
+    /**
+     * Returns the resolution of the measured values. The resolution corresponds to the numerical precision
+     * of the values, which is not always the same as the actual precision of the sensor.
+     * 
+     * @return a floating point number corresponding to the resolution of the measured values
+     * 
+     * @throws YAPI_Exception
+     */
+    public double getResolution() throws YAPI_Exception
+
+    { return get_resolution(); }
+
+    /**
+     * Returns the temperature sensor type.
      * 
      * @return a value among YTemperature.SENSORTYPE_DIGITAL, YTemperature.SENSORTYPE_TYPE_K,
      * YTemperature.SENSORTYPE_TYPE_E, YTemperature.SENSORTYPE_TYPE_J, YTemperature.SENSORTYPE_TYPE_N,
-     * YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S and YTemperature.SENSORTYPE_TYPE_T
-     * corresponding to the tempeture sensor type
+     * YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S, YTemperature.SENSORTYPE_TYPE_T,
+     * YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES and
+     * YTemperature.SENSORTYPE_PT100_2WIRES corresponding to the temperature sensor type
      * 
      * @throws YAPI_Exception
      */
@@ -497,11 +489,12 @@ public class YTemperature extends YFunction
     }
 
     /**
-     * Returns the tempeture sensor type.
+     * Returns the temperature sensor type.
      * 
      * @return a value among Y_SENSORTYPE_DIGITAL, Y_SENSORTYPE_TYPE_K, Y_SENSORTYPE_TYPE_E,
-     * Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S and
-     * Y_SENSORTYPE_TYPE_T corresponding to the tempeture sensor type
+     * Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
+     * Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES and
+     * Y_SENSORTYPE_PT100_2WIRES corresponding to the temperature sensor type
      * 
      * @throws YAPI_Exception
      */
@@ -511,14 +504,16 @@ public class YTemperature extends YFunction
 
     /**
      * Modify the temperature sensor type.  This function is used to
-     * to define the type of thermo couple (K,E...) used with the device.
+     * to define the type of thermocouple (K,E...) used with the device.
      * This will have no effect if module is using a digital sensor.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      * 
      * @param newval : a value among YTemperature.SENSORTYPE_DIGITAL, YTemperature.SENSORTYPE_TYPE_K,
      * YTemperature.SENSORTYPE_TYPE_E, YTemperature.SENSORTYPE_TYPE_J, YTemperature.SENSORTYPE_TYPE_N,
-     * YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S and YTemperature.SENSORTYPE_TYPE_T
+     * YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S, YTemperature.SENSORTYPE_TYPE_T,
+     * YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES and
+     * YTemperature.SENSORTYPE_PT100_2WIRES
      * 
      * @return YAPI.SUCCESS if the call succeeds.
      * 
@@ -534,13 +529,14 @@ public class YTemperature extends YFunction
 
     /**
      * Modify the temperature sensor type.  This function is used to
-     * to define the type of thermo couple (K,E...) used with the device.
+     * to define the type of thermocouple (K,E...) used with the device.
      * This will have no effect if module is using a digital sensor.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      * 
      * @param newval : a value among Y_SENSORTYPE_DIGITAL, Y_SENSORTYPE_TYPE_K, Y_SENSORTYPE_TYPE_E,
-     * Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S and Y_SENSORTYPE_TYPE_T
+     * Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
+     * Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES and Y_SENSORTYPE_PT100_2WIRES
      * 
      * @return YAPI_SUCCESS if the call succeeds.
      * 

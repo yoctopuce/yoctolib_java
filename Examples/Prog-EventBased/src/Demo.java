@@ -75,13 +75,13 @@ public class Demo {
         @Override
         public void yNewValue(YTemperature function, String functionValue)
         {
-            System.out.println("Light change       :    " + function + " = " + functionValue+"lx");
+            System.out.println("Temperature change       :    " + function + " = " + functionValue+"C");
         }
 
     }
 
 
-    public static void main(String[] args)
+    public static void main(String[] args) 
     {
         try {
             try {

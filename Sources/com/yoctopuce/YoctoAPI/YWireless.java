@@ -1,46 +1,47 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 9787 2013-02-08 15:07:03Z mvuilleu $
+ * $Id: YWireless.java 12426 2013-08-20 13:58:34Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
- * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- * 1) If you have obtained this file from www.yoctopuce.com,
- *    Yoctopuce Sarl licenses to you (hereafter Licensee) the
- *    right to use, modify, copy, and integrate this source file
- *    into your own solution for the sole purpose of interfacing
- *    a Yoctopuce product with Licensee's solution.
+ *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ *  non-exclusive license to use, modify, copy and integrate this
+ *  file into your software for the sole purpose of interfacing 
+ *  with Yoctopuce products. 
  *
- *    The use of this file and all relationship between Yoctopuce 
- *    and Licensee are governed by Yoctopuce General Terms and 
- *    Conditions.
+ *  You may reproduce and distribute copies of this file in 
+ *  source or object form, as long as the sole purpose of this
+ *  code is to interface with Yoctopuce products. You must retain 
+ *  this notice in the distributed source file.
  *
- *    THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *    WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *    WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *    FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *    EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *    INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *    COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *    SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *    LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *    CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *    BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *    WARRANTY, OR OTHERWISE.
+ *  You should refer to Yoctopuce General Terms and Conditions
+ *  for additional information regarding your rights and 
+ *  obligations.
  *
- * 2) If your intent is not to interface with Yoctopuce products,
- *    you are not entitled to use, read or create any derived
- *    material from this source file.
+ *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ *  WARRANTY, OR OTHERWISE.
  *
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
 
-  //--- (globals)
-  //--- (end of globals)
+//--- (generated code: globals)
+import java.util.ArrayList;
+//--- (end of generated code: globals)
 /**
  * YWireless Class: Wireless function interface
  * 
@@ -48,7 +49,7 @@ package com.yoctopuce.YoctoAPI;
  */
 public class YWireless extends YFunction
 {
-    //--- (definitions)
+    //--- (generated code: definitions)
     private YWireless.UpdateCallback _valueCallbackWireless;
     /**
      * invalid logicalName value
@@ -73,12 +74,12 @@ public class YWireless extends YFunction
     /**
      * invalid security value
      */
-  public static final int SECURITY_UNKNOWN = 0;
-  public static final int SECURITY_OPEN = 1;
-  public static final int SECURITY_WEP = 2;
-  public static final int SECURITY_WPA = 3;
-  public static final int SECURITY_WPA2 = 4;
-  public static final int SECURITY_INVALID = -1;
+    public static final int SECURITY_UNKNOWN = 0;
+    public static final int SECURITY_OPEN = 1;
+    public static final int SECURITY_WEP = 2;
+    public static final int SECURITY_WPA = 3;
+    public static final int SECURITY_WPA2 = 4;
+    public static final int SECURITY_INVALID = -1;
 
     /**
      * invalid message value
@@ -88,7 +89,7 @@ public class YWireless extends YFunction
      * invalid wlanConfig value
      */
     public static final String WLANCONFIG_INVALID = YAPI.INVALID_STRING;
-    //--- (end of definitions)
+    //--- (end of generated code: definitions)
 
     /**
      * UdateCallback for Wireless
@@ -104,7 +105,7 @@ public class YWireless extends YFunction
 
 
 
-    //--- (YWireless implementation)
+    //--- (generated code: YWireless implementation)
 
     /**
      * Returns the logical name of the wireless lan interface.
@@ -358,7 +359,7 @@ public class YWireless extends YFunction
     /**
      * Changes the configuration of the wireless lan interface to create an ad-hoc
      * wireless network, without using an access point. If a security key is specified,
-     * the network will be protected by WEP128, since WPA is not standardized for
+     * the network is protected by WEP128, since WPA is not standardized for
      * ad-hoc networks.
      * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
      * 
@@ -375,6 +376,29 @@ public class YWireless extends YFunction
         rest_val = String.format("ADHOC:%s\\%s", ssid.toString(), securityKey.toString());
         _setAttr("wlanConfig",rest_val);
         return YAPI.SUCCESS;
+    }
+
+    /**
+     * Returns a list of YWlanRecord objects which describe detected Wireless networks.
+     * This list is not updated when the module is already connected to an acces point (infrastructure mode).
+     * To force an update of this list, adhocNetwork() must be called to disconnect
+     * the module from the current network. The returned list must be unallocated by caller,
+     * 
+     * @return a list of YWlanRecord objects, containing the SSID, channel,
+     *         link quality and the type of security of the wireless network.
+     * 
+     * @throws YAPI_Exception
+     */
+    public ArrayList<YWlanRecord> get_detectedWlans()  throws YAPI_Exception
+    {
+        byte[] json;
+        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<YWlanRecord> res = new ArrayList<YWlanRecord>();
+        json = _download("wlan.json?by=name");
+        list = _json_get_array(json);
+        for (String y :list) { res.add(new YWlanRecord(y));};
+        return res;
+        
     }
 
     /**
@@ -493,6 +517,6 @@ public class YWireless extends YFunction
          }
     }
 
-    //--- (end of YWireless implementation)
+    //--- (end of generated code: YWireless implementation)
 };
 

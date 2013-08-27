@@ -1,46 +1,46 @@
 /*********************************************************************
  *
- * $Id: YLed.java 10471 2013-03-19 10:39:56Z seb $
+ * $Id: YLed.java 12324 2013-08-13 15:10:31Z mvuilleu $
  *
  * Implements yFindLed(), the high-level API for Led functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
- * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- * 1) If you have obtained this file from www.yoctopuce.com,
- *    Yoctopuce Sarl licenses to you (hereafter Licensee) the
- *    right to use, modify, copy, and integrate this source file
- *    into your own solution for the sole purpose of interfacing
- *    a Yoctopuce product with Licensee's solution.
+ *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ *  non-exclusive license to use, modify, copy and integrate this
+ *  file into your software for the sole purpose of interfacing 
+ *  with Yoctopuce products. 
  *
- *    The use of this file and all relationship between Yoctopuce 
- *    and Licensee are governed by Yoctopuce General Terms and 
- *    Conditions.
+ *  You may reproduce and distribute copies of this file in 
+ *  source or object form, as long as the sole purpose of this
+ *  code is to interface with Yoctopuce products. You must retain 
+ *  this notice in the distributed source file.
  *
- *    THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *    WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *    WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *    FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *    EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *    INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *    COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *    SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *    LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *    CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *    BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *    WARRANTY, OR OTHERWISE.
+ *  You should refer to Yoctopuce General Terms and Conditions
+ *  for additional information regarding your rights and 
+ *  obligations.
  *
- * 2) If your intent is not to interface with Yoctopuce products,
- *    you are not entitled to use, read or create any derived
- *    material from this source file.
+ *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ *  WARRANTY, OR OTHERWISE.
  *
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
 
-  //--- (globals)
-  //--- (end of globals)
+//--- (globals)
+//--- (end of globals)
 /**
  * YLed Class: Led function interface
  * 
@@ -63,9 +63,9 @@ public class YLed extends YFunction
     /**
      * invalid power value
      */
-  public static final int POWER_OFF = 0;
-  public static final int POWER_ON = 1;
-  public static final int POWER_INVALID = -1;
+    public static final int POWER_OFF = 0;
+    public static final int POWER_ON = 1;
+    public static final int POWER_INVALID = -1;
 
     /**
      * invalid luminosity value
@@ -74,13 +74,13 @@ public class YLed extends YFunction
     /**
      * invalid blinking value
      */
-  public static final int BLINKING_STILL = 0;
-  public static final int BLINKING_RELAX = 1;
-  public static final int BLINKING_AWARE = 2;
-  public static final int BLINKING_RUN = 3;
-  public static final int BLINKING_CALL = 4;
-  public static final int BLINKING_PANIC = 5;
-  public static final int BLINKING_INVALID = -1;
+    public static final int BLINKING_STILL = 0;
+    public static final int BLINKING_RELAX = 1;
+    public static final int BLINKING_AWARE = 2;
+    public static final int BLINKING_RUN = 3;
+    public static final int BLINKING_CALL = 4;
+    public static final int BLINKING_PANIC = 5;
+    public static final int BLINKING_INVALID = -1;
 
     //--- (end of definitions)
 

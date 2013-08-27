@@ -36,16 +36,17 @@ public class Demo {
                     module.setBeacon(YModule.BEACON_OFF);
                 }
             }
-            System.out.println("serial:       " + module.getSerialNumber());
+            System.out.println("serial:       " + module.get_serialNumber());
             System.out.println("logical name: " + module.get_logicalName());
             System.out.println("luminosity:   " + module.get_luminosity());
-            if (module.getBeacon() == YModule.BEACON_ON) {
+            if (module.get_beacon() == YModule.BEACON_ON) {
                 System.out.println("beacon:       ON");
             } else {
                 System.out.println("beacon:       OFF");
             }
-            System.out.println("upTime:       " + module.getUpTime() / 1000 + " sec");
-            System.out.println("USB current:  " + module.getUsbCurrent() + " mA");
+            System.out.println("upTime:       " + module.get_upTime() / 1000 + " sec");
+            System.out.println("USB current:  " + module.get_usbCurrent() + " mA");
+            System.out.println("logs:\n" + module.get_lastLogs());
         } catch (YAPI_Exception ex) {
             System.out.println(args[1] + " not connected (check identification and USB cable)");
         }

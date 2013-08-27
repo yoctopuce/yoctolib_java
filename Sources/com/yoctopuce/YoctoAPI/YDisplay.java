@@ -1,46 +1,46 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 8861 2012-11-26 22:00:46Z mvuilleu $
+ * $Id: YDisplay.java 12426 2013-08-20 13:58:34Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
- * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- * 1) If you have obtained this file from www.yoctopuce.com,
- *    Yoctopuce Sarl licenses to you (hereafter Licensee) the
- *    right to use, modify, copy, and integrate this source file
- *    into your own solution for the sole purpose of interfacing
- *    a Yoctopuce product with Licensee's solution.
+ *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ *  non-exclusive license to use, modify, copy and integrate this
+ *  file into your software for the sole purpose of interfacing 
+ *  with Yoctopuce products. 
  *
- *    The use of this file and all relationship between Yoctopuce 
- *    and Licensee are governed by Yoctopuce General Terms and 
- *    Conditions.
+ *  You may reproduce and distribute copies of this file in 
+ *  source or object form, as long as the sole purpose of this
+ *  code is to interface with Yoctopuce products. You must retain 
+ *  this notice in the distributed source file.
  *
- *    THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *    WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *    WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *    FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *    EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *    INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *    COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *    SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *    LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *    CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *    BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *    WARRANTY, OR OTHERWISE.
+ *  You should refer to Yoctopuce General Terms and Conditions
+ *  for additional information regarding your rights and 
+ *  obligations.
  *
- * 2) If your intent is not to interface with Yoctopuce products,
- *    you are not entitled to use, read or create any derived
- *    material from this source file.
+ *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ *  WARRANTY, OR OTHERWISE.
  *
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI; 
 
   //--- (generated code: globals)
-  //--- (end of generated code: globals)
+//--- (end of generated code: globals)
 /**
  * YDisplay Class: Display function interface
  * 
@@ -64,9 +64,9 @@ public class YDisplay extends YFunction
     /**
      * invalid powerState value
      */
-  public static final int POWERSTATE_OFF = 0;
-  public static final int POWERSTATE_ON = 1;
-  public static final int POWERSTATE_INVALID = -1;
+    public static final int POWERSTATE_OFF = 0;
+    public static final int POWERSTATE_ON = 1;
+    public static final int POWERSTATE_INVALID = -1;
 
     /**
      * invalid startupSeq value
@@ -79,11 +79,11 @@ public class YDisplay extends YFunction
     /**
      * invalid orientation value
      */
-  public static final int ORIENTATION_LEFT = 0;
-  public static final int ORIENTATION_UP = 1;
-  public static final int ORIENTATION_RIGHT = 2;
-  public static final int ORIENTATION_DOWN = 3;
-  public static final int ORIENTATION_INVALID = -1;
+    public static final int ORIENTATION_LEFT = 0;
+    public static final int ORIENTATION_UP = 1;
+    public static final int ORIENTATION_RIGHT = 2;
+    public static final int ORIENTATION_DOWN = 3;
+    public static final int ORIENTATION_INVALID = -1;
 
     /**
      * invalid displayWidth value
@@ -96,10 +96,10 @@ public class YDisplay extends YFunction
     /**
      * invalid displayType value
      */
-  public static final int DISPLAYTYPE_MONO = 0;
-  public static final int DISPLAYTYPE_GRAY = 1;
-  public static final int DISPLAYTYPE_RGB = 2;
-  public static final int DISPLAYTYPE_INVALID = -1;
+    public static final int DISPLAYTYPE_MONO = 0;
+    public static final int DISPLAYTYPE_GRAY = 1;
+    public static final int DISPLAYTYPE_RGB = 2;
+    public static final int DISPLAYTYPE_INVALID = -1;
 
     /**
      * invalid layerWidth value
@@ -685,7 +685,7 @@ public class YDisplay extends YFunction
     {
         flushLayers();
         _recording = false; 
-        _upload(sequenceName, _sequence);
+        _upload(sequenceName, _sequence.getBytes());
         //We need to use YPRINTF("") for Objective-C 
         _sequence = String.format(""); 
         return YAPI.SUCCESS; 

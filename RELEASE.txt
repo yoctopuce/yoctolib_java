@@ -1,2 +1,4 @@
-- Fix module() method of all YFunction
-- Publish library to GitHub
+- clarify license agreement
+- fix YAPI.RegisterHub and YAPI.PreregisterHub that was failing for the second IP hub.
+- add get_lastLogs() method to YModule class
+- minor fixes 
