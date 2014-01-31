@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 12426 2013-08-20 13:58:34Z seb $
+ * $Id: YModule.java 14779 2014-01-30 14:56:39Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -38,7 +38,11 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+//--- (generated code: YModule class start)
 /**
  * YModule Class: Module control interface
  * 
@@ -46,11 +50,12 @@ package com.yoctopuce.YoctoAPI;
  * It can be used to control the module global parameters, and
  * to enumerate the functions provided by each module.
  */
+public class YModule extends YFunction
+{
+//--- (end of generated code: YModule class start)
 
-public class YModule extends YFunction {
 
-
-    // --- (generated code: definitions)
+    // --- (generated code: YModule definitions)
     /**
      * invalid productName value
      */
@@ -60,17 +65,13 @@ public class YModule extends YFunction {
      */
     public static final String SERIALNUMBER_INVALID = YAPI.INVALID_STRING;
     /**
-     * invalid logicalName value
-     */
-    public static final String LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-    /**
      * invalid productId value
      */
-    public static final int PRODUCTID_INVALID = YAPI.INVALID_UNSIGNED;
+    public static final int PRODUCTID_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid productRelease value
      */
-    public static final int PRODUCTRELEASE_INVALID = YAPI.INVALID_UNSIGNED;
+    public static final int PRODUCTRELEASE_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid firmwareRelease value
      */
@@ -86,7 +87,7 @@ public class YModule extends YFunction {
     /**
      * invalid luminosity value
      */
-    public static final int LUMINOSITY_INVALID = YAPI.INVALID_UNSIGNED;
+    public static final int LUMINOSITY_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid beacon value
      */
@@ -101,7 +102,7 @@ public class YModule extends YFunction {
     /**
      * invalid usbCurrent value
      */
-    public static final long USBCURRENT_INVALID = YAPI.INVALID_LONG;
+    public static final int USBCURRENT_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid rebootCountdown value
      */
@@ -113,7 +114,44 @@ public class YModule extends YFunction {
     public static final int USBBANDWIDTH_DOUBLE = 1;
     public static final int USBBANDWIDTH_INVALID = -1;
 
-    //--- (end of generated code: definitions)
+    protected String _productName = PRODUCTNAME_INVALID;
+    protected String _serialNumber = SERIALNUMBER_INVALID;
+    protected int _productId = PRODUCTID_INVALID;
+    protected int _productRelease = PRODUCTRELEASE_INVALID;
+    protected String _firmwareRelease = FIRMWARERELEASE_INVALID;
+    protected int _persistentSettings = PERSISTENTSETTINGS_INVALID;
+    protected int _luminosity = LUMINOSITY_INVALID;
+    protected int _beacon = BEACON_INVALID;
+    protected long _upTime = UPTIME_INVALID;
+    protected int _usbCurrent = USBCURRENT_INVALID;
+    protected int _rebootCountdown = REBOOTCOUNTDOWN_INVALID;
+    protected int _usbBandwidth = USBBANDWIDTH_INVALID;
+    protected UpdateCallback _valueCallbackModule = null;
+
+    /**
+     * Deprecated UpdateCallback for Module
+     */
+    public interface UpdateCallback {
+        /**
+         * 
+         * @param function      : the function object of which the value has changed
+         * @param functionValue : the character string describing the new advertised value
+         */
+        void yNewValue(YModule function, String functionValue);
+    }
+
+    /**
+     * TimedReportCallback for Module
+     */
+    public interface TimedReportCallback {
+        /**
+         * 
+         * @param function : the function object of which the value has changed
+         * @param measure  : measure
+         */
+        void timedReportCallback(YModule  function, YMeasure measure);
+    }
+    //--- (end of generated code: YModule definitions)
 
 
     // Return the internal device object hosting the function
@@ -122,12 +160,24 @@ public class YModule extends YFunction {
         String devid = _func;
         int dotidx = devid.indexOf('.');
         if( dotidx>=0) devid = devid.substring(0, dotidx);
-        YDevice dev = YAPI.getDevice(devid);
+        YDevice dev = SafeYAPI().getDevice(devid);
         if(dev==null) {
             throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "Device ["+devid+"] is not online");
         }
         return dev;
     }
+
+    /**
+     * @param func : functionid
+     */
+    protected YModule(String func)
+    {
+        super(func);
+        _className = "Module";
+        //--- (generated code: YModule attributes initialization)
+        //--- (end of generated code: YModule attributes initialization)
+    }
+
 
     // Return the number of functions (beside "module") available on the device
     public int functionCount() throws YAPI_Exception
@@ -140,24 +190,65 @@ public class YModule extends YFunction {
     public String functionId(int functionIndex) throws YAPI_Exception
     {
         YDevice dev = _getDev();
-        return dev.functionId(functionIndex);
+        return dev.getYPEntry(functionIndex).getFuncId();
     }
     // Retrieve the name of the nth function (beside "module") in the device
     public String functionName(int functionIndex) throws YAPI_Exception
     {
         YDevice dev = _getDev();
-        return dev.functionName(functionIndex);
+        return dev.getYPEntry(functionIndex).getLogicalName();
     }
 
     // Retrieve the advertised value of the nth function (beside "module") in the device
     public String functionValue(int functionIndex) throws YAPI_Exception
     {
         YDevice dev = _getDev();
-        return dev.functionValue(functionIndex);
+        return dev.getYPEntry(functionIndex).getAdvertisedValue();
     }
 
 
     // --- (generated code: YModule implementation)
+    @Override
+    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    {
+        if (json_val.has("productName")) {
+            _productName =  json_val.getString("productName"); ;
+        }
+        if (json_val.has("serialNumber")) {
+            _serialNumber =  json_val.getString("serialNumber"); ;
+        }
+        if (json_val.has("productId")) {
+            _productId =  json_val.getInt("productId");
+        }
+        if (json_val.has("productRelease")) {
+            _productRelease =  json_val.getInt("productRelease");
+        }
+        if (json_val.has("firmwareRelease")) {
+            _firmwareRelease =  json_val.getString("firmwareRelease"); ;
+        }
+        if (json_val.has("persistentSettings")) {
+            _persistentSettings =  json_val.getInt("persistentSettings");
+        }
+        if (json_val.has("luminosity")) {
+            _luminosity =  json_val.getInt("luminosity");
+        }
+        if (json_val.has("beacon")) {
+            _beacon =  json_val.getInt("beacon")>0?1:0;
+        }
+        if (json_val.has("upTime")) {
+            _upTime =  json_val.getLong("upTime");
+        }
+        if (json_val.has("usbCurrent")) {
+            _usbCurrent =  json_val.getInt("usbCurrent");
+        }
+        if (json_val.has("rebootCountdown")) {
+            _rebootCountdown =  json_val.getInt("rebootCountdown");
+        }
+        if (json_val.has("usbBandwidth")) {
+            _usbBandwidth =  json_val.getInt("usbBandwidth");
+        }
+        super._parseAttr(json_val);
+    }
 
     /**
      * Returns the commercial name of the module, as set by the factory.
@@ -168,10 +259,12 @@ public class YModule extends YFunction {
      */
     public String get_productName()  throws YAPI_Exception
     {
-        YDevice dev = _getDev();
-        if (dev == null)
-            return PRODUCTNAME_INVALID;
-        return dev.getProductName();
+        if (_cacheExpiration == 0) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PRODUCTNAME_INVALID;
+            }
+        }
+        return _productName;
     }
 
     /**
@@ -194,10 +287,12 @@ public class YModule extends YFunction {
      */
     public String get_serialNumber()  throws YAPI_Exception
     {
-        YDevice dev = _getDev();
-        if (dev == null)
-            return SERIALNUMBER_INVALID;
-        return dev.getSerialNumber();
+        if (_cacheExpiration == 0) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SERIALNUMBER_INVALID;
+            }
+        }
+        return _serialNumber;
     }
 
     /**
@@ -212,71 +307,6 @@ public class YModule extends YFunction {
     { return get_serialNumber(); }
 
     /**
-     * Returns the logical name of the module.
-     * 
-     * @return a string corresponding to the logical name of the module
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_logicalName()  throws YAPI_Exception
-    {
-        YDevice dev = _getDev();
-        if(dev!=null && _expiration <= YAPI.GetTickCount())
-            return dev.getLogicalName();
-        String json_val = (String) _getAttr("logicalName");
-        return json_val;
-    }
-
-    /**
-     * Returns the logical name of the module.
-     * 
-     * @return a string corresponding to the logical name of the module
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getLogicalName() throws YAPI_Exception
-
-    { return get_logicalName(); }
-
-    /**
-     * Changes the logical name of the module. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the module
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int set_logicalName( String  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = newval;
-        _setAttr("logicalName",rest_val);
-        YDevice dev = _getDev();
-        if(dev!=null) dev.refresh();
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the logical name of the module. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the module
-     * 
-     * @return YAPI_SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int setLogicalName( String newval)  throws YAPI_Exception
-
-    { return set_logicalName(newval); }
-
-    /**
      * Returns the USB device identifier of the module.
      * 
      * @return an integer corresponding to the USB device identifier of the module
@@ -285,10 +315,12 @@ public class YModule extends YFunction {
      */
     public int get_productId()  throws YAPI_Exception
     {
-        YDevice dev = _getDev();
-        if (dev == null)
-            return PRODUCTID_INVALID;
-        return dev.getProductId();
+        if (_cacheExpiration == 0) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PRODUCTID_INVALID;
+            }
+        }
+        return _productId;
     }
 
     /**
@@ -311,8 +343,12 @@ public class YModule extends YFunction {
      */
     public int get_productRelease()  throws YAPI_Exception
     {
-        String json_val = (String) _getFixedAttr("productRelease");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration == 0) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PRODUCTRELEASE_INVALID;
+            }
+        }
+        return _productRelease;
     }
 
     /**
@@ -335,8 +371,12 @@ public class YModule extends YFunction {
      */
     public String get_firmwareRelease()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("firmwareRelease");
-        return json_val;
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return FIRMWARERELEASE_INVALID;
+            }
+        }
+        return _firmwareRelease;
     }
 
     /**
@@ -360,8 +400,12 @@ public class YModule extends YFunction {
      */
     public int get_persistentSettings()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("persistentSettings");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PERSISTENTSETTINGS_INVALID;
+            }
+        }
+        return _persistentSettings;
     }
 
     /**
@@ -376,50 +420,17 @@ public class YModule extends YFunction {
 
     { return get_persistentSettings(); }
 
-    public int set_persistentSettings( int  newval)  throws YAPI_Exception
+    public int set_persistentSettings(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
+        rest_val = Integer.toString(newval);
         _setAttr("persistentSettings",rest_val);
         return YAPI.SUCCESS;
     }
 
-    public int setPersistentSettings( int newval)  throws YAPI_Exception
+    public int setPersistentSettings(int newval)  throws YAPI_Exception
 
     { return set_persistentSettings(newval); }
-
-    /**
-     * Saves current settings in the nonvolatile memory of the module.
-     * Warning: the number of allowed save operations during a module life is
-     * limited (about 100000 cycles). Do not call this function within a loop.
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int saveToFlash()  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = "1";
-        _setAttr("persistentSettings",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Reloads the settings stored in the nonvolatile memory, as
-     * when the module is powered on.
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int revertFromFlash()  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = "0";
-        _setAttr("persistentSettings",rest_val);
-        return YAPI.SUCCESS;
-    }
 
     /**
      * Returns the luminosity of the  module informative leds (from 0 to 100).
@@ -430,8 +441,12 @@ public class YModule extends YFunction {
      */
     public int get_luminosity()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("luminosity");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return LUMINOSITY_INVALID;
+            }
+        }
+        return _luminosity;
     }
 
     /**
@@ -457,10 +472,10 @@ public class YModule extends YFunction {
      * 
      * @throws YAPI_Exception
      */
-    public int set_luminosity( int  newval)  throws YAPI_Exception
+    public int set_luminosity(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
+        rest_val = Integer.toString(newval);
         _setAttr("luminosity",rest_val);
         return YAPI.SUCCESS;
     }
@@ -477,7 +492,7 @@ public class YModule extends YFunction {
      * 
      * @throws YAPI_Exception
      */
-    public int setLuminosity( int newval)  throws YAPI_Exception
+    public int setLuminosity(int newval)  throws YAPI_Exception
 
     { return set_luminosity(newval); }
 
@@ -490,11 +505,12 @@ public class YModule extends YFunction {
      */
     public int get_beacon()  throws YAPI_Exception
     {
-        YDevice dev = _getDev();
-        if(dev!=null && _expiration <= YAPI.GetTickCount())
-            return dev.getBeacon();
-        String json_val = (String) _getAttr("beacon");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BEACON_INVALID;
+            }
+        }
+        return _beacon;
     }
 
     /**
@@ -517,7 +533,7 @@ public class YModule extends YFunction {
      * 
      * @throws YAPI_Exception
      */
-    public int set_beacon( int  newval)  throws YAPI_Exception
+    public int set_beacon(int  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = (newval > 0 ? "1" : "0");
@@ -534,7 +550,7 @@ public class YModule extends YFunction {
      * 
      * @throws YAPI_Exception
      */
-    public int setBeacon( int newval)  throws YAPI_Exception
+    public int setBeacon(int newval)  throws YAPI_Exception
 
     { return set_beacon(newval); }
 
@@ -547,8 +563,12 @@ public class YModule extends YFunction {
      */
     public long get_upTime()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("upTime");
-        return Long.parseLong(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return UPTIME_INVALID;
+            }
+        }
+        return _upTime;
     }
 
     /**
@@ -569,10 +589,14 @@ public class YModule extends YFunction {
      * 
      * @throws YAPI_Exception
      */
-    public long get_usbCurrent()  throws YAPI_Exception
+    public int get_usbCurrent()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("usbCurrent");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return USBCURRENT_INVALID;
+            }
+        }
+        return _usbCurrent;
     }
 
     /**
@@ -582,7 +606,7 @@ public class YModule extends YFunction {
      * 
      * @throws YAPI_Exception
      */
-    public long getUsbCurrent() throws YAPI_Exception
+    public int getUsbCurrent() throws YAPI_Exception
 
     { return get_usbCurrent(); }
 
@@ -597,8 +621,12 @@ public class YModule extends YFunction {
      */
     public int get_rebootCountdown()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("rebootCountdown");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return REBOOTCOUNTDOWN_INVALID;
+            }
+        }
+        return _rebootCountdown;
     }
 
     /**
@@ -614,7 +642,7 @@ public class YModule extends YFunction {
 
     { return get_rebootCountdown(); }
 
-    public int set_rebootCountdown( int  newval)  throws YAPI_Exception
+    public int set_rebootCountdown(int  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = Integer.toString(newval);
@@ -622,43 +650,9 @@ public class YModule extends YFunction {
         return YAPI.SUCCESS;
     }
 
-    public int setRebootCountdown( int newval)  throws YAPI_Exception
+    public int setRebootCountdown(int newval)  throws YAPI_Exception
 
     { return set_rebootCountdown(newval); }
-
-    /**
-     * Schedules a simple module reboot after the given number of seconds.
-     * 
-     * @param secBeforeReboot : number of seconds before rebooting
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int reboot(int secBeforeReboot)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = Integer.toString(secBeforeReboot);
-        _setAttr("rebootCountdown",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Schedules a module reboot into special firmware update mode.
-     * 
-     * @param secBeforeReboot : number of seconds before rebooting
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int triggerFirmwareUpdate(int secBeforeReboot)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = Integer.toString(-secBeforeReboot);
-        _setAttr("rebootCountdown",rest_val);
-        return YAPI.SUCCESS;
-    }
 
     /**
      * Returns the number of USB interfaces used by the module.
@@ -670,8 +664,12 @@ public class YModule extends YFunction {
      */
     public int get_usbBandwidth()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("usbBandwidth");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return USBBANDWIDTH_INVALID;
+            }
+        }
+        return _usbBandwidth;
     }
 
     /**
@@ -697,10 +695,10 @@ public class YModule extends YFunction {
      * 
      * @throws YAPI_Exception
      */
-    public int set_usbBandwidth( int  newval)  throws YAPI_Exception
+    public int set_usbBandwidth(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
+        rest_val = Integer.toString(newval);
         _setAttr("usbBandwidth",rest_val);
         return YAPI.SUCCESS;
     }
@@ -716,64 +714,9 @@ public class YModule extends YFunction {
      * 
      * @throws YAPI_Exception
      */
-    public int setUsbBandwidth( int newval)  throws YAPI_Exception
+    public int setUsbBandwidth(int newval)  throws YAPI_Exception
 
     { return set_usbBandwidth(newval); }
-
-    /**
-     * Downloads the specified built-in file and returns a binary buffer with its content.
-     * 
-     * @param pathname : name of the new file to load
-     * 
-     * @return a binary buffer with the file content
-     * 
-     * @throws YAPI_Exception
-     */
-    public byte[] download(String pathname)  throws YAPI_Exception
-    {
-        return _download(pathname);
-        
-    }
-
-    /**
-     * Returns the icon of the module. The icon is a PNG image and does not
-     * exceeds 1536 bytes.
-     * 
-     * @return a binary buffer with module icon, in png format.
-     */
-    public byte[] get_icon2d()  throws YAPI_Exception
-    {
-        return _download("icon2d.png");
-        
-    }
-
-    /**
-     * Returns a string with last logs of the module. This method return only
-     * logs that are still in the module.
-     * 
-     * @return a string with last logs of the module.
-     */
-    public String get_lastLogs()  throws YAPI_Exception
-    {
-        byte[] content;
-        content = _download("logs.txt");
-        return new String(content);
-        
-    }
-
-    /**
-     * Continues the module enumeration started using yFirstModule().
-     * 
-     * @return a pointer to a YModule object, corresponding to
-     *         the next module found, or a null pointer
-     *         if there are no more modules to enumerate.
-     */
-    public  YModule nextModule()
-    {
-        String next_hwid = YAPI.getNextHardwareId(_className, _func);
-        if(next_hwid == null) return null;
-        return FindModule(next_hwid);
-    }
 
     /**
      * Allows you to find a module from its serial number or from its logical name.
@@ -793,11 +736,163 @@ public class YModule extends YFunction {
      *         or get additional information on the module.
      */
     public static YModule FindModule(String func)
-    {   YFunction yfunc = YAPI.getFunction("Module", func);
-        if (yfunc != null) {
-            return (YModule) yfunc;
+    {
+        YModule obj;
+        obj = (YModule) YFunction._FindFromCache("Module", func);
+        if (obj == null) {
+            obj = new YModule(func);
+            YFunction._AddToCache("Module", func, obj);
         }
-        return new YModule(func);
+        return obj;
+    }
+
+    /**
+     * Registers the callback function that is invoked on every change of advertised value.
+     * The callback is invoked only during the execution of ySleep or yHandleEvents.
+     * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
+     * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * 
+     * @param callback : the callback function to call, or a null pointer. The callback function should take two
+     *         arguments: the function object of which the value has changed, and the character string describing
+     *         the new advertised value.
+     * @noreturn
+     */
+    public int registerValueCallback(UpdateCallback callback)
+    {
+        String val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        _valueCallbackModule = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && isOnline()) {
+            val = _advertisedValue;
+            if (!(val.equals(""))) {
+                _invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int _invokeValueCallback(String value)
+    {
+        if (_valueCallbackModule != null) {
+            _valueCallbackModule.yNewValue(this, value);
+        } else {
+            super._invokeValueCallback(value);
+        }
+        return 0;
+    }
+
+    /**
+     * Saves current settings in the nonvolatile memory of the module.
+     * Warning: the number of allowed save operations during a module life is
+     * limited (about 100000 cycles). Do not call this function within a loop.
+     * 
+     * @return YAPI.SUCCESS when the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int saveToFlash()  throws YAPI_Exception
+    {
+        return set_persistentSettings(PERSISTENTSETTINGS_SAVED);
+    }
+
+    /**
+     * Reloads the settings stored in the nonvolatile memory, as
+     * when the module is powered on.
+     * 
+     * @return YAPI.SUCCESS when the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int revertFromFlash()  throws YAPI_Exception
+    {
+        return set_persistentSettings(PERSISTENTSETTINGS_LOADED);
+    }
+
+    /**
+     * Schedules a simple module reboot after the given number of seconds.
+     * 
+     * @param secBeforeReboot : number of seconds before rebooting
+     * 
+     * @return YAPI.SUCCESS when the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int reboot(int secBeforeReboot)  throws YAPI_Exception
+    {
+        return set_rebootCountdown(secBeforeReboot);
+    }
+
+    /**
+     * Schedules a module reboot into special firmware update mode.
+     * 
+     * @param secBeforeReboot : number of seconds before rebooting
+     * 
+     * @return YAPI.SUCCESS when the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int triggerFirmwareUpdate(int secBeforeReboot)  throws YAPI_Exception
+    {
+        return set_rebootCountdown(-secBeforeReboot);
+    }
+
+    /**
+     * Downloads the specified built-in file and returns a binary buffer with its content.
+     * 
+     * @param pathname : name of the new file to load
+     * 
+     * @return a binary buffer with the file content
+     * 
+     * @throws YAPI_Exception
+     */
+    public byte[] download(String pathname)  throws YAPI_Exception
+    {
+        return _download(pathname);
+    }
+
+    /**
+     * Returns the icon of the module. The icon is a PNG image and does not
+     * exceeds 1536 bytes.
+     * 
+     * @return a binary buffer with module icon, in png format.
+     */
+    public byte[] get_icon2d()  throws YAPI_Exception
+    {
+        return _download("icon2d.png");
+    }
+
+    /**
+     * Returns a string with last logs of the module. This method return only
+     * logs that are still in the module.
+     * 
+     * @return a string with last logs of the module.
+     */
+    public String get_lastLogs()  throws YAPI_Exception
+    {
+        byte[] content;
+        // may throw an exception
+        content = _download("logs.txt");
+        return new String(content);
+    }
+
+    /**
+     * Continues the module enumeration started using yFirstModule().
+     * 
+     * @return a pointer to a YModule object, corresponding to
+     *         the next module found, or a null pointer
+     *         if there are no more modules to enumerate.
+     */
+    public  YModule nextModule()
+    {
+        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        if(next_hwid == null) return null;
+        return FindModule(next_hwid);
     }
 
     /**
@@ -811,20 +906,10 @@ public class YModule extends YFunction {
      */
     public static YModule FirstModule()
     {
-        String next_hwid = YAPI.getFirstHardwareId("Module");
+        String next_hwid = SafeYAPI().getFirstHardwareId("Module");
         if (next_hwid == null)  return null;
         return FindModule(next_hwid);
     }
-
-    /**
-     * 
-     * @param func : functionid
-     */
-    private YModule(String func)
-    {
-        super("Module", func);
-    }
-
 
     //--- (end of generated code: YModule implementation)
 

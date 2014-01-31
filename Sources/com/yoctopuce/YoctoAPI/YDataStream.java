@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 12426 2013-08-20 13:58:34Z seb $
+ * $Id: YDataStream.java 14779 2014-01-30 14:56:39Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -39,282 +39,261 @@
 
 package com.yoctopuce.YoctoAPI;
 
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 import java.util.ArrayList;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
+//--- (generated code: YDataStream class start)
 /**
- * YDataStream Class: Sequence of measured data, stored by the data logger
- *
- * A data stream is a small collection of consecutive measures for a set of
- * sensors. A few properties are available directly from the object itself (they
- * are preloaded at instantiation time), while most other properties and the
- * actual data are loaded on demand when accessed for the first time.
+ * YDataStream Class: Unformatted data sequence
+ * 
+ * YDataStream objects represent bare recorded measure sequences,
+ * exactly as found within the data logger present on Yoctopuce
+ * sensors.
+ * 
+ * In most cases, it is not necessary to use YDataStream objects
+ * directly, as the YDataSet objects (returned by the
+ * get_recordedData() method from sensors and the
+ * get_dataSets() method from the data logger) provide
+ * a more convenient interface.
  */
-public class YDataStream {
-
-    /**
-     *
-     */
+public class YDataStream
+{
+//--- (end of generated code: YDataStream class start)
     public static final double DATA_INVALID = YAPI.INVALID_DOUBLE;
-    // Data preloaded on object instantiation
-    private YDataLogger _dataLogger;
-    private int _runNo;
-    private int _timeStamp;
-	private int _interval;
-	private long _utcStamp;
-    // Data loaded using a specific connection
-    private int _nRows;
-    private int _nCols;
-    private ArrayList<String> _columnNames;
-    private ArrayList<ArrayList<Double> > _values;
+    
+    //--- (generated code: YDataStream definitions)
+    protected YFunction _parent;
+    protected int _runNo = 0;
+    protected long _utcStamp = 0;
+    protected int _nCols = 0;
+    protected int _nRows = 0;
+    protected int _duration = 0;
+    protected ArrayList<String> _columnNames = new ArrayList<String>();
+    protected String _functionId;
+    protected boolean _isClosed;
+    protected boolean _isAvg;
+    protected boolean _isScal;
+    protected int _decimals = 0;
+    protected double _offset = 0;
+    protected double _scale = 0;
+    protected int _samplesPerHour = 0;
+    protected double _minVal = 0;
+    protected double _avgVal = 0;
+    protected double _maxVal = 0;
+    protected double _decexp = 0;
+    protected int _caltyp = 0;
+    protected ArrayList<Integer> _calpar = new ArrayList<Integer>();
+    protected ArrayList<Double> _calraw = new ArrayList<Double>();
+    protected ArrayList<Double> _calref = new ArrayList<Double>();
+    protected ArrayList<ArrayList<Double>> _values = new ArrayList<ArrayList<Double>>();
 
-    /**
-     *
-     * @param parent
-     * @param jsondata
-     * @throws YAPI_Exception
-     */
-    public YDataStream(YDataLogger parent, JSONArray jsondata) throws YAPI_Exception
+    //--- (end of generated code: YDataStream definitions)
+    protected YAPI.CalibrationHandlerCallback _calhdl=null;
+    
+    protected YDataStream(YFunction parent)
     {
-        try {
-            _dataLogger = parent;
-
-            this._runNo = jsondata.getInt(0);
-            this._timeStamp = jsondata.getInt(1);
-            this._utcStamp = jsondata.getLong(2);
-            this._interval = jsondata.getInt(3);
-            this._nRows = 0;
-            this._nCols = 0;
-            //this._values = _values;
-        } catch (JSONException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
-        }
+        _parent = parent;
+    }
+    
+    YDataStream(YFunction parent, YDataSet dataset, ArrayList<Integer> encoded) throws YAPI_Exception
+    {
+        _parent   = parent;
+        _initFromDataSet(dataset, encoded);      
     }
 
-    /**
-     * Internal function to preload all values into object
-     * @return
-     * @throws YAPI_Exception
-     */
-    public int loadStream() throws YAPI_Exception
+    //--- (generated code: YDataStream implementation)
+
+    public int _initFromDataSet(YDataSet dataset,ArrayList<Integer> encoded)
     {
-        JSONArray coldiv = null;
-        int coltyp[] = null;
-        double colscl[];
-        int colofs[];
-        int caltyp[] = null;
-        YAPI.CalibrationHandlerCallback calhdl[]=null;
-        ArrayList<ArrayList<Integer>> calpar = null;
-        ArrayList<ArrayList<Double>>  calraw = null;
-        ArrayList<ArrayList<Double>>  calref = null;
-
-
-
-        JSONObject jsonObj=null;
-
-        try {
-            JSONTokener jsonTokenner = _dataLogger.getData(_runNo, _timeStamp);
-            jsonObj = new JSONObject(jsonTokenner);
-            if (jsonObj.has("time")) {
-                _timeStamp = jsonObj.getInt("time");
+        int val = 0;
+        int i = 0;
+        int iRaw = 0;
+        int iRef = 0;
+        double fRaw = 0;
+        double fRef = 0;
+        double duration_float = 0;
+        ArrayList<Integer> iCalib = new ArrayList<Integer>();
+        
+        // decode sequence header to extract data
+        _runNo = encoded.get(0) + (((encoded.get(1)) << (16)));
+        _utcStamp = encoded.get(2) + (((encoded.get(3)) << (16)));
+        val = encoded.get(4);
+        _isAvg = (((val) & (0x100)) == 0);
+        _samplesPerHour = ((val) & (0xff));
+        if (((val) & (0x100)) != 0) {
+            _samplesPerHour = _samplesPerHour * 3600;
+        } else {
+            if (((val) & (0x200)) != 0) {
+                _samplesPerHour = _samplesPerHour * 60;
             }
-            if (jsonObj.has("UTC")) {
-                _utcStamp = jsonObj.getLong("UTC");
+        }
+        
+        val = encoded.get(5);
+        if (val > 32767) {
+            val = val - 65536;
+        }
+        _decimals = val;
+        _offset = val;
+        _scale = encoded.get(6);
+        _isScal = (_scale != 0);
+        
+        val = encoded.get(7);
+        _isClosed = (val != 0xffff);
+        if (val == 0xffff) {
+            val = 0;
+        }
+        _nRows = val;
+        duration_float = _nRows * 3600 / _samplesPerHour;
+        _duration = (int) Math.round(duration_float);
+        // precompute decoding parameters
+        _decexp = 1.0;
+        if (_scale == 0) {
+            i = 0;
+            while (i < _decimals) {
+                _decexp = _decexp * 10.0;
+                i = i + 1;
             }
-            if (jsonObj.has("interval")) {
-                _interval = jsonObj.getInt("interval");
-            }
-            if (jsonObj.has("nRows")) {
-                _nRows = jsonObj.getInt("nRows");
-            }
-            if (jsonObj.has("keys")) {
-                JSONArray jsonKeys = jsonObj.getJSONArray("keys");
-                if (_nCols == 0) {
-                    _nCols = jsonKeys.length();
-                } else if (_nCols != jsonKeys.length()) {
-                    _nCols = 0;
-                    throw new YAPI_Exception(YAPI.IO_ERROR, "DataStream corrupted");
+        }
+        iCalib = dataset.get_calibration();
+        _caltyp = iCalib.get(0);
+        if (_caltyp != 0) {
+            _calhdl = SafeYAPI()._getCalibrationHandler(_caltyp);
+            _calpar.clear();
+            _calraw.clear();
+            _calref.clear();
+            i = 1;
+            while (i + 1 < iCalib.size()) {
+                iRaw = iCalib.get(i);
+                iRef = iCalib.get(i + 1);
+                _calpar.add(iRaw);
+                _calpar.add(iRef);
+                if (_isScal) {
+                    fRaw = iRaw;
+                    fRaw = (fRaw - _offset) / _scale;
+                    fRef = iRef;
+                    fRef = (fRef - _offset) / _scale;
+                    _calraw.add(fRaw);
+                    _calref.add(fRef);
+                } else {
+                    _calraw.add(SafeYAPI()._decimalToDouble(iRaw));
+                    _calref.add(SafeYAPI()._decimalToDouble(iRef));
                 }
-                _columnNames = new ArrayList<String>(_runNo);
-                for (int i = 0; i < jsonKeys.length(); i++) {
-                    _columnNames.add(jsonKeys.getString(i));
-                }
+                i = i + 2;
             }
+        }
+        // preload column names for backward-compatibility
+        _functionId = dataset.get_functionId();
+        if (_isAvg) {
+            _columnNames.clear();
+            _columnNames.add(String.format("%s_min",_functionId));
+            _columnNames.add(String.format("%s_avg",_functionId));
+            _columnNames.add(String.format("%s_max",_functionId));
+            _nCols = 3;
+        } else {
+            _columnNames.clear();
+            _columnNames.add(_functionId);
+            _nCols = 1;
+        }
+        // decode min/avg/max values for the sequence
+        if (_nRows > 0) {
+            _minVal = _decodeVal(encoded.get(8));
+            _maxVal = _decodeVal(encoded.get(9));
+            _avgVal = _decodeAvg(encoded.get(10) + (((encoded.get(11)) << (16))), _nRows);
+        }
+        return 0;
+    }
 
-            if (jsonObj.has("div")) {
-                coldiv = jsonObj.getJSONArray("div");
-                if (_nCols == 0) {
-                    _nCols = coldiv.length();
-                } else if (_nCols != coldiv.length()) {
-                    _nCols = 0;
-                    throw new YAPI_Exception(YAPI.IO_ERROR, "DataStream corrupted");
-                }
+    public int parse(byte[] sdata)  throws YAPI_Exception
+    {
+        int idx = 0;
+        ArrayList<Integer> udat = new ArrayList<Integer>();
+        ArrayList<Double> dat = new ArrayList<Double>();
+        // may throw an exception
+        udat = SafeYAPI()._decodeWords(_parent._json_get_string(sdata));
+        _values.clear();
+        idx = 0;
+        if (_isAvg) {
+            while (idx + 3 < udat.size()) {
+                dat.clear();
+                dat.add(_decodeVal(udat.get(idx)));
+                dat.add(_decodeAvg(udat.get(idx + 2) + (((udat.get(idx + 3)) << (16))), 1));
+                dat.add(_decodeVal(udat.get(idx + 1)));
+                _values.add((ArrayList<Double>)dat.clone());
+                idx = idx + 4;
             }
-
-
-            if (jsonObj.has("type")) {
-                JSONArray types = jsonObj.getJSONArray("type");
-                if (_nCols == 0) {
-                    _nCols = types.length();
-                } else if (_nCols != types.length()) {
-                    _nCols = 0;
-                    throw new YAPI_Exception(YAPI.IO_ERROR, "DataStream corrupted");
-                }
-                coltyp = new int[_nCols];
-                for (int c=0;c<_nCols;c++) {
-                    coltyp[c] = types.getInt(c);
-                }
-            }
-
-            if (jsonObj.has("scal")) {
-
-                JSONArray json_colscl = jsonObj.getJSONArray("scal");
-                if (_nCols == 0) {
-                    _nCols = json_colscl.length();
-                } else if (_nCols != json_colscl.length()) {
-                    _nCols = 0;
-                    throw new YAPI_Exception(YAPI.IO_ERROR, "DataStream corrupted");
-                }
-                colscl = new double[json_colscl.length()];
-                colofs = new int[json_colscl.length()];
-                for (int i = 0; i < json_colscl.length(); i++) {
-                    double dval = json_colscl.getDouble(i);
-                    colscl[i] = dval / 65536.0;
-                    colofs[i] = (coltyp[i] != 0 ? -32767 : 0);
+        } else {
+            if (_isScal) {
+                while (idx < udat.size()) {
+                    dat.clear();
+                    dat.add(_decodeVal(udat.get(idx)));
+                    _values.add((ArrayList<Double>)dat.clone());
+                    idx = idx + 1;
                 }
             } else {
-                colscl = new double[coldiv.length()];
-                colofs = new int[coldiv.length()];
-                for (int i = 0; i < coldiv.length(); i++) {
-                    colscl[i] = 1.0 / coldiv.getDouble(i);
-                    colofs[i] = (coltyp[i] != 0 ? -32767 : 0);
-                }
-
-            }
-
-            if (jsonObj.has("cal")) {
-                JSONArray jsonCal = jsonObj.getJSONArray("cal");
-                calhdl = new YAPI.CalibrationHandlerCallback[jsonCal.length()];
-                caltyp = new int[jsonCal.length()];
-                calpar = new ArrayList<ArrayList<Integer>>(jsonCal.length());
-                calraw = new ArrayList<ArrayList<Double>>(jsonCal.length());
-                calref = new ArrayList<ArrayList<Double>>(jsonCal.length());
-                for (int c = 0; c > jsonCal.length(); c++) {
-                    String calibration_str = jsonCal.getString(c);
-                    ArrayList<Integer> cur_calpar = new ArrayList<Integer>();
-                    ArrayList<Double>  cur_calraw = new ArrayList<Double>();
-                    ArrayList<Double>  cur_calref = new ArrayList<Double>();
-                    int calibType = YAPI._decodeCalibrationPoints(calibration_str
-                                                        ,cur_calpar
-                                                        ,cur_calraw
-                                                        ,cur_calref
-                                                        ,colscl[c]
-                                                        ,colofs[c]);
-                    calhdl[c] = YAPI.getCalibrationHandler(calibType);
-                    caltyp[c] = calibType;
-                    calpar.set(c,cur_calpar);
-                    calraw.set(c,cur_calraw);
-                    calref.set(c,cur_calref);
-                }
-            }
-        } catch (JSONException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, "json parse error");
-        }
-
-        if (jsonObj!=null && jsonObj.has("data")) {
-            if (_nCols == 0 || coldiv == null || coltyp == null) {
-                throw new YAPI_Exception(YAPI.IO_ERROR, "DataStream corrupted");
-            }
-            ArrayList<Integer> udata = null;
-            try {
-                String data = jsonObj.getString("data");
-                udata = new ArrayList<Integer>();
-                int datalen = data.length();
-                int i = 0;
-                while (i < datalen) {
-                    char c = data.charAt(i++);
-                    if (c >= 'a') {
-                        int srcpos = udata.size() - 1 - (c - 97);
-                        if (srcpos < 0) {
-                            throw new YAPI_Exception(YAPI.IO_ERROR, "");
-                        }
-                        udata.add(udata.get(srcpos));
-                    } else {
-                        if (i + 2 > datalen) {
-                            throw new YAPI_Exception(YAPI.IO_ERROR, "");
-                        }
-                        int val = c - 48;
-                        c = data.charAt(i++);
-                        val += (c - 48) << 5;
-                        c = data.charAt(i++);
-                        if (c == 'z') {
-                            c ='\\' ;
-                        } 
-                        val += (c - 48) << 10;
-                        udata.add(val);
-                    }
-                }
-            } catch (JSONException ex) {
-            }
-
-            if (udata == null) {
-                try {
-                    JSONArray jsonData = jsonObj.getJSONArray("data");
-                    udata = new ArrayList<Integer>();
-                    for (int i = 0; i < jsonData.length(); i++) {
-                        udata.add(jsonData.getInt(i));
-                    }
-                } catch (JSONException ex) {
-                    throw new YAPI_Exception(YAPI.IO_ERROR, "");
-                }
-
-            }
-            _values = new ArrayList<ArrayList<Double>>();
-            ArrayList<Double> dat = new ArrayList<Double>();
-            int c = 0;
-            for (int val_i : udata) {
-                double val_d;
-                if (coltyp[c] < 2) {
-                    val_d = (val_i + colofs[c]) * colscl[c];
-                } else {
-                    val_d = YAPI._decimalToDouble(val_i-32767);
-                }
-                if (calhdl != null && calhdl[c] != null) {
-                    YAPI.CalibrationHandlerCallback handler = calhdl[c];
-                    // use post-calibration function
-                    double cval=val_d;
-                    if(caltyp[c] <= 10) {
-                        // linear calibration using unscaled value                        cval = ;
-                        cval = handler.yCalibrationHandler((val_i + colofs[c]) + colscl[c], caltyp[c], calpar.get(c), calraw.get(c), calref.get(c));
-                    } else if(caltyp[c] > 20) {
-                        // custom calibration function: floating-point value is uncalibrated in the datalogger
-                        cval = handler.yCalibrationHandler(val_d, caltyp[c], calpar.get(c), calraw.get(c), calref.get(c));
-                    }
-                    dat.add(cval);
-                } else {
-                    // simply map value to range
-                    dat.add(val_d);
-                }
-                c++;
-                if (c == _nCols) {
-                    _values.add(dat);
-                    dat = new ArrayList<Double>();
-                    c = 0;
+                while (idx + 1 < udat.size()) {
+                    dat.clear();
+                    dat.add(_decodeAvg(udat.get(idx) + (((udat.get(idx + 1)) << (16))), 1));
+                    _values.add((ArrayList<Double>)dat.clone());
+                    idx = idx + 2;
                 }
             }
         }
+        
+        _nRows = _values.size();
         return YAPI.SUCCESS;
+    }
+
+    public String get_url()
+    {
+        String url;
+        url = String.format("logger.json?id=%s&run=%d&utc=%d",
+        _functionId,_runNo,_utcStamp);
+        return url;
+    }
+
+    public int loadStream()  throws YAPI_Exception
+    {
+        return parse(_parent._download(get_url()));
+    }
+
+    public double _decodeVal(int w)
+    {
+        double val = 0;
+        val = w;
+        if (_isScal) {
+            val = (val - _offset) / _scale;
+        } else {
+            val = SafeYAPI()._decimalToDouble(w);
+        }
+        if (_caltyp != 0) {
+            val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
+        }
+        return val;
+    }
+
+    public double _decodeAvg(int dw,int count)
+    {
+        double val = 0;
+        val = dw;
+        if (_isScal) {
+            val = (val / (100 * count) - _offset) / _scale;
+        } else {
+            val = val / (count * _decexp);
+        }
+        if (_caltyp != 0) {
+            val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
+        }
+        return val;
+    }
+
+    public boolean isClosed()
+    {
+        return _isClosed;
     }
 
     /**
      * Returns the run index of the data stream. A run can be made of
      * multiple datastreams, for different time intervals.
-     * 
-     * This method does not cause any access to the device, as the value
-     * is preloaded in the object at instantiation time.
      * 
      * @return an unsigned number corresponding to the run index.
      */
@@ -324,25 +303,13 @@ public class YDataStream {
     }
 
     /**
-     * Returns the run index of the data stream. A run can be made of multiple
-     * datastreams, for different time intervals.
-     *
-     * This method does not cause any access to the device, as the value is
-     * preloaded in the object at instantiation time.
-     *
-     * @return an unsigned number corresponding to the run index.
-     */
-    public int getRunIndex()
-    {
-        return _runNo;
-    }
-
-    /**
-     * Returns the start time of the data stream, relative to the beginning
-     * of the run. If you need an absolute time, use get_startTimeUTC().
-     * 
-     * This method does not cause any access to the device, as the value
-     * is preloaded in the object at instantiation time.
+     * Returns the relative start time of the data stream, measured in seconds.
+     * For recent firmwares, the value is relative to the present time,
+     * which means the value is always negative.
+     * If the device uses a firmware older than version 13000, value is
+     * relative to the start of the time the device was powered on, and
+     * is always positive.
+     * If you need an absolute UTC timestamp, use get_startTimeUTC().
      * 
      * @return an unsigned number corresponding to the number of seconds
      *         between the start of the run and the beginning of this data
@@ -350,22 +317,7 @@ public class YDataStream {
      */
     public int get_startTime()
     {
-        return _timeStamp;
-    }
-
-    /**
-     * Returns the start time of the data stream, relative to the beginning of
-     * the run. If you need an absolute time, use get_startTimeUTC().
-     *
-     * This method does not cause any access to the device, as the value is
-     * preloaded in the object at instantiation time.
-     *
-     * @return an unsigned number corresponding to the number of seconds between
-     * the start of the run and the beginning of this data stream.
-     */
-    public int getStartTime()
-    {
-        return _timeStamp;
+        return (int)(_utcStamp - (System.currentTimeMillis() / 1000L));
     }
 
     /**
@@ -373,99 +325,51 @@ public class YDataStream {
      * If the UTC time was not set in the datalogger at the time of the recording
      * of this data stream, this method returns 0.
      * 
-     * This method does not cause any access to the device, as the value
-     * is preloaded in the object at instantiation time.
-     * 
      * @return an unsigned number corresponding to the number of seconds
      *         between the Jan 1, 1970 and the beginning of this data
      *         stream (i.e. Unix time representation of the absolute time).
      */
     public long get_startTimeUTC()
     {
-        return this._utcStamp;
+        return _utcStamp;
     }
 
     /**
-     * Returns the start time of the data stream, relative to the Jan 1, 1970.
-     * If the UTC time was not set in the datalogger at the time of the
-     * recording of this data stream, this method returns 0.
-     *
-     * This method does not cause any access to the device, as the value is
-     * preloaded in the object at instantiation time.
-     *
-     * @return an unsigned number corresponding to the number of seconds between
-     * the Jan 1, 1970 and the beginning of this data stream (i.e. Unix time
-     * representation of the absolute time).
-     */
-    public long getStartTimeUTC()
-    {
-        return this._utcStamp;
-    }
-
-    /**
-     * Returns the number of seconds elapsed between  two consecutive
+     * Returns the number of milliseconds between two consecutive
      * rows of this data stream. By default, the data logger records one row
-     * per second, but there might be alternative streams at lower resolution
-     * created by summarizing the original stream for archiving purposes.
+     * per second, but the recording frequency can be changed for
+     * each device function
      * 
-     * This method does not cause any access to the device, as the value
-     * is preloaded in the object at instantiation time.
-     * 
-     * @return an unsigned number corresponding to a number of seconds.
+     * @return an unsigned number corresponding to a number of milliseconds.
      */
-    public int get_dataSamplesInterval()
+    public int get_dataSamplesIntervalMs()
     {
-        return _interval;
+        return ((3600000) / (_samplesPerHour));
     }
 
-    /**
-     * Returns the number of seconds elapsed between two consecutive rows of
-     * this data stream. By default, the data logger records one row per second,
-     * but there might be alternative streams at lower resolution created by
-     * summarizing the original stream for archiving purposes.
-     *
-     * This method does not cause any access to the device, as the value is
-     * preloaded in the object at instantiation time.
-     *
-     * @return an unsigned number corresponding to a number of seconds.
-     */
-    public int getDataSamplesInterval()
+    public double get_dataSamplesInterval()
     {
-        return _interval;
+        return 3600.0 / _samplesPerHour;
     }
 
     /**
      * Returns the number of data rows present in this stream.
      * 
-     * This method fetches the whole data stream from the device,
-     * if not yet done.
+     * If the device uses a firmware older than version 13000,
+     * this method fetches the whole data stream from the device
+     * if not yet done, which can cause a little delay.
      * 
      * @return an unsigned number corresponding to the number of rows.
      * 
      * @throws YAPI_Exception
      */
-    public int get_rowCount() throws YAPI_Exception
+    public int get_rowCount()  throws YAPI_Exception
     {
-        if (_nRows == 0) {
-            loadStream();
+        if ((_nRows != 0) && _isClosed) {
+            return _nRows;
         }
+        loadStream();
         return _nRows;
-    }
-
-    /**
-     * Returns the number of data rows present in this stream.
-     *
-     * This method fetches the whole data stream from the device, if not yet
-     * done.
-     *
-     * @return an unsigned number corresponding to the number of rows.
-     *
-     * On failure, throws an exception or returns zero.
-     * @throws YAPI_Exception
-     */
-    public int getRowCount() throws YAPI_Exception
-    {
-        return get_rowCount();
     }
 
     /**
@@ -473,84 +377,107 @@ public class YDataStream {
      * The meaning of the values present in each column can be obtained
      * using the method get_columnNames().
      * 
-     * This method fetches the whole data stream from the device,
-     * if not yet done.
+     * If the device uses a firmware older than version 13000,
+     * this method fetches the whole data stream from the device
+     * if not yet done, which can cause a little delay.
      * 
-     * @return an unsigned number corresponding to the number of rows.
+     * @return an unsigned number corresponding to the number of columns.
      * 
      * @throws YAPI_Exception
      */
-    public int get_columnCount() throws YAPI_Exception
+    public int get_columnCount()  throws YAPI_Exception
     {
-        if (_nCols == 0) {
-            loadStream();
+        if (_nCols != 0) {
+            return _nCols;
         }
+        loadStream();
         return _nCols;
     }
 
     /**
-     * Returns the number of data columns present in this stream. The meaning of
-     * the values present in each column can be obtained using the method
-     * get_columnNames().
-     *
-     * This method fetches the whole data stream from the device, if not yet
-     * done.
-     *
-     * @return an unsigned number corresponding to the number of rows.
-     *
-     * On failure, throws an exception or returns zero.
-     * @throws YAPI_Exception
-     */
-    public int getColumnCount() throws YAPI_Exception
-    {
-        return get_columnCount();
-    }
-
-    /**
-     * Returns the title (or meaning) of each data column present in this
-     * stream. In most case, the title of the data column is the hardware
-     * identifier of the sensor that produced the data. For archived streams
-     * created by summarizing a high-resolution data stream, there can be a
-     * suffix appended to the sensor identifier, such as _min for the minimum
-     * value, _avg for the average value and _max for the maximal value.
-     *
-     * This method fetches the whole data stream from the device, if not yet
-     * done.
-     *
+     * Returns the title (or meaning) of each data column present in this stream.
+     * In most case, the title of the data column is the hardware identifier
+     * of the sensor that produced the data. For streams recorded at a lower
+     * recording rate, the dataLogger stores the min, average and max value
+     * during each measure interval into three columns with suffixes _min,
+     * _avg and _max respectively.
+     * 
+     * If the device uses a firmware older than version 13000,
+     * this method fetches the whole data stream from the device
+     * if not yet done, which can cause a little delay.
+     * 
      * @return a list containing as many strings as there are columns in the
-     * data stream.
-     *
-     * On failure, throws an exception or returns an empty array.
+     *         data stream.
+     * 
      * @throws YAPI_Exception
      */
-    public String[] get_columnNames() throws YAPI_Exception
+    public ArrayList<String> get_columnNames()  throws YAPI_Exception
     {
-        if (_columnNames.isEmpty()) {
-            loadStream();
+        if (_columnNames.size() != 0) {
+            return _columnNames;
         }
-        return _columnNames.toArray(new String[0]);
+        loadStream();
+        return _columnNames;
     }
 
     /**
-     * Returns the title (or meaning) of each data column present in this
-     * stream. In most case, the title of the data column is the hardware
-     * identifier of the sensor that produced the data. For archived streams
-     * created by summarizing a high-resolution data stream, there can be a
-     * suffix appended to the sensor identifier, such as _min for the minimum
-     * value, _avg for the average value and _max for the maximal value.
-     *
-     * This method fetches the whole data stream from the device, if not yet
-     * done.
-     *
-     * @return a list containing as many strings as there are columns in the
-     * data stream.
-     *
-     * On failure, throws an exception or returns an empty array.
+     * Returns the smallest measure observed within this stream.
+     * If the device uses a firmware older than version 13000,
+     * this method will always return YDataStream.DATA_INVALID.
+     * 
+     * @return a floating-point number corresponding to the smallest value,
+     *         or YDataStream.DATA_INVALID if the stream is not yet complete (still recording).
+     * 
      * @throws YAPI_Exception
      */
-    public String[] getColumnNames() throws YAPI_Exception
+    public double get_minValue()  throws YAPI_Exception
     {
-        return get_columnNames();
+        return _minVal;
+    }
+
+    /**
+     * Returns the average of all measures observed within this stream.
+     * If the device uses a firmware older than version 13000,
+     * this method will always return YDataStream.DATA_INVALID.
+     * 
+     * @return a floating-point number corresponding to the average value,
+     *         or YDataStream.DATA_INVALID if the stream is not yet complete (still recording).
+     * 
+     * @throws YAPI_Exception
+     */
+    public double get_averageValue()  throws YAPI_Exception
+    {
+        return _avgVal;
+    }
+
+    /**
+     * Returns the largest measure observed within this stream.
+     * If the device uses a firmware older than version 13000,
+     * this method will always return YDataStream.DATA_INVALID.
+     * 
+     * @return a floating-point number corresponding to the largest value,
+     *         or YDataStream.DATA_INVALID if the stream is not yet complete (still recording).
+     * 
+     * @throws YAPI_Exception
+     */
+    public double get_maxValue()  throws YAPI_Exception
+    {
+        return _maxVal;
+    }
+
+    /**
+     * Returns the approximate duration of this stream, in seconds.
+     * 
+     * @return the number of seconds covered by this stream.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int get_duration()  throws YAPI_Exception
+    {
+        if (_isClosed) {
+            return _duration;
+        }
+        return (int)((System.currentTimeMillis() / 1000L) - _utcStamp);
     }
 
     /**
@@ -568,31 +495,12 @@ public class YDataStream {
      * 
      * @throws YAPI_Exception
      */
-    public ArrayList<ArrayList<Double>> get_dataRows() throws YAPI_Exception
+    public ArrayList<ArrayList<Double>> get_dataRows()  throws YAPI_Exception
     {
-        if (_values.isEmpty()) {
+        if ((_values.size() == 0) || !(_isClosed)) {
             loadStream();
         }
         return _values;
-    }
-
-    /**
-     * Returns the whole data set contained in the stream, as a bidimensional
-     * table of numbers. The meaning of the values present in each column can be
-     * obtained using the method get_columnNames().
-     *
-     * This method fetches the whole data stream from the device, if not yet
-     * done.
-     *
-     * @return a list containing as many elements as there are rows in the data
-     * stream. Each row itself is a list of floating-point numbers.
-     *
-     * On failure, throws an exception or returns an empty array.
-     * @throws YAPI_Exception
-     */
-    public ArrayList<ArrayList<Double>>  getDataRows() throws YAPI_Exception
-    {
-        return get_dataRows();
     }
 
     /**
@@ -611,38 +519,19 @@ public class YDataStream {
      * 
      * @throws YAPI_Exception
      */
-    public double get_data(int row, int col) throws YAPI_Exception
+    public double get_data(int row,int col)  throws YAPI_Exception
     {
-        if (_values.isEmpty()) {
+        if ((_values.size() == 0) || !(_isClosed)) {
             loadStream();
         }
         if (row >= _values.size()) {
             return DATA_INVALID;
         }
-        if (col >= _nCols) {
+        if (col >= _values.get(row).size()) {
             return DATA_INVALID;
         }
         return _values.get(row).get(col);
     }
 
-    /**
-     * Returns a single measure from the data stream, specified by its row and
-     * column index. The meaning of the values present in each column can be
-     * obtained using the method get_columnNames().
-     *
-     * This method fetches the whole data stream from the device, if not yet
-     * done.
-     *
-     * @param row : row index
-     * @param col : column index
-     *
-     * @return a floating-point number
-     *
-     * On failure, throws an exception or returns Y_DATA_INVALID.
-     * @throws YAPI_Exception
-     */
-    public double getData(int row, int col) throws YAPI_Exception
-    {
-        return get_data(row, col);
-    }
+    //--- (end of generated code: YDataStream implementation)
 }

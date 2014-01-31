@@ -1,16 +1,42 @@
 import com.yoctopuce.YoctoAPI.*;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Demo {
 
+    public static void dumpSensor(YSensor sensor) throws YAPI_Exception {
+        SimpleDateFormat ft = new SimpleDateFormat ("dd MMM yyyy hh:mm:ss,SSS");
+        System.out.println("Using DataLogger of " + sensor.get_friendlyName());
+        YDataSet dataset = sensor.get_recordedData(0, 0);
+        System.out.println("loading summary... ");
+        dataset.loadMore();
+        YMeasure summary = dataset.get_summary();
+        String line = String.format("from %s to %s : min=%.3f%s avg=%.3f%s  max=%.3f%s",
+                ft.format(summary.get_startTimeUTC_asDate()),ft.format(summary.get_endTimeUTC_asDate()),summary.get_minValue(),sensor.get_unit(),summary.get_averageValue(),sensor.get_unit(), summary.get_maxValue(),sensor.get_unit());
+        System.out.println(line);
+        System.out.print("loading details :   0%");
+        int progress=0;
+        do {
+            progress = dataset.loadMore();
+            System.out.print(String.format("\b\b\b\b%3d%%",progress));
+        } while(progress <100);
+        ArrayList<YMeasure> details = dataset.get_measures();
+        for(YMeasure m :details) {
+            System.out.println(String.format("from %s to %s : min=%.3f%s avg=%.3f%s  max=%.3f%s",
+                    ft.format(m.get_startTimeUTC_asDate()),ft.format(m.get_endTimeUTC_asDate()),m.get_minValue(),sensor.get_unit(),m.get_averageValue(),sensor.get_unit(), m.get_maxValue(),sensor.get_unit()));
+        }
+    }
+
+
     public static void main(String[] args)
     {
         try {
             try {
                 // setup the API to use local VirtualHub
-                YAPI.RegisterHub("http://127.0.0.1:4444/");
+                YAPI.RegisterHub("127.0.0.1");
             } catch (YAPI_Exception ex) {
                 System.out.println("Cannot contact VirtualHub on 127.0.0.1 (" + ex.getLocalizedMessage() + ")");
                 System.out.println("Ensure that the VirtualHub application is running");
@@ -18,38 +44,21 @@ public class Demo {
             }
 
 
-            YDataLogger logger;
+            YSensor sensor;
             if (args.length == 0) {
-                logger = YDataLogger.FirstDataLogger();
-                if (logger == null) {
+                sensor = YSensor.FirstSensor();
+                if (sensor == null) {
                     System.out.println("No module connected (check USB cable)");
                     System.exit(1);
                 }
             } else {
-                logger = YDataLogger.FindDataLogger(args[0] + ".datalogger");
-                if (!logger.isOnline()) {
-                    System.out.println("datalogger " + logger + " is notconnected (check USB cable)");
+                sensor = YSensor.FindSensor(args[0]);
+                if (!sensor.isOnline()) {
+                    System.out.println("Sensor " + sensor + " is not connected (check USB cable)");
                     System.exit(1);
                 }
             }
-
-            // Main page: display controllers and result frames
-            System.out.println("Data Logger demo<");
-            System.out.println("Module to use: <input name='serial' value='$serial'><br><br>");
-            ArrayList<YDataStream> streams = null;
-            // Handle recorder on/off state
-            // Dump list of available streams
-            logger.get_dataStreams(streams);
-            System.out.println("Available data streams in the data logger:<br>");
-            System.out.println("<table border=1>\n<tr><th>Run</th><th>Relative time</th>"
-                    + "<th>UTC time</th><th>Measures interval</th></tr>\n");
-            for (YDataStream stream : streams) {
-                int run = stream.getRunIndex();
-                int time = stream.getStartTime();
-                long utc = stream.getStartTimeUTC();
-                int itv = stream.getDataSamplesInterval();
-                System.out.println("<tr><td>#$run</td><td>$time [s]</td><td>$utc</td><td>$itv [s]</td>");
-            }
+            dumpSensor(sensor);
             YAPI.FreeAPI();
         } catch (YAPI_Exception ex) {
             Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);

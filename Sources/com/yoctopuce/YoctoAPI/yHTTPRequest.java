@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yHTTPRequest.java 12426 2013-08-20 13:58:34Z seb $
+ * $Id: yHTTPRequest.java 14779 2014-01-30 14:56:39Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -39,15 +39,16 @@
 
 package com.yoctopuce.YoctoAPI;
 
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.Date;
 
 
 class yHTTPRequest implements Runnable{
-
-
-
 
     private enum State {
         AVAIL, IN_REQUEST,STOPED
@@ -63,16 +64,23 @@ class yHTTPRequest implements Runnable{
     private boolean                 _eof;
     private String                  _firstLine;
     private byte[]                  _rest_of_request;
-    @SuppressWarnings("unused")
     private String                  _dbglabel;
     private final StringBuilder     _header = new StringBuilder(1024);
     private Boolean                 _header_found;
     private final ByteArrayOutputStream _result = new ByteArrayOutputStream(1024);
-
+    private Date                    _lastReceiveDate;
+    private long                    _noTrafficTimeout=0;
+    
     yHTTPRequest(YHTTPHub hub,String dbglabel)
     {
         _hub = hub;
         _dbglabel =dbglabel;
+    }
+
+    public void setNoTrafficTimeout(int noTrafficTimeout) throws SocketException {
+        if(_socket!=null)    
+            _socket.setSoTimeout(noTrafficTimeout);
+        this._noTrafficTimeout = noTrafficTimeout;
     }
 
 
@@ -126,6 +134,8 @@ class yHTTPRequest implements Runnable{
             _eof=false;
 	    _out.write(full_request);
             _out.flush();
+            _lastReceiveDate= null;
+
         }
         catch (UnknownHostException e)
         {
@@ -155,7 +165,7 @@ class yHTTPRequest implements Runnable{
                 _socket.close();
                 _socket = null;
             }
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
     }
 
@@ -169,7 +179,7 @@ class yHTTPRequest implements Runnable{
      int _requestProcesss() throws YAPI_Exception
     {
         boolean retry;
-        int read;
+        int read = 0;
 
         if(_eof)
             return -1;
@@ -179,6 +189,14 @@ class yHTTPRequest implements Runnable{
             byte[] buffer = new byte[1024];
             try {
                 read = _in.read(buffer,0,buffer.length);
+            }catch (SocketTimeoutException e){
+                Date now= new Date();
+                if(_lastReceiveDate==null || now.getTime()-_lastReceiveDate.getTime() < _noTrafficTimeout) {
+                    retry = true;
+                    continue;   
+                }
+                long timeout = now.getTime()-_lastReceiveDate.getTime();
+                throw new YAPI_Exception(YAPI.TIMEOUT,String.format("Hub did not send data durring %d seconds",timeout/1000));
             } catch (IOException e) {
                 throw new YAPI_Exception(YAPI.IO_ERROR,e.getLocalizedMessage());
             }
@@ -186,6 +204,7 @@ class yHTTPRequest implements Runnable{
                 // end of connection
                 _eof=true;
             }else if(read>0){
+                _lastReceiveDate= new Date();
                 synchronized(_result) {
                     if( !_header_found ) {
                         String partial_head = new String(buffer,0,read);
@@ -213,7 +232,6 @@ class yHTTPRequest implements Runnable{
                                     } else {
                                         _hub.parseWWWAuthenticate(_header.toString());
                                         _requestReset();
-                                        retry=true;
                                         break;
                                     }
 
@@ -237,7 +255,7 @@ class yHTTPRequest implements Runnable{
 
     byte[] getPartialResult() throws YAPI_Exception
     {
-        byte[] res=null;
+        byte[] res;
         synchronized(_result) {
             if(!_header_found)
                 return null;
@@ -292,7 +310,7 @@ class yHTTPRequest implements Runnable{
             do {
                 read = _requestProcesss();
             } while (read >= 0);
-        } catch (YAPI_Exception ex) {
+        } catch (YAPI_Exception ignored) {
         }
         _requestStop();
         _requestRelease();
@@ -305,6 +323,7 @@ class yHTTPRequest implements Runnable{
         try {
            _requestStart(req_first_line,req_head_and_body);
            Thread t = new Thread(this);
+           t.setName(_dbglabel);
            t.start();
         } catch (YAPI_Exception ex) {
             _requestRelease();
@@ -324,7 +343,7 @@ class yHTTPRequest implements Runnable{
             }
         }
         if(_state == State.IN_REQUEST)
-            YAPI.Log("WARNING: Last Http request did not finished");
+            SafeYAPI()._Log("WARNING: Last Http request did not finished");
         _state   = State.STOPED;
     }
 

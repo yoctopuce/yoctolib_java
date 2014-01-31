@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOsControl.java 12337 2013-08-14 15:22:22Z mvuilleu $
+ * $Id: YOsControl.java 14779 2014-01-30 14:56:39Z seb $
  *
  * Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -38,9 +38,13 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+import org.json.JSONException;
+import org.json.JSONObject;
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-//--- (globals)
-//--- (end of globals)
+    //--- (YOsControl return codes)
+    //--- (end of YOsControl return codes)
+//--- (YOsControl class start)
 /**
  * YOsControl Class: OS control
  * 
@@ -50,123 +54,62 @@ package com.yoctopuce.YoctoAPI;
  */
 public class YOsControl extends YFunction
 {
-    //--- (definitions)
-    private YOsControl.UpdateCallback _valueCallbackOsControl;
-    /**
-     * invalid logicalName value
-     */
-    public static final String LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-    /**
-     * invalid advertisedValue value
-     */
-    public static final String ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
+//--- (end of YOsControl class start)
+//--- (YOsControl definitions)
     /**
      * invalid shutdownCountdown value
      */
-    public static final int SHUTDOWNCOUNTDOWN_INVALID = YAPI.INVALID_UNSIGNED;
-    //--- (end of definitions)
+    public static final int SHUTDOWNCOUNTDOWN_INVALID = YAPI.INVALID_UINT;
+    protected int _shutdownCountdown = SHUTDOWNCOUNTDOWN_INVALID;
+    protected UpdateCallback _valueCallbackOsControl = null;
 
     /**
-     * UdateCallback for OsControl
+     * Deprecated UpdateCallback for OsControl
      */
     public interface UpdateCallback {
         /**
          * 
-         * @param function : the function object of which the value has changed
-         * @param functionValue :the character string describing the new advertised value
+         * @param function      : the function object of which the value has changed
+         * @param functionValue : the character string describing the new advertised value
          */
         void yNewValue(YOsControl function, String functionValue);
     }
 
+    /**
+     * TimedReportCallback for OsControl
+     */
+    public interface TimedReportCallback {
+        /**
+         * 
+         * @param function : the function object of which the value has changed
+         * @param measure  : measure
+         */
+        void timedReportCallback(YOsControl  function, YMeasure measure);
+    }
+    //--- (end of YOsControl definitions)
 
+
+    /**
+     * 
+     * @param func : functionid
+     */
+    protected YOsControl(String func)
+    {
+        super(func);
+        _className = "OsControl";
+        //--- (YOsControl attributes initialization)
+        //--- (end of YOsControl attributes initialization)
+    }
 
     //--- (YOsControl implementation)
-
-    /**
-     * Returns the logical name of the OS control, corresponding to the network name of the module.
-     * 
-     * @return a string corresponding to the logical name of the OS control, corresponding to the network
-     * name of the module
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_logicalName()  throws YAPI_Exception
+    @Override
+    protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
-        String json_val = (String) _getAttr("logicalName");
-        return json_val;
+        if (json_val.has("shutdownCountdown")) {
+            _shutdownCountdown =  json_val.getInt("shutdownCountdown");
+        }
+        super._parseAttr(json_val);
     }
-
-    /**
-     * Returns the logical name of the OS control, corresponding to the network name of the module.
-     * 
-     * @return a string corresponding to the logical name of the OS control, corresponding to the network
-     * name of the module
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getLogicalName() throws YAPI_Exception
-
-    { return get_logicalName(); }
-
-    /**
-     * Changes the logical name of the OS control. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the OS control
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int set_logicalName( String  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = newval;
-        _setAttr("logicalName",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the logical name of the OS control. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the OS control
-     * 
-     * @return YAPI_SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int setLogicalName( String newval)  throws YAPI_Exception
-
-    { return set_logicalName(newval); }
-
-    /**
-     * Returns the current value of the OS control (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the OS control (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_advertisedValue()  throws YAPI_Exception
-    {
-        String json_val = (String) _getAttr("advertisedValue");
-        return json_val;
-    }
-
-    /**
-     * Returns the current value of the OS control (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the OS control (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getAdvertisedValue() throws YAPI_Exception
-
-    { return get_advertisedValue(); }
 
     /**
      * Returns the remaining number of seconds before the OS shutdown, or zero when no
@@ -179,8 +122,12 @@ public class YOsControl extends YFunction
      */
     public int get_shutdownCountdown()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("shutdownCountdown");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SHUTDOWNCOUNTDOWN_INVALID;
+            }
+        }
+        return _shutdownCountdown;
     }
 
     /**
@@ -196,48 +143,17 @@ public class YOsControl extends YFunction
 
     { return get_shutdownCountdown(); }
 
-    public int set_shutdownCountdown( int  newval)  throws YAPI_Exception
+    public int set_shutdownCountdown(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
+        rest_val = Integer.toString(newval);
         _setAttr("shutdownCountdown",rest_val);
         return YAPI.SUCCESS;
     }
 
-    public int setShutdownCountdown( int newval)  throws YAPI_Exception
+    public int setShutdownCountdown(int newval)  throws YAPI_Exception
 
     { return set_shutdownCountdown(newval); }
-
-    /**
-     * Schedules an OS shutdown after a given number of seconds.
-     * 
-     * @param secBeforeShutDown : number of seconds before shutdown
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int shutdown(int secBeforeShutDown)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = Long.toString(secBeforeShutDown);
-        _setAttr("shutdownCountdown",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Continues the enumeration of OS control started using yFirstOsControl().
-     * 
-     * @return a pointer to a YOsControl object, corresponding to
-     *         OS control currently online, or a null pointer
-     *         if there are no more OS control to enumerate.
-     */
-    public  YOsControl nextOsControl()
-    {
-        String next_hwid = YAPI.getNextHardwareId(_className, _func);
-        if(next_hwid == null) return null;
-        return FindOsControl(next_hwid);
-    }
 
     /**
      * Retrieves OS control for a given identifier.
@@ -263,56 +179,14 @@ public class YOsControl extends YFunction
      * @return a YOsControl object allowing you to drive the OS control.
      */
     public static YOsControl FindOsControl(String func)
-    {   YFunction yfunc = YAPI.getFunction("OsControl", func);
-        if (yfunc != null) {
-            return (YOsControl) yfunc;
+    {
+        YOsControl obj;
+        obj = (YOsControl) YFunction._FindFromCache("OsControl", func);
+        if (obj == null) {
+            obj = new YOsControl(func);
+            YFunction._AddToCache("OsControl", func, obj);
         }
-        return new YOsControl(func);
-    }
-
-    /**
-     * Starts the enumeration of OS control currently accessible.
-     * Use the method YOsControl.nextOsControl() to iterate on
-     * next OS control.
-     * 
-     * @return a pointer to a YOsControl object, corresponding to
-     *         the first OS control currently online, or a null pointer
-     *         if there are none.
-     */
-    public static YOsControl FirstOsControl()
-    {
-        String next_hwid = YAPI.getFirstHardwareId("OsControl");
-        if (next_hwid == null)  return null;
-        return FindOsControl(next_hwid);
-    }
-
-    /**
-     * 
-     * @param func : functionid
-     */
-    private YOsControl(String func)
-    {
-        super("OsControl", func);
-    }
-
-    @Override
-    void advertiseValue(String newvalue)
-    {
-        super.advertiseValue(newvalue);
-        if (_valueCallbackOsControl != null) {
-            _valueCallbackOsControl.yNewValue(this, newvalue);
-        }
-    }
-
-    /**
-     * Internal: check if we have a callback interface registered
-     * 
-     * @return yes if the user has registered a interface
-     */
-    @Override
-     protected boolean hasCallbackRegistered()
-    {
-        return super.hasCallbackRegistered() || (_valueCallbackOsControl!=null);
+        return obj;
     }
 
     /**
@@ -326,21 +200,80 @@ public class YOsControl extends YFunction
      *         the new advertised value.
      * @noreturn
      */
-    public void registerValueCallback(YOsControl.UpdateCallback callback)
+    public int registerValueCallback(UpdateCallback callback)
     {
-         _valueCallbackOsControl =  callback;
-         if (callback != null && isOnline()) {
-             String newval;
-             try {
-                 newval = get_advertisedValue();
-                 if (!newval.equals("") && !newval.equals("!INVALDI!")) {
-                     callback.yNewValue(this, newval);
-                 }
-             } catch (YAPI_Exception ex) {
-             }
-         }
+        String val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        _valueCallbackOsControl = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && isOnline()) {
+            val = _advertisedValue;
+            if (!(val.equals(""))) {
+                _invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int _invokeValueCallback(String value)
+    {
+        if (_valueCallbackOsControl != null) {
+            _valueCallbackOsControl.yNewValue(this, value);
+        } else {
+            super._invokeValueCallback(value);
+        }
+        return 0;
+    }
+
+    /**
+     * Schedules an OS shutdown after a given number of seconds.
+     * 
+     * @param secBeforeShutDown : number of seconds before shutdown
+     * 
+     * @return YAPI.SUCCESS when the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int shutdown(int secBeforeShutDown)  throws YAPI_Exception
+    {
+        return set_shutdownCountdown(secBeforeShutDown);
+    }
+
+    /**
+     * Continues the enumeration of OS control started using yFirstOsControl().
+     * 
+     * @return a pointer to a YOsControl object, corresponding to
+     *         OS control currently online, or a null pointer
+     *         if there are no more OS control to enumerate.
+     */
+    public  YOsControl nextOsControl()
+    {
+        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        if(next_hwid == null) return null;
+        return FindOsControl(next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of OS control currently accessible.
+     * Use the method YOsControl.nextOsControl() to iterate on
+     * next OS control.
+     * 
+     * @return a pointer to a YOsControl object, corresponding to
+     *         the first OS control currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YOsControl FirstOsControl()
+    {
+        String next_hwid = SafeYAPI().getFirstHardwareId("OsControl");
+        if (next_hwid == null)  return null;
+        return FindOsControl(next_hwid);
     }
 
     //--- (end of YOsControl implementation)
-};
+}
 

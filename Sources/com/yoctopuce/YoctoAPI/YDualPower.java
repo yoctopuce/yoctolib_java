@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDualPower.java 12324 2013-08-13 15:10:31Z mvuilleu $
+ * $Id: YDualPower.java 14779 2014-01-30 14:56:39Z seb $
  *
  * Implements yFindDualPower(), the high-level API for DualPower functions
  *
@@ -38,9 +38,13 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+import org.json.JSONException;
+import org.json.JSONObject;
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-//--- (globals)
-//--- (end of globals)
+    //--- (YDualPower return codes)
+    //--- (end of YDualPower return codes)
+//--- (YDualPower class start)
 /**
  * YDualPower Class: External power supply control interface
  * 
@@ -52,16 +56,8 @@ package com.yoctopuce.YoctoAPI;
  */
 public class YDualPower extends YFunction
 {
-    //--- (definitions)
-    private YDualPower.UpdateCallback _valueCallbackDualPower;
-    /**
-     * invalid logicalName value
-     */
-    public static final String LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-    /**
-     * invalid advertisedValue value
-     */
-    public static final String ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
+//--- (end of YDualPower class start)
+//--- (YDualPower definitions)
     /**
      * invalid powerState value
      */
@@ -82,108 +78,65 @@ public class YDualPower extends YFunction
     /**
      * invalid extVoltage value
      */
-    public static final int EXTVOLTAGE_INVALID = YAPI.INVALID_UNSIGNED;
-    //--- (end of definitions)
+    public static final int EXTVOLTAGE_INVALID = YAPI.INVALID_UINT;
+    protected int _powerState = POWERSTATE_INVALID;
+    protected int _powerControl = POWERCONTROL_INVALID;
+    protected int _extVoltage = EXTVOLTAGE_INVALID;
+    protected UpdateCallback _valueCallbackDualPower = null;
 
     /**
-     * UdateCallback for DualPower
+     * Deprecated UpdateCallback for DualPower
      */
     public interface UpdateCallback {
         /**
          * 
-         * @param function : the function object of which the value has changed
-         * @param functionValue :the character string describing the new advertised value
+         * @param function      : the function object of which the value has changed
+         * @param functionValue : the character string describing the new advertised value
          */
         void yNewValue(YDualPower function, String functionValue);
     }
 
+    /**
+     * TimedReportCallback for DualPower
+     */
+    public interface TimedReportCallback {
+        /**
+         * 
+         * @param function : the function object of which the value has changed
+         * @param measure  : measure
+         */
+        void timedReportCallback(YDualPower  function, YMeasure measure);
+    }
+    //--- (end of YDualPower definitions)
 
+
+    /**
+     * 
+     * @param func : functionid
+     */
+    protected YDualPower(String func)
+    {
+        super(func);
+        _className = "DualPower";
+        //--- (YDualPower attributes initialization)
+        //--- (end of YDualPower attributes initialization)
+    }
 
     //--- (YDualPower implementation)
-
-    /**
-     * Returns the logical name of the power control.
-     * 
-     * @return a string corresponding to the logical name of the power control
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_logicalName()  throws YAPI_Exception
+    @Override
+    protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
-        String json_val = (String) _getAttr("logicalName");
-        return json_val;
+        if (json_val.has("powerState")) {
+            _powerState =  json_val.getInt("powerState");
+        }
+        if (json_val.has("powerControl")) {
+            _powerControl =  json_val.getInt("powerControl");
+        }
+        if (json_val.has("extVoltage")) {
+            _extVoltage =  json_val.getInt("extVoltage");
+        }
+        super._parseAttr(json_val);
     }
-
-    /**
-     * Returns the logical name of the power control.
-     * 
-     * @return a string corresponding to the logical name of the power control
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getLogicalName() throws YAPI_Exception
-
-    { return get_logicalName(); }
-
-    /**
-     * Changes the logical name of the power control. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the power control
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int set_logicalName( String  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = newval;
-        _setAttr("logicalName",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the logical name of the power control. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the power control
-     * 
-     * @return YAPI_SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int setLogicalName( String newval)  throws YAPI_Exception
-
-    { return set_logicalName(newval); }
-
-    /**
-     * Returns the current value of the power control (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the power control (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_advertisedValue()  throws YAPI_Exception
-    {
-        String json_val = (String) _getAttr("advertisedValue");
-        return json_val;
-    }
-
-    /**
-     * Returns the current value of the power control (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the power control (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getAdvertisedValue() throws YAPI_Exception
-
-    { return get_advertisedValue(); }
 
     /**
      * Returns the current power source for module functions that require lots of current.
@@ -196,8 +149,12 @@ public class YDualPower extends YFunction
      */
     public int get_powerState()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("powerState");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return POWERSTATE_INVALID;
+            }
+        }
+        return _powerState;
     }
 
     /**
@@ -223,8 +180,12 @@ public class YDualPower extends YFunction
      */
     public int get_powerControl()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("powerControl");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return POWERCONTROL_INVALID;
+            }
+        }
+        return _powerControl;
     }
 
     /**
@@ -250,10 +211,10 @@ public class YDualPower extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_powerControl( int  newval)  throws YAPI_Exception
+    public int set_powerControl(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
+        rest_val = Integer.toString(newval);
         _setAttr("powerControl",rest_val);
         return YAPI.SUCCESS;
     }
@@ -269,7 +230,7 @@ public class YDualPower extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setPowerControl( int newval)  throws YAPI_Exception
+    public int setPowerControl(int newval)  throws YAPI_Exception
 
     { return set_powerControl(newval); }
 
@@ -282,8 +243,12 @@ public class YDualPower extends YFunction
      */
     public int get_extVoltage()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("extVoltage");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return EXTVOLTAGE_INVALID;
+            }
+        }
+        return _extVoltage;
     }
 
     /**
@@ -296,20 +261,6 @@ public class YDualPower extends YFunction
     public int getExtVoltage() throws YAPI_Exception
 
     { return get_extVoltage(); }
-
-    /**
-     * Continues the enumeration of dual power controls started using yFirstDualPower().
-     * 
-     * @return a pointer to a YDualPower object, corresponding to
-     *         a dual power control currently online, or a null pointer
-     *         if there are no more dual power controls to enumerate.
-     */
-    public  YDualPower nextDualPower()
-    {
-        String next_hwid = YAPI.getNextHardwareId(_className, _func);
-        if(next_hwid == null) return null;
-        return FindDualPower(next_hwid);
-    }
 
     /**
      * Retrieves a dual power control for a given identifier.
@@ -335,56 +286,14 @@ public class YDualPower extends YFunction
      * @return a YDualPower object allowing you to drive the power control.
      */
     public static YDualPower FindDualPower(String func)
-    {   YFunction yfunc = YAPI.getFunction("DualPower", func);
-        if (yfunc != null) {
-            return (YDualPower) yfunc;
+    {
+        YDualPower obj;
+        obj = (YDualPower) YFunction._FindFromCache("DualPower", func);
+        if (obj == null) {
+            obj = new YDualPower(func);
+            YFunction._AddToCache("DualPower", func, obj);
         }
-        return new YDualPower(func);
-    }
-
-    /**
-     * Starts the enumeration of dual power controls currently accessible.
-     * Use the method YDualPower.nextDualPower() to iterate on
-     * next dual power controls.
-     * 
-     * @return a pointer to a YDualPower object, corresponding to
-     *         the first dual power control currently online, or a null pointer
-     *         if there are none.
-     */
-    public static YDualPower FirstDualPower()
-    {
-        String next_hwid = YAPI.getFirstHardwareId("DualPower");
-        if (next_hwid == null)  return null;
-        return FindDualPower(next_hwid);
-    }
-
-    /**
-     * 
-     * @param func : functionid
-     */
-    private YDualPower(String func)
-    {
-        super("DualPower", func);
-    }
-
-    @Override
-    void advertiseValue(String newvalue)
-    {
-        super.advertiseValue(newvalue);
-        if (_valueCallbackDualPower != null) {
-            _valueCallbackDualPower.yNewValue(this, newvalue);
-        }
-    }
-
-    /**
-     * Internal: check if we have a callback interface registered
-     * 
-     * @return yes if the user has registered a interface
-     */
-    @Override
-     protected boolean hasCallbackRegistered()
-    {
-        return super.hasCallbackRegistered() || (_valueCallbackDualPower!=null);
+        return obj;
     }
 
     /**
@@ -398,21 +307,66 @@ public class YDualPower extends YFunction
      *         the new advertised value.
      * @noreturn
      */
-    public void registerValueCallback(YDualPower.UpdateCallback callback)
+    public int registerValueCallback(UpdateCallback callback)
     {
-         _valueCallbackDualPower =  callback;
-         if (callback != null && isOnline()) {
-             String newval;
-             try {
-                 newval = get_advertisedValue();
-                 if (!newval.equals("") && !newval.equals("!INVALDI!")) {
-                     callback.yNewValue(this, newval);
-                 }
-             } catch (YAPI_Exception ex) {
-             }
-         }
+        String val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        _valueCallbackDualPower = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && isOnline()) {
+            val = _advertisedValue;
+            if (!(val.equals(""))) {
+                _invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int _invokeValueCallback(String value)
+    {
+        if (_valueCallbackDualPower != null) {
+            _valueCallbackDualPower.yNewValue(this, value);
+        } else {
+            super._invokeValueCallback(value);
+        }
+        return 0;
+    }
+
+    /**
+     * Continues the enumeration of dual power controls started using yFirstDualPower().
+     * 
+     * @return a pointer to a YDualPower object, corresponding to
+     *         a dual power control currently online, or a null pointer
+     *         if there are no more dual power controls to enumerate.
+     */
+    public  YDualPower nextDualPower()
+    {
+        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        if(next_hwid == null) return null;
+        return FindDualPower(next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of dual power controls currently accessible.
+     * Use the method YDualPower.nextDualPower() to iterate on
+     * next dual power controls.
+     * 
+     * @return a pointer to a YDualPower object, corresponding to
+     *         the first dual power control currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YDualPower FirstDualPower()
+    {
+        String next_hwid = SafeYAPI().getFirstHardwareId("DualPower");
+        if (next_hwid == null)  return null;
+        return FindDualPower(next_hwid);
     }
 
     //--- (end of YDualPower implementation)
-};
+}
 

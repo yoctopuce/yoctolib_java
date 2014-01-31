@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI.java 12426 2013-08-20 13:58:34Z seb $
+ * $Id: YAPI.java 14779 2014-01-30 14:56:39Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -39,43 +39,32 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
+import com.yoctopuce.YoctoAPI.YGenericHub.HTTPParams;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  *
  */
+@SuppressWarnings("UnusedDeclaration")
 public class YAPI {
 
-    private static Boolean _apiInitialized = false;
-    // Default cache validity (in [ms]) before reloading data from device. This
-    // saves a lots of trafic.
-    // Note that a value undger 2 ms makes little sense since a USB bus itself
-    // has a 2ms roundtrip period
-    // Default cache validity (in [ms]) before reloading data from device. This
-    // saves a lots of trafic.
-    // Note that a value under 2 ms makes little sense since a USB bus itself
-    // has a 2ms roundtrip period
-    public static int DefaultCacheValidity = 5;
+
     // Return value for invalid strings
     public static final String INVALID_STRING = "!INVALID!";
     public static final double INVALID_DOUBLE = -1.79769313486231E+308;
     public static final int INVALID_INT = -2147483648;
     public static final long INVALID_LONG = -9223372036854775807L;
-    public static final int INVALID_UNSIGNED = -1;
-    public static final String YOCTO_API_VERSION_STR = "1.01";
-    public static final int YOCTO_API_VERSION_BCD = 0x0101;
+    public static final int INVALID_UINT = -1;
+    public static final String YOCTO_API_VERSION_STR = "1.10";
+    public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
     public static final int YOCTO_DEVID_BOOTLOADER = 2;
-    // --- (generated code: globals)
+    // --- (generated code: YFunction return codes)
     // Yoctopuce error codes, used by default as function return value
     public static final int SUCCESS = 0;                   // everything worked allright
     public static final int NOT_INITIALIZED = -1;          // call yInitAPI() first !
@@ -92,7 +81,7 @@ public class YAPI {
     public static final int UNAUTHORIZED = -12;            // unauthorized access to password-protected device
     public static final int RTC_NOT_READY = -13;           // real-time clock has not been initialized (or time was lost)
 
-//--- (end of generated code: globals)
+    //--- (end of generated code: YFunction return codes)
     static final String   DefaultEncoding = "ISO-8859-1";
     
     // Yoctopuce generic constant
@@ -113,6 +102,31 @@ public class YAPI {
     public static final int DETECT_USB = 1;
     public static final int DETECT_NET = 2;
     public static final int DETECT_ALL = DETECT_USB | DETECT_NET;
+
+
+    private final YSSDP.HubDiscoveryCallback _ssdpCallback = new YSSDP.HubDiscoveryCallback() {
+        @Override
+        public void HubDiscoveryCallback(String serial, String urlToRegister, String urlToUnregister) {
+            if (urlToRegister != null) {
+                synchronized (_newHubCallbackLock){
+                    if(_HubDiscoveryCallback!=null)
+                        _HubDiscoveryCallback.yHubDiscoveryCallback(serial, urlToRegister);
+                }
+            }
+            if ((_apiMode & DETECT_NET) != 0) {
+		if (urlToUnregister != null) {
+                    _UnregisterHub(urlToUnregister);
+		} 
+		if (urlToRegister != null) {
+                    try {
+                        _PreregisterHub(urlToRegister);
+                    } catch (YAPI_Exception ex) {
+                        _Log("Unable to register hub " + urlToRegister + " detected by SSDP:" + ex.toString());
+                    }
+		}
+            }            
+        }
+    };
 
     /**
      *
@@ -142,20 +156,16 @@ public class YAPI {
         double yCalibrationHandler(double rawValue, int calibType,
                 ArrayList<Integer> params, ArrayList<Double> rawValues, ArrayList<Double> refValues);
     }
-    private static ArrayList<YGenericHub> _hubs  = new ArrayList<YGenericHub>(); // array of root urls
-    private static HashMap<String, YDevice> _devs = new HashMap<String, YDevice>(); // hash table of devices, by serial number
-    private static HashMap<String, String> _snByUrl = new HashMap<String, String>(); // serial number for each device, by URL
-    private static HashMap<String, String> _snByName = new HashMap<String, String>(); // serial number for each device, by name
-    private static HashMap<String, YFunctionType> _fnByType = new HashMap<String, YFunctionType>(); // functions by type
-    private static boolean _firstArrival=true;
-    private final static Queue<PlugEvent> _pendingCallbacks = new LinkedList<PlugEvent>();
-    private final static Queue<PendingValue> _pendingValues = new LinkedList<PendingValue>();
-    private static DeviceArrivalCallback _arrivalCallback=null;
-    private static DeviceChangeCallback _namechgCallback=null;
-    private static DeviceRemovalCallback _removalCallback=null;
-    private static LogCallback _logCallback = null;
-    private static HashMap<Integer, CalibrationHandlerCallback> _calibHandlers= new HashMap<Integer, YAPI.CalibrationHandlerCallback>();
-    private static CalibrationHandlerCallback linearCalibrationHandler= new CalibrationHandlerCallback() {
+    private static final HashMap<String, YPEntry.BaseClass> _BaseType;
+    static
+    {
+        _BaseType = new HashMap<String, YPEntry.BaseClass>();
+        _BaseType.put("Function", YPEntry.BaseClass.Function);
+        _BaseType.put("Sensor", YPEntry.BaseClass.Sensor);
+    }
+
+
+    private final static CalibrationHandlerCallback linearCalibrationHandler= new CalibrationHandlerCallback() {
 
         @Override
         public double yCalibrationHandler(double rawValue, int calibType, ArrayList<Integer> params, ArrayList<Double> rawValues, ArrayList<Double> refValues)
@@ -165,16 +175,16 @@ public class YAPI {
             double x   = rawValues.get(0);
             double adj = refValues.get(0) - x;
             int    i   = 0;
-    
-            if(npt > (int)rawValues.size()) npt = (int)rawValues.size();
-            if(npt > (int)refValues.size()) npt = (int)refValues.size();
+
+            if(npt > rawValues.size()) npt = rawValues.size();
+            if(npt > refValues.size()) npt = refValues.size();
             while(rawValue > rawValues.get(i) && ++i < npt) {
                 double x2   = x;
                 double adj2 = adj;
-        
+
                 x   = rawValues.get(i);
                 adj = refValues.get(i) - x;
-        
+
                 if(rawValue < x && x > x2) {
                     adj = adj2 + (adj - adj2) * (rawValue - x2) / (x - x2);
                 }
@@ -183,16 +193,82 @@ public class YAPI {
         }
     };
 
-    private static class PendingValue {
 
-        public YFunction fun;
-        public String value;
 
-        public PendingValue(YFunction fun, String value)
+    // Non static Variable
+    // Default cache validity (in [ms]) before reloading data from device. This
+    // saves a lots of traffic.
+    // Note that a value under 2 ms makes little sense since a USB bus itself
+    // has a 2ms roundtrip period
+    public int DefaultCacheValidity;
+    private int _apiMode;
+    private ArrayList<YGenericHub> _hubs; // array of root urls
+    private HashMap<String, YDevice> _devs; // hash table of devices, by serial number
+    private HashMap<String, String> _snByUrl; // serial number for each device, by URL
+    private HashMap<String, String> _snByName; // serial number for each device, by name
+    private HashMap<String, YFunctionType> _fnByType; // functions by type
+    private boolean _firstArrival;
+    private final Queue<PlugEvent> _pendingCallbacks = new LinkedList<PlugEvent>();
+    private final Queue<DataEvent> _data_events = new LinkedList<DataEvent>();
+    private DeviceArrivalCallback _arrivalCallback=null;
+    private DeviceChangeCallback _namechgCallback=null;
+    private DeviceRemovalCallback _removalCallback=null;
+    private LogCallback _logCallback=null;
+    private final Object _newHubCallbackLock = new Object();
+    private HubDiscoveryCallback _HubDiscoveryCallback=null;
+    private HashMap<Integer, CalibrationHandlerCallback> _calibHandlers = new HashMap<Integer, YAPI.CalibrationHandlerCallback>();
+    private YSSDP _ssdp;
+
+    //YFunction Callback list
+    private static ArrayList<YFunction> _ValueCallbackList = new ArrayList<YFunction>();
+    private static ArrayList<YFunction> _TimedReportCallbackList = new ArrayList<YFunction>();
+    // YDevice cache
+    //public static ArrayList<YDevice> _devCache = new ArrayList<YDevice>();// Device cache entries
+
+    public interface HubDiscoveryCallback  {
+        /**
+         *
+         * @param serial : the serial number of the discovered Hub
+         * @param url : the URL (with port number) of the discoveredHub
+         */
+        void yHubDiscoveryCallback(String serial, String url);
+    }
+
+
+    static class DataEvent {
+
+        private final YFunction _fun;
+        private final String _value;
+        private final ArrayList<Integer> _report;
+        private final double _timestamp;
+
+        public DataEvent(YFunction fun, String value)
         {
-            this.fun = fun;
-            this.value = value;
+            _fun = fun;
+            _value = value;
+            _report = null;
+            _timestamp = 0;
         }
+
+        public DataEvent(YFunction fun, double timestamp, ArrayList<Integer> report)
+        {
+            _fun = fun;
+            _value = null;
+            _timestamp = timestamp;
+            _report = report;
+        }
+
+        public void invoke(){
+            if (_value==null) {
+                YSensor sensor = (YSensor)_fun;
+                YMeasure mesure =  sensor._decodeTimedReport(_timestamp,_report);
+                sensor._invokeTimedReportCallback(mesure);
+            }else {
+                // new value
+                _fun._invokeValueCallback(_value);
+            }
+        }
+
     }
 
     static class PlugEvent {
@@ -211,14 +287,14 @@ public class YAPI {
         }
     }
 
-    static void pushPlugEvent(PlugEvent.Event ev, String serial)
+    void pushPlugEvent(PlugEvent.Event ev, String serial)
     {
         synchronized(_pendingCallbacks){
             _pendingCallbacks.add(new PlugEvent(ev, serial));
         }
     }
 
-    private static void _updateDeviceList_internal(boolean forceupdate, boolean invokecallbacks) throws YAPI_Exception
+    private synchronized void _updateDeviceList_internal(boolean forceupdate, boolean invokecallbacks) throws YAPI_Exception
     {
         if (_firstArrival && invokecallbacks && _arrivalCallback != null) {
             forceupdate = true;
@@ -267,7 +343,7 @@ public class YAPI {
     /*
      * Return a the calibration handler for a given type
      */
-    public static CalibrationHandlerCallback getCalibrationHandler(int calibType)
+    CalibrationHandlerCallback _getCalibrationHandler(int calibType)
     {
         if (!_calibHandlers.containsKey(calibType)) {
             return null;
@@ -278,7 +354,7 @@ public class YAPI {
 
 
 
-       static double decExp[] = new double[] {
+     private final static double decExp[] = new double[] {
         1.0e-6, 1.0e-5, 1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0,
         1.0e1, 1.0e2, 1.0e3, 1.0e4, 1.0e5, 1.0e6, 1.0e7, 1.0e8, 1.0e9 };
 
@@ -333,132 +409,51 @@ public class YAPI {
         return (negate!=0 ? -res : res);
     }
 
-
-    /*
-     * Method used to encode calibration points into fixed-point 16-bit integers
-     */
-    static String _encodeCalibrationPoints(ArrayList<Double> rawValues, ArrayList<Double> refValues, double resolution, int calibrationOffset,String actualCparams)
+    // Parse an array of u16 encoded in a base64-like string with memory-based compresssion
+    static ArrayList<Integer> _decodeWords(String data)
     {
-        int npt = (rawValues.size() < refValues.size() ? rawValues.size() : refValues.size());
-        int rawVal, refVal;
-        int calibType;
-        int minRaw = 0;
-        String res;
+        ArrayList<Integer> udata;
 
-        if(npt==0){
-            return "";
-        }
-        if(actualCparams.equals("")){
-            calibType =10 + npt;
-        }else{
-            int pos = actualCparams.indexOf(',');
-            calibType = Integer.parseInt(actualCparams.substring(0,pos));
-            if(calibType <=10)
-                calibType =npt;
-            else
-                calibType = 10+npt;
-        }
-        res = Integer.toString(calibType);
-        if(calibType<=10){
-            for (int i = 0; i < npt; i++) {
-                rawVal = (int) (rawValues.get(i) / resolution - calibrationOffset + .5);
-                if (rawVal >= minRaw && rawVal < 65536) {
-                    refVal = (int) (refValues.get(i) / resolution - calibrationOffset + .5);
-                    if (refVal >= 0 && refVal < 65536) {
-                        res += String.format(",%d,%d", rawVal, refVal);
-                        minRaw = rawVal + 1;
-                    }
+        udata = new ArrayList<Integer>();
+        int datalen = data.length();
+        int i = 0;
+        int val;
+        while (i < datalen) {
+            char c = data.charAt(i);
+            if (c == '*'){
+                val = 0;
+                i++;
+            } else if (c >= 'X') {
+                val = 0xffff;
+                i++;
+            } else if (c >= 'Y') {
+                val = 0x7fff;
+                i++;
+            } else if (c >= 'a') {
+                i++;
+                int srcpos = udata.size() - 1 - (c - 97);
+                if (srcpos < 0) {
+                    val =0;
+                }else {
+                    val = udata.get(srcpos);
                 }
-            }
-        } else {
-            // 16-bit floating-point decimal encoding
-            for(int i = 0; i < npt; i++) {
-                rawVal = (int) _doubleToDecimal(rawValues.get(i));
-                refVal = (int) _doubleToDecimal(refValues.get(i));
-                res += String.format(",%d,%d", rawVal, refVal);
-            }
-        }
-        return res;
-    }
-
-
-    /*
-     * Method used to decode calibration points from fixed-point 16-bit integers
-     */
-    static int _decodeCalibrationPoints(String calibParams, ArrayList<Integer> intPt, ArrayList<Double> rawPt, ArrayList<Double> calPt, double resolution, int calibrationOffset)
-    {
-
-
-        String[] valuesStr = calibParams.split(",",0);
-        if(intPt!=null)
-            intPt.clear();
-        rawPt.clear();
-        calPt.clear();
-        if(valuesStr[0].equals(""))
-            return 0;
-        int calibType=0;
-        try{
-            calibType = Integer.parseInt(valuesStr[0]);
-        }catch (java.lang.NumberFormatException e){
-            return 0;
-        }
-        // parse calibration parameters
-        int nval = (calibType <= 20 ? 2*(calibType % 10) : 99);
-        for (int i =1; i< nval && i< valuesStr.length ;i+=2){
-            int rawval = Integer.parseInt(valuesStr[i]);
-            int calval = Integer.parseInt(valuesStr[i+1]);
-            double rawval_d, calval_d;
-            if(calibType <= 10) {
-                rawval_d = (rawval + calibrationOffset) * resolution;
-                calval_d = (calval + calibrationOffset) * resolution;
             } else {
-                rawval_d = _decimalToDouble(rawval);
-                calval_d = _decimalToDouble(calval);
+                if (i + 2 > datalen) {
+                    return udata;
+                }
+                i++;
+                val = c - 48;
+                c = data.charAt(i++);
+                val += (c - 48) << 5;
+                c = data.charAt(i++);
+                if (c == 'z') {
+                    c ='\\' ;
+                }
+                val += (c - 48) << 10;
             }
-            if(intPt!=null){
-                intPt.add(rawval);
-                intPt.add(calval);
-            }
-            rawPt.add(rawval_d);
-            calPt.add(calval_d);
+            udata.add(val);
         }
-        return calibType;
-    }
-
-    /*
-     * Compute the currentValue for the provided function, using the
-     * currentRawValue, the calibrationParam and the proper registered
-     * calibration handler
-     */
-    static double applyCalibration(double rawValue, String calibParams,
-            int calibOffset, double resolution)
-    {
-
-        if(rawValue == INVALID_DOUBLE || resolution == INVALID_DOUBLE) {
-            return INVALID_DOUBLE;
-        }
-        if(calibParams==null || calibParams.indexOf(',')<0)
-            return rawValue;
-
-        ArrayList<Integer> cur_calpar = new ArrayList<Integer>();
-        ArrayList<Double>  cur_calraw = new ArrayList<Double>();
-        ArrayList<Double>  cur_calref = new ArrayList<Double>();
-        int calibType = _decodeCalibrationPoints(calibParams
-                                                        ,cur_calpar
-                                                        ,cur_calraw
-                                                        ,cur_calref
-                                                        ,resolution
-                                                        ,calibOffset);
-
-        if(calibType == 0) {
-            return rawValue;
-        }
-        if (!_calibHandlers.containsKey(calibType)) {
-            return INVALID_DOUBLE;
-        }
-        return _calibHandlers.get(calibType).yCalibrationHandler(rawValue,
-                calibType, cur_calpar, cur_calraw, cur_calref);
-
+        return udata;
     }
 
     // helper function to find pattern in byte[]
@@ -494,11 +489,22 @@ public class YAPI {
         }
         return ret;
     }
+
+    final protected static char[] _hexArray = "0123456789abcdef".toCharArray();
+    static String _bytesToHexStr(byte[] bytes, int offset, int len) {
+        char[] hexChars = new char[len * 2];
+        for ( int j = 0; j < len; j++ ) {
+            int v = bytes[offset + j] & 0xFF;
+            hexChars[j * 2] = _hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = _hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
     
     // Return a Device object for a specified URL, serial number or logical
     // device name
     // This function will not cause any network access
-    static YDevice getDevice(String device)
+    YDevice getDevice(String device)
     {
         YDevice dev = null;
         if (device.startsWith("http://")) {
@@ -525,7 +531,7 @@ public class YAPI {
 
     // Return the class name for a given function ID or full Hardware Id
     // Also make sure that the function type is registered in the API
-    static String functionClass(String funcid)
+    String functionClass(String funcid)
     {
         int dotpos = funcid.indexOf('.');
 
@@ -538,7 +544,7 @@ public class YAPI {
             classlen--;
         }
 
-        String classname = funcid.substring(0, 1).toUpperCase()
+        String classname = funcid.substring(0, 1).toUpperCase(Locale.US)
                 + funcid.substring(1, classlen);
         getFnByType(classname);
 
@@ -546,7 +552,7 @@ public class YAPI {
     }
 
     // Reindex a device in YAPI after a name change detected by device refresh
-    static void reindexDevice(YDevice dev)
+    void reindexDevice(YDevice dev)
     {
         String serial = dev.getSerialNumber();
         String lname = dev.getLogicalName();
@@ -555,19 +561,17 @@ public class YAPI {
         if (!lname.equals("")) {
             _snByName.put(lname, serial);
         }
-        _fnByType.get("Module").reindexFunction(serial + ".module", lname, null);
+
+        _fnByType.get("Module").reindexFunction(dev.getModuleYPEntry());
         int count = dev.functionCount();
         for (int i = 0; i < count; i++) {
-            String funcid = dev.functionId(i);
-            String funcname = dev.functionName(i);
-            String classname = functionClass(funcid);
-            _fnByType.get(classname).reindexFunction(serial + "." + funcid,
-                    funcname, null);
+            YPEntry yp = dev.getYPEntry(i);
+            _fnByType.get(yp.getClassname()).reindexFunction(yp);
         }
     }
 
     // Remove a device from YAPI after an unplug detected by device refresh
-    static void forgetDevice(YDevice dev)
+    void forgetDevice(YDevice dev)
     {
         String serial = dev.getSerialNumber();
         String lname = dev.getLogicalName();
@@ -577,17 +581,14 @@ public class YAPI {
         }
 
         _fnByType.get("Module").forgetFunction(serial + ".module");
-
         int count = dev.functionCount();
         for (int i = 0; i < count; i++) {
-
-            String funcid = dev.functionId(i);
-            String classname = functionClass(funcid);
-            _fnByType.get(classname).forgetFunction(serial + funcid);
+            YPEntry yp = dev.getYPEntry(i);
+            _fnByType.get(yp.getClassname()).forgetFunction(yp.getHardwareId());
         }
     }
 
-    static YFunctionType getFnByType(String className)
+    YFunctionType getFnByType(String className)
     {
         if (!_fnByType.containsKey(className)) {
             _fnByType.put(className, new YFunctionType(className));
@@ -596,80 +597,123 @@ public class YAPI {
     }
 
     // Find the best known identifier (hardware Id) for a given function
-    static String resolveFunction(String className, String func)
+    YPEntry resolveFunction(String className, String func)
             throws YAPI_Exception
     {
-        return getFnByType(className).resolve(func).toString();
+        if (!_BaseType.containsKey(className)) {
+            return getFnByType(className).getYPEntry(func);
+        } else {
+           // using an abstract baseType
+            YPEntry.BaseClass baseType = _BaseType.get(className);
+            for(YFunctionType subClassType : _fnByType.values()) {
+                try {
+                    YPEntry yp = subClassType.getYPEntry(func);
+                    if (yp.getBaseclass().equals(baseType)){
+                        return yp;
+                    }
+                } catch (YAPI_Exception ignore){}
+            }
+        }
+        throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "No function of type " + className + " found");
     }
 
+
+    
     // Retrieve a function object by hardware id, updating the indexes on the
     // fly if needed
-    static void setFunction(String className, String func, YFunction yfunc)
+    void setFunction(String className, String func, YFunction yfunc)
     {
         getFnByType(className).setFunction(func, yfunc);
     }
 
     // Retrieve a function object by hardware id, logicalname, updating the indexes on the
     // fly if needed
-    static YFunction getFunction(String className, String func)
+    YFunction getFunction(String className, String func)
     {
 
         return getFnByType(className).getFunction(func);
     }
 
     // Set a function advertised value by hardware id
-    static void setFunctionValue(String hwid, String pubval)
+    void setFunctionValue(String hwid, String pubval)
     {
         String classname = functionClass(hwid);
         getFnByType(classname).setFunctionValue(hwid, pubval);
     }
 
-    // Retrieve a function advertised value by hardware id
-    static String getFunctionValue(String hwid)
+    // Set a function advertised value by hardware id
+    void setTimedReport(String hwid, double deviceTime, ArrayList<Integer> report)
     {
         String classname = functionClass(hwid);
-        return getFnByType(classname).getFunctionValue(hwid);
+        getFnByType(classname).setTimedReport(hwid, deviceTime, report);
     }
 
-    // Queue a function value event
-    static void addValueEvent(YFunction conn_fn, String pubval)
+    // Queue a function data event (timed report of notification value)
+    void _PushDataEvent(DataEvent ev)
     {
-        synchronized(_pendingValues) {
-            _pendingValues.add(new PendingValue(conn_fn, pubval));
+        synchronized(_data_events) {
+            _data_events.add(ev);
         }
     }
 
     // Find the hardwareId for the first instance of a given function class
-    static String getFirstHardwareId(String className)
+    String getFirstHardwareId(String className)
     {
-        return getFnByType(className).getFirstHardwareId();
+
+        if (!_BaseType.containsKey(className)) {
+            YFunctionType ft =  getFnByType(className);
+            YPEntry yp = ft.getFirstYPEntry();
+            if (yp == null)
+                return null;
+            return yp.getHardwareId();
+        } else {
+            // using an abstract baseType
+            YPEntry.BaseClass baseType = _BaseType.get(className);
+            for(YFunctionType subClassType : _fnByType.values()) {
+                YPEntry yp = subClassType.getFirstYPEntry();
+                if (yp != null && yp.getBaseclass().equals(baseType)){
+                    return yp.getHardwareId();
+                }
+            }
+            return null;
+        }
     }
 
     // Find the hardwareId for the next instance of a given function class
-    static String getNextHardwareId(String className, String hwid)
+    String getNextHardwareId(String className, String hwid)
     {
-        return getFnByType(className).getNextHardwareId(hwid);
-    }
-
-    private static HashMap<String, String> _json2Hash(JSONObject json)
-    {
-
-        HashMap<String, String> res = new HashMap<String, String>(json.length());
-        Iterator<?> keys = json.keys();
-        while (keys.hasNext()) {
-            String key = keys.next().toString();
-            String value = json.optString(key);
-            res.put(key, value);
+        if (!_BaseType.containsKey(className)) {
+            YFunctionType ft =  getFnByType(className);
+            YPEntry yp = ft.getNextYPEntry(hwid);
+            if (yp == null)
+                return null;
+            return yp.getHardwareId();
+        } else {
+            // enumeration of an abstract class
+            YPEntry.BaseClass baseType = _BaseType.get(className);
+            String prevclass = functionClass(hwid);
+            YPEntry res = getFnByType(prevclass).getNextYPEntry(hwid);
+            if (res != null)
+                return res.getHardwareId();
+            for(String  altClassName : _fnByType.keySet()) {
+                if (!prevclass.equals("")) {
+                    if (!altClassName.equals(prevclass))
+                        continue;
+                    prevclass = "";
+                    continue;
+                }
+                res = _fnByType.get(altClassName).getFirstYPEntry();
+                if (res != null && res.getBaseclass().equals(baseType)) {
+                    return res.getHardwareId();
+                }
+            }
+            return null;
         }
-        return res;
-
     }
 
-
-
-    static YDevice funcGetDevice(String className, String func) throws YAPI_Exception
+    YDevice funcGetDevice(String className, String func) throws YAPI_Exception
     {
-        String resolved = null;
+        YPEntry resolved;
         try {
             resolved = resolveFunction(className, func);
         } catch (YAPI_Exception ex) {
@@ -683,9 +727,7 @@ public class YAPI {
                 resolved = resolveFunction(className, func);
             }
         }
-        func = resolved;
-        int dotpos = func.indexOf('.');
-        String devid = func.substring(0, dotpos);
+        String devid = resolved.getSerial();
         YDevice dev = getDevice(devid);
         if (dev == null) {
             // try to force a device list update to check if the device arrived
@@ -701,83 +743,327 @@ public class YAPI {
         return dev;
     }
 
-
-    // Load and parse the REST API for a function given by class name and
-    // identifier, possibly applying changes
-    // Device cache will be preloaded when loading function "module" and
-    // leveraged for other modules
-    static HashMap<String, String> funcRequest(String className, String func, String extra) throws YAPI_Exception
+    protected synchronized int _AddNewHub(String url, InputStream request, OutputStream response) throws YAPI_Exception
     {
-        YDevice dev = funcGetDevice(className, func);
-        func = resolveFunction(className, func);
-        JSONObject loadval = null;
-        int dotpos = func.indexOf('.');
-        String funcid = func.substring(dotpos + 1);
-        if (extra.equals("")) {
-            // use a cached API string, without reloading unless module is
-            // requested
-            String yreq = dev.requestAPI();
+        for (YGenericHub h : _hubs) {
+            if (h.isSameRootUrl(url)) {
+                return SUCCESS;
+            }
+        }
+        YGenericHub newhub;
+        HTTPParams parsedurl;
+        parsedurl = new HTTPParams(url);
+        // Add hub to known list
+        if (url.equals("usb")) {
+        	YUSBHub.CheckUSBAcces();
+            newhub = new YUSBHub(_hubs.size());
+        } else if (url.equals("net")){
+            if((_apiMode& DETECT_NET)==0) {
+                newhub = new YHTTPHub(_hubs.size(), new HTTPParams("localhost"));
+                _hubs.add(newhub);
+                newhub.startNotifications();
+                _apiMode |= DETECT_NET;
+                _ssdp.addCallback(_ssdpCallback);
+            }
+            return SUCCESS;
+        } else if (parsedurl.getHost().equals("callback")){
+            newhub = new YCallbackHub(_hubs.size(), parsedurl, request, response);
+        }else {
+            newhub = new YHTTPHub(_hubs.size(), parsedurl);
+        }
+        _hubs.add(newhub);
+        newhub.startNotifications();
+        return SUCCESS;
+    }
+
+
+    void _UpdateValueCallbackList(YFunction func, boolean add)
+    {
+        if (add)
+        {
+            func.isOnline();
+            if (!_ValueCallbackList.contains(func)) {
+                _ValueCallbackList.add(func);
+            }
+        } else {
+            _ValueCallbackList.remove(func);
+        }
+    }
+
+    YFunction _GetValueCallback(String hwid)
+    {
+        for (YFunction func : _ValueCallbackList) {
             try {
-                JSONObject jsonval = new JSONObject(yreq);
-                loadval = jsonval.getJSONObject(funcid);
-            } catch (JSONException ex) {
-                throw new YAPI_Exception(IO_ERROR,
-                        "Request failed, could not parse API result for " + dev);
-            }
-        } else {
-            dev.dropCache();
-        }
-        if (loadval == null) {
-            // request specified function only to minimize traffic
-            if (extra.equals("")) {
-                String httpreq = "GET /api/" + funcid + ".json";
-                String yreq = new String(dev.requestHTTP(httpreq,null, false));
-                try {
-                    loadval = new JSONObject(yreq);
-                } catch (JSONException ex) {
-                    throw new YAPI_Exception(IO_ERROR,
-                            "Request failed, could not parse API value for "
-                            + httpreq);
+                if (func.getHardwareId().equals(hwid)) {
+                    return func;
                 }
-            } else {
-                String httpreq = "GET /api/" + funcid + extra;
-                dev.requestHTTP(httpreq,null, true);
-                return null;
-            }
+            } catch (YAPI_Exception ignore) {}
         }
-        return _json2Hash(loadval);
+        return null;
     }
 
-    private static synchronized void _init_free(boolean mustfree)
+
+
+    void _UpdateTimedReportCallbackList(YFunction func, boolean add)
     {
-
-        if (!mustfree) {
-            if (!_apiInitialized) {
-                _fnByType.put("Module", new YFunctionType("Module"));
-                _apiInitialized = true;
-                for (int i =1 ;i<=20;i++){
-                    _calibHandlers.put(i, linearCalibrationHandler);
-                }
+        if (add)
+        {
+            func.isOnline();
+            if (!_TimedReportCallbackList.contains(func)) {
+                _TimedReportCallbackList.add(func);
             }
         } else {
-            if (_apiInitialized) {
-                for (YGenericHub h : _hubs) {
-                    h.stopNotifications();
-                    h.release();
+            _TimedReportCallbackList.remove(func);
+        }
+    }
+
+    YFunction _GetTimedReportCallback(String hwid)
+    {
+        for (YFunction func : _TimedReportCallbackList) {
+            try {
+                if (func.getHardwareId().equals(hwid)) {
+                    return func;
                 }
-                _hubs.clear();
-                _devs.clear();
-                _snByUrl.clear();
-                _snByName.clear();
-                _fnByType.clear();
-                _firstArrival = true;
-                _namechgCallback = null;
-                _removalCallback = null;
-                _apiInitialized = false;
-                _calibHandlers.clear();
+            } catch (YAPI_Exception ignore) {}
+        }
+        return null;
+    }
+
+
+
+
+
+    private static HashMap<Long, YAPI> _MultipleYAPI = null;
+    private static YAPI _SingleYAPI = null;
+
+
+    public static synchronized void SetThreadSpecificMode() throws YAPI_Exception
+    {
+        if (_SingleYAPI != null)
+            throw new YAPI_Exception(INVALID_ARGUMENT, "SetSingleThreadMode must be called before start using the Yoctopuce API");
+        _MultipleYAPI = new HashMap<Long, YAPI>();
+    }
+
+    static synchronized YAPI GetYAPI()
+    {
+        if (_MultipleYAPI != null) {
+            return _MultipleYAPI.get(Thread.currentThread().getId());
+        } else {
+            return _SingleYAPI;
+        }
+    }
+
+    static synchronized YAPI SafeYAPI()
+    {
+        YAPI yapi = GetYAPI();
+        if (yapi == null){
+            yapi = new YAPI();
+            AddYAPI(yapi);
+        }
+        return yapi;
+    }
+
+    static synchronized void  AddYAPI(YAPI yapi)
+    {
+        if (_MultipleYAPI != null){
+            _MultipleYAPI.put(Thread.currentThread().getId(),yapi);
+        } else {
+            _SingleYAPI = yapi;
+        }
+    }
+
+    static synchronized void  RemoveYAPI()
+    {
+        if (_MultipleYAPI != null){
+            _MultipleYAPI.remove(Thread.currentThread().getId());
+        } else {
+            _SingleYAPI = null;
+        }
+    }
+
+
+    YAPI()
+    {
+        // reste static field
+        DefaultCacheValidity = 5;
+        _hubs  = new ArrayList<YGenericHub>();
+        _devs = new HashMap<String, YDevice>();
+        _snByUrl = new HashMap<String, String>();
+        _snByName = new HashMap<String, String>();
+        _fnByType = new HashMap<String, YFunctionType>(2);
+        _firstArrival=true;
+        _pendingCallbacks.clear();
+        _data_events.clear();
+        _ssdp = null;
+
+        _fnByType.put("Module", new YFunctionType("Module"));
+        for (int i =1 ;i<=20;i++){
+            _calibHandlers.put(i, linearCalibrationHandler);
+        }
+        _ssdp = new YSSDP();
+    }
+
+    private void setAPIMode(int mode) throws YAPI_Exception
+    {
+        if((mode & DETECT_NET)!=0) {
+            _ssdp.addCallback(_ssdpCallback);
+        }
+        _apiMode = mode;
+    }
+
+
+    void _FreeAPI()
+    {
+        if((_apiMode & DETECT_NET)!=0){
+            _ssdp.Stop();
+        }
+        for (YGenericHub h : _hubs) {
+            h.stopNotifications();
+            h.release();
+        }
+    }
+
+
+    public int _RegisterHub(String url) throws YAPI_Exception
+    {
+        _AddNewHub(url, null, null);
+        // Register device list
+        _updateDeviceList_internal(true, false);
+        return SUCCESS;
+    }
+
+    
+    public int _RegisterHub(String url, InputStream request, OutputStream response) throws YAPI_Exception
+    {
+        _AddNewHub(url, request, response);
+        // Register device list
+        _updateDeviceList_internal(true, false);
+        return SUCCESS;
+    }
+
+    
+    public void _EnableUSBHost(Object osContext) throws YAPI_Exception
+    {
+        YUSBHub.SetContextType(osContext);
+    }
+
+    public int _PreregisterHub(String url) throws YAPI_Exception
+    {
+        _AddNewHub(url, null, null);
+        return SUCCESS;
+    }
+
+    public void _UnregisterHub(String url)
+    {
+        if(url.equals("net")){
+            _apiMode &= ~DETECT_NET;
+            return;
+        }
+
+        for (YGenericHub h : _hubs) {
+            if (h.isSameRootUrl(url)) {
+                h.stopNotifications();
+                for (String serial : h._serialByYdx.values()) {
+                    forgetDevice(_devs.get(serial));
+                }
+                h.release();
+                _hubs.remove(h);
+                return;
             }
         }
     }
+
+    public int _UpdateDeviceList() throws YAPI_Exception
+    {
+        _updateDeviceList_internal(false, true);
+        return SUCCESS;
+    }
+
+    public int _HandleEvents() throws YAPI_Exception {
+        // handle pending events
+        while(true) {
+            DataEvent pv;
+            synchronized(_data_events) {
+                if(_data_events.isEmpty()) {
+                    break;
+                }
+                pv = _data_events.poll();
+            }
+            pv.invoke();
+        }
+        return SUCCESS;
+    }
+
+
+    public int _Sleep(long ms_duration) throws YAPI_Exception
+    {
+        long end = GetTickCount() + ms_duration;
+
+        do {
+            _HandleEvents();
+            if (end > GetTickCount()) {
+                try {
+                    Thread.sleep(3);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(YAPI.class.getName()).log(Level.SEVERE,
+                            null, ex);
+                    throw new YAPI_Exception(YAPI.IO_ERROR,
+                            "Thread has been interrupted");
+                }
+            }
+        } while (end > GetTickCount());
+        return SUCCESS;
+    }
+
+    public int _TriggerHubDiscovery() throws YAPI_Exception
+    {
+        // Register device list
+        _ssdp.addCallback(_ssdpCallback);
+        return YAPI.SUCCESS;
+    }
+    
+
+    public void _RegisterDeviceArrivalCallback(
+            YAPI.DeviceArrivalCallback arrivalCallback)
+    {
+        _arrivalCallback = arrivalCallback;
+    }
+
+    public void _RegisterDeviceChangeCallback(
+            YAPI.DeviceChangeCallback changeCallback)
+    {
+        _namechgCallback = changeCallback;
+    }
+
+    public synchronized void _RegisterDeviceRemovalCallback(
+            YAPI.DeviceRemovalCallback removalCallback)
+    {
+        _removalCallback = removalCallback;
+    }
+
+    public void _RegisterHubDiscoveryCallback(HubDiscoveryCallback hubDiscoveryCallback) {
+        synchronized (_newHubCallbackLock){
+            _HubDiscoveryCallback = hubDiscoveryCallback;
+        }
+        try {
+            _TriggerHubDiscovery();
+        } catch (YAPI_Exception ignore) {}
+    }
+
+    public void _RegisterLogFunction(YAPI.LogCallback logfun)
+    {
+        _logCallback = logfun;
+    }
+
+    void _Log(String message)
+    {
+        if (_logCallback != null) {
+            _logCallback.yLog(message);
+        }
+    }
+
+
+    //PUBLIC STATIC METHODE:
 
     /**
      * Returns the version identifier for the Yoctopuce library in use.
@@ -797,34 +1083,37 @@ public class YAPI {
      */
     public static String GetAPIVersion()
     {
-        return "1.01.12553";
+        return YOCTO_API_VERSION_STR + ".14801";
     }
+
 
     /**
      * Initializes the Yoctopuce programming library explicitly.
      * It is not strictly needed to call yInitAPI(), as the library is
      * automatically  initialized when calling yRegisterHub() for the
      * first time.
-     * 
+     *
      * When YAPI.DETECT_NONE is used as detection mode,
      * you must explicitly use yRegisterHub() to point the API to the
      * VirtualHub on which your devices are connected before trying to access them.
-     * 
+     *
      * @param mode : an integer corresponding to the type of automatic
      *         device detection to use. Possible values are
      *         YAPI.DETECT_NONE, YAPI.DETECT_USB, YAPI.DETECT_NET,
      *         and YAPI.DETECT_ALL.
-     * @param errmsg : a string passed by reference to receive any error message.
-     * 
+     *
      * @return YAPI.SUCCESS when the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception
      */
-    public static int InitAPI(int mode)
-    {
-        _init_free(false);
+    public static int sInitAPI(int mode) throws YAPI_Exception {
+
+        YAPI yapi = SafeYAPI();
+        //FIXME: Ensure API is working in correcte Mode
+
         return YAPI.SUCCESS;
     }
+
 
     /**
      * Frees dynamically allocated memory blocks used by the Yoctopuce library.
@@ -836,19 +1125,36 @@ public class YAPI {
      */
     public static void FreeAPI()
     {
-        _init_free(true);
+        YAPI yapi = GetYAPI();
+        if (yapi != null) {
+            yapi._FreeAPI();
+            RemoveYAPI();
+        }
     }
 
-  
+
+
 
     /**
-     * Setup the Yoctopuce library to use modules connected on a given machine.
-     * When using Yoctopuce modules through the VirtualHub gateway,
-     * you should provide as parameter the address of the machine on which the
-     * VirtualHub software is running (typically "http://127.0.0.1:4444",
-     * which represents the local machine).
-     * When you use a language which has direct access to the USB hardware,
-     * you can use the pseudo-URL "usb" instead.
+     * Setup the Yoctopuce library to use modules connected on a given machine. The
+     * parameter will determine how the API will work. Use the following values:
+     * 
+     * <b>usb</b>: When the usb keyword is used, the API will work with
+     * devices connected directly to the USB bus. Some programming languages such a Javascript,
+     * PHP, and Java don't provide direct access to USB hardware, so usb will
+     * not work with these. In this case, use a VirtualHub or a networked YoctoHub (see below).
+     * 
+     * <b><i>x.x.x.x</i></b> or <b><i>hostname</i></b>: The API will use the devices connected to the
+     * host with the given IP address or hostname. That host can be a regular computer
+     * running a VirtualHub, or a networked YoctoHub such as YoctoHub-Ethernet or
+     * YoctoHub-Wireless. If you want to use the VirtualHub running on you local
+     * computer, use the IP address 127.0.0.1.
+     * 
+     * <b>callback</b>: that keyword make the API run in "<i>HTTP Callback</i>" mode.
+     * This a special mode allowing to take control of Yoctopuce devices
+     * through a NAT filter when using a VirtualHub or a networked YoctoHub. You only
+     * need to configure your hub to call your server script on a regular basis.
+     * This mode is currently available for PHP and Node.JS only.
      * 
      * Be aware that only one application can use direct USB access at a
      * given time on a machine. Multiple access would cause conflicts
@@ -858,14 +1164,15 @@ public class YAPI {
      * for this limitation is to setup the library to use the VirtualHub
      * rather than direct USB access.
      * 
-     * If acces control has been activated on the VirtualHub you want to
+     * If access control has been activated on the hub, virtual or not, you want to
      * reach, the URL parameter should look like:
      * 
      * http://username:password@adresse:port
      * 
-     * @param url : a string containing either "usb" or the
+     * You can call <i>RegisterHub</i> several times to connect to several machines.
+     * 
+     * @param url : a string containing either "usb","callback" or the
      *         root URL of the hub to monitor
-     * @param errmsg : a string passed by reference to receive any error message.
      * 
      * @return YAPI.SUCCESS when the call succeeds.
      * 
@@ -873,24 +1180,20 @@ public class YAPI {
      */
     public static int RegisterHub(String url) throws YAPI_Exception
     {
-        _init_free(false);
-
-        if (!url.equalsIgnoreCase("usb")) {
-            //TODO: test if the host respond to url
-        }
-
-        YAPI.PreregisterHub(url);
-
-        // Register device list
-        _updateDeviceList_internal(true, false);
-
-        return SUCCESS;
+        return SafeYAPI()._RegisterHub(url);
     }
+
+
+    public static int RegisterHub(String url, InputStream request, OutputStream response) throws YAPI_Exception
+    {
+        return SafeYAPI()._RegisterHub(url, request, response);
+    }
+
 
     /**
      * This function is used only on Android. Before calling yRegisterHub("usb")
      * you need to activate the USB host port of the system. This function takes as argument,
-     * an object of class android.content.Context (or any subclasee).
+     * an object of class android.content.Context (or any subclass).
      * It is not necessary to call this function to reach modules through the network.
      * 
      * @param osContext : an object of class android.content.Context (or any subclass).
@@ -899,32 +1202,26 @@ public class YAPI {
      */
     public static void EnableUSBHost(Object osContext) throws YAPI_Exception
     {
-        _init_free(false);
         YUSBHub.SetContextType(osContext);
     }
 
     /**
-     *
+     * Fault-tolerant alternative to RegisterHub(). This function has the same
+     * purpose and same arguments as RegisterHub(), but does not trigger
+     * an error when the selected hub is not available at the time of the function call.
+     * This makes it possible to register a network hub independently of the current
+     * connectivity, and to try to contact it only when a device is actively needed.
+     * 
+     * @param url : a string containing either "usb","callback" or the
+     *         root URL of the hub to monitor
+     * 
+     * @return YAPI.SUCCESS when the call succeeds.
+     * 
+     * @throws YAPI_Exception
      */
     public static int PreregisterHub(String url) throws YAPI_Exception
     {
-        _init_free(false);
-        for (YGenericHub h : _hubs) {
-            if (h.isSameRootUrl(url)) {
-                return SUCCESS;
-            }
-        }
-        YGenericHub newhub;
-        // Add hub to known list
-        if (url.equals("usb")) {
-        	YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(_hubs.size());
-        } else {
-            newhub = new YHTTPHub(_hubs.size(), url);
-        }
-        _hubs.add(newhub);
-        newhub.startNotifications();
-        return SUCCESS;
+        return SafeYAPI()._PreregisterHub(url);
     }
 
     /**
@@ -936,17 +1233,7 @@ public class YAPI {
      */
     public static void UnregisterHub(String url)
     {
-        for (YGenericHub h : _hubs) {
-            if (h.isSameRootUrl(url)) {
-                h.stopNotifications();
-                for (String serial : h._serialByYdx.values()) {
-                    forgetDevice(_devs.get(serial));
-                }
-                h.release();
-                _hubs.remove(h);
-                return;
-            }
-        }
+        SafeYAPI()._UnregisterHub(url);
     }
 
     /**
@@ -958,17 +1245,13 @@ public class YAPI {
      * This function can be called as frequently as desired to refresh the device list
      * and to make the application aware of hot-plug events.
      * 
-     * @param errmsg : a string passed by reference to receive any error message.
-     * 
      * @return YAPI.SUCCESS when the call succeeds.
      * 
      * @throws YAPI_Exception
      */
     public static int UpdateDeviceList() throws YAPI_Exception
     {
-        _init_free(false);
-        _updateDeviceList_internal(false, true);
-        return SUCCESS;
+        return SafeYAPI()._UpdateDeviceList();
     }
 
     /**
@@ -982,32 +1265,18 @@ public class YAPI {
      * This function may signal an error in case there is a communication problem
      * while contacting a module.
      * 
-     * @param errmsg : a string passed by reference to receive any error message.
-     * 
      * @return YAPI.SUCCESS when the call succeeds.
      * 
      * @throws YAPI_Exception
      */
-    public static void HandleEvents()
-    {
-        _init_free(false);
-        // handle pending events
-        while(true) {
-            PendingValue pv;
-            synchronized(_pendingValues) {
-                if(_pendingValues.isEmpty()) {
-                    break;
-                }
-                pv = _pendingValues.poll();
-            }
-            pv.fun.advertiseValue(pv.value);
-        }
+    public static int HandleEvents() throws YAPI_Exception {
+        return SafeYAPI()._HandleEvents();
     }
 
     /**
      * Pauses the execution flow for a specified duration.
      * This function implements a passive waiting loop, meaning that it does not
-     * consume CPU cycles significatively. The processor is left available for
+     * consume CPU cycles significantly. The processor is left available for
      * other threads and processes. During the pause, the library nevertheless
      * reads from time to time information from the Yoctopuce modules by
      * calling yHandleEvents(), in order to stay up-to-date.
@@ -1017,36 +1286,33 @@ public class YAPI {
      * 
      * @param ms_duration : an integer corresponding to the duration of the pause,
      *         in milliseconds.
-     * @param errmsg : a string passed by reference to receive any error message.
      * 
      * @return YAPI.SUCCESS when the call succeeds.
      * 
      * @throws YAPI_Exception
      */
-    public static void Sleep(long ms_duration) throws YAPI_Exception
+    public static int Sleep(long ms_duration) throws YAPI_Exception
     {
-        long end = GetTickCount() + ms_duration;
-        _init_free(false);
-
-        do {
-            HandleEvents();
-            if (end > GetTickCount()) {
-                try {
-                    Thread.sleep(3);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(YAPI.class.getName()).log(Level.SEVERE,
-                            null, ex);
-                    throw new YAPI_Exception(YAPI.IO_ERROR,
-                            "Thread has been interrupted");
-                }
-            }
-        } while (end > GetTickCount());
+        return SafeYAPI()._Sleep(ms_duration);
     }
+
+    /**
+     * Force a hub discovery, if a callback as been registered with yRegisterDeviceRemovalCallback it
+     * will be called for each net work hub that will respond to the discovery
+     * 
+     * @return YAPI.SUCCESS when the call succeeds.
+     * @throws YAPI_Exception
+     */
+    public int TriggerHubDiscovery() throws YAPI_Exception
+    {
+        return SafeYAPI()._TriggerHubDiscovery();
+    }
+
 
     /**
      * Returns the current value of a monotone millisecond-based time counter.
      * This counter can be used to compute delays in relation with
-     * Yoctopuce devices, which also uses the milisecond as timebase.
+     * Yoctopuce devices, which also uses the millisecond as timebase.
      * 
      * @return a long integer corresponding to the millisecond counter.
      */
@@ -1068,71 +1334,65 @@ public class YAPI {
      */
     public static boolean CheckLogicalName(String name)
     {
-        if (name == null) {
-            return false;
-        }
-        if (name.equals("")) {
-            return true;
-        }
-        if (name.length() > 19) {
-            return false;
-        }
-        return name.matches("^[A-Za-z0-9_-]*$");
+        return name != null && (name.equals("") || name.length() <= 19 && name.matches("^[A-Za-z0-9_-]*$"));
     }
 
     /**
      * Register a callback function, to be called each time
-     * a device is pluged. This callback will be invoked while yUpdateDeviceList
+     * a device is plugged. This callback will be invoked while yUpdateDeviceList
      * is running. You will have to call this function on a regular basis.
      * 
      * @param arrivalCallback : a procedure taking a YModule parameter, or null
      *         to unregister a previously registered  callback.
      */
-    public static void RegisterDeviceArrivalCallback(
-            YAPI.DeviceArrivalCallback arrivalCallback)
+    public static void RegisterDeviceArrivalCallback(YAPI.DeviceArrivalCallback arrivalCallback)
     {
-        _arrivalCallback = arrivalCallback;
-    }
+        SafeYAPI()._RegisterDeviceArrivalCallback(arrivalCallback);
+            }
 
-    /**
-     * Register a device logical name change callback
-     */
-    public static void RegisterDeviceChangeCallback(
-            YAPI.DeviceChangeCallback changeCallback)
+    public static void RegisterDeviceChangeCallback(YAPI.DeviceChangeCallback changeCallback)
     {
-        _namechgCallback = changeCallback;
+        SafeYAPI()._RegisterDeviceChangeCallback(changeCallback);
     }
 
     /**
      * Register a callback function, to be called each time
-     * a device is unpluged. This callback will be invoked while yUpdateDeviceList
+     * a device is unplugged. This callback will be invoked while yUpdateDeviceList
      * is running. You will have to call this function on a regular basis.
      * 
      * @param removalCallback : a procedure taking a YModule parameter, or null
      *         to unregister a previously registered  callback.
      */
-    public static void RegisterDeviceRemovalCallback(
-            YAPI.DeviceRemovalCallback removalCallback)
+    public static void RegisterDeviceRemovalCallback(YAPI.DeviceRemovalCallback removalCallback)
     {
-        _removalCallback = removalCallback;
+        SafeYAPI()._RegisterDeviceRemovalCallback(removalCallback);
+    }
+
+    /**
+     * Register a callback function, to be called each time an Network Hub send
+     * an SSDP message. The callback has two string parameter, the first one
+     * contain the serial number of the hub and the second contain the URL of the
+     * network hub (this URL can be passed to RegisterHub). This callback will be invoked
+     * while yUpdateDeviceList is running. You will have to call this function on a regular basis.
+     * 
+     * @param hubDiscoveryCallback : a procedure taking two string parameter, or null
+     *         to unregister a previously registered  callback.
+     */
+    public static void RegisterHubDiscoveryCallback(HubDiscoveryCallback hubDiscoveryCallback)
+    {
+        SafeYAPI()._RegisterHubDiscoveryCallback(hubDiscoveryCallback);
     }
 
     /**
      * Registers a log callback function. This callback will be called each time
-     * the API have something to say. Quite usefull to debug the API.
+     * the API have something to say. Quite useful to debug the API.
      * 
      * @param logfun : a procedure taking a string parameter, or null
      *         to unregister a previously registered  callback.
      */
     public static void RegisterLogFunction(YAPI.LogCallback logfun)
     {
-        _logCallback = logfun;
+        SafeYAPI()._RegisterLogFunction(logfun);
     }
 
-    public static void Log(String message)
-    {
-        if (_logCallback != null) {
-            _logCallback.yLog(message);
-        }
-    }
 }

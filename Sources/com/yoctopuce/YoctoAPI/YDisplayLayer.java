@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 12426 2013-08-20 13:58:34Z seb $
+ * $Id: YDisplayLayer.java 14791 2014-01-31 10:14:04Z seb $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *
@@ -39,16 +39,19 @@
 
 package com.yoctopuce.YoctoAPI;
 
+//--- (generated code: YDisplayLayer class start)
 /**
- * YDisplayLayer Class: Image layer containing data to display
- *
- * A DisplayLayer is an image layer containing objects to display (bitmaps,
- * text, etc.). The content will only be displayed when the layer is active on
- * the screen (and not masked by other overlapping layers).
+ * YDisplayLayer Class: DisplayLayer object interface
+ * 
+ * A DisplayLayer is an image layer containing objects to display
+ * (bitmaps, text, etc.). The content is displayed only when
+ * the layer is active on the screen (and not masked by other
+ * overlapping layers).
  */
-public class YDisplayLayer {
-
-    //--- (generated code: definitions)
+public class YDisplayLayer
+{
+//--- (end of generated code: YDisplayLayer class start)
+    //--- (generated code: YDisplayLayer definitions)
     public enum ALIGN {
         TOP_LEFT (0),
         CENTER_LEFT (1),
@@ -73,7 +76,8 @@ public class YDisplayLayer {
         };
     };
     
-    //--- (end of generated code: definitions)
+
+    //--- (end of generated code: YDisplayLayer definitions)
 
     private YDisplay _display;
     private int _id;
@@ -140,9 +144,8 @@ public class YDisplayLayer {
      */
     public int reset()  throws YAPI_Exception
     {
-        _hidden = false; 
-        return command_flush("X"); 
-        
+        _hidden = false;
+        return command_flush("X");
     }
 
     /**
@@ -229,7 +232,7 @@ public class YDisplayLayer {
      */
     public int setAntialiasingMode(boolean mode)  throws YAPI_Exception
     {
-        return command_push(String.format("a%d",mode));
+        return command_push(String.format("a%d",(mode ? 1 : 0)));
     }
 
     /**
@@ -336,8 +339,8 @@ public class YDisplayLayer {
      * to the specified pixel position is called the anchor point, and can be chosen among
      * several options. Text is rendered from left to right, without implicit wrapping.
      * 
-     * @param x: the distance from left of layer to the text ancor point, in pixels
-     * @param y: the distance from top of layer to the text ancor point, in pixels
+     * @param x: the distance from left of layer to the text anchor point, in pixels
+     * @param y: the distance from top of layer to the text anchor point, in pixels
      * @param anchor: the text anchor point, chosen among the YDisplayLayer.ALIGN enumeration:
      *         YDisplayLayer.ALIGN_TOP_LEFT,    YDisplayLayer.ALIGN_CENTER_LEFT,   
      *         YDisplayLayer.ALIGN_BASELINE_LEFT,    YDisplayLayer.ALIGN_BOTTOM_LEFT,
@@ -375,7 +378,6 @@ public class YDisplayLayer {
     public int drawImage(int x,int y,String imagename)  throws YAPI_Exception
     {
         return command_flush(String.format("*%d,%d,%s%c",x,y,imagename,27));
-        
     }
 
     /**
@@ -403,7 +405,6 @@ public class YDisplayLayer {
         String destname;
         destname = String.format("layer%d:%d,%d@%d,%d",_id,w,bgcol,x,y);
         return _display.upload(destname,bitmap);
-        
     }
 
     /**
@@ -470,8 +471,7 @@ public class YDisplayLayer {
      */
     public int setConsoleMargins(int x1,int y1,int x2,int y2)  throws YAPI_Exception
     {
-        return command_push(String.format("m%d,%d,%d,%d",x1,y1,x2,y2)); 
-        
+        return command_push(String.format("m%d,%d,%d,%d",x1,y1,x2,y2));
     }
 
     /**
@@ -487,8 +487,7 @@ public class YDisplayLayer {
      */
     public int setConsoleBackground(int bgcol)  throws YAPI_Exception
     {
-        return command_push(String.format("b%d",bgcol)); 
-        
+        return command_push(String.format("b%d",bgcol));
     }
 
     /**
@@ -503,8 +502,7 @@ public class YDisplayLayer {
      */
     public int setConsoleWordWrap(boolean wordwrap)  throws YAPI_Exception
     {
-        return command_push(String.format("w%d",wordwrap)); 
-        
+        return command_push(String.format("w%d",(wordwrap ? 1 : 0)));
     }
 
     /**
@@ -536,8 +534,7 @@ public class YDisplayLayer {
      */
     public int setLayerPosition(int x,int y,int scrollTime)  throws YAPI_Exception
     {
-        return command_flush(String.format("#%d,%d,%d",x,y,scrollTime)); 
-        
+        return command_flush(String.format("#%d,%d,%d",x,y,scrollTime));
     }
 
     /**
@@ -552,10 +549,9 @@ public class YDisplayLayer {
      */
     public int hide()  throws YAPI_Exception
     {
-        command_push("h"); 
-        _hidden = true; 
-        return flush_now(); 
-        
+        command_push("h");
+        _hidden = true;
+        return flush_now();
     }
 
     /**
@@ -567,9 +563,8 @@ public class YDisplayLayer {
      */
     public int unhide()  throws YAPI_Exception
     {
-        _hidden = false; 
-        return command_flush("s"); 
-        
+        _hidden = false;
+        return command_flush("s");
     }
 
     /**
@@ -577,10 +572,9 @@ public class YDisplayLayer {
      * 
      * @return an YDisplay object
      */
-    public YDisplay get_display()  throws YAPI_Exception
+    public YDisplay get_display()
     {
-        return _display; 
-        
+        return _display;
     }
 
     /**
@@ -593,7 +587,6 @@ public class YDisplayLayer {
     public int get_displayWidth()  throws YAPI_Exception
     {
         return _display.get_displayWidth();
-        
     }
 
     /**
@@ -606,7 +599,6 @@ public class YDisplayLayer {
     public int get_displayHeight()  throws YAPI_Exception
     {
         return _display.get_displayHeight();
-        
     }
 
     /**
@@ -619,7 +611,6 @@ public class YDisplayLayer {
     public int get_layerWidth()  throws YAPI_Exception
     {
         return _display.get_layerWidth();
-        
     }
 
     /**
@@ -632,15 +623,13 @@ public class YDisplayLayer {
     public int get_layerHeight()  throws YAPI_Exception
     {
         return _display.get_layerHeight();
-        
     }
 
-    public int resetHiddenFlag()  throws YAPI_Exception
+    public int resetHiddenFlag()
     {
-        _hidden = false; 
+        _hidden = false;
         return YAPI.SUCCESS;
-        
     }
 
     //--- (end of generated code: YDisplayLayer implementation)
-};
+}

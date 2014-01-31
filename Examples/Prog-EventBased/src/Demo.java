@@ -1,52 +1,70 @@
+
 import com.yoctopuce.YoctoAPI.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Demo {
 
     static class EventHandler implements YAPI.DeviceArrivalCallback, YAPI.DeviceRemovalCallback,
-                                        YAnButton.UpdateCallback, YLightSensor.UpdateCallback,YTemperature.UpdateCallback
-                                        
-    {
+            YAnButton.UpdateCallback, YSensor.UpdateCallback, YSensor.TimedReportCallback {
 
         @Override
-        public void yDeviceArrival(YModule module)
-        {
+        public void yNewValue(YAnButton fct, String value) {
             try {
-                System.out.println("Device arrival          : " + module);
-                int fctcount = module.functionCount();
-                String fctName, fctFullName;
+                System.out.println(fct.get_hardwareId() + ": " + value + " (new value)");
+            } catch (YAPI_Exception ex) {
+                Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
+        @Override
+        public void yNewValue(YSensor fct, String value) {
+            try {
+                System.out.println(fct.get_hardwareId() + ": " + value + " (new value)");
+            } catch (YAPI_Exception ex) {
+                Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        @Override
+        public void timedReportCallback(YSensor fct, YMeasure measure) {
+            try {
+                System.out.println(fct.get_hardwareId() + ": " + measure.get_averageValue() + " " + fct.get_unit() + " (timed report)");
+            } catch (YAPI_Exception ex) {
+                Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        @Override
+        public void yDeviceArrival(YModule module) {
+            try {
+                String serial = module.get_serialNumber();
+                System.out.println("Device arrival : " + serial);
+
+                // First solution: look for a specific type of function (eg. anButton)
+                int fctcount = module.functionCount();
                 for (int i = 0; i < fctcount; i++) {
-                    fctName = module.functionId(i);
-                    fctFullName = module.get_serialNumber() + "." + fctName;
+                    String fctName = module.functionId(i);
+                    String hardwareId = serial + "." + fctName;
 
                     // register call back for anbuttons
-                    if (fctName.startsWith("anButton") ) {
-                        YAnButton bt = YAnButton.FindAnButton(fctFullName);
-                        if (bt.isOnline()) {
-                            bt.registerValueCallback(this);
-                            System.out.println("Callback registered for : " + fctFullName);
-                        }
+                    if (fctName.startsWith("anButton")) {
+                        System.out.println("- " + hardwareId);
+                        YAnButton bt = YAnButton.FindAnButton(hardwareId);
+                        bt.registerValueCallback(this);
                     }
+                }
 
-                    // register call back for temperature sensors
-                    if (fctName.startsWith("temperature")) {
-                        YTemperature t = YTemperature.FindTemperature(fctFullName);
-                        if (t.isOnline()) {
-                            t.registerValueCallback(this);
-                            System.out.println("Callback registered for : " + fctFullName);
-                        }
+                // Alternate solution: register any kind of sensor on the device
+                YSensor sensor = YSensor.FirstSensor();
+                while (sensor != null) {
+                    if (sensor.get_module().get_serialNumber().equals(serial)) {
+                        String hardwareId = sensor.get_hardwareId();
+                        System.out.println("- " + hardwareId);
+                        sensor.registerValueCallback(this);
+                        sensor.registerTimedReportCallback(this);
                     }
-
-                    // register call back for light sensors
-                    if (fctName.startsWith("lightSensor") ) {
-                        YLightSensor l = YLightSensor.FindLightSensor(fctFullName);
-                        if (l.isOnline()) {
-                            l.registerValueCallback(this);
-                            System.out.println("Callback registered for : " + fctFullName);
-                        }
-                    }
-                    // and so on for other sensor type.....
-
+                    sensor = sensor.nextSensor();
                 }
             } catch (YAPI_Exception ex) {
                 System.out.println("Device access error : " + ex.getLocalizedMessage());
@@ -54,35 +72,13 @@ public class Demo {
         }
 
         @Override
-        public void yDeviceRemoval(YModule module)
-        {
-            System.out.println("Device removal          : " + module);
-        }
-
-        @Override
-        public void yNewValue(YAnButton function, String functionValue)
-        {
-            System.out.println("Position change    :" + function + " = " + functionValue);
-        }
-
-
-        @Override
-        public void yNewValue(YLightSensor function, String functionValue)
-        {
-            System.out.println("Light change       :    " + function + " = " + functionValue+"lx");
-        }
-
-        @Override
-        public void yNewValue(YTemperature function, String functionValue)
-        {
-            System.out.println("Temperature change       :    " + function + " = " + functionValue+"C");
+        public void yDeviceRemoval(YModule module) {
+            System.out.println("Device removal : " + module);
         }
 
     }
 
-
-    public static void main(String[] args) 
-    {
+    public static void main(String[] args) {
         try {
             try {
                 // setup the API to use local VirtualHub

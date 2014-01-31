@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 12324 2013-08-13 15:10:31Z mvuilleu $
+ * $Id: YRealTimeClock.java 14779 2014-01-30 14:56:39Z seb $
  *
  * Implements yFindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -38,9 +38,13 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+import org.json.JSONException;
+import org.json.JSONObject;
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-//--- (globals)
-//--- (end of globals)
+    //--- (YRealTimeClock return codes)
+    //--- (end of YRealTimeClock return codes)
+//--- (YRealTimeClock class start)
 /**
  * YRealTimeClock Class: Real Time Clock function interface
  * 
@@ -51,16 +55,8 @@ package com.yoctopuce.YoctoAPI;
  */
 public class YRealTimeClock extends YFunction
 {
-    //--- (definitions)
-    private YRealTimeClock.UpdateCallback _valueCallbackRealTimeClock;
-    /**
-     * invalid logicalName value
-     */
-    public static final String LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-    /**
-     * invalid advertisedValue value
-     */
-    public static final String ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
+//--- (end of YRealTimeClock class start)
+//--- (YRealTimeClock definitions)
     /**
      * invalid unixTime value
      */
@@ -80,107 +76,68 @@ public class YRealTimeClock extends YFunction
     public static final int TIMESET_TRUE = 1;
     public static final int TIMESET_INVALID = -1;
 
-    //--- (end of definitions)
+    protected long _unixTime = UNIXTIME_INVALID;
+    protected String _dateTime = DATETIME_INVALID;
+    protected int _utcOffset = UTCOFFSET_INVALID;
+    protected int _timeSet = TIMESET_INVALID;
+    protected UpdateCallback _valueCallbackRealTimeClock = null;
 
     /**
-     * UdateCallback for RealTimeClock
+     * Deprecated UpdateCallback for RealTimeClock
      */
     public interface UpdateCallback {
         /**
          * 
-         * @param function : the function object of which the value has changed
-         * @param functionValue :the character string describing the new advertised value
+         * @param function      : the function object of which the value has changed
+         * @param functionValue : the character string describing the new advertised value
          */
         void yNewValue(YRealTimeClock function, String functionValue);
     }
 
+    /**
+     * TimedReportCallback for RealTimeClock
+     */
+    public interface TimedReportCallback {
+        /**
+         * 
+         * @param function : the function object of which the value has changed
+         * @param measure  : measure
+         */
+        void timedReportCallback(YRealTimeClock  function, YMeasure measure);
+    }
+    //--- (end of YRealTimeClock definitions)
 
+
+    /**
+     * 
+     * @param func : functionid
+     */
+    protected YRealTimeClock(String func)
+    {
+        super(func);
+        _className = "RealTimeClock";
+        //--- (YRealTimeClock attributes initialization)
+        //--- (end of YRealTimeClock attributes initialization)
+    }
 
     //--- (YRealTimeClock implementation)
-
-    /**
-     * Returns the logical name of the clock.
-     * 
-     * @return a string corresponding to the logical name of the clock
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_logicalName()  throws YAPI_Exception
+    @Override
+    protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
-        String json_val = (String) _getAttr("logicalName");
-        return json_val;
+        if (json_val.has("unixTime")) {
+            _unixTime =  json_val.getLong("unixTime");
+        }
+        if (json_val.has("dateTime")) {
+            _dateTime =  json_val.getString("dateTime"); ;
+        }
+        if (json_val.has("utcOffset")) {
+            _utcOffset =  json_val.getInt("utcOffset");
+        }
+        if (json_val.has("timeSet")) {
+            _timeSet =  json_val.getInt("timeSet")>0?1:0;
+        }
+        super._parseAttr(json_val);
     }
-
-    /**
-     * Returns the logical name of the clock.
-     * 
-     * @return a string corresponding to the logical name of the clock
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getLogicalName() throws YAPI_Exception
-
-    { return get_logicalName(); }
-
-    /**
-     * Changes the logical name of the clock. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the clock
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int set_logicalName( String  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = newval;
-        _setAttr("logicalName",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the logical name of the clock. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the clock
-     * 
-     * @return YAPI_SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int setLogicalName( String newval)  throws YAPI_Exception
-
-    { return set_logicalName(newval); }
-
-    /**
-     * Returns the current value of the clock (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the clock (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_advertisedValue()  throws YAPI_Exception
-    {
-        String json_val = (String) _getAttr("advertisedValue");
-        return json_val;
-    }
-
-    /**
-     * Returns the current value of the clock (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the clock (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getAdvertisedValue() throws YAPI_Exception
-
-    { return get_advertisedValue(); }
 
     /**
      * Returns the current time in Unix format (number of elapsed seconds since Jan 1st, 1970).
@@ -192,8 +149,12 @@ public class YRealTimeClock extends YFunction
      */
     public long get_unixTime()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("unixTime");
-        return Long.parseLong(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return UNIXTIME_INVALID;
+            }
+        }
+        return _unixTime;
     }
 
     /**
@@ -218,7 +179,7 @@ public class YRealTimeClock extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_unixTime( long  newval)  throws YAPI_Exception
+    public int set_unixTime(long  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = Long.toString(newval);
@@ -236,7 +197,7 @@ public class YRealTimeClock extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setUnixTime( long newval)  throws YAPI_Exception
+    public int setUnixTime(long newval)  throws YAPI_Exception
 
     { return set_unixTime(newval); }
 
@@ -249,8 +210,12 @@ public class YRealTimeClock extends YFunction
      */
     public String get_dateTime()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("dateTime");
-        return json_val;
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return DATETIME_INVALID;
+            }
+        }
+        return _dateTime;
     }
 
     /**
@@ -273,8 +238,12 @@ public class YRealTimeClock extends YFunction
      */
     public int get_utcOffset()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("utcOffset");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return UTCOFFSET_INVALID;
+            }
+        }
+        return _utcOffset;
     }
 
     /**
@@ -300,7 +269,7 @@ public class YRealTimeClock extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_utcOffset( int  newval)  throws YAPI_Exception
+    public int set_utcOffset(int  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = Integer.toString(newval);
@@ -320,7 +289,7 @@ public class YRealTimeClock extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setUtcOffset( int newval)  throws YAPI_Exception
+    public int setUtcOffset(int newval)  throws YAPI_Exception
 
     { return set_utcOffset(newval); }
 
@@ -334,8 +303,12 @@ public class YRealTimeClock extends YFunction
      */
     public int get_timeSet()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("timeSet");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return TIMESET_INVALID;
+            }
+        }
+        return _timeSet;
     }
 
     /**
@@ -349,20 +322,6 @@ public class YRealTimeClock extends YFunction
     public int getTimeSet() throws YAPI_Exception
 
     { return get_timeSet(); }
-
-    /**
-     * Continues the enumeration of clocks started using yFirstRealTimeClock().
-     * 
-     * @return a pointer to a YRealTimeClock object, corresponding to
-     *         a clock currently online, or a null pointer
-     *         if there are no more clocks to enumerate.
-     */
-    public  YRealTimeClock nextRealTimeClock()
-    {
-        String next_hwid = YAPI.getNextHardwareId(_className, _func);
-        if(next_hwid == null) return null;
-        return FindRealTimeClock(next_hwid);
-    }
 
     /**
      * Retrieves a clock for a given identifier.
@@ -388,56 +347,14 @@ public class YRealTimeClock extends YFunction
      * @return a YRealTimeClock object allowing you to drive the clock.
      */
     public static YRealTimeClock FindRealTimeClock(String func)
-    {   YFunction yfunc = YAPI.getFunction("RealTimeClock", func);
-        if (yfunc != null) {
-            return (YRealTimeClock) yfunc;
+    {
+        YRealTimeClock obj;
+        obj = (YRealTimeClock) YFunction._FindFromCache("RealTimeClock", func);
+        if (obj == null) {
+            obj = new YRealTimeClock(func);
+            YFunction._AddToCache("RealTimeClock", func, obj);
         }
-        return new YRealTimeClock(func);
-    }
-
-    /**
-     * Starts the enumeration of clocks currently accessible.
-     * Use the method YRealTimeClock.nextRealTimeClock() to iterate on
-     * next clocks.
-     * 
-     * @return a pointer to a YRealTimeClock object, corresponding to
-     *         the first clock currently online, or a null pointer
-     *         if there are none.
-     */
-    public static YRealTimeClock FirstRealTimeClock()
-    {
-        String next_hwid = YAPI.getFirstHardwareId("RealTimeClock");
-        if (next_hwid == null)  return null;
-        return FindRealTimeClock(next_hwid);
-    }
-
-    /**
-     * 
-     * @param func : functionid
-     */
-    private YRealTimeClock(String func)
-    {
-        super("RealTimeClock", func);
-    }
-
-    @Override
-    void advertiseValue(String newvalue)
-    {
-        super.advertiseValue(newvalue);
-        if (_valueCallbackRealTimeClock != null) {
-            _valueCallbackRealTimeClock.yNewValue(this, newvalue);
-        }
-    }
-
-    /**
-     * Internal: check if we have a callback interface registered
-     * 
-     * @return yes if the user has registered a interface
-     */
-    @Override
-     protected boolean hasCallbackRegistered()
-    {
-        return super.hasCallbackRegistered() || (_valueCallbackRealTimeClock!=null);
+        return obj;
     }
 
     /**
@@ -451,21 +368,66 @@ public class YRealTimeClock extends YFunction
      *         the new advertised value.
      * @noreturn
      */
-    public void registerValueCallback(YRealTimeClock.UpdateCallback callback)
+    public int registerValueCallback(UpdateCallback callback)
     {
-         _valueCallbackRealTimeClock =  callback;
-         if (callback != null && isOnline()) {
-             String newval;
-             try {
-                 newval = get_advertisedValue();
-                 if (!newval.equals("") && !newval.equals("!INVALDI!")) {
-                     callback.yNewValue(this, newval);
-                 }
-             } catch (YAPI_Exception ex) {
-             }
-         }
+        String val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        _valueCallbackRealTimeClock = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && isOnline()) {
+            val = _advertisedValue;
+            if (!(val.equals(""))) {
+                _invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int _invokeValueCallback(String value)
+    {
+        if (_valueCallbackRealTimeClock != null) {
+            _valueCallbackRealTimeClock.yNewValue(this, value);
+        } else {
+            super._invokeValueCallback(value);
+        }
+        return 0;
+    }
+
+    /**
+     * Continues the enumeration of clocks started using yFirstRealTimeClock().
+     * 
+     * @return a pointer to a YRealTimeClock object, corresponding to
+     *         a clock currently online, or a null pointer
+     *         if there are no more clocks to enumerate.
+     */
+    public  YRealTimeClock nextRealTimeClock()
+    {
+        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        if(next_hwid == null) return null;
+        return FindRealTimeClock(next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of clocks currently accessible.
+     * Use the method YRealTimeClock.nextRealTimeClock() to iterate on
+     * next clocks.
+     * 
+     * @return a pointer to a YRealTimeClock object, corresponding to
+     *         the first clock currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YRealTimeClock FirstRealTimeClock()
+    {
+        String next_hwid = SafeYAPI().getFirstHardwareId("RealTimeClock");
+        if (next_hwid == null)  return null;
+        return FindRealTimeClock(next_hwid);
     }
 
     //--- (end of YRealTimeClock implementation)
-};
+}
 

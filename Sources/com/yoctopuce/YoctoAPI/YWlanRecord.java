@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWlanRecord.java 12426 2013-08-20 13:58:34Z seb $
+ * $Id: YWlanRecord.java 14473 2014-01-15 21:42:41Z seb $
  *
  * YWlanRecord Class: Description of a wireless network detected
  *
@@ -42,19 +42,22 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-//--- (generated code: globals)
-//--- (end of generated code: globals)
+//--- (generated code: YWlanRecord class start)
 /**
- * YWlanRecord Class: Description of a wireless network detected
+ * YWlanRecord Class: Description of a wireless network
  * 
  * 
  */
 public class YWlanRecord
 {
-    private String _ssid;
-    private int    _channel;
-    private String _sec;
-    private int    _rssi;
+//--- (end of generated code: YWlanRecord class start)
+    //--- (generated code: YWlanRecord definitions)
+    protected String _ssid;
+    protected int _channel = 0;
+    protected String _sec;
+    protected int _rssi = 0;
+
+    //--- (end of generated code: YWlanRecord definitions)
 
     YWlanRecord(String json_str) throws YAPI_Exception
     {
@@ -69,30 +72,29 @@ public class YWlanRecord
             throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json struct for YWlanRecord");
         }
     }
-    //--- (generated code: definitions)
-    //--- (end of generated code: definitions)
+    
     //--- (generated code: YWlanRecord implementation)
 
-    public String get_ssid()  throws YAPI_Exception
+    public String get_ssid()
     {
         return _ssid;
     }
 
-    public int get_channel()  throws YAPI_Exception
+    public int get_channel()
     {
         return _channel;
     }
 
-    public String get_security()  throws YAPI_Exception
+    public String get_security()
     {
         return _sec;
     }
 
-    public int get_linkQuality()  throws YAPI_Exception
+    public int get_linkQuality()
     {
         return _rssi;
     }
 
     //--- (end of generated code: YWlanRecord implementation)
-};
+}
 

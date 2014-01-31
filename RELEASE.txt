@@ -1,4 +1,3 @@
-- clarify license agreement
-- fix YAPI.RegisterHub and YAPI.PreregisterHub that was failing for the second IP hub.
-- add get_lastLogs() method to YModule class
-- minor fixes 
+- add support for HTTP Callback mode
+- add YAPI.RegisterHubDiscoveryCallback and YAPI.TriggerHubDiscovery
+- minor bug fixes

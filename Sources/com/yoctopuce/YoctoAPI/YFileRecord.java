@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFileRecord.java 12426 2013-08-20 13:58:34Z seb $
+ * $Id: YFileRecord.java 14473 2014-01-15 21:42:41Z seb $
  *
  * YFileRecord Class: Description of a file on the device filesystem
  *
@@ -42,8 +42,7 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-  //--- (generated code: globals)
-//--- (end of generated code: globals)
+//--- (generated code: YFileRecord class start)
 /**
  * YFileRecord Class: Description of a file on the device filesystem
  * 
@@ -51,13 +50,15 @@ import org.json.JSONObject;
  */
 public class YFileRecord
 {
-    private String _name;
-    private int _crc;
-    private int _size;
-    
-    
-    //--- (generated code: definitions)
-    //--- (end of generated code: definitions)
+//--- (end of generated code: YFileRecord class start)
+
+    //--- (generated code: YFileRecord definitions)
+    protected String _name;
+    protected int _size = 0;
+    protected int _crc = 0;
+
+    //--- (end of generated code: YFileRecord definitions)
+
     public YFileRecord(String json_str) throws YAPI_Exception
     {
         JSONObject json;
@@ -70,38 +71,24 @@ public class YFileRecord
             throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json struct for YFileRecord");
         }
     }
+
     //--- (generated code: YFileRecord implementation)
 
-    public String get_name()  throws YAPI_Exception
+    public String get_name()
     {
         return _name;
     }
 
-    public int get_size()  throws YAPI_Exception
+    public int get_size()
     {
         return _size;
     }
 
-    public int get_crc()  throws YAPI_Exception
-    {
-        return _crc;
-    }
-
-    public String name()  throws YAPI_Exception
-    {
-        return _name;
-    }
-
-    public int size()  throws YAPI_Exception
-    {
-        return _size;
-    }
-
-    public int crc()  throws YAPI_Exception
+    public int get_crc()
     {
         return _crc;
     }
 
     //--- (end of generated code: YFileRecord implementation)
-};
+}
 

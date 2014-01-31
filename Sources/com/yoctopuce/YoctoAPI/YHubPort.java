@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHubPort.java 12337 2013-08-14 15:22:22Z mvuilleu $
+ * $Id: YHubPort.java 14779 2014-01-30 14:56:39Z seb $
  *
  * Implements yFindHubPort(), the high-level API for HubPort functions
  *
@@ -38,26 +38,25 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+import org.json.JSONException;
+import org.json.JSONObject;
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-//--- (globals)
-//--- (end of globals)
+    //--- (YHubPort return codes)
+    //--- (end of YHubPort return codes)
+//--- (YHubPort class start)
 /**
  * YHubPort Class: Yocto-hub port interface
  * 
- * 
+ * YHubPort objects provide control over the power supply for every
+ * YoctoHub port and provide information about the device connected to it.
+ * The logical name of a YHubPort is always automatically set to the
+ * unique serial number of the Yoctopuce device connected to it.
  */
 public class YHubPort extends YFunction
 {
-    //--- (definitions)
-    private YHubPort.UpdateCallback _valueCallbackHubPort;
-    /**
-     * invalid logicalName value
-     */
-    public static final String LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-    /**
-     * invalid advertisedValue value
-     */
-    public static final String ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
+//--- (end of YHubPort class start)
+//--- (YHubPort definitions)
     /**
      * invalid enabled value
      */
@@ -78,110 +77,65 @@ public class YHubPort extends YFunction
     /**
      * invalid baudRate value
      */
-    public static final int BAUDRATE_INVALID = YAPI.INVALID_UNSIGNED;
-    //--- (end of definitions)
+    public static final int BAUDRATE_INVALID = YAPI.INVALID_UINT;
+    protected int _enabled = ENABLED_INVALID;
+    protected int _portState = PORTSTATE_INVALID;
+    protected int _baudRate = BAUDRATE_INVALID;
+    protected UpdateCallback _valueCallbackHubPort = null;
 
     /**
-     * UdateCallback for HubPort
+     * Deprecated UpdateCallback for HubPort
      */
     public interface UpdateCallback {
         /**
          * 
-         * @param function : the function object of which the value has changed
-         * @param functionValue :the character string describing the new advertised value
+         * @param function      : the function object of which the value has changed
+         * @param functionValue : the character string describing the new advertised value
          */
         void yNewValue(YHubPort function, String functionValue);
     }
 
+    /**
+     * TimedReportCallback for HubPort
+     */
+    public interface TimedReportCallback {
+        /**
+         * 
+         * @param function : the function object of which the value has changed
+         * @param measure  : measure
+         */
+        void timedReportCallback(YHubPort  function, YMeasure measure);
+    }
+    //--- (end of YHubPort definitions)
 
+
+    /**
+     * 
+     * @param func : functionid
+     */
+    protected YHubPort(String func)
+    {
+        super(func);
+        _className = "HubPort";
+        //--- (YHubPort attributes initialization)
+        //--- (end of YHubPort attributes initialization)
+    }
 
     //--- (YHubPort implementation)
-
-    /**
-     * Returns the logical name of the Yocto-hub port, which is always the serial number of the
-     * connected module.
-     * 
-     * @return a string corresponding to the logical name of the Yocto-hub port, which is always the
-     * serial number of the
-     *         connected module
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_logicalName()  throws YAPI_Exception
+    @Override
+    protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
-        String json_val = (String) _getAttr("logicalName");
-        return json_val;
+        if (json_val.has("enabled")) {
+            _enabled =  json_val.getInt("enabled")>0?1:0;
+        }
+        if (json_val.has("portState")) {
+            _portState =  json_val.getInt("portState");
+        }
+        if (json_val.has("baudRate")) {
+            _baudRate =  json_val.getInt("baudRate");
+        }
+        super._parseAttr(json_val);
     }
-
-    /**
-     * Returns the logical name of the Yocto-hub port, which is always the serial number of the
-     * connected module.
-     * 
-     * @return a string corresponding to the logical name of the Yocto-hub port, which is always the
-     * serial number of the
-     *         connected module
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getLogicalName() throws YAPI_Exception
-
-    { return get_logicalName(); }
-
-    /**
-     * It is not possible to configure the logical name of a Yocto-hub port. The logical
-     * name is automatically set to the serial number of the connected module.
-     * 
-     * @param newval : a string
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int set_logicalName( String  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = newval;
-        _setAttr("logicalName",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * It is not possible to configure the logical name of a Yocto-hub port. The logical
-     * name is automatically set to the serial number of the connected module.
-     * 
-     * @param newval : a string
-     * 
-     * @return YAPI_SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int setLogicalName( String newval)  throws YAPI_Exception
-
-    { return set_logicalName(newval); }
-
-    /**
-     * Returns the current value of the Yocto-hub port (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the Yocto-hub port (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_advertisedValue()  throws YAPI_Exception
-    {
-        String json_val = (String) _getAttr("advertisedValue");
-        return json_val;
-    }
-
-    /**
-     * Returns the current value of the Yocto-hub port (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the Yocto-hub port (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getAdvertisedValue() throws YAPI_Exception
-
-    { return get_advertisedValue(); }
 
     /**
      * Returns true if the Yocto-hub port is powered, false otherwise.
@@ -193,8 +147,12 @@ public class YHubPort extends YFunction
      */
     public int get_enabled()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("enabled");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ENABLED_INVALID;
+            }
+        }
+        return _enabled;
     }
 
     /**
@@ -211,7 +169,7 @@ public class YHubPort extends YFunction
 
     /**
      * Changes the activation of the Yocto-hub port. If the port is enabled, the
-     * *      connected module is powered. Otherwise, port power is shut down.
+     * connected module is powered. Otherwise, port power is shut down.
      * 
      * @param newval : either YHubPort.ENABLED_FALSE or YHubPort.ENABLED_TRUE, according to the activation
      * of the Yocto-hub port
@@ -220,7 +178,7 @@ public class YHubPort extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_enabled( int  newval)  throws YAPI_Exception
+    public int set_enabled(int  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = (newval > 0 ? "1" : "0");
@@ -230,7 +188,7 @@ public class YHubPort extends YFunction
 
     /**
      * Changes the activation of the Yocto-hub port. If the port is enabled, the
-     * *      connected module is powered. Otherwise, port power is shut down.
+     * connected module is powered. Otherwise, port power is shut down.
      * 
      * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation of the Yocto-hub port
      * 
@@ -238,7 +196,7 @@ public class YHubPort extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setEnabled( int newval)  throws YAPI_Exception
+    public int setEnabled(int newval)  throws YAPI_Exception
 
     { return set_enabled(newval); }
 
@@ -252,8 +210,12 @@ public class YHubPort extends YFunction
      */
     public int get_portState()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("portState");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PORTSTATE_INVALID;
+            }
+        }
+        return _portState;
     }
 
     /**
@@ -279,8 +241,12 @@ public class YHubPort extends YFunction
      */
     public int get_baudRate()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("baudRate");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BAUDRATE_INVALID;
+            }
+        }
+        return _baudRate;
     }
 
     /**
@@ -295,20 +261,6 @@ public class YHubPort extends YFunction
     public int getBaudRate() throws YAPI_Exception
 
     { return get_baudRate(); }
-
-    /**
-     * Continues the enumeration of Yocto-hub ports started using yFirstHubPort().
-     * 
-     * @return a pointer to a YHubPort object, corresponding to
-     *         a Yocto-hub port currently online, or a null pointer
-     *         if there are no more Yocto-hub ports to enumerate.
-     */
-    public  YHubPort nextHubPort()
-    {
-        String next_hwid = YAPI.getNextHardwareId(_className, _func);
-        if(next_hwid == null) return null;
-        return FindHubPort(next_hwid);
-    }
 
     /**
      * Retrieves a Yocto-hub port for a given identifier.
@@ -334,56 +286,14 @@ public class YHubPort extends YFunction
      * @return a YHubPort object allowing you to drive the Yocto-hub port.
      */
     public static YHubPort FindHubPort(String func)
-    {   YFunction yfunc = YAPI.getFunction("HubPort", func);
-        if (yfunc != null) {
-            return (YHubPort) yfunc;
+    {
+        YHubPort obj;
+        obj = (YHubPort) YFunction._FindFromCache("HubPort", func);
+        if (obj == null) {
+            obj = new YHubPort(func);
+            YFunction._AddToCache("HubPort", func, obj);
         }
-        return new YHubPort(func);
-    }
-
-    /**
-     * Starts the enumeration of Yocto-hub ports currently accessible.
-     * Use the method YHubPort.nextHubPort() to iterate on
-     * next Yocto-hub ports.
-     * 
-     * @return a pointer to a YHubPort object, corresponding to
-     *         the first Yocto-hub port currently online, or a null pointer
-     *         if there are none.
-     */
-    public static YHubPort FirstHubPort()
-    {
-        String next_hwid = YAPI.getFirstHardwareId("HubPort");
-        if (next_hwid == null)  return null;
-        return FindHubPort(next_hwid);
-    }
-
-    /**
-     * 
-     * @param func : functionid
-     */
-    private YHubPort(String func)
-    {
-        super("HubPort", func);
-    }
-
-    @Override
-    void advertiseValue(String newvalue)
-    {
-        super.advertiseValue(newvalue);
-        if (_valueCallbackHubPort != null) {
-            _valueCallbackHubPort.yNewValue(this, newvalue);
-        }
-    }
-
-    /**
-     * Internal: check if we have a callback interface registered
-     * 
-     * @return yes if the user has registered a interface
-     */
-    @Override
-     protected boolean hasCallbackRegistered()
-    {
-        return super.hasCallbackRegistered() || (_valueCallbackHubPort!=null);
+        return obj;
     }
 
     /**
@@ -397,21 +307,66 @@ public class YHubPort extends YFunction
      *         the new advertised value.
      * @noreturn
      */
-    public void registerValueCallback(YHubPort.UpdateCallback callback)
+    public int registerValueCallback(UpdateCallback callback)
     {
-         _valueCallbackHubPort =  callback;
-         if (callback != null && isOnline()) {
-             String newval;
-             try {
-                 newval = get_advertisedValue();
-                 if (!newval.equals("") && !newval.equals("!INVALDI!")) {
-                     callback.yNewValue(this, newval);
-                 }
-             } catch (YAPI_Exception ex) {
-             }
-         }
+        String val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        _valueCallbackHubPort = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && isOnline()) {
+            val = _advertisedValue;
+            if (!(val.equals(""))) {
+                _invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int _invokeValueCallback(String value)
+    {
+        if (_valueCallbackHubPort != null) {
+            _valueCallbackHubPort.yNewValue(this, value);
+        } else {
+            super._invokeValueCallback(value);
+        }
+        return 0;
+    }
+
+    /**
+     * Continues the enumeration of Yocto-hub ports started using yFirstHubPort().
+     * 
+     * @return a pointer to a YHubPort object, corresponding to
+     *         a Yocto-hub port currently online, or a null pointer
+     *         if there are no more Yocto-hub ports to enumerate.
+     */
+    public  YHubPort nextHubPort()
+    {
+        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        if(next_hwid == null) return null;
+        return FindHubPort(next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of Yocto-hub ports currently accessible.
+     * Use the method YHubPort.nextHubPort() to iterate on
+     * next Yocto-hub ports.
+     * 
+     * @return a pointer to a YHubPort object, corresponding to
+     *         the first Yocto-hub port currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YHubPort FirstHubPort()
+    {
+        String next_hwid = SafeYAPI().getFirstHardwareId("HubPort");
+        if (next_hwid == null)  return null;
+        return FindHubPort(next_hwid);
     }
 
     //--- (end of YHubPort implementation)
-};
+}
 

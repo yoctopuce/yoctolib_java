@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YServo.java 12324 2013-08-13 15:10:31Z mvuilleu $
+ * $Id: YServo.java 14779 2014-01-30 14:56:39Z seb $
  *
  * Implements yFindServo(), the high-level API for Servo functions
  *
@@ -38,9 +38,13 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+import org.json.JSONException;
+import org.json.JSONObject;
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-//--- (globals)
-//--- (end of globals)
+    //--- (YServo return codes)
+    //--- (end of YServo return codes)
+//--- (YServo class start)
 /**
  * YServo Class: Servo function interface
  * 
@@ -51,24 +55,16 @@ package com.yoctopuce.YoctoAPI;
  */
 public class YServo extends YFunction
 {
-    //--- (definitions)
-    private YServo.UpdateCallback _valueCallbackServo;
+//--- (end of YServo class start)
+//--- (YServo definitions)
     public static class YMove
     {
-        public long target = YAPI.INVALID_LONG;
-        public long ms = YAPI.INVALID_LONG;
-        public long moving = YAPI.INVALID_LONG;
-        public YMove(String attr){}
+        public int target = YAPI.INVALID_INT;
+        public int ms = YAPI.INVALID_INT;
+        public int moving = YAPI.INVALID_UINT;
+        public YMove(){}
     }
 
-    /**
-     * invalid logicalName value
-     */
-    public static final String LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-    /**
-     * invalid advertisedValue value
-     */
-    public static final String ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
     /**
      * invalid position value
      */
@@ -76,117 +72,87 @@ public class YServo extends YFunction
     /**
      * invalid range value
      */
-    public static final int RANGE_INVALID = YAPI.INVALID_UNSIGNED;
+    public static final int RANGE_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid neutral value
      */
-    public static final int NEUTRAL_INVALID = YAPI.INVALID_UNSIGNED;
-    public static final YMove MOVE_INVALID = new YMove("");
-    //--- (end of definitions)
+    public static final int NEUTRAL_INVALID = YAPI.INVALID_UINT;
+    public static final YMove MOVE_INVALID = null;
+    protected int _position = POSITION_INVALID;
+    protected int _range = RANGE_INVALID;
+    protected int _neutral = NEUTRAL_INVALID;
+    protected YMove _move = new YMove();
+    protected UpdateCallback _valueCallbackServo = null;
 
     /**
-     * UdateCallback for Servo
+     * Deprecated UpdateCallback for Servo
      */
     public interface UpdateCallback {
         /**
          * 
-         * @param function : the function object of which the value has changed
-         * @param functionValue :the character string describing the new advertised value
+         * @param function      : the function object of which the value has changed
+         * @param functionValue : the character string describing the new advertised value
          */
         void yNewValue(YServo function, String functionValue);
     }
 
+    /**
+     * TimedReportCallback for Servo
+     */
+    public interface TimedReportCallback {
+        /**
+         * 
+         * @param function : the function object of which the value has changed
+         * @param measure  : measure
+         */
+        void timedReportCallback(YServo  function, YMeasure measure);
+    }
+    //--- (end of YServo definitions)
 
+
+    /**
+     * 
+     * @param func : functionid
+     */
+    protected YServo(String func)
+    {
+        super(func);
+        _className = "Servo";
+        //--- (YServo attributes initialization)
+        //--- (end of YServo attributes initialization)
+    }
 
     //--- (YServo implementation)
+    @Override
+    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    {
+        if (json_val.has("position")) {
+            _position =  json_val.getInt("position");
+        }
+        if (json_val.has("range")) {
+            _range =  json_val.getInt("range");
+        }
+        if (json_val.has("neutral")) {
+            _neutral =  json_val.getInt("neutral");
+        }
+        if (json_val.has("move")) {
+            JSONObject subjson = json_val.getJSONObject("move");
+            if (subjson.has("moving")) {
+                _move.moving = subjson.getInt("moving");
+            }
+            if (subjson.has("target")) {
+                _move.moving = subjson.getInt("target");
+            }
+            if (subjson.has("ms")) {
+                _move.moving = subjson.getInt("ms");
+            }
+        }
+        super._parseAttr(json_val);
+    }
 
     /**
      * invalid move
      */
-    /**
-     * Returns the logical name of the servo.
-     * 
-     * @return a string corresponding to the logical name of the servo
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_logicalName()  throws YAPI_Exception
-    {
-        String json_val = (String) _getAttr("logicalName");
-        return json_val;
-    }
-
-    /**
-     * Returns the logical name of the servo.
-     * 
-     * @return a string corresponding to the logical name of the servo
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getLogicalName() throws YAPI_Exception
-
-    { return get_logicalName(); }
-
-    /**
-     * Changes the logical name of the servo. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the servo
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int set_logicalName( String  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = newval;
-        _setAttr("logicalName",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the logical name of the servo. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the servo
-     * 
-     * @return YAPI_SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int setLogicalName( String newval)  throws YAPI_Exception
-
-    { return set_logicalName(newval); }
-
-    /**
-     * Returns the current value of the servo (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the servo (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_advertisedValue()  throws YAPI_Exception
-    {
-        String json_val = (String) _getAttr("advertisedValue");
-        return json_val;
-    }
-
-    /**
-     * Returns the current value of the servo (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the servo (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getAdvertisedValue() throws YAPI_Exception
-
-    { return get_advertisedValue(); }
-
     /**
      * Returns the current servo position.
      * 
@@ -196,8 +162,12 @@ public class YServo extends YFunction
      */
     public int get_position()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("position");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return POSITION_INVALID;
+            }
+        }
+        return _position;
     }
 
     /**
@@ -220,7 +190,7 @@ public class YServo extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_position( int  newval)  throws YAPI_Exception
+    public int set_position(int  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = Integer.toString(newval);
@@ -237,7 +207,7 @@ public class YServo extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setPosition( int newval)  throws YAPI_Exception
+    public int setPosition(int newval)  throws YAPI_Exception
 
     { return set_position(newval); }
 
@@ -250,8 +220,12 @@ public class YServo extends YFunction
      */
     public int get_range()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("range");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return RANGE_INVALID;
+            }
+        }
+        return _range;
     }
 
     /**
@@ -279,10 +253,10 @@ public class YServo extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_range( int  newval)  throws YAPI_Exception
+    public int set_range(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
+        rest_val = Integer.toString(newval);
         _setAttr("range",rest_val);
         return YAPI.SUCCESS;
     }
@@ -301,7 +275,7 @@ public class YServo extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setRange( int newval)  throws YAPI_Exception
+    public int setRange(int newval)  throws YAPI_Exception
 
     { return set_range(newval); }
 
@@ -314,8 +288,12 @@ public class YServo extends YFunction
      */
     public int get_neutral()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("neutral");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return NEUTRAL_INVALID;
+            }
+        }
+        return _neutral;
     }
 
     /**
@@ -343,10 +321,10 @@ public class YServo extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_neutral( int  newval)  throws YAPI_Exception
+    public int set_neutral(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
+        rest_val = Integer.toString(newval);
         _setAttr("neutral",rest_val);
         return YAPI.SUCCESS;
     }
@@ -365,21 +343,31 @@ public class YServo extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setNeutral( int newval)  throws YAPI_Exception
+    public int setNeutral(int newval)  throws YAPI_Exception
 
     { return set_neutral(newval); }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public YMove get_move()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("move");
-        return new YMove(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return MOVE_INVALID;
+            }
+        }
+        return _move;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public YMove getMove() throws YAPI_Exception
 
     { return get_move(); }
 
-    public int set_move( YMove  newval)  throws YAPI_Exception
+    public int set_move(YMove  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = String.format("%d:%d",newval.target,newval.ms);
@@ -387,7 +375,7 @@ public class YServo extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setMove( YMove newval)  throws YAPI_Exception
+    public int setMove(YMove newval)  throws YAPI_Exception
 
     { return set_move(newval); }
 
@@ -407,20 +395,6 @@ public class YServo extends YFunction
         rest_val = String.format("%d:%d",target,ms_duration);
         _setAttr("move",rest_val);
         return YAPI.SUCCESS;
-    }
-
-    /**
-     * Continues the enumeration of servos started using yFirstServo().
-     * 
-     * @return a pointer to a YServo object, corresponding to
-     *         a servo currently online, or a null pointer
-     *         if there are no more servos to enumerate.
-     */
-    public  YServo nextServo()
-    {
-        String next_hwid = YAPI.getNextHardwareId(_className, _func);
-        if(next_hwid == null) return null;
-        return FindServo(next_hwid);
     }
 
     /**
@@ -447,56 +421,14 @@ public class YServo extends YFunction
      * @return a YServo object allowing you to drive the servo.
      */
     public static YServo FindServo(String func)
-    {   YFunction yfunc = YAPI.getFunction("Servo", func);
-        if (yfunc != null) {
-            return (YServo) yfunc;
+    {
+        YServo obj;
+        obj = (YServo) YFunction._FindFromCache("Servo", func);
+        if (obj == null) {
+            obj = new YServo(func);
+            YFunction._AddToCache("Servo", func, obj);
         }
-        return new YServo(func);
-    }
-
-    /**
-     * Starts the enumeration of servos currently accessible.
-     * Use the method YServo.nextServo() to iterate on
-     * next servos.
-     * 
-     * @return a pointer to a YServo object, corresponding to
-     *         the first servo currently online, or a null pointer
-     *         if there are none.
-     */
-    public static YServo FirstServo()
-    {
-        String next_hwid = YAPI.getFirstHardwareId("Servo");
-        if (next_hwid == null)  return null;
-        return FindServo(next_hwid);
-    }
-
-    /**
-     * 
-     * @param func : functionid
-     */
-    private YServo(String func)
-    {
-        super("Servo", func);
-    }
-
-    @Override
-    void advertiseValue(String newvalue)
-    {
-        super.advertiseValue(newvalue);
-        if (_valueCallbackServo != null) {
-            _valueCallbackServo.yNewValue(this, newvalue);
-        }
-    }
-
-    /**
-     * Internal: check if we have a callback interface registered
-     * 
-     * @return yes if the user has registered a interface
-     */
-    @Override
-     protected boolean hasCallbackRegistered()
-    {
-        return super.hasCallbackRegistered() || (_valueCallbackServo!=null);
+        return obj;
     }
 
     /**
@@ -510,21 +442,66 @@ public class YServo extends YFunction
      *         the new advertised value.
      * @noreturn
      */
-    public void registerValueCallback(YServo.UpdateCallback callback)
+    public int registerValueCallback(UpdateCallback callback)
     {
-         _valueCallbackServo =  callback;
-         if (callback != null && isOnline()) {
-             String newval;
-             try {
-                 newval = get_advertisedValue();
-                 if (!newval.equals("") && !newval.equals("!INVALDI!")) {
-                     callback.yNewValue(this, newval);
-                 }
-             } catch (YAPI_Exception ex) {
-             }
-         }
+        String val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        _valueCallbackServo = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && isOnline()) {
+            val = _advertisedValue;
+            if (!(val.equals(""))) {
+                _invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int _invokeValueCallback(String value)
+    {
+        if (_valueCallbackServo != null) {
+            _valueCallbackServo.yNewValue(this, value);
+        } else {
+            super._invokeValueCallback(value);
+        }
+        return 0;
+    }
+
+    /**
+     * Continues the enumeration of servos started using yFirstServo().
+     * 
+     * @return a pointer to a YServo object, corresponding to
+     *         a servo currently online, or a null pointer
+     *         if there are no more servos to enumerate.
+     */
+    public  YServo nextServo()
+    {
+        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        if(next_hwid == null) return null;
+        return FindServo(next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of servos currently accessible.
+     * Use the method YServo.nextServo() to iterate on
+     * next servos.
+     * 
+     * @return a pointer to a YServo object, corresponding to
+     *         the first servo currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YServo FirstServo()
+    {
+        String next_hwid = SafeYAPI().getFirstHardwareId("Servo");
+        if (next_hwid == null)  return null;
+        return FindServo(next_hwid);
     }
 
     //--- (end of YServo implementation)
-};
+}
 

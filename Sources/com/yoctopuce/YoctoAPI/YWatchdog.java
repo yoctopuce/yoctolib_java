@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.java 12324 2013-08-13 15:10:31Z mvuilleu $
+ * $Id: YWatchdog.java 14779 2014-01-30 14:56:39Z seb $
  *
  * Implements yFindWatchdog(), the high-level API for Watchdog functions
  *
@@ -38,9 +38,13 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+import org.json.JSONException;
+import org.json.JSONObject;
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-//--- (globals)
-//--- (end of globals)
+    //--- (YWatchdog return codes)
+    //--- (end of YWatchdog return codes)
+//--- (YWatchdog class start)
 /**
  * YWatchdog Class: Watchdog function interface
  * 
@@ -53,24 +57,16 @@ package com.yoctopuce.YoctoAPI;
  */
 public class YWatchdog extends YFunction
 {
-    //--- (definitions)
-    private YWatchdog.UpdateCallback _valueCallbackWatchdog;
+//--- (end of YWatchdog class start)
+//--- (YWatchdog definitions)
     public static class YDelayedPulse
     {
-        public long target = YAPI.INVALID_LONG;
-        public long ms = YAPI.INVALID_LONG;
-        public long moving = YAPI.INVALID_LONG;
-        public YDelayedPulse(String attr){}
+        public int target = YAPI.INVALID_INT;
+        public int ms = YAPI.INVALID_INT;
+        public int moving = YAPI.INVALID_UINT;
+        public YDelayedPulse(){}
     }
 
-    /**
-     * invalid logicalName value
-     */
-    public static final String LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-    /**
-     * invalid advertisedValue value
-     */
-    public static final String ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
     /**
      * invalid state value
      */
@@ -78,6 +74,22 @@ public class YWatchdog extends YFunction
     public static final int STATE_B = 1;
     public static final int STATE_INVALID = -1;
 
+    /**
+     * invalid stateAtPowerOn value
+     */
+    public static final int STATEATPOWERON_UNCHANGED = 0;
+    public static final int STATEATPOWERON_A = 1;
+    public static final int STATEATPOWERON_B = 2;
+    public static final int STATEATPOWERON_INVALID = -1;
+
+    /**
+     * invalid maxTimeOnStateA value
+     */
+    public static final long MAXTIMEONSTATEA_INVALID = YAPI.INVALID_LONG;
+    /**
+     * invalid maxTimeOnStateB value
+     */
+    public static final long MAXTIMEONSTATEB_INVALID = YAPI.INVALID_LONG;
     /**
      * invalid output value
      */
@@ -115,112 +127,114 @@ public class YWatchdog extends YFunction
      * invalid triggerDuration value
      */
     public static final long TRIGGERDURATION_INVALID = YAPI.INVALID_LONG;
-    public static final YDelayedPulse DELAYEDPULSETIMER_INVALID = new YDelayedPulse("");
-    //--- (end of definitions)
+    public static final YDelayedPulse DELAYEDPULSETIMER_INVALID = null;
+    protected int _state = STATE_INVALID;
+    protected int _stateAtPowerOn = STATEATPOWERON_INVALID;
+    protected long _maxTimeOnStateA = MAXTIMEONSTATEA_INVALID;
+    protected long _maxTimeOnStateB = MAXTIMEONSTATEB_INVALID;
+    protected int _output = OUTPUT_INVALID;
+    protected long _pulseTimer = PULSETIMER_INVALID;
+    protected YDelayedPulse _delayedPulseTimer = new YDelayedPulse();
+    protected long _countdown = COUNTDOWN_INVALID;
+    protected int _autoStart = AUTOSTART_INVALID;
+    protected int _running = RUNNING_INVALID;
+    protected long _triggerDelay = TRIGGERDELAY_INVALID;
+    protected long _triggerDuration = TRIGGERDURATION_INVALID;
+    protected UpdateCallback _valueCallbackWatchdog = null;
 
     /**
-     * UdateCallback for Watchdog
+     * Deprecated UpdateCallback for Watchdog
      */
     public interface UpdateCallback {
         /**
          * 
-         * @param function : the function object of which the value has changed
-         * @param functionValue :the character string describing the new advertised value
+         * @param function      : the function object of which the value has changed
+         * @param functionValue : the character string describing the new advertised value
          */
         void yNewValue(YWatchdog function, String functionValue);
     }
 
+    /**
+     * TimedReportCallback for Watchdog
+     */
+    public interface TimedReportCallback {
+        /**
+         * 
+         * @param function : the function object of which the value has changed
+         * @param measure  : measure
+         */
+        void timedReportCallback(YWatchdog  function, YMeasure measure);
+    }
+    //--- (end of YWatchdog definitions)
 
+
+    /**
+     * 
+     * @param func : functionid
+     */
+    protected YWatchdog(String func)
+    {
+        super(func);
+        _className = "Watchdog";
+        //--- (YWatchdog attributes initialization)
+        //--- (end of YWatchdog attributes initialization)
+    }
 
     //--- (YWatchdog implementation)
+    @Override
+    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    {
+        if (json_val.has("state")) {
+            _state =  json_val.getInt("state")>0?1:0;
+        }
+        if (json_val.has("stateAtPowerOn")) {
+            _stateAtPowerOn =  json_val.getInt("stateAtPowerOn");
+        }
+        if (json_val.has("maxTimeOnStateA")) {
+            _maxTimeOnStateA =  json_val.getLong("maxTimeOnStateA");
+        }
+        if (json_val.has("maxTimeOnStateB")) {
+            _maxTimeOnStateB =  json_val.getLong("maxTimeOnStateB");
+        }
+        if (json_val.has("output")) {
+            _output =  json_val.getInt("output")>0?1:0;
+        }
+        if (json_val.has("pulseTimer")) {
+            _pulseTimer =  json_val.getLong("pulseTimer");
+        }
+        if (json_val.has("delayedPulseTimer")) {
+            JSONObject subjson = json_val.getJSONObject("delayedPulseTimer");
+            if (subjson.has("moving")) {
+                _delayedPulseTimer.moving = subjson.getInt("moving");
+            }
+            if (subjson.has("target")) {
+                _delayedPulseTimer.moving = subjson.getInt("target");
+            }
+            if (subjson.has("ms")) {
+                _delayedPulseTimer.moving = subjson.getInt("ms");
+            }
+        }
+        if (json_val.has("countdown")) {
+            _countdown =  json_val.getLong("countdown");
+        }
+        if (json_val.has("autoStart")) {
+            _autoStart =  json_val.getInt("autoStart")>0?1:0;
+        }
+        if (json_val.has("running")) {
+            _running =  json_val.getInt("running")>0?1:0;
+        }
+        if (json_val.has("triggerDelay")) {
+            _triggerDelay =  json_val.getLong("triggerDelay");
+        }
+        if (json_val.has("triggerDuration")) {
+            _triggerDuration =  json_val.getLong("triggerDuration");
+        }
+        super._parseAttr(json_val);
+    }
 
     /**
      * invalid delayedPulseTimer
      */
-    /**
-     * Returns the logical name of the watchdog.
-     * 
-     * @return a string corresponding to the logical name of the watchdog
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_logicalName()  throws YAPI_Exception
-    {
-        String json_val = (String) _getAttr("logicalName");
-        return json_val;
-    }
-
-    /**
-     * Returns the logical name of the watchdog.
-     * 
-     * @return a string corresponding to the logical name of the watchdog
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getLogicalName() throws YAPI_Exception
-
-    { return get_logicalName(); }
-
-    /**
-     * Changes the logical name of the watchdog. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the watchdog
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int set_logicalName( String  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = newval;
-        _setAttr("logicalName",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the logical name of the watchdog. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the watchdog
-     * 
-     * @return YAPI_SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int setLogicalName( String newval)  throws YAPI_Exception
-
-    { return set_logicalName(newval); }
-
-    /**
-     * Returns the current value of the watchdog (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the watchdog (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_advertisedValue()  throws YAPI_Exception
-    {
-        String json_val = (String) _getAttr("advertisedValue");
-        return json_val;
-    }
-
-    /**
-     * Returns the current value of the watchdog (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the watchdog (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getAdvertisedValue() throws YAPI_Exception
-
-    { return get_advertisedValue(); }
-
     /**
      * Returns the state of the watchdog (A for the idle position, B for the active position).
      * 
@@ -231,8 +245,12 @@ public class YWatchdog extends YFunction
      */
     public int get_state()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("state");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return STATE_INVALID;
+            }
+        }
+        return _state;
     }
 
     /**
@@ -257,7 +275,7 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_state( int  newval)  throws YAPI_Exception
+    public int set_state(int  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = (newval > 0 ? "1" : "0");
@@ -275,9 +293,202 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setState( int newval)  throws YAPI_Exception
+    public int setState(int newval)  throws YAPI_Exception
 
     { return set_state(newval); }
+
+    /**
+     * Returns the state of the watchdog at device startup (A for the idle position, B for the active
+     * position, UNCHANGED for no change).
+     * 
+     * @return a value among YWatchdog.STATEATPOWERON_UNCHANGED, YWatchdog.STATEATPOWERON_A and
+     * YWatchdog.STATEATPOWERON_B corresponding to the state of the watchdog at device startup (A for the
+     * idle position, B for the active position, UNCHANGED for no change)
+     * 
+     * @throws YAPI_Exception
+     */
+    public int get_stateAtPowerOn()  throws YAPI_Exception
+    {
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return STATEATPOWERON_INVALID;
+            }
+        }
+        return _stateAtPowerOn;
+    }
+
+    /**
+     * Returns the state of the watchdog at device startup (A for the idle position, B for the active
+     * position, UNCHANGED for no change).
+     * 
+     * @return a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
+     * corresponding to the state of the watchdog at device startup (A for the idle position, B for the
+     * active position, UNCHANGED for no change)
+     * 
+     * @throws YAPI_Exception
+     */
+    public int getStateAtPowerOn() throws YAPI_Exception
+
+    { return get_stateAtPowerOn(); }
+
+    /**
+     * Preset the state of the watchdog at device startup (A for the idle position,
+     * B for the active position, UNCHANGED for no modification). Remember to call the matching module saveToFlash()
+     * method, otherwise this call will have no effect.
+     * 
+     * @param newval : a value among YWatchdog.STATEATPOWERON_UNCHANGED, YWatchdog.STATEATPOWERON_A and
+     * YWatchdog.STATEATPOWERON_B
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int set_stateAtPowerOn(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("stateAtPowerOn",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Preset the state of the watchdog at device startup (A for the idle position,
+     * B for the active position, UNCHANGED for no modification). Remember to call the matching module saveToFlash()
+     * method, otherwise this call will have no effect.
+     * 
+     * @param newval : a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
+     * 
+     * @return YAPI_SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int setStateAtPowerOn(int newval)  throws YAPI_Exception
+
+    { return set_stateAtPowerOn(newval); }
+
+    /**
+     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     * switching back in to B state. Zero means no maximum time.
+     * 
+     * @return an integer
+     * 
+     * @throws YAPI_Exception
+     */
+    public long get_maxTimeOnStateA()  throws YAPI_Exception
+    {
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return MAXTIMEONSTATEA_INVALID;
+            }
+        }
+        return _maxTimeOnStateA;
+    }
+
+    /**
+     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     * switching back in to B state. Zero means no maximum time.
+     * 
+     * @return an integer
+     * 
+     * @throws YAPI_Exception
+     */
+    public long getMaxTimeOnStateA() throws YAPI_Exception
+
+    { return get_maxTimeOnStateA(); }
+
+    /**
+     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     * switching back in to B state. Use zero for no maximum time.
+     * 
+     * @param newval : an integer
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int set_maxTimeOnStateA(long  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Long.toString(newval);
+        _setAttr("maxTimeOnStateA",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     * switching back in to B state. Use zero for no maximum time.
+     * 
+     * @param newval : an integer
+     * 
+     * @return YAPI_SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int setMaxTimeOnStateA(long newval)  throws YAPI_Exception
+
+    { return set_maxTimeOnStateA(newval); }
+
+    /**
+     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     * switching back in to A state. Zero means no maximum time.
+     * 
+     * @return an integer
+     * 
+     * @throws YAPI_Exception
+     */
+    public long get_maxTimeOnStateB()  throws YAPI_Exception
+    {
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return MAXTIMEONSTATEB_INVALID;
+            }
+        }
+        return _maxTimeOnStateB;
+    }
+
+    /**
+     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     * switching back in to A state. Zero means no maximum time.
+     * 
+     * @return an integer
+     * 
+     * @throws YAPI_Exception
+     */
+    public long getMaxTimeOnStateB() throws YAPI_Exception
+
+    { return get_maxTimeOnStateB(); }
+
+    /**
+     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     * switching back in to A state. Use zero for no maximum time.
+     * 
+     * @param newval : an integer
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int set_maxTimeOnStateB(long  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Long.toString(newval);
+        _setAttr("maxTimeOnStateB",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     * switching back in to A state. Use zero for no maximum time.
+     * 
+     * @param newval : an integer
+     * 
+     * @return YAPI_SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int setMaxTimeOnStateB(long newval)  throws YAPI_Exception
+
+    { return set_maxTimeOnStateB(newval); }
 
     /**
      * Returns the output state of the watchdog, when used as a simple switch (single throw).
@@ -289,8 +500,12 @@ public class YWatchdog extends YFunction
      */
     public int get_output()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("output");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return OUTPUT_INVALID;
+            }
+        }
+        return _output;
     }
 
     /**
@@ -315,7 +530,7 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_output( int  newval)  throws YAPI_Exception
+    public int set_output(int  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = (newval > 0 ? "1" : "0");
@@ -333,7 +548,7 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setOutput( int newval)  throws YAPI_Exception
+    public int setOutput(int newval)  throws YAPI_Exception
 
     { return set_output(newval); }
 
@@ -349,8 +564,12 @@ public class YWatchdog extends YFunction
      */
     public long get_pulseTimer()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("pulseTimer");
-        return Long.parseLong(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PULSETIMER_INVALID;
+            }
+        }
+        return _pulseTimer;
     }
 
     /**
@@ -367,7 +586,7 @@ public class YWatchdog extends YFunction
 
     { return get_pulseTimer(); }
 
-    public int set_pulseTimer( long  newval)  throws YAPI_Exception
+    public int set_pulseTimer(long  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = Long.toString(newval);
@@ -375,7 +594,7 @@ public class YWatchdog extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setPulseTimer( long newval)  throws YAPI_Exception
+    public int setPulseTimer(long newval)  throws YAPI_Exception
 
     { return set_pulseTimer(newval); }
 
@@ -397,17 +616,27 @@ public class YWatchdog extends YFunction
         return YAPI.SUCCESS;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public YDelayedPulse get_delayedPulseTimer()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("delayedPulseTimer");
-        return new YDelayedPulse(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return DELAYEDPULSETIMER_INVALID;
+            }
+        }
+        return _delayedPulseTimer;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public YDelayedPulse getDelayedPulseTimer() throws YAPI_Exception
 
     { return get_delayedPulseTimer(); }
 
-    public int set_delayedPulseTimer( YDelayedPulse  newval)  throws YAPI_Exception
+    public int set_delayedPulseTimer(YDelayedPulse  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = String.format("%d:%d",newval.target,newval.ms);
@@ -415,7 +644,7 @@ public class YWatchdog extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setDelayedPulseTimer( YDelayedPulse newval)  throws YAPI_Exception
+    public int setDelayedPulseTimer(YDelayedPulse newval)  throws YAPI_Exception
 
     { return set_delayedPulseTimer(newval); }
 
@@ -448,8 +677,12 @@ public class YWatchdog extends YFunction
      */
     public long get_countdown()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("countdown");
-        return Long.parseLong(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return COUNTDOWN_INVALID;
+            }
+        }
+        return _countdown;
     }
 
     /**
@@ -475,8 +708,12 @@ public class YWatchdog extends YFunction
      */
     public int get_autoStart()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("autoStart");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return AUTOSTART_INVALID;
+            }
+        }
+        return _autoStart;
     }
 
     /**
@@ -501,7 +738,7 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_autoStart( int  newval)  throws YAPI_Exception
+    public int set_autoStart(int  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = (newval > 0 ? "1" : "0");
@@ -520,7 +757,7 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setAutoStart( int newval)  throws YAPI_Exception
+    public int setAutoStart(int newval)  throws YAPI_Exception
 
     { return set_autoStart(newval); }
 
@@ -533,8 +770,12 @@ public class YWatchdog extends YFunction
      */
     public int get_running()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("running");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return RUNNING_INVALID;
+            }
+        }
+        return _running;
     }
 
     /**
@@ -558,7 +799,7 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_running( int  newval)  throws YAPI_Exception
+    public int set_running(int  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = (newval > 0 ? "1" : "0");
@@ -575,7 +816,7 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setRunning( int newval)  throws YAPI_Exception
+    public int setRunning(int newval)  throws YAPI_Exception
 
     { return set_running(newval); }
 
@@ -606,8 +847,12 @@ public class YWatchdog extends YFunction
      */
     public long get_triggerDelay()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("triggerDelay");
-        return Long.parseLong(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return TRIGGERDELAY_INVALID;
+            }
+        }
+        return _triggerDelay;
     }
 
     /**
@@ -632,7 +877,7 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_triggerDelay( long  newval)  throws YAPI_Exception
+    public int set_triggerDelay(long  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = Long.toString(newval);
@@ -650,7 +895,7 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setTriggerDelay( long newval)  throws YAPI_Exception
+    public int setTriggerDelay(long newval)  throws YAPI_Exception
 
     { return set_triggerDelay(newval); }
 
@@ -663,8 +908,12 @@ public class YWatchdog extends YFunction
      */
     public long get_triggerDuration()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("triggerDuration");
-        return Long.parseLong(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return TRIGGERDURATION_INVALID;
+            }
+        }
+        return _triggerDuration;
     }
 
     /**
@@ -687,7 +936,7 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_triggerDuration( long  newval)  throws YAPI_Exception
+    public int set_triggerDuration(long  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = Long.toString(newval);
@@ -704,23 +953,9 @@ public class YWatchdog extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setTriggerDuration( long newval)  throws YAPI_Exception
+    public int setTriggerDuration(long newval)  throws YAPI_Exception
 
     { return set_triggerDuration(newval); }
-
-    /**
-     * Continues the enumeration of watchdog started using yFirstWatchdog().
-     * 
-     * @return a pointer to a YWatchdog object, corresponding to
-     *         a watchdog currently online, or a null pointer
-     *         if there are no more watchdog to enumerate.
-     */
-    public  YWatchdog nextWatchdog()
-    {
-        String next_hwid = YAPI.getNextHardwareId(_className, _func);
-        if(next_hwid == null) return null;
-        return FindWatchdog(next_hwid);
-    }
 
     /**
      * Retrieves a watchdog for a given identifier.
@@ -746,56 +981,14 @@ public class YWatchdog extends YFunction
      * @return a YWatchdog object allowing you to drive the watchdog.
      */
     public static YWatchdog FindWatchdog(String func)
-    {   YFunction yfunc = YAPI.getFunction("Watchdog", func);
-        if (yfunc != null) {
-            return (YWatchdog) yfunc;
+    {
+        YWatchdog obj;
+        obj = (YWatchdog) YFunction._FindFromCache("Watchdog", func);
+        if (obj == null) {
+            obj = new YWatchdog(func);
+            YFunction._AddToCache("Watchdog", func, obj);
         }
-        return new YWatchdog(func);
-    }
-
-    /**
-     * Starts the enumeration of watchdog currently accessible.
-     * Use the method YWatchdog.nextWatchdog() to iterate on
-     * next watchdog.
-     * 
-     * @return a pointer to a YWatchdog object, corresponding to
-     *         the first watchdog currently online, or a null pointer
-     *         if there are none.
-     */
-    public static YWatchdog FirstWatchdog()
-    {
-        String next_hwid = YAPI.getFirstHardwareId("Watchdog");
-        if (next_hwid == null)  return null;
-        return FindWatchdog(next_hwid);
-    }
-
-    /**
-     * 
-     * @param func : functionid
-     */
-    private YWatchdog(String func)
-    {
-        super("Watchdog", func);
-    }
-
-    @Override
-    void advertiseValue(String newvalue)
-    {
-        super.advertiseValue(newvalue);
-        if (_valueCallbackWatchdog != null) {
-            _valueCallbackWatchdog.yNewValue(this, newvalue);
-        }
-    }
-
-    /**
-     * Internal: check if we have a callback interface registered
-     * 
-     * @return yes if the user has registered a interface
-     */
-    @Override
-     protected boolean hasCallbackRegistered()
-    {
-        return super.hasCallbackRegistered() || (_valueCallbackWatchdog!=null);
+        return obj;
     }
 
     /**
@@ -809,21 +1002,66 @@ public class YWatchdog extends YFunction
      *         the new advertised value.
      * @noreturn
      */
-    public void registerValueCallback(YWatchdog.UpdateCallback callback)
+    public int registerValueCallback(UpdateCallback callback)
     {
-         _valueCallbackWatchdog =  callback;
-         if (callback != null && isOnline()) {
-             String newval;
-             try {
-                 newval = get_advertisedValue();
-                 if (!newval.equals("") && !newval.equals("!INVALDI!")) {
-                     callback.yNewValue(this, newval);
-                 }
-             } catch (YAPI_Exception ex) {
-             }
-         }
+        String val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        _valueCallbackWatchdog = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && isOnline()) {
+            val = _advertisedValue;
+            if (!(val.equals(""))) {
+                _invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int _invokeValueCallback(String value)
+    {
+        if (_valueCallbackWatchdog != null) {
+            _valueCallbackWatchdog.yNewValue(this, value);
+        } else {
+            super._invokeValueCallback(value);
+        }
+        return 0;
+    }
+
+    /**
+     * Continues the enumeration of watchdog started using yFirstWatchdog().
+     * 
+     * @return a pointer to a YWatchdog object, corresponding to
+     *         a watchdog currently online, or a null pointer
+     *         if there are no more watchdog to enumerate.
+     */
+    public  YWatchdog nextWatchdog()
+    {
+        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        if(next_hwid == null) return null;
+        return FindWatchdog(next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of watchdog currently accessible.
+     * Use the method YWatchdog.nextWatchdog() to iterate on
+     * next watchdog.
+     * 
+     * @return a pointer to a YWatchdog object, corresponding to
+     *         the first watchdog currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YWatchdog FirstWatchdog()
+    {
+        String next_hwid = SafeYAPI().getFirstHardwareId("Watchdog");
+        if (next_hwid == null)  return null;
+        return FindWatchdog(next_hwid);
     }
 
     //--- (end of YWatchdog implementation)
-};
+}
 

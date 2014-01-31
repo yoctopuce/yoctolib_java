@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFunction.java 12426 2013-08-20 13:58:34Z seb $
+ * $Id: YFunction.java 14779 2014-01-30 14:56:39Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -39,60 +39,319 @@
 
 package com.yoctopuce.YoctoAPI;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
+
+
+//--- (generated code: YFunction class start)
 /**
- * YFunction Class (virtual class, used internally)
- *
- * This is the parent class for all public objects representing device functions
- * documented in the high-level programming API. This abstract class does all
- * the real job, but without knowledge of the specific function attributes.
- *
+ * YFunction Class: Common function interface
+ * 
+ * This is the parent class for all public objects representing device functions documented in
+ * the high-level programming API. This abstract class does all the real job, but without
+ * knowledge of the specific function attributes.
+ * 
  * Instantiating a child class of YFunction does not cause any communication.
- * The instance simply keeps track of its function identifier, and will
- * dynamically bind to a matching device at the time it is really beeing used to
- * read or set an attribute. In order to allow true hot-plug replacement of one
- * device by another, the binding stay dynamic through the life of the object.
- *
- * The YFunction class implements a generic high-level cache for the attribute
- * values of the specified function, pre-parsed from the REST API string.
+ * The instance simply keeps track of its function identifier, and will dynamically bind
+ * to a matching device at the time it is really being used to read or set an attribute.
+ * In order to allow true hot-plug replacement of one device by another, the binding stay
+ * dynamic through the life of the object.
+ * 
+ * The YFunction class implements a generic high-level cache for the attribute values of
+ * the specified function, pre-parsed from the REST API string.
  */
-public class YFunction {
+public class YFunction
+{
+//--- (end of generated code: YFunction class start)
 
     public static final String FUNCTIONDESCRIPTOR_INVALID = "!INVALID!";
+
     protected String _className;
     protected String _func;
     protected int _lastErrorType;
     protected String _lastErrorMsg;
-    protected long _expiration;
-    protected HashMap<String, String> _cache;
     protected Object _userData;
-    protected UpdateCallback _valueCallback;
+    protected HashMap<String, YDataStream> _dataStreams;
+    //--- (generated code: YFunction definitions)
+    /**
+     * invalid logicalName value
+     */
+    public static final String LOGICALNAME_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid advertisedValue value
+     */
+    public static final String ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
+    protected String _logicalName = LOGICALNAME_INVALID;
+    protected String _advertisedValue = ADVERTISEDVALUE_INVALID;
+    protected UpdateCallback _valueCallbackFunction = null;
+    protected long _cacheExpiration = 0;
+    protected String _serial;
+    protected String _funId;
+    protected String _hwId;
 
+    /**
+     * Deprecated UpdateCallback for Function
+     */
     public interface UpdateCallback {
-
+        /**
+         * 
+         * @param function      : the function object of which the value has changed
+         * @param functionValue : the character string describing the new advertised value
+         */
         void yNewValue(YFunction function, String functionValue);
     }
 
-    public YFunction(String classname, String func)
+    /**
+     * TimedReportCallback for Function
+     */
+    public interface TimedReportCallback {
+        /**
+         * 
+         * @param function : the function object of which the value has changed
+         * @param measure  : measure
+         */
+        void timedReportCallback(YFunction  function, YMeasure measure);
+    }
+    //--- (end of generated code: YFunction definitions)
+
+
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YFunction(String func)
     {
-        _className = classname;
+        _className = "Function";
         _func = func;
         _lastErrorType = YAPI.SUCCESS;
         _lastErrorMsg = "";
-        _expiration = 0;
-        _cache = new HashMap<String, String>();
         _userData = null;
-        _valueCallback = null;
-        YAPI.setFunction(classname, func, this);
+        _dataStreams = new HashMap<String, YDataStream>();
+        //--- (generated code: YFunction attributes initialization)
+        //--- (end of generated code: YFunction attributes initialization)
     }
+
+    protected void _throw(int error,String message) throws YAPI_Exception {
+        throw new YAPI_Exception(error, message);
+    }
+
+    protected static YFunction _FindFromCache(String className, String func)
+    {
+        return SafeYAPI().getFunction(className, func);
+    }
+
+    protected static void _AddToCache(String className, String func, YFunction obj)
+    {
+        SafeYAPI().setFunction(className, func, obj);
+    }
+
+
+    protected static void _UpdateValueCallbackList(YFunction func, boolean add)
+    {
+        SafeYAPI()._UpdateValueCallbackList(func, add);
+    }
+
+
+
+
+    protected static void _UpdateTimedReportCallbackList(YFunction func, boolean add)
+    {
+        SafeYAPI()._UpdateTimedReportCallbackList(func, add);
+    }
+
+
+    //--- (generated code: YFunction implementation)
+    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    {
+        if (json_val.has("logicalName")) {
+            _logicalName =  json_val.getString("logicalName"); ;
+        }
+        if (json_val.has("advertisedValue")) {
+            _advertisedValue =  json_val.getString("advertisedValue"); ;
+        }
+    }
+
+    /**
+     * Returns the logical name of the function.
+     * 
+     * @return a string corresponding to the logical name of the function
+     * 
+     * @throws YAPI_Exception
+     */
+    public String get_logicalName()  throws YAPI_Exception
+    {
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return LOGICALNAME_INVALID;
+            }
+        }
+        return _logicalName;
+    }
+
+    /**
+     * Returns the logical name of the function.
+     * 
+     * @return a string corresponding to the logical name of the function
+     * 
+     * @throws YAPI_Exception
+     */
+    public String getLogicalName() throws YAPI_Exception
+
+    { return get_logicalName(); }
+
+    /**
+     * Changes the logical name of the function. You can use yCheckLogicalName()
+     * prior to this call to make sure that your parameter is valid.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     * 
+     * @param newval : a string corresponding to the logical name of the function
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int set_logicalName(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = newval;
+        _setAttr("logicalName",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the logical name of the function. You can use yCheckLogicalName()
+     * prior to this call to make sure that your parameter is valid.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     * 
+     * @param newval : a string corresponding to the logical name of the function
+     * 
+     * @return YAPI_SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int setLogicalName(String newval)  throws YAPI_Exception
+
+    { return set_logicalName(newval); }
+
+    /**
+     * Returns the current value of the function (no more than 6 characters).
+     * 
+     * @return a string corresponding to the current value of the function (no more than 6 characters)
+     * 
+     * @throws YAPI_Exception
+     */
+    public String get_advertisedValue()  throws YAPI_Exception
+    {
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ADVERTISEDVALUE_INVALID;
+            }
+        }
+        return _advertisedValue;
+    }
+
+    /**
+     * Returns the current value of the function (no more than 6 characters).
+     * 
+     * @return a string corresponding to the current value of the function (no more than 6 characters)
+     * 
+     * @throws YAPI_Exception
+     */
+    public String getAdvertisedValue() throws YAPI_Exception
+
+    { return get_advertisedValue(); }
+
+    /**
+     * Retrieves a function for a given identifier.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     * 
+     * This function does not require that the function is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YFunction.isOnline() to test if the function is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a function by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     * 
+     * @param func : a string that uniquely characterizes the function
+     * 
+     * @return a YFunction object allowing you to drive the function.
+     */
+    public static YFunction FindFunction(String func)
+    {
+        YFunction obj;
+        obj = (YFunction) YFunction._FindFromCache("Function", func);
+        if (obj == null) {
+            obj = new YFunction(func);
+            YFunction._AddToCache("Function", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Registers the callback function that is invoked on every change of advertised value.
+     * The callback is invoked only during the execution of ySleep or yHandleEvents.
+     * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
+     * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * 
+     * @param callback : the callback function to call, or a null pointer. The callback function should take two
+     *         arguments: the function object of which the value has changed, and the character string describing
+     *         the new advertised value.
+     * @noreturn
+     */
+    public int registerValueCallback(UpdateCallback callback)
+    {
+        String val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        _valueCallbackFunction = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && isOnline()) {
+            val = _advertisedValue;
+            if (!(val.equals(""))) {
+                _invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
+
+    public int _invokeValueCallback(String value)
+    {
+        if (_valueCallbackFunction != null) {
+            _valueCallbackFunction.yNewValue(this, value);
+        } else {
+        }
+        return 0;
+    }
+
+    public int _parserHelper()
+    {
+        return 0;
+    }
+
+    //--- (end of generated code: YFunction implementation)
 
     /**
      * Returns a short text that describes the function in the form TYPE(NAME)=SERIAL&#46;FUNCTIONID.
@@ -111,12 +370,10 @@ public class YFunction {
      */
     public String describe()
     {
-
-
         try {
-            String hwid = YAPI.resolveFunction(_className, _func);
+            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
             return _className + "(" + _func + ")="+hwid;
-        } catch (YAPI_Exception ex) {
+        } catch (YAPI_Exception ignored) {
         }
         return _className + "(" + _func + ")=unresolved";
 
@@ -124,7 +381,7 @@ public class YFunction {
 
 
     /**
-     * Returns the unique hardware identifier of the function in the form SERIAL&#46;FUNCTIONID.
+     * Returns the unique hardware identifier of the function in the form SERIAL.FUNCTIONID.
      * The unique hardware identifier is composed of the device serial
      * number and of the hardware identifier of the function. (for example RELAYLO1-123456.relay1)
      * 
@@ -134,12 +391,12 @@ public class YFunction {
      */
     public String get_hardwareId() throws YAPI_Exception
     {
-        return YAPI.resolveFunction(_className, _func);
+        return SafeYAPI().resolveFunction(_className, _func).getHardwareId();
     }
 
     public String getHardwareId() throws YAPI_Exception
     {
-        return YAPI.resolveFunction(_className, _func);    	
+        return SafeYAPI().resolveFunction(_className, _func).getHardwareId();
     }
 
 
@@ -153,14 +410,12 @@ public class YFunction {
      */
     public String get_functionId() throws YAPI_Exception
     {
-        String hwid = get_hardwareId();
-        int pos = hwid.indexOf('.');
-        return hwid.substring(pos+1);
+        return SafeYAPI().resolveFunction(_className, _func).getFuncId();
     }
 
     public String getFunctionId() throws YAPI_Exception
     {
-        return get_functionId();
+        return SafeYAPI().resolveFunction(_className, _func).getFuncId();
     }
 
 
@@ -177,8 +432,8 @@ public class YFunction {
      */
     public String get_friendlyName() throws YAPI_Exception
     {
-        YFunctionType ftype = YAPI.getFnByType(_className);
-        return ftype.friendlyName(_func).toString();
+        YPEntry yp = SafeYAPI().resolveFunction(_className, _func);
+        return yp.getFriendlyName();
     }
 
     public String getFriendlyName() throws YAPI_Exception
@@ -193,36 +448,22 @@ public class YFunction {
         return describe();
     }
 
-    // Return the value of an attribute from function cache, after reloading it from device if needed
-    // Note: the function cache is a typed (parsed) cache, contrarily to the agnostic device cache
-    protected Object _getAttr(String attr) throws YAPI_Exception
-    {
-        if (_expiration <= YAPI.GetTickCount()) {
-            // no valid cached value, reload from device
-            load(YAPI.DefaultCacheValidity);
+    protected void  _parse(JSONObject json, long msValidity) throws YAPI_Exception {
+        _cacheExpiration = YAPI.GetTickCount()+ msValidity;
+        try {
+            _parseAttr(json);
+        } catch (JSONException e) {
+            _throw(YAPI.IO_ERROR,e.getMessage());
         }
-        if (!_cache.containsKey(attr)) {
-            throw new YAPI_Exception(YAPI.VERSION_MISMATCH, "No such attribute " + attr + " in function");
-        }
-        return _cache.get(attr);
+        _parserHelper();
     }
 
-    // Return the value of an attribute from function cache, after loading it from device if needed
-    protected Object _getFixedAttr(String attr) throws YAPI_Exception
-    {
-        if (_expiration == 0) {
-            // no cached value, load from device
-            load(YAPI.DefaultCacheValidity);
-        }
-        if (!_cache.containsKey(attr)) {
-            throw new YAPI_Exception(YAPI.VERSION_MISMATCH, "No such attribute " + attr + " in function");
-        }
-        return _cache.get(attr);
-    }
+
+
 
     // Change the value of an attribute on a device, and update cache on the fly
     // Note: the function cache is a typed (parsed) cache, contrarily to the agnostic device cache
-    protected void _setAttr(String attr, String newval) throws YAPI_Exception
+    protected int _setAttr(String attr, String newval) throws YAPI_Exception
     {
         if (newval == null) {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Undefined value to set for attribute " + attr);
@@ -241,17 +482,18 @@ public class YFunction {
         } catch (UnsupportedEncodingException ex) {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Unsupported Encoding");
         }
-        YAPI.funcRequest(_className, _func, extra);
-        if (_expiration!=0) {
-            _expiration = YAPI.GetTickCount();
+        _devRequest(extra);
+        if (_cacheExpiration!=0) {
+            _cacheExpiration = YAPI.GetTickCount();
         }
+        return YAPI.SUCCESS;
     }
 
 
 
     private byte[] _request(String req_first_line,byte[] req_head_and_body) throws YAPI_Exception
     {
-        YDevice dev = YAPI.funcGetDevice(_className, _func);
+        YDevice dev = SafeYAPI().funcGetDevice(_className, _func);
         return dev.requestHTTP(req_first_line,req_head_and_body, false);
     }
 
@@ -262,11 +504,11 @@ public class YFunction {
         String request = "POST /upload.html HTTP/1.1\r\n";
         String mp_header = "Content-Disposition: form-data; name=\""+path+"\"; filename=\"api\"\r\n"+
                     "Content-Type: application/octet-stream\r\n"+
-                    "Cobntent-Transfer-Encoding: binary\r\n\r\n";
+                    "Content-Transfer-Encoding: binary\r\n\r\n";
         // find a valid boundary
         do {
             boundary = String.format("Zz%06xzZ", randomGenerator.nextInt(0x1000000));
-        } while(mp_header.indexOf(boundary)>=0 && YAPI._find_in_bytes(content,boundary.getBytes())>=0);
+        } while(mp_header.contains(boundary) && YAPI._find_in_bytes(content,boundary.getBytes())>=0);
         //construct header parts
         String header_start = "Content-Type: multipart/form-data; boundary="+boundary+"\r\n\r\n--"+boundary+"\r\n"+mp_header;
         String header_stop="\r\n--"+boundary+"--\r\n";
@@ -318,6 +560,23 @@ public class YFunction {
         throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,"No key "+key+"in JSON struct");
     }
 
+    protected String _json_get_string(byte[] json) throws YAPI_Exception
+    {
+        JSONArray array = null;
+        try {
+            array = new JSONArray("["+new String(json,"ISO-8859-1")+"]");
+        } catch (JSONException ex) {
+            throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
+        } catch (UnsupportedEncodingException ex) {
+            throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
+        }
+        try {
+            return array.getString(0);
+        } catch (JSONException ex) {
+            throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
+        }
+    }
+
     protected ArrayList<String> _json_get_array(byte[] json) throws YAPI_Exception
     {
         JSONArray array = null;
@@ -339,19 +598,64 @@ public class YFunction {
         }
         return list;
     }
-
-    
-    
-    protected boolean hasCallbackRegistered()
+    // Load and parse the REST API for a function given by class name and
+    // identifier, possibly applying changes
+    // Device cache will be preloaded when loading function "module" and
+    // leveraged for other modules
+    protected JSONObject _devRequest(String extra) throws YAPI_Exception
     {
-        return _valueCallback != null;
+        YDevice dev = SafeYAPI().funcGetDevice(_className, _func);
+        YPEntry yp = SafeYAPI().resolveFunction(_className, _func);
+        _hwId = yp.getHardwareId();
+        _funId = yp.getFuncId();
+        _serial = yp.getSerial();
+        JSONObject loadval = null;
+        if (extra.equals("")) {
+            // use a cached API string, without reloading unless module is
+            // requested
+            String yreq = dev.requestAPI();
+            try {
+                JSONObject jsonval = new JSONObject(yreq);
+                loadval = jsonval.getJSONObject(_funId);
+            } catch (JSONException ex) {
+                throw new YAPI_Exception(YAPI.IO_ERROR,
+                        "Request failed, could not parse API result for " + dev);
+            }
+        } else {
+            dev.dropCache();
+        }
+        if (loadval == null) {
+            // request specified function only to minimize traffic
+            if (extra.equals("")) {
+                String httpreq = "GET /api/" + _funId + ".json";
+                String yreq = new String(dev.requestHTTP(httpreq,null, false));
+                try {
+                    loadval = new JSONObject(yreq);
+                } catch (JSONException ex) {
+                    throw new YAPI_Exception(YAPI.IO_ERROR,
+                            "Request failed, could not parse API value for "
+                            + httpreq);
+                }
+            } else {
+                String httpreq = "GET /api/" + _funId + extra;
+                dev.requestHTTP(httpreq,null, true);
+                return null;
+            }
+        }
+        return loadval;
     }
 
-    void advertiseValue(String newvalue)
+    // Method used to cache DataStream objects (new DataLogger)
+    YDataStream _findDataStream(YDataSet dataset, String def) throws YAPI_Exception
     {
-        if (_valueCallback != null) {
-            _valueCallback.yNewValue(this, newvalue);
+        String key = dataset.get_functionId()+":"+def;
+        if(_dataStreams.containsKey(key)) {
+            return _dataStreams.get(def);
         }
+
+        YDataStream newDataStream = new YDataStream(this, dataset, YAPI._decodeWords(def));
+        _dataStreams.put(key, newDataStream);
+        return newDataStream;
     }
 
     /**
@@ -359,33 +663,32 @@ public class YFunction {
      * If there is a cached value for the function in cache, that has not yet
      * expired, the device is considered reachable.
      * No exception is raised if there is an error while trying to contact the
-     * device hosting the requested function.
+     * device hosting the function.
      * 
      * @return true if the function can be reached, and false otherwise
      */
     public boolean isOnline()
     {
         // A valid value in cache means that the device is online
-        if (_expiration > YAPI.GetTickCount()) {
+        if (_cacheExpiration > YAPI.GetTickCount()) {
             return true;
         }
         try {
             // Check that the function is available without throwing exceptions
-            load(YAPI.DefaultCacheValidity);
+            load(SafeYAPI().DefaultCacheValidity);
         } catch (YAPI_Exception ex) {
             return false;
         }
-
         return true;
     }
 
     /**
-     * Returns the numerical error code of the latest error with this function.
+     * Returns the numerical error code of the latest error with the function.
      * This method is mostly useful when using the Yoctopuce library with
      * exceptions disabled.
      * 
      * @return a number corresponding to the code of the latest error that occured while
-     *         using this function object
+     *         using the function object
      */
     public int get_errorType()
     {
@@ -408,12 +711,12 @@ public class YFunction {
     }
 
     /**
-     * Returns the error message of the latest error with this function.
+     * Returns the error message of the latest error with the function.
      * This method is mostly useful when using the Yoctopuce library with
      * exceptions disabled.
      * 
      * @return a string corresponding to the latest error message that occured while
-     *         using this function object
+     *         using the function object
      */
     public String get_errorMessage()
     {
@@ -451,8 +754,8 @@ public class YFunction {
      */
     public int load(long msValidity) throws YAPI_Exception
     {
-        _cache = YAPI.funcRequest(_className, _func, "");
-        _expiration = YAPI.GetTickCount() + msValidity;
+        JSONObject json_obj = _devRequest("");
+        _parse(json_obj, msValidity);
         return YAPI.SUCCESS;
     }
 
@@ -465,33 +768,22 @@ public class YFunction {
      */
     public YModule get_module()
     {
-
+        YPEntry ypEntry;
         // try to resolve the function name to a device id without query
-        String hwid = _func;
-        if (hwid.indexOf('.') == -1) {
+        if (_func.indexOf('.') == -1) {
             try {
-                hwid = YAPI.resolveFunction(_className, _func);
-            } catch (YAPI_Exception ex) {
+                ypEntry = SafeYAPI().resolveFunction(_className, _func);
+                return YModule.FindModule(ypEntry.getSerial());
+            } catch (YAPI_Exception ignored) {
             }
-        }
-
-        int dotidx = hwid.indexOf('.');
-        if (dotidx >= 0) {
-            // resolution worked
-            return YModule.FindModule(hwid.substring(0, dotidx));
         }
         try {
             // device not resolved for now, force a communication for a last chance resolution
-            if (load(YAPI.DefaultCacheValidity) == YAPI.SUCCESS) {
-                hwid = YAPI.resolveFunction(_className, _func);
+            if (load(SafeYAPI().DefaultCacheValidity) == YAPI.SUCCESS) {
+                ypEntry = SafeYAPI().resolveFunction(_className, _func);
+                return YModule.FindModule(ypEntry.getSerial());
             }
-        } catch (YAPI_Exception ex) {
-        }
-
-        dotidx = hwid.indexOf('.');
-        if (dotidx >= 0) {
-            // resolution worked
-            return YModule.FindModule(hwid.substring(0, dotidx));
+        } catch (YAPI_Exception ignored) {
         }
         // return a true yFindModule object even if it is not a module valid for communicating
         return YModule.FindModule("module_of_" + _className + "_" + _func);
@@ -519,20 +811,11 @@ public class YFunction {
     public String get_functionDescriptor()
     {
         // try to resolve the function name to a device id without query
-        String hwid = _func;
-        int dotidx = hwid.indexOf('.');
-        if (dotidx < 0) {
-            try {
-                hwid = YAPI.resolveFunction(_className, _func);
-            } catch (YAPI_Exception ex) {
-            }
+        try {
+            return SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+        } catch (YAPI_Exception ignored) {
+            return FUNCTIONDESCRIPTOR_INVALID;
         }
-        dotidx = hwid.indexOf('.');
-        if (dotidx >= 0) {
-            // resolution worked
-            return hwid;
-        }
-        return FUNCTIONDESCRIPTOR_INVALID;
     }
 
     public String getFunctionDescriptor()
@@ -585,34 +868,4 @@ public class YFunction {
         set_userData(data);
     }
 
-    /**
-     * Registers the callback function that is invoked on every change of advertised value.
-     * The callback is invoked only during the execution of ySleep or yHandleEvents.
-     * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-     * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
-     * @param callback : the callback function to call, or a null pointer. The callback function should take two
-     *         arguments: the function object of which the value has changed, and the character string describing
-     *         the new advertised value.
-     * @noreturn
-     */
-    public void registerValueCallback(UpdateCallback callback)
-    {
-        _valueCallback = callback;
-        if (callback != null && isOnline()) {
-            String newval;
-            try {
-                newval = get_advertisedValue();
-                if (!newval.equals("") && !newval.equals("!INVALDI!")) {
-                    callback.yNewValue(this, newval);
-                }
-            } catch (YAPI_Exception ex) {
-            }
-        }
-    }
-
-    String get_advertisedValue() throws YAPI_Exception
-    {
-        throw new UnsupportedOperationException("Should be overridden by subclass");
-    }
 }

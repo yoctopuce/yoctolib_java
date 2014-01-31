@@ -25,7 +25,7 @@ public class Demo {
 
         while (true) {
             try {
-                System.out.println("Current temperature: " + tsensor.get_currentValue() + " Â°C");
+                System.out.println("Current temperature: " + tsensor.get_currentValue() + " °C");
                 System.out.println("  (press Ctrl-C to exit)");
                 YAPI.Sleep(1000);
             } catch (YAPI_Exception ex) {

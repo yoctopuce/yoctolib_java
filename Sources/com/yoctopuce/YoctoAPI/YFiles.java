@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 12426 2013-08-20 13:58:34Z seb $
+ * $Id: YFiles.java 14779 2014-01-30 14:56:39Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -10,26 +10,26 @@
  *
  *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
  *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ *  file into your software for the sole purpose of interfacing
+ *  with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
+ *  You may reproduce and distribute copies of this file in
  *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
+ *  code is to interface with Yoctopuce products. You must retain
  *  this notice in the distributed source file.
  *
  *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
+ *  for additional information regarding your rights and
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
  *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
@@ -39,9 +39,12 @@
 
 package com.yoctopuce.YoctoAPI;
 
-  //--- (generated code: globals)
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 import java.util.ArrayList;
-//--- (end of generated code: globals)
+import org.json.JSONException;
+import org.json.JSONObject;
+
+//--- (generated code: YFiles class start)
 /**
  * YFiles Class: Files function interface
  * 
@@ -52,125 +55,70 @@ import java.util.ArrayList;
  */
 public class YFiles extends YFunction
 {
-    //--- (generated code: definitions)
-    private YFiles.UpdateCallback _valueCallbackFiles;
-    /**
-     * invalid logicalName value
-     */
-    public static final String LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-    /**
-     * invalid advertisedValue value
-     */
-    public static final String ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
+//--- (end of generated code: YFiles class start)
+
+    //--- (generated code: YFiles definitions)
     /**
      * invalid filesCount value
      */
-    public static final int FILESCOUNT_INVALID = YAPI.INVALID_UNSIGNED;
+    public static final int FILESCOUNT_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid freeSpace value
      */
-    public static final int FREESPACE_INVALID = YAPI.INVALID_UNSIGNED;
-    //--- (end of generated code: definitions)
+    public static final int FREESPACE_INVALID = YAPI.INVALID_UINT;
+    protected int _filesCount = FILESCOUNT_INVALID;
+    protected int _freeSpace = FREESPACE_INVALID;
+    protected UpdateCallback _valueCallbackFiles = null;
 
     /**
-     * UdateCallback for Files
+     * Deprecated UpdateCallback for Files
      */
     public interface UpdateCallback {
         /**
          * 
-         * @param function : the function object of which the value has changed
-         * @param functionValue :the character string describing the new advertised value
+         * @param function      : the function object of which the value has changed
+         * @param functionValue : the character string describing the new advertised value
          */
         void yNewValue(YFiles function, String functionValue);
     }
 
+    /**
+     * TimedReportCallback for Files
+     */
+    public interface TimedReportCallback {
+        /**
+         * 
+         * @param function : the function object of which the value has changed
+         * @param measure  : measure
+         */
+        void timedReportCallback(YFiles  function, YMeasure measure);
+    }
+    //--- (end of generated code: YFiles definitions)
+
+    /**
+     * @param func : functionid
+     */
+    protected YFiles(String func)
+    {
+        super(func);
+        _className = "Files";
+        //--- (generated code: YFiles attributes initialization)
+        //--- (end of generated code: YFiles attributes initialization)
+    }
 
 
     //--- (generated code: YFiles implementation)
-
-    /**
-     * Returns the logical name of the filesystem.
-     * 
-     * @return a string corresponding to the logical name of the filesystem
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_logicalName()  throws YAPI_Exception
+    @Override
+    protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
-        String json_val = (String) _getAttr("logicalName");
-        return json_val;
+        if (json_val.has("filesCount")) {
+            _filesCount =  json_val.getInt("filesCount");
+        }
+        if (json_val.has("freeSpace")) {
+            _freeSpace =  json_val.getInt("freeSpace");
+        }
+        super._parseAttr(json_val);
     }
-
-    /**
-     * Returns the logical name of the filesystem.
-     * 
-     * @return a string corresponding to the logical name of the filesystem
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getLogicalName() throws YAPI_Exception
-
-    { return get_logicalName(); }
-
-    /**
-     * Changes the logical name of the filesystem. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the filesystem
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int set_logicalName( String  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = newval;
-        _setAttr("logicalName",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the logical name of the filesystem. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the filesystem
-     * 
-     * @return YAPI_SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int setLogicalName( String newval)  throws YAPI_Exception
-
-    { return set_logicalName(newval); }
-
-    /**
-     * Returns the current value of the filesystem (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the filesystem (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_advertisedValue()  throws YAPI_Exception
-    {
-        String json_val = (String) _getAttr("advertisedValue");
-        return json_val;
-    }
-
-    /**
-     * Returns the current value of the filesystem (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the filesystem (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getAdvertisedValue() throws YAPI_Exception
-
-    { return get_advertisedValue(); }
 
     /**
      * Returns the number of files currently loaded in the filesystem.
@@ -181,8 +129,12 @@ public class YFiles extends YFunction
      */
     public int get_filesCount()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("filesCount");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return FILESCOUNT_INVALID;
+            }
+        }
+        return _filesCount;
     }
 
     /**
@@ -205,8 +157,12 @@ public class YFiles extends YFunction
      */
     public int get_freeSpace()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("freeSpace");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return FREESPACE_INVALID;
+            }
+        }
+        return _freeSpace;
     }
 
     /**
@@ -219,129 +175,6 @@ public class YFiles extends YFunction
     public int getFreeSpace() throws YAPI_Exception
 
     { return get_freeSpace(); }
-
-    public byte[] sendCommand(String command)  throws YAPI_Exception
-    {
-        String url;
-        url =  String.format("files.json?a=%s",command);
-        return _download(url);
-        
-    }
-
-    /**
-     * Reinitializes the filesystem to its clean, unfragmented, empty state.
-     * All files previously uploaded are permanently lost.
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int format_fs()  throws YAPI_Exception
-    {
-        byte[] json;
-        String res;
-        json = sendCommand("format"); 
-        res  = _json_get_key(json, "res");
-        if (!(res.equals("ok"))) { throw new YAPI_Exception( YAPI.IO_ERROR,  "format failed");};
-        return YAPI.SUCCESS;
-        
-    }
-
-    /**
-     * Returns a list of YFileRecord objects that describe files currently loaded
-     * in the filesystem.
-     * 
-     * @param pattern : an optional filter pattern, using star and question marks
-     *         as wildcards. When an empty pattern is provided, all file records
-     *         are returned.
-     * 
-     * @return a list of YFileRecord objects, containing the file path
-     *         and name, byte size and 32-bit CRC of the file content.
-     * 
-     * @throws YAPI_Exception
-     */
-    public ArrayList<YFileRecord> get_list(String pattern)  throws YAPI_Exception
-    {
-        byte[] json;
-        ArrayList<String> list = new ArrayList<String>();
-        ArrayList<YFileRecord> res = new ArrayList<YFileRecord>();
-        json = sendCommand(String.format("dir&f=%s",pattern));
-        list = _json_get_array(json);
-        for (String y :list) { res.add(new YFileRecord(y));};
-        return res;
-        
-    }
-
-    /**
-     * Downloads the requested file and returns a binary buffer with its content.
-     * 
-     * @param pathname : path and name of the new file to load
-     * 
-     * @return a binary buffer with the file content
-     * 
-     * @throws YAPI_Exception
-     */
-    public byte[] download(String pathname)  throws YAPI_Exception
-    {
-        return _download(pathname);
-        
-    }
-
-    /**
-     * Uploads a file to the filesystem, to the specified full path name.
-     * If a file already exists with the same path name, its content is overwritten.
-     * 
-     * @param pathname : path and name of the new file to create
-     * @param content : binary buffer with the content to set
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int upload(String pathname,byte[] content)  throws YAPI_Exception
-    {
-        return _upload(pathname,content);
-        
-    }
-
-    /**
-     * Deletes a file, given by its full path name, from the filesystem.
-     * Because of filesystem fragmentation, deleting a file may not always
-     * free up the whole space used by the file. However, rewriting a file
-     * with the same path name will always reuse any space not freed previously.
-     * If you need to ensure that no space is taken by previously deleted files,
-     * you can use format_fs to fully reinitialize the filesystem.
-     * 
-     * @param pathname : path and name of the file to remove.
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int remove(String pathname)  throws YAPI_Exception
-    {
-        byte[] json;
-        String res;
-        json = sendCommand(String.format("del&f=%s",pathname)); 
-        res  = _json_get_key(json, "res");
-        if (!(res.equals("ok"))) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to remove file");};
-        return YAPI.SUCCESS;
-        
-    }
-
-    /**
-     * Continues the enumeration of filesystems started using yFirstFiles().
-     * 
-     * @return a pointer to a YFiles object, corresponding to
-     *         a filesystem currently online, or a null pointer
-     *         if there are no more filesystems to enumerate.
-     */
-    public  YFiles nextFiles()
-    {
-        String next_hwid = YAPI.getNextHardwareId(_className, _func);
-        if(next_hwid == null) return null;
-        return FindFiles(next_hwid);
-    }
 
     /**
      * Retrieves a filesystem for a given identifier.
@@ -367,56 +200,14 @@ public class YFiles extends YFunction
      * @return a YFiles object allowing you to drive the filesystem.
      */
     public static YFiles FindFiles(String func)
-    {   YFunction yfunc = YAPI.getFunction("Files", func);
-        if (yfunc != null) {
-            return (YFiles) yfunc;
+    {
+        YFiles obj;
+        obj = (YFiles) YFunction._FindFromCache("Files", func);
+        if (obj == null) {
+            obj = new YFiles(func);
+            YFunction._AddToCache("Files", func, obj);
         }
-        return new YFiles(func);
-    }
-
-    /**
-     * Starts the enumeration of filesystems currently accessible.
-     * Use the method YFiles.nextFiles() to iterate on
-     * next filesystems.
-     * 
-     * @return a pointer to a YFiles object, corresponding to
-     *         the first filesystem currently online, or a null pointer
-     *         if there are none.
-     */
-    public static YFiles FirstFiles()
-    {
-        String next_hwid = YAPI.getFirstHardwareId("Files");
-        if (next_hwid == null)  return null;
-        return FindFiles(next_hwid);
-    }
-
-    /**
-     * 
-     * @param func : functionid
-     */
-    private YFiles(String func)
-    {
-        super("Files", func);
-    }
-
-    @Override
-    void advertiseValue(String newvalue)
-    {
-        super.advertiseValue(newvalue);
-        if (_valueCallbackFiles != null) {
-            _valueCallbackFiles.yNewValue(this, newvalue);
-        }
-    }
-
-    /**
-     * Internal: check if we have a callback interface registered
-     * 
-     * @return yes if the user has registered a interface
-     */
-    @Override
-     protected boolean hasCallbackRegistered()
-    {
-        return super.hasCallbackRegistered() || (_valueCallbackFiles!=null);
+        return obj;
     }
 
     /**
@@ -430,21 +221,173 @@ public class YFiles extends YFunction
      *         the new advertised value.
      * @noreturn
      */
-    public void registerValueCallback(YFiles.UpdateCallback callback)
+    public int registerValueCallback(UpdateCallback callback)
     {
-         _valueCallbackFiles =  callback;
-         if (callback != null && isOnline()) {
-             String newval;
-             try {
-                 newval = get_advertisedValue();
-                 if (!newval.equals("") && !newval.equals("!INVALDI!")) {
-                     callback.yNewValue(this, newval);
-                 }
-             } catch (YAPI_Exception ex) {
-             }
-         }
+        String val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        _valueCallbackFiles = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && isOnline()) {
+            val = _advertisedValue;
+            if (!(val.equals(""))) {
+                _invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int _invokeValueCallback(String value)
+    {
+        if (_valueCallbackFiles != null) {
+            _valueCallbackFiles.yNewValue(this, value);
+        } else {
+            super._invokeValueCallback(value);
+        }
+        return 0;
+    }
+
+    public byte[] sendCommand(String command)  throws YAPI_Exception
+    {
+        String url;
+        url = String.format("files.json?a=%s",command);
+        // may throw an exception
+        return _download(url);
+    }
+
+    /**
+     * Reinitializes the filesystem to its clean, unfragmented, empty state.
+     * All files previously uploaded are permanently lost.
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int format_fs()  throws YAPI_Exception
+    {
+        byte[] json;
+        String res;
+        json = sendCommand("format");
+        res = _json_get_key(json, "res");
+        if (!(res.equals("ok"))) { throw new YAPI_Exception( YAPI.IO_ERROR,  "format failed");}
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Returns a list of YFileRecord objects that describe files currently loaded
+     * in the filesystem.
+     * 
+     * @param pattern : an optional filter pattern, using star and question marks
+     *         as wildcards. When an empty pattern is provided, all file records
+     *         are returned.
+     * 
+     * @return a list of YFileRecord objects, containing the file path
+     *         and name, byte size and 32-bit CRC of the file content.
+     * 
+     * @throws YAPI_Exception
+     */
+    public ArrayList<YFileRecord> get_list(String pattern)  throws YAPI_Exception
+    {
+        byte[] json;
+        ArrayList<String> filelist = new ArrayList<String>();
+        ArrayList<YFileRecord> res = new ArrayList<YFileRecord>();
+        json = sendCommand(String.format("dir&f=%s",pattern));
+        filelist = _json_get_array(json);
+        res.clear();
+        for (String ii:filelist) {
+            res.add(new YFileRecord(ii));
+        }
+        return res;
+    }
+
+    /**
+     * Downloads the requested file and returns a binary buffer with its content.
+     * 
+     * @param pathname : path and name of the file to download
+     * 
+     * @return a binary buffer with the file content
+     * 
+     * @throws YAPI_Exception
+     */
+    public byte[] download(String pathname)  throws YAPI_Exception
+    {
+        return _download(pathname);
+    }
+
+    /**
+     * Uploads a file to the filesystem, to the specified full path name.
+     * If a file already exists with the same path name, its content is overwritten.
+     * 
+     * @param pathname : path and name of the new file to create
+     * @param content : binary buffer with the content to set
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int upload(String pathname,byte[] content)  throws YAPI_Exception
+    {
+        return _upload(pathname, content);
+    }
+
+    /**
+     * Deletes a file, given by its full path name, from the filesystem.
+     * Because of filesystem fragmentation, deleting a file may not always
+     * free up the whole space used by the file. However, rewriting a file
+     * with the same path name will always reuse any space not freed previously.
+     * If you need to ensure that no space is taken by previously deleted files,
+     * you can use format_fs to fully reinitialize the filesystem.
+     * 
+     * @param pathname : path and name of the file to remove.
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int remove(String pathname)  throws YAPI_Exception
+    {
+        byte[] json;
+        String res;
+        json = sendCommand(String.format("del&f=%s",pathname));
+        res  = _json_get_key(json, "res");
+        if (!(res.equals("ok"))) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to remove file");}
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Continues the enumeration of filesystems started using yFirstFiles().
+     * 
+     * @return a pointer to a YFiles object, corresponding to
+     *         a filesystem currently online, or a null pointer
+     *         if there are no more filesystems to enumerate.
+     */
+    public  YFiles nextFiles()
+    {
+        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        if(next_hwid == null) return null;
+        return FindFiles(next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of filesystems currently accessible.
+     * Use the method YFiles.nextFiles() to iterate on
+     * next filesystems.
+     * 
+     * @return a pointer to a YFiles object, corresponding to
+     *         the first filesystem currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YFiles FirstFiles()
+    {
+        String next_hwid = SafeYAPI().getFirstHardwareId("Files");
+        if (next_hwid == null)  return null;
+        return FindFiles(next_hwid);
     }
 
     //--- (end of generated code: YFiles implementation)
-};
+}
 

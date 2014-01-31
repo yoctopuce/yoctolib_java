@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAnButton.java 12324 2013-08-13 15:10:31Z mvuilleu $
+ * $Id: YAnButton.java 14779 2014-01-30 14:56:39Z seb $
  *
  * Implements yFindAnButton(), the high-level API for AnButton functions
  *
@@ -38,9 +38,13 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+import org.json.JSONException;
+import org.json.JSONObject;
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-//--- (globals)
-//--- (end of globals)
+    //--- (YAnButton return codes)
+    //--- (end of YAnButton return codes)
+//--- (YAnButton class start)
 /**
  * YAnButton Class: AnButton function interface
  * 
@@ -53,24 +57,16 @@ package com.yoctopuce.YoctoAPI;
  */
 public class YAnButton extends YFunction
 {
-    //--- (definitions)
-    private YAnButton.UpdateCallback _valueCallbackAnButton;
-    /**
-     * invalid logicalName value
-     */
-    public static final String LOGICALNAME_INVALID = YAPI.INVALID_STRING;
-    /**
-     * invalid advertisedValue value
-     */
-    public static final String ADVERTISEDVALUE_INVALID = YAPI.INVALID_STRING;
+//--- (end of YAnButton class start)
+//--- (YAnButton definitions)
     /**
      * invalid calibratedValue value
      */
-    public static final int CALIBRATEDVALUE_INVALID = YAPI.INVALID_UNSIGNED;
+    public static final int CALIBRATEDVALUE_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid rawValue value
      */
-    public static final int RAWVALUE_INVALID = YAPI.INVALID_UNSIGNED;
+    public static final int RAWVALUE_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid analogCalibration value
      */
@@ -81,15 +77,15 @@ public class YAnButton extends YFunction
     /**
      * invalid calibrationMax value
      */
-    public static final int CALIBRATIONMAX_INVALID = YAPI.INVALID_UNSIGNED;
+    public static final int CALIBRATIONMAX_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid calibrationMin value
      */
-    public static final int CALIBRATIONMIN_INVALID = YAPI.INVALID_UNSIGNED;
+    public static final int CALIBRATIONMIN_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid sensitivity value
      */
-    public static final int SENSITIVITY_INVALID = YAPI.INVALID_UNSIGNED;
+    public static final int SENSITIVITY_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid isPressed value
      */
@@ -113,107 +109,96 @@ public class YAnButton extends YFunction
      * invalid pulseTimer value
      */
     public static final long PULSETIMER_INVALID = YAPI.INVALID_LONG;
-    //--- (end of definitions)
+    protected int _calibratedValue = CALIBRATEDVALUE_INVALID;
+    protected int _rawValue = RAWVALUE_INVALID;
+    protected int _analogCalibration = ANALOGCALIBRATION_INVALID;
+    protected int _calibrationMax = CALIBRATIONMAX_INVALID;
+    protected int _calibrationMin = CALIBRATIONMIN_INVALID;
+    protected int _sensitivity = SENSITIVITY_INVALID;
+    protected int _isPressed = ISPRESSED_INVALID;
+    protected long _lastTimePressed = LASTTIMEPRESSED_INVALID;
+    protected long _lastTimeReleased = LASTTIMERELEASED_INVALID;
+    protected long _pulseCounter = PULSECOUNTER_INVALID;
+    protected long _pulseTimer = PULSETIMER_INVALID;
+    protected UpdateCallback _valueCallbackAnButton = null;
 
     /**
-     * UdateCallback for AnButton
+     * Deprecated UpdateCallback for AnButton
      */
     public interface UpdateCallback {
         /**
          * 
-         * @param function : the function object of which the value has changed
-         * @param functionValue :the character string describing the new advertised value
+         * @param function      : the function object of which the value has changed
+         * @param functionValue : the character string describing the new advertised value
          */
         void yNewValue(YAnButton function, String functionValue);
     }
 
+    /**
+     * TimedReportCallback for AnButton
+     */
+    public interface TimedReportCallback {
+        /**
+         * 
+         * @param function : the function object of which the value has changed
+         * @param measure  : measure
+         */
+        void timedReportCallback(YAnButton  function, YMeasure measure);
+    }
+    //--- (end of YAnButton definitions)
 
+
+    /**
+     * 
+     * @param func : functionid
+     */
+    protected YAnButton(String func)
+    {
+        super(func);
+        _className = "AnButton";
+        //--- (YAnButton attributes initialization)
+        //--- (end of YAnButton attributes initialization)
+    }
 
     //--- (YAnButton implementation)
-
-    /**
-     * Returns the logical name of the analog input.
-     * 
-     * @return a string corresponding to the logical name of the analog input
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_logicalName()  throws YAPI_Exception
+    @Override
+    protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
-        String json_val = (String) _getAttr("logicalName");
-        return json_val;
+        if (json_val.has("calibratedValue")) {
+            _calibratedValue =  json_val.getInt("calibratedValue");
+        }
+        if (json_val.has("rawValue")) {
+            _rawValue =  json_val.getInt("rawValue");
+        }
+        if (json_val.has("analogCalibration")) {
+            _analogCalibration =  json_val.getInt("analogCalibration")>0?1:0;
+        }
+        if (json_val.has("calibrationMax")) {
+            _calibrationMax =  json_val.getInt("calibrationMax");
+        }
+        if (json_val.has("calibrationMin")) {
+            _calibrationMin =  json_val.getInt("calibrationMin");
+        }
+        if (json_val.has("sensitivity")) {
+            _sensitivity =  json_val.getInt("sensitivity");
+        }
+        if (json_val.has("isPressed")) {
+            _isPressed =  json_val.getInt("isPressed")>0?1:0;
+        }
+        if (json_val.has("lastTimePressed")) {
+            _lastTimePressed =  json_val.getLong("lastTimePressed");
+        }
+        if (json_val.has("lastTimeReleased")) {
+            _lastTimeReleased =  json_val.getLong("lastTimeReleased");
+        }
+        if (json_val.has("pulseCounter")) {
+            _pulseCounter =  json_val.getLong("pulseCounter");
+        }
+        if (json_val.has("pulseTimer")) {
+            _pulseTimer =  json_val.getLong("pulseTimer");
+        }
+        super._parseAttr(json_val);
     }
-
-    /**
-     * Returns the logical name of the analog input.
-     * 
-     * @return a string corresponding to the logical name of the analog input
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getLogicalName() throws YAPI_Exception
-
-    { return get_logicalName(); }
-
-    /**
-     * Changes the logical name of the analog input. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the analog input
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int set_logicalName( String  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = newval;
-        _setAttr("logicalName",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the logical name of the analog input. You can use yCheckLogicalName()
-     * prior to this call to make sure that your parameter is valid.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
-     * 
-     * @param newval : a string corresponding to the logical name of the analog input
-     * 
-     * @return YAPI_SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int setLogicalName( String newval)  throws YAPI_Exception
-
-    { return set_logicalName(newval); }
-
-    /**
-     * Returns the current value of the analog input (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the analog input (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String get_advertisedValue()  throws YAPI_Exception
-    {
-        String json_val = (String) _getAttr("advertisedValue");
-        return json_val;
-    }
-
-    /**
-     * Returns the current value of the analog input (no more than 6 characters).
-     * 
-     * @return a string corresponding to the current value of the analog input (no more than 6 characters)
-     * 
-     * @throws YAPI_Exception
-     */
-    public String getAdvertisedValue() throws YAPI_Exception
-
-    { return get_advertisedValue(); }
 
     /**
      * Returns the current calibrated input value (between 0 and 1000, included).
@@ -224,8 +209,12 @@ public class YAnButton extends YFunction
      */
     public int get_calibratedValue()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("calibratedValue");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return CALIBRATEDVALUE_INVALID;
+            }
+        }
+        return _calibratedValue;
     }
 
     /**
@@ -248,8 +237,12 @@ public class YAnButton extends YFunction
      */
     public int get_rawValue()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("rawValue");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return RAWVALUE_INVALID;
+            }
+        }
+        return _rawValue;
     }
 
     /**
@@ -272,8 +265,12 @@ public class YAnButton extends YFunction
      */
     public int get_analogCalibration()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("analogCalibration");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ANALOGCALIBRATION_INVALID;
+            }
+        }
+        return _analogCalibration;
     }
 
     /**
@@ -297,7 +294,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_analogCalibration( int  newval)  throws YAPI_Exception
+    public int set_analogCalibration(int  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = (newval > 0 ? "1" : "0");
@@ -315,7 +312,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setAnalogCalibration( int newval)  throws YAPI_Exception
+    public int setAnalogCalibration(int newval)  throws YAPI_Exception
 
     { return set_analogCalibration(newval); }
 
@@ -329,8 +326,12 @@ public class YAnButton extends YFunction
      */
     public int get_calibrationMax()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("calibrationMax");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return CALIBRATIONMAX_INVALID;
+            }
+        }
+        return _calibrationMax;
     }
 
     /**
@@ -358,10 +359,10 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_calibrationMax( int  newval)  throws YAPI_Exception
+    public int set_calibrationMax(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
+        rest_val = Integer.toString(newval);
         _setAttr("calibrationMax",rest_val);
         return YAPI.SUCCESS;
     }
@@ -379,7 +380,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setCalibrationMax( int newval)  throws YAPI_Exception
+    public int setCalibrationMax(int newval)  throws YAPI_Exception
 
     { return set_calibrationMax(newval); }
 
@@ -393,8 +394,12 @@ public class YAnButton extends YFunction
      */
     public int get_calibrationMin()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("calibrationMin");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return CALIBRATIONMIN_INVALID;
+            }
+        }
+        return _calibrationMin;
     }
 
     /**
@@ -422,10 +427,10 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_calibrationMin( int  newval)  throws YAPI_Exception
+    public int set_calibrationMin(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
+        rest_val = Integer.toString(newval);
         _setAttr("calibrationMin",rest_val);
         return YAPI.SUCCESS;
     }
@@ -443,7 +448,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setCalibrationMin( int newval)  throws YAPI_Exception
+    public int setCalibrationMin(int newval)  throws YAPI_Exception
 
     { return set_calibrationMin(newval); }
 
@@ -457,8 +462,12 @@ public class YAnButton extends YFunction
      */
     public int get_sensitivity()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("sensitivity");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SENSITIVITY_INVALID;
+            }
+        }
+        return _sensitivity;
     }
 
     /**
@@ -488,10 +497,10 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int set_sensitivity( int  newval)  throws YAPI_Exception
+    public int set_sensitivity(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
+        rest_val = Integer.toString(newval);
         _setAttr("sensitivity",rest_val);
         return YAPI.SUCCESS;
     }
@@ -511,7 +520,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int setSensitivity( int newval)  throws YAPI_Exception
+    public int setSensitivity(int newval)  throws YAPI_Exception
 
     { return set_sensitivity(newval); }
 
@@ -525,8 +534,12 @@ public class YAnButton extends YFunction
      */
     public int get_isPressed()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("isPressed");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ISPRESSED_INVALID;
+            }
+        }
+        return _isPressed;
     }
 
     /**
@@ -553,8 +566,12 @@ public class YAnButton extends YFunction
      */
     public long get_lastTimePressed()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("lastTimePressed");
-        return Long.parseLong(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return LASTTIMEPRESSED_INVALID;
+            }
+        }
+        return _lastTimePressed;
     }
 
     /**
@@ -583,8 +600,12 @@ public class YAnButton extends YFunction
      */
     public long get_lastTimeReleased()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("lastTimeReleased");
-        return Long.parseLong(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return LASTTIMERELEASED_INVALID;
+            }
+        }
+        return _lastTimeReleased;
     }
 
     /**
@@ -610,8 +631,12 @@ public class YAnButton extends YFunction
      */
     public long get_pulseCounter()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("pulseCounter");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PULSECOUNTER_INVALID;
+            }
+        }
+        return _pulseCounter;
     }
 
     /**
@@ -625,7 +650,7 @@ public class YAnButton extends YFunction
 
     { return get_pulseCounter(); }
 
-    public int set_pulseCounter( long  newval)  throws YAPI_Exception
+    public int set_pulseCounter(long  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = Long.toString(newval);
@@ -633,7 +658,7 @@ public class YAnButton extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setPulseCounter( long newval)  throws YAPI_Exception
+    public int setPulseCounter(long newval)  throws YAPI_Exception
 
     { return set_pulseCounter(newval); }
 
@@ -661,8 +686,12 @@ public class YAnButton extends YFunction
      */
     public long get_pulseTimer()  throws YAPI_Exception
     {
-        String json_val = (String) _getAttr("pulseTimer");
-        return Integer.parseInt(json_val);
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PULSETIMER_INVALID;
+            }
+        }
+        return _pulseTimer;
     }
 
     /**
@@ -675,20 +704,6 @@ public class YAnButton extends YFunction
     public long getPulseTimer() throws YAPI_Exception
 
     { return get_pulseTimer(); }
-
-    /**
-     * Continues the enumeration of analog inputs started using yFirstAnButton().
-     * 
-     * @return a pointer to a YAnButton object, corresponding to
-     *         an analog input currently online, or a null pointer
-     *         if there are no more analog inputs to enumerate.
-     */
-    public  YAnButton nextAnButton()
-    {
-        String next_hwid = YAPI.getNextHardwareId(_className, _func);
-        if(next_hwid == null) return null;
-        return FindAnButton(next_hwid);
-    }
 
     /**
      * Retrieves an analog input for a given identifier.
@@ -714,56 +729,14 @@ public class YAnButton extends YFunction
      * @return a YAnButton object allowing you to drive the analog input.
      */
     public static YAnButton FindAnButton(String func)
-    {   YFunction yfunc = YAPI.getFunction("AnButton", func);
-        if (yfunc != null) {
-            return (YAnButton) yfunc;
+    {
+        YAnButton obj;
+        obj = (YAnButton) YFunction._FindFromCache("AnButton", func);
+        if (obj == null) {
+            obj = new YAnButton(func);
+            YFunction._AddToCache("AnButton", func, obj);
         }
-        return new YAnButton(func);
-    }
-
-    /**
-     * Starts the enumeration of analog inputs currently accessible.
-     * Use the method YAnButton.nextAnButton() to iterate on
-     * next analog inputs.
-     * 
-     * @return a pointer to a YAnButton object, corresponding to
-     *         the first analog input currently online, or a null pointer
-     *         if there are none.
-     */
-    public static YAnButton FirstAnButton()
-    {
-        String next_hwid = YAPI.getFirstHardwareId("AnButton");
-        if (next_hwid == null)  return null;
-        return FindAnButton(next_hwid);
-    }
-
-    /**
-     * 
-     * @param func : functionid
-     */
-    private YAnButton(String func)
-    {
-        super("AnButton", func);
-    }
-
-    @Override
-    void advertiseValue(String newvalue)
-    {
-        super.advertiseValue(newvalue);
-        if (_valueCallbackAnButton != null) {
-            _valueCallbackAnButton.yNewValue(this, newvalue);
-        }
-    }
-
-    /**
-     * Internal: check if we have a callback interface registered
-     * 
-     * @return yes if the user has registered a interface
-     */
-    @Override
-     protected boolean hasCallbackRegistered()
-    {
-        return super.hasCallbackRegistered() || (_valueCallbackAnButton!=null);
+        return obj;
     }
 
     /**
@@ -777,21 +750,66 @@ public class YAnButton extends YFunction
      *         the new advertised value.
      * @noreturn
      */
-    public void registerValueCallback(YAnButton.UpdateCallback callback)
+    public int registerValueCallback(UpdateCallback callback)
     {
-         _valueCallbackAnButton =  callback;
-         if (callback != null && isOnline()) {
-             String newval;
-             try {
-                 newval = get_advertisedValue();
-                 if (!newval.equals("") && !newval.equals("!INVALDI!")) {
-                     callback.yNewValue(this, newval);
-                 }
-             } catch (YAPI_Exception ex) {
-             }
-         }
+        String val;
+        if (callback != null) {
+            YFunction._UpdateValueCallbackList(this, true);
+        } else {
+            YFunction._UpdateValueCallbackList(this, false);
+        }
+        _valueCallbackAnButton = callback;
+        // Immediately invoke value callback with current value
+        if (callback != null && isOnline()) {
+            val = _advertisedValue;
+            if (!(val.equals(""))) {
+                _invokeValueCallback(val);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int _invokeValueCallback(String value)
+    {
+        if (_valueCallbackAnButton != null) {
+            _valueCallbackAnButton.yNewValue(this, value);
+        } else {
+            super._invokeValueCallback(value);
+        }
+        return 0;
+    }
+
+    /**
+     * Continues the enumeration of analog inputs started using yFirstAnButton().
+     * 
+     * @return a pointer to a YAnButton object, corresponding to
+     *         an analog input currently online, or a null pointer
+     *         if there are no more analog inputs to enumerate.
+     */
+    public  YAnButton nextAnButton()
+    {
+        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        if(next_hwid == null) return null;
+        return FindAnButton(next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of analog inputs currently accessible.
+     * Use the method YAnButton.nextAnButton() to iterate on
+     * next analog inputs.
+     * 
+     * @return a pointer to a YAnButton object, corresponding to
+     *         the first analog input currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YAnButton FirstAnButton()
+    {
+        String next_hwid = SafeYAPI().getFirstHardwareId("AnButton");
+        if (next_hwid == null)  return null;
+        return FindAnButton(next_hwid);
     }
 
     //--- (end of YAnButton implementation)
-};
+}
 
