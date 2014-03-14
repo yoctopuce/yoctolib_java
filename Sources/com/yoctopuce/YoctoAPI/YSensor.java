@@ -306,7 +306,7 @@ public class YSensor extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public String get_unit()  throws YAPI_Exception
+    public String get_unit() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -334,7 +334,7 @@ public class YSensor extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public double get_currentValue()  throws YAPI_Exception
+    public double get_currentValue() throws YAPI_Exception
     {
         double res = 0;
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
@@ -399,7 +399,7 @@ public class YSensor extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public double get_lowestValue()  throws YAPI_Exception
+    public double get_lowestValue() throws YAPI_Exception
     {
         double res = 0;
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
@@ -461,7 +461,7 @@ public class YSensor extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public double get_highestValue()  throws YAPI_Exception
+    public double get_highestValue() throws YAPI_Exception
     {
         double res = 0;
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
@@ -492,7 +492,7 @@ public class YSensor extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public double get_currentRawValue()  throws YAPI_Exception
+    public double get_currentRawValue() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -522,7 +522,7 @@ public class YSensor extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public String get_logFrequency()  throws YAPI_Exception
+    public String get_logFrequency() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -592,7 +592,7 @@ public class YSensor extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public String get_reportFrequency()  throws YAPI_Exception
+    public String get_reportFrequency() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -656,7 +656,7 @@ public class YSensor extends YFunction
     /**
      * @throws YAPI_Exception
      */
-    public String get_calibrationParam()  throws YAPI_Exception
+    public String get_calibrationParam() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -725,7 +725,7 @@ public class YSensor extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public double get_resolution()  throws YAPI_Exception
+    public double get_resolution() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -958,7 +958,7 @@ public class YSensor extends YFunction
      *         data. Past measures can be loaded progressively
      *         using methods from the YDataSet object.
      */
-    public YDataSet get_recordedData(long startTime,long endTime)  throws YAPI_Exception
+    public YDataSet get_recordedData(long startTime,long endTime) throws YAPI_Exception
     {
         String funcid;
         String funit;
@@ -1015,8 +1015,12 @@ public class YSensor extends YFunction
      *         values returned by the sensor for the correction points.
      * @param refValues : array of floating point numbers, corresponding to the corrected
      *         values for the correction points.
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
      */
-    public int calibrateFromPoints(ArrayList<Double> rawValues,ArrayList<Double> refValues)  throws YAPI_Exception
+    public int calibrateFromPoints(ArrayList<Double> rawValues,ArrayList<Double> refValues) throws YAPI_Exception
     {
         String rest_val;
         // may throw an exception
@@ -1037,7 +1041,7 @@ public class YSensor extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int loadCalibrationPoints(ArrayList<Double> rawValues,ArrayList<Double> refValues)  throws YAPI_Exception
+    public int loadCalibrationPoints(ArrayList<Double> rawValues,ArrayList<Double> refValues) throws YAPI_Exception
     {
         rawValues.clear();
         refValues.clear();
@@ -1064,7 +1068,7 @@ public class YSensor extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public String _encodeCalibrationPoints(ArrayList<Double> rawValues,ArrayList<Double> refValues)  throws YAPI_Exception
+    public String _encodeCalibrationPoints(ArrayList<Double> rawValues,ArrayList<Double> refValues) throws YAPI_Exception
     {
         String res;
         int npt = 0;
@@ -1232,7 +1236,13 @@ public class YSensor extends YFunction
      */
     public  YSensor nextSensor()
     {
-        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        String next_hwid;
+        try {
+            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+        } catch (YAPI_Exception ignored) {
+            next_hwid = null;
+        }
         if(next_hwid == null) return null;
         return FindSensor(next_hwid);
     }

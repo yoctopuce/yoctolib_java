@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFunction.java 14779 2014-01-30 14:56:39Z seb $
+ * $Id: YFunction.java 15407 2014-03-12 19:34:44Z mvuilleu $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -188,7 +188,7 @@ public class YFunction
      * 
      * @throws YAPI_Exception
      */
-    public String get_logicalName()  throws YAPI_Exception
+    public String get_logicalName() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -252,7 +252,7 @@ public class YFunction
      * 
      * @throws YAPI_Exception
      */
-    public String get_advertisedValue()  throws YAPI_Exception
+    public String get_advertisedValue() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -351,10 +351,37 @@ public class YFunction
         return 0;
     }
 
+    /**
+     * comment from .yc definition
+     */
+    public  YFunction nextFunction()
+    {
+        String next_hwid;
+        try {
+            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+        } catch (YAPI_Exception ignored) {
+            next_hwid = null;
+        }
+        if(next_hwid == null) return null;
+        return FindFunction(next_hwid);
+    }
+
+    /**
+     * comment from .yc definition
+     */
+    public static YFunction FirstFunction()
+    {
+        String next_hwid = SafeYAPI().getFirstHardwareId("Function");
+        if (next_hwid == null)  return null;
+        return FindFunction(next_hwid);
+    }
+
     //--- (end of generated code: YFunction implementation)
 
     /**
-     * Returns a short text that describes the function in the form TYPE(NAME)=SERIAL&#46;FUNCTIONID.
+     * Returns a short text that describes unambiguously the instance of the function in the form
+     * TYPE(NAME)=SERIAL&#46;FUNCTIONID.
      * More precisely,
      * TYPE       is the type of the function,
      * NAME       it the name used for the first access to the function,
@@ -650,7 +677,7 @@ public class YFunction
     {
         String key = dataset.get_functionId()+":"+def;
         if(_dataStreams.containsKey(key)) {
-            return _dataStreams.get(def);
+            return _dataStreams.get(key);
         }
 
         YDataStream newDataStream = new YDataStream(this, dataset, YAPI._decodeWords(def));
@@ -770,10 +797,13 @@ public class YFunction
     {
         YPEntry ypEntry;
         // try to resolve the function name to a device id without query
+        if (!_serial.equals("")) {
+            return YModule.FindModule(_serial + ".module");
+        }
         if (_func.indexOf('.') == -1) {
             try {
                 ypEntry = SafeYAPI().resolveFunction(_className, _func);
-                return YModule.FindModule(ypEntry.getSerial());
+                return YModule.FindModule(ypEntry.getSerial() + ".module");
             } catch (YAPI_Exception ignored) {
             }
         }
@@ -781,7 +811,7 @@ public class YFunction
             // device not resolved for now, force a communication for a last chance resolution
             if (load(SafeYAPI().DefaultCacheValidity) == YAPI.SUCCESS) {
                 ypEntry = SafeYAPI().resolveFunction(_className, _func);
-                return YModule.FindModule(ypEntry.getSerial());
+                return YModule.FindModule(ypEntry.getSerial() + ".module");
             }
         } catch (YAPI_Exception ignored) {
         }

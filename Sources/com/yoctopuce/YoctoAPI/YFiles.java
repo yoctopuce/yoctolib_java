@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 14779 2014-01-30 14:56:39Z seb $
+ * $Id: YFiles.java 15407 2014-03-12 19:34:44Z mvuilleu $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -127,7 +127,7 @@ public class YFiles extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_filesCount()  throws YAPI_Exception
+    public int get_filesCount() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -155,7 +155,7 @@ public class YFiles extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_freeSpace()  throws YAPI_Exception
+    public int get_freeSpace() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -251,7 +251,7 @@ public class YFiles extends YFunction
         return 0;
     }
 
-    public byte[] sendCommand(String command)  throws YAPI_Exception
+    public byte[] sendCommand(String command) throws YAPI_Exception
     {
         String url;
         url = String.format("files.json?a=%s",command);
@@ -267,7 +267,7 @@ public class YFiles extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int format_fs()  throws YAPI_Exception
+    public int format_fs() throws YAPI_Exception
     {
         byte[] json;
         String res;
@@ -290,7 +290,7 @@ public class YFiles extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public ArrayList<YFileRecord> get_list(String pattern)  throws YAPI_Exception
+    public ArrayList<YFileRecord> get_list(String pattern) throws YAPI_Exception
     {
         byte[] json;
         ArrayList<String> filelist = new ArrayList<String>();
@@ -313,7 +313,7 @@ public class YFiles extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public byte[] download(String pathname)  throws YAPI_Exception
+    public byte[] download(String pathname) throws YAPI_Exception
     {
         return _download(pathname);
     }
@@ -329,7 +329,7 @@ public class YFiles extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int upload(String pathname,byte[] content)  throws YAPI_Exception
+    public int upload(String pathname,byte[] content) throws YAPI_Exception
     {
         return _upload(pathname, content);
     }
@@ -348,7 +348,7 @@ public class YFiles extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int remove(String pathname)  throws YAPI_Exception
+    public int remove(String pathname) throws YAPI_Exception
     {
         byte[] json;
         String res;
@@ -367,7 +367,13 @@ public class YFiles extends YFunction
      */
     public  YFiles nextFiles()
     {
-        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        String next_hwid;
+        try {
+            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+        } catch (YAPI_Exception ignored) {
+            next_hwid = null;
+        }
         if(next_hwid == null) return null;
         return FindFiles(next_hwid);
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YServo.java 14779 2014-01-30 14:56:39Z seb $
+ * $Id: YServo.java 15407 2014-03-12 19:34:44Z mvuilleu $
  *
  * Implements yFindServo(), the high-level API for Servo functions
  *
@@ -10,24 +10,24 @@
  *
  *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
  *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ *  file into your software for the sole purpose of interfacing
+ *  with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
+ *  You may reproduce and distribute copies of this file in
  *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
+ *  code is to interface with Yoctopuce products. You must retain
  *  this notice in the distributed source file.
  *
  *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
+ *  for additional information regarding your rights and
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
  *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
  *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
  *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
@@ -70,6 +70,13 @@ public class YServo extends YFunction
      */
     public static final int POSITION_INVALID = YAPI.INVALID_INT;
     /**
+     * invalid enabled value
+     */
+    public static final int ENABLED_FALSE = 0;
+    public static final int ENABLED_TRUE = 1;
+    public static final int ENABLED_INVALID = -1;
+
+    /**
      * invalid range value
      */
     public static final int RANGE_INVALID = YAPI.INVALID_UINT;
@@ -77,11 +84,25 @@ public class YServo extends YFunction
      * invalid neutral value
      */
     public static final int NEUTRAL_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid positionAtPowerOn value
+     */
+    public static final int POSITIONATPOWERON_INVALID = YAPI.INVALID_INT;
+    /**
+     * invalid enabledAtPowerOn value
+     */
+    public static final int ENABLEDATPOWERON_FALSE = 0;
+    public static final int ENABLEDATPOWERON_TRUE = 1;
+    public static final int ENABLEDATPOWERON_INVALID = -1;
+
     public static final YMove MOVE_INVALID = null;
     protected int _position = POSITION_INVALID;
+    protected int _enabled = ENABLED_INVALID;
     protected int _range = RANGE_INVALID;
     protected int _neutral = NEUTRAL_INVALID;
     protected YMove _move = new YMove();
+    protected int _positionAtPowerOn = POSITIONATPOWERON_INVALID;
+    protected int _enabledAtPowerOn = ENABLEDATPOWERON_INVALID;
     protected UpdateCallback _valueCallbackServo = null;
 
     /**
@@ -129,6 +150,9 @@ public class YServo extends YFunction
         if (json_val.has("position")) {
             _position =  json_val.getInt("position");
         }
+        if (json_val.has("enabled")) {
+            _enabled =  json_val.getInt("enabled")>0?1:0;
+        }
         if (json_val.has("range")) {
             _range =  json_val.getInt("range");
         }
@@ -147,6 +171,12 @@ public class YServo extends YFunction
                 _move.moving = subjson.getInt("ms");
             }
         }
+        if (json_val.has("positionAtPowerOn")) {
+            _positionAtPowerOn =  json_val.getInt("positionAtPowerOn");
+        }
+        if (json_val.has("enabledAtPowerOn")) {
+            _enabledAtPowerOn =  json_val.getInt("enabledAtPowerOn")>0?1:0;
+        }
         super._parseAttr(json_val);
     }
 
@@ -160,7 +190,7 @@ public class YServo extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_position()  throws YAPI_Exception
+    public int get_position() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -212,13 +242,71 @@ public class YServo extends YFunction
     { return set_position(newval); }
 
     /**
+     * Returns the state of the servos.
+     * 
+     * @return either YServo.ENABLED_FALSE or YServo.ENABLED_TRUE, according to the state of the servos
+     * 
+     * @throws YAPI_Exception
+     */
+    public int get_enabled() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ENABLED_INVALID;
+            }
+        }
+        return _enabled;
+    }
+
+    /**
+     * Returns the state of the servos.
+     * 
+     * @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the state of the servos
+     * 
+     * @throws YAPI_Exception
+     */
+    public int getEnabled() throws YAPI_Exception
+
+    { return get_enabled(); }
+
+    /**
+     * Stops or starts the servo.
+     * 
+     * @param newval : either YServo.ENABLED_FALSE or YServo.ENABLED_TRUE
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int set_enabled(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        _setAttr("enabled",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Stops or starts the servo.
+     * 
+     * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE
+     * 
+     * @return YAPI_SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int setEnabled(int newval)  throws YAPI_Exception
+
+    { return set_enabled(newval); }
+
+    /**
      * Returns the current range of use of the servo.
      * 
      * @return an integer corresponding to the current range of use of the servo
      * 
      * @throws YAPI_Exception
      */
-    public int get_range()  throws YAPI_Exception
+    public int get_range() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -286,7 +374,7 @@ public class YServo extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_neutral()  throws YAPI_Exception
+    public int get_neutral() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -350,7 +438,7 @@ public class YServo extends YFunction
     /**
      * @throws YAPI_Exception
      */
-    public YMove get_move()  throws YAPI_Exception
+    public YMove get_move() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -396,6 +484,128 @@ public class YServo extends YFunction
         _setAttr("move",rest_val);
         return YAPI.SUCCESS;
     }
+
+    /**
+     * Returns the servo position at device power up.
+     * 
+     * @return an integer corresponding to the servo position at device power up
+     * 
+     * @throws YAPI_Exception
+     */
+    public int get_positionAtPowerOn() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return POSITIONATPOWERON_INVALID;
+            }
+        }
+        return _positionAtPowerOn;
+    }
+
+    /**
+     * Returns the servo position at device power up.
+     * 
+     * @return an integer corresponding to the servo position at device power up
+     * 
+     * @throws YAPI_Exception
+     */
+    public int getPositionAtPowerOn() throws YAPI_Exception
+
+    { return get_positionAtPowerOn(); }
+
+    /**
+     * Configure the servo position at device power up. Remember to call the matching
+     * module saveToFlash() method, otherwise this call will have no effect.
+     * 
+     * @param newval : an integer
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int set_positionAtPowerOn(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("positionAtPowerOn",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Configure the servo position at device power up. Remember to call the matching
+     * module saveToFlash() method, otherwise this call will have no effect.
+     * 
+     * @param newval : an integer
+     * 
+     * @return YAPI_SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int setPositionAtPowerOn(int newval)  throws YAPI_Exception
+
+    { return set_positionAtPowerOn(newval); }
+
+    /**
+     * Returns the servo signal generator state at power up.
+     * 
+     * @return either YServo.ENABLEDATPOWERON_FALSE or YServo.ENABLEDATPOWERON_TRUE, according to the
+     * servo signal generator state at power up
+     * 
+     * @throws YAPI_Exception
+     */
+    public int get_enabledAtPowerOn() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ENABLEDATPOWERON_INVALID;
+            }
+        }
+        return _enabledAtPowerOn;
+    }
+
+    /**
+     * Returns the servo signal generator state at power up.
+     * 
+     * @return either Y_ENABLEDATPOWERON_FALSE or Y_ENABLEDATPOWERON_TRUE, according to the servo signal
+     * generator state at power up
+     * 
+     * @throws YAPI_Exception
+     */
+    public int getEnabledAtPowerOn() throws YAPI_Exception
+
+    { return get_enabledAtPowerOn(); }
+
+    /**
+     * Configure the servo signal generator state at power up. Remember to call the matching module saveToFlash()
+     * method, otherwise this call will have no effect.
+     * 
+     * @param newval : either YServo.ENABLEDATPOWERON_FALSE or YServo.ENABLEDATPOWERON_TRUE
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int set_enabledAtPowerOn(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        _setAttr("enabledAtPowerOn",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Configure the servo signal generator state at power up. Remember to call the matching module saveToFlash()
+     * method, otherwise this call will have no effect.
+     * 
+     * @param newval : either Y_ENABLEDATPOWERON_FALSE or Y_ENABLEDATPOWERON_TRUE
+     * 
+     * @return YAPI_SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int setEnabledAtPowerOn(int newval)  throws YAPI_Exception
+
+    { return set_enabledAtPowerOn(newval); }
 
     /**
      * Retrieves a servo for a given identifier.
@@ -481,7 +691,13 @@ public class YServo extends YFunction
      */
     public  YServo nextServo()
     {
-        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        String next_hwid;
+        try {
+            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+        } catch (YAPI_Exception ignored) {
+            next_hwid = null;
+        }
         if(next_hwid == null) return null;
         return FindServo(next_hwid);
     }

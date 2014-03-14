@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRelay.java 14779 2014-01-30 14:56:39Z seb $
+ * $Id: YRelay.java 15407 2014-03-12 19:34:44Z mvuilleu $
  *
  * Implements yFindRelay(), the high-level API for Relay functions
  *
@@ -10,24 +10,24 @@
  *
  *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
  *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ *  file into your software for the sole purpose of interfacing
+ *  with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
+ *  You may reproduce and distribute copies of this file in
  *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
+ *  code is to interface with Yoctopuce products. You must retain
  *  this notice in the distributed source file.
  *
  *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
+ *  for additional information regarding your rights and
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
  *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
  *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
  *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
@@ -206,7 +206,7 @@ public class YRelay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_state()  throws YAPI_Exception
+    public int get_state() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -270,7 +270,7 @@ public class YRelay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_stateAtPowerOn()  throws YAPI_Exception
+    public int get_stateAtPowerOn() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -337,7 +337,7 @@ public class YRelay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public long get_maxTimeOnStateA()  throws YAPI_Exception
+    public long get_maxTimeOnStateA() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -399,7 +399,7 @@ public class YRelay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public long get_maxTimeOnStateB()  throws YAPI_Exception
+    public long get_maxTimeOnStateB() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -461,7 +461,7 @@ public class YRelay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_output()  throws YAPI_Exception
+    public int get_output() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -525,7 +525,7 @@ public class YRelay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public long get_pulseTimer()  throws YAPI_Exception
+    public long get_pulseTimer() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -582,7 +582,7 @@ public class YRelay extends YFunction
     /**
      * @throws YAPI_Exception
      */
-    public YDelayedPulse get_delayedPulseTimer()  throws YAPI_Exception
+    public YDelayedPulse get_delayedPulseTimer() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -638,7 +638,7 @@ public class YRelay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public long get_countdown()  throws YAPI_Exception
+    public long get_countdown() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -745,7 +745,13 @@ public class YRelay extends YFunction
      */
     public  YRelay nextRelay()
     {
-        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        String next_hwid;
+        try {
+            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+        } catch (YAPI_Exception ignored) {
+            next_hwid = null;
+        }
         if(next_hwid == null) return null;
         return FindRelay(next_hwid);
     }

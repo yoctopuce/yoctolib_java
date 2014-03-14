@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 14779 2014-01-30 14:56:39Z seb $
+ * $Id: YDisplay.java 15407 2014-03-12 19:34:44Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -211,7 +211,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_enabled()  throws YAPI_Exception
+    public int get_enabled() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -270,7 +270,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public String get_startupSeq()  throws YAPI_Exception
+    public String get_startupSeq() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -332,7 +332,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_brightness()  throws YAPI_Exception
+    public int get_brightness() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -396,7 +396,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_orientation()  throws YAPI_Exception
+    public int get_orientation() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -459,7 +459,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_displayWidth()  throws YAPI_Exception
+    public int get_displayWidth() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -487,7 +487,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_displayHeight()  throws YAPI_Exception
+    public int get_displayHeight() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -516,7 +516,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_displayType()  throws YAPI_Exception
+    public int get_displayType() throws YAPI_Exception
     {
         if (_cacheExpiration == 0) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -545,7 +545,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_layerWidth()  throws YAPI_Exception
+    public int get_layerWidth() throws YAPI_Exception
     {
         if (_cacheExpiration == 0) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -573,7 +573,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_layerHeight()  throws YAPI_Exception
+    public int get_layerHeight() throws YAPI_Exception
     {
         if (_cacheExpiration == 0) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -601,7 +601,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_layerCount()  throws YAPI_Exception
+    public int get_layerCount() throws YAPI_Exception
     {
         if (_cacheExpiration == 0) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -625,7 +625,7 @@ public class YDisplay extends YFunction
     /**
      * @throws YAPI_Exception
      */
-    public String get_command()  throws YAPI_Exception
+    public String get_command() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -736,7 +736,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int resetAll()  throws YAPI_Exception
+    public int resetAll() throws YAPI_Exception
     {
         flushLayers();
         resetHiddenLayerFlags();
@@ -754,7 +754,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int fade(int brightness,int duration)  throws YAPI_Exception
+    public int fade(int brightness,int duration) throws YAPI_Exception
     {
         flushLayers();
         return sendCommand(String.format("+%d,%d",brightness,duration));
@@ -769,7 +769,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int newSequence()  throws YAPI_Exception
+    public int newSequence() throws YAPI_Exception
     {
         flushLayers();
         _sequence = "";
@@ -788,7 +788,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int saveSequence(String sequenceName)  throws YAPI_Exception
+    public int saveSequence(String sequenceName) throws YAPI_Exception
     {
         flushLayers();
         _recording = false;
@@ -808,7 +808,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int playSequence(String sequenceName)  throws YAPI_Exception
+    public int playSequence(String sequenceName) throws YAPI_Exception
     {
         flushLayers();
         return sendCommand(String.format("S%s",sequenceName));
@@ -828,7 +828,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int pauseSequence(int delay_ms)  throws YAPI_Exception
+    public int pauseSequence(int delay_ms) throws YAPI_Exception
     {
         flushLayers();
         return sendCommand(String.format("W%d",delay_ms));
@@ -842,7 +842,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int stopSequence()  throws YAPI_Exception
+    public int stopSequence() throws YAPI_Exception
     {
         flushLayers();
         return sendCommand("S");
@@ -860,7 +860,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int upload(String pathname,byte[] content)  throws YAPI_Exception
+    public int upload(String pathname,byte[] content) throws YAPI_Exception
     {
         return _upload(pathname, content);
     }
@@ -879,7 +879,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int copyLayerContent(int srcLayerId,int dstLayerId)  throws YAPI_Exception
+    public int copyLayerContent(int srcLayerId,int dstLayerId) throws YAPI_Exception
     {
         flushLayers();
         return sendCommand(String.format("o%d,%d",srcLayerId,dstLayerId));
@@ -900,7 +900,7 @@ public class YDisplay extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int swapLayerContent(int layerIdA,int layerIdB)  throws YAPI_Exception
+    public int swapLayerContent(int layerIdA,int layerIdB) throws YAPI_Exception
     {
         flushLayers();
         return sendCommand(String.format("E%d,%d",layerIdA,layerIdB));
@@ -915,7 +915,13 @@ public class YDisplay extends YFunction
      */
     public  YDisplay nextDisplay()
     {
-        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        String next_hwid;
+        try {
+            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+        } catch (YAPI_Exception ignored) {
+            next_hwid = null;
+        }
         if(next_hwid == null) return null;
         return FindDisplay(next_hwid);
     }
@@ -967,13 +973,6 @@ public class YDisplay extends YFunction
         return _allDisplayLayers[layerId];
     }
 
-    /**
-     * Force a flush of all commands buffered by all layers.
-     *
-     * @return YAPI_SUCCESS if the call succeeds.
-     *
-     * On failure, throws an exception or returns a negative error code.
-     */
     public synchronized int flushLayers() throws YAPI_Exception
     {
         if(_allDisplayLayers != null) {
@@ -993,13 +992,6 @@ public class YDisplay extends YFunction
         }
     }
 
-    /**
-     * Add a given command string to the currently recorded display sequence
-     *
-     * @return YAPI_SUCCESS if the call succeeds.
-     *
-     * On failure, throws an exception or returns a negative error code.
-     */
     public synchronized int sendCommand(String cmd) throws YAPI_Exception
     {
         if(!_recording) {

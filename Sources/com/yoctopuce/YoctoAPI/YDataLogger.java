@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataLogger.java 14779 2014-01-30 14:56:39Z seb $
+ * $Id: YDataLogger.java 15407 2014-03-12 19:34:44Z mvuilleu $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -254,7 +254,7 @@ public class YDataLogger extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_currentRunIndex()  throws YAPI_Exception
+    public int get_currentRunIndex() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -284,7 +284,7 @@ public class YDataLogger extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public long get_timeUTC()  throws YAPI_Exception
+    public long get_timeUTC() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -343,7 +343,7 @@ public class YDataLogger extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_recording()  throws YAPI_Exception
+    public int get_recording() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -404,7 +404,7 @@ public class YDataLogger extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_autoStart()  throws YAPI_Exception
+    public int get_autoStart() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -465,7 +465,7 @@ public class YDataLogger extends YFunction
     /**
      * @throws YAPI_Exception
      */
-    public int get_clearHistory()  throws YAPI_Exception
+    public int get_clearHistory() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -577,7 +577,7 @@ public class YDataLogger extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int forgetAllDataStreams()  throws YAPI_Exception
+    public int forgetAllDataStreams() throws YAPI_Exception
     {
         return set_clearHistory(CLEARHISTORY_TRUE);
     }
@@ -594,12 +594,12 @@ public class YDataLogger extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public ArrayList<YDataSet> get_dataSets()  throws YAPI_Exception
+    public ArrayList<YDataSet> get_dataSets() throws YAPI_Exception
     {
         return parse_dataSets(_download("logger.json"));
     }
 
-    public ArrayList<YDataSet> parse_dataSets(byte[] json)  throws YAPI_Exception
+    public ArrayList<YDataSet> parse_dataSets(byte[] json) throws YAPI_Exception
     {
         ArrayList<String> dslist = new ArrayList<String>();
         ArrayList<YDataSet> res = new ArrayList<YDataSet>();
@@ -621,7 +621,13 @@ public class YDataLogger extends YFunction
      */
     public  YDataLogger nextDataLogger()
     {
-        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        String next_hwid;
+        try {
+            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+        } catch (YAPI_Exception ignored) {
+            next_hwid = null;
+        }
         if(next_hwid == null) return null;
         return FindDataLogger(next_hwid);
     }

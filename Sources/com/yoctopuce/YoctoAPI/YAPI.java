@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI.java 14779 2014-01-30 14:56:39Z seb $
+ * $Id: YAPI.java 15107 2014-02-27 16:44:11Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -39,17 +39,19 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import com.yoctopuce.YoctoAPI.YGenericHub.HTTPParams;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
  */
-@SuppressWarnings("UnusedDeclaration")
 public class YAPI {
 
 
@@ -220,8 +222,8 @@ public class YAPI {
     private YSSDP _ssdp;
 
     //YFunction Callback list
-    private static ArrayList<YFunction> _ValueCallbackList = new ArrayList<YFunction>();
-    private static ArrayList<YFunction> _TimedReportCallbackList = new ArrayList<YFunction>();
+    private static final ArrayList<YFunction> _ValueCallbackList = new ArrayList<YFunction>();
+    private static final ArrayList<YFunction> _TimedReportCallbackList = new ArrayList<YFunction>();
     // YDevice cache
     //public static ArrayList<YDevice> _devCache = new ArrayList<YDevice>();// Device cache entries
 
@@ -412,44 +414,35 @@ public class YAPI {
     // Parse an array of u16 encoded in a base64-like string with memory-based compresssion
     static ArrayList<Integer> _decodeWords(String data)
     {
-        ArrayList<Integer> udata;
-
-        udata = new ArrayList<Integer>();
+        ArrayList<Integer> udata = new ArrayList<Integer>();
         int datalen = data.length();
-        int i = 0;
-        int val;
-        while (i < datalen) {
-            char c = data.charAt(i);
-            if (c == '*'){
+        int p = 0;
+        while (p < datalen) {
+            int val;
+            int c = data.charAt(p++);
+            if (c == (int)'*'){
                 val = 0;
-                i++;
-            } else if (c >= 'X') {
+            } else if (c == (int)'X') {
                 val = 0xffff;
-                i++;
-            } else if (c >= 'Y') {
+            } else if (c == (int)'Y') {
                 val = 0x7fff;
-                i++;
-            } else if (c >= 'a') {
-                i++;
-                int srcpos = udata.size() - 1 - (c - 97);
+            } else if (c >= (int)'a') {
+                int srcpos = udata.size() - 1 - (c - (int)'a');
                 if (srcpos < 0) {
                     val =0;
                 }else {
                     val = udata.get(srcpos);
                 }
             } else {
-                if (i + 2 > datalen) {
+                if (p + 2 > datalen) {
                     return udata;
                 }
-                i++;
-                val = c - 48;
-                c = data.charAt(i++);
-                val += (c - 48) << 5;
-                c = data.charAt(i++);
-                if (c == 'z') {
-                    c ='\\' ;
-                }
-                val += (c - 48) << 10;
+                val = c - (int)'0';
+                c = data.charAt(p++);
+                val += (c - (int)'0') << 5;
+                c = data.charAt(p++);
+                if (c == (int)'z') { c ='\\' ;}
+                val += (c - (int)'0') << 10;
             }
             udata.add(val);
         }
@@ -751,15 +744,15 @@ public class YAPI {
             }
         }
         YGenericHub newhub;
-        HTTPParams parsedurl;
-        parsedurl = new HTTPParams(url);
+        YGenericHub.HTTPParams parsedurl;
+        parsedurl = new YGenericHub.HTTPParams(url);
         // Add hub to known list
         if (url.equals("usb")) {
         	YUSBHub.CheckUSBAcces();
             newhub = new YUSBHub(_hubs.size());
         } else if (url.equals("net")){
             if((_apiMode& DETECT_NET)==0) {
-                newhub = new YHTTPHub(_hubs.size(), new HTTPParams("localhost"));
+                newhub = new YHTTPHub(_hubs.size(), new YGenericHub.HTTPParams("localhost"));
                 _hubs.add(newhub);
                 newhub.startNotifications();
                 _apiMode |= DETECT_NET;
@@ -782,22 +775,28 @@ public class YAPI {
         if (add)
         {
             func.isOnline();
-            if (!_ValueCallbackList.contains(func)) {
-                _ValueCallbackList.add(func);
+            synchronized (_ValueCallbackList){
+                if (!_ValueCallbackList.contains(func)) {
+                    _ValueCallbackList.add(func);
+                }
             }
         } else {
-            _ValueCallbackList.remove(func);
+            synchronized (_ValueCallbackList){
+                _ValueCallbackList.remove(func);
+            }
         }
     }
 
     YFunction _GetValueCallback(String hwid)
     {
-        for (YFunction func : _ValueCallbackList) {
-            try {
-                if (func.getHardwareId().equals(hwid)) {
-                    return func;
-                }
-            } catch (YAPI_Exception ignore) {}
+        synchronized (_ValueCallbackList){
+            for (YFunction func : _ValueCallbackList) {
+                try {
+                    if (func.getHardwareId().equals(hwid)) {
+                        return func;
+                    }
+                } catch (YAPI_Exception ignore) {}
+            }
         }
         return null;
     }
@@ -809,22 +808,28 @@ public class YAPI {
         if (add)
         {
             func.isOnline();
-            if (!_TimedReportCallbackList.contains(func)) {
-                _TimedReportCallbackList.add(func);
+            synchronized (_TimedReportCallbackList){
+                if (!_TimedReportCallbackList.contains(func)) {
+                    _TimedReportCallbackList.add(func);
+                }
             }
         } else {
-            _TimedReportCallbackList.remove(func);
+            synchronized (_TimedReportCallbackList){
+                _TimedReportCallbackList.remove(func);
+            }
         }
     }
 
     YFunction _GetTimedReportCallback(String hwid)
     {
-        for (YFunction func : _TimedReportCallbackList) {
-            try {
-                if (func.getHardwareId().equals(hwid)) {
-                    return func;
-                }
-            } catch (YAPI_Exception ignore) {}
+        synchronized (_TimedReportCallbackList){
+            for (YFunction func : _TimedReportCallbackList) {
+                try {
+                    if (func.getHardwareId().equals(hwid)) {
+                        return func;
+                    }
+                } catch (YAPI_Exception ignore) {}
+            }
         }
         return null;
     }
@@ -1083,37 +1088,35 @@ public class YAPI {
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".14801";
+        return YOCTO_API_VERSION_STR + ".15466";
     }
-
 
     /**
      * Initializes the Yoctopuce programming library explicitly.
      * It is not strictly needed to call yInitAPI(), as the library is
      * automatically  initialized when calling yRegisterHub() for the
      * first time.
-     *
+     * 
      * When YAPI.DETECT_NONE is used as detection mode,
      * you must explicitly use yRegisterHub() to point the API to the
      * VirtualHub on which your devices are connected before trying to access them.
-     *
+     * 
      * @param mode : an integer corresponding to the type of automatic
      *         device detection to use. Possible values are
      *         YAPI.DETECT_NONE, YAPI.DETECT_USB, YAPI.DETECT_NET,
      *         and YAPI.DETECT_ALL.
-     *
+     * 
      * @return YAPI.SUCCESS when the call succeeds.
-     *
+     * 
      * @throws YAPI_Exception
      */
-    public static int sInitAPI(int mode) throws YAPI_Exception {
+    public static int InitAPI(int mode) throws YAPI_Exception {
 
         YAPI yapi = SafeYAPI();
         //FIXME: Ensure API is working in correcte Mode
 
         return YAPI.SUCCESS;
     }
-
 
     /**
      * Frees dynamically allocated memory blocks used by the Yoctopuce library.
@@ -1298,7 +1301,7 @@ public class YAPI {
 
     /**
      * Force a hub discovery, if a callback as been registered with yRegisterDeviceRemovalCallback it
-     * will be called for each net work hub that will respond to the discovery
+     * will be called for each net work hub that will respond to the discovery.
      * 
      * @return YAPI.SUCCESS when the call succeeds.
      * @throws YAPI_Exception
@@ -1307,7 +1310,6 @@ public class YAPI {
     {
         return SafeYAPI()._TriggerHubDiscovery();
     }
-
 
     /**
      * Returns the current value of a monotone millisecond-based time counter.

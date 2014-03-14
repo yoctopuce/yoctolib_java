@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 14779 2014-01-30 14:56:39Z seb $
+ * $Id: YDataStream.java 15249 2014-03-06 10:12:58Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -203,7 +203,7 @@ public class YDataStream
         return 0;
     }
 
-    public int parse(byte[] sdata)  throws YAPI_Exception
+    public int parse(byte[] sdata) throws YAPI_Exception
     {
         int idx = 0;
         ArrayList<Integer> udat = new ArrayList<Integer>();
@@ -218,7 +218,7 @@ public class YDataStream
                 dat.add(_decodeVal(udat.get(idx)));
                 dat.add(_decodeAvg(udat.get(idx + 2) + (((udat.get(idx + 3)) << (16))), 1));
                 dat.add(_decodeVal(udat.get(idx + 1)));
-                _values.add((ArrayList<Double>)dat.clone());
+                _values.add(new ArrayList<Double>(dat));
                 idx = idx + 4;
             }
         } else {
@@ -226,14 +226,14 @@ public class YDataStream
                 while (idx < udat.size()) {
                     dat.clear();
                     dat.add(_decodeVal(udat.get(idx)));
-                    _values.add((ArrayList<Double>)dat.clone());
+                    _values.add(new ArrayList<Double>(dat));
                     idx = idx + 1;
                 }
             } else {
                 while (idx + 1 < udat.size()) {
                     dat.clear();
                     dat.add(_decodeAvg(udat.get(idx) + (((udat.get(idx + 1)) << (16))), 1));
-                    _values.add((ArrayList<Double>)dat.clone());
+                    _values.add(new ArrayList<Double>(dat));
                     idx = idx + 2;
                 }
             }
@@ -251,7 +251,7 @@ public class YDataStream
         return url;
     }
 
-    public int loadStream()  throws YAPI_Exception
+    public int loadStream() throws YAPI_Exception
     {
         return parse(_parent._download(get_url()));
     }
@@ -363,7 +363,7 @@ public class YDataStream
      * 
      * @throws YAPI_Exception
      */
-    public int get_rowCount()  throws YAPI_Exception
+    public int get_rowCount() throws YAPI_Exception
     {
         if ((_nRows != 0) && _isClosed) {
             return _nRows;
@@ -385,7 +385,7 @@ public class YDataStream
      * 
      * @throws YAPI_Exception
      */
-    public int get_columnCount()  throws YAPI_Exception
+    public int get_columnCount() throws YAPI_Exception
     {
         if (_nCols != 0) {
             return _nCols;
@@ -411,7 +411,7 @@ public class YDataStream
      * 
      * @throws YAPI_Exception
      */
-    public ArrayList<String> get_columnNames()  throws YAPI_Exception
+    public ArrayList<String> get_columnNames() throws YAPI_Exception
     {
         if (_columnNames.size() != 0) {
             return _columnNames;
@@ -430,7 +430,7 @@ public class YDataStream
      * 
      * @throws YAPI_Exception
      */
-    public double get_minValue()  throws YAPI_Exception
+    public double get_minValue() throws YAPI_Exception
     {
         return _minVal;
     }
@@ -445,7 +445,7 @@ public class YDataStream
      * 
      * @throws YAPI_Exception
      */
-    public double get_averageValue()  throws YAPI_Exception
+    public double get_averageValue() throws YAPI_Exception
     {
         return _avgVal;
     }
@@ -460,7 +460,7 @@ public class YDataStream
      * 
      * @throws YAPI_Exception
      */
-    public double get_maxValue()  throws YAPI_Exception
+    public double get_maxValue() throws YAPI_Exception
     {
         return _maxVal;
     }
@@ -472,7 +472,7 @@ public class YDataStream
      * 
      * @throws YAPI_Exception
      */
-    public int get_duration()  throws YAPI_Exception
+    public int get_duration() throws YAPI_Exception
     {
         if (_isClosed) {
             return _duration;
@@ -495,7 +495,7 @@ public class YDataStream
      * 
      * @throws YAPI_Exception
      */
-    public ArrayList<ArrayList<Double>> get_dataRows()  throws YAPI_Exception
+    public ArrayList<ArrayList<Double>> get_dataRows() throws YAPI_Exception
     {
         if ((_values.size() == 0) || !(_isClosed)) {
             loadStream();
@@ -519,7 +519,7 @@ public class YDataStream
      * 
      * @throws YAPI_Exception
      */
-    public double get_data(int row,int col)  throws YAPI_Exception
+    public double get_data(int row,int col) throws YAPI_Exception
     {
         if ((_values.size() == 0) || !(_isClosed)) {
             loadStream();

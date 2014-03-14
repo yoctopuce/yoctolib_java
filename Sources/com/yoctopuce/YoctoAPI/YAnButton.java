@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAnButton.java 14779 2014-01-30 14:56:39Z seb $
+ * $Id: YAnButton.java 15407 2014-03-12 19:34:44Z mvuilleu $
  *
  * Implements yFindAnButton(), the high-level API for AnButton functions
  *
@@ -10,24 +10,24 @@
  *
  *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
  *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ *  file into your software for the sole purpose of interfacing
+ *  with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
+ *  You may reproduce and distribute copies of this file in
  *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
+ *  code is to interface with Yoctopuce products. You must retain
  *  this notice in the distributed source file.
  *
  *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
+ *  for additional information regarding your rights and
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
  *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
  *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
  *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
@@ -207,7 +207,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_calibratedValue()  throws YAPI_Exception
+    public int get_calibratedValue() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -235,7 +235,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_rawValue()  throws YAPI_Exception
+    public int get_rawValue() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -263,7 +263,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_analogCalibration()  throws YAPI_Exception
+    public int get_analogCalibration() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -324,7 +324,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_calibrationMax()  throws YAPI_Exception
+    public int get_calibrationMax() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -392,7 +392,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_calibrationMin()  throws YAPI_Exception
+    public int get_calibrationMin() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -460,7 +460,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_sensitivity()  throws YAPI_Exception
+    public int get_sensitivity() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -532,7 +532,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_isPressed()  throws YAPI_Exception
+    public int get_isPressed() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -564,7 +564,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public long get_lastTimePressed()  throws YAPI_Exception
+    public long get_lastTimePressed() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -598,7 +598,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public long get_lastTimeReleased()  throws YAPI_Exception
+    public long get_lastTimeReleased() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -629,7 +629,7 @@ public class YAnButton extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public long get_pulseCounter()  throws YAPI_Exception
+    public long get_pulseCounter() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -663,28 +663,13 @@ public class YAnButton extends YFunction
     { return set_pulseCounter(newval); }
 
     /**
-     * Returns the pulse counter value as well as his timer
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception
-     */
-    public int resetCounter()  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = "0";
-        _setAttr("pulseCounter",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
      * Returns the timer of the pulses counter (ms)
      * 
      * @return an integer corresponding to the timer of the pulses counter (ms)
      * 
      * @throws YAPI_Exception
      */
-    public long get_pulseTimer()  throws YAPI_Exception
+    public long get_pulseTimer() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -781,6 +766,18 @@ public class YAnButton extends YFunction
     }
 
     /**
+     * Returns the pulse counter value as well as his timer
+     * 
+     * @return YAPI.SUCCESS if the call succeeds.
+     * 
+     * @throws YAPI_Exception
+     */
+    public int resetCounter() throws YAPI_Exception
+    {
+        return set_pulseCounter(0);
+    }
+
+    /**
      * Continues the enumeration of analog inputs started using yFirstAnButton().
      * 
      * @return a pointer to a YAnButton object, corresponding to
@@ -789,7 +786,13 @@ public class YAnButton extends YFunction
      */
     public  YAnButton nextAnButton()
     {
-        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        String next_hwid;
+        try {
+            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+        } catch (YAPI_Exception ignored) {
+            next_hwid = null;
+        }
         if(next_hwid == null) return null;
         return FindAnButton(next_hwid);
     }

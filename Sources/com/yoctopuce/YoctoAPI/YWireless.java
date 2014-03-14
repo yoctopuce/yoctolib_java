@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 14779 2014-01-30 14:56:39Z seb $
+ * $Id: YWireless.java 15407 2014-03-12 19:34:44Z mvuilleu $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -163,7 +163,7 @@ public class YWireless extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_linkQuality()  throws YAPI_Exception
+    public int get_linkQuality() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -191,7 +191,7 @@ public class YWireless extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public String get_ssid()  throws YAPI_Exception
+    public String get_ssid() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -220,7 +220,7 @@ public class YWireless extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_channel()  throws YAPI_Exception
+    public int get_channel() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -251,7 +251,7 @@ public class YWireless extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public int get_security()  throws YAPI_Exception
+    public int get_security() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -280,7 +280,7 @@ public class YWireless extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public String get_message()  throws YAPI_Exception
+    public String get_message() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -304,7 +304,7 @@ public class YWireless extends YFunction
     /**
      * @throws YAPI_Exception
      */
-    public String get_wlanConfig()  throws YAPI_Exception
+    public String get_wlanConfig() throws YAPI_Exception
     {
         if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
@@ -461,7 +461,7 @@ public class YWireless extends YFunction
      * 
      * @throws YAPI_Exception
      */
-    public ArrayList<YWlanRecord> get_detectedWlans()  throws YAPI_Exception
+    public ArrayList<YWlanRecord> get_detectedWlans() throws YAPI_Exception
     {
         byte[] json;
         ArrayList<String> wlanlist = new ArrayList<String>();
@@ -485,7 +485,13 @@ public class YWireless extends YFunction
      */
     public  YWireless nextWireless()
     {
-        String next_hwid = SafeYAPI().getNextHardwareId(_className, _func);
+        String next_hwid;
+        try {
+            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+        } catch (YAPI_Exception ignored) {
+            next_hwid = null;
+        }
         if(next_hwid == null) return null;
         return FindWireless(next_hwid);
     }

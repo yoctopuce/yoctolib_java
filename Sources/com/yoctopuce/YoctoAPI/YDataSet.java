@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataSet.java 14615 2014-01-19 00:16:40Z mvuilleu $
+ * $Id: YDataSet.java 15277 2014-03-06 17:48:49Z martinm $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -154,7 +154,7 @@ public class YDataSet
                     }
                 }
             }
-            if(_streams.size() > 0) {
+            if((_streams.size() > 0) && (summaryTotalTime>0)){
                 // update time boundaries with actual data
                 YDataStream stream = _streams.get(_streams.size()-1);
                 long endtime = stream.get_startTimeUTC() + stream.get_duration();
@@ -181,7 +181,7 @@ public class YDataSet
         return _calib;
     }
 
-    public int processMore(int progress,byte[] data)  throws YAPI_Exception
+    public int processMore(int progress,byte[] data) throws YAPI_Exception
     {
         YDataStream stream;
         ArrayList<ArrayList<Double>> dataRows = new ArrayList<ArrayList<Double>>();
@@ -251,7 +251,7 @@ public class YDataSet
      * 
      * @throws YAPI_Exception
      */
-    public String get_hardwareId()  throws YAPI_Exception
+    public String get_hardwareId() throws YAPI_Exception
     {
         YModule mo;
         if (!(_hardwareId.equals(""))) {
@@ -280,7 +280,7 @@ public class YDataSet
      * 
      * @throws YAPI_Exception
      */
-    public String get_unit()  throws YAPI_Exception
+    public String get_unit() throws YAPI_Exception
     {
         return _unit;
     }
@@ -348,7 +348,7 @@ public class YDataSet
      * 
      * @throws YAPI_Exception
      */
-    public int loadMore()  throws YAPI_Exception
+    public int loadMore() throws YAPI_Exception
     {
         String url;
         YDataStream stream;
@@ -402,7 +402,7 @@ public class YDataSet
      * 
      * @throws YAPI_Exception
      */
-    public ArrayList<YMeasure> get_preview()  throws YAPI_Exception
+    public ArrayList<YMeasure> get_preview() throws YAPI_Exception
     {
         return _preview;
     }
@@ -432,7 +432,7 @@ public class YDataSet
      * 
      * @throws YAPI_Exception
      */
-    public ArrayList<YMeasure> get_measures()  throws YAPI_Exception
+    public ArrayList<YMeasure> get_measures() throws YAPI_Exception
     {
         return _measures;
     }
