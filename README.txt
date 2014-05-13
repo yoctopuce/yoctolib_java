@@ -39,13 +39,14 @@ Content of this package:
 ------------------------
 build.bat               Automated build script for Windows
 build.sh                Automated build script for UNIX platforms
+pom.xml                 Maven build script to compile library and examples
 FILES.txt               List of files contained in this archive
 RELEASE.txt             Release notes
 Documentation/          API Reference, in HTML and PDF format
 Examples/               Directory with sample programs in Java
-NetBeansProject/        Netbeans project to compile Java library
+JsonParser/             Json parser source file (not used by Maven lib)
 Sources/                Source code of the high-level library (in Java)
-Binaries/               Precompiled Java library 
+Binaries/               Precompiled far files
 
 In order to use the Java examples, you will probably need to download
 as well the VirtualHub software for your OS.
@@ -55,6 +56,13 @@ them from source, or to compile the examples, use the following command:
 
 on Windows: build
 on UNIX:    ./build.sh
+
+If you use Maven you can recompile everything with
+	mvn package
+
+or use the library uploaded to maven central repository
+    groupId: com.yoctopuce.java
+    artifactId: yoctolib
 
 For more details, refer to the documentation specific to each product, which
 includes sample code with explanations, and a programming reference manual.

@@ -5,7 +5,7 @@ if [ $1 == 'clean' ]; then
 	rm -rf Binaries/*
 	exit 0
 else
-	javac -g -d Binaries -sourcepath Sources Sources/com/yoctopuce/YoctoAPI/*.java
+	javac -g -d Binaries -sourcepath yoctolib/main/java yoctolib/main/java/com/yoctopuce/YoctoAPI/*.java
 	if [ "$?" -ne "0" ]; then
 	  exit 1
 	fi
