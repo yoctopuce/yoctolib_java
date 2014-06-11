@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFunction.java 15961 2014-04-28 16:32:50Z seb $
+ * $Id: YFunction.java 16278 2014-05-22 13:42:16Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -224,6 +224,8 @@ public class YFunction
     public int set_logicalName(String  newval)  throws YAPI_Exception
     {
         String rest_val;
+        if (!YAPI.CheckLogicalName(newval))
+            _throw(YAPI.INVALID_ARGUMENT,"Invalid name :" + newval);
         rest_val = newval;
         _setAttr("logicalName",rest_val);
         return YAPI.SUCCESS;

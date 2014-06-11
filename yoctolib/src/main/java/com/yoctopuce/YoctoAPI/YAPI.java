@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YAPI.java 16278 2014-05-22 13:42:16Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -46,8 +46,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -1001,8 +999,6 @@ public class YAPI {
                 try {
                     Thread.sleep(3);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(YAPI.class.getName()).log(Level.SEVERE,
-                            null, ex);
                     throw new YAPI_Exception(YAPI.IO_ERROR,
                             "Thread has been interrupted");
                 }
@@ -1079,7 +1075,7 @@ public class YAPI {
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".16182";
+        return YOCTO_API_VERSION_STR + ".16490";
     }
 
     /**
