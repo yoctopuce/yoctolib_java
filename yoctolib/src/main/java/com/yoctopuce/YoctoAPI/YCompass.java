@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCompass.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YCompass.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindCompass(), the high-level API for Compass functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YCompass class start)
 /**
  * YCompass Class: Compass function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YCompass extends YSensor
 {
 //--- (end of YCompass class start)
@@ -77,7 +78,7 @@ public class YCompass extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -89,7 +90,7 @@ public class YCompass extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -99,7 +100,7 @@ public class YCompass extends YSensor
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YCompass(String func)
@@ -118,7 +119,7 @@ public class YCompass extends YSensor
             _axis =  json_val.getInt("axis");
         }
         if (json_val.has("magneticHeading")) {
-            _magneticHeading =  json_val.getDouble("magneticHeading")/65536.0;
+            _magneticHeading =  Math.round(json_val.getDouble("magneticHeading") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
     }
@@ -128,7 +129,7 @@ public class YCompass extends YSensor
      */
     public int get_axis() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AXIS_INVALID;
             }
@@ -145,14 +146,14 @@ public class YCompass extends YSensor
 
     /**
      * Returns the magnetic heading, regardless of the configured bearing.
-     * 
+     *
      * @return a floating point number corresponding to the magnetic heading, regardless of the configured bearing
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_magneticHeading() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAGNETICHEADING_INVALID;
             }
@@ -162,9 +163,9 @@ public class YCompass extends YSensor
 
     /**
      * Returns the magnetic heading, regardless of the configured bearing.
-     * 
+     *
      * @return a floating point number corresponding to the magnetic heading, regardless of the configured bearing
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getMagneticHeading() throws YAPI_Exception
@@ -181,7 +182,7 @@ public class YCompass extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the compass is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YCompass.isOnline() to test if the compass is
@@ -189,9 +190,9 @@ public class YCompass extends YSensor
      * a compass by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the compass
-     * 
+     *
      * @return a YCompass object allowing you to drive the compass.
      */
     public static YCompass FindCompass(String func)
@@ -210,11 +211,11 @@ public class YCompass extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -251,11 +252,11 @@ public class YCompass extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -281,7 +282,7 @@ public class YCompass extends YSensor
 
     /**
      * Continues the enumeration of compasses started using yFirstCompass().
-     * 
+     *
      * @return a pointer to a YCompass object, corresponding to
      *         a compass currently online, or a null pointer
      *         if there are no more compasses to enumerate.
@@ -303,7 +304,7 @@ public class YCompass extends YSensor
      * Starts the enumeration of compasses currently accessible.
      * Use the method YCompass.nextCompass() to iterate on
      * next compasses.
-     * 
+     *
      * @return a pointer to a YCompass object, corresponding to
      *         the first compass currently online, or a null pointer
      *         if there are none.

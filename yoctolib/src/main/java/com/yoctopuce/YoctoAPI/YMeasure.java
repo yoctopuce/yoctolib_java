@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMeasure.java 15813 2014-04-16 06:57:36Z seb $
+ * $Id: YMeasure.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindMeasure(), the high-level API for Measure functions
  *
@@ -45,11 +45,12 @@ import java.util.Date;
 //--- (generated code: YMeasure class start)
 /**
  * YMeasure Class: Measured value
- * 
+ *
  * YMeasure objects are used within the API to represent
  * a value measured at a specified time. These objects are
  * used in particular in conjunction with the YDataSet class.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YMeasure
 {
 //--- (end of generated code: YMeasure class start)
@@ -89,7 +90,7 @@ public class YMeasure
      * Returns the start time of the measure, relative to the Jan 1, 1970 UTC
      * (Unix timestamp). When the recording rate is higher then 1 sample
      * per second, the timestamp may have a fractional part.
-     * 
+     *
      * @return an floating point number corresponding to the number of seconds
      *         between the Jan 1, 1970 UTC and the beginning of this measure.
      */
@@ -102,7 +103,7 @@ public class YMeasure
      * Returns the end time of the measure, relative to the Jan 1, 1970 UTC
      * (Unix timestamp). When the recording rate is higher than 1 sample
      * per second, the timestamp may have a fractional part.
-     * 
+     *
      * @return an floating point number corresponding to the number of seconds
      *         between the Jan 1, 1970 UTC and the end of this measure.
      */
@@ -114,7 +115,7 @@ public class YMeasure
     /**
      * Returns the smallest value observed during the time interval
      * covered by this measure.
-     * 
+     *
      * @return a floating-point number corresponding to the smallest value observed.
      */
     public double get_minValue()
@@ -125,7 +126,7 @@ public class YMeasure
     /**
      * Returns the average value observed during the time interval
      * covered by this measure.
-     * 
+     *
      * @return a floating-point number corresponding to the average value observed.
      */
     public double get_averageValue()
@@ -136,7 +137,7 @@ public class YMeasure
     /**
      * Returns the largest value observed during the time interval
      * covered by this measure.
-     * 
+     *
      * @return a floating-point number corresponding to the largest value observed.
      */
     public double get_maxValue()

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDigitalIO.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YDigitalIO.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -47,12 +47,13 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YDigitalIO class start)
 /**
  * YDigitalIO Class: Digital IO function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to switch the state of each
  * bit of the I/O port. You can switch all bits at once, or one by one. The library
  * can also automatically generate short pulses of a determined duration. Electrical behavior
  * of each I/O can be modified (open drain and reverse polarity).
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YDigitalIO extends YFunction
 {
 //--- (end of YDigitalIO class start)
@@ -103,7 +104,7 @@ public class YDigitalIO extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -115,7 +116,7 @@ public class YDigitalIO extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -125,7 +126,7 @@ public class YDigitalIO extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YDigitalIO(String func)
@@ -159,21 +160,21 @@ public class YDigitalIO extends YFunction
             _outputVoltage =  json_val.getInt("outputVoltage");
         }
         if (json_val.has("command")) {
-            _command =  json_val.getString("command"); ;
+            _command =  json_val.getString("command");
         }
         super._parseAttr(json_val);
     }
 
     /**
      * Returns the digital IO port state: bit 0 represents input 0, and so on.
-     * 
+     *
      * @return an integer corresponding to the digital IO port state: bit 0 represents input 0, and so on
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_portState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTSTATE_INVALID;
             }
@@ -183,9 +184,9 @@ public class YDigitalIO extends YFunction
 
     /**
      * Returns the digital IO port state: bit 0 represents input 0, and so on.
-     * 
+     *
      * @return an integer corresponding to the digital IO port state: bit 0 represents input 0, and so on
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPortState() throws YAPI_Exception
@@ -195,11 +196,11 @@ public class YDigitalIO extends YFunction
     /**
      * Changes the digital IO port state: bit 0 represents input 0, and so on. This function has no effect
      * on bits configured as input in portDirection.
-     * 
+     *
      * @param newval : an integer corresponding to the digital IO port state: bit 0 represents input 0, and so on
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_portState(int  newval)  throws YAPI_Exception
@@ -213,11 +214,11 @@ public class YDigitalIO extends YFunction
     /**
      * Changes the digital IO port state: bit 0 represents input 0, and so on. This function has no effect
      * on bits configured as input in portDirection.
-     * 
+     *
      * @param newval : an integer corresponding to the digital IO port state: bit 0 represents input 0, and so on
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setPortState(int newval)  throws YAPI_Exception
@@ -226,15 +227,15 @@ public class YDigitalIO extends YFunction
 
     /**
      * Returns the IO direction of all bits of the port: 0 makes a bit an input, 1 makes it an output.
-     * 
-     * @return an integer corresponding to the IO direction of all bits of the port: 0 makes a bit an
+     *
+     *  @return an integer corresponding to the IO direction of all bits of the port: 0 makes a bit an
      * input, 1 makes it an output
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_portDirection() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTDIRECTION_INVALID;
             }
@@ -244,10 +245,10 @@ public class YDigitalIO extends YFunction
 
     /**
      * Returns the IO direction of all bits of the port: 0 makes a bit an input, 1 makes it an output.
-     * 
-     * @return an integer corresponding to the IO direction of all bits of the port: 0 makes a bit an
+     *
+     *  @return an integer corresponding to the IO direction of all bits of the port: 0 makes a bit an
      * input, 1 makes it an output
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPortDirection() throws YAPI_Exception
@@ -257,12 +258,12 @@ public class YDigitalIO extends YFunction
     /**
      * Changes the IO direction of all bits of the port: 0 makes a bit an input, 1 makes it an output.
      * Remember to call the saveToFlash() method  to make sure the setting is kept after a reboot.
-     * 
-     * @param newval : an integer corresponding to the IO direction of all bits of the port: 0 makes a bit
+     *
+     *  @param newval : an integer corresponding to the IO direction of all bits of the port: 0 makes a bit
      * an input, 1 makes it an output
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_portDirection(int  newval)  throws YAPI_Exception
@@ -276,12 +277,12 @@ public class YDigitalIO extends YFunction
     /**
      * Changes the IO direction of all bits of the port: 0 makes a bit an input, 1 makes it an output.
      * Remember to call the saveToFlash() method  to make sure the setting is kept after a reboot.
-     * 
-     * @param newval : an integer corresponding to the IO direction of all bits of the port: 0 makes a bit
+     *
+     *  @param newval : an integer corresponding to the IO direction of all bits of the port: 0 makes a bit
      * an input, 1 makes it an output
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setPortDirection(int newval)  throws YAPI_Exception
@@ -289,17 +290,17 @@ public class YDigitalIO extends YFunction
     { return set_portDirection(newval); }
 
     /**
-     * Returns the electrical interface for each bit of the port. For each bit set to 0  the matching I/O
+     *  Returns the electrical interface for each bit of the port. For each bit set to 0  the matching I/O
      * works in the regular,
      * intuitive way, for each bit set to 1, the I/O works in reverse mode.
-     * 
+     *
      * @return an integer corresponding to the electrical interface for each bit of the port
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_portOpenDrain() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTOPENDRAIN_INVALID;
             }
@@ -308,12 +309,12 @@ public class YDigitalIO extends YFunction
     }
 
     /**
-     * Returns the electrical interface for each bit of the port. For each bit set to 0  the matching I/O
+     *  Returns the electrical interface for each bit of the port. For each bit set to 0  the matching I/O
      * works in the regular,
      * intuitive way, for each bit set to 1, the I/O works in reverse mode.
-     * 
+     *
      * @return an integer corresponding to the electrical interface for each bit of the port
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPortOpenDrain() throws YAPI_Exception
@@ -324,11 +325,11 @@ public class YDigitalIO extends YFunction
      * Changes the electrical interface for each bit of the port. 0 makes a bit a regular input/output, 1 makes
      * it an open-drain (open-collector) input/output. Remember to call the
      * saveToFlash() method  to make sure the setting is kept after a reboot.
-     * 
+     *
      * @param newval : an integer corresponding to the electrical interface for each bit of the port
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_portOpenDrain(int  newval)  throws YAPI_Exception
@@ -343,11 +344,11 @@ public class YDigitalIO extends YFunction
      * Changes the electrical interface for each bit of the port. 0 makes a bit a regular input/output, 1 makes
      * it an open-drain (open-collector) input/output. Remember to call the
      * saveToFlash() method  to make sure the setting is kept after a reboot.
-     * 
+     *
      * @param newval : an integer corresponding to the electrical interface for each bit of the port
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setPortOpenDrain(int newval)  throws YAPI_Exception
@@ -357,14 +358,14 @@ public class YDigitalIO extends YFunction
     /**
      * Returns the polarity of all the bits of the port.  For each bit set to 0, the matching I/O works the regular,
      * intuitive way; for each bit set to 1, the I/O works in reverse mode.
-     * 
+     *
      * @return an integer corresponding to the polarity of all the bits of the port
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_portPolarity() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTPOLARITY_INVALID;
             }
@@ -375,9 +376,9 @@ public class YDigitalIO extends YFunction
     /**
      * Returns the polarity of all the bits of the port.  For each bit set to 0, the matching I/O works the regular,
      * intuitive way; for each bit set to 1, the I/O works in reverse mode.
-     * 
+     *
      * @return an integer corresponding to the polarity of all the bits of the port
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPortPolarity() throws YAPI_Exception
@@ -387,12 +388,12 @@ public class YDigitalIO extends YFunction
     /**
      * Changes the polarity of all the bits of the port: 0 makes a bit an input, 1 makes it an output.
      * Remember to call the saveToFlash() method  to make sure the setting will be kept after a reboot.
-     * 
-     * @param newval : an integer corresponding to the polarity of all the bits of the port: 0 makes a bit
+     *
+     *  @param newval : an integer corresponding to the polarity of all the bits of the port: 0 makes a bit
      * an input, 1 makes it an output
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_portPolarity(int  newval)  throws YAPI_Exception
@@ -406,12 +407,12 @@ public class YDigitalIO extends YFunction
     /**
      * Changes the polarity of all the bits of the port: 0 makes a bit an input, 1 makes it an output.
      * Remember to call the saveToFlash() method  to make sure the setting will be kept after a reboot.
-     * 
-     * @param newval : an integer corresponding to the polarity of all the bits of the port: 0 makes a bit
+     *
+     *  @param newval : an integer corresponding to the polarity of all the bits of the port: 0 makes a bit
      * an input, 1 makes it an output
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setPortPolarity(int newval)  throws YAPI_Exception
@@ -420,14 +421,14 @@ public class YDigitalIO extends YFunction
 
     /**
      * Returns the number of bits implemented in the I/O port.
-     * 
+     *
      * @return an integer corresponding to the number of bits implemented in the I/O port
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_portSize() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTSIZE_INVALID;
             }
@@ -437,9 +438,9 @@ public class YDigitalIO extends YFunction
 
     /**
      * Returns the number of bits implemented in the I/O port.
-     * 
+     *
      * @return an integer corresponding to the number of bits implemented in the I/O port
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPortSize() throws YAPI_Exception
@@ -448,15 +449,15 @@ public class YDigitalIO extends YFunction
 
     /**
      * Returns the voltage source used to drive output bits.
-     * 
-     * @return a value among YDigitalIO.OUTPUTVOLTAGE_USB_5V, YDigitalIO.OUTPUTVOLTAGE_USB_3V and
+     *
+     *  @return a value among YDigitalIO.OUTPUTVOLTAGE_USB_5V, YDigitalIO.OUTPUTVOLTAGE_USB_3V and
      * YDigitalIO.OUTPUTVOLTAGE_EXT_V corresponding to the voltage source used to drive output bits
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_outputVoltage() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OUTPUTVOLTAGE_INVALID;
             }
@@ -466,10 +467,10 @@ public class YDigitalIO extends YFunction
 
     /**
      * Returns the voltage source used to drive output bits.
-     * 
-     * @return a value among Y_OUTPUTVOLTAGE_USB_5V, Y_OUTPUTVOLTAGE_USB_3V and Y_OUTPUTVOLTAGE_EXT_V
+     *
+     *  @return a value among Y_OUTPUTVOLTAGE_USB_5V, Y_OUTPUTVOLTAGE_USB_3V and Y_OUTPUTVOLTAGE_EXT_V
      * corresponding to the voltage source used to drive output bits
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getOutputVoltage() throws YAPI_Exception
@@ -479,12 +480,12 @@ public class YDigitalIO extends YFunction
     /**
      * Changes the voltage source used to drive output bits.
      * Remember to call the saveToFlash() method  to make sure the setting is kept after a reboot.
-     * 
-     * @param newval : a value among YDigitalIO.OUTPUTVOLTAGE_USB_5V, YDigitalIO.OUTPUTVOLTAGE_USB_3V and
+     *
+     *  @param newval : a value among YDigitalIO.OUTPUTVOLTAGE_USB_5V, YDigitalIO.OUTPUTVOLTAGE_USB_3V and
      * YDigitalIO.OUTPUTVOLTAGE_EXT_V corresponding to the voltage source used to drive output bits
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_outputVoltage(int  newval)  throws YAPI_Exception
@@ -498,12 +499,12 @@ public class YDigitalIO extends YFunction
     /**
      * Changes the voltage source used to drive output bits.
      * Remember to call the saveToFlash() method  to make sure the setting is kept after a reboot.
-     * 
-     * @param newval : a value among Y_OUTPUTVOLTAGE_USB_5V, Y_OUTPUTVOLTAGE_USB_3V and
+     *
+     *  @param newval : a value among Y_OUTPUTVOLTAGE_USB_5V, Y_OUTPUTVOLTAGE_USB_3V and
      * Y_OUTPUTVOLTAGE_EXT_V corresponding to the voltage source used to drive output bits
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setOutputVoltage(int newval)  throws YAPI_Exception
@@ -515,7 +516,7 @@ public class YDigitalIO extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -552,7 +553,7 @@ public class YDigitalIO extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the digital IO port is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YDigitalIO.isOnline() to test if the digital IO port is
@@ -560,9 +561,9 @@ public class YDigitalIO extends YFunction
      * a digital IO port by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the digital IO port
-     * 
+     *
      * @return a YDigitalIO object allowing you to drive the digital IO port.
      */
     public static YDigitalIO FindDigitalIO(String func)
@@ -581,11 +582,11 @@ public class YDigitalIO extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -619,12 +620,12 @@ public class YDigitalIO extends YFunction
 
     /**
      * Sets a single bit of the I/O port.
-     * 
+     *
      * @param bitno : the bit number; lowest bit has index 0
      * @param bitstate : the state of the bit (1 or 0)
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_bitState(int bitno,int bitstate) throws YAPI_Exception
@@ -636,27 +637,27 @@ public class YDigitalIO extends YFunction
 
     /**
      * Returns the state of a single bit of the I/O port.
-     * 
+     *
      * @param bitno : the bit number; lowest bit has index 0
-     * 
+     *
      * @return the bit state (0 or 1)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_bitState(int bitno) throws YAPI_Exception
     {
-        int portVal = 0;
+        int portVal;
         portVal = get_portState();
         return ((((portVal) >> (bitno))) & (1));
     }
 
     /**
      * Reverts a single bit of the I/O port.
-     * 
+     *
      * @param bitno : the bit number; lowest bit has index 0
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int toggle_bitState(int bitno) throws YAPI_Exception
@@ -666,13 +667,13 @@ public class YDigitalIO extends YFunction
 
     /**
      * Changes  the direction of a single bit from the I/O port.
-     * 
+     *
      * @param bitno : the bit number; lowest bit has index 0
      * @param bitdirection : direction to set, 0 makes the bit an input, 1 makes it an output.
      *         Remember to call the   saveToFlash() method to make sure the setting is kept after a reboot.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_bitDirection(int bitno,int bitdirection) throws YAPI_Exception
@@ -684,30 +685,30 @@ public class YDigitalIO extends YFunction
 
     /**
      * Returns the direction of a single bit from the I/O port (0 means the bit is an input, 1  an output).
-     * 
+     *
      * @param bitno : the bit number; lowest bit has index 0
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_bitDirection(int bitno) throws YAPI_Exception
     {
-        int portDir = 0;
+        int portDir;
         portDir = get_portDirection();
         return ((((portDir) >> (bitno))) & (1));
     }
 
     /**
      * Changes the polarity of a single bit from the I/O port.
-     * 
+     *
      * @param bitno : the bit number; lowest bit has index 0.
-     * @param bitpolarity : polarity to set, 0 makes the I/O work in regular mode, 1 makes the I/O  works
+     *  @param bitpolarity : polarity to set, 0 makes the I/O work in regular mode, 1 makes the I/O  works
      * in reverse mode.
      *         Remember to call the   saveToFlash() method to make sure the setting is kept after a reboot.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_bitPolarity(int bitno,int bitpolarity) throws YAPI_Exception
@@ -718,32 +719,32 @@ public class YDigitalIO extends YFunction
     }
 
     /**
-     * Returns the polarity of a single bit from the I/O port (0 means the I/O works in regular mode, 1
+     *  Returns the polarity of a single bit from the I/O port (0 means the I/O works in regular mode, 1
      * means the I/O  works in reverse mode).
-     * 
+     *
      * @param bitno : the bit number; lowest bit has index 0
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_bitPolarity(int bitno) throws YAPI_Exception
     {
-        int portPol = 0;
+        int portPol;
         portPol = get_portPolarity();
         return ((((portPol) >> (bitno))) & (1));
     }
 
     /**
      * Changes  the electrical interface of a single bit from the I/O port.
-     * 
+     *
      * @param bitno : the bit number; lowest bit has index 0
      * @param opendrain : 0 makes a bit a regular input/output, 1 makes
      *         it an open-drain (open-collector) input/output. Remember to call the
      *         saveToFlash() method to make sure the setting is kept after a reboot.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_bitOpenDrain(int bitno,int opendrain) throws YAPI_Exception
@@ -754,19 +755,19 @@ public class YDigitalIO extends YFunction
     }
 
     /**
-     * Returns the type of electrical interface of a single bit from the I/O port. (0 means the bit is an
+     *  Returns the type of electrical interface of a single bit from the I/O port. (0 means the bit is an
      * input, 1  an output).
-     * 
+     *
      * @param bitno : the bit number; lowest bit has index 0
-     * 
+     *
      * @return   0 means the a bit is a regular input/output, 1 means the bit is an open-drain
      *         (open-collector) input/output.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_bitOpenDrain(int bitno) throws YAPI_Exception
     {
-        int portOpenDrain = 0;
+        int portOpenDrain;
         portOpenDrain = get_portOpenDrain();
         return ((((portOpenDrain) >> (bitno))) & (1));
     }
@@ -774,13 +775,13 @@ public class YDigitalIO extends YFunction
     /**
      * Triggers a pulse on a single bit for a specified duration. The specified bit
      * will be turned to 1, and then back to 0 after the given duration.
-     * 
+     *
      * @param bitno : the bit number; lowest bit has index 0
      * @param ms_duration : desired pulse duration in milliseconds. Be aware that the device time
      *         resolution is not guaranteed up to the millisecond.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int pulse(int bitno,int ms_duration) throws YAPI_Exception
@@ -791,14 +792,14 @@ public class YDigitalIO extends YFunction
     /**
      * Schedules a pulse on a single bit for a specified duration. The specified bit
      * will be turned to 1, and then back to 0 after the given duration.
-     * 
+     *
      * @param bitno : the bit number; lowest bit has index 0
      * @param ms_delay : waiting time before the pulse, in milliseconds
      * @param ms_duration : desired pulse duration in milliseconds. Be aware that the device time
      *         resolution is not guaranteed up to the millisecond.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int delayedPulse(int bitno,int ms_delay,int ms_duration) throws YAPI_Exception
@@ -808,7 +809,7 @@ public class YDigitalIO extends YFunction
 
     /**
      * Continues the enumeration of digital IO ports started using yFirstDigitalIO().
-     * 
+     *
      * @return a pointer to a YDigitalIO object, corresponding to
      *         a digital IO port currently online, or a null pointer
      *         if there are no more digital IO ports to enumerate.
@@ -830,7 +831,7 @@ public class YDigitalIO extends YFunction
      * Starts the enumeration of digital IO ports currently accessible.
      * Use the method YDigitalIO.nextDigitalIO() to iterate on
      * next digital IO ports.
-     * 
+     *
      * @return a pointer to a YDigitalIO object, corresponding to
      *         the first digital IO port currently online, or a null pointer
      *         if there are none.

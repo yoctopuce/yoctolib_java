@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI.java 16278 2014-05-22 13:42:16Z seb $
+ * $Id: YAPI.java 17678 2014-09-16 16:31:26Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -10,26 +10,26 @@
  *
  *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
  *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ *  file into your software for the sole purpose of interfacing
+ *  with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
+ *  You may reproduce and distribute copies of this file in
  *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
+ *  code is to interface with Yoctopuce products. You must retain
  *  this notice in the distributed source file.
  *
  *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
+ *  for additional information regarding your rights and
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
  *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
@@ -41,11 +41,7 @@ package com.yoctopuce.YoctoAPI;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Queue;
+import java.util.*;
 
 /**
  *
@@ -60,13 +56,14 @@ public class YAPI {
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
+    public static final String YOCTO_API_BUILD_STR = "17849";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
     public static final int YOCTO_DEVID_BOOTLOADER = 2;
     // --- (generated code: YFunction return codes)
     // Yoctopuce error codes, used by default as function return value
-    public static final int SUCCESS = 0;                   // everything worked allright
+    public static final int SUCCESS = 0;                   // everything worked all right
     public static final int NOT_INITIALIZED = -1;          // call yInitAPI() first !
     public static final int INVALID_ARGUMENT = -2;         // one of the arguments passed to the function is invalid
     public static final int NOT_SUPPORTED = -3;            // the operation attempted is (currently) not supported
@@ -76,14 +73,18 @@ public class YAPI {
     public static final int TIMEOUT = -7;                  // the device took too long to provide an answer
     public static final int IO_ERROR = -8;                 // there was an I/O problem while talking to the device
     public static final int NO_MORE_DATA = -9;             // there is no more data to read from
-    public static final int EXHAUSTED = -10;               // you have run out of a limited ressource, check the documentation
-    public static final int DOUBLE_ACCES = -11;            // you have two process that try to acces to the same device
+    public static final int EXHAUSTED = -10;               // you have run out of a limited resource, check the documentation
+    public static final int DOUBLE_ACCES = -11;            // you have two process that try to access to the same device
     public static final int UNAUTHORIZED = -12;            // unauthorized access to password-protected device
     public static final int RTC_NOT_READY = -13;           // real-time clock has not been initialized (or time was lost)
+    public static final int FILE_NOT_FOUND = -14;          // the file is not found
 
     //--- (end of generated code: YFunction return codes)
     static final String   DefaultEncoding = "ISO-8859-1";
-    
+
+    // Encoding types
+    static final int YOCTO_CALIB_TYPE_OFS = 30;
+
     // Yoctopuce generic constant
     static final int YOCTO_MANUFACTURER_LEN = 20;
     static final int YOCTO_SERIAL_LEN = 20;
@@ -114,21 +115,21 @@ public class YAPI {
                 }
             }
             if ((_apiMode & DETECT_NET) != 0) {
-		if (urlToUnregister != null) {
+        if (urlToUnregister != null) {
                     _UnregisterHub(urlToUnregister);
-		} 
-		if (urlToRegister != null) {
+        }
+        if (urlToRegister != null) {
                     try {
                         _PreregisterHub(urlToRegister);
                     } catch (YAPI_Exception ex) {
                         _Log("Unable to register hub " + urlToRegister + " detected by SSDP:" + ex.toString());
                     }
-		}
-            }            
+        }
+            }
         }
     };
 
-    /**
+     /**
      *
      */
     public interface DeviceArrivalCallback {
@@ -171,13 +172,18 @@ public class YAPI {
         public double yCalibrationHandler(double rawValue, int calibType, ArrayList<Integer> params, ArrayList<Double> rawValues, ArrayList<Double> refValues)
         {
             // calibration types n=1..10 and 11.20 are meant for linear calibration using n points
-            int    npt = calibType % 10;
+            int    npt;
             double x   = rawValues.get(0);
             double adj = refValues.get(0) - x;
             int    i   = 0;
 
-            if(npt > rawValues.size()) npt = rawValues.size();
-            if(npt > refValues.size()) npt = refValues.size();
+            if(calibType < YAPI.YOCTO_CALIB_TYPE_OFS) {
+                npt = calibType % 10;
+                if(npt > rawValues.size()) npt = rawValues.size();
+                if(npt > refValues.size()) npt = refValues.size();
+            } else {
+                npt = refValues.size();
+            }
             while(rawValue > rawValues.get(i) && ++i < npt) {
                 double x2   = x;
                 double adj2 = adj;
@@ -199,7 +205,7 @@ public class YAPI {
     // Default cache validity (in [ms]) before reloading data from device. This
     // saves a lots of traffic.
     // Note that a value under 2 ms makes little sense since a USB bus itself
-    // has a 2ms roundtrip period
+    // has a 2ms round trip period
     public int DefaultCacheValidity;
     private int _apiMode;
     private ArrayList<YGenericHub> _hubs; // array of root urls
@@ -409,7 +415,7 @@ public class YAPI {
         return (negate!=0 ? -res : res);
     }
 
-    // Parse an array of u16 encoded in a base64-like string with memory-based compresssion
+    // Parse an array of u16 encoded in a base64-like string with memory-based compression
     static ArrayList<Integer> _decodeWords(String data)
     {
         ArrayList<Integer> udata = new ArrayList<Integer>();
@@ -445,6 +451,54 @@ public class YAPI {
             udata.add(val);
         }
         return udata;
+    }
+
+    // Parse an array of u16 encoded in a base64-like string with memory-based compression
+    static ArrayList<Integer> _decodeFloats(String data)
+    {
+        ArrayList<Integer> idata = new ArrayList<Integer>();
+        int datalen = data.length();
+        int p = 0;
+        while (p < datalen) {
+            int val = 0;
+            int sign = 1;
+            int dec = 0;
+            int decInc = 0;
+            int c = data.charAt(p++);
+            while(c != (int)'-' && (c < (int)'0' || c > (int)'9')) {
+                if(p >= datalen) {
+                    return idata;
+                }
+                c = data.charAt(p++);
+            }
+            if(c == '-') {
+                if(p >= datalen) {
+                    return idata;
+                }
+                sign = -sign;
+                c = data.charAt(p++);
+            }
+            while((c >= '0' && c <= '9') || c == '.') {
+                if(c == '.') {
+                    decInc = 1;
+                } else if(dec < 3) {
+                    val = val * 10 + (c - '0');
+                    dec += decInc;
+                }
+                if(p < datalen) {
+                    c = data.charAt(p++);
+                } else {
+                    c = 0;
+                }
+            }
+            if(dec < 3) {
+                if(dec == 0) val *= 1000;
+                else if(dec == 1) val *= 100;
+                else val *= 10;
+            }
+            idata.add(sign*val);
+        }
+        return idata;
     }
 
     // helper function to find pattern in byte[]
@@ -491,7 +545,7 @@ public class YAPI {
         }
         return new String(hexChars);
     }
-    
+
     // Return a Device object for a specified URL, serial number or logical
     // device name
     // This function will not cause any network access
@@ -609,7 +663,7 @@ public class YAPI {
     }
 
 
-    
+
     // Retrieve a function object by hardware id, updating the indexes on the
     // fly if needed
     void setFunction(String className, String func, YFunction yfunc)
@@ -710,7 +764,7 @@ public class YAPI {
         } catch (YAPI_Exception ex) {
             if (ex.errorType == DEVICE_NOT_FOUND && _hubs.isEmpty()) {
                 // when USB is supported, check if no USB device is connected
-                // before outputing this message
+                // before outputting this message
                 throw new YAPI_Exception(ex.errorType,
                         "Impossible to contact any device because no hub has been registered");
             } else {
@@ -746,14 +800,13 @@ public class YAPI {
         parsedurl = new YGenericHub.HTTPParams(url);
         // Add hub to known list
         if (url.equals("usb")) {
-        	YUSBHub.CheckUSBAcces();
+            YUSBHub.CheckUSBAcces();
             newhub = new YUSBHub(_hubs.size());
         } else if (url.equals("net")){
             if((_apiMode& DETECT_NET)==0) {
                 if (YUSBHub.RegisterLocalhost()) {
-                    newhub = new YHTTPHub(_hubs.size(), new YGenericHub.HTTPParams("localhost"));
+                    newhub = new YHTTPHub(_hubs.size(), new YGenericHub.HTTPParams("localhost"),false);
                     _hubs.add(newhub);
-                    newhub.reportConnectionLost(false);
                     newhub.startNotifications();
                 }
                 _apiMode |= DETECT_NET;
@@ -763,9 +816,8 @@ public class YAPI {
         } else if (parsedurl.getHost().equals("callback")){
             newhub = new YCallbackHub(_hubs.size(), parsedurl, request, response);
         }else {
-            newhub = new YHTTPHub(_hubs.size(), parsedurl);
+            newhub = new YHTTPHub(_hubs.size(), parsedurl,reportConnnectionLost);
         }
-        newhub.reportConnectionLost(reportConnnectionLost);
         _hubs.add(newhub);
         newhub.startNotifications();
         return SUCCESS;
@@ -892,7 +944,6 @@ public class YAPI {
 
     YAPI()
     {
-        // reste static field
         DefaultCacheValidity = 5;
         _hubs  = new ArrayList<YGenericHub>();
         _devs = new HashMap<String, YDevice>();
@@ -908,6 +959,7 @@ public class YAPI {
         for (int i =1 ;i<=20;i++){
             _calibHandlers.put(i, linearCalibrationHandler);
         }
+        _calibHandlers.put(YAPI.YOCTO_CALIB_TYPE_OFS, linearCalibrationHandler);
         _ssdp = new YSSDP();
     }
 
@@ -931,7 +983,7 @@ public class YAPI {
         return SUCCESS;
     }
 
-    
+
     public int _RegisterHub(String url, InputStream request, OutputStream response) throws YAPI_Exception
     {
         _AddNewHub(url, true, request, response);
@@ -1013,7 +1065,7 @@ public class YAPI {
         _ssdp.addCallback(_ssdpCallback);
         return YAPI.SUCCESS;
     }
-    
+
 
     public void _RegisterDeviceArrivalCallback(
             YAPI.DeviceArrivalCallback arrivalCallback)
@@ -1055,7 +1107,7 @@ public class YAPI {
     }
 
 
-    //PUBLIC STATIC METHODE:
+    //PUBLIC STATIC METHOD:
 
     /**
      * Returns the version identifier for the Yoctopuce library in use.
@@ -1064,18 +1116,18 @@ public class YAPI {
      * DLL (for instance C#, VisualBasic or Delphi), the character string
      * includes as well the DLL version, for instance
      * "1.01.5535 (1.01.5439)".
-     * 
+     *
      * If you want to verify in your code that the library version is
      * compatible with the version that you have used during development,
      * verify that the major number is strictly equal and that the minor
      * number is greater or equal. The build number is not relevant
      * with respect to the library compatibility.
-     * 
+     *
      * @return a character string describing the library version.
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".16490";
+        return YOCTO_API_VERSION_STR + ".17849";
     }
 
     /**
@@ -1083,18 +1135,18 @@ public class YAPI {
      * It is not strictly needed to call yInitAPI(), as the library is
      * automatically  initialized when calling yRegisterHub() for the
      * first time.
-     * 
+     *
      * When YAPI.DETECT_NONE is used as detection mode,
      * you must explicitly use yRegisterHub() to point the API to the
      * VirtualHub on which your devices are connected before trying to access them.
-     * 
+     *
      * @param mode : an integer corresponding to the type of automatic
      *         device detection to use. Possible values are
      *         YAPI.DETECT_NONE, YAPI.DETECT_USB, YAPI.DETECT_NET,
      *         and YAPI.DETECT_ALL.
-     * 
+     *
      * @return YAPI.SUCCESS when the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public static int InitAPI(int mode) throws YAPI_Exception {
@@ -1102,10 +1154,10 @@ public class YAPI {
         YAPI yapi = SafeYAPI();
         if ((mode & YAPI.DETECT_NET)!=0){
             yapi._RegisterHub("net");
-        } 
+        }
         if ((mode & YAPI.DETECT_USB)!=0){
             yapi._RegisterHub("usb");
-        } 
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1132,24 +1184,24 @@ public class YAPI {
     /**
      * Setup the Yoctopuce library to use modules connected on a given machine. The
      * parameter will determine how the API will work. Use the following values:
-     * 
+     *
      * <b>usb</b>: When the usb keyword is used, the API will work with
      * devices connected directly to the USB bus. Some programming languages such a Javascript,
      * PHP, and Java don't provide direct access to USB hardware, so usb will
      * not work with these. In this case, use a VirtualHub or a networked YoctoHub (see below).
-     * 
+     *
      * <b><i>x.x.x.x</i></b> or <b><i>hostname</i></b>: The API will use the devices connected to the
      * host with the given IP address or hostname. That host can be a regular computer
      * running a VirtualHub, or a networked YoctoHub such as YoctoHub-Ethernet or
      * YoctoHub-Wireless. If you want to use the VirtualHub running on you local
      * computer, use the IP address 127.0.0.1.
-     * 
+     *
      * <b>callback</b>: that keyword make the API run in "<i>HTTP Callback</i>" mode.
      * This a special mode allowing to take control of Yoctopuce devices
      * through a NAT filter when using a VirtualHub or a networked YoctoHub. You only
      * need to configure your hub to call your server script on a regular basis.
      * This mode is currently available for PHP and Node.JS only.
-     * 
+     *
      * Be aware that only one application can use direct USB access at a
      * given time on a machine. Multiple access would cause conflicts
      * while trying to access the USB modules. In particular, this means
@@ -1157,19 +1209,19 @@ public class YAPI {
      * an application that uses direct USB access. The workaround
      * for this limitation is to setup the library to use the VirtualHub
      * rather than direct USB access.
-     * 
+     *
      * If access control has been activated on the hub, virtual or not, you want to
      * reach, the URL parameter should look like:
-     * 
-     * http://username:password@adresse:port
-     * 
+     *
+     * http://username:password@address:port
+     *
      * You can call <i>RegisterHub</i> several times to connect to several machines.
-     * 
+     *
      * @param url : a string containing either "usb","callback" or the
      *         root URL of the hub to monitor
-     * 
+     *
      * @return YAPI.SUCCESS when the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public static int RegisterHub(String url) throws YAPI_Exception
@@ -1189,9 +1241,9 @@ public class YAPI {
      * you need to activate the USB host port of the system. This function takes as argument,
      * an object of class android.content.Context (or any subclass).
      * It is not necessary to call this function to reach modules through the network.
-     * 
+     *
      * @param osContext : an object of class android.content.Context (or any subclass).
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public static void EnableUSBHost(Object osContext) throws YAPI_Exception
@@ -1205,12 +1257,12 @@ public class YAPI {
      * an error when the selected hub is not available at the time of the function call.
      * This makes it possible to register a network hub independently of the current
      * connectivity, and to try to contact it only when a device is actively needed.
-     * 
+     *
      * @param url : a string containing either "usb","callback" or the
      *         root URL of the hub to monitor
-     * 
+     *
      * @return YAPI.SUCCESS when the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public static int PreregisterHub(String url) throws YAPI_Exception
@@ -1221,7 +1273,7 @@ public class YAPI {
     /**
      * Setup the Yoctopuce library to no more use modules connected on a previously
      * registered machine with RegisterHub.
-     * 
+     *
      * @param url : a string containing either "usb" or the
      *         root URL of the hub to monitor
      */
@@ -1235,12 +1287,12 @@ public class YAPI {
      * The library searches the machines or USB ports previously registered using
      * yRegisterHub(), and invokes any user-defined callback function
      * in case a change in the list of connected devices is detected.
-     * 
+     *
      * This function can be called as frequently as desired to refresh the device list
      * and to make the application aware of hot-plug events.
-     * 
+     *
      * @return YAPI.SUCCESS when the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public static int UpdateDeviceList() throws YAPI_Exception
@@ -1255,12 +1307,12 @@ public class YAPI {
      * the information pushed by the modules on the communication channels.
      * This is not strictly necessary, but it may improve the reactivity
      * of the library for the following commands.
-     * 
+     *
      * This function may signal an error in case there is a communication problem
      * while contacting a module.
-     * 
+     *
      * @return YAPI.SUCCESS when the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public static int HandleEvents() throws YAPI_Exception {
@@ -1274,15 +1326,15 @@ public class YAPI {
      * other threads and processes. During the pause, the library nevertheless
      * reads from time to time information from the Yoctopuce modules by
      * calling yHandleEvents(), in order to stay up-to-date.
-     * 
+     *
      * This function may signal an error in case there is a communication problem
      * while contacting a module.
-     * 
+     *
      * @param ms_duration : an integer corresponding to the duration of the pause,
      *         in milliseconds.
-     * 
+     *
      * @return YAPI.SUCCESS when the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public static int Sleep(long ms_duration) throws YAPI_Exception
@@ -1293,7 +1345,7 @@ public class YAPI {
     /**
      * Force a hub discovery, if a callback as been registered with yRegisterDeviceRemovalCallback it
      * will be called for each net work hub that will respond to the discovery.
-     * 
+     *
      * @return YAPI.SUCCESS when the call succeeds.
      * @throws YAPI_Exception on error
      */
@@ -1306,7 +1358,7 @@ public class YAPI {
      * Returns the current value of a monotone millisecond-based time counter.
      * This counter can be used to compute delays in relation with
      * Yoctopuce devices, which also uses the millisecond as timebase.
-     * 
+     *
      * @return a long integer corresponding to the millisecond counter.
      */
     public static long GetTickCount()
@@ -1320,9 +1372,9 @@ public class YAPI {
      * A..Z, a..z, 0..9, _, and -.
      * If you try to configure a logical name with an incorrect string,
      * the invalid characters are ignored.
-     * 
+     *
      * @param name : a string containing the name to check.
-     * 
+     *
      * @return true if the name is valid, false otherwise.
      */
     public static boolean CheckLogicalName(String name)
@@ -1334,7 +1386,7 @@ public class YAPI {
      * Register a callback function, to be called each time
      * a device is plugged. This callback will be invoked while yUpdateDeviceList
      * is running. You will have to call this function on a regular basis.
-     * 
+     *
      * @param arrivalCallback : a procedure taking a YModule parameter, or null
      *         to unregister a previously registered  callback.
      */
@@ -1352,7 +1404,7 @@ public class YAPI {
      * Register a callback function, to be called each time
      * a device is unplugged. This callback will be invoked while yUpdateDeviceList
      * is running. You will have to call this function on a regular basis.
-     * 
+     *
      * @param removalCallback : a procedure taking a YModule parameter, or null
      *         to unregister a previously registered  callback.
      */
@@ -1367,7 +1419,7 @@ public class YAPI {
      * contain the serial number of the hub and the second contain the URL of the
      * network hub (this URL can be passed to RegisterHub). This callback will be invoked
      * while yUpdateDeviceList is running. You will have to call this function on a regular basis.
-     * 
+     *
      * @param hubDiscoveryCallback : a procedure taking two string parameter, or null
      *         to unregister a previously registered  callback.
      */
@@ -1379,7 +1431,7 @@ public class YAPI {
     /**
      * Registers a log callback function. This callback will be called each time
      * the API have something to say. Quite useful to debug the API.
-     * 
+     *
      * @param logfun : a procedure taking a string parameter, or null
      *         to unregister a previously registered  callback.
      */

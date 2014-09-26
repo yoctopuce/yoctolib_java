@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoltage.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YVoltage.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindVoltage(), the high-level API for Voltage functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YVoltage class start)
 /**
  * YVoltage Class: Voltage function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YVoltage extends YSensor
 {
 //--- (end of YVoltage class start)
@@ -63,7 +64,7 @@ public class YVoltage extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -75,7 +76,7 @@ public class YVoltage extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -85,7 +86,7 @@ public class YVoltage extends YSensor
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YVoltage(String func)
@@ -113,7 +114,7 @@ public class YVoltage extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the voltage sensor is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YVoltage.isOnline() to test if the voltage sensor is
@@ -121,9 +122,9 @@ public class YVoltage extends YSensor
      * a voltage sensor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the voltage sensor
-     * 
+     *
      * @return a YVoltage object allowing you to drive the voltage sensor.
      */
     public static YVoltage FindVoltage(String func)
@@ -142,11 +143,11 @@ public class YVoltage extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -183,11 +184,11 @@ public class YVoltage extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -213,7 +214,7 @@ public class YVoltage extends YSensor
 
     /**
      * Continues the enumeration of voltage sensors started using yFirstVoltage().
-     * 
+     *
      * @return a pointer to a YVoltage object, corresponding to
      *         a voltage sensor currently online, or a null pointer
      *         if there are no more voltage sensors to enumerate.
@@ -235,7 +236,7 @@ public class YVoltage extends YSensor
      * Starts the enumeration of voltage sensors currently accessible.
      * Use the method YVoltage.nextVoltage() to iterate on
      * next voltage sensors.
-     * 
+     *
      * @return a pointer to a YVoltage object, corresponding to
      *         the first voltage sensor currently online, or a null pointer
      *         if there are none.

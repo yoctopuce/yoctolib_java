@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOldDataStream.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YOldDataStream.java 17843 2014-09-26 08:09:00Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -177,7 +177,7 @@ public class YOldDataStream extends YDataStream
             try {
                 String data = jsonObj.getString("data");
                 udata = YAPI._decodeWords(data);
-            } catch (JSONException ex) {
+            } catch (JSONException ignore) {
             }
 
             if (udata == null) {

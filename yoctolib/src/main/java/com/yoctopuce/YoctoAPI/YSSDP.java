@@ -56,7 +56,7 @@ public class YSSDP {
 
     synchronized void addCallback(HubDiscoveryCallback callback) throws YAPI_Exception {
         if (_callbacks == callback)
-            // allready started
+            // already started
             return;
         _callbacks = callback;
         if(!mListening){

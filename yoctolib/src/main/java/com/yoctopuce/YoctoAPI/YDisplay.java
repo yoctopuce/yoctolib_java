@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 16340 2014-05-30 10:41:54Z seb $
+ * $Id: YDisplay.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -46,13 +46,14 @@ import org.json.JSONObject;
 //--- (generated code: YDisplay class start)
 /**
  * YDisplay Class: Display function interface
- * 
+ *
  * Yoctopuce display interface has been designed to easily
  * show information and images. The device provides built-in
  * multi-layer rendering. Layers can be drawn offline, individually,
  * and freely moved on the display. It can also replay recorded
  * sequences (animations).
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YDisplay extends YFunction
 {
 //--- (end of generated code: YDisplay class start)
@@ -131,7 +132,7 @@ public class YDisplay extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -143,7 +144,7 @@ public class YDisplay extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -171,7 +172,7 @@ public class YDisplay extends YFunction
             _enabled =  json_val.getInt("enabled")>0?1:0;
         }
         if (json_val.has("startupSeq")) {
-            _startupSeq =  json_val.getString("startupSeq"); ;
+            _startupSeq =  json_val.getString("startupSeq");
         }
         if (json_val.has("brightness")) {
             _brightness =  json_val.getInt("brightness");
@@ -198,22 +199,22 @@ public class YDisplay extends YFunction
             _layerCount =  json_val.getInt("layerCount");
         }
         if (json_val.has("command")) {
-            _command =  json_val.getString("command"); ;
+            _command =  json_val.getString("command");
         }
         super._parseAttr(json_val);
     }
 
     /**
      * Returns true if the screen is powered, false otherwise.
-     * 
-     * @return either YDisplay.ENABLED_FALSE or YDisplay.ENABLED_TRUE, according to true if the screen is
+     *
+     *  @return either YDisplay.ENABLED_FALSE or YDisplay.ENABLED_TRUE, according to true if the screen is
      * powered, false otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLED_INVALID;
             }
@@ -223,9 +224,9 @@ public class YDisplay extends YFunction
 
     /**
      * Returns true if the screen is powered, false otherwise.
-     * 
+     *
      * @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to true if the screen is powered, false otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getEnabled() throws YAPI_Exception
@@ -234,12 +235,12 @@ public class YDisplay extends YFunction
 
     /**
      * Changes the power state of the display.
-     * 
-     * @param newval : either YDisplay.ENABLED_FALSE or YDisplay.ENABLED_TRUE, according to the power
+     *
+     *  @param newval : either YDisplay.ENABLED_FALSE or YDisplay.ENABLED_TRUE, according to the power
      * state of the display
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_enabled(int  newval)  throws YAPI_Exception
@@ -252,11 +253,11 @@ public class YDisplay extends YFunction
 
     /**
      * Changes the power state of the display.
-     * 
+     *
      * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the power state of the display
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setEnabled(int newval)  throws YAPI_Exception
@@ -265,14 +266,14 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the name of the sequence to play when the displayed is powered on.
-     * 
+     *
      * @return a string corresponding to the name of the sequence to play when the displayed is powered on
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_startupSeq() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STARTUPSEQ_INVALID;
             }
@@ -282,9 +283,9 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the name of the sequence to play when the displayed is powered on.
-     * 
+     *
      * @return a string corresponding to the name of the sequence to play when the displayed is powered on
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getStartupSeq() throws YAPI_Exception
@@ -295,11 +296,11 @@ public class YDisplay extends YFunction
      * Changes the name of the sequence to play when the displayed is powered on.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the name of the sequence to play when the displayed is powered on
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_startupSeq(String  newval)  throws YAPI_Exception
@@ -314,11 +315,11 @@ public class YDisplay extends YFunction
      * Changes the name of the sequence to play when the displayed is powered on.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the name of the sequence to play when the displayed is powered on
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setStartupSeq(String newval)  throws YAPI_Exception
@@ -327,14 +328,14 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the luminosity of the  module informative leds (from 0 to 100).
-     * 
+     *
      * @return an integer corresponding to the luminosity of the  module informative leds (from 0 to 100)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_brightness() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BRIGHTNESS_INVALID;
             }
@@ -344,9 +345,9 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the luminosity of the  module informative leds (from 0 to 100).
-     * 
+     *
      * @return an integer corresponding to the luminosity of the  module informative leds (from 0 to 100)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getBrightness() throws YAPI_Exception
@@ -357,11 +358,11 @@ public class YDisplay extends YFunction
      * Changes the brightness of the display. The parameter is a value between 0 and
      * 100. Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : an integer corresponding to the brightness of the display
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_brightness(int  newval)  throws YAPI_Exception
@@ -376,11 +377,11 @@ public class YDisplay extends YFunction
      * Changes the brightness of the display. The parameter is a value between 0 and
      * 100. Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : an integer corresponding to the brightness of the display
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setBrightness(int newval)  throws YAPI_Exception
@@ -389,16 +390,16 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the currently selected display orientation.
-     * 
-     * @return a value among YDisplay.ORIENTATION_LEFT, YDisplay.ORIENTATION_UP,
-     * YDisplay.ORIENTATION_RIGHT and YDisplay.ORIENTATION_DOWN corresponding to the currently selected
+     *
+     *  @return a value among YDisplay.ORIENTATION_LEFT, YDisplay.ORIENTATION_UP,
+     *  YDisplay.ORIENTATION_RIGHT and YDisplay.ORIENTATION_DOWN corresponding to the currently selected
      * display orientation
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_orientation() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ORIENTATION_INVALID;
             }
@@ -408,10 +409,10 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the currently selected display orientation.
-     * 
-     * @return a value among Y_ORIENTATION_LEFT, Y_ORIENTATION_UP, Y_ORIENTATION_RIGHT and
+     *
+     *  @return a value among Y_ORIENTATION_LEFT, Y_ORIENTATION_UP, Y_ORIENTATION_RIGHT and
      * Y_ORIENTATION_DOWN corresponding to the currently selected display orientation
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getOrientation() throws YAPI_Exception
@@ -421,12 +422,12 @@ public class YDisplay extends YFunction
     /**
      * Changes the display orientation. Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
-     * 
-     * @param newval : a value among YDisplay.ORIENTATION_LEFT, YDisplay.ORIENTATION_UP,
+     *
+     *  @param newval : a value among YDisplay.ORIENTATION_LEFT, YDisplay.ORIENTATION_UP,
      * YDisplay.ORIENTATION_RIGHT and YDisplay.ORIENTATION_DOWN corresponding to the display orientation
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_orientation(int  newval)  throws YAPI_Exception
@@ -440,12 +441,12 @@ public class YDisplay extends YFunction
     /**
      * Changes the display orientation. Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
-     * 
-     * @param newval : a value among Y_ORIENTATION_LEFT, Y_ORIENTATION_UP, Y_ORIENTATION_RIGHT and
+     *
+     *  @param newval : a value among Y_ORIENTATION_LEFT, Y_ORIENTATION_UP, Y_ORIENTATION_RIGHT and
      * Y_ORIENTATION_DOWN corresponding to the display orientation
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setOrientation(int newval)  throws YAPI_Exception
@@ -454,14 +455,14 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the display width, in pixels.
-     * 
+     *
      * @return an integer corresponding to the display width, in pixels
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_displayWidth() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYWIDTH_INVALID;
             }
@@ -471,9 +472,9 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the display width, in pixels.
-     * 
+     *
      * @return an integer corresponding to the display width, in pixels
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getDisplayWidth() throws YAPI_Exception
@@ -482,14 +483,14 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the display height, in pixels.
-     * 
+     *
      * @return an integer corresponding to the display height, in pixels
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_displayHeight() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYHEIGHT_INVALID;
             }
@@ -499,9 +500,9 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the display height, in pixels.
-     * 
+     *
      * @return an integer corresponding to the display height, in pixels
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getDisplayHeight() throws YAPI_Exception
@@ -510,10 +511,10 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the display type: monochrome, gray levels or full color.
-     * 
-     * @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_GRAY and
+     *
+     *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_GRAY and
      * YDisplay.DISPLAYTYPE_RGB corresponding to the display type: monochrome, gray levels or full color
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_displayType() throws YAPI_Exception
@@ -528,10 +529,10 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the display type: monochrome, gray levels or full color.
-     * 
-     * @return a value among Y_DISPLAYTYPE_MONO, Y_DISPLAYTYPE_GRAY and Y_DISPLAYTYPE_RGB corresponding to
+     *
+     *  @return a value among Y_DISPLAYTYPE_MONO, Y_DISPLAYTYPE_GRAY and Y_DISPLAYTYPE_RGB corresponding to
      * the display type: monochrome, gray levels or full color
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getDisplayType() throws YAPI_Exception
@@ -540,9 +541,9 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the width of the layers to draw on, in pixels.
-     * 
+     *
      * @return an integer corresponding to the width of the layers to draw on, in pixels
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_layerWidth() throws YAPI_Exception
@@ -557,9 +558,9 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the width of the layers to draw on, in pixels.
-     * 
+     *
      * @return an integer corresponding to the width of the layers to draw on, in pixels
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getLayerWidth() throws YAPI_Exception
@@ -568,9 +569,9 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the height of the layers to draw on, in pixels.
-     * 
+     *
      * @return an integer corresponding to the height of the layers to draw on, in pixels
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_layerHeight() throws YAPI_Exception
@@ -585,9 +586,9 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the height of the layers to draw on, in pixels.
-     * 
+     *
      * @return an integer corresponding to the height of the layers to draw on, in pixels
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getLayerHeight() throws YAPI_Exception
@@ -596,9 +597,9 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the number of available layers to draw on.
-     * 
+     *
      * @return an integer corresponding to the number of available layers to draw on
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_layerCount() throws YAPI_Exception
@@ -613,9 +614,9 @@ public class YDisplay extends YFunction
 
     /**
      * Returns the number of available layers to draw on.
-     * 
+     *
      * @return an integer corresponding to the number of available layers to draw on
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getLayerCount() throws YAPI_Exception
@@ -627,7 +628,7 @@ public class YDisplay extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -664,7 +665,7 @@ public class YDisplay extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the display is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YDisplay.isOnline() to test if the display is
@@ -672,9 +673,9 @@ public class YDisplay extends YFunction
      * a display by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the display
-     * 
+     *
      * @return a YDisplay object allowing you to drive the display.
      */
     public static YDisplay FindDisplay(String func)
@@ -693,11 +694,11 @@ public class YDisplay extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -733,9 +734,9 @@ public class YDisplay extends YFunction
      * Clears the display screen and resets all display layers to their default state.
      * Using this function in a sequence will kill the sequence play-back. Don't use that
      * function to reset the display at sequence start-up.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int resetAll() throws YAPI_Exception
@@ -748,12 +749,12 @@ public class YDisplay extends YFunction
     /**
      * Smoothly changes the brightness of the screen to produce a fade-in or fade-out
      * effect.
-     * 
+     *
      * @param brightness : the new screen brightness
      * @param duration : duration of the brightness transition, in milliseconds.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int fade(int brightness,int duration) throws YAPI_Exception
@@ -766,9 +767,9 @@ public class YDisplay extends YFunction
      * Starts to record all display commands into a sequence, for later replay.
      * The name used to store the sequence is specified when calling
      * saveSequence(), once the recording is complete.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int newSequence() throws YAPI_Exception
@@ -783,11 +784,11 @@ public class YDisplay extends YFunction
      * Stops recording display commands and saves the sequence into the specified
      * file on the display internal memory. The sequence can be later replayed
      * using playSequence().
-     * 
+     *
      * @param sequenceName : the name of the newly created sequence
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int saveSequence(String sequenceName) throws YAPI_Exception
@@ -803,11 +804,11 @@ public class YDisplay extends YFunction
     /**
      * Replays a display sequence previously recorded using
      * newSequence() and saveSequence().
-     * 
+     *
      * @param sequenceName : the name of the newly created sequence
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int playSequence(String sequenceName) throws YAPI_Exception
@@ -823,11 +824,11 @@ public class YDisplay extends YFunction
      * (without any immediate effect). It can also be used dynamically while
      * playing a pre-recorded sequence, to suspend or resume the execution of
      * the sequence. To cancel a delay, call the same method with a zero delay.
-     * 
+     *
      * @param delay_ms : the duration to wait, in milliseconds
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int pauseSequence(int delay_ms) throws YAPI_Exception
@@ -839,9 +840,9 @@ public class YDisplay extends YFunction
     /**
      * Stops immediately any ongoing sequence replay.
      * The display is left as is.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int stopSequence() throws YAPI_Exception
@@ -854,12 +855,12 @@ public class YDisplay extends YFunction
      * Uploads an arbitrary file (for instance a GIF file) to the display, to the
      * specified full path name. If a file already exists with the same path name,
      * its content is overwritten.
-     * 
+     *
      * @param pathname : path and name of the new file to create
      * @param content : binary buffer with the content to set
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int upload(String pathname,byte[] content) throws YAPI_Exception
@@ -873,12 +874,12 @@ public class YDisplay extends YFunction
      * This method only affects the displayed content, but does not change any
      * property of the layer object.
      * Note that layer 0 has no transparency support (it is always completely opaque).
-     * 
+     *
      * @param srcLayerId : the identifier of the source layer (a number in range 0..layerCount-1)
      * @param dstLayerId : the identifier of the destination layer (a number in range 0..layerCount-1)
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int copyLayerContent(int srcLayerId,int dstLayerId) throws YAPI_Exception
@@ -894,12 +895,12 @@ public class YDisplay extends YFunction
      * layer stays unchanged. When used between onae hidden layer and a visible layer,
      * this method makes it possible to easily implement double-buffering.
      * Note that layer 0 has no transparency support (it is always completely opaque).
-     * 
+     *
      * @param layerIdA : the first layer (a number in range 0..layerCount-1)
      * @param layerIdB : the second layer (a number in range 0..layerCount-1)
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int swapLayerContent(int layerIdA,int layerIdB) throws YAPI_Exception
@@ -910,7 +911,7 @@ public class YDisplay extends YFunction
 
     /**
      * Continues the enumeration of displays started using yFirstDisplay().
-     * 
+     *
      * @return a pointer to a YDisplay object, corresponding to
      *         a display currently online, or a null pointer
      *         if there are no more displays to enumerate.
@@ -932,7 +933,7 @@ public class YDisplay extends YFunction
      * Starts the enumeration of displays currently accessible.
      * Use the method YDisplay.nextDisplay() to iterate on
      * next displays.
-     * 
+     *
      * @return a pointer to a YDisplay object, corresponding to
      *         the first display currently online, or a null pointer
      *         if there are none.
@@ -953,11 +954,11 @@ public class YDisplay extends YFunction
      * Returns a YDisplayLayer object that can be used to draw on the specified
      * layer. The content is displayed only when the layer is active on the
      * screen (and not masked by other overlapping layers).
-     * 
+     *
      * @param layerId : the identifier of the layer (a number in range 0..layerCount-1)
-     * 
+     *
      * @return an YDisplayLayer object
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public synchronized YDisplayLayer get_displayLayer(int layerId) throws YAPI_Exception

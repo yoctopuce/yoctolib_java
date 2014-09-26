@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YUSBHub.java 15826 2014-04-16 17:13:43Z seb $
+ * $Id: YUSBHub.java 17831 2014-09-25 16:31:39Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -44,21 +44,18 @@ public class YUSBHub extends YGenericHub
 
     static void SetContextType(Object ctx) throws YAPI_Exception
     {
-        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct acces is supported only on Android Platform");
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct access is supported only on Android Platform");
     }
 
     static void CheckUSBAcces() throws YAPI_Exception
     {
-        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct acces is supported only on Android Platform");
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct access is supported only on Android Platform");
     }
 
-    /*
-     * Constuctor
-     */
     public YUSBHub(int idx) throws YAPI_Exception
     {
-        super(idx);
-        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct acces is supported only on Android Platform");
+        super(idx,true);
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct access is supported only on Android Platform");
     }
 
     @Override
@@ -79,7 +76,13 @@ public class YUSBHub extends YGenericHub
     @Override
     void updateDeviceList(boolean forceupdate) throws YAPI_Exception
     {
-        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct acces is supported only on Android Platform");
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct access is supported only on Android Platform");
+    }
+
+    @Override
+    java.util.ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception
+    {
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Firmware update over USB is not yet supported");
     }
 
     @Override
@@ -91,7 +94,7 @@ public class YUSBHub extends YGenericHub
     @Override
     byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body) throws YAPI_Exception
     {
-        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct acces is supported only on Android Platform");
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct access is supported only on Android Platform");
     }
     @Override
     public String getRootUrl()

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMotor.java 16182 2014-05-12 15:14:26Z seb $
+ * $Id: YMotor.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindMotor(), the high-level API for Motor functions
  *
@@ -47,13 +47,14 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YMotor class start)
 /**
  * YMotor Class: Motor function interface
- * 
+ *
  * Yoctopuce application programming interface allows you to drive the
- * power sent to motor to make it turn both ways, but also to drive accelerations
+ * power sent to the motor to make it turn both ways, but also to drive accelerations
  * and decelerations. The motor will then accelerate automatically: you will not
  * have to monitor it. The API also allows to slow down the motor by shortening
- * its terminals: the motor will then act as an electromagnetic break.
+ * its terminals: the motor will then act as an electromagnetic brake.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YMotor extends YFunction
 {
 //--- (end of YMotor class start)
@@ -62,7 +63,7 @@ public class YMotor extends YFunction
      * invalid motorStatus value
      */
     public static final int MOTORSTATUS_IDLE = 0;
-    public static final int MOTORSTATUS_BREAK = 1;
+    public static final int MOTORSTATUS_BRAKE = 1;
     public static final int MOTORSTATUS_FORWD = 2;
     public static final int MOTORSTATUS_BACKWD = 3;
     public static final int MOTORSTATUS_LOVOLT = 4;
@@ -76,9 +77,9 @@ public class YMotor extends YFunction
      */
     public static final double DRIVINGFORCE_INVALID = YAPI.INVALID_DOUBLE;
     /**
-     * invalid breakingForce value
+     * invalid brakingForce value
      */
-    public static final double BREAKINGFORCE_INVALID = YAPI.INVALID_DOUBLE;
+    public static final double BRAKINGFORCE_INVALID = YAPI.INVALID_DOUBLE;
     /**
      * invalid cutOffVoltage value
      */
@@ -90,7 +91,7 @@ public class YMotor extends YFunction
     /**
      * invalid frequency value
      */
-    public static final int FREQUENCY_INVALID = YAPI.INVALID_UINT;
+    public static final double FREQUENCY_INVALID = YAPI.INVALID_DOUBLE;
     /**
      * invalid starterTime value
      */
@@ -105,10 +106,10 @@ public class YMotor extends YFunction
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _motorStatus = MOTORSTATUS_INVALID;
     protected double _drivingForce = DRIVINGFORCE_INVALID;
-    protected double _breakingForce = BREAKINGFORCE_INVALID;
+    protected double _brakingForce = BRAKINGFORCE_INVALID;
     protected double _cutOffVoltage = CUTOFFVOLTAGE_INVALID;
     protected int _overCurrentLimit = OVERCURRENTLIMIT_INVALID;
-    protected int _frequency = FREQUENCY_INVALID;
+    protected double _frequency = FREQUENCY_INVALID;
     protected int _starterTime = STARTERTIME_INVALID;
     protected int _failSafeTimeout = FAILSAFETIMEOUT_INVALID;
     protected String _command = COMMAND_INVALID;
@@ -119,7 +120,7 @@ public class YMotor extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -131,7 +132,7 @@ public class YMotor extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -141,7 +142,7 @@ public class YMotor extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YMotor(String func)
@@ -160,19 +161,19 @@ public class YMotor extends YFunction
             _motorStatus =  json_val.getInt("motorStatus");
         }
         if (json_val.has("drivingForce")) {
-            _drivingForce =  json_val.getDouble("drivingForce")/65536.0;
+            _drivingForce =  Math.round(json_val.getDouble("drivingForce") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.has("breakingForce")) {
-            _breakingForce =  json_val.getDouble("breakingForce")/65536.0;
+        if (json_val.has("brakingForce")) {
+            _brakingForce =  Math.round(json_val.getDouble("brakingForce") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("cutOffVoltage")) {
-            _cutOffVoltage =  json_val.getDouble("cutOffVoltage")/65536.0;
+            _cutOffVoltage =  Math.round(json_val.getDouble("cutOffVoltage") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("overCurrentLimit")) {
             _overCurrentLimit =  json_val.getInt("overCurrentLimit");
         }
         if (json_val.has("frequency")) {
-            _frequency =  json_val.getInt("frequency");
+            _frequency =  Math.round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("starterTime")) {
             _starterTime =  json_val.getInt("starterTime");
@@ -181,7 +182,7 @@ public class YMotor extends YFunction
             _failSafeTimeout =  json_val.getInt("failSafeTimeout");
         }
         if (json_val.has("command")) {
-            _command =  json_val.getString("command"); ;
+            _command =  json_val.getString("command");
         }
         super._parseAttr(json_val);
     }
@@ -191,24 +192,24 @@ public class YMotor extends YFunction
      * IDLE   when the motor is stopped/in free wheel, ready to start;
      * FORWD  when the controller is driving the motor forward;
      * BACKWD when the controller is driving the motor backward;
-     * BREAK  when the controller is breaking;
+     * BRAKE  when the controller is braking;
      * LOVOLT when the controller has detected a low voltage condition;
      * HICURR when the controller has detected an overcurrent condition;
-     * HIHEAT when the controller detected an overheat condition;
+     * HIHEAT when the controller has detected an overheat condition;
      * FAILSF when the controller switched on the failsafe security.
-     * 
+     *
      * When an error condition occurred (LOVOLT, HICURR, HIHEAT, FAILSF), the controller
      * status must be explicitly reset using the resetStatus function.
-     * 
-     * @return a value among YMotor.MOTORSTATUS_IDLE, YMotor.MOTORSTATUS_BREAK, YMotor.MOTORSTATUS_FORWD,
-     * YMotor.MOTORSTATUS_BACKWD, YMotor.MOTORSTATUS_LOVOLT, YMotor.MOTORSTATUS_HICURR,
+     *
+     *  @return a value among YMotor.MOTORSTATUS_IDLE, YMotor.MOTORSTATUS_BRAKE, YMotor.MOTORSTATUS_FORWD,
+     *  YMotor.MOTORSTATUS_BACKWD, YMotor.MOTORSTATUS_LOVOLT, YMotor.MOTORSTATUS_HICURR,
      * YMotor.MOTORSTATUS_HIHEAT and YMotor.MOTORSTATUS_FAILSF
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_motorStatus() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MOTORSTATUS_INVALID;
             }
@@ -221,18 +222,18 @@ public class YMotor extends YFunction
      * IDLE   when the motor is stopped/in free wheel, ready to start;
      * FORWD  when the controller is driving the motor forward;
      * BACKWD when the controller is driving the motor backward;
-     * BREAK  when the controller is breaking;
+     * BRAKE  when the controller is braking;
      * LOVOLT when the controller has detected a low voltage condition;
      * HICURR when the controller has detected an overcurrent condition;
-     * HIHEAT when the controller detected an overheat condition;
+     * HIHEAT when the controller has detected an overheat condition;
      * FAILSF when the controller switched on the failsafe security.
-     * 
+     *
      * When an error condition occurred (LOVOLT, HICURR, HIHEAT, FAILSF), the controller
      * status must be explicitly reset using the resetStatus function.
-     * 
-     * @return a value among Y_MOTORSTATUS_IDLE, Y_MOTORSTATUS_BREAK, Y_MOTORSTATUS_FORWD,
+     *
+     *  @return a value among Y_MOTORSTATUS_IDLE, Y_MOTORSTATUS_BRAKE, Y_MOTORSTATUS_FORWD,
      * Y_MOTORSTATUS_BACKWD, Y_MOTORSTATUS_LOVOLT, Y_MOTORSTATUS_HICURR, Y_MOTORSTATUS_HIHEAT and Y_MOTORSTATUS_FAILSF
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getMotorStatus() throws YAPI_Exception
@@ -256,18 +257,18 @@ public class YMotor extends YFunction
      * to 100%. If you want go easy on your mechanics and avoid excessive current consumption,
      * try to avoid brutal power changes. For example, immediate transition from forward full power
      * to reverse full power is a very bad idea. Each time the driving power is modified, the
-     * breaking power is set to zero.
-     * 
+     * braking power is set to zero.
+     *
      * @param newval : a floating point number corresponding to immediately the power sent to the motor
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_drivingForce(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval*65536.0));
+        rest_val = Long.toString(Math.round(newval * 65536.0));
         _setAttr("drivingForce",rest_val);
         return YAPI.SUCCESS;
     }
@@ -277,12 +278,12 @@ public class YMotor extends YFunction
      * to 100%. If you want go easy on your mechanics and avoid excessive current consumption,
      * try to avoid brutal power changes. For example, immediate transition from forward full power
      * to reverse full power is a very bad idea. Each time the driving power is modified, the
-     * breaking power is set to zero.
-     * 
+     * braking power is set to zero.
+     *
      * @param newval : a floating point number corresponding to immediately the power sent to the motor
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setDrivingForce(double newval)  throws YAPI_Exception
@@ -291,15 +292,15 @@ public class YMotor extends YFunction
 
     /**
      * Returns the power sent to the motor, as a percentage between -100% and +100%.
-     * 
-     * @return a floating point number corresponding to the power sent to the motor, as a percentage
+     *
+     *  @return a floating point number corresponding to the power sent to the motor, as a percentage
      * between -100% and +100%
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_drivingForce() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DRIVINGFORCE_INVALID;
             }
@@ -309,10 +310,10 @@ public class YMotor extends YFunction
 
     /**
      * Returns the power sent to the motor, as a percentage between -100% and +100%.
-     * 
-     * @return a floating point number corresponding to the power sent to the motor, as a percentage
+     *
+     *  @return a floating point number corresponding to the power sent to the motor, as a percentage
      * between -100% and +100%
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getDrivingForce() throws YAPI_Exception
@@ -320,107 +321,107 @@ public class YMotor extends YFunction
     { return get_drivingForce(); }
 
     /**
-     * Changes immediately the breaking force applied to the motor (in per cents).
-     * The value 0 corresponds to no breaking (free wheel). When the breaking force
+     * Changes immediately the braking force applied to the motor (in percents).
+     * The value 0 corresponds to no braking (free wheel). When the braking force
      * is changed, the driving power is set to zero. The value is a percentage.
-     * 
-     * @param newval : a floating point number corresponding to immediately the breaking force applied to
-     * the motor (in per cents)
-     * 
+     *
+     *  @param newval : a floating point number corresponding to immediately the braking force applied to
+     * the motor (in percents)
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
-    public int set_breakingForce(double  newval)  throws YAPI_Exception
+    public int set_brakingForce(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval*65536.0));
-        _setAttr("breakingForce",rest_val);
+        rest_val = Long.toString(Math.round(newval * 65536.0));
+        _setAttr("brakingForce",rest_val);
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes immediately the breaking force applied to the motor (in per cents).
-     * The value 0 corresponds to no breaking (free wheel). When the breaking force
+     * Changes immediately the braking force applied to the motor (in percents).
+     * The value 0 corresponds to no braking (free wheel). When the braking force
      * is changed, the driving power is set to zero. The value is a percentage.
-     * 
-     * @param newval : a floating point number corresponding to immediately the breaking force applied to
-     * the motor (in per cents)
-     * 
+     *
+     *  @param newval : a floating point number corresponding to immediately the braking force applied to
+     * the motor (in percents)
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
-    public int setBreakingForce(double newval)  throws YAPI_Exception
+    public int setBrakingForce(double newval)  throws YAPI_Exception
 
-    { return set_breakingForce(newval); }
+    { return set_brakingForce(newval); }
 
     /**
-     * Returns the breaking force applied to the motor, as a percentage.
-     * The value 0 corresponds to no breaking (free wheel).
-     * 
-     * @return a floating point number corresponding to the breaking force applied to the motor, as a percentage
-     * 
+     * Returns the braking force applied to the motor, as a percentage.
+     * The value 0 corresponds to no braking (free wheel).
+     *
+     * @return a floating point number corresponding to the braking force applied to the motor, as a percentage
+     *
      * @throws YAPI_Exception on error
      */
-    public double get_breakingForce() throws YAPI_Exception
+    public double get_brakingForce() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BREAKINGFORCE_INVALID;
+                return BRAKINGFORCE_INVALID;
             }
         }
-        return _breakingForce;
+        return _brakingForce;
     }
 
     /**
-     * Returns the breaking force applied to the motor, as a percentage.
-     * The value 0 corresponds to no breaking (free wheel).
-     * 
-     * @return a floating point number corresponding to the breaking force applied to the motor, as a percentage
-     * 
+     * Returns the braking force applied to the motor, as a percentage.
+     * The value 0 corresponds to no braking (free wheel).
+     *
+     * @return a floating point number corresponding to the braking force applied to the motor, as a percentage
+     *
      * @throws YAPI_Exception on error
      */
-    public double getBreakingForce() throws YAPI_Exception
+    public double getBrakingForce() throws YAPI_Exception
 
-    { return get_breakingForce(); }
+    { return get_brakingForce(); }
 
     /**
-     * Changes the threshold voltage under which the controller will automatically switch to error state
-     * and prevent further current draw. This setting prevent damage to a battery that can
+     * Changes the threshold voltage under which the controller automatically switches to error state
+     * and prevents further current draw. This setting prevent damage to a battery that can
      * occur when drawing current from an "empty" battery.
-     * Note that whatever the cutoff threshold, the controller will switch to undervoltage
+     * Note that whatever the cutoff threshold, the controller switches to undervoltage
      * error state if the power supply goes under 3V, even for a very brief time.
-     * 
-     * @param newval : a floating point number corresponding to the threshold voltage under which the
-     * controller will automatically switch to error state
-     *         and prevent further current draw
-     * 
+     *
+     *  @param newval : a floating point number corresponding to the threshold voltage under which the
+     * controller automatically switches to error state
+     *         and prevents further current draw
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_cutOffVoltage(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval*65536.0));
+        rest_val = Long.toString(Math.round(newval * 65536.0));
         _setAttr("cutOffVoltage",rest_val);
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes the threshold voltage under which the controller will automatically switch to error state
-     * and prevent further current draw. This setting prevent damage to a battery that can
+     * Changes the threshold voltage under which the controller automatically switches to error state
+     * and prevents further current draw. This setting prevent damage to a battery that can
      * occur when drawing current from an "empty" battery.
-     * Note that whatever the cutoff threshold, the controller will switch to undervoltage
+     * Note that whatever the cutoff threshold, the controller switches to undervoltage
      * error state if the power supply goes under 3V, even for a very brief time.
-     * 
-     * @param newval : a floating point number corresponding to the threshold voltage under which the
-     * controller will automatically switch to error state
-     *         and prevent further current draw
-     * 
+     *
+     *  @param newval : a floating point number corresponding to the threshold voltage under which the
+     * controller automatically switches to error state
+     *         and prevents further current draw
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setCutOffVoltage(double newval)  throws YAPI_Exception
@@ -428,19 +429,19 @@ public class YMotor extends YFunction
     { return set_cutOffVoltage(newval); }
 
     /**
-     * Returns the threshold voltage under which the controller will automatically switch to error state
-     * and prevent further current draw. This setting prevent damage to a battery that can
+     * Returns the threshold voltage under which the controller automatically switches to error state
+     * and prevents further current draw. This setting prevents damage to a battery that can
      * occur when drawing current from an "empty" battery.
-     * 
-     * @return a floating point number corresponding to the threshold voltage under which the controller
-     * will automatically switch to error state
-     *         and prevent further current draw
-     * 
+     *
+     *  @return a floating point number corresponding to the threshold voltage under which the controller
+     * automatically switches to error state
+     *         and prevents further current draw
+     *
      * @throws YAPI_Exception on error
      */
     public double get_cutOffVoltage() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CUTOFFVOLTAGE_INVALID;
             }
@@ -449,14 +450,14 @@ public class YMotor extends YFunction
     }
 
     /**
-     * Returns the threshold voltage under which the controller will automatically switch to error state
-     * and prevent further current draw. This setting prevent damage to a battery that can
+     * Returns the threshold voltage under which the controller automatically switches to error state
+     * and prevents further current draw. This setting prevents damage to a battery that can
      * occur when drawing current from an "empty" battery.
-     * 
-     * @return a floating point number corresponding to the threshold voltage under which the controller
-     * will automatically switch to error state
-     *         and prevent further current draw
-     * 
+     *
+     *  @return a floating point number corresponding to the threshold voltage under which the controller
+     * automatically switches to error state
+     *         and prevents further current draw
+     *
      * @throws YAPI_Exception on error
      */
     public double getCutOffVoltage() throws YAPI_Exception
@@ -464,17 +465,17 @@ public class YMotor extends YFunction
     { return get_cutOffVoltage(); }
 
     /**
-     * Returns the current threshold (in mA) above which the controller will automatically
-     * switch to error state. A zero value means that there is no limit.
-     * 
-     * @return an integer corresponding to the current threshold (in mA) above which the controller will automatically
-     *         switch to error state
-     * 
+     * Returns the current threshold (in mA) above which the controller automatically
+     * switches to error state. A zero value means that there is no limit.
+     *
+     * @return an integer corresponding to the current threshold (in mA) above which the controller automatically
+     *         switches to error state
+     *
      * @throws YAPI_Exception on error
      */
     public int get_overCurrentLimit() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OVERCURRENTLIMIT_INVALID;
             }
@@ -483,12 +484,12 @@ public class YMotor extends YFunction
     }
 
     /**
-     * Returns the current threshold (in mA) above which the controller will automatically
-     * switch to error state. A zero value means that there is no limit.
-     * 
-     * @return an integer corresponding to the current threshold (in mA) above which the controller will automatically
-     *         switch to error state
-     * 
+     * Returns the current threshold (in mA) above which the controller automatically
+     * switches to error state. A zero value means that there is no limit.
+     *
+     * @return an integer corresponding to the current threshold (in mA) above which the controller automatically
+     *         switches to error state
+     *
      * @throws YAPI_Exception on error
      */
     public int getOverCurrentLimit() throws YAPI_Exception
@@ -496,17 +497,17 @@ public class YMotor extends YFunction
     { return get_overCurrentLimit(); }
 
     /**
-     * Changes tthe current threshold (in mA) above which the controller will automatically
-     * switch to error state. A zero value means that there is no limit. Note that whatever the
-     * current limit is, the controller will switch to OVERCURRENT status if the current
+     * Changes the current threshold (in mA) above which the controller automatically
+     * switches to error state. A zero value means that there is no limit. Note that whatever the
+     * current limit is, the controller switches to OVERCURRENT status if the current
      * goes above 32A, even for a very brief time.
-     * 
-     * @param newval : an integer corresponding to tthe current threshold (in mA) above which the
-     * controller will automatically
-     *         switch to error state
-     * 
+     *
+     *  @param newval : an integer corresponding to the current threshold (in mA) above which the
+     * controller automatically
+     *         switches to error state
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_overCurrentLimit(int  newval)  throws YAPI_Exception
@@ -518,17 +519,17 @@ public class YMotor extends YFunction
     }
 
     /**
-     * Changes tthe current threshold (in mA) above which the controller will automatically
-     * switch to error state. A zero value means that there is no limit. Note that whatever the
-     * current limit is, the controller will switch to OVERCURRENT status if the current
+     * Changes the current threshold (in mA) above which the controller automatically
+     * switches to error state. A zero value means that there is no limit. Note that whatever the
+     * current limit is, the controller switches to OVERCURRENT status if the current
      * goes above 32A, even for a very brief time.
-     * 
-     * @param newval : an integer corresponding to tthe current threshold (in mA) above which the
-     * controller will automatically
-     *         switch to error state
-     * 
+     *
+     *  @param newval : an integer corresponding to the current threshold (in mA) above which the
+     * controller automatically
+     *         switches to error state
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setOverCurrentLimit(int newval)  throws YAPI_Exception
@@ -536,49 +537,21 @@ public class YMotor extends YFunction
     { return set_overCurrentLimit(newval); }
 
     /**
-     * Returns the PWM frequency used to control the motor.
-     * 
-     * @return an integer corresponding to the PWM frequency used to control the motor
-     * 
-     * @throws YAPI_Exception on error
-     */
-    public int get_frequency() throws YAPI_Exception
-    {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FREQUENCY_INVALID;
-            }
-        }
-        return _frequency;
-    }
-
-    /**
-     * Returns the PWM frequency used to control the motor.
-     * 
-     * @return an integer corresponding to the PWM frequency used to control the motor
-     * 
-     * @throws YAPI_Exception on error
-     */
-    public int getFrequency() throws YAPI_Exception
-
-    { return get_frequency(); }
-
-    /**
      * Changes the PWM frequency used to control the motor. Low frequency is usually
      * more efficient and may help the motor to start, but an audible noise might be
      * generated. A higher frequency reduces the noise, but more energy is converted
      * into heat.
-     * 
-     * @param newval : an integer corresponding to the PWM frequency used to control the motor
-     * 
+     *
+     * @param newval : a floating point number corresponding to the PWM frequency used to control the motor
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
-    public int set_frequency(int  newval)  throws YAPI_Exception
+    public int set_frequency(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
+        rest_val = Long.toString(Math.round(newval * 65536.0));
         _setAttr("frequency",rest_val);
         return YAPI.SUCCESS;
     }
@@ -588,30 +561,58 @@ public class YMotor extends YFunction
      * more efficient and may help the motor to start, but an audible noise might be
      * generated. A higher frequency reduces the noise, but more energy is converted
      * into heat.
-     * 
-     * @param newval : an integer corresponding to the PWM frequency used to control the motor
-     * 
+     *
+     * @param newval : a floating point number corresponding to the PWM frequency used to control the motor
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
-    public int setFrequency(int newval)  throws YAPI_Exception
+    public int setFrequency(double newval)  throws YAPI_Exception
 
     { return set_frequency(newval); }
 
     /**
+     * Returns the PWM frequency used to control the motor.
+     *
+     * @return a floating point number corresponding to the PWM frequency used to control the motor
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_frequency() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return FREQUENCY_INVALID;
+            }
+        }
+        return _frequency;
+    }
+
+    /**
+     * Returns the PWM frequency used to control the motor.
+     *
+     * @return a floating point number corresponding to the PWM frequency used to control the motor
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getFrequency() throws YAPI_Exception
+
+    { return get_frequency(); }
+
+    /**
      * Returns the duration (in ms) during which the motor is driven at low frequency to help
      * it start up.
-     * 
-     * @return an integer corresponding to the duration (in ms) during which the motor is driven at low
+     *
+     *  @return an integer corresponding to the duration (in ms) during which the motor is driven at low
      * frequency to help
      *         it start up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_starterTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STARTERTIME_INVALID;
             }
@@ -622,11 +623,11 @@ public class YMotor extends YFunction
     /**
      * Returns the duration (in ms) during which the motor is driven at low frequency to help
      * it start up.
-     * 
-     * @return an integer corresponding to the duration (in ms) during which the motor is driven at low
+     *
+     *  @return an integer corresponding to the duration (in ms) during which the motor is driven at low
      * frequency to help
      *         it start up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getStarterTime() throws YAPI_Exception
@@ -636,13 +637,13 @@ public class YMotor extends YFunction
     /**
      * Changes the duration (in ms) during which the motor is driven at low frequency to help
      * it start up.
-     * 
-     * @param newval : an integer corresponding to the duration (in ms) during which the motor is driven
+     *
+     *  @param newval : an integer corresponding to the duration (in ms) during which the motor is driven
      * at low frequency to help
      *         it start up
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_starterTime(int  newval)  throws YAPI_Exception
@@ -656,13 +657,13 @@ public class YMotor extends YFunction
     /**
      * Changes the duration (in ms) during which the motor is driven at low frequency to help
      * it start up.
-     * 
-     * @param newval : an integer corresponding to the duration (in ms) during which the motor is driven
+     *
+     *  @param newval : an integer corresponding to the duration (in ms) during which the motor is driven
      * at low frequency to help
      *         it start up
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setStarterTime(int newval)  throws YAPI_Exception
@@ -671,19 +672,19 @@ public class YMotor extends YFunction
 
     /**
      * Returns the delay in milliseconds allowed for the controller to run autonomously without
-     * receiving any instruction from the control process. Once this delay is elapsed,
-     * the controller will automatically stop the motor and switch to FAILSAFE error.
+     * receiving any instruction from the control process. When this delay has elapsed,
+     * the controller automatically stops the motor and switches to FAILSAFE error.
      * Failsafe security is disabled when the value is zero.
-     * 
-     * @return an integer corresponding to the delay in milliseconds allowed for the controller to run
+     *
+     *  @return an integer corresponding to the delay in milliseconds allowed for the controller to run
      * autonomously without
      *         receiving any instruction from the control process
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_failSafeTimeout() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FAILSAFETIMEOUT_INVALID;
             }
@@ -693,14 +694,14 @@ public class YMotor extends YFunction
 
     /**
      * Returns the delay in milliseconds allowed for the controller to run autonomously without
-     * receiving any instruction from the control process. Once this delay is elapsed,
-     * the controller will automatically stop the motor and switch to FAILSAFE error.
+     * receiving any instruction from the control process. When this delay has elapsed,
+     * the controller automatically stops the motor and switches to FAILSAFE error.
      * Failsafe security is disabled when the value is zero.
-     * 
-     * @return an integer corresponding to the delay in milliseconds allowed for the controller to run
+     *
+     *  @return an integer corresponding to the delay in milliseconds allowed for the controller to run
      * autonomously without
      *         receiving any instruction from the control process
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getFailSafeTimeout() throws YAPI_Exception
@@ -709,16 +710,16 @@ public class YMotor extends YFunction
 
     /**
      * Changes the delay in milliseconds allowed for the controller to run autonomously without
-     * receiving any instruction from the control process. Once this delay is elapsed,
-     * the controller will automatically stop the motor and switch to FAILSAFE error.
+     * receiving any instruction from the control process. When this delay has elapsed,
+     * the controller automatically stops the motor and switches to FAILSAFE error.
      * Failsafe security is disabled when the value is zero.
-     * 
-     * @param newval : an integer corresponding to the delay in milliseconds allowed for the controller to
+     *
+     *  @param newval : an integer corresponding to the delay in milliseconds allowed for the controller to
      * run autonomously without
      *         receiving any instruction from the control process
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_failSafeTimeout(int  newval)  throws YAPI_Exception
@@ -731,16 +732,16 @@ public class YMotor extends YFunction
 
     /**
      * Changes the delay in milliseconds allowed for the controller to run autonomously without
-     * receiving any instruction from the control process. Once this delay is elapsed,
-     * the controller will automatically stop the motor and switch to FAILSAFE error.
+     * receiving any instruction from the control process. When this delay has elapsed,
+     * the controller automatically stops the motor and switches to FAILSAFE error.
      * Failsafe security is disabled when the value is zero.
-     * 
-     * @param newval : an integer corresponding to the delay in milliseconds allowed for the controller to
+     *
+     *  @param newval : an integer corresponding to the delay in milliseconds allowed for the controller to
      * run autonomously without
      *         receiving any instruction from the control process
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setFailSafeTimeout(int newval)  throws YAPI_Exception
@@ -752,7 +753,7 @@ public class YMotor extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -789,7 +790,7 @@ public class YMotor extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the motor is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YMotor.isOnline() to test if the motor is
@@ -797,9 +798,9 @@ public class YMotor extends YFunction
      * a motor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the motor
-     * 
+     *
      * @return a YMotor object allowing you to drive the motor.
      */
     public static YMotor FindMotor(String func)
@@ -818,11 +819,11 @@ public class YMotor extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -857,7 +858,7 @@ public class YMotor extends YFunction
     /**
      * Rearms the controller failsafe timer. When the motor is running and the failsafe feature
      * is active, this function should be called periodically to prove that the control process
-     * is running properly. Otherwise, the motor will be automatically stopped after the specified
+     * is running properly. Otherwise, the motor is automatically stopped after the specified
      * timeout. Calling a motor <i>set</i> function implicitely rearms the failsafe timer.
      */
     public int keepALive() throws YAPI_Exception
@@ -876,37 +877,37 @@ public class YMotor extends YFunction
 
     /**
      * Changes progressively the power sent to the moteur for a specific duration.
-     * 
-     * @param targetPower : desired motor power, in per cents (between -100% and +100%)
+     *
+     * @param targetPower : desired motor power, in percents (between -100% and +100%)
      * @param delay : duration (in ms) of the transition
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int drivingForceMove(double targetPower,int delay) throws YAPI_Exception
     {
-        return set_command(String.format("P%d,%d",(int) Math.round(targetPower*10),delay));
+        return set_command(String.format("P%d,%d",(int) (double)Math.round(targetPower*10),delay));
     }
 
     /**
-     * Changes progressively the breaking force applied to the motor for a specific duration.
-     * 
-     * @param targetPower : desired breaking force, in per cents
+     * Changes progressively the braking force applied to the motor for a specific duration.
+     *
+     * @param targetPower : desired braking force, in percents
      * @param delay : duration (in ms) of the transition
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
-    public int breakingForceMove(double targetPower,int delay) throws YAPI_Exception
+    public int brakingForceMove(double targetPower,int delay) throws YAPI_Exception
     {
-        return set_command(String.format("B%d,%d",(int) Math.round(targetPower*10),delay));
+        return set_command(String.format("B%d,%d",(int) (double)Math.round(targetPower*10),delay));
     }
 
     /**
      * Continues the enumeration of motors started using yFirstMotor().
-     * 
+     *
      * @return a pointer to a YMotor object, corresponding to
      *         a motor currently online, or a null pointer
      *         if there are no more motors to enumerate.
@@ -928,7 +929,7 @@ public class YMotor extends YFunction
      * Starts the enumeration of motors currently accessible.
      * Use the method YMotor.nextMotor() to iterate on
      * next motors.
-     * 
+     *
      * @return a pointer to a YMotor object, corresponding to
      *         the first motor currently online, or a null pointer
      *         if there are none.

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YServo.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YServo.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindServo(), the high-level API for Servo functions
  *
@@ -47,12 +47,13 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YServo class start)
 /**
  * YServo Class: Servo function interface
- * 
+ *
  * Yoctopuce application programming interface allows you not only to move
  * a servo to a given position, but also to specify the time interval
  * in which the move should be performed. This makes it possible to
  * synchronize two servos involved in a same move.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YServo extends YFunction
 {
 //--- (end of YServo class start)
@@ -110,7 +111,7 @@ public class YServo extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -122,7 +123,7 @@ public class YServo extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -132,7 +133,7 @@ public class YServo extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YServo(String func)
@@ -185,14 +186,14 @@ public class YServo extends YFunction
      */
     /**
      * Returns the current servo position.
-     * 
+     *
      * @return an integer corresponding to the current servo position
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_position() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POSITION_INVALID;
             }
@@ -202,9 +203,9 @@ public class YServo extends YFunction
 
     /**
      * Returns the current servo position.
-     * 
+     *
      * @return an integer corresponding to the current servo position
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPosition() throws YAPI_Exception
@@ -213,11 +214,11 @@ public class YServo extends YFunction
 
     /**
      * Changes immediately the servo driving position.
-     * 
+     *
      * @param newval : an integer corresponding to immediately the servo driving position
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_position(int  newval)  throws YAPI_Exception
@@ -230,11 +231,11 @@ public class YServo extends YFunction
 
     /**
      * Changes immediately the servo driving position.
-     * 
+     *
      * @param newval : an integer corresponding to immediately the servo driving position
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setPosition(int newval)  throws YAPI_Exception
@@ -243,14 +244,14 @@ public class YServo extends YFunction
 
     /**
      * Returns the state of the servos.
-     * 
+     *
      * @return either YServo.ENABLED_FALSE or YServo.ENABLED_TRUE, according to the state of the servos
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLED_INVALID;
             }
@@ -260,9 +261,9 @@ public class YServo extends YFunction
 
     /**
      * Returns the state of the servos.
-     * 
+     *
      * @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the state of the servos
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getEnabled() throws YAPI_Exception
@@ -271,11 +272,11 @@ public class YServo extends YFunction
 
     /**
      * Stops or starts the servo.
-     * 
+     *
      * @param newval : either YServo.ENABLED_FALSE or YServo.ENABLED_TRUE
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_enabled(int  newval)  throws YAPI_Exception
@@ -288,11 +289,11 @@ public class YServo extends YFunction
 
     /**
      * Stops or starts the servo.
-     * 
+     *
      * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setEnabled(int newval)  throws YAPI_Exception
@@ -301,14 +302,14 @@ public class YServo extends YFunction
 
     /**
      * Returns the current range of use of the servo.
-     * 
+     *
      * @return an integer corresponding to the current range of use of the servo
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_range() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RANGE_INVALID;
             }
@@ -318,9 +319,9 @@ public class YServo extends YFunction
 
     /**
      * Returns the current range of use of the servo.
-     * 
+     *
      * @return an integer corresponding to the current range of use of the servo
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getRange() throws YAPI_Exception
@@ -334,11 +335,11 @@ public class YServo extends YFunction
      * from 0.5 [ms] to 2.5 [ms], you can select a range of 200%.
      * Be aware that using a range higher than what is supported by the servo
      * is likely to damage the servo.
-     * 
+     *
      * @param newval : an integer corresponding to the range of use of the servo, specified in per cents
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_range(int  newval)  throws YAPI_Exception
@@ -356,11 +357,11 @@ public class YServo extends YFunction
      * from 0.5 [ms] to 2.5 [ms], you can select a range of 200%.
      * Be aware that using a range higher than what is supported by the servo
      * is likely to damage the servo.
-     * 
+     *
      * @param newval : an integer corresponding to the range of use of the servo, specified in per cents
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setRange(int newval)  throws YAPI_Exception
@@ -369,14 +370,14 @@ public class YServo extends YFunction
 
     /**
      * Returns the duration in microseconds of a neutral pulse for the servo.
-     * 
+     *
      * @return an integer corresponding to the duration in microseconds of a neutral pulse for the servo
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_neutral() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return NEUTRAL_INVALID;
             }
@@ -386,9 +387,9 @@ public class YServo extends YFunction
 
     /**
      * Returns the duration in microseconds of a neutral pulse for the servo.
-     * 
+     *
      * @return an integer corresponding to the duration in microseconds of a neutral pulse for the servo
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getNeutral() throws YAPI_Exception
@@ -401,12 +402,12 @@ public class YServo extends YFunction
      * This setting makes it possible to shift the range of use of the servo.
      * Be aware that using a range higher than what is supported by the servo is
      * likely to damage the servo.
-     * 
-     * @param newval : an integer corresponding to the duration of the pulse corresponding to the neutral
+     *
+     *  @param newval : an integer corresponding to the duration of the pulse corresponding to the neutral
      * position of the servo
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_neutral(int  newval)  throws YAPI_Exception
@@ -423,12 +424,12 @@ public class YServo extends YFunction
      * This setting makes it possible to shift the range of use of the servo.
      * Be aware that using a range higher than what is supported by the servo is
      * likely to damage the servo.
-     * 
-     * @param newval : an integer corresponding to the duration of the pulse corresponding to the neutral
+     *
+     *  @param newval : an integer corresponding to the duration of the pulse corresponding to the neutral
      * position of the servo
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setNeutral(int newval)  throws YAPI_Exception
@@ -440,7 +441,7 @@ public class YServo extends YFunction
      */
     public YMove get_move() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MOVE_INVALID;
             }
@@ -469,12 +470,12 @@ public class YServo extends YFunction
 
     /**
      * Performs a smooth move at constant speed toward a given position.
-     * 
+     *
      * @param target      : new position at the end of the move
      * @param ms_duration : total duration of the move, in milliseconds
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int move(int target,int ms_duration)  throws YAPI_Exception
@@ -487,14 +488,14 @@ public class YServo extends YFunction
 
     /**
      * Returns the servo position at device power up.
-     * 
+     *
      * @return an integer corresponding to the servo position at device power up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_positionAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POSITIONATPOWERON_INVALID;
             }
@@ -504,9 +505,9 @@ public class YServo extends YFunction
 
     /**
      * Returns the servo position at device power up.
-     * 
+     *
      * @return an integer corresponding to the servo position at device power up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPositionAtPowerOn() throws YAPI_Exception
@@ -516,11 +517,11 @@ public class YServo extends YFunction
     /**
      * Configure the servo position at device power up. Remember to call the matching
      * module saveToFlash() method, otherwise this call will have no effect.
-     * 
+     *
      * @param newval : an integer
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_positionAtPowerOn(int  newval)  throws YAPI_Exception
@@ -534,11 +535,11 @@ public class YServo extends YFunction
     /**
      * Configure the servo position at device power up. Remember to call the matching
      * module saveToFlash() method, otherwise this call will have no effect.
-     * 
+     *
      * @param newval : an integer
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setPositionAtPowerOn(int newval)  throws YAPI_Exception
@@ -547,15 +548,15 @@ public class YServo extends YFunction
 
     /**
      * Returns the servo signal generator state at power up.
-     * 
-     * @return either YServo.ENABLEDATPOWERON_FALSE or YServo.ENABLEDATPOWERON_TRUE, according to the
+     *
+     *  @return either YServo.ENABLEDATPOWERON_FALSE or YServo.ENABLEDATPOWERON_TRUE, according to the
      * servo signal generator state at power up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_enabledAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLEDATPOWERON_INVALID;
             }
@@ -565,10 +566,10 @@ public class YServo extends YFunction
 
     /**
      * Returns the servo signal generator state at power up.
-     * 
-     * @return either Y_ENABLEDATPOWERON_FALSE or Y_ENABLEDATPOWERON_TRUE, according to the servo signal
+     *
+     *  @return either Y_ENABLEDATPOWERON_FALSE or Y_ENABLEDATPOWERON_TRUE, according to the servo signal
      * generator state at power up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getEnabledAtPowerOn() throws YAPI_Exception
@@ -578,11 +579,11 @@ public class YServo extends YFunction
     /**
      * Configure the servo signal generator state at power up. Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
-     * 
+     *
      * @param newval : either YServo.ENABLEDATPOWERON_FALSE or YServo.ENABLEDATPOWERON_TRUE
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_enabledAtPowerOn(int  newval)  throws YAPI_Exception
@@ -596,11 +597,11 @@ public class YServo extends YFunction
     /**
      * Configure the servo signal generator state at power up. Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
-     * 
+     *
      * @param newval : either Y_ENABLEDATPOWERON_FALSE or Y_ENABLEDATPOWERON_TRUE
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setEnabledAtPowerOn(int newval)  throws YAPI_Exception
@@ -617,7 +618,7 @@ public class YServo extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the servo is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YServo.isOnline() to test if the servo is
@@ -625,9 +626,9 @@ public class YServo extends YFunction
      * a servo by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the servo
-     * 
+     *
      * @return a YServo object allowing you to drive the servo.
      */
     public static YServo FindServo(String func)
@@ -646,11 +647,11 @@ public class YServo extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -684,7 +685,7 @@ public class YServo extends YFunction
 
     /**
      * Continues the enumeration of servos started using yFirstServo().
-     * 
+     *
      * @return a pointer to a YServo object, corresponding to
      *         a servo currently online, or a null pointer
      *         if there are no more servos to enumerate.
@@ -706,7 +707,7 @@ public class YServo extends YFunction
      * Starts the enumeration of servos currently accessible.
      * Use the method YServo.nextServo() to iterate on
      * next servos.
-     * 
+     *
      * @return a pointer to a YServo object, corresponding to
      *         the first servo currently online, or a null pointer
      *         if there are none.

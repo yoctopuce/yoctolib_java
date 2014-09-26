@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YNetwork.java 17582 2014-09-10 17:12:40Z mvuilleu $
  *
  * Implements yFindNetwork(), the high-level API for Network functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YNetwork class start)
 /**
  * YNetwork Class: Network function interface
- * 
+ *
  * YNetwork objects provide access to TCP/IP parameters of Yoctopuce
  * modules that include a built-in network interface.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YNetwork extends YFunction
 {
 //--- (end of YNetwork class start)
@@ -176,7 +177,7 @@ public class YNetwork extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -188,7 +189,7 @@ public class YNetwork extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -198,7 +199,7 @@ public class YNetwork extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YNetwork(String func)
@@ -217,31 +218,31 @@ public class YNetwork extends YFunction
             _readiness =  json_val.getInt("readiness");
         }
         if (json_val.has("macAddress")) {
-            _macAddress =  json_val.getString("macAddress"); ;
+            _macAddress =  json_val.getString("macAddress");
         }
         if (json_val.has("ipAddress")) {
-            _ipAddress =  json_val.getString("ipAddress"); ;
+            _ipAddress =  json_val.getString("ipAddress");
         }
         if (json_val.has("subnetMask")) {
-            _subnetMask =  json_val.getString("subnetMask"); ;
+            _subnetMask =  json_val.getString("subnetMask");
         }
         if (json_val.has("router")) {
-            _router =  json_val.getString("router"); ;
+            _router =  json_val.getString("router");
         }
         if (json_val.has("ipConfig")) {
-            _ipConfig =  json_val.getString("ipConfig"); ;
+            _ipConfig =  json_val.getString("ipConfig");
         }
         if (json_val.has("primaryDNS")) {
-            _primaryDNS =  json_val.getString("primaryDNS"); ;
+            _primaryDNS =  json_val.getString("primaryDNS");
         }
         if (json_val.has("secondaryDNS")) {
-            _secondaryDNS =  json_val.getString("secondaryDNS"); ;
+            _secondaryDNS =  json_val.getString("secondaryDNS");
         }
         if (json_val.has("userPassword")) {
-            _userPassword =  json_val.getString("userPassword"); ;
+            _userPassword =  json_val.getString("userPassword");
         }
         if (json_val.has("adminPassword")) {
-            _adminPassword =  json_val.getString("adminPassword"); ;
+            _adminPassword =  json_val.getString("adminPassword");
         }
         if (json_val.has("discoverable")) {
             _discoverable =  json_val.getInt("discoverable")>0?1:0;
@@ -250,7 +251,7 @@ public class YNetwork extends YFunction
             _wwwWatchdogDelay =  json_val.getInt("wwwWatchdogDelay");
         }
         if (json_val.has("callbackUrl")) {
-            _callbackUrl =  json_val.getString("callbackUrl"); ;
+            _callbackUrl =  json_val.getString("callbackUrl");
         }
         if (json_val.has("callbackMethod")) {
             _callbackMethod =  json_val.getInt("callbackMethod");
@@ -259,7 +260,7 @@ public class YNetwork extends YFunction
             _callbackEncoding =  json_val.getInt("callbackEncoding");
         }
         if (json_val.has("callbackCredentials")) {
-            _callbackCredentials =  json_val.getString("callbackCredentials"); ;
+            _callbackCredentials =  json_val.getString("callbackCredentials");
         }
         if (json_val.has("callbackMinDelay")) {
             _callbackMinDelay =  json_val.getInt("callbackMinDelay");
@@ -288,16 +289,16 @@ public class YNetwork extends YFunction
      * Level 4 (DNS_4) is reached when the DNS server is reachable on the network.
      * Level 5 (WWW_5) is reached when global connectivity is demonstrated by properly loading the
      * current time from an NTP server.
-     * 
-     * @return a value among YNetwork.READINESS_DOWN, YNetwork.READINESS_EXISTS,
-     * YNetwork.READINESS_LINKED, YNetwork.READINESS_LAN_OK and YNetwork.READINESS_WWW_OK corresponding to
+     *
+     *  @return a value among YNetwork.READINESS_DOWN, YNetwork.READINESS_EXISTS,
+     *  YNetwork.READINESS_LINKED, YNetwork.READINESS_LAN_OK and YNetwork.READINESS_WWW_OK corresponding to
      * the current established working mode of the network interface
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_readiness() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return READINESS_INVALID;
             }
@@ -320,10 +321,10 @@ public class YNetwork extends YFunction
      * Level 4 (DNS_4) is reached when the DNS server is reachable on the network.
      * Level 5 (WWW_5) is reached when global connectivity is demonstrated by properly loading the
      * current time from an NTP server.
-     * 
-     * @return a value among Y_READINESS_DOWN, Y_READINESS_EXISTS, Y_READINESS_LINKED, Y_READINESS_LAN_OK
+     *
+     *  @return a value among Y_READINESS_DOWN, Y_READINESS_EXISTS, Y_READINESS_LINKED, Y_READINESS_LAN_OK
      * and Y_READINESS_WWW_OK corresponding to the current established working mode of the network interface
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getReadiness() throws YAPI_Exception
@@ -333,9 +334,9 @@ public class YNetwork extends YFunction
     /**
      * Returns the MAC address of the network interface. The MAC address is also available on a sticker
      * on the module, in both numeric and barcode forms.
-     * 
+     *
      * @return a string corresponding to the MAC address of the network interface
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_macAddress() throws YAPI_Exception
@@ -351,9 +352,9 @@ public class YNetwork extends YFunction
     /**
      * Returns the MAC address of the network interface. The MAC address is also available on a sticker
      * on the module, in both numeric and barcode forms.
-     * 
+     *
      * @return a string corresponding to the MAC address of the network interface
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getMacAddress() throws YAPI_Exception
@@ -363,14 +364,14 @@ public class YNetwork extends YFunction
     /**
      * Returns the IP address currently in use by the device. The address may have been configured
      * statically, or provided by a DHCP server.
-     * 
+     *
      * @return a string corresponding to the IP address currently in use by the device
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_ipAddress() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return IPADDRESS_INVALID;
             }
@@ -381,9 +382,9 @@ public class YNetwork extends YFunction
     /**
      * Returns the IP address currently in use by the device. The address may have been configured
      * statically, or provided by a DHCP server.
-     * 
+     *
      * @return a string corresponding to the IP address currently in use by the device
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getIpAddress() throws YAPI_Exception
@@ -392,14 +393,14 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the subnet mask currently used by the device.
-     * 
+     *
      * @return a string corresponding to the subnet mask currently used by the device
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_subnetMask() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SUBNETMASK_INVALID;
             }
@@ -409,9 +410,9 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the subnet mask currently used by the device.
-     * 
+     *
      * @return a string corresponding to the subnet mask currently used by the device
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getSubnetMask() throws YAPI_Exception
@@ -420,14 +421,14 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the IP address of the router on the device subnet (default gateway).
-     * 
+     *
      * @return a string corresponding to the IP address of the router on the device subnet (default gateway)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_router() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ROUTER_INVALID;
             }
@@ -437,9 +438,9 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the IP address of the router on the device subnet (default gateway).
-     * 
+     *
      * @return a string corresponding to the IP address of the router on the device subnet (default gateway)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getRouter() throws YAPI_Exception
@@ -451,7 +452,7 @@ public class YNetwork extends YFunction
      */
     public String get_ipConfig() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return IPCONFIG_INVALID;
             }
@@ -479,58 +480,15 @@ public class YNetwork extends YFunction
     { return set_ipConfig(newval); }
 
     /**
-     * Changes the configuration of the network interface to enable the use of an
-     * IP address received from a DHCP server. Until an address is received from a DHCP
-     * server, the module uses the IP parameters specified to this function.
-     * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
-     * 
-     * @param fallbackIpAddr : fallback IP address, to be used when no DHCP reply is received
-     * @param fallbackSubnetMaskLen : fallback subnet mask length when no DHCP reply is received, as an
-     *         integer (eg. 24 means 255.255.255.0)
-     * @param fallbackRouter : fallback router IP address, to be used when no DHCP reply is received
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception on error
-     */
-    public int useDHCP(String fallbackIpAddr,int fallbackSubnetMaskLen,String fallbackRouter)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = String.format("DHCP:%s/%d/%s", fallbackIpAddr.toString(), fallbackSubnetMaskLen, fallbackRouter.toString());
-        _setAttr("ipConfig",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the configuration of the network interface to use a static IP address.
-     * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
-     * 
-     * @param ipAddress : device IP address
-     * @param subnetMaskLen : subnet mask length, as an integer (eg. 24 means 255.255.255.0)
-     * @param router : router IP address (default gateway)
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception on error
-     */
-    public int useStaticIP(String ipAddress,int subnetMaskLen,String router)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = String.format("STATIC:%s/%d/%s", ipAddress.toString(), subnetMaskLen, router.toString());
-        _setAttr("ipConfig",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
      * Returns the IP address of the primary name server to be used by the module.
-     * 
+     *
      * @return a string corresponding to the IP address of the primary name server to be used by the module
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_primaryDNS() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PRIMARYDNS_INVALID;
             }
@@ -540,9 +498,9 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the IP address of the primary name server to be used by the module.
-     * 
+     *
      * @return a string corresponding to the IP address of the primary name server to be used by the module
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getPrimaryDNS() throws YAPI_Exception
@@ -553,11 +511,11 @@ public class YNetwork extends YFunction
      * Changes the IP address of the primary name server to be used by the module.
      * When using DHCP, if a value is specified, it overrides the value received from the DHCP server.
      * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
-     * 
+     *
      * @param newval : a string corresponding to the IP address of the primary name server to be used by the module
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_primaryDNS(String  newval)  throws YAPI_Exception
@@ -572,11 +530,11 @@ public class YNetwork extends YFunction
      * Changes the IP address of the primary name server to be used by the module.
      * When using DHCP, if a value is specified, it overrides the value received from the DHCP server.
      * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
-     * 
+     *
      * @param newval : a string corresponding to the IP address of the primary name server to be used by the module
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setPrimaryDNS(String newval)  throws YAPI_Exception
@@ -585,14 +543,14 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the IP address of the secondary name server to be used by the module.
-     * 
+     *
      * @return a string corresponding to the IP address of the secondary name server to be used by the module
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_secondaryDNS() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SECONDARYDNS_INVALID;
             }
@@ -602,9 +560,9 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the IP address of the secondary name server to be used by the module.
-     * 
+     *
      * @return a string corresponding to the IP address of the secondary name server to be used by the module
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getSecondaryDNS() throws YAPI_Exception
@@ -615,11 +573,11 @@ public class YNetwork extends YFunction
      * Changes the IP address of the secondary name server to be used by the module.
      * When using DHCP, if a value is specified, it overrides the value received from the DHCP server.
      * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
-     * 
+     *
      * @param newval : a string corresponding to the IP address of the secondary name server to be used by the module
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_secondaryDNS(String  newval)  throws YAPI_Exception
@@ -634,11 +592,11 @@ public class YNetwork extends YFunction
      * Changes the IP address of the secondary name server to be used by the module.
      * When using DHCP, if a value is specified, it overrides the value received from the DHCP server.
      * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
-     * 
+     *
      * @param newval : a string corresponding to the IP address of the secondary name server to be used by the module
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setSecondaryDNS(String newval)  throws YAPI_Exception
@@ -648,15 +606,15 @@ public class YNetwork extends YFunction
     /**
      * Returns a hash string if a password has been set for "user" user,
      * or an empty string otherwise.
-     * 
+     *
      * @return a string corresponding to a hash string if a password has been set for "user" user,
      *         or an empty string otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_userPassword() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return USERPASSWORD_INVALID;
             }
@@ -667,10 +625,10 @@ public class YNetwork extends YFunction
     /**
      * Returns a hash string if a password has been set for "user" user,
      * or an empty string otherwise.
-     * 
+     *
      * @return a string corresponding to a hash string if a password has been set for "user" user,
      *         or an empty string otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getUserPassword() throws YAPI_Exception
@@ -683,11 +641,11 @@ public class YNetwork extends YFunction
      * empty string, a password is not required anymore.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the password for the "user" user
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_userPassword(String  newval)  throws YAPI_Exception
@@ -704,11 +662,11 @@ public class YNetwork extends YFunction
      * empty string, a password is not required anymore.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the password for the "user" user
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setUserPassword(String newval)  throws YAPI_Exception
@@ -718,15 +676,15 @@ public class YNetwork extends YFunction
     /**
      * Returns a hash string if a password has been set for user "admin",
      * or an empty string otherwise.
-     * 
+     *
      * @return a string corresponding to a hash string if a password has been set for user "admin",
      *         or an empty string otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_adminPassword() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ADMINPASSWORD_INVALID;
             }
@@ -737,10 +695,10 @@ public class YNetwork extends YFunction
     /**
      * Returns a hash string if a password has been set for user "admin",
      * or an empty string otherwise.
-     * 
+     *
      * @return a string corresponding to a hash string if a password has been set for user "admin",
      *         or an empty string otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getAdminPassword() throws YAPI_Exception
@@ -753,11 +711,11 @@ public class YNetwork extends YFunction
      * empty string, a password is not required anymore.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the password for the "admin" user
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_adminPassword(String  newval)  throws YAPI_Exception
@@ -774,11 +732,11 @@ public class YNetwork extends YFunction
      * empty string, a password is not required anymore.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the password for the "admin" user
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setAdminPassword(String newval)  throws YAPI_Exception
@@ -788,16 +746,16 @@ public class YNetwork extends YFunction
     /**
      * Returns the activation state of the multicast announce protocols to allow easy
      * discovery of the module in the network neighborhood (uPnP/Bonjour protocol).
-     * 
-     * @return either YNetwork.DISCOVERABLE_FALSE or YNetwork.DISCOVERABLE_TRUE, according to the
+     *
+     *  @return either YNetwork.DISCOVERABLE_FALSE or YNetwork.DISCOVERABLE_TRUE, according to the
      * activation state of the multicast announce protocols to allow easy
      *         discovery of the module in the network neighborhood (uPnP/Bonjour protocol)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_discoverable() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISCOVERABLE_INVALID;
             }
@@ -808,11 +766,11 @@ public class YNetwork extends YFunction
     /**
      * Returns the activation state of the multicast announce protocols to allow easy
      * discovery of the module in the network neighborhood (uPnP/Bonjour protocol).
-     * 
-     * @return either Y_DISCOVERABLE_FALSE or Y_DISCOVERABLE_TRUE, according to the activation state of
+     *
+     *  @return either Y_DISCOVERABLE_FALSE or Y_DISCOVERABLE_TRUE, according to the activation state of
      * the multicast announce protocols to allow easy
      *         discovery of the module in the network neighborhood (uPnP/Bonjour protocol)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getDiscoverable() throws YAPI_Exception
@@ -822,13 +780,13 @@ public class YNetwork extends YFunction
     /**
      * Changes the activation state of the multicast announce protocols to allow easy
      * discovery of the module in the network neighborhood (uPnP/Bonjour protocol).
-     * 
-     * @param newval : either YNetwork.DISCOVERABLE_FALSE or YNetwork.DISCOVERABLE_TRUE, according to the
+     *
+     *  @param newval : either YNetwork.DISCOVERABLE_FALSE or YNetwork.DISCOVERABLE_TRUE, according to the
      * activation state of the multicast announce protocols to allow easy
      *         discovery of the module in the network neighborhood (uPnP/Bonjour protocol)
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_discoverable(int  newval)  throws YAPI_Exception
@@ -842,13 +800,13 @@ public class YNetwork extends YFunction
     /**
      * Changes the activation state of the multicast announce protocols to allow easy
      * discovery of the module in the network neighborhood (uPnP/Bonjour protocol).
-     * 
-     * @param newval : either Y_DISCOVERABLE_FALSE or Y_DISCOVERABLE_TRUE, according to the activation
+     *
+     *  @param newval : either Y_DISCOVERABLE_FALSE or Y_DISCOVERABLE_TRUE, according to the activation
      * state of the multicast announce protocols to allow easy
      *         discovery of the module in the network neighborhood (uPnP/Bonjour protocol)
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setDiscoverable(int newval)  throws YAPI_Exception
@@ -859,16 +817,16 @@ public class YNetwork extends YFunction
      * Returns the allowed downtime of the WWW link (in seconds) before triggering an automated
      * reboot to try to recover Internet connectivity. A zero value disables automated reboot
      * in case of Internet connectivity loss.
-     * 
-     * @return an integer corresponding to the allowed downtime of the WWW link (in seconds) before
+     *
+     *  @return an integer corresponding to the allowed downtime of the WWW link (in seconds) before
      * triggering an automated
      *         reboot to try to recover Internet connectivity
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_wwwWatchdogDelay() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WWWWATCHDOGDELAY_INVALID;
             }
@@ -880,11 +838,11 @@ public class YNetwork extends YFunction
      * Returns the allowed downtime of the WWW link (in seconds) before triggering an automated
      * reboot to try to recover Internet connectivity. A zero value disables automated reboot
      * in case of Internet connectivity loss.
-     * 
-     * @return an integer corresponding to the allowed downtime of the WWW link (in seconds) before
+     *
+     *  @return an integer corresponding to the allowed downtime of the WWW link (in seconds) before
      * triggering an automated
      *         reboot to try to recover Internet connectivity
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getWwwWatchdogDelay() throws YAPI_Exception
@@ -896,13 +854,13 @@ public class YNetwork extends YFunction
      * reboot to try to recover Internet connectivity. A zero value disables automated reboot
      * in case of Internet connectivity loss. The smallest valid non-zero timeout is
      * 90 seconds.
-     * 
-     * @param newval : an integer corresponding to the allowed downtime of the WWW link (in seconds)
+     *
+     *  @param newval : an integer corresponding to the allowed downtime of the WWW link (in seconds)
      * before triggering an automated
      *         reboot to try to recover Internet connectivity
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_wwwWatchdogDelay(int  newval)  throws YAPI_Exception
@@ -918,13 +876,13 @@ public class YNetwork extends YFunction
      * reboot to try to recover Internet connectivity. A zero value disables automated reboot
      * in case of Internet connectivity loss. The smallest valid non-zero timeout is
      * 90 seconds.
-     * 
-     * @param newval : an integer corresponding to the allowed downtime of the WWW link (in seconds)
+     *
+     *  @param newval : an integer corresponding to the allowed downtime of the WWW link (in seconds)
      * before triggering an automated
      *         reboot to try to recover Internet connectivity
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setWwwWatchdogDelay(int newval)  throws YAPI_Exception
@@ -933,14 +891,14 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the callback URL to notify of significant state changes.
-     * 
+     *
      * @return a string corresponding to the callback URL to notify of significant state changes
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_callbackUrl() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKURL_INVALID;
             }
@@ -950,9 +908,9 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the callback URL to notify of significant state changes.
-     * 
+     *
      * @return a string corresponding to the callback URL to notify of significant state changes
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getCallbackUrl() throws YAPI_Exception
@@ -962,11 +920,11 @@ public class YNetwork extends YFunction
     /**
      * Changes the callback URL to notify significant state changes. Remember to call the
      * saveToFlash() method of the module if the modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the callback URL to notify significant state changes
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_callbackUrl(String  newval)  throws YAPI_Exception
@@ -980,11 +938,11 @@ public class YNetwork extends YFunction
     /**
      * Changes the callback URL to notify significant state changes. Remember to call the
      * saveToFlash() method of the module if the modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the callback URL to notify significant state changes
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setCallbackUrl(String newval)  throws YAPI_Exception
@@ -993,16 +951,16 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the HTTP method used to notify callbacks for significant state changes.
-     * 
-     * @return a value among YNetwork.CALLBACKMETHOD_POST, YNetwork.CALLBACKMETHOD_GET and
-     * YNetwork.CALLBACKMETHOD_PUT corresponding to the HTTP method used to notify callbacks for
+     *
+     *  @return a value among YNetwork.CALLBACKMETHOD_POST, YNetwork.CALLBACKMETHOD_GET and
+     *  YNetwork.CALLBACKMETHOD_PUT corresponding to the HTTP method used to notify callbacks for
      * significant state changes
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_callbackMethod() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKMETHOD_INVALID;
             }
@@ -1012,10 +970,10 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the HTTP method used to notify callbacks for significant state changes.
-     * 
-     * @return a value among Y_CALLBACKMETHOD_POST, Y_CALLBACKMETHOD_GET and Y_CALLBACKMETHOD_PUT
+     *
+     *  @return a value among Y_CALLBACKMETHOD_POST, Y_CALLBACKMETHOD_GET and Y_CALLBACKMETHOD_PUT
      * corresponding to the HTTP method used to notify callbacks for significant state changes
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getCallbackMethod() throws YAPI_Exception
@@ -1024,13 +982,13 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the HTTP method used to notify callbacks for significant state changes.
-     * 
-     * @param newval : a value among YNetwork.CALLBACKMETHOD_POST, YNetwork.CALLBACKMETHOD_GET and
-     * YNetwork.CALLBACKMETHOD_PUT corresponding to the HTTP method used to notify callbacks for
+     *
+     *  @param newval : a value among YNetwork.CALLBACKMETHOD_POST, YNetwork.CALLBACKMETHOD_GET and
+     *  YNetwork.CALLBACKMETHOD_PUT corresponding to the HTTP method used to notify callbacks for
      * significant state changes
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_callbackMethod(int  newval)  throws YAPI_Exception
@@ -1043,12 +1001,12 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the HTTP method used to notify callbacks for significant state changes.
-     * 
-     * @param newval : a value among Y_CALLBACKMETHOD_POST, Y_CALLBACKMETHOD_GET and Y_CALLBACKMETHOD_PUT
+     *
+     *  @param newval : a value among Y_CALLBACKMETHOD_POST, Y_CALLBACKMETHOD_GET and Y_CALLBACKMETHOD_PUT
      * corresponding to the HTTP method used to notify callbacks for significant state changes
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setCallbackMethod(int newval)  throws YAPI_Exception
@@ -1057,17 +1015,17 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the encoding standard to use for representing notification values.
-     * 
-     * @return a value among YNetwork.CALLBACKENCODING_FORM, YNetwork.CALLBACKENCODING_JSON,
-     * YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV and
-     * YNetwork.CALLBACKENCODING_YOCTO_API corresponding to the encoding standard to use for representing
+     *
+     *  @return a value among YNetwork.CALLBACKENCODING_FORM, YNetwork.CALLBACKENCODING_JSON,
+     *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV and
+     *  YNetwork.CALLBACKENCODING_YOCTO_API corresponding to the encoding standard to use for representing
      * notification values
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_callbackEncoding() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKENCODING_INVALID;
             }
@@ -1077,11 +1035,11 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the encoding standard to use for representing notification values.
-     * 
-     * @return a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
-     * Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV and Y_CALLBACKENCODING_YOCTO_API
+     *
+     *  @return a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
+     *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV and Y_CALLBACKENCODING_YOCTO_API
      * corresponding to the encoding standard to use for representing notification values
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getCallbackEncoding() throws YAPI_Exception
@@ -1090,14 +1048,14 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the encoding standard to use for representing notification values.
-     * 
-     * @param newval : a value among YNetwork.CALLBACKENCODING_FORM, YNetwork.CALLBACKENCODING_JSON,
-     * YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV and
-     * YNetwork.CALLBACKENCODING_YOCTO_API corresponding to the encoding standard to use for representing
+     *
+     *  @param newval : a value among YNetwork.CALLBACKENCODING_FORM, YNetwork.CALLBACKENCODING_JSON,
+     *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV and
+     *  YNetwork.CALLBACKENCODING_YOCTO_API corresponding to the encoding standard to use for representing
      * notification values
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_callbackEncoding(int  newval)  throws YAPI_Exception
@@ -1110,13 +1068,13 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the encoding standard to use for representing notification values.
-     * 
-     * @param newval : a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
-     * Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV and Y_CALLBACKENCODING_YOCTO_API
+     *
+     *  @param newval : a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
+     *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV and Y_CALLBACKENCODING_YOCTO_API
      * corresponding to the encoding standard to use for representing notification values
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setCallbackEncoding(int newval)  throws YAPI_Exception
@@ -1126,15 +1084,15 @@ public class YNetwork extends YFunction
     /**
      * Returns a hashed version of the notification callback credentials if set,
      * or an empty string otherwise.
-     * 
+     *
      * @return a string corresponding to a hashed version of the notification callback credentials if set,
      *         or an empty string otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_callbackCredentials() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKCREDENTIALS_INVALID;
             }
@@ -1145,10 +1103,10 @@ public class YNetwork extends YFunction
     /**
      * Returns a hashed version of the notification callback credentials if set,
      * or an empty string otherwise.
-     * 
+     *
      * @return a string corresponding to a hashed version of the notification callback credentials if set,
      *         or an empty string otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getCallbackCredentials() throws YAPI_Exception
@@ -1165,11 +1123,11 @@ public class YNetwork extends YFunction
      * way to configure callback credentials, use function callbackLogin instead.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the credentials required to connect to the callback address
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_callbackCredentials(String  newval)  throws YAPI_Exception
@@ -1190,11 +1148,11 @@ public class YNetwork extends YFunction
      * way to configure callback credentials, use function callbackLogin instead.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the credentials required to connect to the callback address
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setCallbackCredentials(String newval)  throws YAPI_Exception
@@ -1206,12 +1164,12 @@ public class YNetwork extends YFunction
      * log into it. The password is not stored into the module, only a hashed
      * copy of the credentials are saved. Remember to call the
      * saveToFlash() method of the module if the modification must be kept.
-     * 
+     *
      * @param username : username required to log to the callback
      * @param password : password required to log to the callback
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int callbackLogin(String username,String password)  throws YAPI_Exception
@@ -1224,14 +1182,14 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the minimum waiting time between two callback notifications, in seconds.
-     * 
+     *
      * @return an integer corresponding to the minimum waiting time between two callback notifications, in seconds
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_callbackMinDelay() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKMINDELAY_INVALID;
             }
@@ -1241,9 +1199,9 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the minimum waiting time between two callback notifications, in seconds.
-     * 
+     *
      * @return an integer corresponding to the minimum waiting time between two callback notifications, in seconds
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getCallbackMinDelay() throws YAPI_Exception
@@ -1252,12 +1210,12 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the minimum waiting time between two callback notifications, in seconds.
-     * 
-     * @param newval : an integer corresponding to the minimum waiting time between two callback
+     *
+     *  @param newval : an integer corresponding to the minimum waiting time between two callback
      * notifications, in seconds
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_callbackMinDelay(int  newval)  throws YAPI_Exception
@@ -1270,12 +1228,12 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the minimum waiting time between two callback notifications, in seconds.
-     * 
-     * @param newval : an integer corresponding to the minimum waiting time between two callback
+     *
+     *  @param newval : an integer corresponding to the minimum waiting time between two callback
      * notifications, in seconds
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setCallbackMinDelay(int newval)  throws YAPI_Exception
@@ -1284,14 +1242,14 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the maximum waiting time between two callback notifications, in seconds.
-     * 
+     *
      * @return an integer corresponding to the maximum waiting time between two callback notifications, in seconds
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_callbackMaxDelay() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALLBACKMAXDELAY_INVALID;
             }
@@ -1301,9 +1259,9 @@ public class YNetwork extends YFunction
 
     /**
      * Returns the maximum waiting time between two callback notifications, in seconds.
-     * 
+     *
      * @return an integer corresponding to the maximum waiting time between two callback notifications, in seconds
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getCallbackMaxDelay() throws YAPI_Exception
@@ -1312,12 +1270,12 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the maximum waiting time between two callback notifications, in seconds.
-     * 
-     * @param newval : an integer corresponding to the maximum waiting time between two callback
+     *
+     *  @param newval : an integer corresponding to the maximum waiting time between two callback
      * notifications, in seconds
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_callbackMaxDelay(int  newval)  throws YAPI_Exception
@@ -1330,12 +1288,12 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the maximum waiting time between two callback notifications, in seconds.
-     * 
-     * @param newval : an integer corresponding to the maximum waiting time between two callback
+     *
+     *  @param newval : an integer corresponding to the maximum waiting time between two callback
      * notifications, in seconds
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setCallbackMaxDelay(int newval)  throws YAPI_Exception
@@ -1346,15 +1304,15 @@ public class YNetwork extends YFunction
      * Returns the current consumed by the module from Power-over-Ethernet (PoE), in milli-amps.
      * The current consumption is measured after converting PoE source to 5 Volt, and should
      * never exceed 1800 mA.
-     * 
-     * @return an integer corresponding to the current consumed by the module from Power-over-Ethernet
+     *
+     *  @return an integer corresponding to the current consumed by the module from Power-over-Ethernet
      * (PoE), in milli-amps
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_poeCurrent() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POECURRENT_INVALID;
             }
@@ -1366,10 +1324,10 @@ public class YNetwork extends YFunction
      * Returns the current consumed by the module from Power-over-Ethernet (PoE), in milli-amps.
      * The current consumption is measured after converting PoE source to 5 Volt, and should
      * never exceed 1800 mA.
-     * 
-     * @return an integer corresponding to the current consumed by the module from Power-over-Ethernet
+     *
+     *  @return an integer corresponding to the current consumed by the module from Power-over-Ethernet
      * (PoE), in milli-amps
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPoeCurrent() throws YAPI_Exception
@@ -1386,7 +1344,7 @@ public class YNetwork extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the network interface is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YNetwork.isOnline() to test if the network interface is
@@ -1394,9 +1352,9 @@ public class YNetwork extends YFunction
      * a network interface by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the network interface
-     * 
+     *
      * @return a YNetwork object allowing you to drive the network interface.
      */
     public static YNetwork FindNetwork(String func)
@@ -1415,11 +1373,11 @@ public class YNetwork extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -1452,12 +1410,49 @@ public class YNetwork extends YFunction
     }
 
     /**
+     * Changes the configuration of the network interface to enable the use of an
+     * IP address received from a DHCP server. Until an address is received from a DHCP
+     * server, the module uses the IP parameters specified to this function.
+     * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
+     *
+     * @param fallbackIpAddr : fallback IP address, to be used when no DHCP reply is received
+     * @param fallbackSubnetMaskLen : fallback subnet mask length when no DHCP reply is received, as an
+     *         integer (eg. 24 means 255.255.255.0)
+     * @param fallbackRouter : fallback router IP address, to be used when no DHCP reply is received
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int useDHCP(String fallbackIpAddr,int fallbackSubnetMaskLen,String fallbackRouter) throws YAPI_Exception
+    {
+        return set_ipConfig(String.format("DHCP:%s/%d/%s", fallbackIpAddr, fallbackSubnetMaskLen,fallbackRouter));
+    }
+
+    /**
+     * Changes the configuration of the network interface to use a static IP address.
+     * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
+     *
+     * @param ipAddress : device IP address
+     * @param subnetMaskLen : subnet mask length, as an integer (eg. 24 means 255.255.255.0)
+     * @param router : router IP address (default gateway)
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int useStaticIP(String ipAddress,int subnetMaskLen,String router) throws YAPI_Exception
+    {
+        return set_ipConfig(String.format("STATIC:%s/%d/%s", ipAddress, subnetMaskLen,router));
+    }
+
+    /**
      * Pings str_host to test the network connectivity. Sends four ICMP ECHO_REQUEST requests from the
      * module to the target str_host. This method returns a string with the result of the
      * 4 ICMP ECHO_REQUEST requests.
-     * 
+     *
      * @param host : the hostname or the IP address of the target
-     * 
+     *
      * @return a string with the result of the ping.
      */
     public String ping(String host) throws YAPI_Exception
@@ -1470,7 +1465,7 @@ public class YNetwork extends YFunction
 
     /**
      * Continues the enumeration of network interfaces started using yFirstNetwork().
-     * 
+     *
      * @return a pointer to a YNetwork object, corresponding to
      *         a network interface currently online, or a null pointer
      *         if there are no more network interfaces to enumerate.
@@ -1492,7 +1487,7 @@ public class YNetwork extends YFunction
      * Starts the enumeration of network interfaces currently accessible.
      * Use the method YNetwork.nextNetwork() to iterate on
      * next network interfaces.
-     * 
+     *
      * @return a pointer to a YNetwork object, corresponding to
      *         the first network interface currently online, or a null pointer
      *         if there are none.

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTilt.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YTilt.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindTilt(), the high-level API for Tilt functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YTilt class start)
 /**
  * YTilt Class: Tilt function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YTilt extends YSensor
 {
 //--- (end of YTilt class start)
@@ -72,7 +73,7 @@ public class YTilt extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -84,7 +85,7 @@ public class YTilt extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -94,7 +95,7 @@ public class YTilt extends YSensor
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YTilt(String func)
@@ -120,7 +121,7 @@ public class YTilt extends YSensor
      */
     public int get_axis() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AXIS_INVALID;
             }
@@ -145,7 +146,7 @@ public class YTilt extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the tilt sensor is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YTilt.isOnline() to test if the tilt sensor is
@@ -153,9 +154,9 @@ public class YTilt extends YSensor
      * a tilt sensor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the tilt sensor
-     * 
+     *
      * @return a YTilt object allowing you to drive the tilt sensor.
      */
     public static YTilt FindTilt(String func)
@@ -174,11 +175,11 @@ public class YTilt extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -215,11 +216,11 @@ public class YTilt extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -245,7 +246,7 @@ public class YTilt extends YSensor
 
     /**
      * Continues the enumeration of tilt sensors started using yFirstTilt().
-     * 
+     *
      * @return a pointer to a YTilt object, corresponding to
      *         a tilt sensor currently online, or a null pointer
      *         if there are no more tilt sensors to enumerate.
@@ -267,7 +268,7 @@ public class YTilt extends YSensor
      * Starts the enumeration of tilt sensors currently accessible.
      * Use the method YTilt.nextTilt() to iterate on
      * next tilt sensors.
-     * 
+     *
      * @return a pointer to a YTilt object, corresponding to
      *         the first tilt sensor currently online, or a null pointer
      *         if there are none.

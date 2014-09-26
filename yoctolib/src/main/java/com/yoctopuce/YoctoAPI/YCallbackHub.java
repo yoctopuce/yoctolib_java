@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCallbackHub.java 15826 2014-04-16 17:13:43Z seb $
+ * $Id: YCallbackHub.java 17831 2014-09-25 16:31:39Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -39,9 +39,11 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,9 +52,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 public class YCallbackHub extends YGenericHub{
     private final Object    _authLock=new Object();
@@ -64,7 +65,7 @@ public class YCallbackHub extends YGenericHub{
     private byte[] b;
 
     YCallbackHub(int idx, HTTPParams httpParams, InputStream request, OutputStream response) throws YAPI_Exception {
-        super(idx);
+        super(idx,true);
         _http_params = httpParams;
         _in = request;
         _out = response;
@@ -309,7 +310,14 @@ public class YCallbackHub extends YGenericHub{
         now = YAPI.GetTickCount();
         _devListExpires = now + _devListValidity;
     }
-    
+
+    @Override
+    ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception, InterruptedException
+    {
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Firmware update is not supported in HTTP callback");
+    }
+
+
     @Override
     void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception
     {

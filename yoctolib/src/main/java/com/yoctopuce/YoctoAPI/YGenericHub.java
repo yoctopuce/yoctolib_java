@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericHub.java 15826 2014-04-16 17:13:43Z seb $
+ * $Id: YGenericHub.java 17831 2014-09-25 16:31:39Z seb $
  *
  * Internal YGenericHub object
  *
@@ -51,16 +51,17 @@ abstract class YGenericHub {
     protected int _hubidx;
     protected long _notifyTrigger = 0;
     protected Object _notifyHandle = null;
-    protected long _devListValidity = 500;
+    protected volatile long _devListValidity = 500;
     protected long _devListExpires = 0;
     protected HashMap<Integer, String> _serialByYdx = new HashMap<Integer, String>();
     protected HashMap<String, YDevice> _devices = new HashMap< String, YDevice>();
     //protected ArrayList<WPEntry> wpages = new ArrayList<WPEntry>();
-    protected boolean _reportConnnectionLost=true;
+    protected final boolean _reportConnnectionLost;
 
-    public YGenericHub(int idx)
+    public YGenericHub(int idx, boolean reportConnnectionLost)
     {
         _hubidx = idx;
+        _reportConnnectionLost = reportConnnectionLost;
     }
 
     abstract void release();
@@ -74,13 +75,13 @@ abstract class YGenericHub {
 
     protected void updateFromWpAndYp(ArrayList<WPEntry> whitePages, HashMap<String, ArrayList<YPEntry>> yellowPages) throws YAPI_Exception
     {
-        // by default consider all known device as unpluged
+        // by default consider all known device as unplugged
         ArrayList<YDevice> toRemove = new ArrayList<YDevice>(_devices.values());
  
         for (WPEntry wp : whitePages) {
             String serial = wp.getSerialNumber();
             if (_devices.containsKey(serial)) {
-                // allready there
+                // already there
                 YDevice currdev = _devices.get(serial);
                 if (!currdev.getLogicalName().equals(wp.getLogicalName())) {
                     // Reindex device from its own data
@@ -94,42 +95,44 @@ abstract class YGenericHub {
                 YDevice dev = new YDevice(this, wp, yellowPages);
                 _devices.put(serial, dev);
                 SafeYAPI().pushPlugEvent(Event.PLUG, serial);
-            	SafeYAPI()._Log("HUB: device "+serial+" has been pluged\n");
+            	SafeYAPI()._Log("HUB: device "+serial+" has been plugged\n");
             }
         }
         
         for (YDevice dev : toRemove) {
         	String serial = dev.getSerialNumber();
             SafeYAPI().pushPlugEvent(Event.UNPLUG, serial);
-        	SafeYAPI()._Log("HUB: device "+serial+" has been unpluged\n");
+        	SafeYAPI()._Log("HUB: device "+serial+" has been unplugged\n");
         	_devices.remove(serial);
         }
     }
 
     abstract void updateDeviceList(boolean forceupdate) throws YAPI_Exception;
 
+    interface UpdateProgress
+    {
+        public  void firmware_progress(int percent, String message);
+    }
+    abstract ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception, InterruptedException;
+
 
     interface RequestAsyncResult {
-        void RequestAsyncDone(Object context, byte[] result);
+        void RequestAsyncDone(Object context, byte[] result, int error, String errmsg );
     }
-    abstract void devRequestAsync(YDevice device,String req_first_line,byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception;
+    abstract  void devRequestAsync(YDevice device,String req_first_line,byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception;
 
     abstract byte[] devRequestSync(YDevice device,String req_first_line,byte[] req_head_and_body) throws YAPI_Exception;
 
-    void reportConnectionLost(boolean reportConnnectionLost)
-    {
-        _reportConnnectionLost = reportConnnectionLost;
-    }
+
 
     protected static class HTTPParams {
 
-        private String _host = "";
-        private int _port = 4444;
-        private String _user = "";
-        private String _pass = "";
+        private final String _host;
+        private final int _port;
+        private final String _user;
+        private final String _pass;
 
         public  HTTPParams(String url) {
-            super();
             int pos = 0;
             if (url.startsWith("http://")) {
                 pos = 7;
@@ -140,6 +143,9 @@ abstract class YGenericHub {
                 _user = url.substring(pos, end_user);
                 _pass = url.substring(end_user + 1, end_auth);
                 pos = end_auth + 1;
+            } else {
+                _user = "";
+                _pass = "";
             }
             int end_url = url.indexOf('/', pos);
             if (end_url < 0) {
@@ -151,6 +157,7 @@ abstract class YGenericHub {
                 _port = Integer.parseInt(url.substring(portpos + 1, end_url));
             } else {
                 _host = url.substring(pos, end_url);
+                _port = 4444;
             }
         }
 

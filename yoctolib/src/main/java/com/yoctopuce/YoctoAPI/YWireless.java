@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YWireless.java 17594 2014-09-10 21:15:55Z mvuilleu $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -47,10 +47,11 @@ import org.json.JSONObject;
 //--- (generated code: YWireless class start)
 /**
  * YWireless Class: Wireless function interface
- * 
+ *
  * YWireless functions provides control over wireless network parameters
  * and status for devices that are wireless-enabled.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YWireless extends YFunction
 {
 //--- (end of generated code: YWireless class start)
@@ -100,7 +101,7 @@ public class YWireless extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -112,7 +113,7 @@ public class YWireless extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -139,7 +140,7 @@ public class YWireless extends YFunction
             _linkQuality =  json_val.getInt("linkQuality");
         }
         if (json_val.has("ssid")) {
-            _ssid =  json_val.getString("ssid"); ;
+            _ssid =  json_val.getString("ssid");
         }
         if (json_val.has("channel")) {
             _channel =  json_val.getInt("channel");
@@ -148,24 +149,24 @@ public class YWireless extends YFunction
             _security =  json_val.getInt("security");
         }
         if (json_val.has("message")) {
-            _message =  json_val.getString("message"); ;
+            _message =  json_val.getString("message");
         }
         if (json_val.has("wlanConfig")) {
-            _wlanConfig =  json_val.getString("wlanConfig"); ;
+            _wlanConfig =  json_val.getString("wlanConfig");
         }
         super._parseAttr(json_val);
     }
 
     /**
      * Returns the link quality, expressed in percent.
-     * 
+     *
      * @return an integer corresponding to the link quality, expressed in percent
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_linkQuality() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LINKQUALITY_INVALID;
             }
@@ -175,9 +176,9 @@ public class YWireless extends YFunction
 
     /**
      * Returns the link quality, expressed in percent.
-     * 
+     *
      * @return an integer corresponding to the link quality, expressed in percent
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getLinkQuality() throws YAPI_Exception
@@ -186,14 +187,14 @@ public class YWireless extends YFunction
 
     /**
      * Returns the wireless network name (SSID).
-     * 
+     *
      * @return a string corresponding to the wireless network name (SSID)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_ssid() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SSID_INVALID;
             }
@@ -203,9 +204,9 @@ public class YWireless extends YFunction
 
     /**
      * Returns the wireless network name (SSID).
-     * 
+     *
      * @return a string corresponding to the wireless network name (SSID)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getSsid() throws YAPI_Exception
@@ -214,15 +215,15 @@ public class YWireless extends YFunction
 
     /**
      * Returns the 802.11 channel currently used, or 0 when the selected network has not been found.
-     * 
-     * @return an integer corresponding to the 802.11 channel currently used, or 0 when the selected
+     *
+     *  @return an integer corresponding to the 802.11 channel currently used, or 0 when the selected
      * network has not been found
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_channel() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CHANNEL_INVALID;
             }
@@ -232,10 +233,10 @@ public class YWireless extends YFunction
 
     /**
      * Returns the 802.11 channel currently used, or 0 when the selected network has not been found.
-     * 
-     * @return an integer corresponding to the 802.11 channel currently used, or 0 when the selected
+     *
+     *  @return an integer corresponding to the 802.11 channel currently used, or 0 when the selected
      * network has not been found
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getChannel() throws YAPI_Exception
@@ -244,16 +245,16 @@ public class YWireless extends YFunction
 
     /**
      * Returns the security algorithm used by the selected wireless network.
-     * 
-     * @return a value among YWireless.SECURITY_UNKNOWN, YWireless.SECURITY_OPEN, YWireless.SECURITY_WEP,
-     * YWireless.SECURITY_WPA and YWireless.SECURITY_WPA2 corresponding to the security algorithm used by
+     *
+     *  @return a value among YWireless.SECURITY_UNKNOWN, YWireless.SECURITY_OPEN, YWireless.SECURITY_WEP,
+     *  YWireless.SECURITY_WPA and YWireless.SECURITY_WPA2 corresponding to the security algorithm used by
      * the selected wireless network
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_security() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SECURITY_INVALID;
             }
@@ -263,10 +264,10 @@ public class YWireless extends YFunction
 
     /**
      * Returns the security algorithm used by the selected wireless network.
-     * 
-     * @return a value among Y_SECURITY_UNKNOWN, Y_SECURITY_OPEN, Y_SECURITY_WEP, Y_SECURITY_WPA and
+     *
+     *  @return a value among Y_SECURITY_UNKNOWN, Y_SECURITY_OPEN, Y_SECURITY_WEP, Y_SECURITY_WPA and
      * Y_SECURITY_WPA2 corresponding to the security algorithm used by the selected wireless network
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getSecurity() throws YAPI_Exception
@@ -275,14 +276,14 @@ public class YWireless extends YFunction
 
     /**
      * Returns the latest status message from the wireless interface.
-     * 
+     *
      * @return a string corresponding to the latest status message from the wireless interface
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_message() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MESSAGE_INVALID;
             }
@@ -292,9 +293,9 @@ public class YWireless extends YFunction
 
     /**
      * Returns the latest status message from the wireless interface.
-     * 
+     *
      * @return a string corresponding to the latest status message from the wireless interface
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getMessage() throws YAPI_Exception
@@ -306,7 +307,7 @@ public class YWireless extends YFunction
      */
     public String get_wlanConfig() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WLANCONFIG_INVALID;
             }
@@ -334,48 +335,6 @@ public class YWireless extends YFunction
     { return set_wlanConfig(newval); }
 
     /**
-     * Changes the configuration of the wireless lan interface to connect to an existing
-     * access point (infrastructure mode).
-     * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
-     * 
-     * @param ssid : the name of the network to connect to
-     * @param securityKey : the network key, as a character string
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception on error
-     */
-    public int joinNetwork(String ssid,String securityKey)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = String.format("INFRA:%s\\%s", ssid.toString(), securityKey.toString());
-        _setAttr("wlanConfig",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the configuration of the wireless lan interface to create an ad-hoc
-     * wireless network, without using an access point. If a security key is specified,
-     * the network is protected by WEP128, since WPA is not standardized for
-     * ad-hoc networks.
-     * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
-     * 
-     * @param ssid : the name of the network to connect to
-     * @param securityKey : the network key, as a character string
-     * 
-     * @return YAPI.SUCCESS if the call succeeds.
-     * 
-     * @throws YAPI_Exception on error
-     */
-    public int adhocNetwork(String ssid,String securityKey)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = String.format("ADHOC:%s\\%s", ssid.toString(), securityKey.toString());
-        _setAttr("wlanConfig",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
      * Retrieves a wireless lan interface for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
@@ -385,7 +344,7 @@ public class YWireless extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the wireless lan interface is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YWireless.isOnline() to test if the wireless lan interface is
@@ -393,9 +352,9 @@ public class YWireless extends YFunction
      * a wireless lan interface by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the wireless lan interface
-     * 
+     *
      * @return a YWireless object allowing you to drive the wireless lan interface.
      */
     public static YWireless FindWireless(String func)
@@ -414,11 +373,11 @@ public class YWireless extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -451,14 +410,79 @@ public class YWireless extends YFunction
     }
 
     /**
+     * Changes the configuration of the wireless lan interface to connect to an existing
+     * access point (infrastructure mode).
+     * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
+     *
+     * @param ssid : the name of the network to connect to
+     * @param securityKey : the network key, as a character string
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int joinNetwork(String ssid,String securityKey) throws YAPI_Exception
+    {
+        return set_wlanConfig(String.format("INFRA:%s\\%s", ssid,securityKey));
+    }
+
+    /**
+     * Changes the configuration of the wireless lan interface to create an ad-hoc
+     * wireless network, without using an access point. On the YoctoHub-Wireless-g,
+     * it is best to use softAPNetworkInstead(), which emulates an access point
+     * (Soft AP) which is more efficient and more widely supported than ad-hoc networks.
+     *
+     * When a security key is specified for an ad-hoc network, the network is protected
+     * by a WEP40 key (5 characters or 10 hexadecimal digits) or WEP128 key (13 characters
+     * or 26 hexadecimal digits). It is recommended to use a well-randomized WEP128 key
+     * using 26 hexadecimal digits to maximize security.
+     * Remember to call the saveToFlash() method and then to reboot the module
+     * to apply this setting.
+     *
+     * @param ssid : the name of the network to connect to
+     * @param securityKey : the network key, as a character string
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int adhocNetwork(String ssid,String securityKey) throws YAPI_Exception
+    {
+        return set_wlanConfig(String.format("ADHOC:%s\\%s", ssid,securityKey));
+    }
+
+    /**
+     * Changes the configuration of the wireless lan interface to create a new wireless
+     * network by emulating a WiFi access point (Soft AP). This function can only be
+     * used with the YoctoHub-Wireless-g.
+     *
+     * When a security key is specified for a SoftAP network, the network is protected
+     * by a WEP40 key (5 characters or 10 hexadecimal digits) or WEP128 key (13 characters
+     * or 26 hexadecimal digits). It is recommended to use a well-randomized WEP128 key
+     * using 26 hexadecimal digits to maximize security.
+     * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
+     *
+     * @param ssid : the name of the network to connect to
+     * @param securityKey : the network key, as a character string
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int softAPNetwork(String ssid,String securityKey) throws YAPI_Exception
+    {
+        return set_wlanConfig(String.format("SOFTAP:%s\\%s", ssid,securityKey));
+    }
+
+    /**
      * Returns a list of YWlanRecord objects that describe detected Wireless networks.
      * This list is not updated when the module is already connected to an acces point (infrastructure mode).
      * To force an update of this list, adhocNetwork() must be called to disconnect
      * the module from the current network. The returned list must be unallocated by the caller.
-     * 
+     *
      * @return a list of YWlanRecord objects, containing the SSID, channel,
      *         link quality and the type of security of the wireless network.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<YWlanRecord> get_detectedWlans() throws YAPI_Exception
@@ -478,7 +502,7 @@ public class YWireless extends YFunction
 
     /**
      * Continues the enumeration of wireless lan interfaces started using yFirstWireless().
-     * 
+     *
      * @return a pointer to a YWireless object, corresponding to
      *         a wireless lan interface currently online, or a null pointer
      *         if there are no more wireless lan interfaces to enumerate.
@@ -500,7 +524,7 @@ public class YWireless extends YFunction
      * Starts the enumeration of wireless lan interfaces currently accessible.
      * Use the method YWireless.nextWireless() to iterate on
      * next wireless lan interfaces.
-     * 
+     *
      * @return a pointer to a YWireless object, corresponding to
      *         the first wireless lan interface currently online, or a null pointer
      *         if there are none.

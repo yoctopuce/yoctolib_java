@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YRealTimeClock.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -47,12 +47,13 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YRealTimeClock class start)
 /**
  * YRealTimeClock Class: Real Time Clock function interface
- * 
+ *
  * The RealTimeClock function maintains and provides current date and time, even accross power cut
  * lasting several days. It is the base for automated wake-up functions provided by the WakeUpScheduler.
  * The current time may represent a local time as well as an UTC time, but no automatic time change
  * will occur to account for daylight saving time.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YRealTimeClock extends YFunction
 {
 //--- (end of YRealTimeClock class start)
@@ -87,7 +88,7 @@ public class YRealTimeClock extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -99,7 +100,7 @@ public class YRealTimeClock extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -109,7 +110,7 @@ public class YRealTimeClock extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YRealTimeClock(String func)
@@ -128,7 +129,7 @@ public class YRealTimeClock extends YFunction
             _unixTime =  json_val.getLong("unixTime");
         }
         if (json_val.has("dateTime")) {
-            _dateTime =  json_val.getString("dateTime"); ;
+            _dateTime =  json_val.getString("dateTime");
         }
         if (json_val.has("utcOffset")) {
             _utcOffset =  json_val.getInt("utcOffset");
@@ -141,15 +142,15 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Returns the current time in Unix format (number of elapsed seconds since Jan 1st, 1970).
-     * 
-     * @return an integer corresponding to the current time in Unix format (number of elapsed seconds
+     *
+     *  @return an integer corresponding to the current time in Unix format (number of elapsed seconds
      * since Jan 1st, 1970)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_unixTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UNIXTIME_INVALID;
             }
@@ -159,10 +160,10 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Returns the current time in Unix format (number of elapsed seconds since Jan 1st, 1970).
-     * 
-     * @return an integer corresponding to the current time in Unix format (number of elapsed seconds
+     *
+     *  @return an integer corresponding to the current time in Unix format (number of elapsed seconds
      * since Jan 1st, 1970)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getUnixTime() throws YAPI_Exception
@@ -172,11 +173,11 @@ public class YRealTimeClock extends YFunction
     /**
      * Changes the current time. Time is specifid in Unix format (number of elapsed seconds since Jan 1st, 1970).
      * If current UTC time is known, utcOffset will be automatically adjusted for the new specified time.
-     * 
+     *
      * @param newval : an integer corresponding to the current time
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_unixTime(long  newval)  throws YAPI_Exception
@@ -190,11 +191,11 @@ public class YRealTimeClock extends YFunction
     /**
      * Changes the current time. Time is specifid in Unix format (number of elapsed seconds since Jan 1st, 1970).
      * If current UTC time is known, utcOffset will be automatically adjusted for the new specified time.
-     * 
+     *
      * @param newval : an integer corresponding to the current time
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setUnixTime(long newval)  throws YAPI_Exception
@@ -203,14 +204,14 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Returns the current time in the form "YYYY/MM/DD hh:mm:ss"
-     * 
+     *
      * @return a string corresponding to the current time in the form "YYYY/MM/DD hh:mm:ss"
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_dateTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DATETIME_INVALID;
             }
@@ -220,9 +221,9 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Returns the current time in the form "YYYY/MM/DD hh:mm:ss"
-     * 
+     *
      * @return a string corresponding to the current time in the form "YYYY/MM/DD hh:mm:ss"
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getDateTime() throws YAPI_Exception
@@ -231,14 +232,14 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Returns the number of seconds between current time and UTC time (time zone).
-     * 
+     *
      * @return an integer corresponding to the number of seconds between current time and UTC time (time zone)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_utcOffset() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UTCOFFSET_INVALID;
             }
@@ -248,9 +249,9 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Returns the number of seconds between current time and UTC time (time zone).
-     * 
+     *
      * @return an integer corresponding to the number of seconds between current time and UTC time (time zone)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getUtcOffset() throws YAPI_Exception
@@ -260,13 +261,13 @@ public class YRealTimeClock extends YFunction
     /**
      * Changes the number of seconds between current time and UTC time (time zone).
      * The timezone is automatically rounded to the nearest multiple of 15 minutes.
-     * If current UTC time is known, the current time will automatically be updated according to the
+     *  If current UTC time is known, the current time will automatically be updated according to the
      * selected time zone.
-     * 
+     *
      * @param newval : an integer corresponding to the number of seconds between current time and UTC time (time zone)
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_utcOffset(int  newval)  throws YAPI_Exception
@@ -280,13 +281,13 @@ public class YRealTimeClock extends YFunction
     /**
      * Changes the number of seconds between current time and UTC time (time zone).
      * The timezone is automatically rounded to the nearest multiple of 15 minutes.
-     * If current UTC time is known, the current time will automatically be updated according to the
+     *  If current UTC time is known, the current time will automatically be updated according to the
      * selected time zone.
-     * 
+     *
      * @param newval : an integer corresponding to the number of seconds between current time and UTC time (time zone)
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setUtcOffset(int newval)  throws YAPI_Exception
@@ -295,15 +296,15 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Returns true if the clock has been set, and false otherwise.
-     * 
-     * @return either YRealTimeClock.TIMESET_FALSE or YRealTimeClock.TIMESET_TRUE, according to true if
+     *
+     *  @return either YRealTimeClock.TIMESET_FALSE or YRealTimeClock.TIMESET_TRUE, according to true if
      * the clock has been set, and false otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_timeSet() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TIMESET_INVALID;
             }
@@ -313,10 +314,10 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Returns true if the clock has been set, and false otherwise.
-     * 
-     * @return either Y_TIMESET_FALSE or Y_TIMESET_TRUE, according to true if the clock has been set, and
+     *
+     *  @return either Y_TIMESET_FALSE or Y_TIMESET_TRUE, according to true if the clock has been set, and
      * false otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getTimeSet() throws YAPI_Exception
@@ -333,7 +334,7 @@ public class YRealTimeClock extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the clock is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YRealTimeClock.isOnline() to test if the clock is
@@ -341,9 +342,9 @@ public class YRealTimeClock extends YFunction
      * a clock by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the clock
-     * 
+     *
      * @return a YRealTimeClock object allowing you to drive the clock.
      */
     public static YRealTimeClock FindRealTimeClock(String func)
@@ -362,11 +363,11 @@ public class YRealTimeClock extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -400,7 +401,7 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Continues the enumeration of clocks started using yFirstRealTimeClock().
-     * 
+     *
      * @return a pointer to a YRealTimeClock object, corresponding to
      *         a clock currently online, or a null pointer
      *         if there are no more clocks to enumerate.
@@ -422,7 +423,7 @@ public class YRealTimeClock extends YFunction
      * Starts the enumeration of clocks currently accessible.
      * Use the method YRealTimeClock.nextRealTimeClock() to iterate on
      * next clocks.
-     * 
+     *
      * @return a pointer to a YRealTimeClock object, corresponding to
      *         the first clock currently online, or a null pointer
      *         if there are none.

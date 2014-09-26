@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YGenericSensor.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YGenericSensor class start)
 /**
  * YGenericSensor Class: GenericSensor function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YGenericSensor extends YSensor
 {
 //--- (end of YGenericSensor class start)
@@ -71,10 +72,15 @@ public class YGenericSensor extends YSensor
      * invalid valueRange value
      */
     public static final String VALUERANGE_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid signalBias value
+     */
+    public static final double SIGNALBIAS_INVALID = YAPI.INVALID_DOUBLE;
     protected double _signalValue = SIGNALVALUE_INVALID;
     protected String _signalUnit = SIGNALUNIT_INVALID;
     protected String _signalRange = SIGNALRANGE_INVALID;
     protected String _valueRange = VALUERANGE_INVALID;
+    protected double _signalBias = SIGNALBIAS_INVALID;
     protected UpdateCallback _valueCallbackGenericSensor = null;
     protected TimedReportCallback _timedReportCallbackGenericSensor = null;
 
@@ -83,7 +89,7 @@ public class YGenericSensor extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -95,7 +101,7 @@ public class YGenericSensor extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -105,7 +111,7 @@ public class YGenericSensor extends YSensor
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YGenericSensor(String func)
@@ -121,16 +127,19 @@ public class YGenericSensor extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("signalValue")) {
-            _signalValue =  json_val.getDouble("signalValue")/65536.0;
+            _signalValue =  Math.round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("signalUnit")) {
-            _signalUnit =  json_val.getString("signalUnit"); ;
+            _signalUnit =  json_val.getString("signalUnit");
         }
         if (json_val.has("signalRange")) {
-            _signalRange =  json_val.getString("signalRange"); ;
+            _signalRange =  json_val.getString("signalRange");
         }
         if (json_val.has("valueRange")) {
-            _valueRange =  json_val.getString("valueRange"); ;
+            _valueRange =  json_val.getString("valueRange");
+        }
+        if (json_val.has("signalBias")) {
+            _signalBias =  Math.round(json_val.getDouble("signalBias") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
     }
@@ -139,11 +148,11 @@ public class YGenericSensor extends YSensor
      * Changes the measuring unit for the measured value.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the measuring unit for the measured value
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_unit(String  newval)  throws YAPI_Exception
@@ -158,11 +167,11 @@ public class YGenericSensor extends YSensor
      * Changes the measuring unit for the measured value.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @param newval : a string corresponding to the measuring unit for the measured value
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setUnit(String newval)  throws YAPI_Exception
@@ -171,26 +180,26 @@ public class YGenericSensor extends YSensor
 
     /**
      * Returns the measured value of the electrical signal used by the sensor.
-     * 
+     *
      * @return a floating point number corresponding to the measured value of the electrical signal used by the sensor
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_signalValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALVALUE_INVALID;
             }
         }
-        return Math.round(_signalValue * 1000) / 1000;
+        return (double)Math.round(_signalValue * 1000) / 1000;
     }
 
     /**
      * Returns the measured value of the electrical signal used by the sensor.
-     * 
+     *
      * @return a floating point number corresponding to the measured value of the electrical signal used by the sensor
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getSignalValue() throws YAPI_Exception
@@ -199,9 +208,9 @@ public class YGenericSensor extends YSensor
 
     /**
      * Returns the measuring unit of the electrical signal used by the sensor.
-     * 
+     *
      * @return a string corresponding to the measuring unit of the electrical signal used by the sensor
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_signalUnit() throws YAPI_Exception
@@ -216,9 +225,9 @@ public class YGenericSensor extends YSensor
 
     /**
      * Returns the measuring unit of the electrical signal used by the sensor.
-     * 
+     *
      * @return a string corresponding to the measuring unit of the electrical signal used by the sensor
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getSignalUnit() throws YAPI_Exception
@@ -227,14 +236,14 @@ public class YGenericSensor extends YSensor
 
     /**
      * Returns the electric signal range used by the sensor.
-     * 
+     *
      * @return a string corresponding to the electric signal range used by the sensor
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_signalRange() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALRANGE_INVALID;
             }
@@ -244,9 +253,9 @@ public class YGenericSensor extends YSensor
 
     /**
      * Returns the electric signal range used by the sensor.
-     * 
+     *
      * @return a string corresponding to the electric signal range used by the sensor
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getSignalRange() throws YAPI_Exception
@@ -255,11 +264,11 @@ public class YGenericSensor extends YSensor
 
     /**
      * Changes the electric signal range used by the sensor.
-     * 
+     *
      * @param newval : a string corresponding to the electric signal range used by the sensor
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_signalRange(String  newval)  throws YAPI_Exception
@@ -272,11 +281,11 @@ public class YGenericSensor extends YSensor
 
     /**
      * Changes the electric signal range used by the sensor.
-     * 
+     *
      * @param newval : a string corresponding to the electric signal range used by the sensor
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setSignalRange(String newval)  throws YAPI_Exception
@@ -285,14 +294,14 @@ public class YGenericSensor extends YSensor
 
     /**
      * Returns the physical value range measured by the sensor.
-     * 
+     *
      * @return a string corresponding to the physical value range measured by the sensor
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_valueRange() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VALUERANGE_INVALID;
             }
@@ -302,9 +311,9 @@ public class YGenericSensor extends YSensor
 
     /**
      * Returns the physical value range measured by the sensor.
-     * 
+     *
      * @return a string corresponding to the physical value range measured by the sensor
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getValueRange() throws YAPI_Exception
@@ -312,13 +321,13 @@ public class YGenericSensor extends YSensor
     { return get_valueRange(); }
 
     /**
-     * Changes the physical value range measured by the sensor. The range change may have a side effect
-     * on the display resolution, as it may be adapted automatically.
-     * 
+     * Changes the physical value range measured by the sensor. As a side effect, the range modification may
+     * automatically modify the display resolution.
+     *
      * @param newval : a string corresponding to the physical value range measured by the sensor
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_valueRange(String  newval)  throws YAPI_Exception
@@ -330,18 +339,84 @@ public class YGenericSensor extends YSensor
     }
 
     /**
-     * Changes the physical value range measured by the sensor. The range change may have a side effect
-     * on the display resolution, as it may be adapted automatically.
-     * 
+     * Changes the physical value range measured by the sensor. As a side effect, the range modification may
+     * automatically modify the display resolution.
+     *
      * @param newval : a string corresponding to the physical value range measured by the sensor
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setValueRange(String newval)  throws YAPI_Exception
 
     { return set_valueRange(newval); }
+
+    /**
+     * Changes the electric signal bias for zero shift adjustment.
+     * If your electric signal reads positif when it should be zero, setup
+     * a positive signalBias of the same value to fix the zero shift.
+     *
+     * @param newval : a floating point number corresponding to the electric signal bias for zero shift adjustment
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_signalBias(double  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Long.toString(Math.round(newval * 65536.0));
+        _setAttr("signalBias",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the electric signal bias for zero shift adjustment.
+     * If your electric signal reads positif when it should be zero, setup
+     * a positive signalBias of the same value to fix the zero shift.
+     *
+     * @param newval : a floating point number corresponding to the electric signal bias for zero shift adjustment
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setSignalBias(double newval)  throws YAPI_Exception
+
+    { return set_signalBias(newval); }
+
+    /**
+     * Returns the electric signal bias for zero shift adjustment.
+     * A positive bias means that the signal is over-reporting the measure,
+     * while a negative bias means that the signal is underreporting the measure.
+     *
+     * @return a floating point number corresponding to the electric signal bias for zero shift adjustment
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_signalBias() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SIGNALBIAS_INVALID;
+            }
+        }
+        return _signalBias;
+    }
+
+    /**
+     * Returns the electric signal bias for zero shift adjustment.
+     * A positive bias means that the signal is over-reporting the measure,
+     * while a negative bias means that the signal is underreporting the measure.
+     *
+     * @return a floating point number corresponding to the electric signal bias for zero shift adjustment
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getSignalBias() throws YAPI_Exception
+
+    { return get_signalBias(); }
 
     /**
      * Retrieves a generic sensor for a given identifier.
@@ -353,7 +428,7 @@ public class YGenericSensor extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the generic sensor is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YGenericSensor.isOnline() to test if the generic sensor is
@@ -361,9 +436,9 @@ public class YGenericSensor extends YSensor
      * a generic sensor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the generic sensor
-     * 
+     *
      * @return a YGenericSensor object allowing you to drive the generic sensor.
      */
     public static YGenericSensor FindGenericSensor(String func)
@@ -382,11 +457,11 @@ public class YGenericSensor extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -423,11 +498,11 @@ public class YGenericSensor extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -452,8 +527,25 @@ public class YGenericSensor extends YSensor
     }
 
     /**
+     * Adjusts the signal bias so that the current signal value is need
+     * precisely as zero.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int zeroAdjust() throws YAPI_Exception
+    {
+        double currSignal;
+        double currBias;
+        currSignal = get_signalValue();
+        currBias = get_signalBias();
+        return set_signalBias(currSignal + currBias);
+    }
+
+    /**
      * Continues the enumeration of generic sensors started using yFirstGenericSensor().
-     * 
+     *
      * @return a pointer to a YGenericSensor object, corresponding to
      *         a generic sensor currently online, or a null pointer
      *         if there are no more generic sensors to enumerate.
@@ -475,7 +567,7 @@ public class YGenericSensor extends YSensor
      * Starts the enumeration of generic sensors currently accessible.
      * Use the method YGenericSensor.nextGenericSensor() to iterate on
      * next generic sensors.
-     * 
+     *
      * @return a pointer to a YGenericSensor object, corresponding to
      *         the first generic sensor currently online, or a null pointer
      *         if there are none.

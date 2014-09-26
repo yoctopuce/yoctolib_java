@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRelay.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YRelay.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindRelay(), the high-level API for Relay functions
  *
@@ -47,7 +47,7 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YRelay class start)
 /**
  * YRelay Class: Relay function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to switch the relay state.
  * This change is not persistent: the relay will automatically return to its idle position
  * whenever power is lost or if the module is restarted.
@@ -56,6 +56,7 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
  * with output A corresponding to the idle position (at power off) and the output B corresponding to the
  * active state. If you prefer the alternate default state, simply switch your cables on the board.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YRelay extends YFunction
 {
 //--- (end of YRelay class start)
@@ -122,7 +123,7 @@ public class YRelay extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -134,7 +135,7 @@ public class YRelay extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -144,7 +145,7 @@ public class YRelay extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YRelay(String func)
@@ -200,15 +201,15 @@ public class YRelay extends YFunction
      */
     /**
      * Returns the state of the relays (A for the idle position, B for the active position).
-     * 
-     * @return either YRelay.STATE_A or YRelay.STATE_B, according to the state of the relays (A for the
+     *
+     *  @return either YRelay.STATE_A or YRelay.STATE_B, according to the state of the relays (A for the
      * idle position, B for the active position)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_state() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STATE_INVALID;
             }
@@ -218,10 +219,10 @@ public class YRelay extends YFunction
 
     /**
      * Returns the state of the relays (A for the idle position, B for the active position).
-     * 
-     * @return either Y_STATE_A or Y_STATE_B, according to the state of the relays (A for the idle
+     *
+     *  @return either Y_STATE_A or Y_STATE_B, according to the state of the relays (A for the idle
      * position, B for the active position)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getState() throws YAPI_Exception
@@ -230,12 +231,12 @@ public class YRelay extends YFunction
 
     /**
      * Changes the state of the relays (A for the idle position, B for the active position).
-     * 
-     * @param newval : either YRelay.STATE_A or YRelay.STATE_B, according to the state of the relays (A
+     *
+     *  @param newval : either YRelay.STATE_A or YRelay.STATE_B, according to the state of the relays (A
      * for the idle position, B for the active position)
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_state(int  newval)  throws YAPI_Exception
@@ -248,12 +249,12 @@ public class YRelay extends YFunction
 
     /**
      * Changes the state of the relays (A for the idle position, B for the active position).
-     * 
-     * @param newval : either Y_STATE_A or Y_STATE_B, according to the state of the relays (A for the idle
+     *
+     *  @param newval : either Y_STATE_A or Y_STATE_B, according to the state of the relays (A for the idle
      * position, B for the active position)
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setState(int newval)  throws YAPI_Exception
@@ -261,18 +262,18 @@ public class YRelay extends YFunction
     { return set_state(newval); }
 
     /**
-     * Returns the state of the relays at device startup (A for the idle position, B for the active
+     *  Returns the state of the relays at device startup (A for the idle position, B for the active
      * position, UNCHANGED for no change).
-     * 
-     * @return a value among YRelay.STATEATPOWERON_UNCHANGED, YRelay.STATEATPOWERON_A and
-     * YRelay.STATEATPOWERON_B corresponding to the state of the relays at device startup (A for the idle
+     *
+     *  @return a value among YRelay.STATEATPOWERON_UNCHANGED, YRelay.STATEATPOWERON_A and
+     *  YRelay.STATEATPOWERON_B corresponding to the state of the relays at device startup (A for the idle
      * position, B for the active position, UNCHANGED for no change)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_stateAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STATEATPOWERON_INVALID;
             }
@@ -281,13 +282,13 @@ public class YRelay extends YFunction
     }
 
     /**
-     * Returns the state of the relays at device startup (A for the idle position, B for the active
+     *  Returns the state of the relays at device startup (A for the idle position, B for the active
      * position, UNCHANGED for no change).
-     * 
-     * @return a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
-     * corresponding to the state of the relays at device startup (A for the idle position, B for the
+     *
+     *  @return a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
+     *  corresponding to the state of the relays at device startup (A for the idle position, B for the
      * active position, UNCHANGED for no change)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getStateAtPowerOn() throws YAPI_Exception
@@ -298,12 +299,12 @@ public class YRelay extends YFunction
      * Preset the state of the relays at device startup (A for the idle position,
      * B for the active position, UNCHANGED for no modification). Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
-     * 
-     * @param newval : a value among YRelay.STATEATPOWERON_UNCHANGED, YRelay.STATEATPOWERON_A and
+     *
+     *  @param newval : a value among YRelay.STATEATPOWERON_UNCHANGED, YRelay.STATEATPOWERON_A and
      * YRelay.STATEATPOWERON_B
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_stateAtPowerOn(int  newval)  throws YAPI_Exception
@@ -318,11 +319,11 @@ public class YRelay extends YFunction
      * Preset the state of the relays at device startup (A for the idle position,
      * B for the active position, UNCHANGED for no modification). Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
-     * 
+     *
      * @param newval : a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setStateAtPowerOn(int newval)  throws YAPI_Exception
@@ -330,16 +331,16 @@ public class YRelay extends YFunction
     { return set_stateAtPowerOn(newval); }
 
     /**
-     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
      * switching back in to B state. Zero means no maximum time.
-     * 
+     *
      * @return an integer
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_maxTimeOnStateA() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAXTIMEONSTATEA_INVALID;
             }
@@ -348,11 +349,11 @@ public class YRelay extends YFunction
     }
 
     /**
-     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
      * switching back in to B state. Zero means no maximum time.
-     * 
+     *
      * @return an integer
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getMaxTimeOnStateA() throws YAPI_Exception
@@ -360,13 +361,13 @@ public class YRelay extends YFunction
     { return get_maxTimeOnStateA(); }
 
     /**
-     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
      * switching back in to B state. Use zero for no maximum time.
-     * 
+     *
      * @param newval : an integer
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_maxTimeOnStateA(long  newval)  throws YAPI_Exception
@@ -378,13 +379,13 @@ public class YRelay extends YFunction
     }
 
     /**
-     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
      * switching back in to B state. Use zero for no maximum time.
-     * 
+     *
      * @param newval : an integer
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setMaxTimeOnStateA(long newval)  throws YAPI_Exception
@@ -392,16 +393,16 @@ public class YRelay extends YFunction
     { return set_maxTimeOnStateA(newval); }
 
     /**
-     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
      * switching back in to A state. Zero means no maximum time.
-     * 
+     *
      * @return an integer
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_maxTimeOnStateB() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAXTIMEONSTATEB_INVALID;
             }
@@ -410,11 +411,11 @@ public class YRelay extends YFunction
     }
 
     /**
-     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
      * switching back in to A state. Zero means no maximum time.
-     * 
+     *
      * @return an integer
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getMaxTimeOnStateB() throws YAPI_Exception
@@ -422,13 +423,13 @@ public class YRelay extends YFunction
     { return get_maxTimeOnStateB(); }
 
     /**
-     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
      * switching back in to A state. Use zero for no maximum time.
-     * 
+     *
      * @param newval : an integer
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_maxTimeOnStateB(long  newval)  throws YAPI_Exception
@@ -440,13 +441,13 @@ public class YRelay extends YFunction
     }
 
     /**
-     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
      * switching back in to A state. Use zero for no maximum time.
-     * 
+     *
      * @param newval : an integer
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setMaxTimeOnStateB(long newval)  throws YAPI_Exception
@@ -455,15 +456,15 @@ public class YRelay extends YFunction
 
     /**
      * Returns the output state of the relays, when used as a simple switch (single throw).
-     * 
-     * @return either YRelay.OUTPUT_OFF or YRelay.OUTPUT_ON, according to the output state of the relays,
+     *
+     *  @return either YRelay.OUTPUT_OFF or YRelay.OUTPUT_ON, according to the output state of the relays,
      * when used as a simple switch (single throw)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_output() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OUTPUT_INVALID;
             }
@@ -473,10 +474,10 @@ public class YRelay extends YFunction
 
     /**
      * Returns the output state of the relays, when used as a simple switch (single throw).
-     * 
-     * @return either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the relays, when used
+     *
+     *  @return either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the relays, when used
      * as a simple switch (single throw)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getOutput() throws YAPI_Exception
@@ -485,12 +486,12 @@ public class YRelay extends YFunction
 
     /**
      * Changes the output state of the relays, when used as a simple switch (single throw).
-     * 
-     * @param newval : either YRelay.OUTPUT_OFF or YRelay.OUTPUT_ON, according to the output state of the
+     *
+     *  @param newval : either YRelay.OUTPUT_OFF or YRelay.OUTPUT_ON, according to the output state of the
      * relays, when used as a simple switch (single throw)
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_output(int  newval)  throws YAPI_Exception
@@ -503,12 +504,12 @@ public class YRelay extends YFunction
 
     /**
      * Changes the output state of the relays, when used as a simple switch (single throw).
-     * 
-     * @param newval : either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the relays,
+     *
+     *  @param newval : either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the relays,
      * when used as a simple switch (single throw)
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setOutput(int newval)  throws YAPI_Exception
@@ -518,16 +519,16 @@ public class YRelay extends YFunction
     /**
      * Returns the number of milliseconds remaining before the relays is returned to idle position
      * (state A), during a measured pulse generation. When there is no ongoing pulse, returns zero.
-     * 
-     * @return an integer corresponding to the number of milliseconds remaining before the relays is
+     *
+     *  @return an integer corresponding to the number of milliseconds remaining before the relays is
      * returned to idle position
      *         (state A), during a measured pulse generation
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_pulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSETIMER_INVALID;
             }
@@ -538,11 +539,11 @@ public class YRelay extends YFunction
     /**
      * Returns the number of milliseconds remaining before the relays is returned to idle position
      * (state A), during a measured pulse generation. When there is no ongoing pulse, returns zero.
-     * 
-     * @return an integer corresponding to the number of milliseconds remaining before the relays is
+     *
+     *  @return an integer corresponding to the number of milliseconds remaining before the relays is
      * returned to idle position
      *         (state A), during a measured pulse generation
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getPulseTimer() throws YAPI_Exception
@@ -564,11 +565,11 @@ public class YRelay extends YFunction
     /**
      * Sets the relay to output B (active) for a specified duration, then brings it
      * automatically back to output A (idle state).
-     * 
+     *
      * @param ms_duration : pulse duration, in millisecondes
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int pulse(int ms_duration)  throws YAPI_Exception
@@ -584,7 +585,7 @@ public class YRelay extends YFunction
      */
     public YDelayedPulse get_delayedPulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DELAYEDPULSETIMER_INVALID;
             }
@@ -613,12 +614,12 @@ public class YRelay extends YFunction
 
     /**
      * Schedules a pulse.
-     * 
+     *
      * @param ms_delay : waiting time before the pulse, in millisecondes
      * @param ms_duration : pulse duration, in millisecondes
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int delayedPulse(int ms_delay,int ms_duration)  throws YAPI_Exception
@@ -632,15 +633,15 @@ public class YRelay extends YFunction
     /**
      * Returns the number of milliseconds remaining before a pulse (delayedPulse() call)
      * When there is no scheduled pulse, returns zero.
-     * 
+     *
      * @return an integer corresponding to the number of milliseconds remaining before a pulse (delayedPulse() call)
      *         When there is no scheduled pulse, returns zero
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_countdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COUNTDOWN_INVALID;
             }
@@ -651,10 +652,10 @@ public class YRelay extends YFunction
     /**
      * Returns the number of milliseconds remaining before a pulse (delayedPulse() call)
      * When there is no scheduled pulse, returns zero.
-     * 
+     *
      * @return an integer corresponding to the number of milliseconds remaining before a pulse (delayedPulse() call)
      *         When there is no scheduled pulse, returns zero
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getCountdown() throws YAPI_Exception
@@ -671,7 +672,7 @@ public class YRelay extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the relay is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YRelay.isOnline() to test if the relay is
@@ -679,9 +680,9 @@ public class YRelay extends YFunction
      * a relay by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the relay
-     * 
+     *
      * @return a YRelay object allowing you to drive the relay.
      */
     public static YRelay FindRelay(String func)
@@ -700,11 +701,11 @@ public class YRelay extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -738,7 +739,7 @@ public class YRelay extends YFunction
 
     /**
      * Continues the enumeration of relays started using yFirstRelay().
-     * 
+     *
      * @return a pointer to a YRelay object, corresponding to
      *         a relay currently online, or a null pointer
      *         if there are no more relays to enumerate.
@@ -760,7 +761,7 @@ public class YRelay extends YFunction
      * Starts the enumeration of relays currently accessible.
      * Use the method YRelay.nextRelay() to iterate on
      * next relays.
-     * 
+     *
      * @return a pointer to a YRelay object, corresponding to
      *         the first relay currently online, or a null pointer
      *         if there are none.

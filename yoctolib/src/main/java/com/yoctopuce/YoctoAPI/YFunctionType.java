@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFunctionType.java 14779 2014-01-30 14:56:39Z seb $
+ * $Id: YFunctionType.java 17678 2014-09-16 16:31:26Z seb $
  *
  * Internal YFunctionType object
  *
@@ -192,7 +192,7 @@ class YFunctionType {
                 }
             }
         }else {
-            // only functionId  (ie ".tempearture")
+            // only functionId  (ie ".temperature")
             for(String hwid_str :_connectedFns.keySet()){
                 HWID tmpid = new HWID(hwid_str);
                 if(tmpid.getFunction().equals(hwid.getFunction())){

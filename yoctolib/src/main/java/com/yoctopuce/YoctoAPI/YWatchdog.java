@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YWatchdog.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindWatchdog(), the high-level API for Watchdog functions
  *
@@ -47,7 +47,7 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YWatchdog class start)
 /**
  * YWatchdog Class: Watchdog function interface
- * 
+ *
  * The watchog function works like a relay and can cause a brief power cut
  * to an appliance after a preset delay to force this appliance to
  * reset. The Watchdog must be called from time to time to reset the
@@ -55,6 +55,7 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
  * The watchdog can be driven direcly with <i>pulse</i> and <i>delayedpulse</i> methods to switch
  * off an appliance for a given duration.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YWatchdog extends YFunction
 {
 //--- (end of YWatchdog class start)
@@ -147,7 +148,7 @@ public class YWatchdog extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -159,7 +160,7 @@ public class YWatchdog extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -169,7 +170,7 @@ public class YWatchdog extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YWatchdog(String func)
@@ -237,15 +238,15 @@ public class YWatchdog extends YFunction
      */
     /**
      * Returns the state of the watchdog (A for the idle position, B for the active position).
-     * 
-     * @return either YWatchdog.STATE_A or YWatchdog.STATE_B, according to the state of the watchdog (A
+     *
+     *  @return either YWatchdog.STATE_A or YWatchdog.STATE_B, according to the state of the watchdog (A
      * for the idle position, B for the active position)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_state() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STATE_INVALID;
             }
@@ -255,10 +256,10 @@ public class YWatchdog extends YFunction
 
     /**
      * Returns the state of the watchdog (A for the idle position, B for the active position).
-     * 
-     * @return either Y_STATE_A or Y_STATE_B, according to the state of the watchdog (A for the idle
+     *
+     *  @return either Y_STATE_A or Y_STATE_B, according to the state of the watchdog (A for the idle
      * position, B for the active position)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getState() throws YAPI_Exception
@@ -267,12 +268,12 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the state of the watchdog (A for the idle position, B for the active position).
-     * 
-     * @param newval : either YWatchdog.STATE_A or YWatchdog.STATE_B, according to the state of the
+     *
+     *  @param newval : either YWatchdog.STATE_A or YWatchdog.STATE_B, according to the state of the
      * watchdog (A for the idle position, B for the active position)
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_state(int  newval)  throws YAPI_Exception
@@ -285,12 +286,12 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the state of the watchdog (A for the idle position, B for the active position).
-     * 
-     * @param newval : either Y_STATE_A or Y_STATE_B, according to the state of the watchdog (A for the
+     *
+     *  @param newval : either Y_STATE_A or Y_STATE_B, according to the state of the watchdog (A for the
      * idle position, B for the active position)
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setState(int newval)  throws YAPI_Exception
@@ -298,18 +299,18 @@ public class YWatchdog extends YFunction
     { return set_state(newval); }
 
     /**
-     * Returns the state of the watchdog at device startup (A for the idle position, B for the active
+     *  Returns the state of the watchdog at device startup (A for the idle position, B for the active
      * position, UNCHANGED for no change).
-     * 
-     * @return a value among YWatchdog.STATEATPOWERON_UNCHANGED, YWatchdog.STATEATPOWERON_A and
-     * YWatchdog.STATEATPOWERON_B corresponding to the state of the watchdog at device startup (A for the
+     *
+     *  @return a value among YWatchdog.STATEATPOWERON_UNCHANGED, YWatchdog.STATEATPOWERON_A and
+     *  YWatchdog.STATEATPOWERON_B corresponding to the state of the watchdog at device startup (A for the
      * idle position, B for the active position, UNCHANGED for no change)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_stateAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STATEATPOWERON_INVALID;
             }
@@ -318,13 +319,13 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Returns the state of the watchdog at device startup (A for the idle position, B for the active
+     *  Returns the state of the watchdog at device startup (A for the idle position, B for the active
      * position, UNCHANGED for no change).
-     * 
-     * @return a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
-     * corresponding to the state of the watchdog at device startup (A for the idle position, B for the
+     *
+     *  @return a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
+     *  corresponding to the state of the watchdog at device startup (A for the idle position, B for the
      * active position, UNCHANGED for no change)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getStateAtPowerOn() throws YAPI_Exception
@@ -335,12 +336,12 @@ public class YWatchdog extends YFunction
      * Preset the state of the watchdog at device startup (A for the idle position,
      * B for the active position, UNCHANGED for no modification). Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
-     * 
-     * @param newval : a value among YWatchdog.STATEATPOWERON_UNCHANGED, YWatchdog.STATEATPOWERON_A and
+     *
+     *  @param newval : a value among YWatchdog.STATEATPOWERON_UNCHANGED, YWatchdog.STATEATPOWERON_A and
      * YWatchdog.STATEATPOWERON_B
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_stateAtPowerOn(int  newval)  throws YAPI_Exception
@@ -355,11 +356,11 @@ public class YWatchdog extends YFunction
      * Preset the state of the watchdog at device startup (A for the idle position,
      * B for the active position, UNCHANGED for no modification). Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
-     * 
+     *
      * @param newval : a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setStateAtPowerOn(int newval)  throws YAPI_Exception
@@ -367,16 +368,16 @@ public class YWatchdog extends YFunction
     { return set_stateAtPowerOn(newval); }
 
     /**
-     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
      * switching back in to B state. Zero means no maximum time.
-     * 
+     *
      * @return an integer
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_maxTimeOnStateA() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAXTIMEONSTATEA_INVALID;
             }
@@ -385,11 +386,11 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
      * switching back in to B state. Zero means no maximum time.
-     * 
+     *
      * @return an integer
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getMaxTimeOnStateA() throws YAPI_Exception
@@ -397,13 +398,13 @@ public class YWatchdog extends YFunction
     { return get_maxTimeOnStateA(); }
 
     /**
-     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
      * switching back in to B state. Use zero for no maximum time.
-     * 
+     *
      * @param newval : an integer
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_maxTimeOnStateA(long  newval)  throws YAPI_Exception
@@ -415,13 +416,13 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
+     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
      * switching back in to B state. Use zero for no maximum time.
-     * 
+     *
      * @param newval : an integer
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setMaxTimeOnStateA(long newval)  throws YAPI_Exception
@@ -429,16 +430,16 @@ public class YWatchdog extends YFunction
     { return set_maxTimeOnStateA(newval); }
 
     /**
-     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
      * switching back in to A state. Zero means no maximum time.
-     * 
+     *
      * @return an integer
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_maxTimeOnStateB() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAXTIMEONSTATEB_INVALID;
             }
@@ -447,11 +448,11 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
      * switching back in to A state. Zero means no maximum time.
-     * 
+     *
      * @return an integer
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getMaxTimeOnStateB() throws YAPI_Exception
@@ -459,13 +460,13 @@ public class YWatchdog extends YFunction
     { return get_maxTimeOnStateB(); }
 
     /**
-     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
      * switching back in to A state. Use zero for no maximum time.
-     * 
+     *
      * @param newval : an integer
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_maxTimeOnStateB(long  newval)  throws YAPI_Exception
@@ -477,13 +478,13 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
+     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
      * switching back in to A state. Use zero for no maximum time.
-     * 
+     *
      * @param newval : an integer
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setMaxTimeOnStateB(long newval)  throws YAPI_Exception
@@ -492,15 +493,15 @@ public class YWatchdog extends YFunction
 
     /**
      * Returns the output state of the watchdog, when used as a simple switch (single throw).
-     * 
-     * @return either YWatchdog.OUTPUT_OFF or YWatchdog.OUTPUT_ON, according to the output state of the
+     *
+     *  @return either YWatchdog.OUTPUT_OFF or YWatchdog.OUTPUT_ON, according to the output state of the
      * watchdog, when used as a simple switch (single throw)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_output() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OUTPUT_INVALID;
             }
@@ -510,10 +511,10 @@ public class YWatchdog extends YFunction
 
     /**
      * Returns the output state of the watchdog, when used as a simple switch (single throw).
-     * 
-     * @return either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the watchdog, when
+     *
+     *  @return either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the watchdog, when
      * used as a simple switch (single throw)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getOutput() throws YAPI_Exception
@@ -522,12 +523,12 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the output state of the watchdog, when used as a simple switch (single throw).
-     * 
-     * @param newval : either YWatchdog.OUTPUT_OFF or YWatchdog.OUTPUT_ON, according to the output state
+     *
+     *  @param newval : either YWatchdog.OUTPUT_OFF or YWatchdog.OUTPUT_ON, according to the output state
      * of the watchdog, when used as a simple switch (single throw)
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_output(int  newval)  throws YAPI_Exception
@@ -540,12 +541,12 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the output state of the watchdog, when used as a simple switch (single throw).
-     * 
-     * @param newval : either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the watchdog,
+     *
+     *  @param newval : either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the watchdog,
      * when used as a simple switch (single throw)
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setOutput(int newval)  throws YAPI_Exception
@@ -555,16 +556,16 @@ public class YWatchdog extends YFunction
     /**
      * Returns the number of milliseconds remaining before the watchdog is returned to idle position
      * (state A), during a measured pulse generation. When there is no ongoing pulse, returns zero.
-     * 
-     * @return an integer corresponding to the number of milliseconds remaining before the watchdog is
+     *
+     *  @return an integer corresponding to the number of milliseconds remaining before the watchdog is
      * returned to idle position
      *         (state A), during a measured pulse generation
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_pulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSETIMER_INVALID;
             }
@@ -575,11 +576,11 @@ public class YWatchdog extends YFunction
     /**
      * Returns the number of milliseconds remaining before the watchdog is returned to idle position
      * (state A), during a measured pulse generation. When there is no ongoing pulse, returns zero.
-     * 
-     * @return an integer corresponding to the number of milliseconds remaining before the watchdog is
+     *
+     *  @return an integer corresponding to the number of milliseconds remaining before the watchdog is
      * returned to idle position
      *         (state A), during a measured pulse generation
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getPulseTimer() throws YAPI_Exception
@@ -601,11 +602,11 @@ public class YWatchdog extends YFunction
     /**
      * Sets the relay to output B (active) for a specified duration, then brings it
      * automatically back to output A (idle state).
-     * 
+     *
      * @param ms_duration : pulse duration, in millisecondes
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int pulse(int ms_duration)  throws YAPI_Exception
@@ -621,7 +622,7 @@ public class YWatchdog extends YFunction
      */
     public YDelayedPulse get_delayedPulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DELAYEDPULSETIMER_INVALID;
             }
@@ -650,12 +651,12 @@ public class YWatchdog extends YFunction
 
     /**
      * Schedules a pulse.
-     * 
+     *
      * @param ms_delay : waiting time before the pulse, in millisecondes
      * @param ms_duration : pulse duration, in millisecondes
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int delayedPulse(int ms_delay,int ms_duration)  throws YAPI_Exception
@@ -669,15 +670,15 @@ public class YWatchdog extends YFunction
     /**
      * Returns the number of milliseconds remaining before a pulse (delayedPulse() call)
      * When there is no scheduled pulse, returns zero.
-     * 
+     *
      * @return an integer corresponding to the number of milliseconds remaining before a pulse (delayedPulse() call)
      *         When there is no scheduled pulse, returns zero
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_countdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COUNTDOWN_INVALID;
             }
@@ -688,10 +689,10 @@ public class YWatchdog extends YFunction
     /**
      * Returns the number of milliseconds remaining before a pulse (delayedPulse() call)
      * When there is no scheduled pulse, returns zero.
-     * 
+     *
      * @return an integer corresponding to the number of milliseconds remaining before a pulse (delayedPulse() call)
      *         When there is no scheduled pulse, returns zero
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getCountdown() throws YAPI_Exception
@@ -700,15 +701,15 @@ public class YWatchdog extends YFunction
 
     /**
      * Returns the watchdog runing state at module power on.
-     * 
-     * @return either YWatchdog.AUTOSTART_OFF or YWatchdog.AUTOSTART_ON, according to the watchdog runing
+     *
+     *  @return either YWatchdog.AUTOSTART_OFF or YWatchdog.AUTOSTART_ON, according to the watchdog runing
      * state at module power on
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_autoStart() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AUTOSTART_INVALID;
             }
@@ -718,9 +719,9 @@ public class YWatchdog extends YFunction
 
     /**
      * Returns the watchdog runing state at module power on.
-     * 
+     *
      * @return either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the watchdog runing state at module power on
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getAutoStart() throws YAPI_Exception
@@ -730,12 +731,12 @@ public class YWatchdog extends YFunction
     /**
      * Changes the watchdog runningsttae at module power on. Remember to call the
      * saveToFlash() method and then to reboot the module to apply this setting.
-     * 
-     * @param newval : either YWatchdog.AUTOSTART_OFF or YWatchdog.AUTOSTART_ON, according to the watchdog
+     *
+     *  @param newval : either YWatchdog.AUTOSTART_OFF or YWatchdog.AUTOSTART_ON, according to the watchdog
      * runningsttae at module power on
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_autoStart(int  newval)  throws YAPI_Exception
@@ -749,12 +750,12 @@ public class YWatchdog extends YFunction
     /**
      * Changes the watchdog runningsttae at module power on. Remember to call the
      * saveToFlash() method and then to reboot the module to apply this setting.
-     * 
-     * @param newval : either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the watchdog runningsttae at
+     *
+     *  @param newval : either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the watchdog runningsttae at
      * module power on
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setAutoStart(int newval)  throws YAPI_Exception
@@ -763,14 +764,14 @@ public class YWatchdog extends YFunction
 
     /**
      * Returns the watchdog running state.
-     * 
+     *
      * @return either YWatchdog.RUNNING_OFF or YWatchdog.RUNNING_ON, according to the watchdog running state
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_running() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RUNNING_INVALID;
             }
@@ -780,9 +781,9 @@ public class YWatchdog extends YFunction
 
     /**
      * Returns the watchdog running state.
-     * 
+     *
      * @return either Y_RUNNING_OFF or Y_RUNNING_ON, according to the watchdog running state
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getRunning() throws YAPI_Exception
@@ -791,12 +792,12 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the running state of the watchdog.
-     * 
-     * @param newval : either YWatchdog.RUNNING_OFF or YWatchdog.RUNNING_ON, according to the running
+     *
+     *  @param newval : either YWatchdog.RUNNING_OFF or YWatchdog.RUNNING_ON, according to the running
      * state of the watchdog
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_running(int  newval)  throws YAPI_Exception
@@ -809,11 +810,11 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the running state of the watchdog.
-     * 
+     *
      * @param newval : either Y_RUNNING_OFF or Y_RUNNING_ON, according to the running state of the watchdog
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setRunning(int newval)  throws YAPI_Exception
@@ -824,9 +825,9 @@ public class YWatchdog extends YFunction
      * Resets the watchdog. When the watchdog is running, this function
      * must be called on a regular basis to prevent the watchog to
      * trigger
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int resetWatchdog()  throws YAPI_Exception
@@ -839,15 +840,15 @@ public class YWatchdog extends YFunction
 
     /**
      * Returns  the waiting duration before a reset is automatically triggered by the watchdog, in milliseconds.
-     * 
-     * @return an integer corresponding to  the waiting duration before a reset is automatically triggered
+     *
+     *  @return an integer corresponding to  the waiting duration before a reset is automatically triggered
      * by the watchdog, in milliseconds
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_triggerDelay() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TRIGGERDELAY_INVALID;
             }
@@ -857,10 +858,10 @@ public class YWatchdog extends YFunction
 
     /**
      * Returns  the waiting duration before a reset is automatically triggered by the watchdog, in milliseconds.
-     * 
-     * @return an integer corresponding to  the waiting duration before a reset is automatically triggered
+     *
+     *  @return an integer corresponding to  the waiting duration before a reset is automatically triggered
      * by the watchdog, in milliseconds
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getTriggerDelay() throws YAPI_Exception
@@ -869,12 +870,12 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the waiting delay before a reset is triggered by the watchdog, in milliseconds.
-     * 
-     * @param newval : an integer corresponding to the waiting delay before a reset is triggered by the
+     *
+     *  @param newval : an integer corresponding to the waiting delay before a reset is triggered by the
      * watchdog, in milliseconds
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_triggerDelay(long  newval)  throws YAPI_Exception
@@ -887,12 +888,12 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the waiting delay before a reset is triggered by the watchdog, in milliseconds.
-     * 
-     * @param newval : an integer corresponding to the waiting delay before a reset is triggered by the
+     *
+     *  @param newval : an integer corresponding to the waiting delay before a reset is triggered by the
      * watchdog, in milliseconds
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setTriggerDelay(long newval)  throws YAPI_Exception
@@ -901,14 +902,14 @@ public class YWatchdog extends YFunction
 
     /**
      * Returns the duration of resets caused by the watchdog, in milliseconds.
-     * 
+     *
      * @return an integer corresponding to the duration of resets caused by the watchdog, in milliseconds
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_triggerDuration() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TRIGGERDURATION_INVALID;
             }
@@ -918,9 +919,9 @@ public class YWatchdog extends YFunction
 
     /**
      * Returns the duration of resets caused by the watchdog, in milliseconds.
-     * 
+     *
      * @return an integer corresponding to the duration of resets caused by the watchdog, in milliseconds
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getTriggerDuration() throws YAPI_Exception
@@ -929,11 +930,11 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the duration of resets caused by the watchdog, in milliseconds.
-     * 
+     *
      * @param newval : an integer corresponding to the duration of resets caused by the watchdog, in milliseconds
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_triggerDuration(long  newval)  throws YAPI_Exception
@@ -946,11 +947,11 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the duration of resets caused by the watchdog, in milliseconds.
-     * 
+     *
      * @param newval : an integer corresponding to the duration of resets caused by the watchdog, in milliseconds
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setTriggerDuration(long newval)  throws YAPI_Exception
@@ -967,7 +968,7 @@ public class YWatchdog extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the watchdog is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YWatchdog.isOnline() to test if the watchdog is
@@ -975,9 +976,9 @@ public class YWatchdog extends YFunction
      * a watchdog by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the watchdog
-     * 
+     *
      * @return a YWatchdog object allowing you to drive the watchdog.
      */
     public static YWatchdog FindWatchdog(String func)
@@ -996,11 +997,11 @@ public class YWatchdog extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -1034,7 +1035,7 @@ public class YWatchdog extends YFunction
 
     /**
      * Continues the enumeration of watchdog started using yFirstWatchdog().
-     * 
+     *
      * @return a pointer to a YWatchdog object, corresponding to
      *         a watchdog currently online, or a null pointer
      *         if there are no more watchdog to enumerate.
@@ -1056,7 +1057,7 @@ public class YWatchdog extends YFunction
      * Starts the enumeration of watchdog currently accessible.
      * Use the method YWatchdog.nextWatchdog() to iterate on
      * next watchdog.
-     * 
+     *
      * @return a pointer to a YWatchdog object, corresponding to
      *         the first watchdog currently online, or a null pointer
      *         if there are none.

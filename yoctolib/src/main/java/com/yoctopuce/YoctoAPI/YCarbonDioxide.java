@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCarbonDioxide.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YCarbonDioxide.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YCarbonDioxide class start)
 /**
  * YCarbonDioxide Class: CarbonDioxide function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YCarbonDioxide extends YSensor
 {
 //--- (end of YCarbonDioxide class start)
@@ -63,7 +64,7 @@ public class YCarbonDioxide extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -75,7 +76,7 @@ public class YCarbonDioxide extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -85,7 +86,7 @@ public class YCarbonDioxide extends YSensor
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YCarbonDioxide(String func)
@@ -113,7 +114,7 @@ public class YCarbonDioxide extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the CO2 sensor is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YCarbonDioxide.isOnline() to test if the CO2 sensor is
@@ -121,9 +122,9 @@ public class YCarbonDioxide extends YSensor
      * a CO2 sensor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the CO2 sensor
-     * 
+     *
      * @return a YCarbonDioxide object allowing you to drive the CO2 sensor.
      */
     public static YCarbonDioxide FindCarbonDioxide(String func)
@@ -142,11 +143,11 @@ public class YCarbonDioxide extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -183,11 +184,11 @@ public class YCarbonDioxide extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -213,7 +214,7 @@ public class YCarbonDioxide extends YSensor
 
     /**
      * Continues the enumeration of CO2 sensors started using yFirstCarbonDioxide().
-     * 
+     *
      * @return a pointer to a YCarbonDioxide object, corresponding to
      *         a CO2 sensor currently online, or a null pointer
      *         if there are no more CO2 sensors to enumerate.
@@ -235,7 +236,7 @@ public class YCarbonDioxide extends YSensor
      * Starts the enumeration of CO2 sensors currently accessible.
      * Use the method YCarbonDioxide.nextCarbonDioxide() to iterate on
      * next CO2 sensors.
-     * 
+     *
      * @return a pointer to a YCarbonDioxide object, corresponding to
      *         the first CO2 sensor currently online, or a null pointer
      *         if there are none.

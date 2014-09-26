@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpSchedule.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YWakeUpSchedule.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -47,11 +47,12 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YWakeUpSchedule class start)
 /**
  * YWakeUpSchedule Class: WakeUpSchedule function interface
- * 
+ *
  * The WakeUpSchedule function implements a wake up condition. The wake up time is
  * specified as a set of months and/or days and/or hours and/or minutes when the
  * wake up should happen.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YWakeUpSchedule extends YFunction
 {
 //--- (end of YWakeUpSchedule class start)
@@ -98,7 +99,7 @@ public class YWakeUpSchedule extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -110,7 +111,7 @@ public class YWakeUpSchedule extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -120,7 +121,7 @@ public class YWakeUpSchedule extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YWakeUpSchedule(String func)
@@ -161,14 +162,14 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the minutes in the 00-29 interval of each hour scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the minutes in the 00-29 interval of each hour scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_minutesA() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MINUTESA_INVALID;
             }
@@ -178,9 +179,9 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the minutes in the 00-29 interval of each hour scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the minutes in the 00-29 interval of each hour scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getMinutesA() throws YAPI_Exception
@@ -189,11 +190,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the minutes in the 00-29 interval when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the minutes in the 00-29 interval when a wake up must take place
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_minutesA(int  newval)  throws YAPI_Exception
@@ -206,11 +207,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the minutes in the 00-29 interval when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the minutes in the 00-29 interval when a wake up must take place
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setMinutesA(int newval)  throws YAPI_Exception
@@ -219,14 +220,14 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the minutes in the 30-59 intervalof each hour scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the minutes in the 30-59 intervalof each hour scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_minutesB() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MINUTESB_INVALID;
             }
@@ -236,9 +237,9 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the minutes in the 30-59 intervalof each hour scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the minutes in the 30-59 intervalof each hour scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getMinutesB() throws YAPI_Exception
@@ -247,11 +248,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the minutes in the 30-59 interval when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the minutes in the 30-59 interval when a wake up must take place
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_minutesB(int  newval)  throws YAPI_Exception
@@ -264,11 +265,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the minutes in the 30-59 interval when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the minutes in the 30-59 interval when a wake up must take place
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setMinutesB(int newval)  throws YAPI_Exception
@@ -277,14 +278,14 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the hours scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the hours scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_hours() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return HOURS_INVALID;
             }
@@ -294,9 +295,9 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the hours scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the hours scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getHours() throws YAPI_Exception
@@ -305,11 +306,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the hours when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the hours when a wake up must take place
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_hours(int  newval)  throws YAPI_Exception
@@ -322,11 +323,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the hours when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the hours when a wake up must take place
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setHours(int newval)  throws YAPI_Exception
@@ -335,14 +336,14 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the days of the week scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the days of the week scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_weekDays() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WEEKDAYS_INVALID;
             }
@@ -352,9 +353,9 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the days of the week scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the days of the week scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getWeekDays() throws YAPI_Exception
@@ -363,11 +364,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the days of the week when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the days of the week when a wake up must take place
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_weekDays(int  newval)  throws YAPI_Exception
@@ -380,11 +381,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the days of the week when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the days of the week when a wake up must take place
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setWeekDays(int newval)  throws YAPI_Exception
@@ -393,14 +394,14 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the days of the month scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the days of the month scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_monthDays() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MONTHDAYS_INVALID;
             }
@@ -410,9 +411,9 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the days of the month scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the days of the month scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getMonthDays() throws YAPI_Exception
@@ -421,11 +422,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the days of the month when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the days of the month when a wake up must take place
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_monthDays(int  newval)  throws YAPI_Exception
@@ -438,11 +439,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the days of the month when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the days of the month when a wake up must take place
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setMonthDays(int newval)  throws YAPI_Exception
@@ -451,14 +452,14 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the months scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the months scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_months() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MONTHS_INVALID;
             }
@@ -468,9 +469,9 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the months scheduled for wake up.
-     * 
+     *
      * @return an integer corresponding to the months scheduled for wake up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getMonths() throws YAPI_Exception
@@ -479,11 +480,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the months when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the months when a wake up must take place
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_months(int  newval)  throws YAPI_Exception
@@ -496,11 +497,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the months when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the months when a wake up must take place
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setMonths(int newval)  throws YAPI_Exception
@@ -509,14 +510,14 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the date/time (seconds) of the next wake up occurence
-     * 
+     *
      * @return an integer corresponding to the date/time (seconds) of the next wake up occurence
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_nextOccurence() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return NEXTOCCURENCE_INVALID;
             }
@@ -526,9 +527,9 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Returns the date/time (seconds) of the next wake up occurence
-     * 
+     *
      * @return an integer corresponding to the date/time (seconds) of the next wake up occurence
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getNextOccurence() throws YAPI_Exception
@@ -545,7 +546,7 @@ public class YWakeUpSchedule extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the wake up schedule is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YWakeUpSchedule.isOnline() to test if the wake up schedule is
@@ -553,9 +554,9 @@ public class YWakeUpSchedule extends YFunction
      * a wake up schedule by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the wake up schedule
-     * 
+     *
      * @return a YWakeUpSchedule object allowing you to drive the wake up schedule.
      */
     public static YWakeUpSchedule FindWakeUpSchedule(String func)
@@ -574,11 +575,11 @@ public class YWakeUpSchedule extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -615,7 +616,7 @@ public class YWakeUpSchedule extends YFunction
      */
     public long get_minutes() throws YAPI_Exception
     {
-        long res = 0;
+        long res;
         // may throw an exception
         res = get_minutesB();
         res = ((res) << (30));
@@ -625,11 +626,11 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes all the minutes where a wake up must take place.
-     * 
+     *
      * @param bitmap : Minutes 00-59 of each hour scheduled for wake up.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_minutes(long bitmap) throws YAPI_Exception
@@ -641,7 +642,7 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Continues the enumeration of wake up schedules started using yFirstWakeUpSchedule().
-     * 
+     *
      * @return a pointer to a YWakeUpSchedule object, corresponding to
      *         a wake up schedule currently online, or a null pointer
      *         if there are no more wake up schedules to enumerate.
@@ -663,7 +664,7 @@ public class YWakeUpSchedule extends YFunction
      * Starts the enumeration of wake up schedules currently accessible.
      * Use the method YWakeUpSchedule.nextWakeUpSchedule() to iterate on
      * next wake up schedules.
-     * 
+     *
      * @return a pointer to a YWakeUpSchedule object, corresponding to
      *         the first wake up schedule currently online, or a null pointer
      *         if there are none.

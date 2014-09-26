@@ -2,13 +2,6 @@ package com.yoctopuce.YoctoAPI;
 
 import java.util.Date;
 
-/**
- * Created with IntelliJ IDEA.
- * User: seb
- * Date: 04.10.13
- * Time: 16:16
- * To change this template use File | Settings | File Templates.
- */
 class YSSDPCacheEntry {
     private String mSerial;
     private String mUUID;
@@ -41,6 +34,7 @@ class YSSDPCacheEntry {
             serial.append((char) Integer.parseInt(ch, 16));
         }
         serial.append('-');
+        //noinspection SpellCheckingInspection
         i = uuid.indexOf("-COFF-EE");
         i += 8;
         while(uuid.charAt(i) == '0') i++;

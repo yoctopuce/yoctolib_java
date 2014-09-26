@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMagnetometer.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YMagnetometer.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YMagnetometer class start)
 /**
  * YMagnetometer Class: Magnetometer function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YMagnetometer extends YSensor
 {
 //--- (end of YMagnetometer class start)
@@ -78,7 +79,7 @@ public class YMagnetometer extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -90,7 +91,7 @@ public class YMagnetometer extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -100,7 +101,7 @@ public class YMagnetometer extends YSensor
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YMagnetometer(String func)
@@ -116,28 +117,28 @@ public class YMagnetometer extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("xValue")) {
-            _xValue =  json_val.getDouble("xValue")/65536.0;
+            _xValue =  Math.round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("yValue")) {
-            _yValue =  json_val.getDouble("yValue")/65536.0;
+            _yValue =  Math.round(json_val.getDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("zValue")) {
-            _zValue =  json_val.getDouble("zValue")/65536.0;
+            _zValue =  Math.round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
     }
 
     /**
      * Returns the X component of the magnetic field, as a floating point number.
-     * 
-     * @return a floating point number corresponding to the X component of the magnetic field, as a
+     *
+     *  @return a floating point number corresponding to the X component of the magnetic field, as a
      * floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_xValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return XVALUE_INVALID;
             }
@@ -147,10 +148,10 @@ public class YMagnetometer extends YSensor
 
     /**
      * Returns the X component of the magnetic field, as a floating point number.
-     * 
-     * @return a floating point number corresponding to the X component of the magnetic field, as a
+     *
+     *  @return a floating point number corresponding to the X component of the magnetic field, as a
      * floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getXValue() throws YAPI_Exception
@@ -159,15 +160,15 @@ public class YMagnetometer extends YSensor
 
     /**
      * Returns the Y component of the magnetic field, as a floating point number.
-     * 
-     * @return a floating point number corresponding to the Y component of the magnetic field, as a
+     *
+     *  @return a floating point number corresponding to the Y component of the magnetic field, as a
      * floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_yValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YVALUE_INVALID;
             }
@@ -177,10 +178,10 @@ public class YMagnetometer extends YSensor
 
     /**
      * Returns the Y component of the magnetic field, as a floating point number.
-     * 
-     * @return a floating point number corresponding to the Y component of the magnetic field, as a
+     *
+     *  @return a floating point number corresponding to the Y component of the magnetic field, as a
      * floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getYValue() throws YAPI_Exception
@@ -189,15 +190,15 @@ public class YMagnetometer extends YSensor
 
     /**
      * Returns the Z component of the magnetic field, as a floating point number.
-     * 
-     * @return a floating point number corresponding to the Z component of the magnetic field, as a
+     *
+     *  @return a floating point number corresponding to the Z component of the magnetic field, as a
      * floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_zValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ZVALUE_INVALID;
             }
@@ -207,10 +208,10 @@ public class YMagnetometer extends YSensor
 
     /**
      * Returns the Z component of the magnetic field, as a floating point number.
-     * 
-     * @return a floating point number corresponding to the Z component of the magnetic field, as a
+     *
+     *  @return a floating point number corresponding to the Z component of the magnetic field, as a
      * floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getZValue() throws YAPI_Exception
@@ -227,7 +228,7 @@ public class YMagnetometer extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the magnetometer is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YMagnetometer.isOnline() to test if the magnetometer is
@@ -235,9 +236,9 @@ public class YMagnetometer extends YSensor
      * a magnetometer by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the magnetometer
-     * 
+     *
      * @return a YMagnetometer object allowing you to drive the magnetometer.
      */
     public static YMagnetometer FindMagnetometer(String func)
@@ -256,11 +257,11 @@ public class YMagnetometer extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -297,11 +298,11 @@ public class YMagnetometer extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -327,7 +328,7 @@ public class YMagnetometer extends YSensor
 
     /**
      * Continues the enumeration of magnetometers started using yFirstMagnetometer().
-     * 
+     *
      * @return a pointer to a YMagnetometer object, corresponding to
      *         a magnetometer currently online, or a null pointer
      *         if there are no more magnetometers to enumerate.
@@ -349,7 +350,7 @@ public class YMagnetometer extends YSensor
      * Starts the enumeration of magnetometers currently accessible.
      * Use the method YMagnetometer.nextMagnetometer() to iterate on
      * next magnetometers.
-     * 
+     *
      * @return a pointer to a YMagnetometer object, corresponding to
      *         the first magnetometer currently online, or a null pointer
      *         if there are none.

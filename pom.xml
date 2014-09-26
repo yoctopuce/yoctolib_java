@@ -7,7 +7,7 @@
     <groupId>com.yoctopuce.java</groupId>
     <artifactId>javabundle</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.16490-SNAPSHOT</version>
+    <version>1.10.17849-SNAPSHOT</version>
     <name>Yoctopuce Java API (with examples)</name>
     <description>Official Yoctopuce Library for Java with examples</description>
     <url>http://www.yoctopuce.com</url>
@@ -15,48 +15,54 @@
     <modules>
         <module>yoctolib</module>
         <module>Examples/Doc-GettingStarted-Yocto-0-10V-Rx</module>
-        <module>Examples/Doc-GettingStarted-Yocto-LatchedRelay</module>
-        <module>Examples/Doc-GettingStarted-Yocto-PowerRelay</module>
-        <module>Examples/Doc-SaveSettings</module>
         <module>Examples/Doc-GettingStarted-Yocto-3D</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Light</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Relay</module>
-        <module>Examples/Prog-DataLogger</module>
         <module>Examples/Doc-GettingStarted-Yocto-4-20mA-Rx</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Maxi-IO</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Servo</module>
-        <module>Examples/Prog-Display-DoubleBuffering</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Amp</module>
-        <module>Examples/Doc-GettingStarted-Yocto-MaxiCoupler</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Temperature</module>
-        <module>Examples/Prog-Display-DrawBitmap</module>
-        <module>Examples/Doc-GettingStarted-Yocto-MaxiDisplay</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Thermocouple</module>
-        <module>Examples/Prog-Display-Sequences</module>
-        <module>Examples/Doc-GettingStarted-Yocto-CO2</module>
-        <module>Examples/Doc-GettingStarted-Yocto-MaxiRelay</module>
-        <module>Examples/Doc-GettingStarted-Yocto-VOC</module>
-        <module>Examples/Prog-EventBased</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Meteo</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Volt</module>
-        <module>Examples/Prog-GetDeviceLogs</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Color</module>
-        <module>Examples/Doc-GettingStarted-Yocto-MiniDisplay</module>
-        <module>Examples/Doc-GettingStarted-Yocto-WatchdogDC</module>
-        <module>Examples/Prog-HTTPCallback</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Demo</module>
-        <module>Examples/Doc-GettingStarted-Yocto-PT100</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Watt</module>
-        <module>Examples/Prog-HubDiscovery-method1</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Display</module>
-        <module>Examples/Doc-GettingStarted-Yocto-PWM-Tx</module>
-        <module>Examples/Doc-Inventory</module>
-        <module>Examples/Prog-HubDiscovery-method2</module>
-        <module>Examples/Doc-GettingStarted-Yocto-Knob</module>
-        <module>Examples/Doc-GettingStarted-Yocto-PowerColor</module>
-        <module>Examples/Doc-ModuleControl</module>
-        <module>Examples/Prog-OldDataLogger</module>
         <module>Examples/Doc-GettingStarted-Yocto-Altimeter</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Amp</module>
+        <module>Examples/Doc-GettingStarted-Yocto-CO2</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Color</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Demo</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Display</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Knob</module>
+        <module>Examples/Doc-GettingStarted-Yocto-LatchedRelay</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Light</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Maxi-IO</module>
+        <module>Examples/Doc-GettingStarted-Yocto-MaxiCoupler</module>
+        <module>Examples/Doc-GettingStarted-Yocto-MaxiDisplay</module>
+        <module>Examples/Doc-GettingStarted-Yocto-MaxiRelay</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Meteo</module>
+        <module>Examples/Doc-GettingStarted-Yocto-milliVolt-Rx</module>
+        <module>Examples/Doc-GettingStarted-Yocto-milliVolt-Rx-BNC</module>
+        <module>Examples/Doc-GettingStarted-Yocto-MiniDisplay</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Motor-DC</module>
+        <module>Examples/Doc-GettingStarted-Yocto-PowerColor</module>
+        <module>Examples/Doc-GettingStarted-Yocto-PowerRelay</module>
+        <module>Examples/Doc-GettingStarted-Yocto-PT100</module>
+        <module>Examples/Doc-GettingStarted-Yocto-PWM-Rx</module>
+        <module>Examples/Doc-GettingStarted-Yocto-PWM-Tx</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Relay</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Servo</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Temperature</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Thermocouple</module>
+        <module>Examples/Doc-GettingStarted-Yocto-VOC</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Volt</module>
+        <module>Examples/Doc-GettingStarted-Yocto-WatchdogDC</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Watt</module>
+        <module>Examples/Doc-Inventory</module>
+        <module>Examples/Doc-ModuleControl</module>
+        <module>Examples/Doc-SaveSettings</module>
+        <module>Examples/Prog-DataLogger</module>
+        <module>Examples/Prog-Display-DoubleBuffering</module>
+        <module>Examples/Prog-Display-DrawBitmap</module>
+        <module>Examples/Prog-Display-Sequences</module>
+        <module>Examples/Prog-EventBased</module>
+        <module>Examples/Prog-GetDeviceLogs</module>
+        <module>Examples/Prog-HTTPCallback</module>
+        <module>Examples/Prog-HubDiscovery-method1</module>
+        <module>Examples/Prog-HubDiscovery-method2</module>
+        <module>Examples/Prog-MODBUS</module>
+        <module>Examples/Prog-OldDataLogger</module>
+        <module>Examples/Prog-FirmwareUpdate</module>
     </modules>
 
     <developers>

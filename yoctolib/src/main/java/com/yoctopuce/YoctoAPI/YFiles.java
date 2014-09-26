@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YFiles.java 17678 2014-09-16 16:31:26Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -47,12 +47,13 @@ import org.json.JSONObject;
 //--- (generated code: YFiles class start)
 /**
  * YFiles Class: Files function interface
- * 
+ *
  * The filesystem interface makes it possible to store files
  * on some devices, for instance to design a custom web UI
  * (for networked devices) or to add fonts (on display
  * devices).
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YFiles extends YFunction
 {
 //--- (end of generated code: YFiles class start)
@@ -75,7 +76,7 @@ public class YFiles extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -87,7 +88,7 @@ public class YFiles extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -122,14 +123,14 @@ public class YFiles extends YFunction
 
     /**
      * Returns the number of files currently loaded in the filesystem.
-     * 
+     *
      * @return an integer corresponding to the number of files currently loaded in the filesystem
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_filesCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FILESCOUNT_INVALID;
             }
@@ -139,9 +140,9 @@ public class YFiles extends YFunction
 
     /**
      * Returns the number of files currently loaded in the filesystem.
-     * 
+     *
      * @return an integer corresponding to the number of files currently loaded in the filesystem
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getFilesCount() throws YAPI_Exception
@@ -150,14 +151,14 @@ public class YFiles extends YFunction
 
     /**
      * Returns the free space for uploading new files to the filesystem, in bytes.
-     * 
+     *
      * @return an integer corresponding to the free space for uploading new files to the filesystem, in bytes
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_freeSpace() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREESPACE_INVALID;
             }
@@ -167,9 +168,9 @@ public class YFiles extends YFunction
 
     /**
      * Returns the free space for uploading new files to the filesystem, in bytes.
-     * 
+     *
      * @return an integer corresponding to the free space for uploading new files to the filesystem, in bytes
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getFreeSpace() throws YAPI_Exception
@@ -186,7 +187,7 @@ public class YFiles extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the filesystem is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YFiles.isOnline() to test if the filesystem is
@@ -194,9 +195,9 @@ public class YFiles extends YFunction
      * a filesystem by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the filesystem
-     * 
+     *
      * @return a YFiles object allowing you to drive the filesystem.
      */
     public static YFiles FindFiles(String func)
@@ -215,11 +216,11 @@ public class YFiles extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -260,11 +261,11 @@ public class YFiles extends YFunction
     }
 
     /**
-     * Reinitializes the filesystem to its clean, unfragmented, empty state.
+     * Reinitialize the filesystem to its clean, unfragmented, empty state.
      * All files previously uploaded are permanently lost.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int format_fs() throws YAPI_Exception
@@ -280,14 +281,14 @@ public class YFiles extends YFunction
     /**
      * Returns a list of YFileRecord objects that describe files currently loaded
      * in the filesystem.
-     * 
+     *
      * @param pattern : an optional filter pattern, using star and question marks
      *         as wildcards. When an empty pattern is provided, all file records
      *         are returned.
-     * 
+     *
      * @return a list of YFileRecord objects, containing the file path
      *         and name, byte size and 32-bit CRC of the file content.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<YFileRecord> get_list(String pattern) throws YAPI_Exception
@@ -306,11 +307,11 @@ public class YFiles extends YFunction
 
     /**
      * Downloads the requested file and returns a binary buffer with its content.
-     * 
+     *
      * @param pathname : path and name of the file to download
-     * 
+     *
      * @return a binary buffer with the file content
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public byte[] download(String pathname) throws YAPI_Exception
@@ -321,12 +322,12 @@ public class YFiles extends YFunction
     /**
      * Uploads a file to the filesystem, to the specified full path name.
      * If a file already exists with the same path name, its content is overwritten.
-     * 
+     *
      * @param pathname : path and name of the new file to create
      * @param content : binary buffer with the content to set
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int upload(String pathname,byte[] content) throws YAPI_Exception
@@ -341,11 +342,11 @@ public class YFiles extends YFunction
      * with the same path name will always reuse any space not freed previously.
      * If you need to ensure that no space is taken by previously deleted files,
      * you can use format_fs to fully reinitialize the filesystem.
-     * 
+     *
      * @param pathname : path and name of the file to remove.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int remove(String pathname) throws YAPI_Exception
@@ -360,7 +361,7 @@ public class YFiles extends YFunction
 
     /**
      * Continues the enumeration of filesystems started using yFirstFiles().
-     * 
+     *
      * @return a pointer to a YFiles object, corresponding to
      *         a filesystem currently online, or a null pointer
      *         if there are no more filesystems to enumerate.
@@ -382,7 +383,7 @@ public class YFiles extends YFunction
      * Starts the enumeration of filesystems currently accessible.
      * Use the method YFiles.nextFiles() to iterate on
      * next filesystems.
-     * 
+     *
      * @return a pointer to a YFiles object, corresponding to
      *         the first filesystem currently online, or a null pointer
      *         if there are none.

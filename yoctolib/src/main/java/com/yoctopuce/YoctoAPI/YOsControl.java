@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOsControl.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YOsControl.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindOsControl(), the high-level API for OsControl functions
  *
@@ -47,11 +47,12 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YOsControl class start)
 /**
  * YOsControl Class: OS control
- * 
+ *
  * The OScontrol object allows some control over the operating system running a VirtualHub.
  * OsControl is available on the VirtualHub software only. This feature must be activated at the VirtualHub
  * start up with -o option.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YOsControl extends YFunction
 {
 //--- (end of YOsControl class start)
@@ -68,7 +69,7 @@ public class YOsControl extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -80,7 +81,7 @@ public class YOsControl extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -90,7 +91,7 @@ public class YOsControl extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YOsControl(String func)
@@ -114,15 +115,15 @@ public class YOsControl extends YFunction
     /**
      * Returns the remaining number of seconds before the OS shutdown, or zero when no
      * shutdown has been scheduled.
-     * 
+     *
      * @return an integer corresponding to the remaining number of seconds before the OS shutdown, or zero when no
      *         shutdown has been scheduled
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_shutdownCountdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SHUTDOWNCOUNTDOWN_INVALID;
             }
@@ -133,10 +134,10 @@ public class YOsControl extends YFunction
     /**
      * Returns the remaining number of seconds before the OS shutdown, or zero when no
      * shutdown has been scheduled.
-     * 
+     *
      * @return an integer corresponding to the remaining number of seconds before the OS shutdown, or zero when no
      *         shutdown has been scheduled
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getShutdownCountdown() throws YAPI_Exception
@@ -165,7 +166,7 @@ public class YOsControl extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the OS control is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YOsControl.isOnline() to test if the OS control is
@@ -173,9 +174,9 @@ public class YOsControl extends YFunction
      * OS control by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the OS control
-     * 
+     *
      * @return a YOsControl object allowing you to drive the OS control.
      */
     public static YOsControl FindOsControl(String func)
@@ -194,11 +195,11 @@ public class YOsControl extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -232,11 +233,11 @@ public class YOsControl extends YFunction
 
     /**
      * Schedules an OS shutdown after a given number of seconds.
-     * 
+     *
      * @param secBeforeShutDown : number of seconds before shutdown
-     * 
+     *
      * @return YAPI.SUCCESS when the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int shutdown(int secBeforeShutDown) throws YAPI_Exception
@@ -246,7 +247,7 @@ public class YOsControl extends YFunction
 
     /**
      * Continues the enumeration of OS control started using yFirstOsControl().
-     * 
+     *
      * @return a pointer to a YOsControl object, corresponding to
      *         OS control currently online, or a null pointer
      *         if there are no more OS control to enumerate.
@@ -268,7 +269,7 @@ public class YOsControl extends YFunction
      * Starts the enumeration of OS control currently accessible.
      * Use the method YOsControl.nextOsControl() to iterate on
      * next OS control.
-     * 
+     *
      * @return a pointer to a YOsControl object, corresponding to
      *         the first OS control currently online, or a null pointer
      *         if there are none.

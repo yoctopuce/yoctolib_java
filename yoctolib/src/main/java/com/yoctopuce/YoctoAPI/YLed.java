@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLed.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YLed.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindLed(), the high-level API for Led functions
  *
@@ -47,11 +47,12 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YLed class start)
 /**
  * YLed Class: Led function interface
- * 
+ *
  * Yoctopuce application programming interface
  * allows you not only to drive the intensity of the led, but also to
  * have it blink at various preset frequencies.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YLed extends YFunction
 {
 //--- (end of YLed class start)
@@ -88,7 +89,7 @@ public class YLed extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -100,7 +101,7 @@ public class YLed extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -110,7 +111,7 @@ public class YLed extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YLed(String func)
@@ -139,14 +140,14 @@ public class YLed extends YFunction
 
     /**
      * Returns the current led state.
-     * 
+     *
      * @return either YLed.POWER_OFF or YLed.POWER_ON, according to the current led state
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_power() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWER_INVALID;
             }
@@ -156,9 +157,9 @@ public class YLed extends YFunction
 
     /**
      * Returns the current led state.
-     * 
+     *
      * @return either Y_POWER_OFF or Y_POWER_ON, according to the current led state
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPower() throws YAPI_Exception
@@ -167,11 +168,11 @@ public class YLed extends YFunction
 
     /**
      * Changes the state of the led.
-     * 
+     *
      * @param newval : either YLed.POWER_OFF or YLed.POWER_ON, according to the state of the led
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_power(int  newval)  throws YAPI_Exception
@@ -184,11 +185,11 @@ public class YLed extends YFunction
 
     /**
      * Changes the state of the led.
-     * 
+     *
      * @param newval : either Y_POWER_OFF or Y_POWER_ON, according to the state of the led
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setPower(int newval)  throws YAPI_Exception
@@ -197,14 +198,14 @@ public class YLed extends YFunction
 
     /**
      * Returns the current led intensity (in per cent).
-     * 
+     *
      * @return an integer corresponding to the current led intensity (in per cent)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_luminosity() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LUMINOSITY_INVALID;
             }
@@ -214,9 +215,9 @@ public class YLed extends YFunction
 
     /**
      * Returns the current led intensity (in per cent).
-     * 
+     *
      * @return an integer corresponding to the current led intensity (in per cent)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getLuminosity() throws YAPI_Exception
@@ -225,11 +226,11 @@ public class YLed extends YFunction
 
     /**
      * Changes the current led intensity (in per cent).
-     * 
+     *
      * @param newval : an integer corresponding to the current led intensity (in per cent)
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_luminosity(int  newval)  throws YAPI_Exception
@@ -242,11 +243,11 @@ public class YLed extends YFunction
 
     /**
      * Changes the current led intensity (in per cent).
-     * 
+     *
      * @param newval : an integer corresponding to the current led intensity (in per cent)
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setLuminosity(int newval)  throws YAPI_Exception
@@ -255,15 +256,15 @@ public class YLed extends YFunction
 
     /**
      * Returns the current led signaling mode.
-     * 
-     * @return a value among YLed.BLINKING_STILL, YLed.BLINKING_RELAX, YLed.BLINKING_AWARE,
+     *
+     *  @return a value among YLed.BLINKING_STILL, YLed.BLINKING_RELAX, YLed.BLINKING_AWARE,
      * YLed.BLINKING_RUN, YLed.BLINKING_CALL and YLed.BLINKING_PANIC corresponding to the current led signaling mode
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_blinking() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BLINKING_INVALID;
             }
@@ -273,10 +274,10 @@ public class YLed extends YFunction
 
     /**
      * Returns the current led signaling mode.
-     * 
-     * @return a value among Y_BLINKING_STILL, Y_BLINKING_RELAX, Y_BLINKING_AWARE, Y_BLINKING_RUN,
+     *
+     *  @return a value among Y_BLINKING_STILL, Y_BLINKING_RELAX, Y_BLINKING_AWARE, Y_BLINKING_RUN,
      * Y_BLINKING_CALL and Y_BLINKING_PANIC corresponding to the current led signaling mode
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getBlinking() throws YAPI_Exception
@@ -285,12 +286,12 @@ public class YLed extends YFunction
 
     /**
      * Changes the current led signaling mode.
-     * 
-     * @param newval : a value among YLed.BLINKING_STILL, YLed.BLINKING_RELAX, YLed.BLINKING_AWARE,
+     *
+     *  @param newval : a value among YLed.BLINKING_STILL, YLed.BLINKING_RELAX, YLed.BLINKING_AWARE,
      * YLed.BLINKING_RUN, YLed.BLINKING_CALL and YLed.BLINKING_PANIC corresponding to the current led signaling mode
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_blinking(int  newval)  throws YAPI_Exception
@@ -303,12 +304,12 @@ public class YLed extends YFunction
 
     /**
      * Changes the current led signaling mode.
-     * 
-     * @param newval : a value among Y_BLINKING_STILL, Y_BLINKING_RELAX, Y_BLINKING_AWARE, Y_BLINKING_RUN,
+     *
+     *  @param newval : a value among Y_BLINKING_STILL, Y_BLINKING_RELAX, Y_BLINKING_AWARE, Y_BLINKING_RUN,
      * Y_BLINKING_CALL and Y_BLINKING_PANIC corresponding to the current led signaling mode
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setBlinking(int newval)  throws YAPI_Exception
@@ -325,7 +326,7 @@ public class YLed extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the led is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YLed.isOnline() to test if the led is
@@ -333,9 +334,9 @@ public class YLed extends YFunction
      * a led by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the led
-     * 
+     *
      * @return a YLed object allowing you to drive the led.
      */
     public static YLed FindLed(String func)
@@ -354,11 +355,11 @@ public class YLed extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -392,7 +393,7 @@ public class YLed extends YFunction
 
     /**
      * Continues the enumeration of leds started using yFirstLed().
-     * 
+     *
      * @return a pointer to a YLed object, corresponding to
      *         a led currently online, or a null pointer
      *         if there are no more leds to enumerate.
@@ -414,7 +415,7 @@ public class YLed extends YFunction
      * Starts the enumeration of leds currently accessible.
      * Use the method YLed.nextLed() to iterate on
      * next leds.
-     * 
+     *
      * @return a pointer to a YLed object, corresponding to
      *         the first led currently online, or a null pointer
      *         if there are none.

@@ -23,6 +23,7 @@ public class Demo {
             progress = dataset.loadMore();
             System.out.print(String.format("\b\b\b\b%3d%%",progress));
         } while(progress <100);
+        System.out.println("");
         ArrayList<YMeasure> details = dataset.get_measures();
         for(YMeasure m :details) {
             System.out.println(String.format("from %s to %s : min=%.3f%s avg=%.3f%s  max=%.3f%s",

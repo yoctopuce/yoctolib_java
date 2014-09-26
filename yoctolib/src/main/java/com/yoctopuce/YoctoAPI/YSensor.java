@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 16091 2014-05-08 12:10:31Z seb $
+ * $Id: YSensor.java 17678 2014-09-16 16:31:26Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -48,10 +48,11 @@ import java.util.ArrayList;
 //--- (generated code: YSensor class start)
 /**
  * YSensor Class: Sensor function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YSensor extends YFunction
 {
 //--- (end of generated code: YSensor class start)
@@ -110,6 +111,7 @@ public class YSensor extends YFunction
     protected double _scale = 0;
     protected double _decexp = 0;
     protected boolean _isScal;
+    protected boolean _isScal32;
     protected int _caltyp = 0;
     protected ArrayList<Integer> _calpar = new ArrayList<Integer>();
     protected ArrayList<Double> _calraw = new ArrayList<Double>();
@@ -121,7 +123,7 @@ public class YSensor extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -133,7 +135,7 @@ public class YSensor extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -270,45 +272,45 @@ public class YSensor extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("unit")) {
-            _unit =  json_val.getString("unit"); ;
+            _unit =  json_val.getString("unit");
         }
         if (json_val.has("currentValue")) {
-            _currentValue =  json_val.getDouble("currentValue")/65536.0;
+            _currentValue =  Math.round(json_val.getDouble("currentValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("lowestValue")) {
-            _lowestValue =  json_val.getDouble("lowestValue")/65536.0;
+            _lowestValue =  Math.round(json_val.getDouble("lowestValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("highestValue")) {
-            _highestValue =  json_val.getDouble("highestValue")/65536.0;
+            _highestValue =  Math.round(json_val.getDouble("highestValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("currentRawValue")) {
-            _currentRawValue =  json_val.getDouble("currentRawValue")/65536.0;
+            _currentRawValue =  Math.round(json_val.getDouble("currentRawValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("logFrequency")) {
-            _logFrequency =  json_val.getString("logFrequency"); ;
+            _logFrequency =  json_val.getString("logFrequency");
         }
         if (json_val.has("reportFrequency")) {
-            _reportFrequency =  json_val.getString("reportFrequency"); ;
+            _reportFrequency =  json_val.getString("reportFrequency");
         }
         if (json_val.has("calibrationParam")) {
-            _calibrationParam =  json_val.getString("calibrationParam"); ;
+            _calibrationParam =  json_val.getString("calibrationParam");
         }
         if (json_val.has("resolution")) {
-            _resolution =  (json_val.getInt("resolution") > 100 ? 1.0 / Math.round(65536.0/json_val.getDouble("resolution")) : 0.001 / Math.round(67.0/json_val.getDouble("resolution")));
+            _resolution =  Math.round(json_val.getDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
     }
 
     /**
      * Returns the measuring unit for the measure.
-     * 
+     *
      * @return a string corresponding to the measuring unit for the measure
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_unit() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UNIT_INVALID;
             }
@@ -318,9 +320,9 @@ public class YSensor extends YFunction
 
     /**
      * Returns the measuring unit for the measure.
-     * 
+     *
      * @return a string corresponding to the measuring unit for the measure
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getUnit() throws YAPI_Exception
@@ -328,16 +330,17 @@ public class YSensor extends YFunction
     { return get_unit(); }
 
     /**
-     * Returns the current value of the measure.
-     * 
-     * @return a floating point number corresponding to the current value of the measure
-     * 
+     * Returns the current value of the measure, in the specified unit, as a floating point number.
+     *
+     *  @return a floating point number corresponding to the current value of the measure, in the specified
+     * unit, as a floating point number
+     *
      * @throws YAPI_Exception on error
      */
     public double get_currentValue() throws YAPI_Exception
     {
-        double res = 0;
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        double res;
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTVALUE_INVALID;
             }
@@ -347,14 +350,15 @@ public class YSensor extends YFunction
             res = _currentValue;
         }
         res = res * _iresol;
-        return Math.round(res) / _iresol;
+        return (double)Math.round(res) / _iresol;
     }
 
     /**
-     * Returns the current value of the measure.
-     * 
-     * @return a floating point number corresponding to the current value of the measure
-     * 
+     * Returns the current value of the measure, in the specified unit, as a floating point number.
+     *
+     *  @return a floating point number corresponding to the current value of the measure, in the specified
+     * unit, as a floating point number
+     *
      * @throws YAPI_Exception on error
      */
     public double getCurrentValue() throws YAPI_Exception
@@ -363,28 +367,28 @@ public class YSensor extends YFunction
 
     /**
      * Changes the recorded minimal value observed.
-     * 
+     *
      * @param newval : a floating point number corresponding to the recorded minimal value observed
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_lowestValue(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval*65536.0));
+        rest_val = Long.toString(Math.round(newval * 65536.0));
         _setAttr("lowestValue",rest_val);
         return YAPI.SUCCESS;
     }
 
     /**
      * Changes the recorded minimal value observed.
-     * 
+     *
      * @param newval : a floating point number corresponding to the recorded minimal value observed
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setLowestValue(double newval)  throws YAPI_Exception
@@ -393,30 +397,30 @@ public class YSensor extends YFunction
 
     /**
      * Returns the minimal value observed for the measure since the device was started.
-     * 
-     * @return a floating point number corresponding to the minimal value observed for the measure since
+     *
+     *  @return a floating point number corresponding to the minimal value observed for the measure since
      * the device was started
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_lowestValue() throws YAPI_Exception
     {
-        double res = 0;
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        double res;
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOWESTVALUE_INVALID;
             }
         }
         res = _lowestValue * _iresol;
-        return Math.round(res) / _iresol;
+        return (double)Math.round(res) / _iresol;
     }
 
     /**
      * Returns the minimal value observed for the measure since the device was started.
-     * 
-     * @return a floating point number corresponding to the minimal value observed for the measure since
+     *
+     *  @return a floating point number corresponding to the minimal value observed for the measure since
      * the device was started
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getLowestValue() throws YAPI_Exception
@@ -425,28 +429,28 @@ public class YSensor extends YFunction
 
     /**
      * Changes the recorded maximal value observed.
-     * 
+     *
      * @param newval : a floating point number corresponding to the recorded maximal value observed
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_highestValue(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval*65536.0));
+        rest_val = Long.toString(Math.round(newval * 65536.0));
         _setAttr("highestValue",rest_val);
         return YAPI.SUCCESS;
     }
 
     /**
      * Changes the recorded maximal value observed.
-     * 
+     *
      * @param newval : a floating point number corresponding to the recorded maximal value observed
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setHighestValue(double newval)  throws YAPI_Exception
@@ -455,30 +459,30 @@ public class YSensor extends YFunction
 
     /**
      * Returns the maximal value observed for the measure since the device was started.
-     * 
-     * @return a floating point number corresponding to the maximal value observed for the measure since
+     *
+     *  @return a floating point number corresponding to the maximal value observed for the measure since
      * the device was started
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_highestValue() throws YAPI_Exception
     {
-        double res = 0;
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        double res;
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return HIGHESTVALUE_INVALID;
             }
         }
         res = _highestValue * _iresol;
-        return Math.round(res) / _iresol;
+        return (double)Math.round(res) / _iresol;
     }
 
     /**
      * Returns the maximal value observed for the measure since the device was started.
-     * 
-     * @return a floating point number corresponding to the maximal value observed for the measure since
+     *
+     *  @return a floating point number corresponding to the maximal value observed for the measure since
      * the device was started
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getHighestValue() throws YAPI_Exception
@@ -486,15 +490,17 @@ public class YSensor extends YFunction
     { return get_highestValue(); }
 
     /**
-     * Returns the uncalibrated, unrounded raw value returned by the sensor.
-     * 
-     * @return a floating point number corresponding to the uncalibrated, unrounded raw value returned by the sensor
-     * 
+     *  Returns the uncalibrated, unrounded raw value returned by the sensor, in the specified unit, as a
+     * floating point number.
+     *
+     *  @return a floating point number corresponding to the uncalibrated, unrounded raw value returned by
+     * the sensor, in the specified unit, as a floating point number
+     *
      * @throws YAPI_Exception on error
      */
     public double get_currentRawValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTRAWVALUE_INVALID;
             }
@@ -503,10 +509,12 @@ public class YSensor extends YFunction
     }
 
     /**
-     * Returns the uncalibrated, unrounded raw value returned by the sensor.
-     * 
-     * @return a floating point number corresponding to the uncalibrated, unrounded raw value returned by the sensor
-     * 
+     *  Returns the uncalibrated, unrounded raw value returned by the sensor, in the specified unit, as a
+     * floating point number.
+     *
+     *  @return a floating point number corresponding to the uncalibrated, unrounded raw value returned by
+     * the sensor, in the specified unit, as a floating point number
+     *
      * @throws YAPI_Exception on error
      */
     public double getCurrentRawValue() throws YAPI_Exception
@@ -516,15 +524,15 @@ public class YSensor extends YFunction
     /**
      * Returns the datalogger recording frequency for this function, or "OFF"
      * when measures are not stored in the data logger flash memory.
-     * 
+     *
      * @return a string corresponding to the datalogger recording frequency for this function, or "OFF"
      *         when measures are not stored in the data logger flash memory
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_logFrequency() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOGFREQUENCY_INVALID;
             }
@@ -535,10 +543,10 @@ public class YSensor extends YFunction
     /**
      * Returns the datalogger recording frequency for this function, or "OFF"
      * when measures are not stored in the data logger flash memory.
-     * 
+     *
      * @return a string corresponding to the datalogger recording frequency for this function, or "OFF"
      *         when measures are not stored in the data logger flash memory
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getLogFrequency() throws YAPI_Exception
@@ -551,11 +559,11 @@ public class YSensor extends YFunction
      * as sample per minute (for instance "15/m") or in samples per
      * hour (eg. "4/h"). To disable recording for this function, use
      * the value "OFF".
-     * 
+     *
      * @param newval : a string corresponding to the datalogger recording frequency for this function
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_logFrequency(String  newval)  throws YAPI_Exception
@@ -572,11 +580,11 @@ public class YSensor extends YFunction
      * as sample per minute (for instance "15/m") or in samples per
      * hour (eg. "4/h"). To disable recording for this function, use
      * the value "OFF".
-     * 
+     *
      * @param newval : a string corresponding to the datalogger recording frequency for this function
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setLogFrequency(String newval)  throws YAPI_Exception
@@ -586,15 +594,15 @@ public class YSensor extends YFunction
     /**
      * Returns the timed value notification frequency, or "OFF" if timed
      * value notifications are disabled for this function.
-     * 
+     *
      * @return a string corresponding to the timed value notification frequency, or "OFF" if timed
      *         value notifications are disabled for this function
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_reportFrequency() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return REPORTFREQUENCY_INVALID;
             }
@@ -605,10 +613,10 @@ public class YSensor extends YFunction
     /**
      * Returns the timed value notification frequency, or "OFF" if timed
      * value notifications are disabled for this function.
-     * 
+     *
      * @return a string corresponding to the timed value notification frequency, or "OFF" if timed
      *         value notifications are disabled for this function
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String getReportFrequency() throws YAPI_Exception
@@ -621,11 +629,11 @@ public class YSensor extends YFunction
      * as sample per minute (for instance "15/m") or in samples per
      * hour (eg. "4/h"). To disable timed value notifications for this
      * function, use the value "OFF".
-     * 
+     *
      * @param newval : a string corresponding to the timed value notification frequency for this function
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_reportFrequency(String  newval)  throws YAPI_Exception
@@ -642,11 +650,11 @@ public class YSensor extends YFunction
      * as sample per minute (for instance "15/m") or in samples per
      * hour (eg. "4/h"). To disable timed value notifications for this
      * function, use the value "OFF".
-     * 
+     *
      * @param newval : a string corresponding to the timed value notification frequency for this function
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setReportFrequency(String newval)  throws YAPI_Exception
@@ -658,7 +666,7 @@ public class YSensor extends YFunction
      */
     public String get_calibrationParam() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATIONPARAM_INVALID;
             }
@@ -688,17 +696,17 @@ public class YSensor extends YFunction
     /**
      * Changes the resolution of the measured physical values. The resolution corresponds to the numerical precision
      * when displaying value. It does not change the precision of the measure itself.
-     * 
+     *
      * @param newval : a floating point number corresponding to the resolution of the measured physical values
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_resolution(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval*65536.0));
+        rest_val = Long.toString(Math.round(newval * 65536.0));
         _setAttr("resolution",rest_val);
         return YAPI.SUCCESS;
     }
@@ -706,11 +714,11 @@ public class YSensor extends YFunction
     /**
      * Changes the resolution of the measured physical values. The resolution corresponds to the numerical precision
      * when displaying value. It does not change the precision of the measure itself.
-     * 
+     *
      * @param newval : a floating point number corresponding to the resolution of the measured physical values
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setResolution(double newval)  throws YAPI_Exception
@@ -720,14 +728,14 @@ public class YSensor extends YFunction
     /**
      * Returns the resolution of the measured values. The resolution corresponds to the numerical precision
      * of the measures, which is not always the same as the actual precision of the sensor.
-     * 
+     *
      * @return a floating point number corresponding to the resolution of the measured values
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_resolution() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RESOLUTION_INVALID;
             }
@@ -738,9 +746,9 @@ public class YSensor extends YFunction
     /**
      * Returns the resolution of the measured values. The resolution corresponds to the numerical precision
      * of the measures, which is not always the same as the actual precision of the sensor.
-     * 
+     *
      * @return a floating point number corresponding to the resolution of the measured values
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getResolution() throws YAPI_Exception
@@ -757,7 +765,7 @@ public class YSensor extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the sensor is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YSensor.isOnline() to test if the sensor is
@@ -765,9 +773,9 @@ public class YSensor extends YFunction
      * a sensor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the sensor
-     * 
+     *
      * @return a YSensor object allowing you to drive the sensor.
      */
     public static YSensor FindSensor(String func)
@@ -786,11 +794,11 @@ public class YSensor extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -825,110 +833,134 @@ public class YSensor extends YFunction
     @Override
     public int _parserHelper()
     {
-        int position = 0;
-        int maxpos = 0;
+        int position;
+        int maxpos;
         ArrayList<Integer> iCalib = new ArrayList<Integer>();
-        int iRaw = 0;
-        int iRef = 0;
-        double fRaw = 0;
-        double fRef = 0;
-        // Store inverted resolution, to provide better rounding
-        if (_resolution > 0) {
-            _iresol = Math.round(1.0 / _resolution);
-        } else {
-            return 0;
-        }
-        
+        int iRaw;
+        int iRef;
+        double fRaw;
+        double fRef;
+        _caltyp = -1;
         _scale = -1;
+        _isScal32 = false;
         _calpar.clear();
         _calraw.clear();
         _calref.clear();
-        
+        // Store inverted resolution, to provide better rounding
+        if (_resolution > 0) {
+            _iresol = (double)Math.round(1.0 / _resolution);
+        } else {
+            _iresol = 10000;
+            _resolution = 0.0001;
+        }
         // Old format: supported when there is no calibration
         if (_calibrationParam.equals("") || _calibrationParam.equals("0")) {
             _caltyp = 0;
             return 0;
         }
-        // Old format: calibrated value will be provided by the device
         if ((_calibrationParam).indexOf(",") >= 0) {
-            _caltyp = -1;
-            return 0;
-        }
-        // New format, decode parameters
-        iCalib = SafeYAPI()._decodeWords(_calibrationParam);
-        // In case of unknown format, calibrated value will be provided by the device
-        if (iCalib.size() < 2) {
-            _caltyp = -1;
-            return 0;
-        }
-        
-        // Save variable format (scale for scalar, or decimal exponent)
-        _isScal = (iCalib.get(1) > 0);
-        if (_isScal) {
-            _offset = iCalib.get(0);
-            if (_offset > 32767) {
-                _offset = _offset - 65536;
+            iCalib = SafeYAPI()._decodeFloats(_calibrationParam);
+            _caltyp = ((iCalib.get(0).intValue()) / (1000));
+            if (_caltyp > 0) {
+                if (_caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
+                    _caltyp = -1;
+                    return 0;
+                }
+                _calhdl = SafeYAPI()._getCalibrationHandler(_caltyp);
+                if (!(_calhdl != null)) {
+                    _caltyp = -1;
+                    return 0;
+                }
             }
-            _scale = iCalib.get(1);
-            _decexp = 0;
-        } else {
+            _isScal = true;
+            _isScal32 = true;
             _offset = 0;
-            _scale = 1;
-            _decexp = 1.0;
-            position = iCalib.get(0);
-            while (position > 0) {
-                _decexp = _decexp * 10;
-                position = position - 1;
-            }
-        }
-        
-        // Shortcut when there is no calibration parameter
-        if (iCalib.size() == 2) {
-            _caltyp = 0;
-            return 0;
-        }
-        
-        _caltyp = iCalib.get(2);
-        _calhdl = SafeYAPI()._getCalibrationHandler(_caltyp);
-        // parse calibration points
-        position = 3;
-        if (_caltyp <= 10) {
-            maxpos = _caltyp;
-        } else {
-            if (_caltyp <= 20) {
-                maxpos = _caltyp - 10;
-            } else {
-                maxpos = 5;
-            }
-        }
-        maxpos = 3 + 2 * maxpos;
-        if (maxpos > iCalib.size()) {
+            _scale = 1000;
             maxpos = iCalib.size();
-        }
-        _calpar.clear();
-        _calraw.clear();
-        _calref.clear();
-        while (position + 1 < maxpos) {
-            iRaw = iCalib.get(position);
-            iRef = iCalib.get(position + 1);
-            _calpar.add(iRaw);
-            _calpar.add(iRef);
-            if (_isScal) {
-                fRaw = iRaw;
-                fRaw = (fRaw - _offset) / _scale;
-                fRef = iRef;
-                fRef = (fRef - _offset) / _scale;
+            _calpar.clear();
+            position = 1;
+            while (position < maxpos) {
+                _calpar.add(iCalib.get(position));
+                position = position + 1;
+            }
+            _calraw.clear();
+            _calref.clear();
+            position = 1;
+            while (position + 1 < maxpos) {
+                fRaw = iCalib.get(position).doubleValue();
+                fRaw = fRaw / 1000.0;
+                fRef = iCalib.get(position + 1).doubleValue();
+                fRef = fRef / 1000.0;
                 _calraw.add(fRaw);
                 _calref.add(fRef);
-            } else {
-                _calraw.add(SafeYAPI()._decimalToDouble(iRaw));
-                _calref.add(SafeYAPI()._decimalToDouble(iRef));
+                position = position + 2;
             }
-            position = position + 2;
+        } else {
+            iCalib = SafeYAPI()._decodeWords(_calibrationParam);
+            if (iCalib.size() < 2) {
+                _caltyp = -1;
+                return 0;
+            }
+            _isScal = (iCalib.get(1).intValue() > 0);
+            if (_isScal) {
+                _offset = iCalib.get(0).doubleValue();
+                if (_offset > 32767) {
+                    _offset = _offset - 65536;
+                }
+                _scale = iCalib.get(1).doubleValue();
+                _decexp = 0;
+            } else {
+                _offset = 0;
+                _scale = 1;
+                _decexp = 1.0;
+                position = iCalib.get(0).intValue();
+                while (position > 0) {
+                    _decexp = _decexp * 10;
+                    position = position - 1;
+                }
+            }
+            if (iCalib.size() == 2) {
+                _caltyp = 0;
+                return 0;
+            }
+            _caltyp = iCalib.get(2).intValue();
+            _calhdl = SafeYAPI()._getCalibrationHandler(_caltyp);
+            if (_caltyp <= 10) {
+                maxpos = _caltyp;
+            } else {
+                if (_caltyp <= 20) {
+                    maxpos = _caltyp - 10;
+                } else {
+                    maxpos = 5;
+                }
+            }
+            maxpos = 3 + 2 * maxpos;
+            if (maxpos > iCalib.size()) {
+                maxpos = iCalib.size();
+            }
+            _calpar.clear();
+            _calraw.clear();
+            _calref.clear();
+            position = 3;
+            while (position + 1 < maxpos) {
+                iRaw = iCalib.get(position).intValue();
+                iRef = iCalib.get(position + 1).intValue();
+                _calpar.add(iRaw);
+                _calpar.add(iRef);
+                if (_isScal) {
+                    fRaw = iRaw;
+                    fRaw = (fRaw - _offset) / _scale;
+                    fRef = iRef;
+                    fRef = (fRef - _offset) / _scale;
+                    _calraw.add(fRaw);
+                    _calref.add(fRef);
+                } else {
+                    _calraw.add(SafeYAPI()._decimalToDouble(iRaw));
+                    _calref.add(SafeYAPI()._decimalToDouble(iRef));
+                }
+                position = position + 2;
+            }
         }
-        
-        
-        
         return 0;
     }
 
@@ -940,11 +972,11 @@ public class YSensor extends YFunction
      * class for information on how to get an overview of the
      * recorded data, and how to load progressively a large set
      * of measures from the data logger.
-     * 
+     *
      * This function only works if the device uses a recent firmware,
      * as DataSet objects are not supported by firmwares older than
      * version 13000.
-     * 
+     *
      * @param startTime : the start of the desired measure time interval,
      *         as a Unix timestamp, i.e. the number of seconds since
      *         January 1, 1970 UTC. The special value 0 can be used
@@ -953,7 +985,7 @@ public class YSensor extends YFunction
      *         as a Unix timestamp, i.e. the number of seconds since
      *         January 1, 1970 UTC. The special value 0 can be used
      *         to include any meaasure, without ending limit.
-     * 
+     *
      * @return an instance of YDataSet, providing access to historical
      *         data. Past measures can be loaded progressively
      *         using methods from the YDataSet object.
@@ -973,11 +1005,11 @@ public class YSensor extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -1007,17 +1039,17 @@ public class YSensor extends YFunction
      * perform a linear interpolation of the error correction between specified
      * points. Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * For more information on advanced capabilities to refine the calibration of
      * sensors, please contact support@yoctopuce.com.
-     * 
+     *
      * @param rawValues : array of floating point numbers, corresponding to the raw
      *         values returned by the sensor for the correction points.
      * @param refValues : array of floating point numbers, corresponding to the corrected
      *         values for the correction points.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int calibrateFromPoints(ArrayList<Double> rawValues,ArrayList<Double> refValues) throws YAPI_Exception
@@ -1031,30 +1063,28 @@ public class YSensor extends YFunction
     /**
      * Retrieves error correction data points previously entered using the method
      * calibrateFromPoints.
-     * 
+     *
      * @param rawValues : array of floating point numbers, that will be filled by the
      *         function with the raw sensor values for the correction points.
      * @param refValues : array of floating point numbers, that will be filled by the
      *         function with the desired values for the correction points.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int loadCalibrationPoints(ArrayList<Double> rawValues,ArrayList<Double> refValues) throws YAPI_Exception
     {
         rawValues.clear();
         refValues.clear();
-        
         // Load function parameters if not yet loaded
         if (_scale == 0) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YAPI.DEVICE_NOT_FOUND;
             }
         }
-        
         if (_caltyp < 0) {
-            _throw(YAPI.NOT_SUPPORTED, "Device does not support new calibration parameters. Please upgrade your firmware");
+            _throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
             return YAPI.NOT_SUPPORTED;
         }
         rawValues.clear();
@@ -1071,51 +1101,56 @@ public class YSensor extends YFunction
     public String _encodeCalibrationPoints(ArrayList<Double> rawValues,ArrayList<Double> refValues) throws YAPI_Exception
     {
         String res;
-        int npt = 0;
-        int idx = 0;
-        int iRaw = 0;
-        int iRef = 0;
-        
+        int npt;
+        int idx;
+        int iRaw;
+        int iRef;
         npt = rawValues.size();
         if (npt != refValues.size()) {
             _throw(YAPI.INVALID_ARGUMENT, "Invalid calibration parameters (size mismatch)");
             return YAPI.INVALID_STRING;
         }
-        
         // Shortcut when building empty calibration parameters
         if (npt == 0) {
             return "0";
         }
-        
         // Load function parameters if not yet loaded
         if (_scale == 0) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YAPI.INVALID_STRING;
             }
         }
-        
         // Detect old firmware
         if ((_caltyp < 0) || (_scale < 0)) {
-            _throw(YAPI.NOT_SUPPORTED, "Device does not support new calibration parameters. Please upgrade your firmware");
+            _throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
             return "0";
         }
-        if (_isScal) {
-            res = String.format("%d",npt);
+        if (_isScal32) {
+            res = String.format("%d",YAPI.YOCTO_CALIB_TYPE_OFS);
             idx = 0;
             while (idx < npt) {
-                iRaw = (int) Math.round(rawValues.get(idx) * _scale + _offset);
-                iRef = (int) Math.round(refValues.get(idx) * _scale + _offset);
-                res = String.format("%s,%d,%d", res, iRaw,iRef);
+                res = String.format("%s,%f,%f", res, rawValues.get(idx).doubleValue(),refValues.get(idx).doubleValue());
                 idx = idx + 1;
             }
         } else {
-            res = String.format("%d",10 + npt);
-            idx = 0;
-            while (idx < npt) {
-                iRaw = (int) SafeYAPI()._doubleToDecimal(rawValues.get(idx));
-                iRef = (int) SafeYAPI()._doubleToDecimal(refValues.get(idx));
-                res = String.format("%s,%d,%d", res, iRaw,iRef);
-                idx = idx + 1;
+            if (_isScal) {
+                res = String.format("%d",npt);
+                idx = 0;
+                while (idx < npt) {
+                    iRaw = (int) (double)Math.round(rawValues.get(idx).doubleValue() * _scale + _offset);
+                    iRef = (int) (double)Math.round(refValues.get(idx).doubleValue() * _scale + _offset);
+                    res = String.format("%s,%d,%d", res, iRaw,iRef);
+                    idx = idx + 1;
+                }
+            } else {
+                res = String.format("%d",10 + npt);
+                idx = 0;
+                while (idx < npt) {
+                    iRaw = (int) SafeYAPI()._doubleToDecimal(rawValues.get(idx).doubleValue());
+                    iRef = (int) SafeYAPI()._doubleToDecimal(refValues.get(idx).doubleValue());
+                    res = String.format("%s,%d,%d", res, iRaw,iRef);
+                    idx = idx + 1;
+                }
             }
         }
         return res;
@@ -1140,66 +1175,140 @@ public class YSensor extends YFunction
 
     public YMeasure _decodeTimedReport(double timestamp,ArrayList<Integer> report)
     {
-        int i = 0;
-        int byteVal = 0;
-        int poww = 0;
-        int minRaw = 0;
-        int avgRaw = 0;
-        int maxRaw = 0;
-        double startTime = 0;
-        double endTime = 0;
-        double minVal = 0;
-        double avgVal = 0;
-        double maxVal = 0;
-        
+        int i;
+        int byteVal;
+        int poww;
+        int minRaw;
+        int avgRaw;
+        int maxRaw;
+        int sublen;
+        int difRaw;
+        double startTime;
+        double endTime;
+        double minVal;
+        double avgVal;
+        double maxVal;
         startTime = _prevTimedReport;
         endTime = timestamp;
         _prevTimedReport = endTime;
         if (startTime == 0) {
             startTime = endTime;
         }
-        if (report.get(0) > 0) {
-            minRaw = report.get(1) + 0x100 * report.get(2);
-            maxRaw = report.get(3) + 0x100 * report.get(4);
-            avgRaw = report.get(5) + 0x100 * report.get(6) + 0x10000 * report.get(7);
-            byteVal = report.get(8);
-            if (((byteVal) & (0x80)) == 0) {
-                avgRaw = avgRaw + 0x1000000 * byteVal;
-            } else {
-                avgRaw = avgRaw - 0x1000000 * (0x100 - byteVal);
-            }
-            minVal = _decodeVal(minRaw);
-            avgVal = _decodeAvg(avgRaw);
-            maxVal = _decodeVal(maxRaw);
-        } else {
-            poww = 1;
-            avgRaw = 0;
-            byteVal = 0;
-            i = 1;
-            while (i < report.size()) {
-                byteVal = report.get(i);
-                avgRaw = avgRaw + poww * byteVal;
-                poww = poww * 0x100;
-                i = i + 1;
-            }
-            if (_isScal) {
-                avgVal = _decodeVal(avgRaw);
-            } else {
+        if (report.get(0).intValue() == 2) {
+            if (report.size() <= 5) {
+                poww = 1;
+                avgRaw = 0;
+                byteVal = 0;
+                i = 1;
+                while (i < report.size()) {
+                    byteVal = report.get(i).intValue();
+                    avgRaw = avgRaw + poww * byteVal;
+                    poww = poww * 0x100;
+                    i = i + 1;
+                }
                 if (((byteVal) & (0x80)) != 0) {
                     avgRaw = avgRaw - poww;
                 }
-                avgVal = _decodeAvg(avgRaw);
+                avgVal = avgRaw / 1000.0;
+                if (_caltyp != 0) {
+                    if (_calhdl != null) {
+                        avgVal = _calhdl.yCalibrationHandler(avgVal, _caltyp, _calpar, _calraw, _calref);
+                    }
+                }
+                minVal = avgVal;
+                maxVal = avgVal;
+            } else {
+                sublen = 1 + ((report.get(1).intValue()) & (3));
+                poww = 1;
+                avgRaw = 0;
+                byteVal = 0;
+                i = 2;
+                while ((sublen > 0) && (i < report.size())) {
+                    byteVal = report.get(i).intValue();
+                    avgRaw = avgRaw + poww * byteVal;
+                    poww = poww * 0x100;
+                    i = i + 1;
+                    sublen = sublen - 1;
+                }
+                if (((byteVal) & (0x80)) != 0) {
+                    avgRaw = avgRaw - poww;
+                }
+                sublen = 1 + ((((report.get(1).intValue()) >> (2))) & (3));
+                poww = 1;
+                difRaw = 0;
+                while ((sublen > 0) && (i < report.size())) {
+                    byteVal = report.get(i).intValue();
+                    difRaw = avgRaw + poww * byteVal;
+                    poww = poww * 0x100;
+                    i = i + 1;
+                    sublen = sublen - 1;
+                }
+                minRaw = avgRaw - difRaw;
+                sublen = 1 + ((((report.get(1).intValue()) >> (4))) & (3));
+                poww = 1;
+                difRaw = 0;
+                while ((sublen > 0) && (i < report.size())) {
+                    byteVal = report.get(i).intValue();
+                    difRaw = avgRaw + poww * byteVal;
+                    poww = poww * 0x100;
+                    i = i + 1;
+                    sublen = sublen - 1;
+                }
+                maxRaw = avgRaw + difRaw;
+                avgVal = avgRaw / 1000.0;
+                minVal = minRaw / 1000.0;
+                maxVal = maxRaw / 1000.0;
+                if (_caltyp != 0) {
+                    if (_calhdl != null) {
+                        avgVal = _calhdl.yCalibrationHandler(avgVal, _caltyp, _calpar, _calraw, _calref);
+                        minVal = _calhdl.yCalibrationHandler(minVal, _caltyp, _calpar, _calraw, _calref);
+                        maxVal = _calhdl.yCalibrationHandler(maxVal, _caltyp, _calpar, _calraw, _calref);
+                    }
+                }
             }
-            minVal = avgVal;
-            maxVal = avgVal;
+        } else {
+            if (report.get(0).intValue() == 0) {
+                poww = 1;
+                avgRaw = 0;
+                byteVal = 0;
+                i = 1;
+                while (i < report.size()) {
+                    byteVal = report.get(i).intValue();
+                    avgRaw = avgRaw + poww * byteVal;
+                    poww = poww * 0x100;
+                    i = i + 1;
+                }
+                if (_isScal) {
+                    avgVal = _decodeVal(avgRaw);
+                } else {
+                    if (((byteVal) & (0x80)) != 0) {
+                        avgRaw = avgRaw - poww;
+                    }
+                    avgVal = _decodeAvg(avgRaw);
+                }
+                minVal = avgVal;
+                maxVal = avgVal;
+            } else {
+                minRaw = report.get(1).intValue() + 0x100 * report.get(2).intValue();
+                maxRaw = report.get(3).intValue() + 0x100 * report.get(4).intValue();
+                avgRaw = report.get(5).intValue() + 0x100 * report.get(6).intValue() + 0x10000 * report.get(7).intValue();
+                byteVal = report.get(8).intValue();
+                if (((byteVal) & (0x80)) == 0) {
+                    avgRaw = avgRaw + 0x1000000 * byteVal;
+                } else {
+                    avgRaw = avgRaw - 0x1000000 * (0x100 - byteVal);
+                }
+                minVal = _decodeVal(minRaw);
+                avgVal = _decodeAvg(avgRaw);
+                maxVal = _decodeVal(maxRaw);
+            }
         }
-        
         return new YMeasure(startTime, endTime, minVal, avgVal, maxVal);
     }
 
     public double _decodeVal(int w)
     {
-        double val = 0;
+        double val;
         val = w;
         if (_isScal) {
             val = (val - _offset) / _scale;
@@ -1207,14 +1316,16 @@ public class YSensor extends YFunction
             val = SafeYAPI()._decimalToDouble(w);
         }
         if (_caltyp != 0) {
-            val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
+            if (_calhdl != null) {
+                val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
+            }
         }
         return val;
     }
 
     public double _decodeAvg(int dw)
     {
-        double val = 0;
+        double val;
         val = dw;
         if (_isScal) {
             val = (val / 100 - _offset) / _scale;
@@ -1222,14 +1333,16 @@ public class YSensor extends YFunction
             val = val / _decexp;
         }
         if (_caltyp != 0) {
-            val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
+            if (_calhdl != null) {
+                val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
+            }
         }
         return val;
     }
 
     /**
      * Continues the enumeration of sensors started using yFirstSensor().
-     * 
+     *
      * @return a pointer to a YSensor object, corresponding to
      *         a sensor currently online, or a null pointer
      *         if there are no more sensors to enumerate.
@@ -1251,7 +1364,7 @@ public class YSensor extends YFunction
      * Starts the enumeration of sensors currently accessible.
      * Use the method YSensor.nextSensor() to iterate on
      * next sensors.
-     * 
+     *
      * @return a pointer to a YSensor object, corresponding to
      *         the first sensor currently online, or a null pointer
      *         if there are none.

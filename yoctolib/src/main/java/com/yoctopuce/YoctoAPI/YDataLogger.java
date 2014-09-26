@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataLogger.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YDataLogger.java 17678 2014-09-16 16:31:26Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -51,12 +51,13 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (generated code: YDataLogger class start)
 /**
  * YDataLogger Class: DataLogger function interface
- * 
+ *
  * Yoctopuce sensors include a non-volatile memory capable of storing ongoing measured
  * data automatically, without requiring a permanent connection to a computer.
  * The DataLogger function controls the global parameters of the internal data
  * logger.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YDataLogger extends YFunction
 {
 //--- (end of generated code: YDataLogger class start)
@@ -84,6 +85,13 @@ public class YDataLogger extends YFunction
     public static final int AUTOSTART_INVALID = -1;
 
     /**
+     * invalid beaconDriven value
+     */
+    public static final int BEACONDRIVEN_OFF = 0;
+    public static final int BEACONDRIVEN_ON = 1;
+    public static final int BEACONDRIVEN_INVALID = -1;
+
+    /**
      * invalid clearHistory value
      */
     public static final int CLEARHISTORY_FALSE = 0;
@@ -94,6 +102,7 @@ public class YDataLogger extends YFunction
     protected long _timeUTC = TIMEUTC_INVALID;
     protected int _recording = RECORDING_INVALID;
     protected int _autoStart = AUTOSTART_INVALID;
+    protected int _beaconDriven = BEACONDRIVEN_INVALID;
     protected int _clearHistory = CLEARHISTORY_INVALID;
     protected UpdateCallback _valueCallbackDataLogger = null;
 
@@ -102,7 +111,7 @@ public class YDataLogger extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -114,7 +123,7 @@ public class YDataLogger extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -173,16 +182,16 @@ public class YDataLogger extends YFunction
      * The caller must pass by reference an empty array to hold YDataStream
      * objects, and the function fills it with objects describing available
      * data sequences.
-     * 
+     *
      * This is the old way to retrieve data from the DataLogger.
      * For new applications, you should rather use get_dataSets()
      * method, or call directly get_recordedData() on the
      * sensor object.
-     * 
+     *
      * @param v : an array of YDataStream objects to be filled in
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_dataStreams(ArrayList<YDataStream> v) throws YAPI_Exception
@@ -241,6 +250,9 @@ public class YDataLogger extends YFunction
         if (json_val.has("autoStart")) {
             _autoStart =  json_val.getInt("autoStart")>0?1:0;
         }
+        if (json_val.has("beaconDriven")) {
+            _beaconDriven =  json_val.getInt("beaconDriven")>0?1:0;
+        }
         if (json_val.has("clearHistory")) {
             _clearHistory =  json_val.getInt("clearHistory")>0?1:0;
         }
@@ -250,15 +262,15 @@ public class YDataLogger extends YFunction
     /**
      * Returns the current run number, corresponding to the number of times the module was
      * powered on with the dataLogger enabled at some point.
-     * 
+     *
      * @return an integer corresponding to the current run number, corresponding to the number of times the module was
      *         powered on with the dataLogger enabled at some point
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_currentRunIndex() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTRUNINDEX_INVALID;
             }
@@ -269,10 +281,10 @@ public class YDataLogger extends YFunction
     /**
      * Returns the current run number, corresponding to the number of times the module was
      * powered on with the dataLogger enabled at some point.
-     * 
+     *
      * @return an integer corresponding to the current run number, corresponding to the number of times the module was
      *         powered on with the dataLogger enabled at some point
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getCurrentRunIndex() throws YAPI_Exception
@@ -281,14 +293,14 @@ public class YDataLogger extends YFunction
 
     /**
      * Returns the Unix timestamp for current UTC time, if known.
-     * 
+     *
      * @return an integer corresponding to the Unix timestamp for current UTC time, if known
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_timeUTC() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TIMEUTC_INVALID;
             }
@@ -298,9 +310,9 @@ public class YDataLogger extends YFunction
 
     /**
      * Returns the Unix timestamp for current UTC time, if known.
-     * 
+     *
      * @return an integer corresponding to the Unix timestamp for current UTC time, if known
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getTimeUTC() throws YAPI_Exception
@@ -309,11 +321,11 @@ public class YDataLogger extends YFunction
 
     /**
      * Changes the current UTC time reference used for recorded data.
-     * 
+     *
      * @param newval : an integer corresponding to the current UTC time reference used for recorded data
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_timeUTC(long  newval)  throws YAPI_Exception
@@ -326,11 +338,11 @@ public class YDataLogger extends YFunction
 
     /**
      * Changes the current UTC time reference used for recorded data.
-     * 
+     *
      * @param newval : an integer corresponding to the current UTC time reference used for recorded data
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setTimeUTC(long newval)  throws YAPI_Exception
@@ -339,15 +351,15 @@ public class YDataLogger extends YFunction
 
     /**
      * Returns the current activation state of the data logger.
-     * 
-     * @return either YDataLogger.RECORDING_OFF or YDataLogger.RECORDING_ON, according to the current
+     *
+     *  @return either YDataLogger.RECORDING_OFF or YDataLogger.RECORDING_ON, according to the current
      * activation state of the data logger
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_recording() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RECORDING_INVALID;
             }
@@ -357,9 +369,9 @@ public class YDataLogger extends YFunction
 
     /**
      * Returns the current activation state of the data logger.
-     * 
+     *
      * @return either Y_RECORDING_OFF or Y_RECORDING_ON, according to the current activation state of the data logger
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getRecording() throws YAPI_Exception
@@ -368,12 +380,12 @@ public class YDataLogger extends YFunction
 
     /**
      * Changes the activation state of the data logger to start/stop recording data.
-     * 
-     * @param newval : either YDataLogger.RECORDING_OFF or YDataLogger.RECORDING_ON, according to the
+     *
+     *  @param newval : either YDataLogger.RECORDING_OFF or YDataLogger.RECORDING_ON, according to the
      * activation state of the data logger to start/stop recording data
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_recording(int  newval)  throws YAPI_Exception
@@ -386,12 +398,12 @@ public class YDataLogger extends YFunction
 
     /**
      * Changes the activation state of the data logger to start/stop recording data.
-     * 
-     * @param newval : either Y_RECORDING_OFF or Y_RECORDING_ON, according to the activation state of the
+     *
+     *  @param newval : either Y_RECORDING_OFF or Y_RECORDING_ON, according to the activation state of the
      * data logger to start/stop recording data
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setRecording(int newval)  throws YAPI_Exception
@@ -400,15 +412,15 @@ public class YDataLogger extends YFunction
 
     /**
      * Returns the default activation state of the data logger on power up.
-     * 
-     * @return either YDataLogger.AUTOSTART_OFF or YDataLogger.AUTOSTART_ON, according to the default
+     *
+     *  @return either YDataLogger.AUTOSTART_OFF or YDataLogger.AUTOSTART_ON, according to the default
      * activation state of the data logger on power up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_autoStart() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AUTOSTART_INVALID;
             }
@@ -418,10 +430,10 @@ public class YDataLogger extends YFunction
 
     /**
      * Returns the default activation state of the data logger on power up.
-     * 
-     * @return either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the default activation state of the
+     *
+     *  @return either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the default activation state of the
      * data logger on power up
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getAutoStart() throws YAPI_Exception
@@ -432,12 +444,12 @@ public class YDataLogger extends YFunction
      * Changes the default activation state of the data logger on power up.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
-     * @param newval : either YDataLogger.AUTOSTART_OFF or YDataLogger.AUTOSTART_ON, according to the
+     *
+     *  @param newval : either YDataLogger.AUTOSTART_OFF or YDataLogger.AUTOSTART_ON, according to the
      * default activation state of the data logger on power up
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_autoStart(int  newval)  throws YAPI_Exception
@@ -452,12 +464,12 @@ public class YDataLogger extends YFunction
      * Changes the default activation state of the data logger on power up.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
-     * @param newval : either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the default activation state
+     *
+     *  @param newval : either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the default activation state
      * of the data logger on power up
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setAutoStart(int newval)  throws YAPI_Exception
@@ -465,11 +477,75 @@ public class YDataLogger extends YFunction
     { return set_autoStart(newval); }
 
     /**
+     * Return true if the data logger is synchronised with the localization beacon.
+     *
+     * @return either YDataLogger.BEACONDRIVEN_OFF or YDataLogger.BEACONDRIVEN_ON
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_beaconDriven() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BEACONDRIVEN_INVALID;
+            }
+        }
+        return _beaconDriven;
+    }
+
+    /**
+     * Return true if the data logger is synchronised with the localization beacon.
+     *
+     * @return either Y_BEACONDRIVEN_OFF or Y_BEACONDRIVEN_ON
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getBeaconDriven() throws YAPI_Exception
+
+    { return get_beaconDriven(); }
+
+    /**
+     * Changes the type of synchronisation of the data logger.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     *  @param newval : either YDataLogger.BEACONDRIVEN_OFF or YDataLogger.BEACONDRIVEN_ON, according to
+     * the type of synchronisation of the data logger
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_beaconDriven(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        _setAttr("beaconDriven",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the type of synchronisation of the data logger.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     *  @param newval : either Y_BEACONDRIVEN_OFF or Y_BEACONDRIVEN_ON, according to the type of
+     * synchronisation of the data logger
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setBeaconDriven(int newval)  throws YAPI_Exception
+
+    { return set_beaconDriven(newval); }
+
+    /**
      * @throws YAPI_Exception on error
      */
     public int get_clearHistory() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CLEARHISTORY_INVALID;
             }
@@ -506,7 +582,7 @@ public class YDataLogger extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the data logger is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YDataLogger.isOnline() to test if the data logger is
@@ -514,9 +590,9 @@ public class YDataLogger extends YFunction
      * a data logger by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the data logger
-     * 
+     *
      * @return a YDataLogger object allowing you to drive the data logger.
      */
     public static YDataLogger FindDataLogger(String func)
@@ -535,11 +611,11 @@ public class YDataLogger extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -574,9 +650,9 @@ public class YDataLogger extends YFunction
     /**
      * Clears the data logger memory and discards all recorded data streams.
      * This method also resets the current run index to zero.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int forgetAllDataStreams() throws YAPI_Exception
@@ -587,13 +663,13 @@ public class YDataLogger extends YFunction
     /**
      * Returns a list of YDataSet objects that can be used to retrieve
      * all measures stored by the data logger.
-     * 
+     *
      * This function only works if the device uses a recent firmware,
      * as YDataSet objects are not supported by firmwares older than
      * version 13000.
-     * 
+     *
      * @return a list of YDataSet object.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<YDataSet> get_dataSets() throws YAPI_Exception
@@ -616,7 +692,7 @@ public class YDataLogger extends YFunction
 
     /**
      * Continues the enumeration of data loggers started using yFirstDataLogger().
-     * 
+     *
      * @return a pointer to a YDataLogger object, corresponding to
      *         a data logger currently online, or a null pointer
      *         if there are no more data loggers to enumerate.
@@ -638,7 +714,7 @@ public class YDataLogger extends YFunction
      * Starts the enumeration of data loggers currently accessible.
      * Use the method YDataLogger.nextDataLogger() to iterate on
      * next data loggers.
-     * 
+     *
      * @return a pointer to a YDataLogger object, corresponding to
      *         the first data logger currently online, or a null pointer
      *         if there are none.

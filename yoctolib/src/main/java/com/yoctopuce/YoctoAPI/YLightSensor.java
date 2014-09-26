@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YLightSensor.java 17655 2014-09-16 12:24:27Z mvuilleu $
  *
  * Implements yFindLightSensor(), the high-level API for LightSensor functions
  *
@@ -47,14 +47,26 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YLightSensor class start)
 /**
  * YLightSensor Class: LightSensor function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YLightSensor extends YSensor
 {
 //--- (end of YLightSensor class start)
 //--- (YLightSensor definitions)
+    /**
+     * invalid measureType value
+     */
+    public static final int MEASURETYPE_HUMAN_EYE = 0;
+    public static final int MEASURETYPE_WIDE_SPECTRUM = 1;
+    public static final int MEASURETYPE_INFRARED = 2;
+    public static final int MEASURETYPE_HIGH_RATE = 3;
+    public static final int MEASURETYPE_HIGH_ENERGY = 4;
+    public static final int MEASURETYPE_INVALID = -1;
+
+    protected int _measureType = MEASURETYPE_INVALID;
     protected UpdateCallback _valueCallbackLightSensor = null;
     protected TimedReportCallback _timedReportCallbackLightSensor = null;
 
@@ -63,7 +75,7 @@ public class YLightSensor extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -75,7 +87,7 @@ public class YLightSensor extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -85,7 +97,7 @@ public class YLightSensor extends YSensor
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YLightSensor(String func)
@@ -100,13 +112,16 @@ public class YLightSensor extends YSensor
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
+        if (json_val.has("measureType")) {
+            _measureType =  json_val.getInt("measureType");
+        }
         super._parseAttr(json_val);
     }
 
     public int set_currentValue(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval*65536.0));
+        rest_val = Long.toString(Math.round(newval * 65536.0));
         _setAttr("currentValue",rest_val);
         return YAPI.SUCCESS;
     }
@@ -118,23 +133,95 @@ public class YLightSensor extends YSensor
     /**
      * Changes the sensor-specific calibration parameter so that the current value
      * matches a desired target (linear scaling).
-     * 
+     *
      * @param calibratedVal : the desired target value.
-     * 
+     *
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int calibrate(double calibratedVal)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(calibratedVal*65536.0));
+        rest_val = Long.toString(Math.round(calibratedVal * 65536.0));
         _setAttr("currentValue",rest_val);
         return YAPI.SUCCESS;
     }
+
+    /**
+     * Returns the type of light measure.
+     *
+     *  @return a value among YLightSensor.MEASURETYPE_HUMAN_EYE, YLightSensor.MEASURETYPE_WIDE_SPECTRUM,
+     *  YLightSensor.MEASURETYPE_INFRARED, YLightSensor.MEASURETYPE_HIGH_RATE and
+     * YLightSensor.MEASURETYPE_HIGH_ENERGY corresponding to the type of light measure
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_measureType() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return MEASURETYPE_INVALID;
+            }
+        }
+        return _measureType;
+    }
+
+    /**
+     * Returns the type of light measure.
+     *
+     *  @return a value among Y_MEASURETYPE_HUMAN_EYE, Y_MEASURETYPE_WIDE_SPECTRUM, Y_MEASURETYPE_INFRARED,
+     * Y_MEASURETYPE_HIGH_RATE and Y_MEASURETYPE_HIGH_ENERGY corresponding to the type of light measure
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getMeasureType() throws YAPI_Exception
+
+    { return get_measureType(); }
+
+    /**
+     * Modify the light sensor type used in the device. The measure can either
+     * approximate the response of the human eye, focus on a specific light
+     * spectrum, depending on the capabilities of the light-sensitive cell.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     *  @param newval : a value among YLightSensor.MEASURETYPE_HUMAN_EYE,
+     *  YLightSensor.MEASURETYPE_WIDE_SPECTRUM, YLightSensor.MEASURETYPE_INFRARED,
+     * YLightSensor.MEASURETYPE_HIGH_RATE and YLightSensor.MEASURETYPE_HIGH_ENERGY
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_measureType(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("measureType",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Modify the light sensor type used in the device. The measure can either
+     * approximate the response of the human eye, focus on a specific light
+     * spectrum, depending on the capabilities of the light-sensitive cell.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     *  @param newval : a value among Y_MEASURETYPE_HUMAN_EYE, Y_MEASURETYPE_WIDE_SPECTRUM,
+     * Y_MEASURETYPE_INFRARED, Y_MEASURETYPE_HIGH_RATE and Y_MEASURETYPE_HIGH_ENERGY
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setMeasureType(int newval)  throws YAPI_Exception
+
+    { return set_measureType(newval); }
 
     /**
      * Retrieves a light sensor for a given identifier.
@@ -146,7 +233,7 @@ public class YLightSensor extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the light sensor is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YLightSensor.isOnline() to test if the light sensor is
@@ -154,9 +241,9 @@ public class YLightSensor extends YSensor
      * a light sensor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the light sensor
-     * 
+     *
      * @return a YLightSensor object allowing you to drive the light sensor.
      */
     public static YLightSensor FindLightSensor(String func)
@@ -175,11 +262,11 @@ public class YLightSensor extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -216,11 +303,11 @@ public class YLightSensor extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -246,7 +333,7 @@ public class YLightSensor extends YSensor
 
     /**
      * Continues the enumeration of light sensors started using yFirstLightSensor().
-     * 
+     *
      * @return a pointer to a YLightSensor object, corresponding to
      *         a light sensor currently online, or a null pointer
      *         if there are no more light sensors to enumerate.
@@ -268,7 +355,7 @@ public class YLightSensor extends YSensor
      * Starts the enumeration of light sensors currently accessible.
      * Use the method YLightSensor.nextLightSensor() to iterate on
      * next light sensors.
-     * 
+     *
      * @return a pointer to a YLightSensor object, corresponding to
      *         the first light sensor currently online, or a null pointer
      *         if there are none.

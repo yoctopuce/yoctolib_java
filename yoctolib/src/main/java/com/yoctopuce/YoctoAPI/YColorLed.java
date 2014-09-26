@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YColorLed.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindColorLed(), the high-level API for ColorLed functions
  *
@@ -47,7 +47,7 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YColorLed class start)
 /**
  * YColorLed Class: ColorLed function interface
- * 
+ *
  * Yoctopuce application programming interface
  * allows you to drive a color led using RGB coordinates as well as HSL coordinates.
  * The module performs all conversions form RGB to HSL automatically. It is then
@@ -55,6 +55,7 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
  * saturation or lightness. If needed, you can find more information on the
  * difference between RGB and HSL in the section following this one.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YColorLed extends YFunction
 {
 //--- (end of YColorLed class start)
@@ -93,7 +94,7 @@ public class YColorLed extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -105,7 +106,7 @@ public class YColorLed extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -115,7 +116,7 @@ public class YColorLed extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YColorLed(String func)
@@ -174,14 +175,14 @@ public class YColorLed extends YFunction
      */
     /**
      * Returns the current RGB color of the led.
-     * 
+     *
      * @return an integer corresponding to the current RGB color of the led
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_rgbColor() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RGBCOLOR_INVALID;
             }
@@ -191,9 +192,9 @@ public class YColorLed extends YFunction
 
     /**
      * Returns the current RGB color of the led.
-     * 
+     *
      * @return an integer corresponding to the current RGB color of the led
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getRgbColor() throws YAPI_Exception
@@ -202,11 +203,11 @@ public class YColorLed extends YFunction
 
     /**
      * Changes the current color of the led, using a RGB color. Encoding is done as follows: 0xRRGGBB.
-     * 
+     *
      * @param newval : an integer corresponding to the current color of the led, using a RGB color
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_rgbColor(int  newval)  throws YAPI_Exception
@@ -219,11 +220,11 @@ public class YColorLed extends YFunction
 
     /**
      * Changes the current color of the led, using a RGB color. Encoding is done as follows: 0xRRGGBB.
-     * 
+     *
      * @param newval : an integer corresponding to the current color of the led, using a RGB color
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setRgbColor(int newval)  throws YAPI_Exception
@@ -232,14 +233,14 @@ public class YColorLed extends YFunction
 
     /**
      * Returns the current HSL color of the led.
-     * 
+     *
      * @return an integer corresponding to the current HSL color of the led
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_hslColor() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return HSLCOLOR_INVALID;
             }
@@ -249,9 +250,9 @@ public class YColorLed extends YFunction
 
     /**
      * Returns the current HSL color of the led.
-     * 
+     *
      * @return an integer corresponding to the current HSL color of the led
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getHslColor() throws YAPI_Exception
@@ -260,11 +261,11 @@ public class YColorLed extends YFunction
 
     /**
      * Changes the current color of the led, using a color HSL. Encoding is done as follows: 0xHHSSLL.
-     * 
+     *
      * @param newval : an integer corresponding to the current color of the led, using a color HSL
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_hslColor(int  newval)  throws YAPI_Exception
@@ -277,11 +278,11 @@ public class YColorLed extends YFunction
 
     /**
      * Changes the current color of the led, using a color HSL. Encoding is done as follows: 0xHHSSLL.
-     * 
+     *
      * @param newval : an integer corresponding to the current color of the led, using a color HSL
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setHslColor(int newval)  throws YAPI_Exception
@@ -293,7 +294,7 @@ public class YColorLed extends YFunction
      */
     public YMove get_rgbMove() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RGBMOVE_INVALID;
             }
@@ -322,12 +323,12 @@ public class YColorLed extends YFunction
 
     /**
      * Performs a smooth transition in the RGB color space between the current color and a target color.
-     * 
+     *
      * @param rgb_target  : desired RGB color at the end of the transition
      * @param ms_duration : duration of the transition, in millisecond
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int rgbMove(int rgb_target,int ms_duration)  throws YAPI_Exception
@@ -343,7 +344,7 @@ public class YColorLed extends YFunction
      */
     public YMove get_hslMove() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return HSLMOVE_INVALID;
             }
@@ -372,12 +373,12 @@ public class YColorLed extends YFunction
 
     /**
      * Performs a smooth transition in the HSL color space between the current color and a target color.
-     * 
+     *
      * @param hsl_target  : desired HSL color at the end of the transition
      * @param ms_duration : duration of the transition, in millisecond
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int hslMove(int hsl_target,int ms_duration)  throws YAPI_Exception
@@ -390,14 +391,14 @@ public class YColorLed extends YFunction
 
     /**
      * Returns the configured color to be displayed when the module is turned on.
-     * 
+     *
      * @return an integer corresponding to the configured color to be displayed when the module is turned on
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_rgbColorAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RGBCOLORATPOWERON_INVALID;
             }
@@ -407,9 +408,9 @@ public class YColorLed extends YFunction
 
     /**
      * Returns the configured color to be displayed when the module is turned on.
-     * 
+     *
      * @return an integer corresponding to the configured color to be displayed when the module is turned on
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getRgbColorAtPowerOn() throws YAPI_Exception
@@ -421,12 +422,12 @@ public class YColorLed extends YFunction
      * This color will be displayed as soon as the module is powered on.
      * Remember to call the saveToFlash() method of the module if the
      * change should be kept.
-     * 
-     * @param newval : an integer corresponding to the color that the led will display by default when the
+     *
+     *  @param newval : an integer corresponding to the color that the led will display by default when the
      * module is turned on
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_rgbColorAtPowerOn(int  newval)  throws YAPI_Exception
@@ -442,12 +443,12 @@ public class YColorLed extends YFunction
      * This color will be displayed as soon as the module is powered on.
      * Remember to call the saveToFlash() method of the module if the
      * change should be kept.
-     * 
-     * @param newval : an integer corresponding to the color that the led will display by default when the
+     *
+     *  @param newval : an integer corresponding to the color that the led will display by default when the
      * module is turned on
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setRgbColorAtPowerOn(int newval)  throws YAPI_Exception
@@ -464,7 +465,7 @@ public class YColorLed extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the RGB led is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YColorLed.isOnline() to test if the RGB led is
@@ -472,9 +473,9 @@ public class YColorLed extends YFunction
      * an RGB led by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the RGB led
-     * 
+     *
      * @return a YColorLed object allowing you to drive the RGB led.
      */
     public static YColorLed FindColorLed(String func)
@@ -493,11 +494,11 @@ public class YColorLed extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -531,7 +532,7 @@ public class YColorLed extends YFunction
 
     /**
      * Continues the enumeration of RGB leds started using yFirstColorLed().
-     * 
+     *
      * @return a pointer to a YColorLed object, corresponding to
      *         an RGB led currently online, or a null pointer
      *         if there are no more RGB leds to enumerate.
@@ -553,7 +554,7 @@ public class YColorLed extends YFunction
      * Starts the enumeration of RGB leds currently accessible.
      * Use the method YColorLed.nextColorLed() to iterate on
      * next RGB leds.
-     * 
+     *
      * @return a pointer to a YColorLed object, corresponding to
      *         the first RGB led currently online, or a null pointer
      *         if there are none.

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrent.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YCurrent.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindCurrent(), the high-level API for Current functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YCurrent class start)
 /**
  * YCurrent Class: Current function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YCurrent extends YSensor
 {
 //--- (end of YCurrent class start)
@@ -63,7 +64,7 @@ public class YCurrent extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -75,7 +76,7 @@ public class YCurrent extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -85,7 +86,7 @@ public class YCurrent extends YSensor
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YCurrent(String func)
@@ -113,7 +114,7 @@ public class YCurrent extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the current sensor is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YCurrent.isOnline() to test if the current sensor is
@@ -121,9 +122,9 @@ public class YCurrent extends YSensor
      * a current sensor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the current sensor
-     * 
+     *
      * @return a YCurrent object allowing you to drive the current sensor.
      */
     public static YCurrent FindCurrent(String func)
@@ -142,11 +143,11 @@ public class YCurrent extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -183,11 +184,11 @@ public class YCurrent extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -213,7 +214,7 @@ public class YCurrent extends YSensor
 
     /**
      * Continues the enumeration of current sensors started using yFirstCurrent().
-     * 
+     *
      * @return a pointer to a YCurrent object, corresponding to
      *         a current sensor currently online, or a null pointer
      *         if there are no more current sensors to enumerate.
@@ -235,7 +236,7 @@ public class YCurrent extends YSensor
      * Starts the enumeration of current sensors currently accessible.
      * Use the method YCurrent.nextCurrent() to iterate on
      * next current sensors.
-     * 
+     *
      * @return a pointer to a YCurrent object, corresponding to
      *         the first current sensor currently online, or a null pointer
      *         if there are none.

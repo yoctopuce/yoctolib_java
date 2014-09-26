@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAccelerometer.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YAccelerometer.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YAccelerometer class start)
 /**
  * YAccelerometer Class: Accelerometer function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YAccelerometer extends YSensor
 {
 //--- (end of YAccelerometer class start)
@@ -67,9 +68,17 @@ public class YAccelerometer extends YSensor
      * invalid zValue value
      */
     public static final double ZVALUE_INVALID = YAPI.INVALID_DOUBLE;
+    /**
+     * invalid gravityCancellation value
+     */
+    public static final int GRAVITYCANCELLATION_OFF = 0;
+    public static final int GRAVITYCANCELLATION_ON = 1;
+    public static final int GRAVITYCANCELLATION_INVALID = -1;
+
     protected double _xValue = XVALUE_INVALID;
     protected double _yValue = YVALUE_INVALID;
     protected double _zValue = ZVALUE_INVALID;
+    protected int _gravityCancellation = GRAVITYCANCELLATION_INVALID;
     protected UpdateCallback _valueCallbackAccelerometer = null;
     protected TimedReportCallback _timedReportCallbackAccelerometer = null;
 
@@ -78,7 +87,7 @@ public class YAccelerometer extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -90,7 +99,7 @@ public class YAccelerometer extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -100,7 +109,7 @@ public class YAccelerometer extends YSensor
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YAccelerometer(String func)
@@ -116,27 +125,30 @@ public class YAccelerometer extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("xValue")) {
-            _xValue =  json_val.getDouble("xValue")/65536.0;
+            _xValue =  Math.round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("yValue")) {
-            _yValue =  json_val.getDouble("yValue")/65536.0;
+            _yValue =  Math.round(json_val.getDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("zValue")) {
-            _zValue =  json_val.getDouble("zValue")/65536.0;
+            _zValue =  Math.round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
+        }
+        if (json_val.has("gravityCancellation")) {
+            _gravityCancellation =  json_val.getInt("gravityCancellation")>0?1:0;
         }
         super._parseAttr(json_val);
     }
 
     /**
      * Returns the X component of the acceleration, as a floating point number.
-     * 
+     *
      * @return a floating point number corresponding to the X component of the acceleration, as a floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_xValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return XVALUE_INVALID;
             }
@@ -146,9 +158,9 @@ public class YAccelerometer extends YSensor
 
     /**
      * Returns the X component of the acceleration, as a floating point number.
-     * 
+     *
      * @return a floating point number corresponding to the X component of the acceleration, as a floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getXValue() throws YAPI_Exception
@@ -157,14 +169,14 @@ public class YAccelerometer extends YSensor
 
     /**
      * Returns the Y component of the acceleration, as a floating point number.
-     * 
+     *
      * @return a floating point number corresponding to the Y component of the acceleration, as a floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_yValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YVALUE_INVALID;
             }
@@ -174,9 +186,9 @@ public class YAccelerometer extends YSensor
 
     /**
      * Returns the Y component of the acceleration, as a floating point number.
-     * 
+     *
      * @return a floating point number corresponding to the Y component of the acceleration, as a floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getYValue() throws YAPI_Exception
@@ -185,14 +197,14 @@ public class YAccelerometer extends YSensor
 
     /**
      * Returns the Z component of the acceleration, as a floating point number.
-     * 
+     *
      * @return a floating point number corresponding to the Z component of the acceleration, as a floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_zValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ZVALUE_INVALID;
             }
@@ -202,14 +214,46 @@ public class YAccelerometer extends YSensor
 
     /**
      * Returns the Z component of the acceleration, as a floating point number.
-     * 
+     *
      * @return a floating point number corresponding to the Z component of the acceleration, as a floating point number
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getZValue() throws YAPI_Exception
 
     { return get_zValue(); }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public int get_gravityCancellation() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return GRAVITYCANCELLATION_INVALID;
+            }
+        }
+        return _gravityCancellation;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public int getGravityCancellation() throws YAPI_Exception
+
+    { return get_gravityCancellation(); }
+
+    public int set_gravityCancellation(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        _setAttr("gravityCancellation",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    public int setGravityCancellation(int newval)  throws YAPI_Exception
+
+    { return set_gravityCancellation(newval); }
 
     /**
      * Retrieves an accelerometer for a given identifier.
@@ -221,7 +265,7 @@ public class YAccelerometer extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the accelerometer is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YAccelerometer.isOnline() to test if the accelerometer is
@@ -229,9 +273,9 @@ public class YAccelerometer extends YSensor
      * an accelerometer by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the accelerometer
-     * 
+     *
      * @return a YAccelerometer object allowing you to drive the accelerometer.
      */
     public static YAccelerometer FindAccelerometer(String func)
@@ -250,11 +294,11 @@ public class YAccelerometer extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -291,11 +335,11 @@ public class YAccelerometer extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -321,7 +365,7 @@ public class YAccelerometer extends YSensor
 
     /**
      * Continues the enumeration of accelerometers started using yFirstAccelerometer().
-     * 
+     *
      * @return a pointer to a YAccelerometer object, corresponding to
      *         an accelerometer currently online, or a null pointer
      *         if there are no more accelerometers to enumerate.
@@ -343,7 +387,7 @@ public class YAccelerometer extends YSensor
      * Starts the enumeration of accelerometers currently accessible.
      * Use the method YAccelerometer.nextAccelerometer() to iterate on
      * next accelerometers.
-     * 
+     *
      * @return a pointer to a YAccelerometer object, corresponding to
      *         the first accelerometer currently online, or a null pointer
      *         if there are none.

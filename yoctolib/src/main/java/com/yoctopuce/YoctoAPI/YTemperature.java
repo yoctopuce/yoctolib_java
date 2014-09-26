@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YTemperature.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindTemperature(), the high-level API for Temperature functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YTemperature class start)
 /**
  * YTemperature Class: Temperature function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YTemperature extends YSensor
 {
 //--- (end of YTemperature class start)
@@ -80,7 +81,7 @@ public class YTemperature extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -92,7 +93,7 @@ public class YTemperature extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -102,7 +103,7 @@ public class YTemperature extends YSensor
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YTemperature(String func)
@@ -125,18 +126,18 @@ public class YTemperature extends YSensor
 
     /**
      * Returns the temperature sensor type.
-     * 
-     * @return a value among YTemperature.SENSORTYPE_DIGITAL, YTemperature.SENSORTYPE_TYPE_K,
-     * YTemperature.SENSORTYPE_TYPE_E, YTemperature.SENSORTYPE_TYPE_J, YTemperature.SENSORTYPE_TYPE_N,
-     * YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S, YTemperature.SENSORTYPE_TYPE_T,
-     * YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES and
+     *
+     *  @return a value among YTemperature.SENSORTYPE_DIGITAL, YTemperature.SENSORTYPE_TYPE_K,
+     *  YTemperature.SENSORTYPE_TYPE_E, YTemperature.SENSORTYPE_TYPE_J, YTemperature.SENSORTYPE_TYPE_N,
+     *  YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S, YTemperature.SENSORTYPE_TYPE_T,
+     *  YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES and
      * YTemperature.SENSORTYPE_PT100_2WIRES corresponding to the temperature sensor type
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_sensorType() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SENSORTYPE_INVALID;
             }
@@ -146,12 +147,12 @@ public class YTemperature extends YSensor
 
     /**
      * Returns the temperature sensor type.
-     * 
-     * @return a value among Y_SENSORTYPE_DIGITAL, Y_SENSORTYPE_TYPE_K, Y_SENSORTYPE_TYPE_E,
-     * Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
-     * Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES and
+     *
+     *  @return a value among Y_SENSORTYPE_DIGITAL, Y_SENSORTYPE_TYPE_K, Y_SENSORTYPE_TYPE_E,
+     *  Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
+     *  Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES and
      * Y_SENSORTYPE_PT100_2WIRES corresponding to the temperature sensor type
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getSensorType() throws YAPI_Exception
@@ -164,15 +165,15 @@ public class YTemperature extends YSensor
      * This will have no effect if module is using a digital sensor.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
-     * @param newval : a value among YTemperature.SENSORTYPE_DIGITAL, YTemperature.SENSORTYPE_TYPE_K,
-     * YTemperature.SENSORTYPE_TYPE_E, YTemperature.SENSORTYPE_TYPE_J, YTemperature.SENSORTYPE_TYPE_N,
-     * YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S, YTemperature.SENSORTYPE_TYPE_T,
-     * YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES and
+     *
+     *  @param newval : a value among YTemperature.SENSORTYPE_DIGITAL, YTemperature.SENSORTYPE_TYPE_K,
+     *  YTemperature.SENSORTYPE_TYPE_E, YTemperature.SENSORTYPE_TYPE_J, YTemperature.SENSORTYPE_TYPE_N,
+     *  YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S, YTemperature.SENSORTYPE_TYPE_T,
+     *  YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES and
      * YTemperature.SENSORTYPE_PT100_2WIRES
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_sensorType(int  newval)  throws YAPI_Exception
@@ -189,13 +190,13 @@ public class YTemperature extends YSensor
      * This will have no effect if module is using a digital sensor.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
-     * 
-     * @param newval : a value among Y_SENSORTYPE_DIGITAL, Y_SENSORTYPE_TYPE_K, Y_SENSORTYPE_TYPE_E,
-     * Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
+     *
+     *  @param newval : a value among Y_SENSORTYPE_DIGITAL, Y_SENSORTYPE_TYPE_K, Y_SENSORTYPE_TYPE_E,
+     *  Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
      * Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES and Y_SENSORTYPE_PT100_2WIRES
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setSensorType(int newval)  throws YAPI_Exception
@@ -212,7 +213,7 @@ public class YTemperature extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the temperature sensor is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YTemperature.isOnline() to test if the temperature sensor is
@@ -220,9 +221,9 @@ public class YTemperature extends YSensor
      * a temperature sensor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the temperature sensor
-     * 
+     *
      * @return a YTemperature object allowing you to drive the temperature sensor.
      */
     public static YTemperature FindTemperature(String func)
@@ -241,11 +242,11 @@ public class YTemperature extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -282,11 +283,11 @@ public class YTemperature extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -312,7 +313,7 @@ public class YTemperature extends YSensor
 
     /**
      * Continues the enumeration of temperature sensors started using yFirstTemperature().
-     * 
+     *
      * @return a pointer to a YTemperature object, corresponding to
      *         a temperature sensor currently online, or a null pointer
      *         if there are no more temperature sensors to enumerate.
@@ -334,7 +335,7 @@ public class YTemperature extends YSensor
      * Starts the enumeration of temperature sensors currently accessible.
      * Use the method YTemperature.nextTemperature() to iterate on
      * next temperature sensors.
-     * 
+     *
      * @return a pointer to a YTemperature object, corresponding to
      *         the first temperature sensor currently online, or a null pointer
      *         if there are none.

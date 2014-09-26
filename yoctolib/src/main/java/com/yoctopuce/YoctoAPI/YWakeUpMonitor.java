@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpMonitor.java 16424 2014-06-04 14:26:41Z seb $
+ * $Id: YWakeUpMonitor.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YWakeUpMonitor class start)
 /**
  * YWakeUpMonitor Class: WakeUpMonitor function interface
- * 
+ *
  * The WakeUpMonitor function handles globally all wake-up sources, as well
  * as automated sleep mode.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YWakeUpMonitor extends YFunction
 {
 //--- (end of YWakeUpMonitor class start)
@@ -74,15 +75,8 @@ public class YWakeUpMonitor extends YFunction
     public static final int WAKEUPREASON_EXTPOWER = 1;
     public static final int WAKEUPREASON_ENDOFSLEEP = 2;
     public static final int WAKEUPREASON_EXTSIG1 = 3;
-    public static final int WAKEUPREASON_EXTSIG2 = 4;
-    public static final int WAKEUPREASON_EXTSIG3 = 5;
-    public static final int WAKEUPREASON_EXTSIG4 = 6;
-    public static final int WAKEUPREASON_SCHEDULE1 = 7;
-    public static final int WAKEUPREASON_SCHEDULE2 = 8;
-    public static final int WAKEUPREASON_SCHEDULE3 = 9;
-    public static final int WAKEUPREASON_SCHEDULE4 = 10;
-    public static final int WAKEUPREASON_SCHEDULE5 = 11;
-    public static final int WAKEUPREASON_SCHEDULE6 = 12;
+    public static final int WAKEUPREASON_SCHEDULE1 = 4;
+    public static final int WAKEUPREASON_SCHEDULE2 = 5;
     public static final int WAKEUPREASON_INVALID = -1;
 
     /**
@@ -110,7 +104,7 @@ public class YWakeUpMonitor extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -122,7 +116,7 @@ public class YWakeUpMonitor extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -132,7 +126,7 @@ public class YWakeUpMonitor extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YWakeUpMonitor(String func)
@@ -170,14 +164,14 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Returns the maximal wake up time (in seconds) before automatically going to sleep.
-     * 
+     *
      * @return an integer corresponding to the maximal wake up time (in seconds) before automatically going to sleep
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_powerDuration() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWERDURATION_INVALID;
             }
@@ -187,9 +181,9 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Returns the maximal wake up time (in seconds) before automatically going to sleep.
-     * 
+     *
      * @return an integer corresponding to the maximal wake up time (in seconds) before automatically going to sleep
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPowerDuration() throws YAPI_Exception
@@ -198,12 +192,12 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Changes the maximal wake up time (seconds) before automatically going to sleep.
-     * 
-     * @param newval : an integer corresponding to the maximal wake up time (seconds) before automatically
+     *
+     *  @param newval : an integer corresponding to the maximal wake up time (seconds) before automatically
      * going to sleep
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_powerDuration(int  newval)  throws YAPI_Exception
@@ -216,12 +210,12 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Changes the maximal wake up time (seconds) before automatically going to sleep.
-     * 
-     * @param newval : an integer corresponding to the maximal wake up time (seconds) before automatically
+     *
+     *  @param newval : an integer corresponding to the maximal wake up time (seconds) before automatically
      * going to sleep
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setPowerDuration(int newval)  throws YAPI_Exception
@@ -230,14 +224,14 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Returns the delay before the  next sleep period.
-     * 
+     *
      * @return an integer corresponding to the delay before the  next sleep period
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_sleepCountdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SLEEPCOUNTDOWN_INVALID;
             }
@@ -247,9 +241,9 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Returns the delay before the  next sleep period.
-     * 
+     *
      * @return an integer corresponding to the delay before the  next sleep period
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getSleepCountdown() throws YAPI_Exception
@@ -258,11 +252,11 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Changes the delay before the next sleep period.
-     * 
+     *
      * @param newval : an integer corresponding to the delay before the next sleep period
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_sleepCountdown(int  newval)  throws YAPI_Exception
@@ -275,11 +269,11 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Changes the delay before the next sleep period.
-     * 
+     *
      * @param newval : an integer corresponding to the delay before the next sleep period
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setSleepCountdown(int newval)  throws YAPI_Exception
@@ -288,14 +282,14 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Returns the next scheduled wake up date/time (UNIX format)
-     * 
+     *
      * @return an integer corresponding to the next scheduled wake up date/time (UNIX format)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long get_nextWakeUp() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return NEXTWAKEUP_INVALID;
             }
@@ -305,9 +299,9 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Returns the next scheduled wake up date/time (UNIX format)
-     * 
+     *
      * @return an integer corresponding to the next scheduled wake up date/time (UNIX format)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public long getNextWakeUp() throws YAPI_Exception
@@ -316,11 +310,11 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Changes the days of the week when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the days of the week when a wake up must take place
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_nextWakeUp(long  newval)  throws YAPI_Exception
@@ -333,11 +327,11 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Changes the days of the week when a wake up must take place.
-     * 
+     *
      * @param newval : an integer corresponding to the days of the week when a wake up must take place
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setNextWakeUp(long newval)  throws YAPI_Exception
@@ -346,20 +340,17 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Returns the latest wake up reason.
-     * 
-     * @return a value among YWakeUpMonitor.WAKEUPREASON_USBPOWER, YWakeUpMonitor.WAKEUPREASON_EXTPOWER,
-     * YWakeUpMonitor.WAKEUPREASON_ENDOFSLEEP, YWakeUpMonitor.WAKEUPREASON_EXTSIG1,
-     * YWakeUpMonitor.WAKEUPREASON_EXTSIG2, YWakeUpMonitor.WAKEUPREASON_EXTSIG3,
-     * YWakeUpMonitor.WAKEUPREASON_EXTSIG4, YWakeUpMonitor.WAKEUPREASON_SCHEDULE1,
-     * YWakeUpMonitor.WAKEUPREASON_SCHEDULE2, YWakeUpMonitor.WAKEUPREASON_SCHEDULE3,
-     * YWakeUpMonitor.WAKEUPREASON_SCHEDULE4, YWakeUpMonitor.WAKEUPREASON_SCHEDULE5 and
-     * YWakeUpMonitor.WAKEUPREASON_SCHEDULE6 corresponding to the latest wake up reason
-     * 
+     *
+     *  @return a value among YWakeUpMonitor.WAKEUPREASON_USBPOWER, YWakeUpMonitor.WAKEUPREASON_EXTPOWER,
+     *  YWakeUpMonitor.WAKEUPREASON_ENDOFSLEEP, YWakeUpMonitor.WAKEUPREASON_EXTSIG1,
+     *  YWakeUpMonitor.WAKEUPREASON_SCHEDULE1 and YWakeUpMonitor.WAKEUPREASON_SCHEDULE2 corresponding to
+     * the latest wake up reason
+     *
      * @throws YAPI_Exception on error
      */
     public int get_wakeUpReason() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WAKEUPREASON_INVALID;
             }
@@ -369,13 +360,11 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Returns the latest wake up reason.
-     * 
-     * @return a value among Y_WAKEUPREASON_USBPOWER, Y_WAKEUPREASON_EXTPOWER, Y_WAKEUPREASON_ENDOFSLEEP,
-     * Y_WAKEUPREASON_EXTSIG1, Y_WAKEUPREASON_EXTSIG2, Y_WAKEUPREASON_EXTSIG3, Y_WAKEUPREASON_EXTSIG4,
-     * Y_WAKEUPREASON_SCHEDULE1, Y_WAKEUPREASON_SCHEDULE2, Y_WAKEUPREASON_SCHEDULE3,
-     * Y_WAKEUPREASON_SCHEDULE4, Y_WAKEUPREASON_SCHEDULE5 and Y_WAKEUPREASON_SCHEDULE6 corresponding to
-     * the latest wake up reason
-     * 
+     *
+     *  @return a value among Y_WAKEUPREASON_USBPOWER, Y_WAKEUPREASON_EXTPOWER, Y_WAKEUPREASON_ENDOFSLEEP,
+     *  Y_WAKEUPREASON_EXTSIG1, Y_WAKEUPREASON_SCHEDULE1 and Y_WAKEUPREASON_SCHEDULE2 corresponding to the
+     * latest wake up reason
+     *
      * @throws YAPI_Exception on error
      */
     public int getWakeUpReason() throws YAPI_Exception
@@ -384,15 +373,15 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Returns  the current state of the monitor
-     * 
-     * @return either YWakeUpMonitor.WAKEUPSTATE_SLEEPING or YWakeUpMonitor.WAKEUPSTATE_AWAKE, according
+     *
+     *  @return either YWakeUpMonitor.WAKEUPSTATE_SLEEPING or YWakeUpMonitor.WAKEUPSTATE_AWAKE, according
      * to  the current state of the monitor
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_wakeUpState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WAKEUPSTATE_INVALID;
             }
@@ -402,9 +391,9 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Returns  the current state of the monitor
-     * 
+     *
      * @return either Y_WAKEUPSTATE_SLEEPING or Y_WAKEUPSTATE_AWAKE, according to  the current state of the monitor
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getWakeUpState() throws YAPI_Exception
@@ -428,7 +417,7 @@ public class YWakeUpMonitor extends YFunction
      */
     public long get_rtcTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RTCTIME_INVALID;
             }
@@ -453,7 +442,7 @@ public class YWakeUpMonitor extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the monitor is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YWakeUpMonitor.isOnline() to test if the monitor is
@@ -461,9 +450,9 @@ public class YWakeUpMonitor extends YFunction
      * a monitor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the monitor
-     * 
+     *
      * @return a YWakeUpMonitor object allowing you to drive the monitor.
      */
     public static YWakeUpMonitor FindWakeUpMonitor(String func)
@@ -482,11 +471,11 @@ public class YWakeUpMonitor extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -529,16 +518,16 @@ public class YWakeUpMonitor extends YFunction
     /**
      * Goes to sleep until the next wake up condition is met,  the
      * RTC time must have been set before calling this function.
-     * 
+     *
      * @param secBeforeSleep : number of seconds before going into sleep mode,
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int sleep(int secBeforeSleep) throws YAPI_Exception
     {
-        int currTime = 0;
+        int currTime;
         currTime = (int)(get_rtcTime());
         if (!(currTime != 0)) { throw new YAPI_Exception( YAPI.RTC_NOT_READY,  "RTC time not set");}
         set_nextWakeUp(_endOfTime);
@@ -550,17 +539,17 @@ public class YWakeUpMonitor extends YFunction
      * Goes to sleep for a specific duration or until the next wake up condition is met, the
      * RTC time must have been set before calling this function. The count down before sleep
      * can be canceled with resetSleepCountDown.
-     * 
+     *
      * @param secUntilWakeUp : number of seconds before next wake up
      * @param secBeforeSleep : number of seconds before going into sleep mode
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int sleepFor(int secUntilWakeUp,int secBeforeSleep) throws YAPI_Exception
     {
-        int currTime = 0;
+        int currTime;
         currTime = (int)(get_rtcTime());
         if (!(currTime != 0)) { throw new YAPI_Exception( YAPI.RTC_NOT_READY,  "RTC time not set");}
         set_nextWakeUp(currTime+secUntilWakeUp);
@@ -572,17 +561,17 @@ public class YWakeUpMonitor extends YFunction
      * Go to sleep until a specific date is reached or until the next wake up condition is met, the
      * RTC time must have been set before calling this function. The count down before sleep
      * can be canceled with resetSleepCountDown.
-     * 
+     *
      * @param wakeUpTime : wake-up datetime (UNIX format)
      * @param secBeforeSleep : number of seconds before going into sleep mode
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int sleepUntil(int wakeUpTime,int secBeforeSleep) throws YAPI_Exception
     {
-        int currTime = 0;
+        int currTime;
         currTime = (int)(get_rtcTime());
         if (!(currTime != 0)) { throw new YAPI_Exception( YAPI.RTC_NOT_READY,  "RTC time not set");}
         set_nextWakeUp(wakeUpTime);
@@ -592,7 +581,7 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Resets the sleep countdown.
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
      */
@@ -605,7 +594,7 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Continues the enumeration of monitors started using yFirstWakeUpMonitor().
-     * 
+     *
      * @return a pointer to a YWakeUpMonitor object, corresponding to
      *         a monitor currently online, or a null pointer
      *         if there are no more monitors to enumerate.
@@ -627,7 +616,7 @@ public class YWakeUpMonitor extends YFunction
      * Starts the enumeration of monitors currently accessible.
      * Use the method YWakeUpMonitor.nextWakeUpMonitor() to iterate on
      * next monitors.
-     * 
+     *
      * @return a pointer to a YWakeUpMonitor object, corresponding to
      *         the first monitor currently online, or a null pointer
      *         if there are none.

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmPowerSource.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YPwmPowerSource.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YPwmPowerSource class start)
 /**
  * YPwmPowerSource Class: PwmPowerSource function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to configure
  * the voltage source used by all PWM on the same device.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YPwmPowerSource extends YFunction
 {
 //--- (end of YPwmPowerSource class start)
@@ -72,7 +73,7 @@ public class YPwmPowerSource extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -84,7 +85,7 @@ public class YPwmPowerSource extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -94,7 +95,7 @@ public class YPwmPowerSource extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YPwmPowerSource(String func)
@@ -117,16 +118,16 @@ public class YPwmPowerSource extends YFunction
 
     /**
      * Returns the selected power source for the PWM on the same device
-     * 
-     * @return a value among YPwmPowerSource.POWERMODE_USB_5V, YPwmPowerSource.POWERMODE_USB_3V,
-     * YPwmPowerSource.POWERMODE_EXT_V and YPwmPowerSource.POWERMODE_OPNDRN corresponding to the selected
+     *
+     *  @return a value among YPwmPowerSource.POWERMODE_USB_5V, YPwmPowerSource.POWERMODE_USB_3V,
+     *  YPwmPowerSource.POWERMODE_EXT_V and YPwmPowerSource.POWERMODE_OPNDRN corresponding to the selected
      * power source for the PWM on the same device
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_powerMode() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWERMODE_INVALID;
             }
@@ -136,10 +137,10 @@ public class YPwmPowerSource extends YFunction
 
     /**
      * Returns the selected power source for the PWM on the same device
-     * 
-     * @return a value among Y_POWERMODE_USB_5V, Y_POWERMODE_USB_3V, Y_POWERMODE_EXT_V and
+     *
+     *  @return a value among Y_POWERMODE_USB_5V, Y_POWERMODE_USB_3V, Y_POWERMODE_EXT_V and
      * Y_POWERMODE_OPNDRN corresponding to the selected power source for the PWM on the same device
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPowerMode() throws YAPI_Exception
@@ -154,12 +155,12 @@ public class YPwmPowerSource extends YFunction
      * all PWM located on the same device are  affected.
      * If you want the change to be kept after a device reboot, make sure  to call the matching
      * module saveToFlash().
-     * 
-     * @param newval : a value among YPwmPowerSource.POWERMODE_USB_5V, YPwmPowerSource.POWERMODE_USB_3V,
+     *
+     *  @param newval : a value among YPwmPowerSource.POWERMODE_USB_5V, YPwmPowerSource.POWERMODE_USB_3V,
      * YPwmPowerSource.POWERMODE_EXT_V and YPwmPowerSource.POWERMODE_OPNDRN corresponding to  the PWM power source
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_powerMode(int  newval)  throws YAPI_Exception
@@ -178,12 +179,12 @@ public class YPwmPowerSource extends YFunction
      * all PWM located on the same device are  affected.
      * If you want the change to be kept after a device reboot, make sure  to call the matching
      * module saveToFlash().
-     * 
-     * @param newval : a value among Y_POWERMODE_USB_5V, Y_POWERMODE_USB_3V, Y_POWERMODE_EXT_V and
+     *
+     *  @param newval : a value among Y_POWERMODE_USB_5V, Y_POWERMODE_USB_3V, Y_POWERMODE_EXT_V and
      * Y_POWERMODE_OPNDRN corresponding to  the PWM power source
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setPowerMode(int newval)  throws YAPI_Exception
@@ -200,7 +201,7 @@ public class YPwmPowerSource extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the voltage source is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YPwmPowerSource.isOnline() to test if the voltage source is
@@ -208,9 +209,9 @@ public class YPwmPowerSource extends YFunction
      * a voltage source by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the voltage source
-     * 
+     *
      * @return a YPwmPowerSource object allowing you to drive the voltage source.
      */
     public static YPwmPowerSource FindPwmPowerSource(String func)
@@ -229,11 +230,11 @@ public class YPwmPowerSource extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -267,7 +268,7 @@ public class YPwmPowerSource extends YFunction
 
     /**
      * Continues the enumeration of Voltage sources started using yFirstPwmPowerSource().
-     * 
+     *
      * @return a pointer to a YPwmPowerSource object, corresponding to
      *         a voltage source currently online, or a null pointer
      *         if there are no more Voltage sources to enumerate.
@@ -289,7 +290,7 @@ public class YPwmPowerSource extends YFunction
      * Starts the enumeration of Voltage sources currently accessible.
      * Use the method YPwmPowerSource.nextPwmPowerSource() to iterate on
      * next Voltage sources.
-     * 
+     *
      * @return a pointer to a YPwmPowerSource object, corresponding to
      *         the first source currently online, or a null pointer
      *         if there are none.

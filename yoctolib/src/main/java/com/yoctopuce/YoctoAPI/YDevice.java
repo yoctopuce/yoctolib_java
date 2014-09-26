@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDevice.java 15999 2014-05-01 08:28:57Z seb $
+ * $Id: YDevice.java 17678 2014-09-16 16:31:26Z seb $
  *
  * Internal YDevice class
  *
@@ -45,6 +45,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
 
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
@@ -62,7 +63,8 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 // this class implements a device-wide API string cache (agnostic of API content).
 // This is in addition to the function-specific cache implemented in YFunction.
 //
-public class YDevice {
+public class YDevice
+{
     private YGenericHub _hub;
     private WPEntry _wpRec;
     private long _cache_expiration;
@@ -72,17 +74,17 @@ public class YDevice {
     private YPEntry _moduleYPEntry;
     private YModule.LogCallback _logCallback = null;
     private int _logpos = 0;
-    private boolean _logIsPulling=false;
+    private boolean _logIsPulling = false;
 
     // Device constructor. Automatically call the YAPI functin to reindex device
-     YDevice(YGenericHub hub, WPEntry wpRec, HashMap<String, ArrayList<YPEntry>> ypRecs) throws YAPI_Exception
+    YDevice(YGenericHub hub, WPEntry wpRec, HashMap<String, ArrayList<YPEntry>> ypRecs) throws YAPI_Exception
     {
         // private attributes
         _hub = hub;
-        _wpRec =wpRec;
+        _wpRec = wpRec;
         _cache_expiration = 0;
         _cache_json = "";
-        _moduleYPEntry = new YPEntry(wpRec.getSerialNumber(),"module");
+        _moduleYPEntry = new YPEntry(wpRec.getSerialNumber(), "module");
         _moduleYPEntry.setLogicalName(wpRec.getLogicalName());
         _ypRecs = new HashMap<Integer, YPEntry>();
         for (String categ : ypRecs.keySet()) {
@@ -94,6 +96,11 @@ public class YDevice {
             }
         }
         SafeYAPI().reindexDevice(this);
+    }
+
+    YGenericHub getHub()
+    {
+        return _hub;
     }
 
     // Return the serial number of the device, as found during discovery
@@ -137,7 +144,6 @@ public class YDevice {
         return _wpRec.getIndex();
     }
 
-    
 
     // Get the whole REST API string for a device, from cache if possible
     public String requestAPI() throws YAPI_Exception
@@ -145,7 +151,7 @@ public class YDevice {
         if (_cache_expiration > YAPI.GetTickCount()) {
             return _cache_json;
         }
-        String yreq = new String(requestHTTPSync("GET /api.json",null));
+        String yreq = new String(requestHTTPSync("GET /api.json", null));
         this._cache_expiration = YAPI.GetTickCount() + SafeYAPI().DefaultCacheValidity;
         this._cache_json = yreq;
         return yreq;
@@ -223,7 +229,6 @@ public class YDevice {
     }
 
 
-
     YPEntry getYPEntry(int idx)
     {
         if (idx < _ypRecs.size()) {
@@ -233,13 +238,13 @@ public class YDevice {
     }
 
 
-    byte[] requestHTTPSync(String request,byte[] rest_of_request) throws YAPI_Exception
+    byte[] requestHTTPSync(String request, byte[] rest_of_request) throws YAPI_Exception
     {
         String shortRequest = formatRequest(request);
         return _hub.devRequestSync(this, shortRequest, rest_of_request);
     }
 
-    void requestHTTPAsync(String request,byte[] rest_of_request, YGenericHub.RequestAsyncResult asyncResult, Object context) throws YAPI_Exception
+    void requestHTTPAsync(String request, byte[] rest_of_request, YGenericHub.RequestAsyncResult asyncResult, Object context) throws YAPI_Exception
     {
         String shortRequest = formatRequest(request);
         _hub.devRequestAsync(this, shortRequest, rest_of_request, asyncResult, context);
@@ -252,19 +257,21 @@ public class YDevice {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,
                     "Invalid request, not enough words; expected a method name and a URL");
         }
-        String relativeUrl=words[1];
+        String relativeUrl = words[1];
         if (relativeUrl.charAt(0) != '/') {
             relativeUrl = "/" + relativeUrl;
         }
-        return String.format("%s %s%s", words[0],_wpRec.getNetworkUrl(),relativeUrl);
+        return String.format("%s %s%s", words[0], _wpRec.getNetworkUrl(), relativeUrl);
     }
 
 
-    public double getDeviceTime() {
+    public double getDeviceTime()
+    {
         return _deviceTime;
     }
 
-    public void setDeviceTime(Integer[] data) {
+    public void setDeviceTime(Integer[] data)
+    {
         double time = data[0] + 0x100 * data[1] + 0x10000 * data[2] + 0x1000000 * data[3];
         _deviceTime = time + data[4] / 250.0;
     }
@@ -274,23 +281,24 @@ public class YDevice {
         return _moduleYPEntry;
     }
 
-    private YGenericHub.RequestAsyncResult _logCallbackHandler = new YGenericHub.RequestAsyncResult() {
+    private YGenericHub.RequestAsyncResult _logCallbackHandler = new YGenericHub.RequestAsyncResult()
+    {
         @Override
-        public void RequestAsyncDone(Object context, byte[] result)
+        public void RequestAsyncDone(Object context, byte[] result, int error, String errmsg)
         {
 
             if (result == null) {
-                _logIsPulling=false;
-                return;                
+                _logIsPulling = false;
+                return;
             }
             if (_logCallback == null) {
-                _logIsPulling=false;
+                _logIsPulling = false;
                 return;
             }
             String resultStr = new String(result);
             int pos = resultStr.lastIndexOf("@");
             if (pos < 0) {
-                _logIsPulling=false;
+                _logIsPulling = false;
                 return;
             }
             String logs = resultStr.substring(0, pos);
@@ -301,16 +309,16 @@ public class YDevice {
             for (String line : lines) {
                 _logCallback.logCallback(module, line);
             }
-            _logIsPulling=false;
+            _logIsPulling = false;
         }
     };
 
     void triggerLogPull()
     {
-        if (_logCallback==null || _logIsPulling)
+        if (_logCallback == null || _logIsPulling)
             return;
-        _logIsPulling=true;
-        String request = "GET logs.txt?pos=" + _logpos ;
+        _logIsPulling = true;
+        String request = "GET logs.txt?pos=" + _logpos;
         try {
             requestHTTPAsync(request, null, _logCallbackHandler, new Integer(_logpos));
         } catch (YAPI_Exception ex) {
@@ -323,4 +331,41 @@ public class YDevice {
         _logCallback = callback;
         triggerLogPull();
     }
+
+
+    static byte[] formatHTTPUpload(String path, byte[] content) throws YAPI_Exception
+    {
+        Random randomGenerator = new Random();
+        String boundary;
+        String mp_header = "Content-Disposition: form-data; name=\""+path+"\"; filename=\"api\"\r\n"+
+                "Content-Type: application/octet-stream\r\n"+
+                "Content-Transfer-Encoding: binary\r\n\r\n";
+        // find a valid boundary
+        do {
+            boundary = String.format("Zz%06xzZ", randomGenerator.nextInt(0x1000000));
+        } while(mp_header.contains(boundary) && YAPI._find_in_bytes(content,boundary.getBytes())>=0);
+        //construct header parts
+        String header_start = "Content-Type: multipart/form-data; boundary="+boundary+"\r\n\r\n--"+boundary+"\r\n"+mp_header;
+        String header_stop="\r\n--"+boundary+"--\r\n";
+        byte[] head_body = new byte[header_start.length()+ content.length+ header_stop.length()];
+        int pos=0;int len=header_start.length();
+        System.arraycopy(header_start.getBytes(), 0, head_body, pos, len);
+
+        pos+=len;len=content.length;
+        System.arraycopy(content, 0, head_body, pos, len);
+
+        pos+=len;len=header_stop.length();
+        System.arraycopy(header_stop.getBytes(), 0, head_body, pos, len);
+        System.arraycopy(header_stop.getBytes(), 0, head_body, pos, len);
+        return head_body;
+    }
+
+    int requestHTTPUpload(String path, byte[] content) throws YAPI_Exception
+    {
+        String request = "POST /upload.html";
+        byte[] head_body = YDevice.formatHTTPUpload(path, content);
+        requestHTTPSync(request, head_body);
+        return YAPI.SUCCESS;
+    }
+
 }

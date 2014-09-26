@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataSet.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YDataSet.java 17678 2014-09-16 16:31:26Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -39,32 +39,33 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import java.util.ArrayList;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 //--- (generated code: YDataSet class start)
 /**
  * YDataSet Class: Recorded data sequence
- * 
+ *
  * YDataSet objects make it possible to retrieve a set of recorded measures
  * for a given sensor and a specified time interval. They can be used
  * to load data points with a progress report. When the YDataSet object is
- * instanciated by the get_recordedData()  function, no data is
+ * instantiated by the get_recordedData()  function, no data is
  * yet loaded from the module. It is only when the loadMore()
  * method is called over and over than data will be effectively loaded
  * from the dataLogger.
- * 
+ *
  * A preview of available measures is available using the function
  * get_preview() as soon as loadMore() has been called
  * once. Measures themselves are available using function get_measures()
  * when loaded by subsequent calls to loadMore().
- * 
+ *
  * This class can only be used on devices that use a recent firmware,
  * as YDataSet objects are not supported by firmwares older than version 13000.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YDataSet
 {
 //--- (end of generated code: YDataSet class start)
@@ -123,7 +124,12 @@ public class YDataSet
             json = new JSONObject(json_str);
             _functionId = json.getString("id");
             _unit = json.getString("unit");
-            _calib = YAPI._decodeWords(json.getString("cal"));
+            if(json.has("calib")) {
+                _calib = YAPI._decodeFloats(json.getString("calib"));
+                _calib.set(0, _calib.get(0) / 1000);
+            } else {
+                _calib = YAPI._decodeWords(json.getString("cal"));
+            }
             _streams = new ArrayList<YDataStream>();
             _preview = new ArrayList<YMeasure>();
             _measures = new ArrayList<YMeasure>();
@@ -168,7 +174,7 @@ public class YDataSet
                 _summary = new YMeasure(_startTime,_endTime,summaryMinVal,summaryTotalAvg/summaryTotalTime,summaryMaxVal);
             }
         } catch (JSONException e) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json structure for YFileRecord");
+            throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json structure for YDataSet: "+e.getMessage());
         }
         _progress = 0;
         return this.get_progress();
@@ -186,12 +192,12 @@ public class YDataSet
         YDataStream stream;
         ArrayList<ArrayList<Double>> dataRows = new ArrayList<ArrayList<Double>>();
         String strdata;
-        double tim = 0;
-        double itv = 0;
-        int nCols = 0;
-        int minCol = 0;
-        int avgCol = 0;
-        int maxCol = 0;
+        double tim;
+        double itv;
+        int nCols;
+        int minCol;
+        int avgCol;
+        int maxCol;
         // may throw an exception
         if (progress != _progress) {
             return _progress;
@@ -213,6 +219,9 @@ public class YDataSet
         }
         tim = (double) stream.get_startTimeUTC();
         itv = stream.get_dataSamplesInterval();
+        if (tim < itv) {
+            tim = itv;
+        }
         nCols = dataRows.get(0).size();
         minCol = 0;
         if (nCols > 2) {
@@ -228,9 +237,9 @@ public class YDataSet
         
         for (ArrayList<Double> ii:dataRows) {
             if ((tim >= _startTime) && ((_endTime == 0) || (tim <= _endTime))) {
-                _measures.add(new YMeasure(tim - itv, tim, ii.get(minCol), ii.get(avgCol), ii.get(maxCol)));
-                tim = tim + itv;
+                _measures.add(new YMeasure(tim - itv, tim, ii.get(minCol).doubleValue(), ii.get(avgCol).doubleValue(), ii.get(maxCol).doubleValue()));
             }
+            tim = tim + itv;
         }
         
         return get_progress();
@@ -246,9 +255,9 @@ public class YDataSet
      * in the form SERIAL.FUNCTIONID. The unique hardware identifier is composed of the
      * device serial number and of the hardware identifier of the function
      * (for example THRMCPL1-123456.temperature1)
-     * 
+     *
      * @return a string that uniquely identifies the function (ex: THRMCPL1-123456.temperature1)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_hardwareId() throws YAPI_Exception
@@ -265,7 +274,7 @@ public class YDataSet
     /**
      * Returns the hardware identifier of the function that performed the measure,
      * without reference to the module. For example temperature1.
-     * 
+     *
      * @return a string that identifies the function (ex: temperature1)
      */
     public String get_functionId()
@@ -275,9 +284,9 @@ public class YDataSet
 
     /**
      * Returns the measuring unit for the measured value.
-     * 
+     *
      * @return a string that represents a physical unit.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public String get_unit() throws YAPI_Exception
@@ -292,7 +301,7 @@ public class YDataSet
      * very first call to loadMore(), the start time is updated
      * to reflect the timestamp of the first measure actually found in the
      * dataLogger within the specified range.
-     * 
+     *
      * @return an unsigned number corresponding to the number of seconds
      *         between the Jan 1, 1970 and the beginning of this data
      *         set (i.e. Unix time representation of the absolute time).
@@ -309,7 +318,7 @@ public class YDataSet
      * very first call to loadMore(), the end time is updated
      * to reflect the timestamp of the last measure actually found in the
      * dataLogger within the specified range.
-     * 
+     *
      * @return an unsigned number corresponding to the number of seconds
      *         between the Jan 1, 1970 and the end of this data
      *         set (i.e. Unix time representation of the absolute time).
@@ -321,10 +330,10 @@ public class YDataSet
 
     /**
      * Returns the progress of the downloads of the measures from the data logger,
-     * on a scale from 0 to 100. When the object is instanciated by get_dataSet,
+     * on a scale from 0 to 100. When the object is instantiated by get_dataSet,
      * the progress is zero. Each time loadMore() is invoked, the progress
      * is updated, to reach the value 100 only once all measures have been loaded.
-     * 
+     *
      * @return an integer in the range 0 to 100 (percentage of completion).
      */
     public int get_progress()
@@ -342,10 +351,10 @@ public class YDataSet
     /**
      * Loads the the next block of measures from the dataLogger, and updates
      * the progress indicator.
-     * 
+     *
      * @return an integer in the range 0 to 100 (percentage of completion),
      *         or a negative error code in case of failure.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int loadMore() throws YAPI_Exception
@@ -373,10 +382,10 @@ public class YDataSet
      * - the minimal value observed during the time interval
      * - the average value observed during the time interval
      * - the maximal value observed during the time interval
-     * 
+     *
      * This summary is available as soon as loadMore() has
      * been called for the first time.
-     * 
+     *
      * @return an YMeasure object
      */
     public YMeasure get_summary()
@@ -393,13 +402,13 @@ public class YDataSet
      * - the minimal value observed during the time interval
      * - the average value observed during the time interval
      * - the maximal value observed during the time interval
-     * 
+     *
      * This preview is available as soon as loadMore() has
      * been called for the first time.
-     * 
+     *
      * @return a table of records, where each record depicts the
      *         measured values during a time interval
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<YMeasure> get_preview() throws YAPI_Exception
@@ -415,21 +424,21 @@ public class YDataSet
      * - the minimal value observed during the time interval
      * - the average value observed during the time interval
      * - the maximal value observed during the time interval
-     * 
+     *
      * Before calling this method, you should call loadMore()
      * to load data from the device. You may have to call loadMore()
      * several time until all rows are loaded, but you can start
      * looking at available data rows before the load is complete.
-     * 
+     *
      * The oldest measures are always loaded first, and the most
      * recent measures will be loaded last. As a result, timestamps
      * are normally sorted in ascending order within the measure table,
      * unless there was an unexpected adjustment of the datalogger UTC
      * clock.
-     * 
+     *
      * @return a table of records, where each record depicts the
      *         measured value for a given time interval
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<YMeasure> get_measures() throws YAPI_Exception

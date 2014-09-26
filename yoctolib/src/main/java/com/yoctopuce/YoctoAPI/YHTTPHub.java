@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHTTPHub.java 15999 2014-05-01 08:28:57Z seb $
+ * $Id: YHTTPHub.java 17831 2014-09-25 16:31:39Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -36,7 +36,6 @@
  *  WARRANTY, OR OTHERWISE.
  *
  *********************************************************************/
-
 package com.yoctopuce.YoctoAPI;
 
 import org.json.JSONArray;
@@ -62,17 +61,21 @@ class YHTTPHub extends YGenericHub {
     private final static char NOTIFY_NETPKT_FUNCVAL = '5';
     private final static char NOTIFY_NETPKT_LOG = '7';
     private final static char NOTIFY_NETPKT_FUNCNAMEYDX = '8';
+    private final static char NOTIFY_NETPKT_TIMEV2YDX = 'v';
     private final static char NOTIFY_NETPKT_DEVLOGYDX = 'w';
     private final static char NOTIFY_NETPKT_TIMEVALYDX = 'x';
     private final static char NOTIFY_NETPKT_FUNCVALYDX = 'y';
     private final static char NOTIFY_NETPKT_TIMEAVGYDX = 'z';
     private final static char NOTIFY_NETPKT_NOT_SYNC = '@';
+    private static final long YPROG_BOOTLOADER_TIMEOUT = 10000;
 
-    private NotificationThread thread;
+    private NotificationHandler _notificationHandler;
+    private Thread _thread;
     private final Object    _authLock=new Object();
-    private HTTPParams _http_params;
+    private final HTTPParams _http_params;
     private String  _http_realm="";
     private String  _nounce="";
+    private String  _serial ="";
     private int     _nounce_count=0;
     private String   _ha1="";
     private String   _opaque="";
@@ -179,9 +182,9 @@ class YHTTPHub extends YGenericHub {
         }
     }
 
-    YHTTPHub(int idx, HTTPParams httpParams) throws YAPI_Exception
+    YHTTPHub(int idx, HTTPParams httpParams, boolean reportConnnectionLost) throws YAPI_Exception
     {
-        super(idx);
+        super(idx, reportConnnectionLost);
         _http_params = httpParams;
         try {
             mdigest = MessageDigest.getInstance("MD5");
@@ -193,29 +196,27 @@ class YHTTPHub extends YGenericHub {
     @Override
     synchronized void startNotifications() throws YAPI_Exception
     {
-        thread = new YHTTPHub.NotificationThread();
-        thread.setupConnection(this);
-        synchronized (_authLock){
-            thread.setName("Notif_"+_http_params.getHost());
+        if (_notificationHandler != null) {
+            throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,"notification already started");
         }
-        thread.start();
+        _notificationHandler = new NotificationHandler();
+        _thread = new Thread(_notificationHandler, "Notification handler for " + getHost());
+        _thread.start();
     }
 
     @Override
     synchronized void stopNotifications()
     {
-        if (thread != null) {
-            thread.interrupt();
+        if (_notificationHandler != null) {
+            _thread.interrupt();
             try {
-                thread.join(10000);
-            } catch (InterruptedException ignored) {
+                _thread.join(10000);
+            } catch (InterruptedException e) {
+                _thread = null;
+                _notificationHandler = null;
             }
         }
-        thread = null;
     }
-
-
-
 
     @Override
 	synchronized void release()
@@ -229,34 +230,25 @@ class YHTTPHub extends YGenericHub {
 	@Override
     String getRootUrl()
     {
-        synchronized (_authLock){
-	        return _http_params.getUrl();
-        }
+        return _http_params.getUrl();
     }
 
     @Override
     synchronized boolean isSameRootUrl(String url)
     {
         HTTPParams params = new HTTPParams(url);
-        synchronized (_authLock){
-            return params.getUrl().equals(_http_params.getUrl());
-        }
+        return params.getUrl().equals(_http_params.getUrl());
     }
 
-    private class NotificationThread extends Thread {
+    private class NotificationHandler implements Runnable {
         private static final int NET_HUB_NOT_CONNECTION_TIMEOUT = 6000;
-        private yHTTPRequest _yreq;
         private long    _notifyPos = -1;
         private int     _notifRetryCount=0;
-        private boolean _sendPingNotification=false;
-        private boolean _connected=false;
-        private int _error_delay;
+        private volatile  boolean _sendPingNotification=false;
+        private volatile  boolean _connected=false;
+        private int _error_delay = 0;
 
 
-        public void setupConnection(YHTTPHub hub)
-        {
-            _yreq = new yHTTPRequest(hub,"Notification of "+_http_params.getHost());
-        }
 
         boolean disconectionDetetcted(){
             return _sendPingNotification && !_connected;
@@ -266,7 +258,7 @@ class YHTTPHub extends YGenericHub {
         {
             String ev = notification_line.trim();
     
-            if (ev.length() >= 3 && ev.charAt(0) >= NOTIFY_NETPKT_DEVLOGYDX && ev.charAt(0) <= NOTIFY_NETPKT_TIMEAVGYDX) {
+            if (ev.length() >= 3 && ev.charAt(0) >= NOTIFY_NETPKT_TIMEV2YDX && ev.charAt(0) <= NOTIFY_NETPKT_TIMEAVGYDX) {
                 // function value ydx (tiny notification)
                 _devListValidity = 10000;
                 _notifRetryCount = 0;
@@ -299,6 +291,7 @@ class YHTTPHub extends YGenericHub {
                                 break;
                             case NOTIFY_NETPKT_TIMEVALYDX:
                             case NOTIFY_NETPKT_TIMEAVGYDX:
+                            case NOTIFY_NETPKT_TIMEV2YDX:
                                 if (funydx == 0xf) {
                                     Integer[] data = new Integer[5];
                                     for(int i = 0; i < 5; i++) {
@@ -311,7 +304,8 @@ class YHTTPHub extends YGenericHub {
                                     if (!funcid.equals("")) {
                                         // timed value report
                                         ArrayList<Integer> report = new ArrayList<Integer>(1+value.length() / 2);
-                                        report.add((ev.charAt(0) == NOTIFY_NETPKT_TIMEAVGYDX ? 1 : 0));
+                                        report.add((ev.charAt(0) == NOTIFY_NETPKT_TIMEVALYDX ? 0 :
+                                                    (ev.charAt(0) == NOTIFY_NETPKT_TIMEAVGYDX ? 1 : 2)));
                                         for(int pos = 0; pos < value.length(); pos += 2) {
                                             int intval = Integer.parseInt(value.substring(pos,pos + 2),16);
                                             report.add(intval);
@@ -344,7 +338,6 @@ class YHTTPHub extends YGenericHub {
                             break;
                         case NOTIFY_NETPKT_FUNCVAL: // function value (long notification)
                             String[] parts = ev.substring(5).split(",");
-                            //System.out.println("new value ("+parts[2]+") notification for"+parts[0] + "." + parts[1]);
                             SafeYAPI().setFunctionValue(parts[0] + "." + parts[1],
                                     parts[2]);
                             break;
@@ -360,30 +353,32 @@ class YHTTPHub extends YGenericHub {
         @Override
         public void run()
         {
-            while (!isInterrupted()) {
+            final yHTTPRequest yreq = new yHTTPRequest(YHTTPHub.this,"Notification of "+_http_params.getHost());
+            while (!Thread.currentThread().isInterrupted()) {
                 if(_error_delay>0){
                     try {
                         Thread.sleep(_error_delay);
                     } catch (InterruptedException ex) {
-                        if(isInterrupted())
-                            return;
+                        _connected = false;
+                        Thread.currentThread().interrupt();
+                        return;
                     }
                 }
                 try {
-                    _yreq._requestReserve();
+                    yreq._requestReserve();
                     String notUrl;
                     if(_notifyPos<0){
                         notUrl = "GET /not.byn";
                     }else {
                         notUrl = String.format("GET /not.byn?abs=%d",_notifyPos);
                     }
-                    _yreq._requestStart(notUrl,null,null,null);
+                    yreq._requestStart(notUrl, null, null, null);
                     _connected=true;
                     String fifo="";
                     do {
                         byte[] partial;
-                        _yreq._requestProcesss();
-                        partial =_yreq.getPartialResult();
+                        yreq._requestProcesss();
+                        partial = yreq.getPartialResult();
                         if (partial!=null){
                             fifo += new String(partial);
                         }
@@ -393,7 +388,7 @@ class YHTTPHub extends YGenericHub {
                             if(pos <0) break;
                             if (pos==0 && !_sendPingNotification){
                                 try {
-                                    _yreq.setNoTrafficTimeout(NET_HUB_NOT_CONNECTION_TIMEOUT);
+                                    yreq.setNoTrafficTimeout(NET_HUB_NOT_CONNECTION_TIMEOUT);
                                     _sendPingNotification=true;
                                 } catch (SocketException ex) {
                                     Logger.getLogger(YHTTPHub.class.getName()).log(Level.SEVERE, null, ex);
@@ -405,29 +400,20 @@ class YHTTPHub extends YGenericHub {
                             fifo = fifo.substring(pos+1);
                         }while(pos>=0);
                         _error_delay=0;
-                    }while (!isInterrupted());
-                    _yreq._requestStop();
-                    _yreq._requestRelease();
+                    } while (!Thread.currentThread().isInterrupted());
+                    yreq._requestStop();
+                    yreq._requestRelease();
                 } catch (YAPI_Exception ex) {
                     _connected=false;
-                    _yreq._requestStop();
-                    _yreq._requestRelease();
+                    yreq._requestStop();
+                    yreq._requestRelease();
                     _notifRetryCount++;
                     _devListValidity = 500;
-                    if (isInterrupted()) {
-                        return;
-                    }
-                    _error_delay = 500 << (_notifRetryCount>4?4:_notifRetryCount);
+                    _error_delay = 100 << (_notifRetryCount>4?4:_notifRetryCount);
                 }
             }
-        }
-
-        @Override
-        public void interrupt()
-        {
-            super.interrupt();
-            _yreq._requestStop();
-            _yreq._requestRelease();
+            yreq._requestStop();
+            yreq._requestRelease();
         }
     }
 
@@ -443,7 +429,7 @@ class YHTTPHub extends YGenericHub {
             return;
         }
 
-        if(thread.disconectionDetetcted()){
+        if(_notificationHandler.disconectionDetetcted()){
             if (_reportConnnectionLost) {
                 throw new YAPI_Exception(YAPI.TIMEOUT,"hub "+this._http_params.getUrl()+" is not reachable");
             } else {
@@ -471,7 +457,7 @@ class YHTTPHub extends YGenericHub {
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Device "
                         + _http_params.getHost() + " is not a hub");
             }
-
+            _serial = loadval.getJSONObject("module").getString("serialNumber");
             JSONArray whitePages_json = loadval.getJSONObject("services").getJSONArray("whitePages");
             JSONObject yellowPages_json = loadval.getJSONObject("services").getJSONObject("yellowPages");
             if(loadval.has("network")){
@@ -514,14 +500,117 @@ class YHTTPHub extends YGenericHub {
     }
 
     @Override
-    void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception
+    ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception, InterruptedException
     {
-        if(thread.disconectionDetetcted()){
+        boolean use_self_flash = true;
+        String baseurl = "";
+
+        yHTTPRequest req = new yHTTPRequest(this, "hubFUpdate" + serial);
+
+
+        if (!serial.equals(_serial)) {
+            // check if subdevice support self flashing
+            try {
+                req.RequestSync("GET /bySerial/" + serial + "/flash.json?a=state", null);
+                baseurl = "/bySerial/" + serial;
+            } catch (YAPI_Exception ex) {
+                use_self_flash = false;
+            }
+        }
+
+
+        //5% -> 10%
+        progress.firmware_progress(5, "Enter in bootloader");
+        if (!use_self_flash) {
+            // reboot subdevice
+            req.RequestSync("GET /bySerial/" + serial + "/api/module/rebootCountdown?rebootCountdown=-1", null);
+        }
+
+        //10% -> 40%
+        progress.firmware_progress(10, "Send firmware to bootloader");
+        byte[] head_body = YDevice.formatHTTPUpload("firmware", firmware.getData());
+        req.RequestSync("POST " + baseurl + "/upload.html", head_body);
+        //check firmware upload result
+        byte[] bytes = req.RequestSync("GET " + baseurl + "/flash.json?a=state", null);
+        String uploadresstr = new String(bytes);
+        try {
+            JSONObject uploadres = new JSONObject(uploadresstr);
+            if (!uploadres.getString("state").equals("valid")){
+                throw new YAPI_Exception(YAPI.IO_ERROR, "Upload of firmware failed: invalid firmware("+uploadres.getString("state")+")");
+            }
+            if (uploadres.getInt("progress")!=100){
+                throw new YAPI_Exception(YAPI.IO_ERROR, "Upload of firmware failed: incomplete upload");
+            }
+        } catch (JSONException ex) {
+            throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json response :"+ex.getLocalizedMessage());
+        }
+        if (use_self_flash) {
+            progress.firmware_progress(20, "Upload startupConf.json");
+            head_body = YDevice.formatHTTPUpload("startupConf.json", settings);
+            req.RequestSync("POST " + baseurl + "/upload.html", head_body);
+            progress.firmware_progress(20, "Upload firmwareConf");
+            head_body = YDevice.formatHTTPUpload("firmwareConf", settings);
+            req.RequestSync("POST " + baseurl + "/upload.html", head_body);
+        }
+
+        //40%-> 80%
+        progress.firmware_progress(40, "Flash firmware");
+        if (use_self_flash) {
+            // the hub itself -> reboot in autoflash mode
+            req.RequestSync("GET " + baseurl + "/api/module/rebootCountdown?rebootCountdown=-1003", null);
+            Thread.sleep(7000);
+        } else {
+            // verify that the device is in bootloader
+            long timeout = YAPI.GetTickCount() + YPROG_BOOTLOADER_TIMEOUT;
+            byte[] res;
+            boolean found = false;
+            do {
+                res = req.RequestSync("GET /flash.json?a=list", null);
+                String jsonstr = new String(res);
+                try {
+                    JSONObject flashres = new JSONObject(jsonstr);
+                    JSONArray list = flashres.getJSONArray("list");
+                    for (int i = 0; i < list.length(); i++) {
+                        if (list.getString(i).equals(serial)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                } catch (JSONException ex) {
+                    throw new YAPI_Exception(YAPI.IO_ERROR, "Unable to retrieve bootloader list");
+                }
+                if (!found) {
+                    Thread.sleep(100);
+                }
+            } while (!found && YAPI.GetTickCount() < timeout);
+            //start flash
+            res = req.RequestSync("GET /flash.json?a=flash&s=" + serial , null);
+            try {
+                String jsonstr = new String(res);
+                JSONObject flashres = new JSONObject(jsonstr);
+                JSONArray list = flashres.getJSONArray("logs");
+                ArrayList<String> logs = new ArrayList<String>(list.length());
+                for (int i = 0; i < list.length(); i++) {
+                    logs.add(list.getString(i));
+                }
+                return logs;
+            } catch (JSONException ex) {
+                throw new YAPI_Exception(YAPI.IO_ERROR, "invalid response");
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    synchronized void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception
+    {
+        if(_notificationHandler.disconectionDetetcted()){
             throw new YAPI_Exception(YAPI.TIMEOUT,"hub "+this._http_params.getUrl()+" is not reachable");
         }
 
         if (!_httpReqByDev.containsKey(device)){
-            _httpReqByDev.put(device, new yHTTPRequest(this,"Device "+device.getSerialNumber()));
+            _httpReqByDev.put(device, new yHTTPRequest(this,"Device " + device.getSerialNumber()));
         }
         yHTTPRequest req = _httpReqByDev.get(device);
         if(_writeProtected && !_http_params.geUser().equals("admin")){
@@ -531,25 +620,25 @@ class YHTTPHub extends YGenericHub {
     }
 
     @Override
-    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body) throws YAPI_Exception
+    synchronized byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body) throws YAPI_Exception
     {
-        if(thread.disconectionDetetcted()){
+        if(_notificationHandler.disconectionDetetcted()){
             throw new YAPI_Exception(YAPI.TIMEOUT,"hub "+this._http_params.getUrl()+" is not reachable");
         }
 
         if (!_httpReqByDev.containsKey(device)){
-            _httpReqByDev.put(device, new yHTTPRequest(this,"Device "+device.getSerialNumber()));
+            _httpReqByDev.put(device, new yHTTPRequest(this,"Device " + device.getSerialNumber()));
         }
         yHTTPRequest req = _httpReqByDev.get(device);
         return req.RequestSync(req_first_line,req_head_and_body);
     }
 
-    synchronized  String getHost()
+    String getHost()
     {
         return _http_params.getHost();
     }
 
-    synchronized  int getPort()
+    int getPort()
     {
         return _http_params.getPort();
     }

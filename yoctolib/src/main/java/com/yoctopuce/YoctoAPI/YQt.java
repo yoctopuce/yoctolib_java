@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YQt.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -47,11 +47,12 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (generated code: YQt class start)
 /**
  * YQt Class: Quaternion interface
- * 
+ *
  * The Yoctopuce API YQt class provides direct access to the Yocto3D attitude estimation
  * using a quaternion. It is usually not needed to use the YQt class directly, as the
  * YGyro class provides a more convenient higher-level interface.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YQt extends YSensor
 {
 //--- (end of generated code: YQt class start)
@@ -64,7 +65,7 @@ public class YQt extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -76,7 +77,7 @@ public class YQt extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -114,7 +115,7 @@ public class YQt extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the quaternion component is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YQt.isOnline() to test if the quaternion component is
@@ -122,9 +123,9 @@ public class YQt extends YSensor
      * a quaternion component by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the quaternion component
-     * 
+     *
      * @return a YQt object allowing you to drive the quaternion component.
      */
     public static YQt FindQt(String func)
@@ -143,11 +144,11 @@ public class YQt extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -184,11 +185,11 @@ public class YQt extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -214,7 +215,7 @@ public class YQt extends YSensor
 
     /**
      * Continues the enumeration of quaternion components started using yFirstQt().
-     * 
+     *
      * @return a pointer to a YQt object, corresponding to
      *         a quaternion component currently online, or a null pointer
      *         if there are no more quaternion components to enumerate.
@@ -236,7 +237,7 @@ public class YQt extends YSensor
      * Starts the enumeration of quaternion components currently accessible.
      * Use the method YQt.nextQt() to iterate on
      * next quaternion components.
-     * 
+     *
      * @return a pointer to a YQt object, corresponding to
      *         the first quaternion component currently online, or a null pointer
      *         if there are none.

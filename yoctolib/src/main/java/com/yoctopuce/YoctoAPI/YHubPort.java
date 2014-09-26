@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHubPort.java 15871 2014-04-23 15:29:45Z seb $
+ * $Id: YHubPort.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindHubPort(), the high-level API for HubPort functions
  *
@@ -47,12 +47,13 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YHubPort class start)
 /**
  * YHubPort Class: Yocto-hub port interface
- * 
+ *
  * YHubPort objects provide control over the power supply for every
  * YoctoHub port and provide information about the device connected to it.
  * The logical name of a YHubPort is always automatically set to the
  * unique serial number of the Yoctopuce device connected to it.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YHubPort extends YFunction
 {
 //--- (end of YHubPort class start)
@@ -88,7 +89,7 @@ public class YHubPort extends YFunction
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -100,7 +101,7 @@ public class YHubPort extends YFunction
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -110,7 +111,7 @@ public class YHubPort extends YFunction
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YHubPort(String func)
@@ -139,15 +140,15 @@ public class YHubPort extends YFunction
 
     /**
      * Returns true if the Yocto-hub port is powered, false otherwise.
-     * 
-     * @return either YHubPort.ENABLED_FALSE or YHubPort.ENABLED_TRUE, according to true if the Yocto-hub
+     *
+     *  @return either YHubPort.ENABLED_FALSE or YHubPort.ENABLED_TRUE, according to true if the Yocto-hub
      * port is powered, false otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLED_INVALID;
             }
@@ -157,10 +158,10 @@ public class YHubPort extends YFunction
 
     /**
      * Returns true if the Yocto-hub port is powered, false otherwise.
-     * 
-     * @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to true if the Yocto-hub port is
+     *
+     *  @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to true if the Yocto-hub port is
      * powered, false otherwise
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getEnabled() throws YAPI_Exception
@@ -170,12 +171,12 @@ public class YHubPort extends YFunction
     /**
      * Changes the activation of the Yocto-hub port. If the port is enabled, the
      * connected module is powered. Otherwise, port power is shut down.
-     * 
-     * @param newval : either YHubPort.ENABLED_FALSE or YHubPort.ENABLED_TRUE, according to the activation
+     *
+     *  @param newval : either YHubPort.ENABLED_FALSE or YHubPort.ENABLED_TRUE, according to the activation
      * of the Yocto-hub port
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_enabled(int  newval)  throws YAPI_Exception
@@ -189,11 +190,11 @@ public class YHubPort extends YFunction
     /**
      * Changes the activation of the Yocto-hub port. If the port is enabled, the
      * connected module is powered. Otherwise, port power is shut down.
-     * 
+     *
      * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation of the Yocto-hub port
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setEnabled(int newval)  throws YAPI_Exception
@@ -202,15 +203,15 @@ public class YHubPort extends YFunction
 
     /**
      * Returns the current state of the Yocto-hub port.
-     * 
-     * @return a value among YHubPort.PORTSTATE_OFF, YHubPort.PORTSTATE_OVRLD, YHubPort.PORTSTATE_ON,
+     *
+     *  @return a value among YHubPort.PORTSTATE_OFF, YHubPort.PORTSTATE_OVRLD, YHubPort.PORTSTATE_ON,
      * YHubPort.PORTSTATE_RUN and YHubPort.PORTSTATE_PROG corresponding to the current state of the Yocto-hub port
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_portState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTSTATE_INVALID;
             }
@@ -220,10 +221,10 @@ public class YHubPort extends YFunction
 
     /**
      * Returns the current state of the Yocto-hub port.
-     * 
-     * @return a value among Y_PORTSTATE_OFF, Y_PORTSTATE_OVRLD, Y_PORTSTATE_ON, Y_PORTSTATE_RUN and
+     *
+     *  @return a value among Y_PORTSTATE_OFF, Y_PORTSTATE_OVRLD, Y_PORTSTATE_ON, Y_PORTSTATE_RUN and
      * Y_PORTSTATE_PROG corresponding to the current state of the Yocto-hub port
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getPortState() throws YAPI_Exception
@@ -234,14 +235,14 @@ public class YHubPort extends YFunction
      * Returns the current baud rate used by this Yocto-hub port, in kbps.
      * The default value is 1000 kbps, but a slower rate may be used if communication
      * problems are encountered.
-     * 
+     *
      * @return an integer corresponding to the current baud rate used by this Yocto-hub port, in kbps
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int get_baudRate() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BAUDRATE_INVALID;
             }
@@ -253,9 +254,9 @@ public class YHubPort extends YFunction
      * Returns the current baud rate used by this Yocto-hub port, in kbps.
      * The default value is 1000 kbps, but a slower rate may be used if communication
      * problems are encountered.
-     * 
+     *
      * @return an integer corresponding to the current baud rate used by this Yocto-hub port, in kbps
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int getBaudRate() throws YAPI_Exception
@@ -272,7 +273,7 @@ public class YHubPort extends YFunction
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the Yocto-hub port is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YHubPort.isOnline() to test if the Yocto-hub port is
@@ -280,9 +281,9 @@ public class YHubPort extends YFunction
      * a Yocto-hub port by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the Yocto-hub port
-     * 
+     *
      * @return a YHubPort object allowing you to drive the Yocto-hub port.
      */
     public static YHubPort FindHubPort(String func)
@@ -301,11 +302,11 @@ public class YHubPort extends YFunction
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -339,7 +340,7 @@ public class YHubPort extends YFunction
 
     /**
      * Continues the enumeration of Yocto-hub ports started using yFirstHubPort().
-     * 
+     *
      * @return a pointer to a YHubPort object, corresponding to
      *         a Yocto-hub port currently online, or a null pointer
      *         if there are no more Yocto-hub ports to enumerate.
@@ -361,7 +362,7 @@ public class YHubPort extends YFunction
      * Starts the enumeration of Yocto-hub ports currently accessible.
      * Use the method YHubPort.nextHubPort() to iterate on
      * next Yocto-hub ports.
-     * 
+     *
      * @return a pointer to a YHubPort object, corresponding to
      *         the first Yocto-hub port currently online, or a null pointer
      *         if there are none.

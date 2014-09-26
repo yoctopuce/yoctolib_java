@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAltitude.java 16182 2014-05-12 15:14:26Z seb $
+ * $Id: YAltitude.java 17570 2014-09-10 08:16:37Z seb $
  *
  * Implements yFindAltitude(), the high-level API for Altitude functions
  *
@@ -47,10 +47,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (YAltitude class start)
 /**
  * YAltitude Class: Altitude function interface
- * 
+ *
  * The Yoctopuce application programming interface allows you to read an instant
  * measure of the sensor, as well as the minimal and maximal values observed.
  */
+ @SuppressWarnings("UnusedDeclaration")
 public class YAltitude extends YSensor
 {
 //--- (end of YAltitude class start)
@@ -68,7 +69,7 @@ public class YAltitude extends YSensor
      */
     public interface UpdateCallback {
         /**
-         * 
+         *
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
@@ -80,7 +81,7 @@ public class YAltitude extends YSensor
      */
     public interface TimedReportCallback {
         /**
-         * 
+         *
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
@@ -90,7 +91,7 @@ public class YAltitude extends YSensor
 
 
     /**
-     * 
+     *
      * @param func : functionid
      */
     protected YAltitude(String func)
@@ -106,7 +107,7 @@ public class YAltitude extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("qnh")) {
-            _qnh =  json_val.getDouble("qnh")/65536.0;
+            _qnh =  Math.round(json_val.getDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
     }
@@ -114,17 +115,17 @@ public class YAltitude extends YSensor
     /**
      * Changes the current estimated altitude. This allows to compensate for
      * ambient pressure variations and to work in relative mode.
-     * 
+     *
      * @param newval : a floating point number corresponding to the current estimated altitude
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_currentValue(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval*65536.0));
+        rest_val = Long.toString(Math.round(newval * 65536.0));
         _setAttr("currentValue",rest_val);
         return YAPI.SUCCESS;
     }
@@ -132,11 +133,11 @@ public class YAltitude extends YSensor
     /**
      * Changes the current estimated altitude. This allows to compensate for
      * ambient pressure variations and to work in relative mode.
-     * 
+     *
      * @param newval : a floating point number corresponding to the current estimated altitude
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setCurrentValue(double newval)  throws YAPI_Exception
@@ -147,19 +148,19 @@ public class YAltitude extends YSensor
      * Changes the barometric pressure adjusted to sea level used to compute
      * the altitude (QNH). This enables you to compensate for atmospheric pressure
      * changes due to weather conditions.
-     * 
-     * @param newval : a floating point number corresponding to the barometric pressure adjusted to sea
+     *
+     *  @param newval : a floating point number corresponding to the barometric pressure adjusted to sea
      * level used to compute
      *         the altitude (QNH)
-     * 
+     *
      * @return YAPI.SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int set_qnh(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval*65536.0));
+        rest_val = Long.toString(Math.round(newval * 65536.0));
         _setAttr("qnh",rest_val);
         return YAPI.SUCCESS;
     }
@@ -168,13 +169,13 @@ public class YAltitude extends YSensor
      * Changes the barometric pressure adjusted to sea level used to compute
      * the altitude (QNH). This enables you to compensate for atmospheric pressure
      * changes due to weather conditions.
-     * 
-     * @param newval : a floating point number corresponding to the barometric pressure adjusted to sea
+     *
+     *  @param newval : a floating point number corresponding to the barometric pressure adjusted to sea
      * level used to compute
      *         the altitude (QNH)
-     * 
+     *
      * @return YAPI_SUCCESS if the call succeeds.
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public int setQnh(double newval)  throws YAPI_Exception
@@ -184,15 +185,15 @@ public class YAltitude extends YSensor
     /**
      * Returns the barometric pressure adjusted to sea level used to compute
      * the altitude (QNH).
-     * 
+     *
      * @return a floating point number corresponding to the barometric pressure adjusted to sea level used to compute
      *         the altitude (QNH)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double get_qnh() throws YAPI_Exception
     {
-        if (_cacheExpiration <= SafeYAPI().GetTickCount()) {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
                 return QNH_INVALID;
             }
@@ -203,10 +204,10 @@ public class YAltitude extends YSensor
     /**
      * Returns the barometric pressure adjusted to sea level used to compute
      * the altitude (QNH).
-     * 
+     *
      * @return a floating point number corresponding to the barometric pressure adjusted to sea level used to compute
      *         the altitude (QNH)
-     * 
+     *
      * @throws YAPI_Exception on error
      */
     public double getQnh() throws YAPI_Exception
@@ -223,7 +224,7 @@ public class YAltitude extends YSensor
      * <li>ModuleLogicalName.FunctionIdentifier</li>
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
-     * 
+     *
      * This function does not require that the altimeter is online at the time
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YAltitude.isOnline() to test if the altimeter is
@@ -231,9 +232,9 @@ public class YAltitude extends YSensor
      * an altimeter by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
-     * 
+     *
      * @param func : a string that uniquely characterizes the altimeter
-     * 
+     *
      * @return a YAltitude object allowing you to drive the altimeter.
      */
     public static YAltitude FindAltitude(String func)
@@ -252,11 +253,11 @@ public class YAltitude extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerValueCallback(UpdateCallback callback)
     {
@@ -293,11 +294,11 @@ public class YAltitude extends YSensor
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
      * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
-     * 
+     *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and an YMeasure object describing
      *         the new advertised value.
-     * 
+     *
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
@@ -323,7 +324,7 @@ public class YAltitude extends YSensor
 
     /**
      * Continues the enumeration of altimeters started using yFirstAltitude().
-     * 
+     *
      * @return a pointer to a YAltitude object, corresponding to
      *         an altimeter currently online, or a null pointer
      *         if there are no more altimeters to enumerate.
@@ -345,7 +346,7 @@ public class YAltitude extends YSensor
      * Starts the enumeration of altimeters currently accessible.
      * Use the method YAltitude.nextAltitude() to iterate on
      * next altimeters.
-     * 
+     *
      * @return a pointer to a YAltitude object, corresponding to
      *         the first altimeter currently online, or a null pointer
      *         if there are none.
