@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YRealTimeClock.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindRealTimeClock(), the high-level API for RealTimeClock functions
+ * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YRealTimeClock return codes)
-    //--- (end of YRealTimeClock return codes)
+//--- (YRealTimeClock return codes)
+//--- (end of YRealTimeClock return codes)
 //--- (YRealTimeClock class start)
 /**
  * YRealTimeClock Class: Real Time Clock function interface
@@ -76,7 +76,6 @@ public class YRealTimeClock extends YFunction
     public static final int TIMESET_FALSE = 0;
     public static final int TIMESET_TRUE = 1;
     public static final int TIMESET_INVALID = -1;
-
     protected long _unixTime = UNIXTIME_INVALID;
     protected String _dateTime = DATETIME_INVALID;
     protected int _utcOffset = UTCOFFSET_INVALID;
@@ -126,16 +125,16 @@ public class YRealTimeClock extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("unixTime")) {
-            _unixTime =  json_val.getLong("unixTime");
+            _unixTime = json_val.getLong("unixTime");
         }
         if (json_val.has("dateTime")) {
-            _dateTime =  json_val.getString("dateTime");
+            _dateTime = json_val.getString("dateTime");
         }
         if (json_val.has("utcOffset")) {
-            _utcOffset =  json_val.getInt("utcOffset");
+            _utcOffset = json_val.getInt("utcOffset");
         }
         if (json_val.has("timeSet")) {
-            _timeSet =  json_val.getInt("timeSet")>0?1:0;
+            _timeSet = json_val.getInt("timeSet") > 0 ? 1 : 0;
         }
         super._parseAttr(json_val);
     }
@@ -167,8 +166,9 @@ public class YRealTimeClock extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getUnixTime() throws YAPI_Exception
-
-    { return get_unixTime(); }
+    {
+        return get_unixTime();
+    }
 
     /**
      * Changes the current time. Time is specifid in Unix format (number of elapsed seconds since Jan 1st, 1970).
@@ -199,8 +199,9 @@ public class YRealTimeClock extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setUnixTime(long newval)  throws YAPI_Exception
-
-    { return set_unixTime(newval); }
+    {
+        return set_unixTime(newval);
+    }
 
     /**
      * Returns the current time in the form "YYYY/MM/DD hh:mm:ss"
@@ -227,8 +228,9 @@ public class YRealTimeClock extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getDateTime() throws YAPI_Exception
-
-    { return get_dateTime(); }
+    {
+        return get_dateTime();
+    }
 
     /**
      * Returns the number of seconds between current time and UTC time (time zone).
@@ -255,8 +257,9 @@ public class YRealTimeClock extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getUtcOffset() throws YAPI_Exception
-
-    { return get_utcOffset(); }
+    {
+        return get_utcOffset();
+    }
 
     /**
      * Changes the number of seconds between current time and UTC time (time zone).
@@ -291,8 +294,9 @@ public class YRealTimeClock extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setUtcOffset(int newval)  throws YAPI_Exception
-
-    { return set_utcOffset(newval); }
+    {
+        return set_utcOffset(newval);
+    }
 
     /**
      * Returns true if the clock has been set, and false otherwise.
@@ -321,8 +325,9 @@ public class YRealTimeClock extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getTimeSet() throws YAPI_Exception
-
-    { return get_timeSet(); }
+    {
+        return get_timeSet();
+    }
 
     /**
      * Retrieves a clock for a given identifier.

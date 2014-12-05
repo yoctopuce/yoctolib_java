@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 17594 2014-09-10 21:15:55Z mvuilleu $
+ * $Id: YWireless.java 18330 2014-11-11 16:26:36Z mvuilleu $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -79,7 +79,6 @@ public class YWireless extends YFunction
     public static final int SECURITY_WPA = 3;
     public static final int SECURITY_WPA2 = 4;
     public static final int SECURITY_INVALID = -1;
-
     /**
      * invalid message value
      */
@@ -137,22 +136,22 @@ public class YWireless extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("linkQuality")) {
-            _linkQuality =  json_val.getInt("linkQuality");
+            _linkQuality = json_val.getInt("linkQuality");
         }
         if (json_val.has("ssid")) {
-            _ssid =  json_val.getString("ssid");
+            _ssid = json_val.getString("ssid");
         }
         if (json_val.has("channel")) {
-            _channel =  json_val.getInt("channel");
+            _channel = json_val.getInt("channel");
         }
         if (json_val.has("security")) {
-            _security =  json_val.getInt("security");
+            _security = json_val.getInt("security");
         }
         if (json_val.has("message")) {
-            _message =  json_val.getString("message");
+            _message = json_val.getString("message");
         }
         if (json_val.has("wlanConfig")) {
-            _wlanConfig =  json_val.getString("wlanConfig");
+            _wlanConfig = json_val.getString("wlanConfig");
         }
         super._parseAttr(json_val);
     }
@@ -182,8 +181,9 @@ public class YWireless extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getLinkQuality() throws YAPI_Exception
-
-    { return get_linkQuality(); }
+    {
+        return get_linkQuality();
+    }
 
     /**
      * Returns the wireless network name (SSID).
@@ -210,8 +210,9 @@ public class YWireless extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getSsid() throws YAPI_Exception
-
-    { return get_ssid(); }
+    {
+        return get_ssid();
+    }
 
     /**
      * Returns the 802.11 channel currently used, or 0 when the selected network has not been found.
@@ -240,8 +241,9 @@ public class YWireless extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getChannel() throws YAPI_Exception
-
-    { return get_channel(); }
+    {
+        return get_channel();
+    }
 
     /**
      * Returns the security algorithm used by the selected wireless network.
@@ -271,8 +273,9 @@ public class YWireless extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getSecurity() throws YAPI_Exception
-
-    { return get_security(); }
+    {
+        return get_security();
+    }
 
     /**
      * Returns the latest status message from the wireless interface.
@@ -299,8 +302,9 @@ public class YWireless extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getMessage() throws YAPI_Exception
-
-    { return get_message(); }
+    {
+        return get_message();
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -319,8 +323,9 @@ public class YWireless extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getWlanConfig() throws YAPI_Exception
-
-    { return get_wlanConfig(); }
+    {
+        return get_wlanConfig();
+    }
 
     public int set_wlanConfig(String  newval)  throws YAPI_Exception
     {
@@ -331,8 +336,9 @@ public class YWireless extends YFunction
     }
 
     public int setWlanConfig(String newval)  throws YAPI_Exception
-
-    { return set_wlanConfig(newval); }
+    {
+        return set_wlanConfig(newval);
+    }
 
     /**
      * Retrieves a wireless lan interface for a given identifier.

@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 17578 2014-09-10 14:50:36Z seb $
+ * $Id: YRefFrame.java 18524 2014-11-25 17:09:56Z seb $
  *
- * Implements yFindRefFrame(), the high-level API for RefFrame functions
+ * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -43,8 +43,8 @@ import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 import java.util.ArrayList;
 
-    //--- (YRefFrame return codes)
-    //--- (end of YRefFrame return codes)
+//--- (YRefFrame return codes)
+//--- (end of YRefFrame return codes)
 //--- (YRefFrame class start)
 /**
  * YRefFrame Class: Reference frame configuration
@@ -80,11 +80,11 @@ public class YRefFrame extends YFunction
         REAR(4),
         LEFT(5);
         public final int value;
-        private MOUNTPOSITION(int val) 
+        private MOUNTPOSITION(int val)
         {
             this.value = val;
-        };
-        public static MOUNTPOSITION fromInt(int intval) 
+        }
+        public static MOUNTPOSITION fromInt(int intval)
         {
             switch(intval) {
             case 0:
@@ -102,19 +102,19 @@ public class YRefFrame extends YFunction
             }
             return null;
         }
-    };
-    
+    }
+
     public enum MOUNTORIENTATION {
         TWELVE(0),
         THREE(1),
         SIX(2),
         NINE(3);
         public final int value;
-        private MOUNTORIENTATION(int val) 
+        private MOUNTORIENTATION(int val)
         {
             this.value = val;
-        };
-        public static MOUNTORIENTATION fromInt(int intval) 
+        }
+        public static MOUNTORIENTATION fromInt(int intval)
         {
             switch(intval) {
             case 0:
@@ -128,8 +128,8 @@ public class YRefFrame extends YFunction
             }
             return null;
         }
-    };
-    
+    }
+
     protected int _mountPos = MOUNTPOS_INVALID;
     protected double _bearing = BEARING_INVALID;
     protected String _calibrationParam = CALIBRATIONPARAM_INVALID;
@@ -198,13 +198,13 @@ public class YRefFrame extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("mountPos")) {
-            _mountPos =  json_val.getInt("mountPos");
+            _mountPos = json_val.getInt("mountPos");
         }
         if (json_val.has("bearing")) {
-            _bearing =  Math.round(json_val.getDouble("bearing") * 1000.0 / 65536.0) / 1000.0;
+            _bearing = Math.round(json_val.getDouble("bearing") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("calibrationParam")) {
-            _calibrationParam =  json_val.getString("calibrationParam");
+            _calibrationParam = json_val.getString("calibrationParam");
         }
         super._parseAttr(json_val);
     }
@@ -226,8 +226,9 @@ public class YRefFrame extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getMountPos() throws YAPI_Exception
-
-    { return get_mountPos(); }
+    {
+        return get_mountPos();
+    }
 
     public int set_mountPos(int  newval)  throws YAPI_Exception
     {
@@ -238,8 +239,9 @@ public class YRefFrame extends YFunction
     }
 
     public int setMountPos(int newval)  throws YAPI_Exception
-
-    { return set_mountPos(newval); }
+    {
+        return set_mountPos(newval);
+    }
 
     /**
      * Changes the reference bearing used by the compass. The relative bearing
@@ -294,8 +296,9 @@ public class YRefFrame extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setBearing(double newval)  throws YAPI_Exception
-
-    { return set_bearing(newval); }
+    {
+        return set_bearing(newval);
+    }
 
     /**
      * Returns the reference bearing used by the compass. The relative bearing
@@ -326,8 +329,9 @@ public class YRefFrame extends YFunction
      * @throws YAPI_Exception on error
      */
     public double getBearing() throws YAPI_Exception
-
-    { return get_bearing(); }
+    {
+        return get_bearing();
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -346,8 +350,9 @@ public class YRefFrame extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getCalibrationParam() throws YAPI_Exception
-
-    { return get_calibrationParam(); }
+    {
+        return get_calibrationParam();
+    }
 
     public int set_calibrationParam(String  newval)  throws YAPI_Exception
     {
@@ -358,8 +363,9 @@ public class YRefFrame extends YFunction
     }
 
     public int setCalibrationParam(String newval)  throws YAPI_Exception
-
-    { return set_calibrationParam(newval); }
+    {
+        return set_calibrationParam(newval);
+    }
 
     /**
      * Retrieves a reference frame for a given identifier.

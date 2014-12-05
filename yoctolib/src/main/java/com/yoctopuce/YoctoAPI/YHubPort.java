@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YHubPort.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YHubPort.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindHubPort(), the high-level API for HubPort functions
+ * Implements FindHubPort(), the high-level API for HubPort functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YHubPort return codes)
-    //--- (end of YHubPort return codes)
+//--- (YHubPort return codes)
+//--- (end of YHubPort return codes)
 //--- (YHubPort class start)
 /**
  * YHubPort Class: Yocto-hub port interface
@@ -64,7 +64,6 @@ public class YHubPort extends YFunction
     public static final int ENABLED_FALSE = 0;
     public static final int ENABLED_TRUE = 1;
     public static final int ENABLED_INVALID = -1;
-
     /**
      * invalid portState value
      */
@@ -74,7 +73,6 @@ public class YHubPort extends YFunction
     public static final int PORTSTATE_RUN = 3;
     public static final int PORTSTATE_PROG = 4;
     public static final int PORTSTATE_INVALID = -1;
-
     /**
      * invalid baudRate value
      */
@@ -127,13 +125,13 @@ public class YHubPort extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("enabled")) {
-            _enabled =  json_val.getInt("enabled")>0?1:0;
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
         if (json_val.has("portState")) {
-            _portState =  json_val.getInt("portState");
+            _portState = json_val.getInt("portState");
         }
         if (json_val.has("baudRate")) {
-            _baudRate =  json_val.getInt("baudRate");
+            _baudRate = json_val.getInt("baudRate");
         }
         super._parseAttr(json_val);
     }
@@ -165,8 +163,9 @@ public class YHubPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getEnabled() throws YAPI_Exception
-
-    { return get_enabled(); }
+    {
+        return get_enabled();
+    }
 
     /**
      * Changes the activation of the Yocto-hub port. If the port is enabled, the
@@ -198,8 +197,9 @@ public class YHubPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setEnabled(int newval)  throws YAPI_Exception
-
-    { return set_enabled(newval); }
+    {
+        return set_enabled(newval);
+    }
 
     /**
      * Returns the current state of the Yocto-hub port.
@@ -228,8 +228,9 @@ public class YHubPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPortState() throws YAPI_Exception
-
-    { return get_portState(); }
+    {
+        return get_portState();
+    }
 
     /**
      * Returns the current baud rate used by this Yocto-hub port, in kbps.
@@ -260,8 +261,9 @@ public class YHubPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getBaudRate() throws YAPI_Exception
-
-    { return get_baudRate(); }
+    {
+        return get_baudRate();
+    }
 
     /**
      * Retrieves a Yocto-hub port for a given identifier.

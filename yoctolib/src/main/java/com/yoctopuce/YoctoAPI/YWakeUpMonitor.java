@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YWakeUpMonitor.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YWakeUpMonitor.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
+ * Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YWakeUpMonitor return codes)
-    //--- (end of YWakeUpMonitor return codes)
+//--- (YWakeUpMonitor return codes)
+//--- (end of YWakeUpMonitor return codes)
 //--- (YWakeUpMonitor class start)
 /**
  * YWakeUpMonitor Class: WakeUpMonitor function interface
@@ -78,14 +78,12 @@ public class YWakeUpMonitor extends YFunction
     public static final int WAKEUPREASON_SCHEDULE1 = 4;
     public static final int WAKEUPREASON_SCHEDULE2 = 5;
     public static final int WAKEUPREASON_INVALID = -1;
-
     /**
      * invalid wakeUpState value
      */
     public static final int WAKEUPSTATE_SLEEPING = 0;
     public static final int WAKEUPSTATE_AWAKE = 1;
     public static final int WAKEUPSTATE_INVALID = -1;
-
     /**
      * invalid rtcTime value
      */
@@ -142,22 +140,22 @@ public class YWakeUpMonitor extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("powerDuration")) {
-            _powerDuration =  json_val.getInt("powerDuration");
+            _powerDuration = json_val.getInt("powerDuration");
         }
         if (json_val.has("sleepCountdown")) {
-            _sleepCountdown =  json_val.getInt("sleepCountdown");
+            _sleepCountdown = json_val.getInt("sleepCountdown");
         }
         if (json_val.has("nextWakeUp")) {
-            _nextWakeUp =  json_val.getLong("nextWakeUp");
+            _nextWakeUp = json_val.getLong("nextWakeUp");
         }
         if (json_val.has("wakeUpReason")) {
-            _wakeUpReason =  json_val.getInt("wakeUpReason");
+            _wakeUpReason = json_val.getInt("wakeUpReason");
         }
         if (json_val.has("wakeUpState")) {
-            _wakeUpState =  json_val.getInt("wakeUpState");
+            _wakeUpState = json_val.getInt("wakeUpState");
         }
         if (json_val.has("rtcTime")) {
-            _rtcTime =  json_val.getLong("rtcTime");
+            _rtcTime = json_val.getLong("rtcTime");
         }
         super._parseAttr(json_val);
     }
@@ -187,8 +185,9 @@ public class YWakeUpMonitor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPowerDuration() throws YAPI_Exception
-
-    { return get_powerDuration(); }
+    {
+        return get_powerDuration();
+    }
 
     /**
      * Changes the maximal wake up time (seconds) before automatically going to sleep.
@@ -219,8 +218,9 @@ public class YWakeUpMonitor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setPowerDuration(int newval)  throws YAPI_Exception
-
-    { return set_powerDuration(newval); }
+    {
+        return set_powerDuration(newval);
+    }
 
     /**
      * Returns the delay before the  next sleep period.
@@ -247,8 +247,9 @@ public class YWakeUpMonitor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getSleepCountdown() throws YAPI_Exception
-
-    { return get_sleepCountdown(); }
+    {
+        return get_sleepCountdown();
+    }
 
     /**
      * Changes the delay before the next sleep period.
@@ -277,8 +278,9 @@ public class YWakeUpMonitor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setSleepCountdown(int newval)  throws YAPI_Exception
-
-    { return set_sleepCountdown(newval); }
+    {
+        return set_sleepCountdown(newval);
+    }
 
     /**
      * Returns the next scheduled wake up date/time (UNIX format)
@@ -305,8 +307,9 @@ public class YWakeUpMonitor extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getNextWakeUp() throws YAPI_Exception
-
-    { return get_nextWakeUp(); }
+    {
+        return get_nextWakeUp();
+    }
 
     /**
      * Changes the days of the week when a wake up must take place.
@@ -335,8 +338,9 @@ public class YWakeUpMonitor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setNextWakeUp(long newval)  throws YAPI_Exception
-
-    { return set_nextWakeUp(newval); }
+    {
+        return set_nextWakeUp(newval);
+    }
 
     /**
      * Returns the latest wake up reason.
@@ -368,8 +372,9 @@ public class YWakeUpMonitor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getWakeUpReason() throws YAPI_Exception
-
-    { return get_wakeUpReason(); }
+    {
+        return get_wakeUpReason();
+    }
 
     /**
      * Returns  the current state of the monitor
@@ -397,8 +402,9 @@ public class YWakeUpMonitor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getWakeUpState() throws YAPI_Exception
-
-    { return get_wakeUpState(); }
+    {
+        return get_wakeUpState();
+    }
 
     public int set_wakeUpState(int  newval)  throws YAPI_Exception
     {
@@ -409,8 +415,9 @@ public class YWakeUpMonitor extends YFunction
     }
 
     public int setWakeUpState(int newval)  throws YAPI_Exception
-
-    { return set_wakeUpState(newval); }
+    {
+        return set_wakeUpState(newval);
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -429,8 +436,9 @@ public class YWakeUpMonitor extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getRtcTime() throws YAPI_Exception
-
-    { return get_rtcTime(); }
+    {
+        return get_rtcTime();
+    }
 
     /**
      * Retrieves a monitor for a given identifier.

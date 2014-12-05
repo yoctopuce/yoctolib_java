@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YWakeUpSchedule.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YWakeUpSchedule.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
+ * Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YWakeUpSchedule return codes)
-    //--- (end of YWakeUpSchedule return codes)
+//--- (YWakeUpSchedule return codes)
+//--- (end of YWakeUpSchedule return codes)
 //--- (YWakeUpSchedule class start)
 /**
  * YWakeUpSchedule Class: WakeUpSchedule function interface
@@ -137,25 +137,25 @@ public class YWakeUpSchedule extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("minutesA")) {
-            _minutesA =  json_val.getInt("minutesA");
+            _minutesA = json_val.getInt("minutesA");
         }
         if (json_val.has("minutesB")) {
-            _minutesB =  json_val.getInt("minutesB");
+            _minutesB = json_val.getInt("minutesB");
         }
         if (json_val.has("hours")) {
-            _hours =  json_val.getInt("hours");
+            _hours = json_val.getInt("hours");
         }
         if (json_val.has("weekDays")) {
-            _weekDays =  json_val.getInt("weekDays");
+            _weekDays = json_val.getInt("weekDays");
         }
         if (json_val.has("monthDays")) {
-            _monthDays =  json_val.getInt("monthDays");
+            _monthDays = json_val.getInt("monthDays");
         }
         if (json_val.has("months")) {
-            _months =  json_val.getInt("months");
+            _months = json_val.getInt("months");
         }
         if (json_val.has("nextOccurence")) {
-            _nextOccurence =  json_val.getLong("nextOccurence");
+            _nextOccurence = json_val.getLong("nextOccurence");
         }
         super._parseAttr(json_val);
     }
@@ -185,8 +185,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getMinutesA() throws YAPI_Exception
-
-    { return get_minutesA(); }
+    {
+        return get_minutesA();
+    }
 
     /**
      * Changes the minutes in the 00-29 interval when a wake up must take place.
@@ -215,8 +216,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setMinutesA(int newval)  throws YAPI_Exception
-
-    { return set_minutesA(newval); }
+    {
+        return set_minutesA(newval);
+    }
 
     /**
      * Returns the minutes in the 30-59 intervalof each hour scheduled for wake up.
@@ -243,8 +245,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getMinutesB() throws YAPI_Exception
-
-    { return get_minutesB(); }
+    {
+        return get_minutesB();
+    }
 
     /**
      * Changes the minutes in the 30-59 interval when a wake up must take place.
@@ -273,8 +276,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setMinutesB(int newval)  throws YAPI_Exception
-
-    { return set_minutesB(newval); }
+    {
+        return set_minutesB(newval);
+    }
 
     /**
      * Returns the hours scheduled for wake up.
@@ -301,8 +305,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getHours() throws YAPI_Exception
-
-    { return get_hours(); }
+    {
+        return get_hours();
+    }
 
     /**
      * Changes the hours when a wake up must take place.
@@ -331,8 +336,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setHours(int newval)  throws YAPI_Exception
-
-    { return set_hours(newval); }
+    {
+        return set_hours(newval);
+    }
 
     /**
      * Returns the days of the week scheduled for wake up.
@@ -359,8 +365,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getWeekDays() throws YAPI_Exception
-
-    { return get_weekDays(); }
+    {
+        return get_weekDays();
+    }
 
     /**
      * Changes the days of the week when a wake up must take place.
@@ -389,8 +396,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setWeekDays(int newval)  throws YAPI_Exception
-
-    { return set_weekDays(newval); }
+    {
+        return set_weekDays(newval);
+    }
 
     /**
      * Returns the days of the month scheduled for wake up.
@@ -417,8 +425,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getMonthDays() throws YAPI_Exception
-
-    { return get_monthDays(); }
+    {
+        return get_monthDays();
+    }
 
     /**
      * Changes the days of the month when a wake up must take place.
@@ -447,8 +456,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setMonthDays(int newval)  throws YAPI_Exception
-
-    { return set_monthDays(newval); }
+    {
+        return set_monthDays(newval);
+    }
 
     /**
      * Returns the months scheduled for wake up.
@@ -475,8 +485,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getMonths() throws YAPI_Exception
-
-    { return get_months(); }
+    {
+        return get_months();
+    }
 
     /**
      * Changes the months when a wake up must take place.
@@ -505,8 +516,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setMonths(int newval)  throws YAPI_Exception
-
-    { return set_months(newval); }
+    {
+        return set_months(newval);
+    }
 
     /**
      * Returns the date/time (seconds) of the next wake up occurence
@@ -533,8 +545,9 @@ public class YWakeUpSchedule extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getNextOccurence() throws YAPI_Exception
-
-    { return get_nextOccurence(); }
+    {
+        return get_nextOccurence();
+    }
 
     /**
      * Retrieves a wake up schedule for a given identifier.

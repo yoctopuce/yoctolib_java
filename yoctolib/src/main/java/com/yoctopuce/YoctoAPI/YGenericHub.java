@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericHub.java 17831 2014-09-25 16:31:39Z seb $
+ * $Id: YGenericHub.java 18456 2014-11-20 16:29:57Z seb $
  *
  * Internal YGenericHub object
  *
@@ -54,7 +54,7 @@ abstract class YGenericHub {
     protected volatile long _devListValidity = 500;
     protected long _devListExpires = 0;
     protected HashMap<Integer, String> _serialByYdx = new HashMap<Integer, String>();
-    protected HashMap<String, YDevice> _devices = new HashMap< String, YDevice>();
+    protected HashMap<String, YDevice> _devices = new HashMap<String, YDevice>();
     //protected ArrayList<WPEntry> wpages = new ArrayList<WPEntry>();
     protected final boolean _reportConnnectionLost;
 
@@ -65,8 +65,9 @@ abstract class YGenericHub {
     }
 
     abstract void release();
-    
+
     abstract String getRootUrl();
+
     abstract boolean isSameRootUrl(String url);
 
     abstract void startNotifications() throws YAPI_Exception;
@@ -77,7 +78,7 @@ abstract class YGenericHub {
     {
         // by default consider all known device as unplugged
         ArrayList<YDevice> toRemove = new ArrayList<YDevice>(_devices.values());
- 
+
         for (WPEntry wp : whitePages) {
             String serial = wp.getSerialNumber();
             if (_devices.containsKey(serial)) {
@@ -95,34 +96,37 @@ abstract class YGenericHub {
                 YDevice dev = new YDevice(this, wp, yellowPages);
                 _devices.put(serial, dev);
                 SafeYAPI().pushPlugEvent(Event.PLUG, serial);
-            	SafeYAPI()._Log("HUB: device "+serial+" has been plugged\n");
+                SafeYAPI()._Log("HUB: device " + serial + " has been plugged\n");
             }
         }
-        
+
         for (YDevice dev : toRemove) {
-        	String serial = dev.getSerialNumber();
+            String serial = dev.getSerialNumber();
             SafeYAPI().pushPlugEvent(Event.UNPLUG, serial);
-        	SafeYAPI()._Log("HUB: device "+serial+" has been unplugged\n");
-        	_devices.remove(serial);
+            SafeYAPI()._Log("HUB: device " + serial + " has been unplugged\n");
+            _devices.remove(serial);
         }
     }
 
     abstract void updateDeviceList(boolean forceupdate) throws YAPI_Exception;
 
+    public abstract ArrayList<String> getBootloaders();
+
     interface UpdateProgress
     {
-        public  void firmware_progress(int percent, String message);
+        public void firmware_progress(int percent, String message);
     }
+
     abstract ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception, InterruptedException;
 
 
     interface RequestAsyncResult {
-        void RequestAsyncDone(Object context, byte[] result, int error, String errmsg );
+        void RequestAsyncDone(Object context, byte[] result, int error, String errmsg);
     }
-    abstract  void devRequestAsync(YDevice device,String req_first_line,byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception;
 
-    abstract byte[] devRequestSync(YDevice device,String req_first_line,byte[] req_head_and_body) throws YAPI_Exception;
+    abstract void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception;
 
+    abstract byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body) throws YAPI_Exception;
 
 
     protected static class HTTPParams {
@@ -132,7 +136,8 @@ abstract class YGenericHub {
         private final String _user;
         private final String _pass;
 
-        public  HTTPParams(String url) {
+        public HTTPParams(String url)
+        {
             int pos = 0;
             if (url.startsWith("http://")) {
                 pos = 7;
@@ -161,23 +166,28 @@ abstract class YGenericHub {
             }
         }
 
-        String getHost() {
+        String getHost()
+        {
             return _host;
         }
 
-        String getPass() {
+        String getPass()
+        {
             return _pass;
         }
 
-        int getPort() {
+        int getPort()
+        {
             return _port;
         }
 
-        String geUser() {
+        String geUser()
+        {
             return _user;
         }
 
-        public String getUrl() {
+        public String getUrl()
+        {
             StringBuilder url = new StringBuilder();
             if (!_user.equals("")) {
                 url.append(_user);

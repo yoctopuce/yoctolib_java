@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOldDataStream.java 17843 2014-09-26 08:09:00Z seb $
+ * $Id: YOldDataStream.java 18339 2014-11-12 10:08:56Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -76,7 +76,7 @@ public class YOldDataStream extends YDataStream
         _avgVal = DATA_INVALID;
         _maxVal = DATA_INVALID;
     }
-        
+
     public int loadStream() throws YAPI_Exception
     {
         JSONArray coldiv = null;
@@ -84,7 +84,7 @@ public class YOldDataStream extends YDataStream
         double colscl[];
         int colofs[];
 
-        JSONObject jsonObj=null;
+        JSONObject jsonObj = null;
 
         try {
             JSONTokener jsonTokenner = _dataLogger.getData(_runNo, _timeStamp);
@@ -135,7 +135,7 @@ public class YOldDataStream extends YDataStream
                     throw new YAPI_Exception(YAPI.IO_ERROR, "DataStream corrupted");
                 }
                 coltyp = new int[_nCols];
-                for (int c=0;c<_nCols;c++) {
+                for (int c = 0; c < _nCols; c++) {
                     coltyp[c] = types.getInt(c);
                 }
             }
@@ -169,7 +169,7 @@ public class YOldDataStream extends YDataStream
             throw new YAPI_Exception(YAPI.IO_ERROR, "json parse error");
         }
 
-        if (jsonObj!=null && jsonObj.has("data")) {
+        if (jsonObj != null && jsonObj.has("data")) {
             if (_nCols == 0 || coldiv == null || coltyp == null) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, "DataStream corrupted");
             }
@@ -200,7 +200,7 @@ public class YOldDataStream extends YDataStream
                 if (coltyp[c] < 2) {
                     val_d = (val_i + colofs[c]) * colscl[c];
                 } else {
-                    val_d = YAPI._decimalToDouble(val_i-32767);
+                    val_d = YAPI._decimalToDouble(val_i - 32767);
                 }
                 dat.add(val_d);
                 c++;
@@ -213,7 +213,7 @@ public class YOldDataStream extends YDataStream
         }
         return YAPI.SUCCESS;
     }
-    
+
     /**
      * Returns the relative start time of the data stream, measured in seconds.
      * For recent firmwares, the value is relative to the present time,
@@ -227,7 +227,8 @@ public class YOldDataStream extends YDataStream
      *         between the start of the run and the beginning of this data
      *         stream.
      */
-    @Override public int get_startTime()
+    @Override
+    public int get_startTime()
     {
         return _timeStamp;
     }
@@ -246,7 +247,7 @@ public class YOldDataStream extends YDataStream
     {
         return _timeStamp;
     }
-    
+
     /**
      * Returns the number of seconds elapsed between  two consecutive
      * rows of this data stream. By default, the data logger records one row
@@ -255,10 +256,11 @@ public class YOldDataStream extends YDataStream
      * 
      * This method does not cause any access to the device, as the value
      * is preloaded in the object at instantiation time.
-     * 
+     *
      * @return an unsigned number corresponding to a number of seconds.
      */
-    @Override public double get_dataSamplesInterval()
+    @Override
+    public double get_dataSamplesInterval()
     {
         return _interval;
     }
@@ -277,5 +279,5 @@ public class YOldDataStream extends YDataStream
     public double getDataSamplesInterval()
     {
         return _interval;
-    }    
+    }
 }

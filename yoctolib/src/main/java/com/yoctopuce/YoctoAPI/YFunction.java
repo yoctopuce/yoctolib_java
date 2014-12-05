@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFunction.java 17678 2014-09-16 16:31:26Z seb $
+ * $Id: YFunction.java 18339 2014-11-12 10:08:56Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -10,26 +10,26 @@
  *
  *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
  *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ *  file into your software for the sole purpose of interfacing
+ *  with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
+ *  You may reproduce and distribute copies of this file in
  *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
+ *  code is to interface with Yoctopuce products. You must retain
  *  this notice in the distributed source file.
  *
  *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
+ *  for additional information regarding your rights and
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
+ *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
  *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
  *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
@@ -124,9 +124,7 @@ public class YFunction
     //--- (end of generated code: YFunction definitions)
 
 
-
     /**
-     *
      * @param func : functionid
      */
     protected YFunction(String func)
@@ -141,7 +139,7 @@ public class YFunction
         //--- (end of generated code: YFunction attributes initialization)
     }
 
-    protected void _throw(int error,String message) throws YAPI_Exception {
+    protected void _throw(int error, String message) throws YAPI_Exception {
         throw new YAPI_Exception(error, message);
     }
 
@@ -162,8 +160,6 @@ public class YFunction
     }
 
 
-
-
     protected static void _UpdateTimedReportCallbackList(YFunction func, boolean add)
     {
         SafeYAPI()._UpdateTimedReportCallbackList(func, add);
@@ -174,10 +170,10 @@ public class YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("logicalName")) {
-            _logicalName =  json_val.getString("logicalName");
+            _logicalName = json_val.getString("logicalName");
         }
         if (json_val.has("advertisedValue")) {
-            _advertisedValue =  json_val.getString("advertisedValue");
+            _advertisedValue = json_val.getString("advertisedValue");
         }
     }
 
@@ -206,8 +202,9 @@ public class YFunction
      * @throws YAPI_Exception on error
      */
     public String getLogicalName() throws YAPI_Exception
-
-    { return get_logicalName(); }
+    {
+        return get_logicalName();
+    }
 
     /**
      * Changes the logical name of the function. You can use yCheckLogicalName()
@@ -244,8 +241,9 @@ public class YFunction
      * @throws YAPI_Exception on error
      */
     public int setLogicalName(String newval)  throws YAPI_Exception
-
-    { return set_logicalName(newval); }
+    {
+        return set_logicalName(newval);
+    }
 
     /**
      * Returns the current value of the function (no more than 6 characters).
@@ -272,8 +270,9 @@ public class YFunction
      * @throws YAPI_Exception on error
      */
     public String getAdvertisedValue() throws YAPI_Exception
-
-    { return get_advertisedValue(); }
+    {
+        return get_advertisedValue();
+    }
 
     /**
      * Retrieves a function for a given identifier.
@@ -401,7 +400,7 @@ public class YFunction
     {
         try {
             String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            return _className + "(" + _func + ")="+hwid;
+            return _className + "(" + _func + ")=" + hwid;
         } catch (YAPI_Exception ignored) {
         }
         return _className + "(" + _func + ")=unresolved";
@@ -477,18 +476,31 @@ public class YFunction
         return describe();
     }
 
-    protected void  _parse(JSONObject json, long msValidity) throws YAPI_Exception {
-        _cacheExpiration = YAPI.GetTickCount()+ msValidity;
+    protected void _parse(JSONObject json, long msValidity) throws YAPI_Exception {
+        _cacheExpiration = YAPI.GetTickCount() + msValidity;
         try {
             _parseAttr(json);
         } catch (JSONException e) {
-            _throw(YAPI.IO_ERROR,e.getMessage());
+            _throw(YAPI.IO_ERROR, e.getMessage());
         }
         _parserHelper();
     }
 
-
-
+    protected String _escapeAttr(String newval) throws YAPI_Exception
+    {
+        try {
+            String escaped = URLEncoder.encode(newval, "ISO-8859-1");
+            escaped = escaped.replaceAll("%21", "!")
+                    .replaceAll("%23", "#").replaceAll("%24", "$")
+                    .replaceAll("%27", "'").replaceAll("%28", "(").replaceAll("%29", ")")
+                    .replaceAll("%2C", ",").replaceAll("%2F", "/")
+                    .replaceAll("%3A", ":").replaceAll("%3B", ";").replaceAll("%3F", "?")
+                    .replaceAll("%40", "@").replaceAll("%5B", "[").replaceAll("%5D", "]");
+            return escaped;
+        } catch (UnsupportedEncodingException ex) {
+            throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Unsupported Encoding");
+        }
+    }
 
     // Change the value of an attribute on a device, and update cache on the fly
     // Note: the function cache is a typed (parsed) cache, contrarily to the agnostic device cache
@@ -498,22 +510,14 @@ public class YFunction
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Undefined value to set for attribute " + attr);
         }
         String attrname;
-        String extra;
         try {
             attrname = URLEncoder.encode(attr, "ISO-8859-1");
-            extra = "/" + attrname + "?" + attrname + "=" + URLEncoder.encode(newval, "ISO-8859-1");
-            extra = extra.replaceAll("%21", "!")
-                    .replaceAll("%23", "#").replaceAll("%24", "$")
-                    .replaceAll("%27", "'").replaceAll("%28", "(").replaceAll("%29", ")")
-                    .replaceAll("%2C", ",").replaceAll("%2F", "/")
-                    .replaceAll("%3A", ":").replaceAll("%3B", ";").replaceAll("%3F", "?")
-                    .replaceAll("%40", "@").replaceAll("%5B", "[").replaceAll("%5D", "]");
-            extra += "&.";
         } catch (UnsupportedEncodingException ex) {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Unsupported Encoding");
         }
+        String extra = "/" + attrname + "?" + attrname + "=" + _escapeAttr(newval) + "&.";
         _devRequest(extra);
-        if (_cacheExpiration!=0) {
+        if (_cacheExpiration != 0) {
             _cacheExpiration = YAPI.GetTickCount();
         }
         return YAPI.SUCCESS;
@@ -542,8 +546,8 @@ public class YFunction
 
     protected byte[] _download(String url) throws YAPI_Exception
     {
-        String   request = "GET /"+url+" HTTP/1.1\r\n\r\n";
-        return  _request(request,null);
+        String request = "GET /" + url + " HTTP/1.1\r\n\r\n";
+        return _request(request, null);
     }
 
 
@@ -551,36 +555,36 @@ public class YFunction
     {
         JSONObject obj = null;
         try {
-            obj =new JSONObject(new String(json,"ISO-8859-1"));
+            obj = new JSONObject(new String(json, "ISO-8859-1"));
         } catch (JSONException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         } catch (UnsupportedEncodingException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
-        if(obj.has(key)){
-            String val= obj.optString(key);
-            if(val==null)
+        if (obj.has(key)) {
+            String val = obj.optString(key);
+            if (val == null)
                 val = obj.toString();
             return val;
         }
-        throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,"No key "+key+"in JSON struct");
+        throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "No key " + key + "in JSON struct");
     }
 
     protected String _json_get_string(byte[] json) throws YAPI_Exception
     {
         JSONArray array = null;
         try {
-            String s = new String(json,"ISO-8859-1");
-            array = new JSONArray("["+s+"]");
+            String s = new String(json, "ISO-8859-1");
+            array = new JSONArray("[" + s + "]");
         } catch (JSONException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         } catch (UnsupportedEncodingException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         try {
             return array.getString(0);
         } catch (JSONException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
     }
 
@@ -588,29 +592,30 @@ public class YFunction
     {
         JSONArray array = null;
         try {
-            array =new JSONArray(new String(json,"ISO-8859-1"));
+            array = new JSONArray(new String(json, "ISO-8859-1"));
         } catch (JSONException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         } catch (UnsupportedEncodingException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         ArrayList<String> list = new ArrayList<String>();
         int len = array.length();
-        for (int i=0;i<len;i++){
+        for (int i = 0; i < len; i++) {
             try {
                 Object o = array.get(i);
-                if(o.getClass().getName().substring(0, 3).equals("JSO")) {
+                if (o.getClass().getName().substring(0, 3).equals("JSO")) {
                     list.add(o.toString());
                 } else {
                     String s = new JSONStringer().object().key("X").value(o).endObject().toString();
-                    list.add(s.substring(5, s.length()-1));
+                    list.add(s.substring(5, s.length() - 1));
                 }
             } catch (JSONException ex) {
-                throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
+                throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
             }
         }
         return list;
     }
+
     // Load and parse the REST API for a function given by class name and
     // identifier, possibly applying changes
     // Device cache will be preloaded when loading function "module" and
@@ -647,7 +652,7 @@ public class YFunction
                 } catch (JSONException ex) {
                     throw new YAPI_Exception(YAPI.IO_ERROR,
                             "Request failed, could not parse API value for "
-                            + httpreq);
+                                    + httpreq);
                 }
             } else {
                 String httpreq = "GET /api/" + _funId + extra;
@@ -666,8 +671,8 @@ public class YFunction
     // Method used to cache DataStream objects (new DataLogger)
     YDataStream _findDataStream(YDataSet dataset, String def) throws YAPI_Exception
     {
-        String key = dataset.get_functionId()+":"+def;
-        if(_dataStreams.containsKey(key)) {
+        String key = dataset.get_functionId() + ":" + def;
+        if (_dataStreams.containsKey(key)) {
             return _dataStreams.get(key);
         }
 

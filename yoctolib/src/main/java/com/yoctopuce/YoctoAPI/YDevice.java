@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDevice.java 17678 2014-09-16 16:31:26Z seb $
+ * $Id: YDevice.java 18339 2014-11-12 10:08:56Z seb $
  *
  * Internal YDevice class
  *
@@ -337,24 +337,27 @@ public class YDevice
     {
         Random randomGenerator = new Random();
         String boundary;
-        String mp_header = "Content-Disposition: form-data; name=\""+path+"\"; filename=\"api\"\r\n"+
-                "Content-Type: application/octet-stream\r\n"+
+        String mp_header = "Content-Disposition: form-data; name=\"" + path + "\"; filename=\"api\"\r\n" +
+                "Content-Type: application/octet-stream\r\n" +
                 "Content-Transfer-Encoding: binary\r\n\r\n";
         // find a valid boundary
         do {
             boundary = String.format("Zz%06xzZ", randomGenerator.nextInt(0x1000000));
         } while(mp_header.contains(boundary) && YAPI._find_in_bytes(content,boundary.getBytes())>=0);
         //construct header parts
-        String header_start = "Content-Type: multipart/form-data; boundary="+boundary+"\r\n\r\n--"+boundary+"\r\n"+mp_header;
-        String header_stop="\r\n--"+boundary+"--\r\n";
-        byte[] head_body = new byte[header_start.length()+ content.length+ header_stop.length()];
-        int pos=0;int len=header_start.length();
+        String header_start = "Content-Type: multipart/form-data; boundary=" + boundary + "\r\n\r\n--" + boundary + "\r\n" + mp_header;
+        String header_stop = "\r\n--" + boundary + "--\r\n";
+        byte[] head_body = new byte[header_start.length() + content.length + header_stop.length()];
+        int pos = 0;
+        int len = header_start.length();
         System.arraycopy(header_start.getBytes(), 0, head_body, pos, len);
 
-        pos+=len;len=content.length;
+        pos += len;
+        len = content.length;
         System.arraycopy(content, 0, head_body, pos, len);
 
-        pos+=len;len=header_stop.length();
+        pos += len;
+        len = header_stop.length();
         System.arraycopy(header_stop.getBytes(), 0, head_body, pos, len);
         System.arraycopy(header_stop.getBytes(), 0, head_body, pos, len);
         return head_body;

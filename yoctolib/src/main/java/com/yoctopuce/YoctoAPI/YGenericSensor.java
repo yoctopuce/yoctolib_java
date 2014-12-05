@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YGenericSensor.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindGenericSensor(), the high-level API for GenericSensor functions
+ * Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YGenericSensor return codes)
-    //--- (end of YGenericSensor return codes)
+//--- (YGenericSensor return codes)
+//--- (end of YGenericSensor return codes)
 //--- (YGenericSensor class start)
 /**
  * YGenericSensor Class: GenericSensor function interface
@@ -76,11 +76,20 @@ public class YGenericSensor extends YSensor
      * invalid signalBias value
      */
     public static final double SIGNALBIAS_INVALID = YAPI.INVALID_DOUBLE;
+    /**
+     * invalid signalSampling value
+     */
+    public static final int SIGNALSAMPLING_HIGH_RATE = 0;
+    public static final int SIGNALSAMPLING_HIGH_RATE_FILTERED = 1;
+    public static final int SIGNALSAMPLING_LOW_NOISE = 2;
+    public static final int SIGNALSAMPLING_LOW_NOISE_FILTERED = 3;
+    public static final int SIGNALSAMPLING_INVALID = -1;
     protected double _signalValue = SIGNALVALUE_INVALID;
     protected String _signalUnit = SIGNALUNIT_INVALID;
     protected String _signalRange = SIGNALRANGE_INVALID;
     protected String _valueRange = VALUERANGE_INVALID;
     protected double _signalBias = SIGNALBIAS_INVALID;
+    protected int _signalSampling = SIGNALSAMPLING_INVALID;
     protected UpdateCallback _valueCallbackGenericSensor = null;
     protected TimedReportCallback _timedReportCallbackGenericSensor = null;
 
@@ -127,19 +136,22 @@ public class YGenericSensor extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("signalValue")) {
-            _signalValue =  Math.round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
+            _signalValue = Math.round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("signalUnit")) {
-            _signalUnit =  json_val.getString("signalUnit");
+            _signalUnit = json_val.getString("signalUnit");
         }
         if (json_val.has("signalRange")) {
-            _signalRange =  json_val.getString("signalRange");
+            _signalRange = json_val.getString("signalRange");
         }
         if (json_val.has("valueRange")) {
-            _valueRange =  json_val.getString("valueRange");
+            _valueRange = json_val.getString("valueRange");
         }
         if (json_val.has("signalBias")) {
-            _signalBias =  Math.round(json_val.getDouble("signalBias") * 1000.0 / 65536.0) / 1000.0;
+            _signalBias = Math.round(json_val.getDouble("signalBias") * 1000.0 / 65536.0) / 1000.0;
+        }
+        if (json_val.has("signalSampling")) {
+            _signalSampling = json_val.getInt("signalSampling");
         }
         super._parseAttr(json_val);
     }
@@ -175,8 +187,9 @@ public class YGenericSensor extends YSensor
      * @throws YAPI_Exception on error
      */
     public int setUnit(String newval)  throws YAPI_Exception
-
-    { return set_unit(newval); }
+    {
+        return set_unit(newval);
+    }
 
     /**
      * Returns the measured value of the electrical signal used by the sensor.
@@ -203,8 +216,9 @@ public class YGenericSensor extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getSignalValue() throws YAPI_Exception
-
-    { return get_signalValue(); }
+    {
+        return get_signalValue();
+    }
 
     /**
      * Returns the measuring unit of the electrical signal used by the sensor.
@@ -231,8 +245,9 @@ public class YGenericSensor extends YSensor
      * @throws YAPI_Exception on error
      */
     public String getSignalUnit() throws YAPI_Exception
-
-    { return get_signalUnit(); }
+    {
+        return get_signalUnit();
+    }
 
     /**
      * Returns the electric signal range used by the sensor.
@@ -259,8 +274,9 @@ public class YGenericSensor extends YSensor
      * @throws YAPI_Exception on error
      */
     public String getSignalRange() throws YAPI_Exception
-
-    { return get_signalRange(); }
+    {
+        return get_signalRange();
+    }
 
     /**
      * Changes the electric signal range used by the sensor.
@@ -289,8 +305,9 @@ public class YGenericSensor extends YSensor
      * @throws YAPI_Exception on error
      */
     public int setSignalRange(String newval)  throws YAPI_Exception
-
-    { return set_signalRange(newval); }
+    {
+        return set_signalRange(newval);
+    }
 
     /**
      * Returns the physical value range measured by the sensor.
@@ -317,8 +334,9 @@ public class YGenericSensor extends YSensor
      * @throws YAPI_Exception on error
      */
     public String getValueRange() throws YAPI_Exception
-
-    { return get_valueRange(); }
+    {
+        return get_valueRange();
+    }
 
     /**
      * Changes the physical value range measured by the sensor. As a side effect, the range modification may
@@ -349,8 +367,9 @@ public class YGenericSensor extends YSensor
      * @throws YAPI_Exception on error
      */
     public int setValueRange(String newval)  throws YAPI_Exception
-
-    { return set_valueRange(newval); }
+    {
+        return set_valueRange(newval);
+    }
 
     /**
      * Changes the electric signal bias for zero shift adjustment.
@@ -383,8 +402,9 @@ public class YGenericSensor extends YSensor
      * @throws YAPI_Exception on error
      */
     public int setSignalBias(double newval)  throws YAPI_Exception
-
-    { return set_signalBias(newval); }
+    {
+        return set_signalBias(newval);
+    }
 
     /**
      * Returns the electric signal bias for zero shift adjustment.
@@ -415,8 +435,97 @@ public class YGenericSensor extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getSignalBias() throws YAPI_Exception
+    {
+        return get_signalBias();
+    }
 
-    { return get_signalBias(); }
+    /**
+     * Returns the electric signal sampling method to use.
+     * The HIGH_RATE method uses the highest sampling frequency, without any filtering.
+     * The HIGH_RATE_FILTERED method adds a windowed 7-sample median filter.
+     * The LOW_NOISE method uses a reduced acquisition frequency to reduce noise.
+     * The LOW_NOISE_FILTERED method combines a reduced frequency with the median filter
+     * to get measures as stable as possible when working on a noisy signal.
+     *
+     *  @return a value among YGenericSensor.SIGNALSAMPLING_HIGH_RATE,
+     *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE and
+     * YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED corresponding to the electric signal sampling method to use
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_signalSampling() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SIGNALSAMPLING_INVALID;
+            }
+        }
+        return _signalSampling;
+    }
+
+    /**
+     * Returns the electric signal sampling method to use.
+     * The HIGH_RATE method uses the highest sampling frequency, without any filtering.
+     * The HIGH_RATE_FILTERED method adds a windowed 7-sample median filter.
+     * The LOW_NOISE method uses a reduced acquisition frequency to reduce noise.
+     * The LOW_NOISE_FILTERED method combines a reduced frequency with the median filter
+     * to get measures as stable as possible when working on a noisy signal.
+     *
+     *  @return a value among Y_SIGNALSAMPLING_HIGH_RATE, Y_SIGNALSAMPLING_HIGH_RATE_FILTERED,
+     *  Y_SIGNALSAMPLING_LOW_NOISE and Y_SIGNALSAMPLING_LOW_NOISE_FILTERED corresponding to the electric
+     * signal sampling method to use
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getSignalSampling() throws YAPI_Exception
+    {
+        return get_signalSampling();
+    }
+
+    /**
+     * Changes the electric signal sampling method to use.
+     * The HIGH_RATE method uses the highest sampling frequency, without any filtering.
+     * The HIGH_RATE_FILTERED method adds a windowed 7-sample median filter.
+     * The LOW_NOISE method uses a reduced acquisition frequency to reduce noise.
+     * The LOW_NOISE_FILTERED method combines a reduced frequency with the median filter
+     * to get measures as stable as possible when working on a noisy signal.
+     *
+     *  @param newval : a value among YGenericSensor.SIGNALSAMPLING_HIGH_RATE,
+     *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE and
+     * YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED corresponding to the electric signal sampling method to use
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_signalSampling(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("signalSampling",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the electric signal sampling method to use.
+     * The HIGH_RATE method uses the highest sampling frequency, without any filtering.
+     * The HIGH_RATE_FILTERED method adds a windowed 7-sample median filter.
+     * The LOW_NOISE method uses a reduced acquisition frequency to reduce noise.
+     * The LOW_NOISE_FILTERED method combines a reduced frequency with the median filter
+     * to get measures as stable as possible when working on a noisy signal.
+     *
+     *  @param newval : a value among Y_SIGNALSAMPLING_HIGH_RATE, Y_SIGNALSAMPLING_HIGH_RATE_FILTERED,
+     *  Y_SIGNALSAMPLING_LOW_NOISE and Y_SIGNALSAMPLING_LOW_NOISE_FILTERED corresponding to the electric
+     * signal sampling method to use
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setSignalSampling(int newval)  throws YAPI_Exception
+    {
+        return set_signalSampling(newval);
+    }
 
     /**
      * Retrieves a generic sensor for a given identifier.

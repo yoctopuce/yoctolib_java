@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.java 17655 2014-09-16 12:24:27Z mvuilleu $
+ * $Id: YLightSensor.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindLightSensor(), the high-level API for LightSensor functions
+ * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YLightSensor return codes)
-    //--- (end of YLightSensor return codes)
+//--- (YLightSensor return codes)
+//--- (end of YLightSensor return codes)
 //--- (YLightSensor class start)
 /**
  * YLightSensor Class: LightSensor function interface
@@ -65,7 +65,6 @@ public class YLightSensor extends YSensor
     public static final int MEASURETYPE_HIGH_RATE = 3;
     public static final int MEASURETYPE_HIGH_ENERGY = 4;
     public static final int MEASURETYPE_INVALID = -1;
-
     protected int _measureType = MEASURETYPE_INVALID;
     protected UpdateCallback _valueCallbackLightSensor = null;
     protected TimedReportCallback _timedReportCallbackLightSensor = null;
@@ -113,7 +112,7 @@ public class YLightSensor extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("measureType")) {
-            _measureType =  json_val.getInt("measureType");
+            _measureType = json_val.getInt("measureType");
         }
         super._parseAttr(json_val);
     }
@@ -127,8 +126,9 @@ public class YLightSensor extends YSensor
     }
 
     public int setCurrentValue(double newval)  throws YAPI_Exception
-
-    { return set_currentValue(newval); }
+    {
+        return set_currentValue(newval);
+    }
 
     /**
      * Changes the sensor-specific calibration parameter so that the current value
@@ -179,8 +179,9 @@ public class YLightSensor extends YSensor
      * @throws YAPI_Exception on error
      */
     public int getMeasureType() throws YAPI_Exception
-
-    { return get_measureType(); }
+    {
+        return get_measureType();
+    }
 
     /**
      * Modify the light sensor type used in the device. The measure can either
@@ -220,8 +221,9 @@ public class YLightSensor extends YSensor
      * @throws YAPI_Exception on error
      */
     public int setMeasureType(int newval)  throws YAPI_Exception
-
-    { return set_measureType(newval); }
+    {
+        return set_measureType(newval);
+    }
 
     /**
      * Retrieves a light sensor for a given identifier.

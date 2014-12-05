@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YTemperature.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindTemperature(), the high-level API for Temperature functions
+ * Implements FindTemperature(), the high-level API for Temperature functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -41,9 +41,10 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
+import java.util.ArrayList;
 
-    //--- (YTemperature return codes)
-    //--- (end of YTemperature return codes)
+//--- (YTemperature return codes)
+//--- (end of YTemperature return codes)
 //--- (YTemperature class start)
 /**
  * YTemperature Class: Temperature function interface
@@ -70,9 +71,16 @@ public class YTemperature extends YSensor
     public static final int SENSORTYPE_PT100_4WIRES = 8;
     public static final int SENSORTYPE_PT100_3WIRES = 9;
     public static final int SENSORTYPE_PT100_2WIRES = 10;
+    public static final int SENSORTYPE_RES_OHM = 11;
+    public static final int SENSORTYPE_RES_NTC = 12;
+    public static final int SENSORTYPE_RES_LINEAR = 13;
     public static final int SENSORTYPE_INVALID = -1;
-
+    /**
+     * invalid command value
+     */
+    public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _sensorType = SENSORTYPE_INVALID;
+    protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackTemperature = null;
     protected TimedReportCallback _timedReportCallbackTemperature = null;
 
@@ -119,7 +127,10 @@ public class YTemperature extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("sensorType")) {
-            _sensorType =  json_val.getInt("sensorType");
+            _sensorType = json_val.getInt("sensorType");
+        }
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         super._parseAttr(json_val);
     }
@@ -130,8 +141,10 @@ public class YTemperature extends YSensor
      *  @return a value among YTemperature.SENSORTYPE_DIGITAL, YTemperature.SENSORTYPE_TYPE_K,
      *  YTemperature.SENSORTYPE_TYPE_E, YTemperature.SENSORTYPE_TYPE_J, YTemperature.SENSORTYPE_TYPE_N,
      *  YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S, YTemperature.SENSORTYPE_TYPE_T,
-     *  YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES and
-     * YTemperature.SENSORTYPE_PT100_2WIRES corresponding to the temperature sensor type
+     *  YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES,
+     *  YTemperature.SENSORTYPE_PT100_2WIRES, YTemperature.SENSORTYPE_RES_OHM,
+     *  YTemperature.SENSORTYPE_RES_NTC and YTemperature.SENSORTYPE_RES_LINEAR corresponding to the
+     * temperature sensor type
      *
      * @throws YAPI_Exception on error
      */
@@ -150,14 +163,16 @@ public class YTemperature extends YSensor
      *
      *  @return a value among Y_SENSORTYPE_DIGITAL, Y_SENSORTYPE_TYPE_K, Y_SENSORTYPE_TYPE_E,
      *  Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
-     *  Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES and
-     * Y_SENSORTYPE_PT100_2WIRES corresponding to the temperature sensor type
+     *  Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES,
+     *  Y_SENSORTYPE_PT100_2WIRES, Y_SENSORTYPE_RES_OHM, Y_SENSORTYPE_RES_NTC and Y_SENSORTYPE_RES_LINEAR
+     * corresponding to the temperature sensor type
      *
      * @throws YAPI_Exception on error
      */
     public int getSensorType() throws YAPI_Exception
-
-    { return get_sensorType(); }
+    {
+        return get_sensorType();
+    }
 
     /**
      * Modify the temperature sensor type.  This function is used to
@@ -169,8 +184,9 @@ public class YTemperature extends YSensor
      *  @param newval : a value among YTemperature.SENSORTYPE_DIGITAL, YTemperature.SENSORTYPE_TYPE_K,
      *  YTemperature.SENSORTYPE_TYPE_E, YTemperature.SENSORTYPE_TYPE_J, YTemperature.SENSORTYPE_TYPE_N,
      *  YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S, YTemperature.SENSORTYPE_TYPE_T,
-     *  YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES and
-     * YTemperature.SENSORTYPE_PT100_2WIRES
+     *  YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES,
+     *  YTemperature.SENSORTYPE_PT100_2WIRES, YTemperature.SENSORTYPE_RES_OHM,
+     * YTemperature.SENSORTYPE_RES_NTC and YTemperature.SENSORTYPE_RES_LINEAR
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -193,15 +209,51 @@ public class YTemperature extends YSensor
      *
      *  @param newval : a value among Y_SENSORTYPE_DIGITAL, Y_SENSORTYPE_TYPE_K, Y_SENSORTYPE_TYPE_E,
      *  Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
-     * Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES and Y_SENSORTYPE_PT100_2WIRES
+     *  Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES,
+     * Y_SENSORTYPE_PT100_2WIRES, Y_SENSORTYPE_RES_OHM, Y_SENSORTYPE_RES_NTC and Y_SENSORTYPE_RES_LINEAR
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
     public int setSensorType(int newval)  throws YAPI_Exception
+    {
+        return set_sensorType(newval);
+    }
 
-    { return set_sensorType(newval); }
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public String get_command() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return COMMAND_INVALID;
+            }
+        }
+        return _command;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public String getCommand() throws YAPI_Exception
+    {
+        return get_command();
+    }
+
+    public int set_command(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = newval;
+        _setAttr("command",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    public int setCommand(String newval)  throws YAPI_Exception
+    {
+        return set_command(newval);
+    }
 
     /**
      * Retrieves a temperature sensor for a given identifier.
@@ -309,6 +361,142 @@ public class YTemperature extends YSensor
             super._invokeTimedReportCallback(value);
         }
         return 0;
+    }
+
+    /**
+     * Record a thermistor response table, for interpolating the temperature from
+     * the measured resistance. This function can only be used with temperature
+     * sensor based on thermistors.
+     *
+     * @param tempValues : array of floating point numbers, corresponding to all
+     *         temperatures (in degrees Celcius) for which the resistance of the
+     *         thermistor is specified.
+     * @param resValues : array of floating point numbers, corresponding to the resistance
+     *         values (in Ohms) for each of the temperature included in the first
+     *         argument, index by index.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_thermistorResponseTable(ArrayList<Double> tempValues,ArrayList<Double> resValues) throws YAPI_Exception
+    {
+        int siz;
+        int res;
+        int idx;
+        int found;
+        double prev;
+        double curr;
+        double currTemp;
+        double idxres;
+        siz = tempValues.size();
+        if (!(siz >= 2)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "thermistor response table must have at least two points");}
+        if (!(siz == resValues.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "table sizes mismatch");}
+        
+        // may throw an exception
+        res = set_command("Z");
+        if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermistor parameters");}
+        
+        // add records in growing resistance value
+        found = 1;
+        prev = 0.0;
+        while (found > 0) {
+            found = 0;
+            curr = 99999999.0;
+            currTemp = -999999.0;
+            idx = 0;
+            while (idx < siz) {
+                idxres = resValues.get(idx).doubleValue();
+                if ((idxres > prev) && (idxres < curr)) {
+                    curr = idxres;
+                    currTemp = tempValues.get(idx).doubleValue();
+                    found = 1;
+                }
+                idx = idx + 1;
+            }
+            if (found > 0) {
+                res = set_command(String.format("m%d:%d", (int) (double)Math.round(1000*curr),(int) (double)Math.round(1000*currTemp)));
+                if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermistor parameters");}
+                prev = curr;
+            }
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Retrieves the thermistor response table previously configured using function
+     * set_thermistorResponseTable. This function can only be used with
+     * temperature sensor based on thermistors.
+     *
+     * @param tempValues : array of floating point numbers, that will be filled by the function
+     *         with all temperatures (in degrees Celcius) for which the resistance
+     *         of the thermistor is specified.
+     * @param resValues : array of floating point numbers, that will be filled by the function
+     *         with the value (in Ohms) for each of the temperature included in the
+     *         first argument, index by index.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int loadThermistorResponseTable(ArrayList<Double> tempValues,ArrayList<Double> resValues) throws YAPI_Exception
+    {
+        String id;
+        byte[] bin_json;
+        ArrayList<String> paramlist = new ArrayList<String>();
+        ArrayList<Double> templist = new ArrayList<Double>();
+        int siz;
+        int idx;
+        double temp;
+        int found;
+        double prev;
+        double curr;
+        double currRes;
+        
+        tempValues.clear();
+        resValues.clear();
+        
+        // may throw an exception
+        id = get_functionId();
+        id = (id).substring( 11,  11 + (id).length()-1);
+        bin_json = _download(String.format("extra.json?page=%s",id));
+        paramlist = _json_get_array(bin_json);
+        // first convert all temperatures to float
+        siz = ((paramlist.size()) >> (1));
+        templist.clear();
+        idx = 0;
+        while (idx < siz) {
+            temp = Double.valueOf(paramlist.get(2*idx+1))/1000.0;
+            templist.add(temp);
+            idx = idx + 1;
+        }
+        // then add records in growing temperature value
+        tempValues.clear();
+        resValues.clear();
+        found = 1;
+        prev = -999999.0;
+        while (found > 0) {
+            found = 0;
+            curr = 999999.0;
+            currRes = -999999.0;
+            idx = 0;
+            while (idx < siz) {
+                temp = templist.get(idx).doubleValue();
+                if ((temp > prev) && (temp < curr)) {
+                    curr = temp;
+                    currRes = Double.valueOf(paramlist.get(2*idx))/1000.0;
+                    found = 1;
+                }
+                idx = idx + 1;
+            }
+            if (found > 0) {
+                tempValues.add(curr);
+                resValues.add(currRes);
+                prev = curr;
+            }
+        }
+        
+        return YAPI.SUCCESS;
     }
 
     /**

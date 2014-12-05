@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YLed.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YLed.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindLed(), the high-level API for Led functions
+ * Implements FindLed(), the high-level API for Led functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YLed return codes)
-    //--- (end of YLed return codes)
+//--- (YLed return codes)
+//--- (end of YLed return codes)
 //--- (YLed class start)
 /**
  * YLed Class: Led function interface
@@ -63,7 +63,6 @@ public class YLed extends YFunction
     public static final int POWER_OFF = 0;
     public static final int POWER_ON = 1;
     public static final int POWER_INVALID = -1;
-
     /**
      * invalid luminosity value
      */
@@ -78,7 +77,6 @@ public class YLed extends YFunction
     public static final int BLINKING_CALL = 4;
     public static final int BLINKING_PANIC = 5;
     public static final int BLINKING_INVALID = -1;
-
     protected int _power = POWER_INVALID;
     protected int _luminosity = LUMINOSITY_INVALID;
     protected int _blinking = BLINKING_INVALID;
@@ -127,13 +125,13 @@ public class YLed extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("power")) {
-            _power =  json_val.getInt("power")>0?1:0;
+            _power = json_val.getInt("power") > 0 ? 1 : 0;
         }
         if (json_val.has("luminosity")) {
-            _luminosity =  json_val.getInt("luminosity");
+            _luminosity = json_val.getInt("luminosity");
         }
         if (json_val.has("blinking")) {
-            _blinking =  json_val.getInt("blinking");
+            _blinking = json_val.getInt("blinking");
         }
         super._parseAttr(json_val);
     }
@@ -163,8 +161,9 @@ public class YLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPower() throws YAPI_Exception
-
-    { return get_power(); }
+    {
+        return get_power();
+    }
 
     /**
      * Changes the state of the led.
@@ -193,8 +192,9 @@ public class YLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setPower(int newval)  throws YAPI_Exception
-
-    { return set_power(newval); }
+    {
+        return set_power(newval);
+    }
 
     /**
      * Returns the current led intensity (in per cent).
@@ -221,8 +221,9 @@ public class YLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getLuminosity() throws YAPI_Exception
-
-    { return get_luminosity(); }
+    {
+        return get_luminosity();
+    }
 
     /**
      * Changes the current led intensity (in per cent).
@@ -251,8 +252,9 @@ public class YLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setLuminosity(int newval)  throws YAPI_Exception
-
-    { return set_luminosity(newval); }
+    {
+        return set_luminosity(newval);
+    }
 
     /**
      * Returns the current led signaling mode.
@@ -281,8 +283,9 @@ public class YLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getBlinking() throws YAPI_Exception
-
-    { return get_blinking(); }
+    {
+        return get_blinking();
+    }
 
     /**
      * Changes the current led signaling mode.
@@ -313,8 +316,9 @@ public class YLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setBlinking(int newval)  throws YAPI_Exception
-
-    { return set_blinking(newval); }
+    {
+        return set_blinking(newval);
+    }
 
     /**
      * Retrieves a led for a given identifier.

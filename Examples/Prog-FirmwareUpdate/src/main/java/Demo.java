@@ -17,7 +17,7 @@ public class Demo
             String current = module.get_firmwareRelease();
 
             // check if a new firmware is available on yoctopuce.com
-            String newfirm = module.checkFirmware("www.yoctopuce.com", false);
+            String newfirm = module.checkFirmware("www.yoctopuce.com", true);
             if (newfirm.equals("")) {
                 System.out.println(product + " " + serial + "(rev=" + current + ") is up to date");
             } else {
@@ -75,10 +75,10 @@ public class Demo
             while (module != null) {
                 String product = module.get_productName();
                 String serial = module.get_serialNumber();
-                if (product.startsWith("YoctoHub")) {
-                    hubs.add(serial);
-                } else if (product.equals("YoctoHub-Shield")) {
+                if (product.equals("YoctoHub-Shield")) {
                     shield.add(serial);
+                } else if (product.startsWith("YoctoHub")) {
+                    hubs.add(serial);
                 } else if (!product.equals("VirtualHub")) {
                     devices.add(serial);
                 }

@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YVoltage.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YVoltage.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindVoltage(), the high-level API for Voltage functions
+ * Implements FindVoltage(), the high-level API for Voltage functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YVoltage return codes)
-    //--- (end of YVoltage return codes)
+//--- (YVoltage return codes)
+//--- (end of YVoltage return codes)
 //--- (YVoltage class start)
 /**
  * YVoltage Class: Voltage function interface

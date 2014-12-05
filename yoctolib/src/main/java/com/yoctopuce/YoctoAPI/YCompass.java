@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YCompass.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YCompass.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindCompass(), the high-level API for Compass functions
+ * Implements FindCompass(), the high-level API for Compass functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YCompass return codes)
-    //--- (end of YCompass return codes)
+//--- (YCompass return codes)
+//--- (end of YCompass return codes)
 //--- (YCompass class start)
 /**
  * YCompass Class: Compass function interface
@@ -63,7 +63,6 @@ public class YCompass extends YSensor
     public static final int AXIS_Y = 1;
     public static final int AXIS_Z = 2;
     public static final int AXIS_INVALID = -1;
-
     /**
      * invalid magneticHeading value
      */
@@ -116,10 +115,10 @@ public class YCompass extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("axis")) {
-            _axis =  json_val.getInt("axis");
+            _axis = json_val.getInt("axis");
         }
         if (json_val.has("magneticHeading")) {
-            _magneticHeading =  Math.round(json_val.getDouble("magneticHeading") * 1000.0 / 65536.0) / 1000.0;
+            _magneticHeading = Math.round(json_val.getDouble("magneticHeading") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
     }
@@ -141,8 +140,9 @@ public class YCompass extends YSensor
      * @throws YAPI_Exception on error
      */
     public int getAxis() throws YAPI_Exception
-
-    { return get_axis(); }
+    {
+        return get_axis();
+    }
 
     /**
      * Returns the magnetic heading, regardless of the configured bearing.
@@ -169,8 +169,9 @@ public class YCompass extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getMagneticHeading() throws YAPI_Exception
-
-    { return get_magneticHeading(); }
+    {
+        return get_magneticHeading();
+    }
 
     /**
      * Retrieves a compass for a given identifier.

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YDisplay.java 18339 2014-11-12 10:08:56Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -64,7 +64,6 @@ public class YDisplay extends YFunction
     public static final int ENABLED_FALSE = 0;
     public static final int ENABLED_TRUE = 1;
     public static final int ENABLED_INVALID = -1;
-
     /**
      * invalid startupSeq value
      */
@@ -81,7 +80,6 @@ public class YDisplay extends YFunction
     public static final int ORIENTATION_RIGHT = 2;
     public static final int ORIENTATION_DOWN = 3;
     public static final int ORIENTATION_INVALID = -1;
-
     /**
      * invalid displayWidth value
      */
@@ -97,7 +95,6 @@ public class YDisplay extends YFunction
     public static final int DISPLAYTYPE_GRAY = 1;
     public static final int DISPLAYTYPE_RGB = 2;
     public static final int DISPLAYTYPE_INVALID = -1;
-
     /**
      * invalid layerWidth value
      */
@@ -169,37 +166,37 @@ public class YDisplay extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("enabled")) {
-            _enabled =  json_val.getInt("enabled")>0?1:0;
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
         if (json_val.has("startupSeq")) {
-            _startupSeq =  json_val.getString("startupSeq");
+            _startupSeq = json_val.getString("startupSeq");
         }
         if (json_val.has("brightness")) {
-            _brightness =  json_val.getInt("brightness");
+            _brightness = json_val.getInt("brightness");
         }
         if (json_val.has("orientation")) {
-            _orientation =  json_val.getInt("orientation");
+            _orientation = json_val.getInt("orientation");
         }
         if (json_val.has("displayWidth")) {
-            _displayWidth =  json_val.getInt("displayWidth");
+            _displayWidth = json_val.getInt("displayWidth");
         }
         if (json_val.has("displayHeight")) {
-            _displayHeight =  json_val.getInt("displayHeight");
+            _displayHeight = json_val.getInt("displayHeight");
         }
         if (json_val.has("displayType")) {
-            _displayType =  json_val.getInt("displayType");
+            _displayType = json_val.getInt("displayType");
         }
         if (json_val.has("layerWidth")) {
-            _layerWidth =  json_val.getInt("layerWidth");
+            _layerWidth = json_val.getInt("layerWidth");
         }
         if (json_val.has("layerHeight")) {
-            _layerHeight =  json_val.getInt("layerHeight");
+            _layerHeight = json_val.getInt("layerHeight");
         }
         if (json_val.has("layerCount")) {
-            _layerCount =  json_val.getInt("layerCount");
+            _layerCount = json_val.getInt("layerCount");
         }
         if (json_val.has("command")) {
-            _command =  json_val.getString("command");
+            _command = json_val.getString("command");
         }
         super._parseAttr(json_val);
     }
@@ -230,8 +227,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getEnabled() throws YAPI_Exception
-
-    { return get_enabled(); }
+    {
+        return get_enabled();
+    }
 
     /**
      * Changes the power state of the display.
@@ -261,8 +259,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setEnabled(int newval)  throws YAPI_Exception
-
-    { return set_enabled(newval); }
+    {
+        return set_enabled(newval);
+    }
 
     /**
      * Returns the name of the sequence to play when the displayed is powered on.
@@ -289,8 +288,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getStartupSeq() throws YAPI_Exception
-
-    { return get_startupSeq(); }
+    {
+        return get_startupSeq();
+    }
 
     /**
      * Changes the name of the sequence to play when the displayed is powered on.
@@ -323,8 +323,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setStartupSeq(String newval)  throws YAPI_Exception
-
-    { return set_startupSeq(newval); }
+    {
+        return set_startupSeq(newval);
+    }
 
     /**
      * Returns the luminosity of the  module informative leds (from 0 to 100).
@@ -351,8 +352,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getBrightness() throws YAPI_Exception
-
-    { return get_brightness(); }
+    {
+        return get_brightness();
+    }
 
     /**
      * Changes the brightness of the display. The parameter is a value between 0 and
@@ -385,8 +387,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setBrightness(int newval)  throws YAPI_Exception
-
-    { return set_brightness(newval); }
+    {
+        return set_brightness(newval);
+    }
 
     /**
      * Returns the currently selected display orientation.
@@ -416,8 +419,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getOrientation() throws YAPI_Exception
-
-    { return get_orientation(); }
+    {
+        return get_orientation();
+    }
 
     /**
      * Changes the display orientation. Remember to call the saveToFlash()
@@ -450,8 +454,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setOrientation(int newval)  throws YAPI_Exception
-
-    { return set_orientation(newval); }
+    {
+        return set_orientation(newval);
+    }
 
     /**
      * Returns the display width, in pixels.
@@ -478,8 +483,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getDisplayWidth() throws YAPI_Exception
-
-    { return get_displayWidth(); }
+    {
+        return get_displayWidth();
+    }
 
     /**
      * Returns the display height, in pixels.
@@ -506,8 +512,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getDisplayHeight() throws YAPI_Exception
-
-    { return get_displayHeight(); }
+    {
+        return get_displayHeight();
+    }
 
     /**
      * Returns the display type: monochrome, gray levels or full color.
@@ -536,8 +543,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getDisplayType() throws YAPI_Exception
-
-    { return get_displayType(); }
+    {
+        return get_displayType();
+    }
 
     /**
      * Returns the width of the layers to draw on, in pixels.
@@ -564,8 +572,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getLayerWidth() throws YAPI_Exception
-
-    { return get_layerWidth(); }
+    {
+        return get_layerWidth();
+    }
 
     /**
      * Returns the height of the layers to draw on, in pixels.
@@ -592,8 +601,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getLayerHeight() throws YAPI_Exception
-
-    { return get_layerHeight(); }
+    {
+        return get_layerHeight();
+    }
 
     /**
      * Returns the number of available layers to draw on.
@@ -620,8 +630,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getLayerCount() throws YAPI_Exception
-
-    { return get_layerCount(); }
+    {
+        return get_layerCount();
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -640,8 +651,9 @@ public class YDisplay extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getCommand() throws YAPI_Exception
-
-    { return get_command(); }
+    {
+        return get_command();
+    }
 
     public int set_command(String  newval)  throws YAPI_Exception
     {
@@ -652,8 +664,9 @@ public class YDisplay extends YFunction
     }
 
     public int setCommand(String newval)  throws YAPI_Exception
-
-    { return set_command(newval); }
+    {
+        return set_command(newval);
+    }
 
     /**
      * Retrieves a display for a given identifier.
@@ -966,11 +979,11 @@ public class YDisplay extends YFunction
         if (_allDisplayLayers==null) {
             int nb_display_layer = this.get_layerCount();
             _allDisplayLayers = new YDisplayLayer[nb_display_layer];
-            for(int i=0; i < nb_display_layer; i++) {
+            for (int i = 0; i < nb_display_layer; i++) {
                 _allDisplayLayers[i] = new YDisplayLayer(this, i);
             }
         }
-        if(layerId < 0 || layerId >= _allDisplayLayers.length) {
+        if (layerId < 0 || layerId >= _allDisplayLayers.length) {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid layerId");
         }
         return _allDisplayLayers[layerId];
@@ -978,8 +991,8 @@ public class YDisplay extends YFunction
 
     public synchronized int flushLayers() throws YAPI_Exception
     {
-        if(_allDisplayLayers != null) {
-            for(int i = 0; i < _allDisplayLayers.length; i++) {
+        if (_allDisplayLayers != null) {
+            for (int i = 0; i < _allDisplayLayers.length; i++) {
                 _allDisplayLayers[i].flush_now();
             }
         }
@@ -988,8 +1001,8 @@ public class YDisplay extends YFunction
 
     public synchronized void resetHiddenLayerFlags() throws YAPI_Exception
     {
-        if(_allDisplayLayers != null) {
-            for(int i = 0; i < _allDisplayLayers.length; i++) {
+        if (_allDisplayLayers != null) {
+            for (int i = 0; i < _allDisplayLayers.length; i++) {
                 _allDisplayLayers[i].resetHiddenFlag();
             }
         }
@@ -997,10 +1010,10 @@ public class YDisplay extends YFunction
 
     public synchronized int sendCommand(String cmd) throws YAPI_Exception
     {
-        if(!_recording) {
+        if (!_recording) {
             return this.set_command(cmd);
         }
-        this._sequence += cmd+"\n";
+        this._sequence += cmd + "\n";
         return YAPI.SUCCESS;
     }
 }

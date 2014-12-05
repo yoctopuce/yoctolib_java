@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YPressure.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YPressure.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindPressure(), the high-level API for Pressure functions
+ * Implements FindPressure(), the high-level API for Pressure functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YPressure return codes)
-    //--- (end of YPressure return codes)
+//--- (YPressure return codes)
+//--- (end of YPressure return codes)
 //--- (YPressure class start)
 /**
  * YPressure Class: Pressure function interface

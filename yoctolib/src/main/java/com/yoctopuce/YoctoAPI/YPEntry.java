@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPEntry.java 16278 2014-05-22 13:42:16Z seb $
+ * $Id: YPEntry.java 18339 2014-11-12 10:08:56Z seb $
  *
  * Yellow page implementation
  *
@@ -47,14 +47,13 @@ import org.json.JSONObject;
 class YPEntry {
 
 
-
     enum BaseClass {
         Function(0),
         Sensor(1);
 
-        private int _intval =0;
+        private int _intval = 0;
 
-        BaseClass(int intval){
+        BaseClass(int intval) {
             _intval = intval;
         }
 
@@ -65,39 +64,39 @@ class YPEntry {
     }
 
     private String _classname;
-    private String _serial="";
-    private String _funcId="";
-    private String _logicalName="";
-    private String _advertisedValue="";
-    private int    _index=-1;
+    private String _serial = "";
+    private String _funcId = "";
+    private String _logicalName = "";
+    private String _advertisedValue = "";
+    private int _index = -1;
     private BaseClass _baseclass = BaseClass.Function;
-    private String _categ="";
+    private String _categ = "";
 
     public YPEntry(JSONObject json) throws JSONException
     {
         String hardwareId = json.getString("hardwareId");
         int pos = hardwareId.indexOf('.');
         _serial = hardwareId.substring(0, pos);
-        _funcId = hardwareId.substring(pos+1);
+        _funcId = hardwareId.substring(pos + 1);
         _classname = SafeYAPI().functionClass(_funcId);
         _categ = SafeYAPI().functionClass(_funcId);
         _logicalName = json.getString("logicalName");
         _advertisedValue = json.getString("advertisedValue");
         try {
             _index = json.getInt("index");
-        } catch (JSONException ex){
-            _index =0;
+        } catch (JSONException ex) {
+            _index = 0;
         }
 
-        if (json.has("baseType")){
-            _baseclass=BaseClass.values()[json.getInt("baseType")];
+        if (json.has("baseType")) {
+            _baseclass = BaseClass.values()[json.getInt("baseType")];
         }
     }
 
     public YPEntry(String serial, String functionID)
     {
-    	_serial =serial;
-    	_funcId = functionID;
+        _serial = serial;
+        _funcId = functionID;
         _classname = SafeYAPI().functionClass(_funcId);
         _categ = SafeYAPI().functionClass(_funcId);
     }
@@ -110,7 +109,7 @@ class YPEntry {
 
     public String getCateg()
     {
-    	return _categ;
+        return _categ;
     }
 
     public String getAdvertisedValue()
@@ -146,7 +145,7 @@ class YPEntry {
 
     public void setIndex(int index)
     {
-        _index= index;
+        _index = index;
     }
 
     public BaseClass getBaseclass()
@@ -175,7 +174,6 @@ class YPEntry {
     }
 
 
-
     // Find the exact Hardware Id of the specified function, if currently connected
     // If device is not known as connected, return a clean error
     // This function will not cause any network access
@@ -183,18 +181,18 @@ class YPEntry {
     {
         if (_classname.equals("Module")) {
             if (_logicalName.equals(""))
-                return _serial+".module";
+                return _serial + ".module";
             else
-                return  _logicalName+".module";
+                return _logicalName + ".module";
         } else {
             YPEntry moduleYP = SafeYAPI().resolveFunction("Module", _serial);
             String module = moduleYP.getFriendlyName();
             int pos = module.indexOf(".");
             module = module.substring(0, pos);
             if (_logicalName.equals(""))
-                return  module + "." + _funcId;
+                return module + "." + _funcId;
             else
-                return  module + "." + _logicalName;
+                return module + "." + _logicalName;
         }
     }
 

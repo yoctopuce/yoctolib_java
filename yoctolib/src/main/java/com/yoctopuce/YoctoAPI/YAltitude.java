@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YAltitude.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YAltitude.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindAltitude(), the high-level API for Altitude functions
+ * Implements FindAltitude(), the high-level API for Altitude functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YAltitude return codes)
-    //--- (end of YAltitude return codes)
+//--- (YAltitude return codes)
+//--- (end of YAltitude return codes)
 //--- (YAltitude class start)
 /**
  * YAltitude Class: Altitude function interface
@@ -107,7 +107,7 @@ public class YAltitude extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("qnh")) {
-            _qnh =  Math.round(json_val.getDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
+            _qnh = Math.round(json_val.getDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
     }
@@ -141,8 +141,9 @@ public class YAltitude extends YSensor
      * @throws YAPI_Exception on error
      */
     public int setCurrentValue(double newval)  throws YAPI_Exception
-
-    { return set_currentValue(newval); }
+    {
+        return set_currentValue(newval);
+    }
 
     /**
      * Changes the barometric pressure adjusted to sea level used to compute
@@ -179,8 +180,9 @@ public class YAltitude extends YSensor
      * @throws YAPI_Exception on error
      */
     public int setQnh(double newval)  throws YAPI_Exception
-
-    { return set_qnh(newval); }
+    {
+        return set_qnh(newval);
+    }
 
     /**
      * Returns the barometric pressure adjusted to sea level used to compute
@@ -211,8 +213,9 @@ public class YAltitude extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getQnh() throws YAPI_Exception
-
-    { return get_qnh(); }
+    {
+        return get_qnh();
+    }
 
     /**
      * Retrieves an altimeter for a given identifier.

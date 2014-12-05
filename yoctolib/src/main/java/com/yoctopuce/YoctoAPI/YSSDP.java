@@ -17,27 +17,26 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
  */
 public class YSSDP {
 
-    
-    interface HubDiscoveryCallback {
+
+    interface YSSDPReportInterface {
         /**
-         *
-         * @param serial : the serial number of the discovered Hub
-         * @param urlToRegister : the new URL to register
+         * @param serial          : the serial number of the discovered Hub
+         * @param urlToRegister   : the new URL to register
          * @param urlToUnregister : the old URL to unregister
          */
         void HubDiscoveryCallback(String serial, String urlToRegister, String urlToUnregister);
     }
-    
+
     private static final int SSDP_PORT = 1900;
     private static final String SSDP_MCAST_ADDR = "239.255.255.250";
     private static final String SSDP_URN_YOCTOPUCE = "urn:yoctopuce-com:device:hub:1";
     private static final String SSDP_DISCOVERY_MESSAGE =
             "M-SEARCH * HTTP/1.1\r\n" +
-            "HOST: " + SSDP_MCAST_ADDR + ":" + Integer.toString(SSDP_PORT) + "\r\n" +
-            "MAN: \"ssdp:discover\"\r\n" +
-            "MX: 5\r\n" +
-            "ST: " + SSDP_URN_YOCTOPUCE + "\r\n" +
-            "\r\n";
+                    "HOST: " + SSDP_MCAST_ADDR + ":" + Integer.toString(SSDP_PORT) + "\r\n" +
+                    "MAN: \"ssdp:discover\"\r\n" +
+                    "MX: 5\r\n" +
+                    "ST: " + SSDP_URN_YOCTOPUCE + "\r\n" +
+                    "\r\n";
     private static final String SSDP_NOTIFY = "NOTIFY * HTTP/1.1";
     private static final String SSDP_HTTP = "HTTP/1.1 200 OK";
 
@@ -46,61 +45,59 @@ public class YSSDP {
     private InetAddress mMcastAddr;
     private boolean mListening;
     private MulticastSocket mSocketReception;
-    private MulticastSocket mMsearchSocket;
-    private HubDiscoveryCallback _callbacks;
+    private YSSDPReportInterface _callbacks;
 
-    YSSDP(){
+    YSSDP() {
         mListening = false;
     }
 
 
-    synchronized void addCallback(HubDiscoveryCallback callback) throws YAPI_Exception {
+    synchronized void addCallback(YSSDPReportInterface callback) throws YAPI_Exception {
         if (_callbacks == callback)
             // already started
             return;
         _callbacks = callback;
-        if(!mListening){
+        if (!mListening) {
             try {
                 startListening();
             } catch (IOException e) {
-                throw new YAPI_Exception(YAPI.IO_ERROR,"Unable to start SSDP thread : "+e.toString());
+                throw new YAPI_Exception(YAPI.IO_ERROR, "Unable to start SSDP thread : " + e.toString());
             }
         }
     }
 
 
-
-    private  synchronized void updateCache(String uuid, String url, int cacheValidity) {
+    private synchronized void updateCache(String uuid, String url, int cacheValidity) {
         if (cacheValidity <= 0)
             cacheValidity = 1800;
-        cacheValidity*=1000;
+        cacheValidity *= 1000;
 
         if (mCache.containsKey(uuid)) {
             YSSDPCacheEntry entry = mCache.get(uuid);
             if (!entry.getURL().equals(url)) {
                 _callbacks.HubDiscoveryCallback(entry.getSerial(), url, entry.getURL());
-                entry.setURL(url);                
+                entry.setURL(url);
             } else {
-                _callbacks.HubDiscoveryCallback(entry.getSerial(), url, null);                
+                _callbacks.HubDiscoveryCallback(entry.getSerial(), url, null);
             }
             entry.resetExpiration(cacheValidity);
             return;
         }
         YSSDPCacheEntry entry = new YSSDPCacheEntry(uuid, url, cacheValidity);
-        mCache.put(uuid, entry);        
+        mCache.put(uuid, entry);
         _callbacks.HubDiscoveryCallback(entry.getSerial(), entry.getURL(), null);
     }
 
     private synchronized void checkCacheExpiration() {
-        for (YSSDPCacheEntry entry :mCache.values()){
-            if(entry.hasExpired()){
+        for (YSSDPCacheEntry entry : mCache.values()) {
+            if (entry.hasExpired()) {
                 _callbacks.HubDiscoveryCallback(entry.getSerial(), null, entry.getURL());
-                mCache.remove(entry.getUUID());                
+                mCache.remove(entry.getUUID());
             }
         }
     }
 
-    private Thread mListenBcastThread =new Thread(new Runnable() {
+    private Thread mListenBcastThread = new Thread(new Runnable() {
         @Override
         public void run() {
             DatagramPacket pkt;
@@ -114,8 +111,8 @@ public class YSSDP {
                     mSocketReception.receive(pkt);
                     ssdpMessage = new String(pktContent, pkt.getOffset(), pkt.getLength());
                     parseIncomingMessage(ssdpMessage);
-                }catch (SocketTimeoutException ignored){
-                }catch (IOException e) {
+                } catch (SocketTimeoutException ignored) {
+                } catch (IOException e) {
                     SafeYAPI()._Log("SSDP:" + e.getLocalizedMessage());
                 }
                 checkCacheExpiration();
@@ -124,7 +121,7 @@ public class YSSDP {
     });
 
 
-     private void startListening() throws IOException {
+    private void startListening() throws IOException {
         mMcastAddr = InetAddress.getByName(SSDP_MCAST_ADDR);
         mSocketReception = new MulticastSocket(SSDP_PORT);
         mListening = false;
@@ -132,17 +129,16 @@ public class YSSDP {
         mSocketReception.setSoTimeout(10000);
         mListening = true;
         mListenBcastThread.start();
-        sendMSearch();
+        mListenMSearchThread.start();
     }
 
     void Stop() {
         mListening = false;
-        if(mListenMSearchThread.isAlive())
+        if (mListenMSearchThread.isAlive())
             mListenMSearchThread.interrupt();
-        if(mListenBcastThread.isAlive())
+        if (mListenBcastThread.isAlive())
             mListenBcastThread.interrupt();
     }
-
 
 
     private void parseIncomingMessage(String message) {
@@ -195,12 +191,12 @@ public class YSSDP {
             if (poscache < 0) return;
             cache = cache.substring(poscache + 1).trim();
             int cacheVal = Integer.decode(cache);
-            updateCache(uuid,location,cacheVal);
+            updateCache(uuid, location, cacheVal);
         }
     }
 
 
-    private Thread mListenMSearchThread =new Thread(new Runnable() {
+    private Thread mListenMSearchThread = new Thread(new Runnable() {
         @Override
         public void run() {
             DatagramPacket pkt;
@@ -208,29 +204,34 @@ public class YSSDP {
             String ssdpMessage;
             Date date = new Date();
 
+            MulticastSocket mMsearchSocket;
+            try {
+                mMsearchSocket = new MulticastSocket();
+                mMsearchSocket.setTimeToLive(15);
+                byte[] outPktContent = SSDP_DISCOVERY_MESSAGE.getBytes();
+                DatagramPacket outPkt = new DatagramPacket(outPktContent, outPktContent.length, mMcastAddr, SSDP_PORT);
+                mMsearchSocket.send(outPkt);
+            } catch (IOException ex) {
+                //todo: more user friendy error report
+                YAPI.SafeYAPI()._Log("Unable to Send SSDP mSearch:" + ex.getLocalizedMessage());
+                return;
+            }
+
             //look for response only during 3 minutes
-            while (mListening && ( new Date().getTime()-date.getTime()) < 180000 ) {
+            while (mListening && (new Date().getTime() - date.getTime()) < 180000) {
                 pktContent = new byte[1536];
                 pkt = new DatagramPacket(pktContent, pktContent.length);
                 try {
                     mMsearchSocket.receive(pkt);
                     ssdpMessage = new String(pktContent, pkt.getOffset(), pkt.getLength());
                     parseIncomingMessage(ssdpMessage);
-                }catch (IOException e) {
+                } catch (IOException ex) {
+                    //todo: more user friendy error report
+                    YAPI.SafeYAPI()._Log("SSDP error:" + ex.getLocalizedMessage());
                     return;
                 }
             }
         }
     });
-
-
-    private void sendMSearch() throws IOException {
-        mMsearchSocket = new MulticastSocket();
-        mMsearchSocket.setTimeToLive(15);
-        byte[] outPktContent= SSDP_DISCOVERY_MESSAGE.getBytes();
-        DatagramPacket outPkt = new DatagramPacket(outPktContent, outPktContent.length, mMcastAddr, SSDP_PORT);
-        mMsearchSocket.send(outPkt);
-        mListenMSearchThread.start();
-    }
 
 }

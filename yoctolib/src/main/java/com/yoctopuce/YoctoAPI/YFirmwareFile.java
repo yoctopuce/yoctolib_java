@@ -1,11 +1,14 @@
 package com.yoctopuce.YoctoAPI;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
-public class YFirmwareFile
-{
+public class YFirmwareFile {
     private static final int BYN_REV_V4 = 4;
     private static final int BYN_REV_V5 = 5;
     private static final int BYN_REV_V6 = 6;
@@ -27,8 +30,37 @@ public class YFirmwareFile
     private final int _ROM_total_size;
     private final int _FLA_total_size;
     private final byte[] _data;
+    private int _zone_ofs;
 
-    private YFirmwareFile(String path, String serial, String pictype, String product, String firmware, String prog_version, int ROM_nb_zone, int FLA_nb_zone, int ROM_total_size, int FLA_total_size, byte[] data)
+    public byn_zone getBynZone(int zOfs)
+    {
+        return new byn_zone(_data, zOfs);
+    }
+
+    public int getFirstZoneOfs()
+    {
+        return _zone_ofs;
+    }
+
+    public class byn_zone {
+
+        public static final int SIZE = 8;
+        public final int addr_page;
+        public final int len;
+
+        public byn_zone(byte[] data, int zOfs)
+        {
+            final ByteBuffer bb = ByteBuffer.wrap(data, zOfs, 8);
+            bb.order(ByteOrder.LITTLE_ENDIAN);
+            addr_page = bb.getInt();
+            len = bb.getInt();
+        }
+    }
+
+
+    private YFirmwareFile(String path, String serial, String pictype, String product, String firmware,
+                          String prog_version, int ROM_nb_zone, int FLA_nb_zone, int ROM_total_size,
+                          int FLA_total_size, byte[] data, int zone_ofs)
     {
         _path = path;
         _serial = serial;
@@ -41,6 +73,7 @@ public class YFirmwareFile
         _ROM_total_size = ROM_total_size;
         _FLA_total_size = FLA_total_size;
         _data = data;
+        _zone_ofs = zone_ofs;
     }
 
     public static YFirmwareFile Parse(String path, byte[] data) throws YAPI_Exception
@@ -49,7 +82,7 @@ public class YFirmwareFile
         Charset charSet = Charset.forName("ISO-8859-1");
         ByteBuffer buffer = ByteBuffer.wrap(data);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
-        if (buffer.get() != 'B' || buffer.get() != 'Y' || buffer.get() != 'N' || buffer.get()!=0) {
+        if (buffer.get() != 'B' || buffer.get() != 'Y' || buffer.get() != 'N' || buffer.get() != 0) {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Not a firmware file");
         }
         int rev = buffer.getShort();
@@ -82,8 +115,10 @@ public class YFirmwareFile
         int FLA_total_size = 0;
         byte[] prog_buf;
         String prog_version = "";
+        int zone_ofs;
         switch (rev) {
             case BYN_REV_V4:
+                zone_ofs = BYN_HEAD_SIZE_V4;
                 ROM_nb_zone = buffer.getInt();
                 int datasize = buffer.getInt();
                 if (ROM_nb_zone > MAX_ROM_ZONES_PER_FILES) {
@@ -94,6 +129,7 @@ public class YFirmwareFile
                 }
                 break;
             case BYN_REV_V5:
+                zone_ofs = BYN_HEAD_SIZE_V5;
                 prog_buf = new byte[YAPI.YOCTO_FIRMWARE_LEN];
                 buffer.get(prog_buf);
                 prog_version = checkProgField(prog_buf);
@@ -108,15 +144,27 @@ public class YFirmwareFile
                 }
                 break;
             case BYN_REV_V6:
+                zone_ofs = BYN_HEAD_SIZE_V6;
                 byte md5check[] = new byte[16];
                 buffer.get(md5check);
+                try {
+                    // Create MD5 Hash
+                    MessageDigest digest = MessageDigest.getInstance("MD5");
+                    digest.update(data, BYN_MD5_OFS_V6, data.length - BYN_MD5_OFS_V6);
+                    byte messageDigest[] = digest.digest();
+                    if (!Arrays.equals(md5check, messageDigest)) {
+                        throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid checksum");
+                    }
+                } catch (NoSuchAlgorithmException ignore) {
+                    YAPI.SafeYAPI()._Log("Unable to verfiy MD5 of firmware " + path);
+                }
                 prog_buf = new byte[YAPI.YOCTO_FIRMWARE_LEN];
                 buffer.get(prog_buf);
                 prog_version = checkProgField(prog_buf);
                 ROM_nb_zone = buffer.get();
                 FLA_nb_zone = buffer.get();
                 ROM_total_size = buffer.getInt();
-                FLA_total_size= buffer.getInt();
+                FLA_total_size = buffer.getInt();
                 if (ROM_nb_zone > MAX_ROM_ZONES_PER_FILES) {
                     throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Too many ROM zones");
                 }
@@ -127,14 +175,17 @@ public class YFirmwareFile
             default:
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "unknown BYN file revision");
         }
-        return new YFirmwareFile(path,serial, pictype, product, firmware, prog_version, ROM_nb_zone, FLA_nb_zone, ROM_total_size, FLA_total_size, data);
+        return new YFirmwareFile(path, serial, pictype, product, firmware, prog_version,
+                ROM_nb_zone, FLA_nb_zone, ROM_total_size, FLA_total_size, data, zone_ofs);
     }
 
     private static String getString(byte[] serial_buf)
     {
         Charset charSet = Charset.forName("ISO-8859-1");
         int i;
-        for (i = 0; i < serial_buf.length && serial_buf[i] != 0; ) { i++; }
+        for (i = 0; i < serial_buf.length && serial_buf[i] != 0; ) {
+            i++;
+        }
         return new String(serial_buf, 0, i, charSet);
     }
 
@@ -173,11 +224,12 @@ public class YFirmwareFile
     {
         return _firmware;
     }
+
     public int getFirmwareRelaseAsInt()
     {
-        try{
+        try {
             return Integer.parseInt(_firmware);
-        }catch (NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             return 0;
         }
     }
@@ -216,5 +268,6 @@ public class YFirmwareFile
     {
         return _path;
     }
+
 
 }

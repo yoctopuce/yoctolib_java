@@ -38,14 +38,19 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 
-import static com.yoctopuce.YoctoAPI.YAPI.IO_ERROR;
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (generated code: YFirmwareUpdate return codes)
-    //--- (end of generated code: YFirmwareUpdate return codes)
+//--- (end of generated code: YFirmwareUpdate return codes)
 //--- (generated code: YFirmwareUpdate class start)
 /**
  * YFirmwareUpdate Class: Control interface for the firmware update process
@@ -63,7 +68,9 @@ public class YFirmwareUpdate
     protected byte[] _settings;
     protected String _firmwarepath;
     protected String _progress_msg;
+    protected int _progress_c = 0;
     protected int _progress = 0;
+    protected int _restore_step = 0;
 
     //--- (end of generated code: YFirmwareUpdate definitions)
     private Thread _thread = null;
@@ -75,26 +82,26 @@ public class YFirmwareUpdate
         try {
             u = new URL(url);
         } catch (MalformedURLException e) {
-            throw new YAPI_Exception(IO_ERROR,e.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
         }
         BufferedInputStream in = null;
         try {
             URLConnection connection = u.openConnection();
             in = new BufferedInputStream(connection.getInputStream());
             byte[] buffer = new byte[1024];
-            int readed=0;
+            int readed = 0;
             while (readed >= 0) {
-                readed  = in.read(buffer, 0, buffer.length);
-                if (readed <0){
+                readed = in.read(buffer, 0, buffer.length);
+                if (readed < 0) {
                     // end of connection
                     break;
                 } else {
-                    result.write(buffer,0,readed);
+                    result.write(buffer, 0, readed);
                 }
             }
 
         } catch (IOException e) {
-            throw new YAPI_Exception(IO_ERROR, "unable to contact www.yoctopuce.com :" + e.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, "unable to contact www.yoctopuce.com :" + e.getLocalizedMessage());
         } finally {
             if (in != null) {
                 try {
@@ -110,9 +117,9 @@ public class YFirmwareUpdate
     static YFirmwareFile checkFirmware_r(File folder, String serial_base) throws YAPI_Exception
     {
         YFirmwareFile bestFirmware = null;
-        if(folder.isFile()) {
+        if (folder.isFile()) {
             bestFirmware = _loadFirmwareFile(folder);
-        }else {
+        } else {
             File[] listOfFiles = folder.listFiles();
             if (listOfFiles != null) {
 
@@ -123,15 +130,15 @@ public class YFirmwareUpdate
                     if (subfile.isFile()) {
                         try {
                             firmware = _loadFirmwareFile(subfile);
-                        }catch (YAPI_Exception ex){
+                        } catch (YAPI_Exception ex) {
                             continue;
                         }
                     } else if (subfile.isDirectory()) {
-                        firmware = checkFirmware_r(subfile,serial_base);
+                        firmware = checkFirmware_r(subfile, serial_base);
                     }
-                    if (firmware==null || !firmware.getSerial().startsWith(serial_base))
+                    if (firmware == null || !firmware.getSerial().startsWith(serial_base))
                         continue;
-                    if (bestFirmware==null || bestFirmware.getFirmwareRelaseAsInt()<firmware.getFirmwareRelaseAsInt()){
+                    if (bestFirmware == null || bestFirmware.getFirmwareRelaseAsInt() < firmware.getFirmwareRelaseAsInt()) {
                         bestFirmware = firmware;
                     }
                 }
@@ -146,25 +153,25 @@ public class YFirmwareUpdate
         try {
             in = new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            throw new YAPI_Exception(YAPI.FILE_NOT_FOUND,"File not found");
+            throw new YAPI_Exception(YAPI.FILE_NOT_FOUND, "File not found");
         }
         ByteArrayOutputStream result = new ByteArrayOutputStream(1024);
 
         try {
             byte[] buffer = new byte[1024];
-            int readed=0;
+            int readed = 0;
             while (readed >= 0) {
-                readed  = in.read(buffer, 0, buffer.length);
-                if (readed <0){
+                readed = in.read(buffer, 0, buffer.length);
+                if (readed < 0) {
                     // end of connection
                     break;
                 } else {
-                    result.write(buffer,0,readed);
+                    result.write(buffer, 0, readed);
                 }
             }
 
         } catch (IOException e) {
-            throw new YAPI_Exception(IO_ERROR, "unable to load file :" + e.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, "unable to load file :" + e.getLocalizedMessage());
         } finally {
             try {
                 in.close();
@@ -172,7 +179,7 @@ public class YFirmwareUpdate
             }
         }
 
-        return YFirmwareFile.Parse(file.getPath() ,result.toByteArray());
+        return YFirmwareFile.Parse(file.getPath(), result.toByteArray());
     }
 
 
@@ -188,10 +195,10 @@ public class YFirmwareUpdate
 
     private void _progress(int progress, String msg)
     {
-       synchronized (this) {
-           _progress = progress;
-           _progress_msg = msg;
-       }
+        synchronized (this) {
+            _progress = progress;
+            _progress_msg = msg;
+        }
     }
 
     private void _processMore(int start)
@@ -200,8 +207,7 @@ public class YFirmwareUpdate
             if (start > 0) {
                 if (_thread == null || !_thread.isAlive()) {
                     _progress(0, "Firmware update started");
-                    _thread = new Thread(new Runnable()
-                    {
+                    _thread = new Thread(new Runnable() {
                         @Override
                         public void run()
                         {
@@ -217,24 +223,37 @@ public class YFirmwareUpdate
                                 }
 
                                 //5% -> 10%
-                                _progress(5, "Enter in bootloader");
+                                _progress(5, "check if module is already in bootloader");
+                                YGenericHub hub = null;
                                 YModule module = YModule.FindModule(_serial + ".module");
-                                if (!module.isOnline()) {
-                                    throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "device " + _serial + " is not online");
+                                if (module.isOnline()) {
+                                    YDevice yDevice = module.getYDevice();
+                                    hub = yDevice.getHub();
+                                } else {
+                                    // test if already in bootloader
+                                    for (YGenericHub h : SafeYAPI()._hubs) {
+                                        ArrayList<String> bootloaders = h.getBootloaders();
+                                        if (bootloaders.contains(_serial)) {
+                                            hub = h;
+                                            break;
+
+                                        }
+                                    }
                                 }
-                                YDevice yDevice = module.getYDevice();
-                                YGenericHub hub = yDevice.getHub();
-                                hub.firmwareUpdate(_serial, firmware, _settings, new YGenericHub.UpdateProgress()
-                                {
+                                if (hub == null) {
+                                    throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "device " + _serial + " is not detected");
+                                }
+
+                                hub.firmwareUpdate(_serial, firmware, _settings, new YGenericHub.UpdateProgress() {
                                     @Override
                                     public void firmware_progress(int percent, String message)
                                     {
-                                        _progress(percent, message);
+                                        _progress(5 + percent * 80 / 100, message);
                                     }
                                 });
                                 //80%-> 98%
                                 _progress(80, "wait to the device restart");
-                                long timeout = YAPI.GetTickCount() + 20000;
+                                long timeout = YAPI.GetTickCount() + 30000;
                                 while (!module.isOnline() && timeout > YAPI.GetTickCount()) {
                                     Thread.sleep(500);
                                     try {
@@ -243,12 +262,16 @@ public class YFirmwareUpdate
                                     }
                                 }
                                 if (module.isOnline()) {
+                                    if (_settings!=null) {
+                                        module.set_allSettings(_settings);
+                                    }
                                     _progress(100, "Success");
                                 } else {
                                     _progress(-1, "Device did not reboot correctly");
                                 }
                             } catch (YAPI_Exception e) {
                                 _progress(e.errorType, e.getLocalizedMessage());
+                                e.printStackTrace();
                             } catch (InterruptedException ignore) {
                             }
 
@@ -261,22 +284,104 @@ public class YFirmwareUpdate
     }
 
 
+    /**
+     * Test if the byn file is valid for this module. It's possible to pass an directory instead of a file.
+     * In this case this method return the path of the most recent appropriate byn file. This method will
+     * ignore firmware that are older than mintrelase.
+     *
+     * @param serial  : the serial number of the module to update
+     * @param path    : the path of a byn file or a directory that contain byn files
+     * @param minrelease : an positif integer
+     *
+     * @return : the path of the byn file to use or a empty string if no byn files match the requirement
+     *
+     * On failure, returns a string that start with "error:".
+     */
+    public static String CheckFirmware(String serial, String path, int minrelease) throws YAPI_Exception
+    {
+        String link = "";
+        Integer best_rev = 0;
+        Integer current_rev;
+
+
+        if (path.startsWith("www.yoctopuce.com") || path.startsWith("http://www.yoctopuce.com")) {
+            byte[] json = YFirmwareUpdate._downloadfile("http://www.yoctopuce.com//FR/common/getLastFirmwareLink.php?serial=" + serial);
+            JSONObject obj = null;
+            try {
+                obj = new JSONObject(new String(json, "ISO-8859-1"));
+            } catch (JSONException ex) {
+                throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
+            } catch (UnsupportedEncodingException ex) {
+                throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
+            }
+            try {
+                link = obj.getString("link");
+                best_rev = obj.getInt("version");
+            } catch (JSONException e) {
+                throw new YAPI_Exception(YAPI.IO_ERROR, "invalid respond form www.yoctopuce.com" + e.getLocalizedMessage());
+            }
+        } else {
+
+            File folder = new File(path);
+            YFirmwareFile firmware = YFirmwareUpdate.checkFirmware_r(folder, serial.substring(0, YAPI.YOCTO_BASE_SERIAL_LEN));
+            if (firmware != null) {
+                best_rev = firmware.getFirmwareRelaseAsInt();
+                link = firmware.getPath();
+            }
+        }
+        if (minrelease != 0) {
+            if (minrelease < best_rev)
+                return link;
+            else
+                return "";
+        }
+        return link;
+    }
+
+    /**
+     * Retrun a list of all modules in "update" mode. Only USB connected
+     * devices are listed. If the module is connected to a YoctoHub, you have to
+     * connect to the YoctoHub web interface.
+     *
+     * @return an array of strings containing the serial list of module in "update" mode.
+     */
+    public static ArrayList<String> GetAllBootLoaders()
+    {
+        ArrayList<String> res = new ArrayList<String>();
+        for (YGenericHub h : YAPI.SafeYAPI()._hubs) {
+            ArrayList<String> bootloaders = h.getBootloaders();
+            if (bootloaders != null) {
+                res.addAll(bootloaders);
+            }
+        }
+        return res;
+    }
+
+
     //--- (generated code: YFirmwareUpdate implementation)
 
     //cannot be generated for Java:
-    //public int _processMore(int newupdate)
+    //public int _processMore(int newupdate) throws YAPI_Exception
 
-    public int get_progress() throws YAPI_Exception
+    //cannot be generated for Java:
+    //public static ArrayList<String> GetAllBootLoaders()
+
+    //cannot be generated for Java:
+    //public static String CheckFirmware(String serial,String path,int minrelease)
+
+    /**
+     * Returns the progress of the firmware update, on a scale from 0 to 100. When the object is
+     * instantiated the progress is zero. The value is updated During the firmware update process, until
+     * the value of 100 is reached. The value of 100 mean that the firmware update is terminated with
+     * success. If an error occur during the firmware update a negative value is returned, and the
+     * error message can be retrieved with get_progressMessage.
+     *
+     * @return an integer in the range 0 to 100 (percentage of completion) or
+     *         or a negative error code in case of failure.
+     */
+    public int get_progress()
     {
-        YModule m;
         _processMore(0);
-        if ((_progress == 100) && ((_settings).length != 0)) {
-            m = YModule.FindModule(_serial);
-            if (m.isOnline()) {
-                m.set_allSettings(_settings);
-                _settings = new byte[0];
-            }
-        }
         return _progress;
     }
 
@@ -303,6 +408,8 @@ public class YFirmwareUpdate
      */
     public int startUpdate()
     {
+        _progress = 0;
+        _progress_c = 0;
         _processMore(1);
         return _progress;
     }

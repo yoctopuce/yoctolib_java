@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YDualPower.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YDualPower.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindDualPower(), the high-level API for DualPower functions
+ * Implements FindDualPower(), the high-level API for DualPower functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YDualPower return codes)
-    //--- (end of YDualPower return codes)
+//--- (YDualPower return codes)
+//--- (end of YDualPower return codes)
 //--- (YDualPower class start)
 /**
  * YDualPower Class: External power supply control interface
@@ -66,7 +66,6 @@ public class YDualPower extends YFunction
     public static final int POWERSTATE_FROM_USB = 1;
     public static final int POWERSTATE_FROM_EXT = 2;
     public static final int POWERSTATE_INVALID = -1;
-
     /**
      * invalid powerControl value
      */
@@ -75,7 +74,6 @@ public class YDualPower extends YFunction
     public static final int POWERCONTROL_FROM_EXT = 2;
     public static final int POWERCONTROL_OFF = 3;
     public static final int POWERCONTROL_INVALID = -1;
-
     /**
      * invalid extVoltage value
      */
@@ -128,13 +126,13 @@ public class YDualPower extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("powerState")) {
-            _powerState =  json_val.getInt("powerState");
+            _powerState = json_val.getInt("powerState");
         }
         if (json_val.has("powerControl")) {
-            _powerControl =  json_val.getInt("powerControl");
+            _powerControl = json_val.getInt("powerControl");
         }
         if (json_val.has("extVoltage")) {
-            _extVoltage =  json_val.getInt("extVoltage");
+            _extVoltage = json_val.getInt("extVoltage");
         }
         super._parseAttr(json_val);
     }
@@ -167,8 +165,9 @@ public class YDualPower extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPowerState() throws YAPI_Exception
-
-    { return get_powerState(); }
+    {
+        return get_powerState();
+    }
 
     /**
      * Returns the selected power source for module functions that require lots of current.
@@ -198,8 +197,9 @@ public class YDualPower extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPowerControl() throws YAPI_Exception
-
-    { return get_powerControl(); }
+    {
+        return get_powerControl();
+    }
 
     /**
      * Changes the selected power source for module functions that require lots of current.
@@ -232,8 +232,9 @@ public class YDualPower extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setPowerControl(int newval)  throws YAPI_Exception
-
-    { return set_powerControl(newval); }
+    {
+        return set_powerControl(newval);
+    }
 
     /**
      * Returns the measured voltage on the external power source, in millivolts.
@@ -260,8 +261,9 @@ public class YDualPower extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getExtVoltage() throws YAPI_Exception
-
-    { return get_extVoltage(); }
+    {
+        return get_extVoltage();
+    }
 
     /**
      * Retrieves a dual power control for a given identifier.

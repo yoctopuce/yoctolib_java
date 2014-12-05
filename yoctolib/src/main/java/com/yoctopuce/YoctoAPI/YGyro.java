@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGyro.java 17678 2014-09-16 16:31:26Z seb $
+ * $Id: YGyro.java 18339 2014-11-12 10:08:56Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -45,7 +45,7 @@ import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YGyro return codes)
-    //--- (end of generated code: YGyro return codes)
+//--- (end of generated code: YGyro return codes)
 //--- (generated code: YGyro class start)
 /**
  * YGyro Class: Gyroscope function interface
@@ -60,12 +60,12 @@ public class YGyro extends YSensor
     public interface YQuatCallback {
         void yQuaternionCallback(YGyro yGyro, double w, double x, double y, double z);
     }
-    
+
     public interface YAnglesCallback {
         void yAnglesCallback(YGyro yGyro, double roll, double pitch, double head);
     }
 
-	static private YQt.UpdateCallback yInternalGyroCallback = new YQt.UpdateCallback() {
+    static private YQt.UpdateCallback yInternalGyroCallback = new YQt.UpdateCallback() {
         @Override
         public void yNewValue(YQt obj, String value)
         {
@@ -142,7 +142,6 @@ public class YGyro extends YSensor
 
 
     /**
-     * 
      * @param func : functionid
      */
     protected YGyro(String func)
@@ -158,13 +157,13 @@ public class YGyro extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("xValue")) {
-            _xValue =  Math.round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
+            _xValue = Math.round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("yValue")) {
-            _yValue =  Math.round(json_val.getDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
+            _yValue = Math.round(json_val.getDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("zValue")) {
-            _zValue =  Math.round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
+            _zValue = Math.round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
     }
@@ -196,8 +195,9 @@ public class YGyro extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getXValue() throws YAPI_Exception
-
-    { return get_xValue(); }
+    {
+        return get_xValue();
+    }
 
     /**
      * Returns the angular velocity around the Y axis of the device, as a floating point number.
@@ -226,8 +226,9 @@ public class YGyro extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getYValue() throws YAPI_Exception
-
-    { return get_yValue(); }
+    {
+        return get_yValue();
+    }
 
     /**
      * Returns the angular velocity around the Z axis of the device, as a floating point number.
@@ -256,8 +257,9 @@ public class YGyro extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getZValue() throws YAPI_Exception
-
-    { return get_zValue(); }
+    {
+        return get_zValue();
+    }
 
     /**
      * Retrieves a gyroscope for a given identifier.

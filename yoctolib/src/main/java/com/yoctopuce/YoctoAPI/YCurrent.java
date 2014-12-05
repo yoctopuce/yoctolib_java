@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YCurrent.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YCurrent.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindCurrent(), the high-level API for Current functions
+ * Implements FindCurrent(), the high-level API for Current functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YCurrent return codes)
-    //--- (end of YCurrent return codes)
+//--- (YCurrent return codes)
+//--- (end of YCurrent return codes)
 //--- (YCurrent class start)
 /**
  * YCurrent Class: Current function interface

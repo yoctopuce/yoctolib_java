@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YTilt.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YTilt.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindTilt(), the high-level API for Tilt functions
+ * Implements FindTilt(), the high-level API for Tilt functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YTilt return codes)
-    //--- (end of YTilt return codes)
+//--- (YTilt return codes)
+//--- (end of YTilt return codes)
 //--- (YTilt class start)
 /**
  * YTilt Class: Tilt function interface
@@ -63,7 +63,6 @@ public class YTilt extends YSensor
     public static final int AXIS_Y = 1;
     public static final int AXIS_Z = 2;
     public static final int AXIS_INVALID = -1;
-
     protected int _axis = AXIS_INVALID;
     protected UpdateCallback _valueCallbackTilt = null;
     protected TimedReportCallback _timedReportCallbackTilt = null;
@@ -111,7 +110,7 @@ public class YTilt extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("axis")) {
-            _axis =  json_val.getInt("axis");
+            _axis = json_val.getInt("axis");
         }
         super._parseAttr(json_val);
     }
@@ -133,8 +132,9 @@ public class YTilt extends YSensor
      * @throws YAPI_Exception on error
      */
     public int getAxis() throws YAPI_Exception
-
-    { return get_axis(); }
+    {
+        return get_axis();
+    }
 
     /**
      * Retrieves a tilt sensor for a given identifier.

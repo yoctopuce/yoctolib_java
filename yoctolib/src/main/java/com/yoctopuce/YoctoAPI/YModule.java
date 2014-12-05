@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 17678 2014-09-16 16:31:26Z seb $
+ * $Id: YModule.java 18337 2014-11-12 09:12:44Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -92,7 +92,6 @@ public class YModule extends YFunction
     public static final int PERSISTENTSETTINGS_SAVED = 1;
     public static final int PERSISTENTSETTINGS_MODIFIED = 2;
     public static final int PERSISTENTSETTINGS_INVALID = -1;
-
     /**
      * invalid luminosity value
      */
@@ -103,7 +102,6 @@ public class YModule extends YFunction
     public static final int BEACON_OFF = 0;
     public static final int BEACON_ON = 1;
     public static final int BEACON_INVALID = -1;
-
     /**
      * invalid upTime value
      */
@@ -283,109 +281,45 @@ public class YModule extends YFunction
     }
 
 
-
-
-
-    /**
-     * Test if the byn file is valid for this module. This method is useful to test if the module need to be updated.
-     *  It's possible to pass an directory instead of a file. In this case this method return the path of
-     * the most recent
-     *  appropriate byn file. If the parameter onlynew is true the function will discard firmware that are
-     * older or equal to
-     * the installed firmware.
-     *
-     * @param path    : the path of a byn file or a directory that contain byn files
-     * @param onlynew : return only files that are strictly newer
-     *
-     * @return : the path of the byn file to use or a empty string if no byn files match the requirement
-     *
-     * @throws YAPI_Exception on error
-     */
-    public String checkFirmware(String path, boolean onlynew) throws YAPI_Exception
-    {
-        String link = "";
-        Integer best_rev = 0;
-        Integer current_rev;
-        try{
-            current_rev = Integer.parseInt(get_firmwareRelease());
-        }catch (NumberFormatException ex){
-            current_rev =0;
-        }
-
-        if (path.startsWith("www.yoctopuce.com") || path.startsWith("http://www.yoctopuce.com")) {
-            byte[] json = YFirmwareUpdate._downloadfile("http://www.yoctopuce.com//FR/common/getLastFirmwareLink.php?serial=" + this.get_serialNumber());
-            JSONObject obj = null;
-            try {
-                obj =new JSONObject(new String(json,"ISO-8859-1"));
-            } catch (JSONException ex) {
-                throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
-            } catch (UnsupportedEncodingException ex) {
-                throw new YAPI_Exception(YAPI.IO_ERROR,ex.getLocalizedMessage());
-            }
-            try {
-                link = obj.getString("link");
-                best_rev = obj.getInt("version");
-            } catch (JSONException e) {
-                throw new YAPI_Exception(YAPI.IO_ERROR,"invalid respond form www.yoctopuce.com"+e.getLocalizedMessage());
-            }
-        } else{
-
-            File folder = new File(path);
-            YFirmwareFile firmware = YFirmwareUpdate.checkFirmware_r(folder,get_serialNumber().substring(0,YAPI.YOCTO_BASE_SERIAL_LEN));
-            if (firmware!=null) {
-                best_rev = firmware.getFirmwareRelaseAsInt();
-                link = firmware.getPath();
-            }
-        }
-        if (onlynew){
-            if (current_rev < best_rev)
-                return link;
-            else
-                return "";
-        }
-        return link;
-    }
-
-
     // --- (generated code: YModule implementation)
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("productName")) {
-            _productName =  json_val.getString("productName");
+            _productName = json_val.getString("productName");
         }
         if (json_val.has("serialNumber")) {
-            _serialNumber =  json_val.getString("serialNumber");
+            _serialNumber = json_val.getString("serialNumber");
         }
         if (json_val.has("productId")) {
-            _productId =  json_val.getInt("productId");
+            _productId = json_val.getInt("productId");
         }
         if (json_val.has("productRelease")) {
-            _productRelease =  json_val.getInt("productRelease");
+            _productRelease = json_val.getInt("productRelease");
         }
         if (json_val.has("firmwareRelease")) {
-            _firmwareRelease =  json_val.getString("firmwareRelease");
+            _firmwareRelease = json_val.getString("firmwareRelease");
         }
         if (json_val.has("persistentSettings")) {
-            _persistentSettings =  json_val.getInt("persistentSettings");
+            _persistentSettings = json_val.getInt("persistentSettings");
         }
         if (json_val.has("luminosity")) {
-            _luminosity =  json_val.getInt("luminosity");
+            _luminosity = json_val.getInt("luminosity");
         }
         if (json_val.has("beacon")) {
-            _beacon =  json_val.getInt("beacon")>0?1:0;
+            _beacon = json_val.getInt("beacon") > 0 ? 1 : 0;
         }
         if (json_val.has("upTime")) {
-            _upTime =  json_val.getLong("upTime");
+            _upTime = json_val.getLong("upTime");
         }
         if (json_val.has("usbCurrent")) {
-            _usbCurrent =  json_val.getInt("usbCurrent");
+            _usbCurrent = json_val.getInt("usbCurrent");
         }
         if (json_val.has("rebootCountdown")) {
-            _rebootCountdown =  json_val.getInt("rebootCountdown");
+            _rebootCountdown = json_val.getInt("rebootCountdown");
         }
         if (json_val.has("userVar")) {
-            _userVar =  json_val.getInt("userVar");
+            _userVar = json_val.getInt("userVar");
         }
         super._parseAttr(json_val);
     }
@@ -415,8 +349,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getProductName() throws YAPI_Exception
-
-    { return get_productName(); }
+    {
+        return get_productName();
+    }
 
     /**
      * Returns the serial number of the module, as set by the factory.
@@ -443,8 +378,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getSerialNumber() throws YAPI_Exception
-
-    { return get_serialNumber(); }
+    {
+        return get_serialNumber();
+    }
 
     /**
      * Returns the USB device identifier of the module.
@@ -471,8 +407,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getProductId() throws YAPI_Exception
-
-    { return get_productId(); }
+    {
+        return get_productId();
+    }
 
     /**
      * Returns the hardware release version of the module.
@@ -499,8 +436,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getProductRelease() throws YAPI_Exception
-
-    { return get_productRelease(); }
+    {
+        return get_productRelease();
+    }
 
     /**
      * Returns the version of the firmware embedded in the module.
@@ -527,8 +465,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getFirmwareRelease() throws YAPI_Exception
-
-    { return get_firmwareRelease(); }
+    {
+        return get_firmwareRelease();
+    }
 
     /**
      * Returns the current state of persistent module settings.
@@ -557,8 +496,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPersistentSettings() throws YAPI_Exception
-
-    { return get_persistentSettings(); }
+    {
+        return get_persistentSettings();
+    }
 
     public int set_persistentSettings(int  newval)  throws YAPI_Exception
     {
@@ -569,8 +509,9 @@ public class YModule extends YFunction
     }
 
     public int setPersistentSettings(int newval)  throws YAPI_Exception
-
-    { return set_persistentSettings(newval); }
+    {
+        return set_persistentSettings(newval);
+    }
 
     /**
      * Returns the luminosity of the  module informative leds (from 0 to 100).
@@ -597,8 +538,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getLuminosity() throws YAPI_Exception
-
-    { return get_luminosity(); }
+    {
+        return get_luminosity();
+    }
 
     /**
      * Changes the luminosity of the module informative leds. The parameter is a
@@ -633,8 +575,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setLuminosity(int newval)  throws YAPI_Exception
-
-    { return set_luminosity(newval); }
+    {
+        return set_luminosity(newval);
+    }
 
     /**
      * Returns the state of the localization beacon.
@@ -661,8 +604,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getBeacon() throws YAPI_Exception
-
-    { return get_beacon(); }
+    {
+        return get_beacon();
+    }
 
     /**
      * Turns on or off the module localization beacon.
@@ -691,8 +635,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setBeacon(int newval)  throws YAPI_Exception
-
-    { return set_beacon(newval); }
+    {
+        return set_beacon(newval);
+    }
 
     /**
      * Returns the number of milliseconds spent since the module was powered on.
@@ -719,8 +664,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getUpTime() throws YAPI_Exception
-
-    { return get_upTime(); }
+    {
+        return get_upTime();
+    }
 
     /**
      * Returns the current consumed by the module on the USB bus, in milli-amps.
@@ -747,8 +693,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getUsbCurrent() throws YAPI_Exception
-
-    { return get_usbCurrent(); }
+    {
+        return get_usbCurrent();
+    }
 
     /**
      * Returns the remaining number of seconds before the module restarts, or zero when no
@@ -779,8 +726,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getRebootCountdown() throws YAPI_Exception
-
-    { return get_rebootCountdown(); }
+    {
+        return get_rebootCountdown();
+    }
 
     public int set_rebootCountdown(int  newval)  throws YAPI_Exception
     {
@@ -791,8 +739,9 @@ public class YModule extends YFunction
     }
 
     public int setRebootCountdown(int newval)  throws YAPI_Exception
-
-    { return set_rebootCountdown(newval); }
+    {
+        return set_rebootCountdown(newval);
+    }
 
     /**
      * Returns the value previously stored in this attribute.
@@ -821,8 +770,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getUserVar() throws YAPI_Exception
-
-    { return get_userVar(); }
+    {
+        return get_userVar();
+    }
 
     /**
      * Returns the value previously stored in this attribute.
@@ -853,8 +803,9 @@ public class YModule extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setUserVar(int newval)  throws YAPI_Exception
-
-    { return set_userVar(newval); }
+    {
+        return set_userVar(newval);
+    }
 
     /**
      * Allows you to find a module from its serial number or from its logical name.
@@ -980,8 +931,34 @@ public class YModule extends YFunction
         return set_rebootCountdown(-secBeforeReboot);
     }
 
-    //cannot be generated for Java:
-    //public String checkFirmware(String path,boolean onlynew) throws YAPI_Exception
+    /**
+     * Test if the byn file is valid for this module. This method is useful to test if the module need to be updated.
+     *  It's possible to pass an directory instead of a file. In this case this method return the path of
+     * the most recent
+     *  appropriate byn file. If the parameter onlynew is true the function will discard firmware that are
+     * older or equal to
+     * the installed firmware.
+     *
+     * @param path    : the path of a byn file or a directory that contain byn files
+     * @param onlynew : return only files that are strictly newer
+     *
+     * @return : the path of the byn file to use or a empty string if no byn files match the requirement
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String checkFirmware(String path,boolean onlynew) throws YAPI_Exception
+    {
+        String serial;
+        int release;
+        if (onlynew) {
+            release = Integer.valueOf(get_firmwareRelease());
+        } else {
+            release = 0;
+        }
+        //may throw an exception
+        serial = get_serialNumber();
+        return YFirmwareUpdate.CheckFirmware(serial,path, release);
+    }
 
     /**
      * Prepare a firmware upgrade of the module. This method return a object YFirmwareUpdate which
@@ -1244,12 +1221,12 @@ public class YModule extends YFunction
         ArrayList<String> old_dslist = new ArrayList<String>();
         ArrayList<String> old_jpath = new ArrayList<String>();
         ArrayList<Integer> old_jpath_len = new ArrayList<Integer>();
-        ArrayList<String> old_val = new ArrayList<String>();
+        ArrayList<String> old_val_arr = new ArrayList<String>();
         byte[] actualSettings;
         ArrayList<String> new_dslist = new ArrayList<String>();
         ArrayList<String> new_jpath = new ArrayList<String>();
         ArrayList<Integer> new_jpath_len = new ArrayList<Integer>();
-        ArrayList<String> new_val = new ArrayList<String>();
+        ArrayList<String> new_val_arr = new ArrayList<String>();
         int cpos;
         int eqpos;
         int leng;
@@ -1266,14 +1243,16 @@ public class YModule extends YFunction
         String sensorType;
         String unit_name;
         String newval;
+        String oldval;
         String old_calib;
         boolean do_update;
         boolean found;
+        oldval = "";
+        newval = "";
         old_json_flat = _flattenJsonStruct(settings);
         old_dslist = _json_get_array(old_json_flat);
         for (String ii:old_dslist) {
-            leng = (ii).length();
-            ii = (ii).substring( 1,  1 + leng - 2);
+            ii = _json_get_string(ii.getBytes());
             leng = (ii).length();
             eqpos = (ii).indexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
@@ -1285,15 +1264,14 @@ public class YModule extends YFunction
             value = (ii).substring( eqpos,  eqpos + leng - eqpos);
             old_jpath.add(jpath);
             old_jpath_len.add((jpath).length());
-            old_val.add(value);
+            old_val_arr.add(value);
         }
         // may throw an exception
         actualSettings = _download("api.json");
         actualSettings = _flattenJsonStruct(actualSettings);
         new_dslist = _json_get_array(actualSettings);
         for (String ii:new_dslist) {
-            leng = (ii).length();
-            ii = (ii).substring( 1,  1 + leng - 2);
+            ii = _json_get_string(ii.getBytes());
             leng = (ii).length();
             eqpos = (ii).indexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
@@ -1305,7 +1283,7 @@ public class YModule extends YFunction
             value = (ii).substring( eqpos,  eqpos + leng - eqpos);
             new_jpath.add(jpath);
             new_jpath_len.add((jpath).length());
-            new_val.add(value);
+            new_val_arr.add(value);
         }
         i = 0;
         while (i < new_jpath.size()) {
@@ -1431,17 +1409,33 @@ public class YModule extends YFunction
                 do_update = false;
             }
             if (do_update) {
+                do_update = false;
+                newval = new_val_arr.get(i);
+                j = 0;
+                found = false;
+                while ((j < old_jpath.size()) && !(found)) {
+                    if ((new_jpath_len.get(i) == old_jpath_len.get(j)) && (new_jpath.get(i).equals(old_jpath.get(j)))) {
+                        found = true;
+                        oldval = old_val_arr.get(j);
+                        if (!(newval.equals(oldval))) {
+                            do_update = true;
+                        }
+                    }
+                    j = j + 1;
+                }
+            }
+            if (do_update) {
                 if (attr.equals("calibrationParam")) {
                     old_calib = "";
                     unit_name = "";
                     sensorType = "";
-                    new_calib = new_val.get(i);
+                    new_calib = newval;
                     j = 0;
                     found = false;
                     while ((j < old_jpath.size()) && !(found)) {
                         if ((new_jpath_len.get(i) == old_jpath_len.get(j)) && (new_jpath.get(i).equals(old_jpath.get(j)))) {
                             found = true;
-                            old_calib = old_val.get(j);
+                            old_calib = old_val_arr.get(j);
                         }
                         j = j + 1;
                     }
@@ -1465,23 +1459,15 @@ public class YModule extends YFunction
                         }
                         j = j + 1;
                     }
-                    newval = calibConvert(new_val.get(i), old_calib, unit_name, sensorType);
-                    url = "api/" + fun + ".json?" + attr + "=" + newval;
+                    newval = calibConvert(new_val_arr.get(i), old_calib, unit_name, sensorType);
+                    url = "api/" + fun + ".json?" + attr + "=" + _escapeAttr(newval);
                     _download(url);
                 } else {
-                    j = 0;
-                    found = false;
-                    while ((j < old_jpath_len.size()) && !(found)) {
-                        if ((new_jpath_len.get(i).intValue() == old_jpath_len.get(j).intValue()) && (new_jpath.get(i).equals(old_jpath.get(j)))) {
-                            found = true;
-                            url = "api/" + fun + ".json?" + attr + "=" + old_val.get(j);
-                            if (attr.equals("resolution")) {
-                                restoreLast.add(url);
-                            } else {
-                                _download(url);
-                            }
-                        }
-                        j = j + 1;
+                    url = "api/" + fun + ".json?" + attr + "=" + _escapeAttr(oldval);
+                    if (attr.equals("resolution")) {
+                        restoreLast.add(url);
+                    } else {
+                        _download(url);
                     }
                 }
             }

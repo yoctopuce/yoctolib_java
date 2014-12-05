@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YAccelerometer.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YAccelerometer.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindAccelerometer(), the high-level API for Accelerometer functions
+ * Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YAccelerometer return codes)
-    //--- (end of YAccelerometer return codes)
+//--- (YAccelerometer return codes)
+//--- (end of YAccelerometer return codes)
 //--- (YAccelerometer class start)
 /**
  * YAccelerometer Class: Accelerometer function interface
@@ -74,7 +74,6 @@ public class YAccelerometer extends YSensor
     public static final int GRAVITYCANCELLATION_OFF = 0;
     public static final int GRAVITYCANCELLATION_ON = 1;
     public static final int GRAVITYCANCELLATION_INVALID = -1;
-
     protected double _xValue = XVALUE_INVALID;
     protected double _yValue = YVALUE_INVALID;
     protected double _zValue = ZVALUE_INVALID;
@@ -125,16 +124,16 @@ public class YAccelerometer extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("xValue")) {
-            _xValue =  Math.round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
+            _xValue = Math.round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("yValue")) {
-            _yValue =  Math.round(json_val.getDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
+            _yValue = Math.round(json_val.getDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("zValue")) {
-            _zValue =  Math.round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
+            _zValue = Math.round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("gravityCancellation")) {
-            _gravityCancellation =  json_val.getInt("gravityCancellation")>0?1:0;
+            _gravityCancellation = json_val.getInt("gravityCancellation") > 0 ? 1 : 0;
         }
         super._parseAttr(json_val);
     }
@@ -164,8 +163,9 @@ public class YAccelerometer extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getXValue() throws YAPI_Exception
-
-    { return get_xValue(); }
+    {
+        return get_xValue();
+    }
 
     /**
      * Returns the Y component of the acceleration, as a floating point number.
@@ -192,8 +192,9 @@ public class YAccelerometer extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getYValue() throws YAPI_Exception
-
-    { return get_yValue(); }
+    {
+        return get_yValue();
+    }
 
     /**
      * Returns the Z component of the acceleration, as a floating point number.
@@ -220,8 +221,9 @@ public class YAccelerometer extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getZValue() throws YAPI_Exception
-
-    { return get_zValue(); }
+    {
+        return get_zValue();
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -240,8 +242,9 @@ public class YAccelerometer extends YSensor
      * @throws YAPI_Exception on error
      */
     public int getGravityCancellation() throws YAPI_Exception
-
-    { return get_gravityCancellation(); }
+    {
+        return get_gravityCancellation();
+    }
 
     public int set_gravityCancellation(int  newval)  throws YAPI_Exception
     {
@@ -252,8 +255,9 @@ public class YAccelerometer extends YSensor
     }
 
     public int setGravityCancellation(int newval)  throws YAPI_Exception
-
-    { return set_gravityCancellation(newval); }
+    {
+        return set_gravityCancellation(newval);
+    }
 
     /**
      * Retrieves an accelerometer for a given identifier.

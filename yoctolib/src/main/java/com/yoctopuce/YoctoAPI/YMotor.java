@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YMotor.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YMotor.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindMotor(), the high-level API for Motor functions
+ * Implements FindMotor(), the high-level API for Motor functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YMotor return codes)
-    //--- (end of YMotor return codes)
+//--- (YMotor return codes)
+//--- (end of YMotor return codes)
 //--- (YMotor class start)
 /**
  * YMotor Class: Motor function interface
@@ -71,7 +71,6 @@ public class YMotor extends YFunction
     public static final int MOTORSTATUS_HIHEAT = 6;
     public static final int MOTORSTATUS_FAILSF = 7;
     public static final int MOTORSTATUS_INVALID = -1;
-
     /**
      * invalid drivingForce value
      */
@@ -158,31 +157,31 @@ public class YMotor extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("motorStatus")) {
-            _motorStatus =  json_val.getInt("motorStatus");
+            _motorStatus = json_val.getInt("motorStatus");
         }
         if (json_val.has("drivingForce")) {
-            _drivingForce =  Math.round(json_val.getDouble("drivingForce") * 1000.0 / 65536.0) / 1000.0;
+            _drivingForce = Math.round(json_val.getDouble("drivingForce") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("brakingForce")) {
-            _brakingForce =  Math.round(json_val.getDouble("brakingForce") * 1000.0 / 65536.0) / 1000.0;
+            _brakingForce = Math.round(json_val.getDouble("brakingForce") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("cutOffVoltage")) {
-            _cutOffVoltage =  Math.round(json_val.getDouble("cutOffVoltage") * 1000.0 / 65536.0) / 1000.0;
+            _cutOffVoltage = Math.round(json_val.getDouble("cutOffVoltage") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("overCurrentLimit")) {
-            _overCurrentLimit =  json_val.getInt("overCurrentLimit");
+            _overCurrentLimit = json_val.getInt("overCurrentLimit");
         }
         if (json_val.has("frequency")) {
-            _frequency =  Math.round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+            _frequency = Math.round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("starterTime")) {
-            _starterTime =  json_val.getInt("starterTime");
+            _starterTime = json_val.getInt("starterTime");
         }
         if (json_val.has("failSafeTimeout")) {
-            _failSafeTimeout =  json_val.getInt("failSafeTimeout");
+            _failSafeTimeout = json_val.getInt("failSafeTimeout");
         }
         if (json_val.has("command")) {
-            _command =  json_val.getString("command");
+            _command = json_val.getString("command");
         }
         super._parseAttr(json_val);
     }
@@ -237,8 +236,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getMotorStatus() throws YAPI_Exception
-
-    { return get_motorStatus(); }
+    {
+        return get_motorStatus();
+    }
 
     public int set_motorStatus(int  newval)  throws YAPI_Exception
     {
@@ -249,8 +249,9 @@ public class YMotor extends YFunction
     }
 
     public int setMotorStatus(int newval)  throws YAPI_Exception
-
-    { return set_motorStatus(newval); }
+    {
+        return set_motorStatus(newval);
+    }
 
     /**
      * Changes immediately the power sent to the motor. The value is a percentage between -100%
@@ -287,8 +288,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setDrivingForce(double newval)  throws YAPI_Exception
-
-    { return set_drivingForce(newval); }
+    {
+        return set_drivingForce(newval);
+    }
 
     /**
      * Returns the power sent to the motor, as a percentage between -100% and +100%.
@@ -317,8 +319,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public double getDrivingForce() throws YAPI_Exception
-
-    { return get_drivingForce(); }
+    {
+        return get_drivingForce();
+    }
 
     /**
      * Changes immediately the braking force applied to the motor (in percents).
@@ -353,8 +356,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setBrakingForce(double newval)  throws YAPI_Exception
-
-    { return set_brakingForce(newval); }
+    {
+        return set_brakingForce(newval);
+    }
 
     /**
      * Returns the braking force applied to the motor, as a percentage.
@@ -383,8 +387,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public double getBrakingForce() throws YAPI_Exception
-
-    { return get_brakingForce(); }
+    {
+        return get_brakingForce();
+    }
 
     /**
      * Changes the threshold voltage under which the controller automatically switches to error state
@@ -425,8 +430,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setCutOffVoltage(double newval)  throws YAPI_Exception
-
-    { return set_cutOffVoltage(newval); }
+    {
+        return set_cutOffVoltage(newval);
+    }
 
     /**
      * Returns the threshold voltage under which the controller automatically switches to error state
@@ -461,8 +467,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public double getCutOffVoltage() throws YAPI_Exception
-
-    { return get_cutOffVoltage(); }
+    {
+        return get_cutOffVoltage();
+    }
 
     /**
      * Returns the current threshold (in mA) above which the controller automatically
@@ -493,8 +500,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getOverCurrentLimit() throws YAPI_Exception
-
-    { return get_overCurrentLimit(); }
+    {
+        return get_overCurrentLimit();
+    }
 
     /**
      * Changes the current threshold (in mA) above which the controller automatically
@@ -533,8 +541,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setOverCurrentLimit(int newval)  throws YAPI_Exception
-
-    { return set_overCurrentLimit(newval); }
+    {
+        return set_overCurrentLimit(newval);
+    }
 
     /**
      * Changes the PWM frequency used to control the motor. Low frequency is usually
@@ -569,8 +578,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setFrequency(double newval)  throws YAPI_Exception
-
-    { return set_frequency(newval); }
+    {
+        return set_frequency(newval);
+    }
 
     /**
      * Returns the PWM frequency used to control the motor.
@@ -597,8 +607,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public double getFrequency() throws YAPI_Exception
-
-    { return get_frequency(); }
+    {
+        return get_frequency();
+    }
 
     /**
      * Returns the duration (in ms) during which the motor is driven at low frequency to help
@@ -631,8 +642,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getStarterTime() throws YAPI_Exception
-
-    { return get_starterTime(); }
+    {
+        return get_starterTime();
+    }
 
     /**
      * Changes the duration (in ms) during which the motor is driven at low frequency to help
@@ -667,8 +679,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setStarterTime(int newval)  throws YAPI_Exception
-
-    { return set_starterTime(newval); }
+    {
+        return set_starterTime(newval);
+    }
 
     /**
      * Returns the delay in milliseconds allowed for the controller to run autonomously without
@@ -705,8 +718,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getFailSafeTimeout() throws YAPI_Exception
-
-    { return get_failSafeTimeout(); }
+    {
+        return get_failSafeTimeout();
+    }
 
     /**
      * Changes the delay in milliseconds allowed for the controller to run autonomously without
@@ -745,8 +759,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setFailSafeTimeout(int newval)  throws YAPI_Exception
-
-    { return set_failSafeTimeout(newval); }
+    {
+        return set_failSafeTimeout(newval);
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -765,8 +780,9 @@ public class YMotor extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getCommand() throws YAPI_Exception
-
-    { return get_command(); }
+    {
+        return get_command();
+    }
 
     public int set_command(String  newval)  throws YAPI_Exception
     {
@@ -777,8 +793,9 @@ public class YMotor extends YFunction
     }
 
     public int setCommand(String newval)  throws YAPI_Exception
-
-    { return set_command(newval); }
+    {
+        return set_command(newval);
+    }
 
     /**
      * Retrieves a motor for a given identifier.

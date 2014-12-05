@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMeasure.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YMeasure.java 18339 2014-11-12 10:08:56Z seb $
  *
  * Implements yFindMeasure(), the high-level API for Measure functions
  *
@@ -71,16 +71,16 @@ public class YMeasure
         _avgVal = avgVal;
         _maxVal = maxVal;
     }
-    
+
     YMeasure() {
     }
-    
+
     public Date get_startTimeUTC_asDate() {
-        return new Date((long) (_start*1000+0.5));
+        return new Date((long) (_start * 1000 + 0.5));
     }
 
     public Date get_endTimeUTC_asDate() {
-        return new Date((long) (_end*1000+0.5));
+        return new Date((long) (_end * 1000 + 0.5));
     }
 
 

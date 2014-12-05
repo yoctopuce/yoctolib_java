@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCallbackHub.java 17831 2014-09-25 16:31:39Z seb $
+ * $Id: YCallbackHub.java 18456 2014-11-20 16:29:57Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -309,6 +309,12 @@ public class YCallbackHub extends YGenericHub{
         // reset device list cache timeout for this hub
         now = YAPI.GetTickCount();
         _devListExpires = now + _devListValidity;
+    }
+
+    @Override
+    public ArrayList<String> getBootloaders()
+    {
+        return null;
     }
 
     @Override

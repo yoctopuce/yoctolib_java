@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataLogger.java 17678 2014-09-16 16:31:26Z seb $
+ * $Id: YDataLogger.java 18339 2014-11-12 10:08:56Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -76,28 +76,24 @@ public class YDataLogger extends YFunction
     public static final int RECORDING_OFF = 0;
     public static final int RECORDING_ON = 1;
     public static final int RECORDING_INVALID = -1;
-
     /**
      * invalid autoStart value
      */
     public static final int AUTOSTART_OFF = 0;
     public static final int AUTOSTART_ON = 1;
     public static final int AUTOSTART_INVALID = -1;
-
     /**
      * invalid beaconDriven value
      */
     public static final int BEACONDRIVEN_OFF = 0;
     public static final int BEACONDRIVEN_ON = 1;
     public static final int BEACONDRIVEN_INVALID = -1;
-
     /**
      * invalid clearHistory value
      */
     public static final int CLEARHISTORY_FALSE = 0;
     public static final int CLEARHISTORY_TRUE = 1;
     public static final int CLEARHISTORY_INVALID = -1;
-
     protected int _currentRunIndex = CURRENTRUNINDEX_INVALID;
     protected long _timeUTC = TIMEUTC_INVALID;
     protected int _recording = RECORDING_INVALID;
@@ -200,9 +196,9 @@ public class YDataLogger extends YFunction
         JSONTokener loadval = this.getData(null, null);
         try {
             JSONArray jsonAllStreams = new JSONArray(loadval);
-            if(jsonAllStreams.length()== 0 )
+            if (jsonAllStreams.length() == 0)
                 return YAPI.SUCCESS;
-            if(jsonAllStreams.get(0).getClass() == JSONArray.class) {
+            if (jsonAllStreams.get(0).getClass() == JSONArray.class) {
                 for (int i = 0; i < jsonAllStreams.length(); i++) {
                     // old datalogger format: [runIdx, timerel, utc, interval]
                     JSONArray arr = jsonAllStreams.getJSONArray(i);
@@ -214,7 +210,7 @@ public class YDataLogger extends YFunction
                 ArrayList<YDataSet> sets = this.parse_dataSets(jsonAllStreams.toString().getBytes());
                 for (int j = 0; j < sets.size(); j++) {
                     ArrayList<YDataStream> ds = sets.get(j).get_privateDataStreams();
-                    for (int si=0; si < ds.size(); si++) {
+                    for (int si = 0; si < ds.size(); si++) {
 
                         v.add(ds.get(si));
                     }
@@ -239,22 +235,22 @@ public class YDataLogger extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("currentRunIndex")) {
-            _currentRunIndex =  json_val.getInt("currentRunIndex");
+            _currentRunIndex = json_val.getInt("currentRunIndex");
         }
         if (json_val.has("timeUTC")) {
-            _timeUTC =  json_val.getLong("timeUTC");
+            _timeUTC = json_val.getLong("timeUTC");
         }
         if (json_val.has("recording")) {
-            _recording =  json_val.getInt("recording")>0?1:0;
+            _recording = json_val.getInt("recording") > 0 ? 1 : 0;
         }
         if (json_val.has("autoStart")) {
-            _autoStart =  json_val.getInt("autoStart")>0?1:0;
+            _autoStart = json_val.getInt("autoStart") > 0 ? 1 : 0;
         }
         if (json_val.has("beaconDriven")) {
-            _beaconDriven =  json_val.getInt("beaconDriven")>0?1:0;
+            _beaconDriven = json_val.getInt("beaconDriven") > 0 ? 1 : 0;
         }
         if (json_val.has("clearHistory")) {
-            _clearHistory =  json_val.getInt("clearHistory")>0?1:0;
+            _clearHistory = json_val.getInt("clearHistory") > 0 ? 1 : 0;
         }
         super._parseAttr(json_val);
     }
@@ -288,8 +284,9 @@ public class YDataLogger extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getCurrentRunIndex() throws YAPI_Exception
-
-    { return get_currentRunIndex(); }
+    {
+        return get_currentRunIndex();
+    }
 
     /**
      * Returns the Unix timestamp for current UTC time, if known.
@@ -316,8 +313,9 @@ public class YDataLogger extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getTimeUTC() throws YAPI_Exception
-
-    { return get_timeUTC(); }
+    {
+        return get_timeUTC();
+    }
 
     /**
      * Changes the current UTC time reference used for recorded data.
@@ -346,8 +344,9 @@ public class YDataLogger extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setTimeUTC(long newval)  throws YAPI_Exception
-
-    { return set_timeUTC(newval); }
+    {
+        return set_timeUTC(newval);
+    }
 
     /**
      * Returns the current activation state of the data logger.
@@ -375,8 +374,9 @@ public class YDataLogger extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getRecording() throws YAPI_Exception
-
-    { return get_recording(); }
+    {
+        return get_recording();
+    }
 
     /**
      * Changes the activation state of the data logger to start/stop recording data.
@@ -407,8 +407,9 @@ public class YDataLogger extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setRecording(int newval)  throws YAPI_Exception
-
-    { return set_recording(newval); }
+    {
+        return set_recording(newval);
+    }
 
     /**
      * Returns the default activation state of the data logger on power up.
@@ -437,8 +438,9 @@ public class YDataLogger extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getAutoStart() throws YAPI_Exception
-
-    { return get_autoStart(); }
+    {
+        return get_autoStart();
+    }
 
     /**
      * Changes the default activation state of the data logger on power up.
@@ -473,8 +475,9 @@ public class YDataLogger extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setAutoStart(int newval)  throws YAPI_Exception
-
-    { return set_autoStart(newval); }
+    {
+        return set_autoStart(newval);
+    }
 
     /**
      * Return true if the data logger is synchronised with the localization beacon.
@@ -501,8 +504,9 @@ public class YDataLogger extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getBeaconDriven() throws YAPI_Exception
-
-    { return get_beaconDriven(); }
+    {
+        return get_beaconDriven();
+    }
 
     /**
      * Changes the type of synchronisation of the data logger.
@@ -537,8 +541,9 @@ public class YDataLogger extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setBeaconDriven(int newval)  throws YAPI_Exception
-
-    { return set_beaconDriven(newval); }
+    {
+        return set_beaconDriven(newval);
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -557,8 +562,9 @@ public class YDataLogger extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getClearHistory() throws YAPI_Exception
-
-    { return get_clearHistory(); }
+    {
+        return get_clearHistory();
+    }
 
     public int set_clearHistory(int  newval)  throws YAPI_Exception
     {
@@ -569,8 +575,9 @@ public class YDataLogger extends YFunction
     }
 
     public int setClearHistory(int newval)  throws YAPI_Exception
-
-    { return set_clearHistory(newval); }
+    {
+        return set_clearHistory(newval);
+    }
 
     /**
      * Retrieves a data logger for a given identifier.

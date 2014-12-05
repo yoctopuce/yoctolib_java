@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 17678 2014-09-16 16:31:26Z seb $
+ * $Id: YSensor.java 18361 2014-11-13 08:06:41Z mvuilleu $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -144,8 +144,6 @@ public class YSensor extends YFunction
     //--- (end of generated code: YSensor definitions)
 
 
-
-
     /*
      * Method used to encode calibration points into fixed-point 16-bit integers
      */
@@ -157,24 +155,24 @@ public class YSensor extends YFunction
         int minRaw = 0;
         String res;
 
-        if(npt==0){
+        if (npt == 0) {
             return "0";
         }
         int pos = actualCparams.indexOf(',');
-        if (actualCparams.equals("") || actualCparams.equals("0") || pos >= 0){
+        if (actualCparams.equals("") || actualCparams.equals("0") || pos >= 0) {
             _throw(YAPI.NOT_SUPPORTED, "Device does not support new calibration parameters. Please upgrade your firmware");
             return "0";
         }
         ArrayList<Integer> iCalib = YAPI._decodeWords(actualCparams);
-        int calibrationOffset =  iCalib.get(0);
+        int calibrationOffset = iCalib.get(0);
         int divisor = iCalib.get(1);
-        if (divisor >0) {
+        if (divisor > 0) {
             calibType = npt;
         } else {
             calibType = 10 + npt;
         }
         res = Integer.toString(calibType);
-        if(calibType<=10){
+        if (calibType <= 10) {
             for (int i = 0; i < npt; i++) {
                 rawVal = (int) (rawValues.get(i) * divisor - calibrationOffset + .5);
                 if (rawVal >= minRaw && rawVal < 65536) {
@@ -187,7 +185,7 @@ public class YSensor extends YFunction
             }
         } else {
             // 16-bit floating-point decimal encoding
-            for(int i = 0; i < npt; i++) {
+            for (int i = 0; i < npt; i++) {
                 rawVal = (int) YAPI._doubleToDecimal(rawValues.get(i));
                 refVal = (int) YAPI._doubleToDecimal(refValues.get(i));
                 res += String.format(",%d,%d", rawVal, refVal);
@@ -210,38 +208,38 @@ public class YSensor extends YFunction
             // old format: no calibration
             return 0;
         }
-        if(calibParams.indexOf(',') != -1) {
+        if (calibParams.indexOf(',') != -1) {
             // old format -> device must do the calibration
             return -1;
         }
         // new format
         ArrayList<Integer> iCalib = YAPI._decodeWords(calibParams);
-        if(iCalib.size() < 2) {
+        if (iCalib.size() < 2) {
             // bad format
             return -1;
         }
-        if(iCalib.size() == 2) {
+        if (iCalib.size() == 2) {
             // no calibration
             return 0;
         }
         int pos = 0;
-        double calibrationOffset =  iCalib.get(pos++);
+        double calibrationOffset = iCalib.get(pos++);
         double divisor = iCalib.get(pos++);
         int calibType = iCalib.get(pos++);
-        if(calibType == 0) {
+        if (calibType == 0) {
             return 0;
         }
         // parse calibration parameters
-        while(pos < iCalib.size()) {
+        while (pos < iCalib.size()) {
             int ival = iCalib.get(pos++);
             double fval;
-            if(calibType <= 10) {
+            if (calibType <= 10) {
                 fval = (ival + calibrationOffset) / divisor;
             } else {
                 fval = YAPI._decimalToDouble(ival);
             }
             intPt.add(ival);
-            if ( (intPt.size() & 1) == 1) {
+            if ((intPt.size() & 1) == 1) {
                 rawPt.add(fval);
             } else {
                 calPt.add(fval);
@@ -252,7 +250,6 @@ public class YSensor extends YFunction
         }
         return calibType;
     }
-
 
 
     /**
@@ -272,31 +269,31 @@ public class YSensor extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("unit")) {
-            _unit =  json_val.getString("unit");
+            _unit = json_val.getString("unit");
         }
         if (json_val.has("currentValue")) {
-            _currentValue =  Math.round(json_val.getDouble("currentValue") * 1000.0 / 65536.0) / 1000.0;
+            _currentValue = Math.round(json_val.getDouble("currentValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("lowestValue")) {
-            _lowestValue =  Math.round(json_val.getDouble("lowestValue") * 1000.0 / 65536.0) / 1000.0;
+            _lowestValue = Math.round(json_val.getDouble("lowestValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("highestValue")) {
-            _highestValue =  Math.round(json_val.getDouble("highestValue") * 1000.0 / 65536.0) / 1000.0;
+            _highestValue = Math.round(json_val.getDouble("highestValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("currentRawValue")) {
-            _currentRawValue =  Math.round(json_val.getDouble("currentRawValue") * 1000.0 / 65536.0) / 1000.0;
+            _currentRawValue = Math.round(json_val.getDouble("currentRawValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("logFrequency")) {
-            _logFrequency =  json_val.getString("logFrequency");
+            _logFrequency = json_val.getString("logFrequency");
         }
         if (json_val.has("reportFrequency")) {
-            _reportFrequency =  json_val.getString("reportFrequency");
+            _reportFrequency = json_val.getString("reportFrequency");
         }
         if (json_val.has("calibrationParam")) {
-            _calibrationParam =  json_val.getString("calibrationParam");
+            _calibrationParam = json_val.getString("calibrationParam");
         }
         if (json_val.has("resolution")) {
-            _resolution =  Math.round(json_val.getDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
+            _resolution = Math.round(json_val.getDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
     }
@@ -326,8 +323,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getUnit() throws YAPI_Exception
-
-    { return get_unit(); }
+    {
+        return get_unit();
+    }
 
     /**
      * Returns the current value of the measure, in the specified unit, as a floating point number.
@@ -362,8 +360,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public double getCurrentValue() throws YAPI_Exception
-
-    { return get_currentValue(); }
+    {
+        return get_currentValue();
+    }
 
     /**
      * Changes the recorded minimal value observed.
@@ -392,8 +391,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setLowestValue(double newval)  throws YAPI_Exception
-
-    { return set_lowestValue(newval); }
+    {
+        return set_lowestValue(newval);
+    }
 
     /**
      * Returns the minimal value observed for the measure since the device was started.
@@ -424,8 +424,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public double getLowestValue() throws YAPI_Exception
-
-    { return get_lowestValue(); }
+    {
+        return get_lowestValue();
+    }
 
     /**
      * Changes the recorded maximal value observed.
@@ -454,8 +455,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setHighestValue(double newval)  throws YAPI_Exception
-
-    { return set_highestValue(newval); }
+    {
+        return set_highestValue(newval);
+    }
 
     /**
      * Returns the maximal value observed for the measure since the device was started.
@@ -486,8 +488,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public double getHighestValue() throws YAPI_Exception
-
-    { return get_highestValue(); }
+    {
+        return get_highestValue();
+    }
 
     /**
      *  Returns the uncalibrated, unrounded raw value returned by the sensor, in the specified unit, as a
@@ -518,8 +521,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public double getCurrentRawValue() throws YAPI_Exception
-
-    { return get_currentRawValue(); }
+    {
+        return get_currentRawValue();
+    }
 
     /**
      * Returns the datalogger recording frequency for this function, or "OFF"
@@ -550,8 +554,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getLogFrequency() throws YAPI_Exception
-
-    { return get_logFrequency(); }
+    {
+        return get_logFrequency();
+    }
 
     /**
      * Changes the datalogger recording frequency for this function.
@@ -588,8 +593,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setLogFrequency(String newval)  throws YAPI_Exception
-
-    { return set_logFrequency(newval); }
+    {
+        return set_logFrequency(newval);
+    }
 
     /**
      * Returns the timed value notification frequency, or "OFF" if timed
@@ -620,8 +626,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getReportFrequency() throws YAPI_Exception
-
-    { return get_reportFrequency(); }
+    {
+        return get_reportFrequency();
+    }
 
     /**
      * Changes the timed value notification frequency for this function.
@@ -658,8 +665,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setReportFrequency(String newval)  throws YAPI_Exception
-
-    { return set_reportFrequency(newval); }
+    {
+        return set_reportFrequency(newval);
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -678,8 +686,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getCalibrationParam() throws YAPI_Exception
-
-    { return get_calibrationParam(); }
+    {
+        return get_calibrationParam();
+    }
 
     public int set_calibrationParam(String  newval)  throws YAPI_Exception
     {
@@ -690,8 +699,9 @@ public class YSensor extends YFunction
     }
 
     public int setCalibrationParam(String newval)  throws YAPI_Exception
-
-    { return set_calibrationParam(newval); }
+    {
+        return set_calibrationParam(newval);
+    }
 
     /**
      * Changes the resolution of the measured physical values. The resolution corresponds to the numerical precision
@@ -722,8 +732,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setResolution(double newval)  throws YAPI_Exception
-
-    { return set_resolution(newval); }
+    {
+        return set_resolution(newval);
+    }
 
     /**
      * Returns the resolution of the measured values. The resolution corresponds to the numerical precision
@@ -752,8 +763,9 @@ public class YSensor extends YFunction
      * @throws YAPI_Exception on error
      */
     public double getResolution() throws YAPI_Exception
-
-    { return get_resolution(); }
+    {
+        return get_resolution();
+    }
 
     /**
      * Retrieves a sensor for a given identifier.
@@ -962,6 +974,36 @@ public class YSensor extends YFunction
             }
         }
         return 0;
+    }
+
+    /**
+     * Starts the data logger on the device. Note that the data logger
+     * will only save the measures on this sensor if the logFrequency
+     * is not set to "OFF".
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     */
+    public int startDataLogger() throws YAPI_Exception
+    {
+        byte[] res;
+        // may throw an exception
+        res = _download("api/dataLogger/recording?recording=1");
+        if (!((res).length>0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to start datalogger");}
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Stops the datalogger on the device.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     */
+    public int stopDataLogger() throws YAPI_Exception
+    {
+        byte[] res;
+        // may throw an exception
+        res = _download("api/dataLogger/recording?recording=0");
+        if (!((res).length>0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to stop datalogger");}
+        return YAPI.SUCCESS;
     }
 
     /**
@@ -1238,7 +1280,7 @@ public class YSensor extends YFunction
                 difRaw = 0;
                 while ((sublen > 0) && (i < report.size())) {
                     byteVal = report.get(i).intValue();
-                    difRaw = avgRaw + poww * byteVal;
+                    difRaw = difRaw + poww * byteVal;
                     poww = poww * 0x100;
                     i = i + 1;
                     sublen = sublen - 1;
@@ -1249,7 +1291,7 @@ public class YSensor extends YFunction
                 difRaw = 0;
                 while ((sublen > 0) && (i < report.size())) {
                     byteVal = report.get(i).intValue();
-                    difRaw = avgRaw + poww * byteVal;
+                    difRaw = difRaw + poww * byteVal;
                     poww = poww * 0x100;
                     i = i + 1;
                     sublen = sublen - 1;

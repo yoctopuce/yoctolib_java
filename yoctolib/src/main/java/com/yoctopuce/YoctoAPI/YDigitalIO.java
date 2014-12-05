@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YDigitalIO.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YDigitalIO.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindDigitalIO(), the high-level API for DigitalIO functions
+ * Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YDigitalIO return codes)
-    //--- (end of YDigitalIO return codes)
+//--- (YDigitalIO return codes)
+//--- (end of YDigitalIO return codes)
 //--- (YDigitalIO class start)
 /**
  * YDigitalIO Class: Digital IO function interface
@@ -85,7 +85,6 @@ public class YDigitalIO extends YFunction
     public static final int OUTPUTVOLTAGE_USB_3V = 1;
     public static final int OUTPUTVOLTAGE_EXT_V = 2;
     public static final int OUTPUTVOLTAGE_INVALID = -1;
-
     /**
      * invalid command value
      */
@@ -142,25 +141,25 @@ public class YDigitalIO extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("portState")) {
-            _portState =  json_val.getInt("portState");
+            _portState = json_val.getInt("portState");
         }
         if (json_val.has("portDirection")) {
-            _portDirection =  json_val.getInt("portDirection");
+            _portDirection = json_val.getInt("portDirection");
         }
         if (json_val.has("portOpenDrain")) {
-            _portOpenDrain =  json_val.getInt("portOpenDrain");
+            _portOpenDrain = json_val.getInt("portOpenDrain");
         }
         if (json_val.has("portPolarity")) {
-            _portPolarity =  json_val.getInt("portPolarity");
+            _portPolarity = json_val.getInt("portPolarity");
         }
         if (json_val.has("portSize")) {
-            _portSize =  json_val.getInt("portSize");
+            _portSize = json_val.getInt("portSize");
         }
         if (json_val.has("outputVoltage")) {
-            _outputVoltage =  json_val.getInt("outputVoltage");
+            _outputVoltage = json_val.getInt("outputVoltage");
         }
         if (json_val.has("command")) {
-            _command =  json_val.getString("command");
+            _command = json_val.getString("command");
         }
         super._parseAttr(json_val);
     }
@@ -190,8 +189,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPortState() throws YAPI_Exception
-
-    { return get_portState(); }
+    {
+        return get_portState();
+    }
 
     /**
      * Changes the digital IO port state: bit 0 represents input 0, and so on. This function has no effect
@@ -222,8 +222,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setPortState(int newval)  throws YAPI_Exception
-
-    { return set_portState(newval); }
+    {
+        return set_portState(newval);
+    }
 
     /**
      * Returns the IO direction of all bits of the port: 0 makes a bit an input, 1 makes it an output.
@@ -252,8 +253,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPortDirection() throws YAPI_Exception
-
-    { return get_portDirection(); }
+    {
+        return get_portDirection();
+    }
 
     /**
      * Changes the IO direction of all bits of the port: 0 makes a bit an input, 1 makes it an output.
@@ -286,8 +288,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setPortDirection(int newval)  throws YAPI_Exception
-
-    { return set_portDirection(newval); }
+    {
+        return set_portDirection(newval);
+    }
 
     /**
      *  Returns the electrical interface for each bit of the port. For each bit set to 0  the matching I/O
@@ -318,8 +321,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPortOpenDrain() throws YAPI_Exception
-
-    { return get_portOpenDrain(); }
+    {
+        return get_portOpenDrain();
+    }
 
     /**
      * Changes the electrical interface for each bit of the port. 0 makes a bit a regular input/output, 1 makes
@@ -352,8 +356,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setPortOpenDrain(int newval)  throws YAPI_Exception
-
-    { return set_portOpenDrain(newval); }
+    {
+        return set_portOpenDrain(newval);
+    }
 
     /**
      * Returns the polarity of all the bits of the port.  For each bit set to 0, the matching I/O works the regular,
@@ -382,8 +387,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPortPolarity() throws YAPI_Exception
-
-    { return get_portPolarity(); }
+    {
+        return get_portPolarity();
+    }
 
     /**
      * Changes the polarity of all the bits of the port: 0 makes a bit an input, 1 makes it an output.
@@ -416,8 +422,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setPortPolarity(int newval)  throws YAPI_Exception
-
-    { return set_portPolarity(newval); }
+    {
+        return set_portPolarity(newval);
+    }
 
     /**
      * Returns the number of bits implemented in the I/O port.
@@ -444,8 +451,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPortSize() throws YAPI_Exception
-
-    { return get_portSize(); }
+    {
+        return get_portSize();
+    }
 
     /**
      * Returns the voltage source used to drive output bits.
@@ -474,8 +482,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getOutputVoltage() throws YAPI_Exception
-
-    { return get_outputVoltage(); }
+    {
+        return get_outputVoltage();
+    }
 
     /**
      * Changes the voltage source used to drive output bits.
@@ -508,8 +517,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setOutputVoltage(int newval)  throws YAPI_Exception
-
-    { return set_outputVoltage(newval); }
+    {
+        return set_outputVoltage(newval);
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -528,8 +538,9 @@ public class YDigitalIO extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getCommand() throws YAPI_Exception
-
-    { return get_command(); }
+    {
+        return get_command();
+    }
 
     public int set_command(String  newval)  throws YAPI_Exception
     {
@@ -540,8 +551,9 @@ public class YDigitalIO extends YFunction
     }
 
     public int setCommand(String newval)  throws YAPI_Exception
-
-    { return set_command(newval); }
+    {
+        return set_command(newval);
+    }
 
     /**
      * Retrieves a digital IO port for a given identifier.

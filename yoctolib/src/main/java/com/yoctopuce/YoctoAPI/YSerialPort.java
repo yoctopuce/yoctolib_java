@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 17610 2014-09-13 11:30:24Z mvuilleu $
+ * $Id: YSerialPort.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindSerialPort(), the high-level API for SerialPort functions
+ * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -43,8 +43,8 @@ import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 import java.util.ArrayList;
 
-    //--- (YSerialPort return codes)
-    //--- (end of YSerialPort return codes)
+//--- (YSerialPort return codes)
+//--- (end of YSerialPort return codes)
 //--- (YSerialPort class start)
 /**
  * YSerialPort Class: SerialPort function interface
@@ -81,13 +81,21 @@ public class YSerialPort extends YFunction
      */
     public static final int ERRCOUNT_INVALID = YAPI.INVALID_UINT;
     /**
-     * invalid msgCount value
+     * invalid rxMsgCount value
      */
-    public static final int MSGCOUNT_INVALID = YAPI.INVALID_UINT;
+    public static final int RXMSGCOUNT_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid txMsgCount value
+     */
+    public static final int TXMSGCOUNT_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid lastMsg value
      */
     public static final String LASTMSG_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid startupJob value
+     */
+    public static final String STARTUPJOB_INVALID = YAPI.INVALID_STRING;
     /**
      * invalid command value
      */
@@ -97,8 +105,10 @@ public class YSerialPort extends YFunction
     protected int _rxCount = RXCOUNT_INVALID;
     protected int _txCount = TXCOUNT_INVALID;
     protected int _errCount = ERRCOUNT_INVALID;
-    protected int _msgCount = MSGCOUNT_INVALID;
+    protected int _rxMsgCount = RXMSGCOUNT_INVALID;
+    protected int _txMsgCount = TXMSGCOUNT_INVALID;
     protected String _lastMsg = LASTMSG_INVALID;
+    protected String _startupJob = STARTUPJOB_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackSerialPort = null;
     protected int _rxptr = 0;
@@ -146,28 +156,34 @@ public class YSerialPort extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("serialMode")) {
-            _serialMode =  json_val.getString("serialMode");
+            _serialMode = json_val.getString("serialMode");
         }
         if (json_val.has("protocol")) {
-            _protocol =  json_val.getString("protocol");
+            _protocol = json_val.getString("protocol");
         }
         if (json_val.has("rxCount")) {
-            _rxCount =  json_val.getInt("rxCount");
+            _rxCount = json_val.getInt("rxCount");
         }
         if (json_val.has("txCount")) {
-            _txCount =  json_val.getInt("txCount");
+            _txCount = json_val.getInt("txCount");
         }
         if (json_val.has("errCount")) {
-            _errCount =  json_val.getInt("errCount");
+            _errCount = json_val.getInt("errCount");
         }
-        if (json_val.has("msgCount")) {
-            _msgCount =  json_val.getInt("msgCount");
+        if (json_val.has("rxMsgCount")) {
+            _rxMsgCount = json_val.getInt("rxMsgCount");
+        }
+        if (json_val.has("txMsgCount")) {
+            _txMsgCount = json_val.getInt("txMsgCount");
         }
         if (json_val.has("lastMsg")) {
-            _lastMsg =  json_val.getString("lastMsg");
+            _lastMsg = json_val.getString("lastMsg");
+        }
+        if (json_val.has("startupJob")) {
+            _startupJob = json_val.getString("startupJob");
         }
         if (json_val.has("command")) {
-            _command =  json_val.getString("command");
+            _command = json_val.getString("command");
         }
         super._parseAttr(json_val);
     }
@@ -209,8 +225,9 @@ public class YSerialPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getSerialMode() throws YAPI_Exception
-
-    { return get_serialMode(); }
+    {
+        return get_serialMode();
+    }
 
     /**
      * Changes the serial port communication parameters, with a string such as
@@ -251,8 +268,9 @@ public class YSerialPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setSerialMode(String newval)  throws YAPI_Exception
-
-    { return set_serialMode(newval); }
+    {
+        return set_serialMode(newval);
+    }
 
     /**
      * Returns the type of protocol used over the serial line, as a string.
@@ -291,8 +309,9 @@ public class YSerialPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getProtocol() throws YAPI_Exception
-
-    { return get_protocol(); }
+    {
+        return get_protocol();
+    }
 
     /**
      * Changes the type of protocol used over the serial line.
@@ -333,8 +352,9 @@ public class YSerialPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setProtocol(String newval)  throws YAPI_Exception
-
-    { return set_protocol(newval); }
+    {
+        return set_protocol(newval);
+    }
 
     /**
      * Returns the total number of bytes received since last reset.
@@ -361,8 +381,9 @@ public class YSerialPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getRxCount() throws YAPI_Exception
-
-    { return get_rxCount(); }
+    {
+        return get_rxCount();
+    }
 
     /**
      * Returns the total number of bytes transmitted since last reset.
@@ -389,8 +410,9 @@ public class YSerialPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getTxCount() throws YAPI_Exception
-
-    { return get_txCount(); }
+    {
+        return get_txCount();
+    }
 
     /**
      * Returns the total number of communication errors detected since last reset.
@@ -417,24 +439,8 @@ public class YSerialPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getErrCount() throws YAPI_Exception
-
-    { return get_errCount(); }
-
-    /**
-     * Returns the total number of messages received since last reset.
-     *
-     * @return an integer corresponding to the total number of messages received since last reset
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int get_msgCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MSGCOUNT_INVALID;
-            }
-        }
-        return _msgCount;
+        return get_errCount();
     }
 
     /**
@@ -444,9 +450,56 @@ public class YSerialPort extends YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public int getMsgCount() throws YAPI_Exception
+    public int get_rxMsgCount() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return RXMSGCOUNT_INVALID;
+            }
+        }
+        return _rxMsgCount;
+    }
 
-    { return get_msgCount(); }
+    /**
+     * Returns the total number of messages received since last reset.
+     *
+     * @return an integer corresponding to the total number of messages received since last reset
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getRxMsgCount() throws YAPI_Exception
+    {
+        return get_rxMsgCount();
+    }
+
+    /**
+     * Returns the total number of messages send since last reset.
+     *
+     * @return an integer corresponding to the total number of messages send since last reset
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_txMsgCount() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return TXMSGCOUNT_INVALID;
+            }
+        }
+        return _txMsgCount;
+    }
+
+    /**
+     * Returns the total number of messages send since last reset.
+     *
+     * @return an integer corresponding to the total number of messages send since last reset
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getTxMsgCount() throws YAPI_Exception
+    {
+        return get_txMsgCount();
+    }
 
     /**
      * Returns the latest message fully received (for Line, Frame and Modbus protocols).
@@ -473,8 +526,73 @@ public class YSerialPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getLastMsg() throws YAPI_Exception
+    {
+        return get_lastMsg();
+    }
 
-    { return get_lastMsg(); }
+    /**
+     * Returns the job file to use when the device is powered on.
+     *
+     * @return a string corresponding to the job file to use when the device is powered on
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_startupJob() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return STARTUPJOB_INVALID;
+            }
+        }
+        return _startupJob;
+    }
+
+    /**
+     * Returns the job file to use when the device is powered on.
+     *
+     * @return a string corresponding to the job file to use when the device is powered on
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getStartupJob() throws YAPI_Exception
+    {
+        return get_startupJob();
+    }
+
+    /**
+     * Changes the job to use when the device is powered on.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : a string corresponding to the job to use when the device is powered on
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_startupJob(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = newval;
+        _setAttr("startupJob",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the job to use when the device is powered on.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : a string corresponding to the job to use when the device is powered on
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setStartupJob(String newval)  throws YAPI_Exception
+    {
+        return set_startupJob(newval);
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -493,8 +611,9 @@ public class YSerialPort extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getCommand() throws YAPI_Exception
-
-    { return get_command(); }
+    {
+        return get_command();
+    }
 
     public int set_command(String  newval)  throws YAPI_Exception
     {
@@ -505,8 +624,9 @@ public class YSerialPort extends YFunction
     }
 
     public int setCommand(String newval)  throws YAPI_Exception
-
-    { return set_command(newval); }
+    {
+        return set_command(newval);
+    }
 
     /**
      * Retrieves a serial port for a given identifier.
@@ -629,7 +749,6 @@ public class YSerialPort extends YFunction
     {
         byte[] buff;
         int res;
-        
         // may throw an exception
         buff = _download("cts.txt");
         if (!((buff).length == 1)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "invalid CTS reply");}
@@ -652,7 +771,6 @@ public class YSerialPort extends YFunction
         int bufflen;
         int idx;
         int ch;
-        
         buff = text.getBytes();
         bufflen = (buff).length;
         if (bufflen < 100) {
@@ -765,7 +883,6 @@ public class YSerialPort extends YFunction
         int bufflen;
         int idx;
         int ch;
-        
         buff = String.format("%s\r\n",text).getBytes();
         bufflen = (buff).length-2;
         if (bufflen < 100) {
@@ -849,7 +966,7 @@ public class YSerialPort extends YFunction
         if (nChars > bufflen) {
             nChars = bufflen;
         }
-        _rxptr = _rxptr + nChars;
+        _rxptr = endpos - (bufflen - nChars);
         res = (new String(buff)).substring( 0,  0 + nChars);
         return res;
     }
@@ -901,7 +1018,7 @@ public class YSerialPort extends YFunction
         if (nBytes > bufflen) {
             nBytes = bufflen;
         }
-        _rxptr = _rxptr + nBytes;
+        _rxptr = endpos - (bufflen - nBytes);
         res = "";
         ofs = 0;
         while (ofs+3 < nBytes) {
@@ -917,8 +1034,8 @@ public class YSerialPort extends YFunction
 
     /**
      * Reads a single line (or message) from the receive buffer, starting at current stream position.
-     * This function can only be used when the serial port is configured for a message protocol,
-     * such as 'Line' mode or MODBUS protocols. It does not  work in plain stream modes, eg. 'Char' or 'Byte').
+     * This function is intended to be used when the serial port is configured for a message protocol,
+     * such as 'Line' mode or MODBUS protocols.
      *
      * If data at current stream position is not available anymore in the receive buffer,
      * the function returns the oldest available line and moves the stream position just after.
@@ -955,9 +1072,8 @@ public class YSerialPort extends YFunction
 
     /**
      * Searches for incoming messages in the serial port receive buffer matching a given pattern,
-     * starting at current position. This function can only be used when the serial port is
-     * configured for a message protocol, such as 'Line' mode or MODBUS protocols.
-     * It does not work in plain stream modes, eg. 'Char' or 'Byte', for which there is no "start" of message.
+     * starting at current position. This function will only compare and return printable characters
+     * in the message strings. Binary protocols are handled as hexadecimal strings.
      *
      * The search returns all messages matching the expression provided as argument in the buffer.
      * If no matching message is found, the search waits for one up to the specified maximum timeout
@@ -1007,19 +1123,29 @@ public class YSerialPort extends YFunction
      * does not affect the device, it only changes the value stored in the YSerialPort object
      * for the next read operations.
      *
-     * @param rxCountVal : the absolute position index (value of rxCount) for next read operations.
+     * @param absPos : the absolute position index for next read operations.
      *
      * @return nothing.
      */
-    public int read_seek(int rxCountVal)
+    public int read_seek(int absPos)
     {
-        _rxptr = rxCountVal;
+        _rxptr = absPos;
         return YAPI.SUCCESS;
     }
 
     /**
+     * Returns the current absolute stream position pointer of the YSerialPort object.
+     *
+     * @return the absolute position index for next read operations.
+     */
+    public int read_tell()
+    {
+        return _rxptr;
+    }
+
+    /**
      * Sends a text line query to the serial port, and reads the reply, if any.
-     * This function can only be used when the serial port is configured for 'Line' protocol.
+     * This function is intended to be used when the serial port is configured for 'Line' protocol.
      *
      * @param query : the line query to send (without CR/LF)
      * @param maxWait : the maximum number of milliseconds to wait for a reply.
@@ -1570,6 +1696,39 @@ public class YSerialPort extends YFunction
             regpos = regpos + 1;
         }
         return res;
+    }
+
+    /**
+     * Saves the job definition string (JSON data) into a job file.
+     * The job file can be later enabled using selectJob().
+     *
+     * @param jobfile : name of the job file to save on the device filesystem
+     * @param jsonDef : a string containing a JSON definition of the job
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int uploadJob(String jobfile,String jsonDef) throws YAPI_Exception
+    {
+        _upload(jobfile, jsonDef.getBytes());
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Load and start processing the specified job file. The file must have
+     * been previously created using the user interface or uploaded on the
+     * device filesystem using the uploadJob() function.
+     *
+     * @param jobfile : name of the job file (on the device filesystem)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int selectJob(String jobfile) throws YAPI_Exception
+    {
+        return sendCommand(String.format("J%s",jobfile));
     }
 
     /**

@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 17551 2014-09-09 09:06:04Z mvuilleu $
+ * $Id: YPwmInput.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindPwmInput(), the high-level API for PwmInput functions
+ * Implements FindPwmInput(), the high-level API for PwmInput functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YPwmInput return codes)
-    //--- (end of YPwmInput return codes)
+//--- (YPwmInput return codes)
+//--- (end of YPwmInput return codes)
 //--- (YPwmInput class start)
 /**
  * YPwmInput Class: PwmInput function interface
@@ -88,7 +88,6 @@ public class YPwmInput extends YSensor
     public static final int PWMREPORTMODE_PWM_PULSEDURATION = 2;
     public static final int PWMREPORTMODE_PWM_EDGECOUNT = 3;
     public static final int PWMREPORTMODE_INVALID = -1;
-
     protected double _dutyCycle = DUTYCYCLE_INVALID;
     protected double _pulseDuration = PULSEDURATION_INVALID;
     protected double _frequency = FREQUENCY_INVALID;
@@ -142,25 +141,25 @@ public class YPwmInput extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("dutyCycle")) {
-            _dutyCycle =  Math.round(json_val.getDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
+            _dutyCycle = Math.round(json_val.getDouble("dutyCycle") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("pulseDuration")) {
-            _pulseDuration =  Math.round(json_val.getDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
+            _pulseDuration = Math.round(json_val.getDouble("pulseDuration") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("frequency")) {
-            _frequency =  Math.round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+            _frequency = Math.round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("period")) {
-            _period =  Math.round(json_val.getDouble("period") * 1000.0 / 65536.0) / 1000.0;
+            _period = Math.round(json_val.getDouble("period") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("pulseCounter")) {
-            _pulseCounter =  json_val.getLong("pulseCounter");
+            _pulseCounter = json_val.getLong("pulseCounter");
         }
         if (json_val.has("pulseTimer")) {
-            _pulseTimer =  json_val.getLong("pulseTimer");
+            _pulseTimer = json_val.getLong("pulseTimer");
         }
         if (json_val.has("pwmReportMode")) {
-            _pwmReportMode =  json_val.getInt("pwmReportMode");
+            _pwmReportMode = json_val.getInt("pwmReportMode");
         }
         super._parseAttr(json_val);
     }
@@ -190,8 +189,9 @@ public class YPwmInput extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getDutyCycle() throws YAPI_Exception
-
-    { return get_dutyCycle(); }
+    {
+        return get_dutyCycle();
+    }
 
     /**
      * Returns the PWM pulse length in milliseconds, as a floating point number.
@@ -220,8 +220,9 @@ public class YPwmInput extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getPulseDuration() throws YAPI_Exception
-
-    { return get_pulseDuration(); }
+    {
+        return get_pulseDuration();
+    }
 
     /**
      * Returns the PWM frequency in Hz.
@@ -248,8 +249,9 @@ public class YPwmInput extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getFrequency() throws YAPI_Exception
-
-    { return get_frequency(); }
+    {
+        return get_frequency();
+    }
 
     /**
      * Returns the PWM period in milliseconds.
@@ -276,13 +278,14 @@ public class YPwmInput extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getPeriod() throws YAPI_Exception
-
-    { return get_period(); }
+    {
+        return get_period();
+    }
 
     /**
      * Returns the pulse counter value. Actually that
      * counter is incremented twice per period. That counter is
-     * limited  to 1 billions
+     * limited  to 1 billion
      *
      * @return an integer corresponding to the pulse counter value
      *
@@ -301,15 +304,16 @@ public class YPwmInput extends YSensor
     /**
      * Returns the pulse counter value. Actually that
      * counter is incremented twice per period. That counter is
-     * limited  to 1 billions
+     * limited  to 1 billion
      *
      * @return an integer corresponding to the pulse counter value
      *
      * @throws YAPI_Exception on error
      */
     public long getPulseCounter() throws YAPI_Exception
-
-    { return get_pulseCounter(); }
+    {
+        return get_pulseCounter();
+    }
 
     public int set_pulseCounter(long  newval)  throws YAPI_Exception
     {
@@ -320,8 +324,9 @@ public class YPwmInput extends YSensor
     }
 
     public int setPulseCounter(long newval)  throws YAPI_Exception
-
-    { return set_pulseCounter(newval); }
+    {
+        return set_pulseCounter(newval);
+    }
 
     /**
      * Returns the timer of the pulses counter (ms)
@@ -348,8 +353,9 @@ public class YPwmInput extends YSensor
      * @throws YAPI_Exception on error
      */
     public long getPulseTimer() throws YAPI_Exception
-
-    { return get_pulseTimer(); }
+    {
+        return get_pulseTimer();
+    }
 
     /**
      *  Returns the parameter (frequency/duty cycle, pulse width, edges count) returned by the
@@ -383,14 +389,15 @@ public class YPwmInput extends YSensor
      * @throws YAPI_Exception on error
      */
     public int getPwmReportMode() throws YAPI_Exception
-
-    { return get_pwmReportMode(); }
+    {
+        return get_pwmReportMode();
+    }
 
     /**
-     *  Modify the  parameter  type(frequency/duty cycle, pulse width ou edge count) returned by the
+     *  Modifies the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the
      * get_currentValue function and callbacks.
-     *  The edge count value will be limited to the 6 lowest digit, for values greater than one million,
-     * use get_pulseCounter().
+     *  The edge count value is limited to the 6 lowest digits. For values greater than one million, use
+     * get_pulseCounter().
      *
      *  @param newval : a value among YPwmInput.PWMREPORTMODE_PWM_DUTYCYCLE,
      *  YPwmInput.PWMREPORTMODE_PWM_FREQUENCY, YPwmInput.PWMREPORTMODE_PWM_PULSEDURATION and
@@ -409,10 +416,10 @@ public class YPwmInput extends YSensor
     }
 
     /**
-     *  Modify the  parameter  type(frequency/duty cycle, pulse width ou edge count) returned by the
+     *  Modifies the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the
      * get_currentValue function and callbacks.
-     *  The edge count value will be limited to the 6 lowest digit, for values greater than one million,
-     * use get_pulseCounter().
+     *  The edge count value is limited to the 6 lowest digits. For values greater than one million, use
+     * get_pulseCounter().
      *
      *  @param newval : a value among Y_PWMREPORTMODE_PWM_DUTYCYCLE, Y_PWMREPORTMODE_PWM_FREQUENCY,
      * Y_PWMREPORTMODE_PWM_PULSEDURATION and Y_PWMREPORTMODE_PWM_EDGECOUNT
@@ -422,11 +429,12 @@ public class YPwmInput extends YSensor
      * @throws YAPI_Exception on error
      */
     public int setPwmReportMode(int newval)  throws YAPI_Exception
-
-    { return set_pwmReportMode(newval); }
+    {
+        return set_pwmReportMode(newval);
+    }
 
     /**
-     * Retrieves a voltage sensor for a given identifier.
+     * Retrieves a PWM input for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -436,17 +444,17 @@ public class YPwmInput extends YSensor
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the voltage sensor is online at the time
+     * This function does not require that the PWM input is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YPwmInput.isOnline() to test if the voltage sensor is
+     * Use the method YPwmInput.isOnline() to test if the PWM input is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a voltage sensor by logical name, no error is notified: the first instance
+     * a PWM input by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
-     * @param func : a string that uniquely characterizes the voltage sensor
+     * @param func : a string that uniquely characterizes the PWM input
      *
-     * @return a YPwmInput object allowing you to drive the voltage sensor.
+     * @return a YPwmInput object allowing you to drive the PWM input.
      */
     public static YPwmInput FindPwmInput(String func)
     {
@@ -534,7 +542,7 @@ public class YPwmInput extends YSensor
     }
 
     /**
-     * Returns the pulse counter value as well as his timer
+     * Returns the pulse counter value as well as its timer.
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -546,11 +554,11 @@ public class YPwmInput extends YSensor
     }
 
     /**
-     * Continues the enumeration of voltage sensors started using yFirstPwmInput().
+     * Continues the enumeration of PWM inputs started using yFirstPwmInput().
      *
      * @return a pointer to a YPwmInput object, corresponding to
-     *         a voltage sensor currently online, or a null pointer
-     *         if there are no more voltage sensors to enumerate.
+     *         a PWM input currently online, or a null pointer
+     *         if there are no more PWM inputs to enumerate.
      */
     public  YPwmInput nextPwmInput()
     {
@@ -566,12 +574,12 @@ public class YPwmInput extends YSensor
     }
 
     /**
-     * Starts the enumeration of voltage sensors currently accessible.
+     * Starts the enumeration of PWM inputs currently accessible.
      * Use the method YPwmInput.nextPwmInput() to iterate on
-     * next voltage sensors.
+     * next PWM inputs.
      *
      * @return a pointer to a YPwmInput object, corresponding to
-     *         the first voltage sensor currently online, or a null pointer
+     *         the first PWM input currently online, or a null pointer
      *         if there are none.
      */
     public static YPwmInput FirstPwmInput()

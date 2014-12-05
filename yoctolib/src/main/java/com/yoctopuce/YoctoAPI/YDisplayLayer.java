@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YDisplayLayer.java 18524 2014-11-25 17:09:56Z seb $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *
@@ -71,11 +71,11 @@ public class YDisplayLayer
         BASELINE_RIGHT(14),
         BOTTOM_RIGHT(15);
         public final int value;
-        private ALIGN(int val) 
+        private ALIGN(int val)
         {
             this.value = val;
-        };
-        public static ALIGN fromInt(int intval) 
+        }
+        public static ALIGN fromInt(int intval)
         {
             switch(intval) {
             case 0:
@@ -113,8 +113,8 @@ public class YDisplayLayer
             }
             return null;
         }
-    };
-    
+    }
+
 
     //--- (end of generated code: YDisplayLayer definitions)
 
@@ -127,26 +127,26 @@ public class YDisplayLayer
     public synchronized int flush_now()  throws YAPI_Exception
     {
         int res = YAPI.SUCCESS;
-        if(_cmdbuff.length() > 0) {
+        if (_cmdbuff.length() > 0) {
             res = this._display.sendCommand(this._cmdbuff.toString());
             _cmdbuff.setLength(0);
         }
         return res;
     }
-    
+
     // internal function to buffer a command for this layer
     private synchronized int command_push(String cmd)  throws YAPI_Exception
     {
         int res = YAPI.SUCCESS;
-        
-        if(_cmdbuff.length() + cmd.length() >= 100) {
+
+        if (_cmdbuff.length() + cmd.length() >= 100) {
             // force flush before, to prevent overflow
             res = this.flush_now();
         }
-        if(_cmdbuff.length() == 0) {
+        if (_cmdbuff.length() == 0) {
             // always prepend layer ID first
             _cmdbuff.append(this._id);
-        } 
+        }
         _cmdbuff.append(cmd);
         return res;
     }
@@ -155,7 +155,7 @@ public class YDisplayLayer
     private synchronized int command_flush(String cmd)  throws YAPI_Exception
     {
         int res = this.command_push(cmd);
-        if(_hidden) {
+        if (_hidden) {
             return res;
         }
         return this.flush_now();

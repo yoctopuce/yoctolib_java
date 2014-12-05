@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YMagnetometer.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YMagnetometer.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindMagnetometer(), the high-level API for Magnetometer functions
+ * Implements FindMagnetometer(), the high-level API for Magnetometer functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YMagnetometer return codes)
-    //--- (end of YMagnetometer return codes)
+//--- (YMagnetometer return codes)
+//--- (end of YMagnetometer return codes)
 //--- (YMagnetometer class start)
 /**
  * YMagnetometer Class: Magnetometer function interface
@@ -117,13 +117,13 @@ public class YMagnetometer extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("xValue")) {
-            _xValue =  Math.round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
+            _xValue = Math.round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("yValue")) {
-            _yValue =  Math.round(json_val.getDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
+            _yValue = Math.round(json_val.getDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("zValue")) {
-            _zValue =  Math.round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
+            _zValue = Math.round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
     }
@@ -155,8 +155,9 @@ public class YMagnetometer extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getXValue() throws YAPI_Exception
-
-    { return get_xValue(); }
+    {
+        return get_xValue();
+    }
 
     /**
      * Returns the Y component of the magnetic field, as a floating point number.
@@ -185,8 +186,9 @@ public class YMagnetometer extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getYValue() throws YAPI_Exception
-
-    { return get_yValue(); }
+    {
+        return get_yValue();
+    }
 
     /**
      * Returns the Z component of the magnetic field, as a floating point number.
@@ -215,8 +217,9 @@ public class YMagnetometer extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getZValue() throws YAPI_Exception
-
-    { return get_zValue(); }
+    {
+        return get_zValue();
+    }
 
     /**
      * Retrieves a magnetometer for a given identifier.

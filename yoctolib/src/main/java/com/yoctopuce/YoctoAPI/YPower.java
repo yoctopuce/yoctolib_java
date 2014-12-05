@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YPower.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YPower.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindPower(), the high-level API for Power functions
+ * Implements FindPower(), the high-level API for Power functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YPower return codes)
-    //--- (end of YPower return codes)
+//--- (YPower return codes)
+//--- (end of YPower return codes)
 //--- (YPower class start)
 /**
  * YPower Class: Power function interface
@@ -117,13 +117,13 @@ public class YPower extends YSensor
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("cosPhi")) {
-            _cosPhi =  Math.round(json_val.getDouble("cosPhi") * 1000.0 / 65536.0) / 1000.0;
+            _cosPhi = Math.round(json_val.getDouble("cosPhi") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("meter")) {
-            _meter =  Math.round(json_val.getDouble("meter") * 1000.0 / 65536.0) / 1000.0;
+            _meter = Math.round(json_val.getDouble("meter") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("meterTimer")) {
-            _meterTimer =  json_val.getInt("meterTimer");
+            _meterTimer = json_val.getInt("meterTimer");
         }
         super._parseAttr(json_val);
     }
@@ -157,8 +157,9 @@ public class YPower extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getCosPhi() throws YAPI_Exception
-
-    { return get_cosPhi(); }
+    {
+        return get_cosPhi();
+    }
 
     public int set_meter(double  newval)  throws YAPI_Exception
     {
@@ -169,8 +170,9 @@ public class YPower extends YSensor
     }
 
     public int setMeter(double newval)  throws YAPI_Exception
-
-    { return set_meter(newval); }
+    {
+        return set_meter(newval);
+    }
 
     /**
      * Returns the energy counter, maintained by the wattmeter by integrating the power consumption over time.
@@ -201,8 +203,9 @@ public class YPower extends YSensor
      * @throws YAPI_Exception on error
      */
     public double getMeter() throws YAPI_Exception
-
-    { return get_meter(); }
+    {
+        return get_meter();
+    }
 
     /**
      * Returns the elapsed time since last energy counter reset, in seconds.
@@ -229,8 +232,9 @@ public class YPower extends YSensor
      * @throws YAPI_Exception on error
      */
     public int getMeterTimer() throws YAPI_Exception
-
-    { return get_meterTimer(); }
+    {
+        return get_meterTimer();
+    }
 
     /**
      * Retrieves a electrical power sensor for a given identifier.

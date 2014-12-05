@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YWatchdog.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindWatchdog(), the high-level API for Watchdog functions
+ * Implements FindWatchdog(), the high-level API for Watchdog functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YWatchdog return codes)
-    //--- (end of YWatchdog return codes)
+//--- (YWatchdog return codes)
+//--- (end of YWatchdog return codes)
 //--- (YWatchdog class start)
 /**
  * YWatchdog Class: Watchdog function interface
@@ -74,7 +74,6 @@ public class YWatchdog extends YFunction
     public static final int STATE_A = 0;
     public static final int STATE_B = 1;
     public static final int STATE_INVALID = -1;
-
     /**
      * invalid stateAtPowerOn value
      */
@@ -82,7 +81,6 @@ public class YWatchdog extends YFunction
     public static final int STATEATPOWERON_A = 1;
     public static final int STATEATPOWERON_B = 2;
     public static final int STATEATPOWERON_INVALID = -1;
-
     /**
      * invalid maxTimeOnStateA value
      */
@@ -97,7 +95,6 @@ public class YWatchdog extends YFunction
     public static final int OUTPUT_OFF = 0;
     public static final int OUTPUT_ON = 1;
     public static final int OUTPUT_INVALID = -1;
-
     /**
      * invalid pulseTimer value
      */
@@ -112,14 +109,12 @@ public class YWatchdog extends YFunction
     public static final int AUTOSTART_OFF = 0;
     public static final int AUTOSTART_ON = 1;
     public static final int AUTOSTART_INVALID = -1;
-
     /**
      * invalid running value
      */
     public static final int RUNNING_OFF = 0;
     public static final int RUNNING_ON = 1;
     public static final int RUNNING_INVALID = -1;
-
     /**
      * invalid triggerDelay value
      */
@@ -186,22 +181,22 @@ public class YWatchdog extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("state")) {
-            _state =  json_val.getInt("state")>0?1:0;
+            _state = json_val.getInt("state") > 0 ? 1 : 0;
         }
         if (json_val.has("stateAtPowerOn")) {
-            _stateAtPowerOn =  json_val.getInt("stateAtPowerOn");
+            _stateAtPowerOn = json_val.getInt("stateAtPowerOn");
         }
         if (json_val.has("maxTimeOnStateA")) {
-            _maxTimeOnStateA =  json_val.getLong("maxTimeOnStateA");
+            _maxTimeOnStateA = json_val.getLong("maxTimeOnStateA");
         }
         if (json_val.has("maxTimeOnStateB")) {
-            _maxTimeOnStateB =  json_val.getLong("maxTimeOnStateB");
+            _maxTimeOnStateB = json_val.getLong("maxTimeOnStateB");
         }
         if (json_val.has("output")) {
-            _output =  json_val.getInt("output")>0?1:0;
+            _output = json_val.getInt("output") > 0 ? 1 : 0;
         }
         if (json_val.has("pulseTimer")) {
-            _pulseTimer =  json_val.getLong("pulseTimer");
+            _pulseTimer = json_val.getLong("pulseTimer");
         }
         if (json_val.has("delayedPulseTimer")) {
             JSONObject subjson = json_val.getJSONObject("delayedPulseTimer");
@@ -216,19 +211,19 @@ public class YWatchdog extends YFunction
             }
         }
         if (json_val.has("countdown")) {
-            _countdown =  json_val.getLong("countdown");
+            _countdown = json_val.getLong("countdown");
         }
         if (json_val.has("autoStart")) {
-            _autoStart =  json_val.getInt("autoStart")>0?1:0;
+            _autoStart = json_val.getInt("autoStart") > 0 ? 1 : 0;
         }
         if (json_val.has("running")) {
-            _running =  json_val.getInt("running")>0?1:0;
+            _running = json_val.getInt("running") > 0 ? 1 : 0;
         }
         if (json_val.has("triggerDelay")) {
-            _triggerDelay =  json_val.getLong("triggerDelay");
+            _triggerDelay = json_val.getLong("triggerDelay");
         }
         if (json_val.has("triggerDuration")) {
-            _triggerDuration =  json_val.getLong("triggerDuration");
+            _triggerDuration = json_val.getLong("triggerDuration");
         }
         super._parseAttr(json_val);
     }
@@ -263,8 +258,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getState() throws YAPI_Exception
-
-    { return get_state(); }
+    {
+        return get_state();
+    }
 
     /**
      * Changes the state of the watchdog (A for the idle position, B for the active position).
@@ -295,8 +291,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setState(int newval)  throws YAPI_Exception
-
-    { return set_state(newval); }
+    {
+        return set_state(newval);
+    }
 
     /**
      *  Returns the state of the watchdog at device startup (A for the idle position, B for the active
@@ -329,8 +326,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getStateAtPowerOn() throws YAPI_Exception
-
-    { return get_stateAtPowerOn(); }
+    {
+        return get_stateAtPowerOn();
+    }
 
     /**
      * Preset the state of the watchdog at device startup (A for the idle position,
@@ -364,8 +362,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setStateAtPowerOn(int newval)  throws YAPI_Exception
-
-    { return set_stateAtPowerOn(newval); }
+    {
+        return set_stateAtPowerOn(newval);
+    }
 
     /**
      *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
@@ -394,8 +393,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getMaxTimeOnStateA() throws YAPI_Exception
-
-    { return get_maxTimeOnStateA(); }
+    {
+        return get_maxTimeOnStateA();
+    }
 
     /**
      *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
@@ -426,8 +426,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setMaxTimeOnStateA(long newval)  throws YAPI_Exception
-
-    { return set_maxTimeOnStateA(newval); }
+    {
+        return set_maxTimeOnStateA(newval);
+    }
 
     /**
      *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
@@ -456,8 +457,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getMaxTimeOnStateB() throws YAPI_Exception
-
-    { return get_maxTimeOnStateB(); }
+    {
+        return get_maxTimeOnStateB();
+    }
 
     /**
      *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
@@ -488,8 +490,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setMaxTimeOnStateB(long newval)  throws YAPI_Exception
-
-    { return set_maxTimeOnStateB(newval); }
+    {
+        return set_maxTimeOnStateB(newval);
+    }
 
     /**
      * Returns the output state of the watchdog, when used as a simple switch (single throw).
@@ -518,8 +521,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getOutput() throws YAPI_Exception
-
-    { return get_output(); }
+    {
+        return get_output();
+    }
 
     /**
      * Changes the output state of the watchdog, when used as a simple switch (single throw).
@@ -550,8 +554,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setOutput(int newval)  throws YAPI_Exception
-
-    { return set_output(newval); }
+    {
+        return set_output(newval);
+    }
 
     /**
      * Returns the number of milliseconds remaining before the watchdog is returned to idle position
@@ -584,8 +589,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getPulseTimer() throws YAPI_Exception
-
-    { return get_pulseTimer(); }
+    {
+        return get_pulseTimer();
+    }
 
     public int set_pulseTimer(long  newval)  throws YAPI_Exception
     {
@@ -596,8 +602,9 @@ public class YWatchdog extends YFunction
     }
 
     public int setPulseTimer(long newval)  throws YAPI_Exception
-
-    { return set_pulseTimer(newval); }
+    {
+        return set_pulseTimer(newval);
+    }
 
     /**
      * Sets the relay to output B (active) for a specified duration, then brings it
@@ -634,8 +641,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public YDelayedPulse getDelayedPulseTimer() throws YAPI_Exception
-
-    { return get_delayedPulseTimer(); }
+    {
+        return get_delayedPulseTimer();
+    }
 
     public int set_delayedPulseTimer(YDelayedPulse  newval)  throws YAPI_Exception
     {
@@ -646,8 +654,9 @@ public class YWatchdog extends YFunction
     }
 
     public int setDelayedPulseTimer(YDelayedPulse newval)  throws YAPI_Exception
-
-    { return set_delayedPulseTimer(newval); }
+    {
+        return set_delayedPulseTimer(newval);
+    }
 
     /**
      * Schedules a pulse.
@@ -696,8 +705,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getCountdown() throws YAPI_Exception
-
-    { return get_countdown(); }
+    {
+        return get_countdown();
+    }
 
     /**
      * Returns the watchdog runing state at module power on.
@@ -725,8 +735,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getAutoStart() throws YAPI_Exception
-
-    { return get_autoStart(); }
+    {
+        return get_autoStart();
+    }
 
     /**
      * Changes the watchdog runningsttae at module power on. Remember to call the
@@ -759,8 +770,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setAutoStart(int newval)  throws YAPI_Exception
-
-    { return set_autoStart(newval); }
+    {
+        return set_autoStart(newval);
+    }
 
     /**
      * Returns the watchdog running state.
@@ -787,8 +799,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getRunning() throws YAPI_Exception
-
-    { return get_running(); }
+    {
+        return get_running();
+    }
 
     /**
      * Changes the running state of the watchdog.
@@ -818,8 +831,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setRunning(int newval)  throws YAPI_Exception
-
-    { return set_running(newval); }
+    {
+        return set_running(newval);
+    }
 
     /**
      * Resets the watchdog. When the watchdog is running, this function
@@ -865,8 +879,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getTriggerDelay() throws YAPI_Exception
-
-    { return get_triggerDelay(); }
+    {
+        return get_triggerDelay();
+    }
 
     /**
      * Changes the waiting delay before a reset is triggered by the watchdog, in milliseconds.
@@ -897,8 +912,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setTriggerDelay(long newval)  throws YAPI_Exception
-
-    { return set_triggerDelay(newval); }
+    {
+        return set_triggerDelay(newval);
+    }
 
     /**
      * Returns the duration of resets caused by the watchdog, in milliseconds.
@@ -925,8 +941,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getTriggerDuration() throws YAPI_Exception
-
-    { return get_triggerDuration(); }
+    {
+        return get_triggerDuration();
+    }
 
     /**
      * Changes the duration of resets caused by the watchdog, in milliseconds.
@@ -955,8 +972,9 @@ public class YWatchdog extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setTriggerDuration(long newval)  throws YAPI_Exception
-
-    { return set_triggerDuration(newval); }
+    {
+        return set_triggerDuration(newval);
+    }
 
     /**
      * Retrieves a watchdog for a given identifier.

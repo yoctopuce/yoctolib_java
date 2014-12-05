@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YServo.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YServo.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindServo(), the high-level API for Servo functions
+ * Implements FindServo(), the high-level API for Servo functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YServo return codes)
-    //--- (end of YServo return codes)
+//--- (YServo return codes)
+//--- (end of YServo return codes)
 //--- (YServo class start)
 /**
  * YServo Class: Servo function interface
@@ -76,7 +76,6 @@ public class YServo extends YFunction
     public static final int ENABLED_FALSE = 0;
     public static final int ENABLED_TRUE = 1;
     public static final int ENABLED_INVALID = -1;
-
     /**
      * invalid range value
      */
@@ -95,7 +94,6 @@ public class YServo extends YFunction
     public static final int ENABLEDATPOWERON_FALSE = 0;
     public static final int ENABLEDATPOWERON_TRUE = 1;
     public static final int ENABLEDATPOWERON_INVALID = -1;
-
     public static final YMove MOVE_INVALID = null;
     protected int _position = POSITION_INVALID;
     protected int _enabled = ENABLED_INVALID;
@@ -149,16 +147,16 @@ public class YServo extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("position")) {
-            _position =  json_val.getInt("position");
+            _position = json_val.getInt("position");
         }
         if (json_val.has("enabled")) {
-            _enabled =  json_val.getInt("enabled")>0?1:0;
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
         if (json_val.has("range")) {
-            _range =  json_val.getInt("range");
+            _range = json_val.getInt("range");
         }
         if (json_val.has("neutral")) {
-            _neutral =  json_val.getInt("neutral");
+            _neutral = json_val.getInt("neutral");
         }
         if (json_val.has("move")) {
             JSONObject subjson = json_val.getJSONObject("move");
@@ -173,10 +171,10 @@ public class YServo extends YFunction
             }
         }
         if (json_val.has("positionAtPowerOn")) {
-            _positionAtPowerOn =  json_val.getInt("positionAtPowerOn");
+            _positionAtPowerOn = json_val.getInt("positionAtPowerOn");
         }
         if (json_val.has("enabledAtPowerOn")) {
-            _enabledAtPowerOn =  json_val.getInt("enabledAtPowerOn")>0?1:0;
+            _enabledAtPowerOn = json_val.getInt("enabledAtPowerOn") > 0 ? 1 : 0;
         }
         super._parseAttr(json_val);
     }
@@ -209,8 +207,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPosition() throws YAPI_Exception
-
-    { return get_position(); }
+    {
+        return get_position();
+    }
 
     /**
      * Changes immediately the servo driving position.
@@ -239,8 +238,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setPosition(int newval)  throws YAPI_Exception
-
-    { return set_position(newval); }
+    {
+        return set_position(newval);
+    }
 
     /**
      * Returns the state of the servos.
@@ -267,8 +267,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getEnabled() throws YAPI_Exception
-
-    { return get_enabled(); }
+    {
+        return get_enabled();
+    }
 
     /**
      * Stops or starts the servo.
@@ -297,8 +298,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setEnabled(int newval)  throws YAPI_Exception
-
-    { return set_enabled(newval); }
+    {
+        return set_enabled(newval);
+    }
 
     /**
      * Returns the current range of use of the servo.
@@ -325,8 +327,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getRange() throws YAPI_Exception
-
-    { return get_range(); }
+    {
+        return get_range();
+    }
 
     /**
      * Changes the range of use of the servo, specified in per cents.
@@ -365,8 +368,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setRange(int newval)  throws YAPI_Exception
-
-    { return set_range(newval); }
+    {
+        return set_range(newval);
+    }
 
     /**
      * Returns the duration in microseconds of a neutral pulse for the servo.
@@ -393,8 +397,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getNeutral() throws YAPI_Exception
-
-    { return get_neutral(); }
+    {
+        return get_neutral();
+    }
 
     /**
      * Changes the duration of the pulse corresponding to the neutral position of the servo.
@@ -433,8 +438,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setNeutral(int newval)  throws YAPI_Exception
-
-    { return set_neutral(newval); }
+    {
+        return set_neutral(newval);
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -453,8 +459,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public YMove getMove() throws YAPI_Exception
-
-    { return get_move(); }
+    {
+        return get_move();
+    }
 
     public int set_move(YMove  newval)  throws YAPI_Exception
     {
@@ -465,8 +472,9 @@ public class YServo extends YFunction
     }
 
     public int setMove(YMove newval)  throws YAPI_Exception
-
-    { return set_move(newval); }
+    {
+        return set_move(newval);
+    }
 
     /**
      * Performs a smooth move at constant speed toward a given position.
@@ -511,8 +519,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPositionAtPowerOn() throws YAPI_Exception
-
-    { return get_positionAtPowerOn(); }
+    {
+        return get_positionAtPowerOn();
+    }
 
     /**
      * Configure the servo position at device power up. Remember to call the matching
@@ -543,8 +552,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setPositionAtPowerOn(int newval)  throws YAPI_Exception
-
-    { return set_positionAtPowerOn(newval); }
+    {
+        return set_positionAtPowerOn(newval);
+    }
 
     /**
      * Returns the servo signal generator state at power up.
@@ -573,8 +583,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getEnabledAtPowerOn() throws YAPI_Exception
-
-    { return get_enabledAtPowerOn(); }
+    {
+        return get_enabledAtPowerOn();
+    }
 
     /**
      * Configure the servo signal generator state at power up. Remember to call the matching module saveToFlash()
@@ -605,8 +616,9 @@ public class YServo extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setEnabledAtPowerOn(int newval)  throws YAPI_Exception
-
-    { return set_enabledAtPowerOn(newval); }
+    {
+        return set_enabledAtPowerOn(newval);
+    }
 
     /**
      * Retrieves a servo for a given identifier.

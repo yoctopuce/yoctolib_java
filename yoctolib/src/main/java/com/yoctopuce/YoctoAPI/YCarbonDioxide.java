@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YCarbonDioxide.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YCarbonDioxide.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindCarbonDioxide(), the high-level API for CarbonDioxide functions
+ * Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YCarbonDioxide return codes)
-    //--- (end of YCarbonDioxide return codes)
+//--- (YCarbonDioxide return codes)
+//--- (end of YCarbonDioxide return codes)
 //--- (YCarbonDioxide class start)
 /**
  * YCarbonDioxide Class: CarbonDioxide function interface

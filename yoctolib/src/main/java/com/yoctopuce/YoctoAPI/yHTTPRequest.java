@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yHTTPRequest.java 17678 2014-09-16 16:31:26Z seb $
+ * $Id: yHTTPRequest.java 18339 2014-11-12 10:08:56Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -55,6 +55,11 @@ class yHTTPRequest implements Runnable {
     private Object _context;
     private YGenericHub.RequestAsyncResult _resultCallback;
 
+    public void kill()
+    {
+        _requestStop();
+    }
+
     private enum State {
         AVAIL, IN_REQUEST, STOPPED,
     }
@@ -87,7 +92,7 @@ class yHTTPRequest implements Runnable {
 
     public void setNoTrafficTimeout(int noTrafficTimeout) throws SocketException {
         this._noTrafficTimeout = noTrafficTimeout;
-        if(this._soTimeout> noTrafficTimeout) {
+        if (this._soTimeout > noTrafficTimeout) {
             this._soTimeout = noTrafficTimeout;
             if (_socket != null) {
                 _socket.setSoTimeout(_soTimeout);
@@ -119,26 +124,25 @@ class yHTTPRequest implements Runnable {
     }
 
 
-
     void _requestStart(String firstLine,byte[] rest_of_request, Object context,
             YGenericHub.RequestAsyncResult resultCallback) throws YAPI_Exception
     {
         byte[] full_request;
         _firstLine = firstLine;
-        _rest_of_request =rest_of_request;
+        _rest_of_request = rest_of_request;
         _context = context;
         _resultCallback = resultCallback;
         String persistent_tag = firstLine.substring(firstLine.length() - 2);
-        if(persistent_tag.equals("&.")) {
+        if (persistent_tag.equals("&.")) {
             firstLine += " \r\n";
         } else {
             firstLine += " \r\nConnection: close\r\n";
         }
-        if(rest_of_request == null){
-            String str_request = firstLine+_hub.getAuthorization(firstLine)+"\r\n";
+        if (rest_of_request == null) {
+            String str_request = firstLine + _hub.getAuthorization(firstLine) + "\r\n";
             full_request = str_request.getBytes();
-        }else{
-            String str_request = firstLine+_hub.getAuthorization(firstLine);
+        } else {
+            String str_request = firstLine + _hub.getAuthorization(firstLine);
             int len = str_request.length();
             full_request = new byte[len + rest_of_request.length];
             System.arraycopy(str_request.getBytes(), 0, full_request, 0, len);
@@ -165,13 +169,13 @@ class yHTTPRequest implements Runnable {
         catch (UnknownHostException e)
         {
             _requestStop();
-            throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,"Unknown host("+_hub.getHost()+")");
+            throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Unknown host(" + _hub.getHost() + ")");
         } catch (SocketException e) {
             _requestStop();
-            throw new YAPI_Exception(YAPI.IO_ERROR,e.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
         } catch (IOException e) {
             _requestStop();
-            throw new YAPI_Exception(YAPI.IO_ERROR,e.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
         }
     }
 
@@ -206,7 +210,7 @@ class yHTTPRequest implements Runnable {
     void _requestReset() throws YAPI_Exception
     {
         _requestStop();
-        _requestStart(_firstLine,_rest_of_request,_context,_resultCallback);
+        _requestStart(_firstLine, _rest_of_request, _context, _resultCallback);
     }
 
 
@@ -216,7 +220,7 @@ class yHTTPRequest implements Runnable {
         int read = 0;
 
 
-        if(_eof)
+        if (_eof)
             return -1;
 
         do {
@@ -304,12 +308,12 @@ class yHTTPRequest implements Runnable {
     byte[] getPartialResult() throws YAPI_Exception
     {
         byte[] res;
-        synchronized(_result) {
-            if(!_header_found)
+        synchronized (_result) {
+            if (!_header_found)
                 return null;
-            if(_result.size()==0){
-                if(_eof)
-                    throw new YAPI_Exception(YAPI.NO_MORE_DATA,"end of file reached");
+            if (_result.size() == 0) {
+                if (_eof)
+                    throw new YAPI_Exception(YAPI.NO_MORE_DATA, "end of file reached");
                 return null;
             }
             res = _result.toByteArray();
@@ -319,14 +323,12 @@ class yHTTPRequest implements Runnable {
     }
 
 
-
-
     byte[] RequestSync(String req_first_line, byte[] req_head_and_body) throws YAPI_Exception
     {
         byte[] res;
         _requestReserve();
         try {
-            _requestStart(req_first_line, req_head_and_body,null,null);
+            _requestStart(req_first_line, req_head_and_body, null, null);
             int read;
             do {
                 read = _requestProcesss();
@@ -361,18 +363,18 @@ class yHTTPRequest implements Runnable {
             } while (read >= 0);
             synchronized (_result) {
                 res = _result.toByteArray();
-                _result.reset();            
+                _result.reset();
             }
         } catch (YAPI_Exception ex) {
             errorType = ex.errorType;
             errmsg = ex.getMessage();
-            YAPI.SafeYAPI()._Log("ASYNC request " + _firstLine + "failed:" + errmsg+"\n");
+            YAPI.SafeYAPI()._Log("ASYNC request " + _firstLine + "failed:" + errmsg + "\n");
         }
         _requestStop();
-        if (_resultCallback!=null) {
+        if (_resultCallback != null) {
             _resultCallback.RequestAsyncDone(_context, res, errorType, errmsg);
         }
-        _requestRelease();        
+        _requestRelease();
     }
 
 
@@ -380,21 +382,21 @@ class yHTTPRequest implements Runnable {
     {
         _requestReserve();
         try {
-           _requestStart(req_first_line,req_head_and_body, context, callback);
-           Thread t = new Thread(this);
-           t.setName(_dbglabel);
-           t.start();
+            _requestStart(req_first_line, req_head_and_body, context, callback);
+            Thread t = new Thread(this);
+            t.setName(_dbglabel);
+            t.start();
         } catch (YAPI_Exception ex) {
             _requestRelease();
-            throw  ex;
+            throw ex;
         }
     }
 
 
     synchronized void WaitRequestEnd()
     {
-        long timeout = YAPI.GetTickCount()+MAX_REQUEST_MS;
-        while (timeout > YAPI.GetTickCount() &&  _state == State.IN_REQUEST) {
+        long timeout = YAPI.GetTickCount() + MAX_REQUEST_MS;
+        while (timeout > YAPI.GetTickCount() && _state == State.IN_REQUEST) {
             long toWait = timeout - YAPI.GetTickCount();
             try {
                 wait(toWait);
@@ -403,14 +405,13 @@ class yHTTPRequest implements Runnable {
                 break;
             }
         }
-        if(_state == State.IN_REQUEST)
+        if (_state == State.IN_REQUEST)
             SafeYAPI()._Log("WARNING: Last Http request did not finished");
         // ensure that we close all socket
         _reuse_socket = false;
         _requestStop();
-        _state   = State.STOPPED;
+        _state = State.STOPPED;
     }
-
 
 
 }

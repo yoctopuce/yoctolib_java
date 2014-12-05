@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YAnButton.java 17678 2014-09-16 16:31:26Z seb $
+ * $Id: YAnButton.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindAnButton(), the high-level API for AnButton functions
+ * Implements FindAnButton(), the high-level API for AnButton functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YAnButton return codes)
-    //--- (end of YAnButton return codes)
+//--- (YAnButton return codes)
+//--- (end of YAnButton return codes)
 //--- (YAnButton class start)
 /**
  * YAnButton Class: AnButton function interface
@@ -74,7 +74,6 @@ public class YAnButton extends YFunction
     public static final int ANALOGCALIBRATION_OFF = 0;
     public static final int ANALOGCALIBRATION_ON = 1;
     public static final int ANALOGCALIBRATION_INVALID = -1;
-
     /**
      * invalid calibrationMax value
      */
@@ -93,7 +92,6 @@ public class YAnButton extends YFunction
     public static final int ISPRESSED_FALSE = 0;
     public static final int ISPRESSED_TRUE = 1;
     public static final int ISPRESSED_INVALID = -1;
-
     /**
      * invalid lastTimePressed value
      */
@@ -166,37 +164,37 @@ public class YAnButton extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("calibratedValue")) {
-            _calibratedValue =  json_val.getInt("calibratedValue");
+            _calibratedValue = json_val.getInt("calibratedValue");
         }
         if (json_val.has("rawValue")) {
-            _rawValue =  json_val.getInt("rawValue");
+            _rawValue = json_val.getInt("rawValue");
         }
         if (json_val.has("analogCalibration")) {
-            _analogCalibration =  json_val.getInt("analogCalibration")>0?1:0;
+            _analogCalibration = json_val.getInt("analogCalibration") > 0 ? 1 : 0;
         }
         if (json_val.has("calibrationMax")) {
-            _calibrationMax =  json_val.getInt("calibrationMax");
+            _calibrationMax = json_val.getInt("calibrationMax");
         }
         if (json_val.has("calibrationMin")) {
-            _calibrationMin =  json_val.getInt("calibrationMin");
+            _calibrationMin = json_val.getInt("calibrationMin");
         }
         if (json_val.has("sensitivity")) {
-            _sensitivity =  json_val.getInt("sensitivity");
+            _sensitivity = json_val.getInt("sensitivity");
         }
         if (json_val.has("isPressed")) {
-            _isPressed =  json_val.getInt("isPressed")>0?1:0;
+            _isPressed = json_val.getInt("isPressed") > 0 ? 1 : 0;
         }
         if (json_val.has("lastTimePressed")) {
-            _lastTimePressed =  json_val.getLong("lastTimePressed");
+            _lastTimePressed = json_val.getLong("lastTimePressed");
         }
         if (json_val.has("lastTimeReleased")) {
-            _lastTimeReleased =  json_val.getLong("lastTimeReleased");
+            _lastTimeReleased = json_val.getLong("lastTimeReleased");
         }
         if (json_val.has("pulseCounter")) {
-            _pulseCounter =  json_val.getLong("pulseCounter");
+            _pulseCounter = json_val.getLong("pulseCounter");
         }
         if (json_val.has("pulseTimer")) {
-            _pulseTimer =  json_val.getLong("pulseTimer");
+            _pulseTimer = json_val.getLong("pulseTimer");
         }
         super._parseAttr(json_val);
     }
@@ -226,8 +224,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getCalibratedValue() throws YAPI_Exception
-
-    { return get_calibratedValue(); }
+    {
+        return get_calibratedValue();
+    }
 
     /**
      * Returns the current measured input value as-is (between 0 and 4095, included).
@@ -254,8 +253,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getRawValue() throws YAPI_Exception
-
-    { return get_rawValue(); }
+    {
+        return get_rawValue();
+    }
 
     /**
      * Tells if a calibration process is currently ongoing.
@@ -282,8 +282,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getAnalogCalibration() throws YAPI_Exception
-
-    { return get_analogCalibration(); }
+    {
+        return get_analogCalibration();
+    }
 
     /**
      * Starts or stops the calibration process. Remember to call the saveToFlash()
@@ -314,8 +315,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setAnalogCalibration(int newval)  throws YAPI_Exception
-
-    { return set_analogCalibration(newval); }
+    {
+        return set_analogCalibration(newval);
+    }
 
     /**
      * Returns the maximal value measured during the calibration (between 0 and 4095, included).
@@ -344,8 +346,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getCalibrationMax() throws YAPI_Exception
-
-    { return get_calibrationMax(); }
+    {
+        return get_calibrationMax();
+    }
 
     /**
      * Changes the maximal calibration value for the input (between 0 and 4095, included), without actually
@@ -382,8 +385,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setCalibrationMax(int newval)  throws YAPI_Exception
-
-    { return set_calibrationMax(newval); }
+    {
+        return set_calibrationMax(newval);
+    }
 
     /**
      * Returns the minimal value measured during the calibration (between 0 and 4095, included).
@@ -412,8 +416,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getCalibrationMin() throws YAPI_Exception
-
-    { return get_calibrationMin(); }
+    {
+        return get_calibrationMin();
+    }
 
     /**
      * Changes the minimal calibration value for the input (between 0 and 4095, included), without actually
@@ -450,8 +455,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setCalibrationMin(int newval)  throws YAPI_Exception
-
-    { return set_calibrationMin(newval); }
+    {
+        return set_calibrationMin(newval);
+    }
 
     /**
      * Returns the sensibility for the input (between 1 and 1000) for triggering user callbacks.
@@ -480,8 +486,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getSensitivity() throws YAPI_Exception
-
-    { return get_sensitivity(); }
+    {
+        return get_sensitivity();
+    }
 
     /**
      * Changes the sensibility for the input (between 1 and 1000) for triggering user callbacks.
@@ -522,8 +529,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setSensitivity(int newval)  throws YAPI_Exception
-
-    { return set_sensitivity(newval); }
+    {
+        return set_sensitivity(newval);
+    }
 
     /**
      * Returns true if the input (considered as binary) is active (closed contact), and false otherwise.
@@ -552,8 +560,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getIsPressed() throws YAPI_Exception
-
-    { return get_isPressed(); }
+    {
+        return get_isPressed();
+    }
 
     /**
      * Returns the number of elapsed milliseconds between the module power on and the last time
@@ -586,8 +595,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getLastTimePressed() throws YAPI_Exception
-
-    { return get_lastTimePressed(); }
+    {
+        return get_lastTimePressed();
+    }
 
     /**
      * Returns the number of elapsed milliseconds between the module power on and the last time
@@ -620,8 +630,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getLastTimeReleased() throws YAPI_Exception
-
-    { return get_lastTimeReleased(); }
+    {
+        return get_lastTimeReleased();
+    }
 
     /**
      * Returns the pulse counter value
@@ -648,8 +659,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getPulseCounter() throws YAPI_Exception
-
-    { return get_pulseCounter(); }
+    {
+        return get_pulseCounter();
+    }
 
     public int set_pulseCounter(long  newval)  throws YAPI_Exception
     {
@@ -660,8 +672,9 @@ public class YAnButton extends YFunction
     }
 
     public int setPulseCounter(long newval)  throws YAPI_Exception
-
-    { return set_pulseCounter(newval); }
+    {
+        return set_pulseCounter(newval);
+    }
 
     /**
      * Returns the timer of the pulses counter (ms)
@@ -688,8 +701,9 @@ public class YAnButton extends YFunction
      * @throws YAPI_Exception on error
      */
     public long getPulseTimer() throws YAPI_Exception
-
-    { return get_pulseTimer(); }
+    {
+        return get_pulseTimer();
+    }
 
     /**
      * Retrieves an analog input for a given identifier.
@@ -767,7 +781,7 @@ public class YAnButton extends YFunction
     }
 
     /**
-     * Returns the pulse counter value as well as his timer
+     * Returns the pulse counter value as well as its timer.
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

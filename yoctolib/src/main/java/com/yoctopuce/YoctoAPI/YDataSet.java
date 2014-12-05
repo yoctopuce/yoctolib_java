@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataSet.java 17678 2014-09-16 16:31:26Z seb $
+ * $Id: YDataSet.java 18339 2014-11-12 10:08:56Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -85,28 +85,28 @@ public class YDataSet
     protected ArrayList<YMeasure> _measures = new ArrayList<YMeasure>();
 
     //--- (end of generated code: YDataSet definitions)
-    
+
     // YDataSet constructor, when instantiated directly by a function
     public YDataSet(YFunction parent, String functionId, String unit, long startTime, long endTime)
     {
-        _parent     = parent;
+        _parent = parent;
         _functionId = functionId;
-        _unit       = unit;
-        _startTime  = startTime;
-        _endTime    = endTime;
-        _progress   = -1;
+        _unit = unit;
+        _startTime = startTime;
+        _endTime = endTime;
+        _progress = -1;
         _hardwareId = "";
-        _summary    = new YMeasure();
+        _summary = new YMeasure();
     }
 
     // YDataSet constructor for the new datalogger
     public YDataSet(YFunction parent, String json) throws YAPI_Exception
     {
-        _parent     = parent;
-        _startTime  = 0;
-        _endTime    = 0;
+        _parent = parent;
+        _startTime = 0;
+        _endTime = 0;
         _hardwareId = "";
-        _summary    = new YMeasure();
+        _summary = new YMeasure();
         this._parse(json);
     }
 
@@ -114,17 +114,17 @@ public class YDataSet
     protected int _parse(String json_str) throws YAPI_Exception
     {
         JSONObject json;
-        JSONArray  jstreams;
-        double summaryMinVal=Double.MAX_VALUE;
-        double summaryMaxVal=Double.MIN_VALUE;
-        double summaryTotalTime=0;
-        double summaryTotalAvg=0;
+        JSONArray jstreams;
+        double summaryMinVal = Double.MAX_VALUE;
+        double summaryMaxVal = Double.MIN_VALUE;
+        double summaryTotalTime = 0;
+        double summaryTotalAvg = 0;
 
         try {
             json = new JSONObject(json_str);
             _functionId = json.getString("id");
             _unit = json.getString("unit");
-            if(json.has("calib")) {
+            if (json.has("calib")) {
                 _calib = YAPI._decodeFloats(json.getString("calib"));
                 _calib.set(0, _calib.get(0) / 1000);
             } else {
@@ -134,47 +134,47 @@ public class YDataSet
             _preview = new ArrayList<YMeasure>();
             _measures = new ArrayList<YMeasure>();
             jstreams = json.getJSONArray("streams");
-            for(int i = 0; i < jstreams.length(); i++) {
+            for (int i = 0; i < jstreams.length(); i++) {
                 YDataStream stream = _parent._findDataStream(this, jstreams.getString(i));
-                if(_startTime > 0 && stream.get_startTimeUTC() + stream.get_duration() <= _startTime) {
+                if (_startTime > 0 && stream.get_startTimeUTC() + stream.get_duration() <= _startTime) {
                     // this stream is too early, drop it
-                } else if(_endTime > 0 && stream.get_startTimeUTC() > _endTime) {
+                } else if (_endTime > 0 && stream.get_startTimeUTC() > _endTime) {
                     // this stream is too late, drop it
                 } else {
                     _streams.add(stream);
-                    if(stream.isClosed() && stream.get_startTimeUTC() >= _startTime &&
-                        (_endTime == 0 || stream.get_startTimeUTC() + stream.get_duration() <= _endTime)) {
+                    if (stream.isClosed() && stream.get_startTimeUTC() >= _startTime &&
+                            (_endTime == 0 || stream.get_startTimeUTC() + stream.get_duration() <= _endTime)) {
                         if (summaryMinVal > stream.get_minValue())
-                            summaryMinVal =stream.get_minValue();
+                            summaryMinVal = stream.get_minValue();
                         if (summaryMaxVal < stream.get_maxValue())
-                            summaryMaxVal =stream.get_maxValue();
-                        summaryTotalAvg  += stream.get_averageValue() * stream.get_duration();
+                            summaryMaxVal = stream.get_maxValue();
+                        summaryTotalAvg += stream.get_averageValue() * stream.get_duration();
                         summaryTotalTime += stream.get_duration();
 
                         YMeasure rec = new YMeasure(stream.get_startTimeUTC(),
-                                                    stream.get_startTimeUTC() + stream.get_duration(),
-                                                    stream.get_minValue(),
-                                                    stream.get_averageValue(),
-                                                    stream.get_maxValue());
+                                stream.get_startTimeUTC() + stream.get_duration(),
+                                stream.get_minValue(),
+                                stream.get_averageValue(),
+                                stream.get_maxValue());
                         _preview.add(rec);
                     }
                 }
             }
-            if((_streams.size() > 0) && (summaryTotalTime>0)){
+            if ((_streams.size() > 0) && (summaryTotalTime > 0)) {
                 // update time boundaries with actual data
-                YDataStream stream = _streams.get(_streams.size()-1);
+                YDataStream stream = _streams.get(_streams.size() - 1);
                 long endtime = stream.get_startTimeUTC() + stream.get_duration();
-                long startTime = _streams.get(0).get_startTimeUTC() - stream.get_dataSamplesIntervalMs()/1000;
-                if(_startTime < startTime) {
+                long startTime = _streams.get(0).get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
+                if (_startTime < startTime) {
                     _startTime = startTime;
                 }
-                if(_endTime == 0 || _endTime > endtime) {
+                if (_endTime == 0 || _endTime > endtime) {
                     _endTime = endtime;
                 }
-                _summary = new YMeasure(_startTime,_endTime,summaryMinVal,summaryTotalAvg/summaryTotalTime,summaryMaxVal);
+                _summary = new YMeasure(_startTime, _endTime, summaryMinVal, summaryTotalAvg / summaryTotalTime, summaryMaxVal);
             }
         } catch (JSONException e) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json structure for YDataSet: "+e.getMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json structure for YDataSet: " + e.getMessage());
         }
         _progress = 0;
         return this.get_progress();

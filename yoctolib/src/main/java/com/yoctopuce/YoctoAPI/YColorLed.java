@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YColorLed.java 18524 2014-11-25 17:09:56Z seb $
  *
- * Implements yFindColorLed(), the high-level API for ColorLed functions
+ * Implements FindColorLed(), the high-level API for ColorLed functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,13 +42,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YColorLed return codes)
-    //--- (end of YColorLed return codes)
+//--- (YColorLed return codes)
+//--- (end of YColorLed return codes)
 //--- (YColorLed class start)
 /**
  * YColorLed Class: ColorLed function interface
  *
- * Yoctopuce application programming interface
+ * The Yoctopuce application programming interface
  * allows you to drive a color led using RGB coordinates as well as HSL coordinates.
  * The module performs all conversions form RGB to HSL automatically. It is then
  * self-evident to turn on a led with a given hue and to progressively vary its
@@ -80,6 +80,22 @@ public class YColorLed extends YFunction
      * invalid rgbColorAtPowerOn value
      */
     public static final int RGBCOLORATPOWERON_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid blinkSeqSize value
+     */
+    public static final int BLINKSEQSIZE_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid blinkSeqMaxSize value
+     */
+    public static final int BLINKSEQMAXSIZE_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid blinkSeqSignature value
+     */
+    public static final int BLINKSEQSIGNATURE_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid command value
+     */
+    public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     public static final YMove RGBMOVE_INVALID = null;
     public static final YMove HSLMOVE_INVALID = null;
     protected int _rgbColor = RGBCOLOR_INVALID;
@@ -87,6 +103,10 @@ public class YColorLed extends YFunction
     protected YMove _rgbMove = new YMove();
     protected YMove _hslMove = new YMove();
     protected int _rgbColorAtPowerOn = RGBCOLORATPOWERON_INVALID;
+    protected int _blinkSeqSize = BLINKSEQSIZE_INVALID;
+    protected int _blinkSeqMaxSize = BLINKSEQMAXSIZE_INVALID;
+    protected int _blinkSeqSignature = BLINKSEQSIGNATURE_INVALID;
+    protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackColorLed = null;
 
     /**
@@ -132,10 +152,10 @@ public class YColorLed extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("rgbColor")) {
-            _rgbColor =  json_val.getInt("rgbColor");
+            _rgbColor = json_val.getInt("rgbColor");
         }
         if (json_val.has("hslColor")) {
-            _hslColor =  json_val.getInt("hslColor");
+            _hslColor = json_val.getInt("hslColor");
         }
         if (json_val.has("rgbMove")) {
             JSONObject subjson = json_val.getJSONObject("rgbMove");
@@ -162,7 +182,19 @@ public class YColorLed extends YFunction
             }
         }
         if (json_val.has("rgbColorAtPowerOn")) {
-            _rgbColorAtPowerOn =  json_val.getInt("rgbColorAtPowerOn");
+            _rgbColorAtPowerOn = json_val.getInt("rgbColorAtPowerOn");
+        }
+        if (json_val.has("blinkSeqSize")) {
+            _blinkSeqSize = json_val.getInt("blinkSeqSize");
+        }
+        if (json_val.has("blinkSeqMaxSize")) {
+            _blinkSeqMaxSize = json_val.getInt("blinkSeqMaxSize");
+        }
+        if (json_val.has("blinkSeqSignature")) {
+            _blinkSeqSignature = json_val.getInt("blinkSeqSignature");
+        }
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
         }
         super._parseAttr(json_val);
     }
@@ -198,8 +230,9 @@ public class YColorLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getRgbColor() throws YAPI_Exception
-
-    { return get_rgbColor(); }
+    {
+        return get_rgbColor();
+    }
 
     /**
      * Changes the current color of the led, using a RGB color. Encoding is done as follows: 0xRRGGBB.
@@ -228,8 +261,9 @@ public class YColorLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setRgbColor(int newval)  throws YAPI_Exception
-
-    { return set_rgbColor(newval); }
+    {
+        return set_rgbColor(newval);
+    }
 
     /**
      * Returns the current HSL color of the led.
@@ -256,8 +290,9 @@ public class YColorLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getHslColor() throws YAPI_Exception
-
-    { return get_hslColor(); }
+    {
+        return get_hslColor();
+    }
 
     /**
      * Changes the current color of the led, using a color HSL. Encoding is done as follows: 0xHHSSLL.
@@ -286,8 +321,9 @@ public class YColorLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setHslColor(int newval)  throws YAPI_Exception
-
-    { return set_hslColor(newval); }
+    {
+        return set_hslColor(newval);
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -306,8 +342,9 @@ public class YColorLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public YMove getRgbMove() throws YAPI_Exception
-
-    { return get_rgbMove(); }
+    {
+        return get_rgbMove();
+    }
 
     public int set_rgbMove(YMove  newval)  throws YAPI_Exception
     {
@@ -318,8 +355,9 @@ public class YColorLed extends YFunction
     }
 
     public int setRgbMove(YMove newval)  throws YAPI_Exception
-
-    { return set_rgbMove(newval); }
+    {
+        return set_rgbMove(newval);
+    }
 
     /**
      * Performs a smooth transition in the RGB color space between the current color and a target color.
@@ -356,8 +394,9 @@ public class YColorLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public YMove getHslMove() throws YAPI_Exception
-
-    { return get_hslMove(); }
+    {
+        return get_hslMove();
+    }
 
     public int set_hslMove(YMove  newval)  throws YAPI_Exception
     {
@@ -368,8 +407,9 @@ public class YColorLed extends YFunction
     }
 
     public int setHslMove(YMove newval)  throws YAPI_Exception
-
-    { return set_hslMove(newval); }
+    {
+        return set_hslMove(newval);
+    }
 
     /**
      * Performs a smooth transition in the HSL color space between the current color and a target color.
@@ -414,14 +454,12 @@ public class YColorLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getRgbColorAtPowerOn() throws YAPI_Exception
-
-    { return get_rgbColorAtPowerOn(); }
+    {
+        return get_rgbColorAtPowerOn();
+    }
 
     /**
      * Changes the color that the led will display by default when the module is turned on.
-     * This color will be displayed as soon as the module is powered on.
-     * Remember to call the saveToFlash() method of the module if the
-     * change should be kept.
      *
      *  @param newval : an integer corresponding to the color that the led will display by default when the
      * module is turned on
@@ -440,9 +478,6 @@ public class YColorLed extends YFunction
 
     /**
      * Changes the color that the led will display by default when the module is turned on.
-     * This color will be displayed as soon as the module is powered on.
-     * Remember to call the saveToFlash() method of the module if the
-     * change should be kept.
      *
      *  @param newval : an integer corresponding to the color that the led will display by default when the
      * module is turned on
@@ -452,8 +487,136 @@ public class YColorLed extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setRgbColorAtPowerOn(int newval)  throws YAPI_Exception
+    {
+        return set_rgbColorAtPowerOn(newval);
+    }
 
-    { return set_rgbColorAtPowerOn(newval); }
+    /**
+     * Returns the current length of the blinking sequence
+     *
+     * @return an integer corresponding to the current length of the blinking sequence
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_blinkSeqSize() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BLINKSEQSIZE_INVALID;
+            }
+        }
+        return _blinkSeqSize;
+    }
+
+    /**
+     * Returns the current length of the blinking sequence
+     *
+     * @return an integer corresponding to the current length of the blinking sequence
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getBlinkSeqSize() throws YAPI_Exception
+    {
+        return get_blinkSeqSize();
+    }
+
+    /**
+     * Returns the maximum length of the blinking sequence
+     *
+     * @return an integer corresponding to the maximum length of the blinking sequence
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_blinkSeqMaxSize() throws YAPI_Exception
+    {
+        if (_cacheExpiration == 0) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BLINKSEQMAXSIZE_INVALID;
+            }
+        }
+        return _blinkSeqMaxSize;
+    }
+
+    /**
+     * Returns the maximum length of the blinking sequence
+     *
+     * @return an integer corresponding to the maximum length of the blinking sequence
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getBlinkSeqMaxSize() throws YAPI_Exception
+    {
+        return get_blinkSeqMaxSize();
+    }
+
+    /**
+     * Return the blinking sequence signature. Since blinking
+     * sequences cannot be read from the device, this can be used
+     * to detect if a specific blinking sequence is already
+     * programmed.
+     *
+     * @return an integer
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_blinkSeqSignature() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BLINKSEQSIGNATURE_INVALID;
+            }
+        }
+        return _blinkSeqSignature;
+    }
+
+    /**
+     * Return the blinking sequence signature. Since blinking
+     * sequences cannot be read from the device, this can be used
+     * to detect if a specific blinking sequence is already
+     * programmed.
+     *
+     * @return an integer
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getBlinkSeqSignature() throws YAPI_Exception
+    {
+        return get_blinkSeqSignature();
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public String get_command() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return COMMAND_INVALID;
+            }
+        }
+        return _command;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public String getCommand() throws YAPI_Exception
+    {
+        return get_command();
+    }
+
+    public int set_command(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = newval;
+        _setAttr("command",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    public int setCommand(String newval)  throws YAPI_Exception
+    {
+        return set_command(newval);
+    }
 
     /**
      * Retrieves an RGB led for a given identifier.
@@ -528,6 +691,76 @@ public class YColorLed extends YFunction
             super._invokeValueCallback(value);
         }
         return 0;
+    }
+
+    public int sendCommand(String command) throws YAPI_Exception
+    {
+        return set_command(command);
+    }
+
+    /**
+     * Add a new transition to the blinking sequence, the move will
+     * be performed in the HSL space.
+     *
+     * @param HSLcolor : desired HSL color when the traisntion is completed
+     * @param msDelay : duration of the color transition, in milliseconds.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int addHslMoveToBlinkSeq(int HSLcolor,int msDelay) throws YAPI_Exception
+    {
+        return sendCommand(String.format("H%d,%d",HSLcolor,msDelay));
+    }
+
+    /**
+     * Add a new transition to the blinking sequence, the move will
+     * be performed in the RGB space.
+     *
+     * @param RGBcolor : desired RGB color when the transition is completed
+     * @param msDelay : duration of the color transition, in milliseconds.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int addRgbMoveToBlinkSeq(int RGBcolor,int msDelay) throws YAPI_Exception
+    {
+        return sendCommand(String.format("R%d,%d",RGBcolor,msDelay));
+    }
+
+    /**
+     * Starts the preprogrammed blinking sequence. The sequence will
+     * run in loop until it is stopped by stopBlinkSeq or an explicit
+     * change.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int startBlinkSeq() throws YAPI_Exception
+    {
+        return sendCommand("S");
+    }
+
+    /**
+     * Stops the preprogrammed blinking sequence.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int stopBlinkSeq() throws YAPI_Exception
+    {
+        return sendCommand("X");
+    }
+
+    /**
+     * Resets the preprogrammed blinking sequence.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int resetBlinkSeq() throws YAPI_Exception
+    {
+        return sendCommand("Z");
     }
 
     /**

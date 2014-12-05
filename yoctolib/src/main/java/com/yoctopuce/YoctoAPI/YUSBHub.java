@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YUSBHub.java 17831 2014-09-25 16:31:39Z seb $
+ * $Id: YUSBHub.java 18456 2014-11-20 16:29:57Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -38,6 +38,8 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+
+import java.util.ArrayList;
 
 public class YUSBHub extends YGenericHub
 {
@@ -77,6 +79,12 @@ public class YUSBHub extends YGenericHub
     void updateDeviceList(boolean forceupdate) throws YAPI_Exception
     {
         throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct access is supported only on Android Platform");
+    }
+
+    @Override
+    public ArrayList<String> getBootloaders()
+    {
+        return null;
     }
 
     @Override

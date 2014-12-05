@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YOsControl.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YOsControl.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindOsControl(), the high-level API for OsControl functions
+ * Implements FindOsControl(), the high-level API for OsControl functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YOsControl return codes)
-    //--- (end of YOsControl return codes)
+//--- (YOsControl return codes)
+//--- (end of YOsControl return codes)
 //--- (YOsControl class start)
 /**
  * YOsControl Class: OS control
@@ -107,7 +107,7 @@ public class YOsControl extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("shutdownCountdown")) {
-            _shutdownCountdown =  json_val.getInt("shutdownCountdown");
+            _shutdownCountdown = json_val.getInt("shutdownCountdown");
         }
         super._parseAttr(json_val);
     }
@@ -141,8 +141,9 @@ public class YOsControl extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getShutdownCountdown() throws YAPI_Exception
-
-    { return get_shutdownCountdown(); }
+    {
+        return get_shutdownCountdown();
+    }
 
     public int set_shutdownCountdown(int  newval)  throws YAPI_Exception
     {
@@ -153,8 +154,9 @@ public class YOsControl extends YFunction
     }
 
     public int setShutdownCountdown(int newval)  throws YAPI_Exception
-
-    { return set_shutdownCountdown(newval); }
+    {
+        return set_shutdownCountdown(newval);
+    }
 
     /**
      * Retrieves OS control for a given identifier.

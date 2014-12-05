@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YNetwork.java 17582 2014-09-10 17:12:40Z mvuilleu $
+ * $Id: YNetwork.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindNetwork(), the high-level API for Network functions
+ * Implements FindNetwork(), the high-level API for Network functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YNetwork return codes)
-    //--- (end of YNetwork return codes)
+//--- (YNetwork return codes)
+//--- (end of YNetwork return codes)
 //--- (YNetwork class start)
 /**
  * YNetwork Class: Network function interface
@@ -65,7 +65,6 @@ public class YNetwork extends YFunction
     public static final int READINESS_LAN_OK = 3;
     public static final int READINESS_WWW_OK = 4;
     public static final int READINESS_INVALID = -1;
-
     /**
      * invalid macAddress value
      */
@@ -108,7 +107,6 @@ public class YNetwork extends YFunction
     public static final int DISCOVERABLE_FALSE = 0;
     public static final int DISCOVERABLE_TRUE = 1;
     public static final int DISCOVERABLE_INVALID = -1;
-
     /**
      * invalid wwwWatchdogDelay value
      */
@@ -124,7 +122,6 @@ public class YNetwork extends YFunction
     public static final int CALLBACKMETHOD_GET = 1;
     public static final int CALLBACKMETHOD_PUT = 2;
     public static final int CALLBACKMETHOD_INVALID = -1;
-
     /**
      * invalid callbackEncoding value
      */
@@ -134,7 +131,6 @@ public class YNetwork extends YFunction
     public static final int CALLBACKENCODING_CSV = 3;
     public static final int CALLBACKENCODING_YOCTO_API = 4;
     public static final int CALLBACKENCODING_INVALID = -1;
-
     /**
      * invalid callbackCredentials value
      */
@@ -215,61 +211,61 @@ public class YNetwork extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("readiness")) {
-            _readiness =  json_val.getInt("readiness");
+            _readiness = json_val.getInt("readiness");
         }
         if (json_val.has("macAddress")) {
-            _macAddress =  json_val.getString("macAddress");
+            _macAddress = json_val.getString("macAddress");
         }
         if (json_val.has("ipAddress")) {
-            _ipAddress =  json_val.getString("ipAddress");
+            _ipAddress = json_val.getString("ipAddress");
         }
         if (json_val.has("subnetMask")) {
-            _subnetMask =  json_val.getString("subnetMask");
+            _subnetMask = json_val.getString("subnetMask");
         }
         if (json_val.has("router")) {
-            _router =  json_val.getString("router");
+            _router = json_val.getString("router");
         }
         if (json_val.has("ipConfig")) {
-            _ipConfig =  json_val.getString("ipConfig");
+            _ipConfig = json_val.getString("ipConfig");
         }
         if (json_val.has("primaryDNS")) {
-            _primaryDNS =  json_val.getString("primaryDNS");
+            _primaryDNS = json_val.getString("primaryDNS");
         }
         if (json_val.has("secondaryDNS")) {
-            _secondaryDNS =  json_val.getString("secondaryDNS");
+            _secondaryDNS = json_val.getString("secondaryDNS");
         }
         if (json_val.has("userPassword")) {
-            _userPassword =  json_val.getString("userPassword");
+            _userPassword = json_val.getString("userPassword");
         }
         if (json_val.has("adminPassword")) {
-            _adminPassword =  json_val.getString("adminPassword");
+            _adminPassword = json_val.getString("adminPassword");
         }
         if (json_val.has("discoverable")) {
-            _discoverable =  json_val.getInt("discoverable")>0?1:0;
+            _discoverable = json_val.getInt("discoverable") > 0 ? 1 : 0;
         }
         if (json_val.has("wwwWatchdogDelay")) {
-            _wwwWatchdogDelay =  json_val.getInt("wwwWatchdogDelay");
+            _wwwWatchdogDelay = json_val.getInt("wwwWatchdogDelay");
         }
         if (json_val.has("callbackUrl")) {
-            _callbackUrl =  json_val.getString("callbackUrl");
+            _callbackUrl = json_val.getString("callbackUrl");
         }
         if (json_val.has("callbackMethod")) {
-            _callbackMethod =  json_val.getInt("callbackMethod");
+            _callbackMethod = json_val.getInt("callbackMethod");
         }
         if (json_val.has("callbackEncoding")) {
-            _callbackEncoding =  json_val.getInt("callbackEncoding");
+            _callbackEncoding = json_val.getInt("callbackEncoding");
         }
         if (json_val.has("callbackCredentials")) {
-            _callbackCredentials =  json_val.getString("callbackCredentials");
+            _callbackCredentials = json_val.getString("callbackCredentials");
         }
         if (json_val.has("callbackMinDelay")) {
-            _callbackMinDelay =  json_val.getInt("callbackMinDelay");
+            _callbackMinDelay = json_val.getInt("callbackMinDelay");
         }
         if (json_val.has("callbackMaxDelay")) {
-            _callbackMaxDelay =  json_val.getInt("callbackMaxDelay");
+            _callbackMaxDelay = json_val.getInt("callbackMaxDelay");
         }
         if (json_val.has("poeCurrent")) {
-            _poeCurrent =  json_val.getInt("poeCurrent");
+            _poeCurrent = json_val.getInt("poeCurrent");
         }
         super._parseAttr(json_val);
     }
@@ -328,8 +324,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getReadiness() throws YAPI_Exception
-
-    { return get_readiness(); }
+    {
+        return get_readiness();
+    }
 
     /**
      * Returns the MAC address of the network interface. The MAC address is also available on a sticker
@@ -358,8 +355,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getMacAddress() throws YAPI_Exception
-
-    { return get_macAddress(); }
+    {
+        return get_macAddress();
+    }
 
     /**
      * Returns the IP address currently in use by the device. The address may have been configured
@@ -388,8 +386,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getIpAddress() throws YAPI_Exception
-
-    { return get_ipAddress(); }
+    {
+        return get_ipAddress();
+    }
 
     /**
      * Returns the subnet mask currently used by the device.
@@ -416,8 +415,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getSubnetMask() throws YAPI_Exception
-
-    { return get_subnetMask(); }
+    {
+        return get_subnetMask();
+    }
 
     /**
      * Returns the IP address of the router on the device subnet (default gateway).
@@ -444,8 +444,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getRouter() throws YAPI_Exception
-
-    { return get_router(); }
+    {
+        return get_router();
+    }
 
     /**
      * @throws YAPI_Exception on error
@@ -464,8 +465,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getIpConfig() throws YAPI_Exception
-
-    { return get_ipConfig(); }
+    {
+        return get_ipConfig();
+    }
 
     public int set_ipConfig(String  newval)  throws YAPI_Exception
     {
@@ -476,8 +478,9 @@ public class YNetwork extends YFunction
     }
 
     public int setIpConfig(String newval)  throws YAPI_Exception
-
-    { return set_ipConfig(newval); }
+    {
+        return set_ipConfig(newval);
+    }
 
     /**
      * Returns the IP address of the primary name server to be used by the module.
@@ -504,8 +507,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getPrimaryDNS() throws YAPI_Exception
-
-    { return get_primaryDNS(); }
+    {
+        return get_primaryDNS();
+    }
 
     /**
      * Changes the IP address of the primary name server to be used by the module.
@@ -538,8 +542,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setPrimaryDNS(String newval)  throws YAPI_Exception
-
-    { return set_primaryDNS(newval); }
+    {
+        return set_primaryDNS(newval);
+    }
 
     /**
      * Returns the IP address of the secondary name server to be used by the module.
@@ -566,8 +571,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getSecondaryDNS() throws YAPI_Exception
-
-    { return get_secondaryDNS(); }
+    {
+        return get_secondaryDNS();
+    }
 
     /**
      * Changes the IP address of the secondary name server to be used by the module.
@@ -600,8 +606,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setSecondaryDNS(String newval)  throws YAPI_Exception
-
-    { return set_secondaryDNS(newval); }
+    {
+        return set_secondaryDNS(newval);
+    }
 
     /**
      * Returns a hash string if a password has been set for "user" user,
@@ -632,8 +639,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getUserPassword() throws YAPI_Exception
-
-    { return get_userPassword(); }
+    {
+        return get_userPassword();
+    }
 
     /**
      * Changes the password for the "user" user. This password becomes instantly required
@@ -670,8 +678,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setUserPassword(String newval)  throws YAPI_Exception
-
-    { return set_userPassword(newval); }
+    {
+        return set_userPassword(newval);
+    }
 
     /**
      * Returns a hash string if a password has been set for user "admin",
@@ -702,8 +711,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getAdminPassword() throws YAPI_Exception
-
-    { return get_adminPassword(); }
+    {
+        return get_adminPassword();
+    }
 
     /**
      * Changes the password for the "admin" user. This password becomes instantly required
@@ -740,8 +750,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setAdminPassword(String newval)  throws YAPI_Exception
-
-    { return set_adminPassword(newval); }
+    {
+        return set_adminPassword(newval);
+    }
 
     /**
      * Returns the activation state of the multicast announce protocols to allow easy
@@ -774,8 +785,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getDiscoverable() throws YAPI_Exception
-
-    { return get_discoverable(); }
+    {
+        return get_discoverable();
+    }
 
     /**
      * Changes the activation state of the multicast announce protocols to allow easy
@@ -810,8 +822,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setDiscoverable(int newval)  throws YAPI_Exception
-
-    { return set_discoverable(newval); }
+    {
+        return set_discoverable(newval);
+    }
 
     /**
      * Returns the allowed downtime of the WWW link (in seconds) before triggering an automated
@@ -846,8 +859,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getWwwWatchdogDelay() throws YAPI_Exception
-
-    { return get_wwwWatchdogDelay(); }
+    {
+        return get_wwwWatchdogDelay();
+    }
 
     /**
      * Changes the allowed downtime of the WWW link (in seconds) before triggering an automated
@@ -886,8 +900,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setWwwWatchdogDelay(int newval)  throws YAPI_Exception
-
-    { return set_wwwWatchdogDelay(newval); }
+    {
+        return set_wwwWatchdogDelay(newval);
+    }
 
     /**
      * Returns the callback URL to notify of significant state changes.
@@ -914,8 +929,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getCallbackUrl() throws YAPI_Exception
-
-    { return get_callbackUrl(); }
+    {
+        return get_callbackUrl();
+    }
 
     /**
      * Changes the callback URL to notify significant state changes. Remember to call the
@@ -946,8 +962,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setCallbackUrl(String newval)  throws YAPI_Exception
-
-    { return set_callbackUrl(newval); }
+    {
+        return set_callbackUrl(newval);
+    }
 
     /**
      * Returns the HTTP method used to notify callbacks for significant state changes.
@@ -977,8 +994,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getCallbackMethod() throws YAPI_Exception
-
-    { return get_callbackMethod(); }
+    {
+        return get_callbackMethod();
+    }
 
     /**
      * Changes the HTTP method used to notify callbacks for significant state changes.
@@ -1010,8 +1028,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setCallbackMethod(int newval)  throws YAPI_Exception
-
-    { return set_callbackMethod(newval); }
+    {
+        return set_callbackMethod(newval);
+    }
 
     /**
      * Returns the encoding standard to use for representing notification values.
@@ -1043,8 +1062,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getCallbackEncoding() throws YAPI_Exception
-
-    { return get_callbackEncoding(); }
+    {
+        return get_callbackEncoding();
+    }
 
     /**
      * Changes the encoding standard to use for representing notification values.
@@ -1078,8 +1098,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setCallbackEncoding(int newval)  throws YAPI_Exception
-
-    { return set_callbackEncoding(newval); }
+    {
+        return set_callbackEncoding(newval);
+    }
 
     /**
      * Returns a hashed version of the notification callback credentials if set,
@@ -1110,8 +1131,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public String getCallbackCredentials() throws YAPI_Exception
-
-    { return get_callbackCredentials(); }
+    {
+        return get_callbackCredentials();
+    }
 
     /**
      * Changes the credentials required to connect to the callback address. The credentials
@@ -1156,8 +1178,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setCallbackCredentials(String newval)  throws YAPI_Exception
-
-    { return set_callbackCredentials(newval); }
+    {
+        return set_callbackCredentials(newval);
+    }
 
     /**
      * Connects to the notification callback and saves the credentials required to
@@ -1205,8 +1228,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getCallbackMinDelay() throws YAPI_Exception
-
-    { return get_callbackMinDelay(); }
+    {
+        return get_callbackMinDelay();
+    }
 
     /**
      * Changes the minimum waiting time between two callback notifications, in seconds.
@@ -1237,8 +1261,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setCallbackMinDelay(int newval)  throws YAPI_Exception
-
-    { return set_callbackMinDelay(newval); }
+    {
+        return set_callbackMinDelay(newval);
+    }
 
     /**
      * Returns the maximum waiting time between two callback notifications, in seconds.
@@ -1265,8 +1290,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getCallbackMaxDelay() throws YAPI_Exception
-
-    { return get_callbackMaxDelay(); }
+    {
+        return get_callbackMaxDelay();
+    }
 
     /**
      * Changes the maximum waiting time between two callback notifications, in seconds.
@@ -1297,8 +1323,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setCallbackMaxDelay(int newval)  throws YAPI_Exception
-
-    { return set_callbackMaxDelay(newval); }
+    {
+        return set_callbackMaxDelay(newval);
+    }
 
     /**
      * Returns the current consumed by the module from Power-over-Ethernet (PoE), in milli-amps.
@@ -1331,8 +1358,9 @@ public class YNetwork extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPoeCurrent() throws YAPI_Exception
-
-    { return get_poeCurrent(); }
+    {
+        return get_poeCurrent();
+    }
 
     /**
      * Retrieves a network interface for a given identifier.

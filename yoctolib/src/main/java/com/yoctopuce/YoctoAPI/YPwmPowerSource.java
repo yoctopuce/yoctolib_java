@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YPwmPowerSource.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YPwmPowerSource.java 18466 2014-11-21 08:19:59Z seb $
  *
- * Implements yFindPwmPowerSource(), the high-level API for PwmPowerSource functions
+ * Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,8 +42,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-    //--- (YPwmPowerSource return codes)
-    //--- (end of YPwmPowerSource return codes)
+//--- (YPwmPowerSource return codes)
+//--- (end of YPwmPowerSource return codes)
 //--- (YPwmPowerSource class start)
 /**
  * YPwmPowerSource Class: PwmPowerSource function interface
@@ -64,7 +64,6 @@ public class YPwmPowerSource extends YFunction
     public static final int POWERMODE_EXT_V = 2;
     public static final int POWERMODE_OPNDRN = 3;
     public static final int POWERMODE_INVALID = -1;
-
     protected int _powerMode = POWERMODE_INVALID;
     protected UpdateCallback _valueCallbackPwmPowerSource = null;
 
@@ -111,7 +110,7 @@ public class YPwmPowerSource extends YFunction
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
         if (json_val.has("powerMode")) {
-            _powerMode =  json_val.getInt("powerMode");
+            _powerMode = json_val.getInt("powerMode");
         }
         super._parseAttr(json_val);
     }
@@ -144,8 +143,9 @@ public class YPwmPowerSource extends YFunction
      * @throws YAPI_Exception on error
      */
     public int getPowerMode() throws YAPI_Exception
-
-    { return get_powerMode(); }
+    {
+        return get_powerMode();
+    }
 
     /**
      * Changes  the PWM power source. PWM can use isolated 5V from USB, isolated 3V from USB or
@@ -188,8 +188,9 @@ public class YPwmPowerSource extends YFunction
      * @throws YAPI_Exception on error
      */
     public int setPowerMode(int newval)  throws YAPI_Exception
-
-    { return set_powerMode(newval); }
+    {
+        return set_powerMode(newval);
+    }
 
     /**
      * Retrieves a voltage source for a given identifier.

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 17678 2014-09-16 16:31:26Z seb $
+ * $Id: YDataStream.java 18339 2014-11-12 10:08:56Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -61,7 +61,7 @@ public class YDataStream
 {
 //--- (end of generated code: YDataStream class start)
     public static final double DATA_INVALID = YAPI.INVALID_DOUBLE;
-    
+
     //--- (generated code: YDataStream definitions)
     protected YFunction _parent;
     protected int _runNo = 0;
@@ -90,17 +90,17 @@ public class YDataStream
     protected ArrayList<ArrayList<Double>> _values = new ArrayList<ArrayList<Double>>();
 
     //--- (end of generated code: YDataStream definitions)
-    protected YAPI.CalibrationHandlerCallback _calhdl=null;
-    
+    protected YAPI.CalibrationHandlerCallback _calhdl = null;
+
     protected YDataStream(YFunction parent)
     {
         _parent = parent;
     }
-    
+
     YDataStream(YFunction parent, YDataSet dataset, ArrayList<Integer> encoded) throws YAPI_Exception
     {
-        _parent   = parent;
-        _initFromDataSet(dataset, encoded);      
+        _parent = parent;
+        _initFromDataSet(dataset, encoded);
     }
 
     //--- (generated code: YDataStream implementation)

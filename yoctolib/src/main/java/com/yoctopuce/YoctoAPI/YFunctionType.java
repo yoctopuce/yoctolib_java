@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFunctionType.java 17678 2014-09-16 16:31:26Z seb $
+ * $Id: YFunctionType.java 18339 2014-11-12 10:08:56Z seb $
  *
  * Internal YFunctionType object
  *
@@ -99,13 +99,12 @@ class YFunctionType {
         }
 
 
-
     }
 
     public YFunctionType(String classname)
     {
         _className = classname;
-     }
+    }
 
 
     public void reindexFunction(YPEntry yp)
@@ -128,7 +127,6 @@ class YFunctionType {
         }
         _ypEntries.put(yp.getHardwareId(), yp);
     }
-
 
 
     // Forget a disconnected function given by HardwareId
@@ -171,7 +169,7 @@ class YFunctionType {
             return hwid;
         }
 
-        if(hwid.module.length()>0){
+        if (hwid.module.length() > 0) {
 
             // either the device id is a logical name, or the function is unknown
             YDevice dev = SafeYAPI().getDevice(hwid.module);
@@ -188,21 +186,20 @@ class YFunctionType {
             for (int i = 0; i < nfun; i++) {
                 YPEntry yp = dev.getYPEntry(i);
                 if (yp.getLogicalName().equals(hwid.getFunction()) && _ypEntries.containsValue(yp)) {
-                    return new HWID(serial ,yp.getFuncId());
+                    return new HWID(serial, yp.getFuncId());
                 }
             }
-        }else {
+        } else {
             // only functionId  (ie ".temperature")
-            for(String hwid_str :_connectedFns.keySet()){
+            for (String hwid_str : _connectedFns.keySet()) {
                 HWID tmpid = new HWID(hwid_str);
-                if(tmpid.getFunction().equals(hwid.getFunction())){
+                if (tmpid.getFunction().equals(hwid.getFunction())) {
                     return tmpid;
                 }
             }
         }
         throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "No function [" + hwid.function + "] found on device [" + hwid.module + "]");
     }
-
 
 
     // Retrieve a function object by hardware id, updating the indexes on the fly if needed
@@ -255,7 +252,7 @@ class YFunctionType {
     {
 
         YPEntry yp = _ypEntries.get(hwid);
-        if (yp==null)
+        if (yp == null)
             // device has not been correctly registered
             return;
         if (yp.getAdvertisedValue().equals(pubval)) {
@@ -272,7 +269,7 @@ class YFunctionType {
     public void setTimedReport(String hwid, double timestamp, ArrayList<Integer> report)
     {
         YFunction func = SafeYAPI()._GetTimedReportCallback(hwid);
-        if (func!=null){
+        if (func != null) {
             SafeYAPI()._PushDataEvent(new YAPI.DataEvent(func, timestamp, report));
         }
     }
@@ -289,7 +286,7 @@ class YFunctionType {
     // Find the hardwareId for the next instance of a given function class
     public YPEntry getNextYPEntry(String hwid)
     {
-        boolean found=false;
+        boolean found = false;
         for (String iter_hwid : _ypEntries.keySet()) {
             if (found) {
                 return _ypEntries.get(iter_hwid);

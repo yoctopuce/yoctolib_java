@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YQt.java 18339 2014-11-12 10:08:56Z seb $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -43,7 +43,7 @@ import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YQt return codes)
-    //--- (end of generated code: YQt return codes)
+//--- (end of generated code: YQt return codes)
 //--- (generated code: YQt class start)
 /**
  * YQt Class: Quaternion interface
@@ -87,7 +87,6 @@ public class YQt extends YSensor
 
 
     /**
-     * 
      * @param func : functionid
      */
     protected YQt(String func)
