@@ -339,9 +339,9 @@ public class YFirmwareUpdate
     }
 
     /**
-     * Retrun a list of all modules in "update" mode. Only USB connected
-     * devices are listed. If the module is connected to a YoctoHub, you have to
-     * connect to the YoctoHub web interface.
+     * Retruns a list of all the modules in "update" mode. Only USB connected
+     * devices are listed. For modules connected to a YoctoHub, you must
+     * connect yourself to the YoctoHub web interface.
      *
      * @return an array of strings containing the serial list of module in "update" mode.
      */
@@ -371,12 +371,12 @@ public class YFirmwareUpdate
 
     /**
      * Returns the progress of the firmware update, on a scale from 0 to 100. When the object is
-     * instantiated the progress is zero. The value is updated During the firmware update process, until
-     * the value of 100 is reached. The value of 100 mean that the firmware update is terminated with
-     * success. If an error occur during the firmware update a negative value is returned, and the
+     * instantiated, the progress is zero. The value is updated during the firmware update process until
+     * the value of 100 is reached. The 100 value means that the firmware update was completed
+     * successfully. If an error occurs during the firmware update, a negative value is returned, and the
      * error message can be retrieved with get_progressMessage.
      *
-     * @return an integer in the range 0 to 100 (percentage of completion) or
+     * @return an integer in the range 0 to 100 (percentage of completion)
      *         or a negative error code in case of failure.
      */
     public int get_progress()
@@ -386,10 +386,10 @@ public class YFirmwareUpdate
     }
 
     /**
-     * Returns the last progress message of the firmware update process. If an error occur during the
-     * firmware update process the error message is returned
+     * Returns the last progress message of the firmware update process. If an error occurs during the
+     * firmware update process, the error message is returned
      *
-     * @return an string  with the last progress message, or the error message.
+     * @return a string  with the latest progress message, or the error message.
      */
     public String get_progressMessage()
     {
@@ -397,9 +397,9 @@ public class YFirmwareUpdate
     }
 
     /**
-     * Start the firmware update process. This method start the firmware update process in background. This method
-     * return immediately. The progress of the firmware update can be monitored with methods get_progress()
-     * and get_progressMessage().
+     * Starts the firmware update process. This method starts the firmware update process in background. This method
+     * returns immediately. You can monitor the progress of the firmware update with the get_progress()
+     * and get_progressMessage() methods.
      *
      * @return an integer in the range 0 to 100 (percentage of completion),
      *         or a negative error code in case of failure.

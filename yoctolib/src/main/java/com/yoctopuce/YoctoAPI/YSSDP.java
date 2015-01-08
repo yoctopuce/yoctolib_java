@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -89,11 +90,15 @@ public class YSSDP {
     }
 
     private synchronized void checkCacheExpiration() {
+        ArrayList<String> to_remove = new ArrayList<String>();
         for (YSSDPCacheEntry entry : mCache.values()) {
             if (entry.hasExpired()) {
                 _callbacks.HubDiscoveryCallback(entry.getSerial(), null, entry.getURL());
-                mCache.remove(entry.getUUID());
+                to_remove.add(entry.getUUID());
             }
+        }
+        for (String uuid :to_remove) {
+            mCache.remove(uuid);
         }
     }
 

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI.java 18612 2014-12-02 16:25:18Z seb $
+ * $Id: YAPI.java 18841 2014-12-23 18:07:04Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -56,7 +56,7 @@ public class YAPI {
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "18640";
+    public static final String YOCTO_API_BUILD_STR = "18903";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -370,9 +370,11 @@ public class YAPI {
     {
         boolean negate = false;
         double res;
+        int mantis = val & 2047;
 
-        if (val == 0)
+        if (mantis == 0) {
             return 0.0;
+        }
         if (val > 32767) {
             negate = true;
             val = 65536 - val;
@@ -381,7 +383,7 @@ public class YAPI {
             val = -val;
         }
         int exp = val >> 11;
-        res = (double) (val & 2047) * decExp[exp];
+        res = (double) mantis * decExp[exp];
         return (negate ? -res : res);
     }
 
@@ -1126,7 +1128,7 @@ public class YAPI {
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".18640";
+        return YOCTO_API_VERSION_STR + ".18903";
     }
 
     /**

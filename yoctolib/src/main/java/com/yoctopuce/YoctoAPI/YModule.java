@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 18337 2014-11-12 09:12:44Z seb $
+ * $Id: YModule.java 18749 2014-12-11 14:31:54Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -932,17 +932,18 @@ public class YModule extends YFunction
     }
 
     /**
-     * Test if the byn file is valid for this module. This method is useful to test if the module need to be updated.
-     *  It's possible to pass an directory instead of a file. In this case this method return the path of
-     * the most recent
-     *  appropriate byn file. If the parameter onlynew is true the function will discard firmware that are
+     *  Tests whether the byn file is valid for this module. This method is useful to test if the module
+     * needs to be updated.
+     *  It is possible to pass a directory as argument instead of a file. In this case, this method returns
+     * the path of the most recent
+     *  appropriate byn file. If the parameter onlynew is true, the function discards firmware that are
      * older or equal to
      * the installed firmware.
      *
-     * @param path    : the path of a byn file or a directory that contain byn files
-     * @param onlynew : return only files that are strictly newer
+     * @param path    : the path of a byn file or a directory that contains byn files
+     * @param onlynew : returns only files that are strictly newer
      *
-     * @return : the path of the byn file to use or a empty string if no byn files match the requirement
+     * @return : the path of the byn file to use or a empty string if no byn files matches the requirement
      *
      * @throws YAPI_Exception on error
      */
@@ -950,6 +951,7 @@ public class YModule extends YFunction
     {
         String serial;
         int release;
+        String tmp_res;
         if (onlynew) {
             release = Integer.valueOf(get_firmwareRelease());
         } else {
@@ -957,16 +959,20 @@ public class YModule extends YFunction
         }
         //may throw an exception
         serial = get_serialNumber();
-        return YFirmwareUpdate.CheckFirmware(serial,path, release);
+        tmp_res = YFirmwareUpdate.CheckFirmware(serial,path, release);
+        if ((tmp_res).indexOf("error:") == 0) {
+            _throw(YAPI.INVALID_ARGUMENT, tmp_res);
+        }
+        return tmp_res;
     }
 
     /**
-     * Prepare a firmware upgrade of the module. This method return a object YFirmwareUpdate which
-     * will handle the firmware upgrade process.
+     * Prepares a firmware update of the module. This method returns a YFirmwareUpdate object which
+     * handles the firmware update process.
      *
      * @param path : the path of the byn file to use.
      *
-     * @return : A object YFirmwareUpdate.
+     * @return : A YFirmwareUpdate object.
      */
     public YFirmwareUpdate updateFirmware(String path) throws YAPI_Exception
     {
@@ -979,10 +985,10 @@ public class YModule extends YFunction
     }
 
     /**
-     * Returns all the setting of the module. Useful to backup all the logical name and calibrations parameters
+     * Returns all the settings of the module. Useful to backup all the logical names and calibrations parameters
      * of a connected module.
      *
-     * @return a binary buffer with all settings.
+     * @return a binary buffer with all the settings.
      *
      * @throws YAPI_Exception on error
      */
@@ -1205,10 +1211,10 @@ public class YModule extends YFunction
     }
 
     /**
-     * Restore all the setting of the module. Useful to restore all the logical name and calibrations parameters
+     * Restores all the settings of the module. Useful to restore all the logical names and calibrations parameters
      * of a module from a backup.
      *
-     * @param settings : a binary buffer with all settings.
+     * @param settings : a binary buffer with all the settings.
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
