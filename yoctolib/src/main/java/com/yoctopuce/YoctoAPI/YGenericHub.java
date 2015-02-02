@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericHub.java 18456 2014-11-20 16:29:57Z seb $
+ * $Id: YGenericHub.java 19135 2015-01-29 16:45:58Z seb $
  *
  * Internal YGenericHub object
  *
@@ -55,7 +55,6 @@ abstract class YGenericHub {
     protected long _devListExpires = 0;
     protected HashMap<Integer, String> _serialByYdx = new HashMap<Integer, String>();
     protected HashMap<String, YDevice> _devices = new HashMap<String, YDevice>();
-    //protected ArrayList<WPEntry> wpages = new ArrayList<WPEntry>();
     protected final boolean _reportConnnectionLost;
 
     public YGenericHub(int idx, boolean reportConnnectionLost)
@@ -110,7 +109,7 @@ abstract class YGenericHub {
 
     abstract void updateDeviceList(boolean forceupdate) throws YAPI_Exception;
 
-    public abstract ArrayList<String> getBootloaders();
+    public abstract ArrayList<String> getBootloaders() throws YAPI_Exception;
 
     interface UpdateProgress
     {

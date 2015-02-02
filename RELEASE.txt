@@ -1,4 +1,9 @@
-- Fix occasional crash during SSDP discovery
-- Change error code to YAPI.UNAUTHORIZED for invalid MD5 signature in HTTP Callback mode
+- Add Yocto-Buzzer example
+- Add RS232 examples
+- Add old school yoctoAPI.jar
+- Do not unregister network hub if SSDP discovery expire
+- Implement YFirmwareUpdate::GetAllBootLoaders
+- Raise an error if too may devices are in update modes during firmware update
 - Fix YModule.checkFirmware that was not throwing exception on error
-- Fix overflow in decoding in malformed timed notifications
+- Fix YAPI.TriggerHubDiscovery method that was not declared static
+- Fix RIGHT/REAR device mount position

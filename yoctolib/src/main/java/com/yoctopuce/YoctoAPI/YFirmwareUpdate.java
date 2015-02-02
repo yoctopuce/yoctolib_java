@@ -349,9 +349,13 @@ public class YFirmwareUpdate
     {
         ArrayList<String> res = new ArrayList<String>();
         for (YGenericHub h : YAPI.SafeYAPI()._hubs) {
-            ArrayList<String> bootloaders = h.getBootloaders();
-            if (bootloaders != null) {
-                res.addAll(bootloaders);
+            try {
+                ArrayList<String> bootloaders = h.getBootloaders();
+                if (bootloaders != null) {
+                    res.addAll(bootloaders);
+                }
+            } catch (YAPI_Exception e) {
+                YAPI.SafeYAPI()._Log(e.getLocalizedMessage());
             }
         }
         return res;

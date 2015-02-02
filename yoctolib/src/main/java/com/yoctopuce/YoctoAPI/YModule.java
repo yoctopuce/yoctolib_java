@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 18749 2014-12-11 14:31:54Z seb $
+ * $Id: YModule.java 19092 2015-01-27 11:07:59Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -172,10 +172,10 @@ public class YModule extends YFunction
     {
         String devid = _func;
         int dotidx = devid.indexOf('.');
-        if( dotidx>=0) devid = devid.substring(0, dotidx);
+        if (dotidx >= 0) devid = devid.substring(0, dotidx);
         YDevice dev = SafeYAPI().getDevice(devid);
-        if(dev==null) {
-            throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "Device ["+devid+"] is not online");
+        if (dev == null) {
+            throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "Device [" + devid + "] is not online");
         }
         return dev;
     }
@@ -205,6 +205,7 @@ public class YModule extends YFunction
         YDevice dev = _getDev();
         return dev.getYPEntry(functionIndex).getFuncId();
     }
+
     // Retrieve the name of the nth function (beside "module") in the device
     public String functionName(int functionIndex) throws YAPI_Exception
     {
@@ -219,24 +220,24 @@ public class YModule extends YFunction
         return dev.getYPEntry(functionIndex).getAdvertisedValue();
     }
 
-      /**
-       * Registers a device log callback function. This callback will be called each time
-       * that a module sends a new log message. Mostly useful to debug a Yoctopuce module.
-       *
-       * @param callback : the callback function to call, or a null pointer. The callback function should take two
-       *         arguments: the module object that emitted the log message, and the character string containing the log.
-       *
-       */
+    /**
+     * Registers a device log callback function. This callback will be called each time
+     * that a module sends a new log message. Mostly useful to debug a Yoctopuce module.
+     *
+     * @param callback : the callback function to call, or a null pointer. The callback function should take two
+     *         arguments: the module object that emitted the log message, and the character string containing the log.
+     *
+     */
     public void registerLogCallback(LogCallback callback)
     {
         _logCallback = callback;
         YDevice ydev = SafeYAPI().getDevice(_serial);
-        if (ydev!=null) {
+        if (ydev != null) {
             ydev.registerLogCallback(callback);
         }
     }
-    
-  
+
+
     LogCallback get_logCallback()
     {
         return _logCallback;
@@ -254,21 +255,21 @@ public class YModule extends YFunction
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         Iterator functionList = json.keys();
-        while( functionList.hasNext() ){
-            String fun_key = (String)functionList.next();
-            if (!fun_key.equals("services")){
+        while (functionList.hasNext()) {
+            String fun_key = (String) functionList.next();
+            if (!fun_key.equals("services")) {
                 JSONObject functionJson = json.optJSONObject(fun_key);
-                if (functionJson==null) {
+                if (functionJson == null) {
                     continue;
                 }
                 Iterator attr_keys = functionJson.keys();
-                while( attr_keys.hasNext() ) {
-                    String attr_key = (String)attr_keys.next();
-                    if (functionJson.optJSONObject(attr_key)!=null){
+                while (attr_keys.hasNext()) {
+                    String attr_key = (String) attr_keys.next();
+                    if (functionJson.optJSONObject(attr_key) != null) {
                         continue;
                     }
                     Object value = functionJson.opt(attr_key);
-                    if (value==null){
+                    if (value == null) {
                         continue;
                     }
                     String flat_attr = fun_key + "/" + attr_key + "=" + value.toString();

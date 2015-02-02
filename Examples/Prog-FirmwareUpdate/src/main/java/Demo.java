@@ -29,12 +29,12 @@ public class Demo
                 do {
                     int newstatus = update.get_progress();
                     if (newstatus != status)
-                        System.out.println(status + "% " + update.get_progressMessage());
+                        System.out.println(newstatus + "% " + update.get_progressMessage());
                     YAPI.Sleep(500);
                     status = newstatus;
                 } while (status < 100 && status >= 0);
                 if (status < 0) {
-                    System.out.println("    " + status + " Firmware Update failed: " + update.get_progressMessage());
+                    System.out.println("Firmware Update failed: " + update.get_progressMessage());
                     System.exit(1);
                 } else {
                     if (module.isOnline()) {

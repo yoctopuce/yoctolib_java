@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHTTPHub.java 18456 2014-11-20 16:29:57Z seb $
+ * $Id: YHTTPHub.java 19201 2015-01-30 18:18:15Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -192,6 +192,14 @@ class YHTTPHub extends YGenericHub {
         }
     }
 
+    synchronized String getSerialFromYDX(int devydx)
+    {
+        if (_serialByYdx.containsKey(devydx)) {
+            return _serialByYdx.get(devydx);
+        }
+        return null;
+    }
+
     @Override
     synchronized void startNotifications() throws YAPI_Exception
     {
@@ -273,10 +281,9 @@ class YHTTPHub extends YGenericHub {
                     devydx += 128;
                 }
                 String value = ev.substring(3);
-                String serial;
+                String serial = getSerialFromYDX(devydx);
                 String funcid;
-                if (_serialByYdx.containsKey(devydx)) {
-                    serial = _serialByYdx.get(devydx);
+                if (serial != null) {
                     YDevice ydev = SafeYAPI().getDevice(serial);
                     if (ydev != null) {
                         switch (ev.charAt(0)) {
@@ -396,7 +403,10 @@ class YHTTPHub extends YGenericHub {
                                 }
                             } else {
                                 String line = fifo.substring(0, pos + 1);
-                                handleNetNotification(line);
+                                if (line.indexOf(27) == -1) {
+                                    // drop notification that contain esc char
+                                    handleNetNotification(line);
+                                }
                             }
                             fifo = fifo.substring(pos + 1);
                         } while (pos >= 0);
@@ -490,6 +500,7 @@ class YHTTPHub extends YGenericHub {
                 yellowPages.put(classname, yprecs_arr);
             }
 
+            _serialByYdx.clear();
             // Reindex all devices from white pages
             for (int i = 0; i < whitePages_json.length(); i++) {
                 WPEntry devinfo = new WPEntry(whitePages_json.getJSONObject(i));
@@ -511,30 +522,42 @@ class YHTTPHub extends YGenericHub {
     @Override
     ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception, InterruptedException
     {
-        boolean use_self_flash = true;
+        boolean use_self_flash = false;
         String baseurl = "";
+        boolean need_reboot = true;
 
         yHTTPRequest req = new yHTTPRequest(this, "hubFUpdate" + serial);
-
-
-        if (!serial.equals(_serial)) {
+        if (serial.equals(_serial) && !_serial.startsWith("VIRTHUB")){
+            use_self_flash = true;
+        }else {
             // check if subdevice support self flashing
             try {
                 req.RequestSync("GET /bySerial/" + serial + "/flash.json?a=state", null);
                 baseurl = "/bySerial/" + serial;
+                use_self_flash = true;
             } catch (YAPI_Exception ex) {
-                use_self_flash = false;
             }
         }
-
-
         //5% -> 10%
         progress.firmware_progress(5, "Enter in bootloader");
-        if (!use_self_flash) {
+        ArrayList<String> bootloaders = getBootloaders();
+        if (bootloaders.size() >= 4) {
+            throw new YAPI_Exception(YAPI.IO_ERROR, "Too many devices in update mode");
+        }
+        boolean is_shield = serial.startsWith("YHUBSHL1");
+        for (String bl :bootloaders) {
+            if (bl.equals(serial)) {
+                need_reboot = false;
+            } else if (is_shield) {
+                if (bl.startsWith("YHUBSHL1")) {
+                    throw new YAPI_Exception(YAPI.IO_ERROR, "Only one YoctoHub-Shield is allowed in update mode");
+                }
+            }
+        }
+        if (!use_self_flash && need_reboot) {
             // reboot subdevice
             req.RequestSync("GET /bySerial/" + serial + "/api/module/rebootCountdown?rebootCountdown=-1", null);
         }
-
         //10% -> 40%
         progress.firmware_progress(10, "Send firmware to bootloader");
         byte[] head_body = YDevice.formatHTTPUpload("firmware", firmware.getData());
@@ -563,8 +586,8 @@ class YHTTPHub extends YGenericHub {
         }
 
         //40%-> 80%
-        progress.firmware_progress(40, "Flash firmware");
         if (use_self_flash) {
+            progress.firmware_progress(40, "Flash firmware");
             // the hub itself -> reboot in autoflash mode
             req.RequestSync("GET " + baseurl + "/api/module/rebootCountdown?rebootCountdown=-1003", null);
             Thread.sleep(7000);
@@ -573,26 +596,21 @@ class YHTTPHub extends YGenericHub {
             long timeout = YAPI.GetTickCount() + YPROG_BOOTLOADER_TIMEOUT;
             byte[] res;
             boolean found = false;
+            progress.firmware_progress(40, "Wait for device to be in bootloader");
             do {
-                res = req.RequestSync("GET /flash.json?a=list", null);
-                String jsonstr = new String(res);
-                try {
-                    JSONObject flashres = new JSONObject(jsonstr);
-                    JSONArray list = flashres.getJSONArray("list");
-                    for (int i = 0; i < list.length(); i++) {
-                        if (list.getString(i).equals(serial)) {
-                            found = true;
-                            break;
-                        }
+                ArrayList<String> list = getBootloaders();
+                for (String bl : list) {
+                    if (bl.equals(serial)) {
+                        found = true;
+                        break;
                     }
-                } catch (JSONException ex) {
-                    throw new YAPI_Exception(YAPI.IO_ERROR, "Unable to retrieve bootloader list");
                 }
                 if (!found) {
                     Thread.sleep(100);
                 }
             } while (!found && YAPI.GetTickCount() < timeout);
             //start flash
+            progress.firmware_progress(45, "Flash firmware");
             res = req.RequestSync("GET /flash.json?a=flash&s=" + serial, null);
             try {
                 String jsonstr = new String(res);
@@ -653,9 +671,22 @@ class YHTTPHub extends YGenericHub {
     }
 
     @Override
-    public ArrayList<String> getBootloaders()
+    public ArrayList<String> getBootloaders() throws YAPI_Exception
     {
-        return null;
+        ArrayList<String> res = new ArrayList<String>();
+        yHTTPRequest req = new yHTTPRequest(this, "getBootloaders");
+        byte[] raw_data = req.RequestSync("GET /flash.json?a=list", null);
+        String jsonstr = new String(raw_data);
+        try {
+            JSONObject flashres = new JSONObject(jsonstr);
+            JSONArray list = flashres.getJSONArray("list");
+            for (int i = 0; i < list.length(); i++) {
+                res.add(list.getString(i));
+            }
+        } catch (JSONException ex) {
+            throw new YAPI_Exception(YAPI.IO_ERROR, "Unable to retrieve bootloader list");
+        }
+        return res;
     }
 
 }

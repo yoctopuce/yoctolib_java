@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI.java 18841 2014-12-23 18:07:04Z seb $
+ * $Id: YAPI.java 19101 2015-01-27 14:13:32Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -56,7 +56,7 @@ public class YAPI {
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "18903";
+    public static final String YOCTO_API_BUILD_STR = "19218";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -116,10 +116,10 @@ public class YAPI {
                 }
             }
             if ((_apiMode & DETECT_NET) != 0) {
-                if (urlToUnregister != null) {
-                    _UnregisterHub(urlToUnregister);
-                }
                 if (urlToRegister != null) {
+                    if (urlToUnregister != null) {
+                        _UnregisterHub(urlToUnregister);
+                    }
                     try {
                         _PreregisterHub(urlToRegister);
                     } catch (YAPI_Exception ex) {
@@ -1128,7 +1128,7 @@ public class YAPI {
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".18903";
+        return YOCTO_API_VERSION_STR + ".19218";
     }
 
     /**
@@ -1350,7 +1350,7 @@ public class YAPI {
      * @return YAPI.SUCCESS when the call succeeds.
      * @throws YAPI_Exception on error
      */
-    public int TriggerHubDiscovery() throws YAPI_Exception
+    public static int TriggerHubDiscovery() throws YAPI_Exception
     {
         return SafeYAPI()._TriggerHubDiscovery();
     }

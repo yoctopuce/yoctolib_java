@@ -15,7 +15,7 @@ public class Demo {
             try {
                 // The call-back can be called several times for the same hub
                 // (the discovery technique is based on a periodic broadcast)
-                // So we use a dictionnary to avoid duplicates
+                // So we use a dictionary to avoid duplicates
                 if (KnownHubs.contains(serial)) return;
                 
                 System.out.println("hub found: " + serial+" ("+url+")");
@@ -29,7 +29,7 @@ public class Demo {
                 // iterate on all functions on the module and find the ports
                 int fctCount =  hub.functionCount();
                 for (int i=0;i< fctCount;i++) {
-                    // retreive the hardware name of the ith function
+                    // retrieve the hardware name of the ith function
                     String fctHwdName = hub.functionId(i);
                     if (fctHwdName.length()>7 && "hubPort".equals(fctHwdName.substring(0,7))) {
                         // The port logical name is always the serial#
@@ -38,7 +38,7 @@ public class Demo {
                         System.out.println("  " +fctHwdName+" : "+deviceid);
                     }
                 }
-                // add the hub to the dictionnary so we won't have to
+                // add the hub to the dictionary so we won't have to
                 // process is again.
                 KnownHubs.add(serial);
                 

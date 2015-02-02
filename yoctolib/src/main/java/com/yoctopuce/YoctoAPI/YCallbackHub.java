@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCallbackHub.java 18867 2015-01-05 09:38:28Z seb $
+ * $Id: YCallbackHub.java 19135 2015-01-29 16:45:58Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -314,9 +314,9 @@ public class YCallbackHub extends YGenericHub
     }
 
     @Override
-    public ArrayList<String> getBootloaders()
+    public ArrayList<String> getBootloaders() throws YAPI_Exception
     {
-        return null;
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Firmware update is not supported in HTTP callback");
     }
 
     @Override

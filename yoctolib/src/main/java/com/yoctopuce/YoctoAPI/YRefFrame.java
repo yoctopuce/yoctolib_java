@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 18524 2014-11-25 17:09:56Z seb $
+ * $Id: YRefFrame.java 19211 2015-02-02 13:18:41Z mvuilleu $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -76,8 +76,8 @@ public class YRefFrame extends YFunction
         BOTTOM(0),
         TOP(1),
         FRONT(2),
-        RIGHT(3),
-        REAR(4),
+        REAR(3),
+        RIGHT(4),
         LEFT(5);
         public final int value;
         private MOUNTPOSITION(int val)
@@ -94,9 +94,9 @@ public class YRefFrame extends YFunction
             case 2:
                 return FRONT;
             case 3:
-                return RIGHT;
-            case 4:
                 return REAR;
+            case 4:
+                return RIGHT;
             case 5:
                 return LEFT;
             }

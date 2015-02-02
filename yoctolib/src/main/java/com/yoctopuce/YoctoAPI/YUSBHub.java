@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YUSBHub.java 18456 2014-11-20 16:29:57Z seb $
+ * $Id: YUSBHub.java 19135 2015-01-29 16:45:58Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -82,9 +82,9 @@ public class YUSBHub extends YGenericHub
     }
 
     @Override
-    public ArrayList<String> getBootloaders()
+    public ArrayList<String> getBootloaders() throws YAPI_Exception
     {
-        return null;
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct access is supported only on Android Platform");
     }
 
     @Override
@@ -96,7 +96,7 @@ public class YUSBHub extends YGenericHub
     @Override
     void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception
     {
-        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct acces is supported only on Android Platform");
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "USB direct access is supported only on Android Platform");
     }
 
     @Override
