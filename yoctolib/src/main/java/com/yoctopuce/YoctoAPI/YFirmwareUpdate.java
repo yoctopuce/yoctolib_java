@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 16414 2014-06-04 12:12:47Z seb $
+ * $Id: YFirmwareUpdate.java 19452 2015-02-20 09:52:13Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -308,10 +308,8 @@ public class YFirmwareUpdate
             byte[] json = YFirmwareUpdate._downloadfile("http://www.yoctopuce.com//FR/common/getLastFirmwareLink.php?serial=" + serial);
             JSONObject obj = null;
             try {
-                obj = new JSONObject(new String(json, "ISO-8859-1"));
+                obj = new JSONObject(new String(json, YAPI.DeviceCharset));
             } catch (JSONException ex) {
-                throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
-            } catch (UnsupportedEncodingException ex) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
             }
             try {

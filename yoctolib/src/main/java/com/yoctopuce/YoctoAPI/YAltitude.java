@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAltitude.java 18466 2014-11-21 08:19:59Z seb $
+ * $Id: YAltitude.java 19746 2015-03-17 10:34:00Z seb $
  *
  * Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -48,8 +48,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 /**
  * YAltitude Class: Altitude function interface
  *
- * The Yoctopuce application programming interface allows you to read an instant
- * measure of the sensor, as well as the minimal and maximal values observed.
+ * The Yoctopuce class YAltitude allows you to read and configure Yoctopuce altitude
+ * sensors. It inherits from the YSensor class the core functions to read measurements,
+ * register callback functions, access to the autonomous datalogger.
+ * This class adds the ability to configure the barometric pressure adjusted to
+ * sea level (QNH) for barometric sensors.
  */
  @SuppressWarnings("UnusedDeclaration")
 public class YAltitude extends YSensor
@@ -60,7 +63,12 @@ public class YAltitude extends YSensor
      * invalid qnh value
      */
     public static final double QNH_INVALID = YAPI.INVALID_DOUBLE;
+    /**
+     * invalid technology value
+     */
+    public static final String TECHNOLOGY_INVALID = YAPI.INVALID_STRING;
     protected double _qnh = QNH_INVALID;
+    protected String _technology = TECHNOLOGY_INVALID;
     protected UpdateCallback _valueCallbackAltitude = null;
     protected TimedReportCallback _timedReportCallbackAltitude = null;
 
@@ -108,6 +116,9 @@ public class YAltitude extends YSensor
     {
         if (json_val.has("qnh")) {
             _qnh = Math.round(json_val.getDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
+        }
+        if (json_val.has("technology")) {
+            _technology = json_val.getString("technology");
         }
         super._parseAttr(json_val);
     }
@@ -215,6 +226,39 @@ public class YAltitude extends YSensor
     public double getQnh() throws YAPI_Exception
     {
         return get_qnh();
+    }
+
+    /**
+     * Returns the technology used by the sesnor to compute
+     * altitude. Possibles values are  "barometric" and "gps"
+     *
+     * @return a string corresponding to the technology used by the sesnor to compute
+     *         altitude
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_technology() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return TECHNOLOGY_INVALID;
+            }
+        }
+        return _technology;
+    }
+
+    /**
+     * Returns the technology used by the sesnor to compute
+     * altitude. Possibles values are  "barometric" and "gps"
+     *
+     * @return a string corresponding to the technology used by the sesnor to compute
+     *         altitude
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getTechnology() throws YAPI_Exception
+    {
+        return get_technology();
     }
 
     /**

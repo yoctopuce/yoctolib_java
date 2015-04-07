@@ -1,9 +1,4 @@
-- Add Yocto-Buzzer example
-- Add RS232 examples
-- Add old school yoctoAPI.jar
-- Do not unregister network hub if SSDP discovery expire
-- Implement YFirmwareUpdate::GetAllBootLoaders
-- Raise an error if too may devices are in update modes during firmware update
-- Fix YModule.checkFirmware that was not throwing exception on error
-- Fix YAPI.TriggerHubDiscovery method that was not declared static
-- Fix RIGHT/REAR device mount position
+- Add Yocto-RS485 example
+- Add additional functions to handle binary streams
+- Fix bug that corrupt calibration during firmware update
+- Fix empty string that can be returned by GetAllBootLoaders

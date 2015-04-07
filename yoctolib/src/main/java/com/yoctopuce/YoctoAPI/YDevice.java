@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDevice.java 18339 2014-11-12 10:08:56Z seb $
+ * $Id: YDevice.java 19452 2015-02-20 09:52:13Z seb $
  *
  * Internal YDevice class
  *
@@ -42,6 +42,7 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -151,7 +152,7 @@ public class YDevice
         if (_cache_expiration > YAPI.GetTickCount()) {
             return _cache_json;
         }
-        String yreq = new String(requestHTTPSync("GET /api.json", null));
+        String yreq = requestHTTPSyncAsString("GET /api.json", null);
         this._cache_expiration = YAPI.GetTickCount() + SafeYAPI().DefaultCacheValidity;
         this._cache_json = yreq;
         return yreq;
@@ -242,6 +243,13 @@ public class YDevice
     {
         String shortRequest = formatRequest(request);
         return _hub.devRequestSync(this, shortRequest, rest_of_request);
+    }
+
+    String requestHTTPSyncAsString(String request, byte[] rest_of_request) throws YAPI_Exception
+    {
+        String shortRequest = formatRequest(request);
+        final byte[] bytes = _hub.devRequestSync(this, shortRequest, rest_of_request);
+        return new String(bytes, YAPI.DeviceCharset);
     }
 
     void requestHTTPAsync(String request, byte[] rest_of_request, YGenericHub.RequestAsyncResult asyncResult, Object context) throws YAPI_Exception

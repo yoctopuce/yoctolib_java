@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 18339 2014-11-12 10:08:56Z seb $
+ * $Id: YQt.java 19328 2015-02-17 17:30:45Z seb $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericHub.java 19135 2015-01-29 16:45:58Z seb $
+ * $Id: YGenericHub.java 19535 2015-03-02 11:48:21Z seb $
  *
  * Internal YGenericHub object
  *
@@ -41,12 +41,32 @@ package com.yoctopuce.YoctoAPI;
 
 import com.yoctopuce.YoctoAPI.YAPI.PlugEvent.Event;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-abstract class YGenericHub {
+abstract class YGenericHub
+{
+
+    protected static final int NOTIFY_V2_LEGACY = 0;       // unused (reserved for compatibility with legacy notifications)
+    protected static final int NOTIFY_V2_6RAWBYTES = 1;       // largest type: data is always 6 bytes
+    protected static final int NOTIFY_V2_TYPEDDATA = 2;       // other types: first data byte holds the decoding format
+    protected static final int NOTIFY_V2_FLUSHGROUP = 3;       // no data associated
+
+    private static final int PUBVAL_LEGACY = 0;   // 0-6 ASCII characters (normally sent as YSTREAM_NOTICE)
+    private static final int PUBVAL_1RAWBYTE = 1;   // 1 raw byte  (=2 characters)
+    private static final int PUBVAL_2RAWBYTES = 2;   // 2 raw bytes (=4 characters)
+    private static final int PUBVAL_3RAWBYTES = 3;   // 3 raw bytes (=6 characters)
+    private static final int PUBVAL_4RAWBYTES = 4;   // 4 raw bytes (=8 characters)
+    private static final int PUBVAL_5RAWBYTES = 5;   // 5 raw bytes (=10 characters)
+    private static final int PUBVAL_6RAWBYTES = 6;   // 6 hex bytes (=12 characters) (sent as V2_6RAWBYTES)
+    private static final int PUBVAL_C_LONG = 7;   // 32-bit C signed integer
+    private static final int PUBVAL_C_FLOAT = 8;   // 32-bit C float
+    private static final int PUBVAL_YOCTO_FLOAT_E3 = 9;   // 32-bit Yocto fixed-point format (e-3)
+    private static final int PUBVAL_YOCTO_FLOAT_E6 = 10;   // 32-bit Yocto fixed-point format (e-6)
 
     protected int _hubidx;
     protected long _notifyTrigger = 0;
@@ -72,6 +92,86 @@ abstract class YGenericHub {
     abstract void startNotifications() throws YAPI_Exception;
 
     abstract void stopNotifications();
+
+
+    static String decodePubVal(int typeV2, byte[] funcval, int ofs, int funcvallen)
+    {
+        String buffer = "";
+
+        if (typeV2 == NOTIFY_V2_6RAWBYTES || typeV2 == NOTIFY_V2_TYPEDDATA) {
+            int funcValType;
+
+            if (typeV2 == NOTIFY_V2_6RAWBYTES) {
+                funcValType = PUBVAL_6RAWBYTES;
+            } else {
+                funcValType = funcval[ofs++] & 0xff;
+            }
+            switch (funcValType) {
+                case PUBVAL_LEGACY:
+                    // fallback to legacy handling, just in case
+                    break;
+                case PUBVAL_1RAWBYTE:
+                case PUBVAL_2RAWBYTES:
+                case PUBVAL_3RAWBYTES:
+                case PUBVAL_4RAWBYTES:
+                case PUBVAL_5RAWBYTES:
+                case PUBVAL_6RAWBYTES:
+                    // 1..5 hex bytes
+                    for (int i = 0; i < funcValType; i++) {
+                        int c = funcval[ofs++] & 0xff;
+                        int b = c >> 4;
+                        buffer += (b > 9) ? b + 'a' - 10 : b + '0';
+                        b = c & 0xf;
+                        buffer += (b > 9) ? b + 'a' - 10 : b + '0';
+                    }
+                    return buffer;
+                case PUBVAL_C_LONG:
+                case PUBVAL_YOCTO_FLOAT_E3:
+                    // 32bit integer in little endian format or Yoctopuce 10-3 format
+                    int numVal = funcval[ofs++] & 0xff;
+                    numVal += (int)(funcval[ofs++] & 0xff) << 8;
+                    numVal += (int)(funcval[ofs++] & 0xff) << 16;
+                    numVal += (int)(funcval[ofs++] & 0xff) << 24;
+                    if (funcValType == PUBVAL_C_LONG) {
+                        return String.format("%d", numVal);
+                    } else {
+                        buffer = String.format("%.3f", numVal / 1000.0);
+                        int endp = buffer.length();
+                        while (endp > 0 && buffer.charAt(endp - 1) == '0') {
+                            --endp;
+                        }
+                        if (endp > 0  && buffer.charAt(endp - 1) == '.') {
+                            --endp;
+                        }
+                        return buffer.substring(0, endp);
+                    }
+                case PUBVAL_C_FLOAT:
+                    // 32bit (short) float
+                    float floatVal = ByteBuffer.wrap(funcval).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                    buffer = String.format("%.6f", floatVal);
+                    int endp = buffer.length();
+                    while (endp > 0 && buffer.charAt(endp - 1) == '0') {
+                        --endp;
+                    }
+                    if (endp > 0  && buffer.charAt(endp - 1) == '.') {
+                        --endp;
+                    }
+                    return buffer.substring(0, endp);
+                default:
+                    return "?";
+            }
+        }
+
+        // Legacy handling: just pad with NUL up to 7 chars
+        int len = 0;
+        while (len < YAPI.YOCTO_PUBVAL_SIZE && len < funcvallen) {
+            if (funcval[len] == 0)
+                break;
+            len++;
+        }
+        return new String(funcval, 0, len);
+    }
+
 
     protected void updateFromWpAndYp(ArrayList<WPEntry> whitePages, HashMap<String, ArrayList<YPEntry>> yellowPages) throws YAPI_Exception
     {
@@ -119,7 +219,8 @@ abstract class YGenericHub {
     abstract ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception, InterruptedException;
 
 
-    interface RequestAsyncResult {
+    interface RequestAsyncResult
+    {
         void RequestAsyncDone(Object context, byte[] result, int error, String errmsg);
     }
 
@@ -128,7 +229,8 @@ abstract class YGenericHub {
     abstract byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body) throws YAPI_Exception;
 
 
-    protected static class HTTPParams {
+    protected static class HTTPParams
+    {
 
         private final String _host;
         private final int _port;

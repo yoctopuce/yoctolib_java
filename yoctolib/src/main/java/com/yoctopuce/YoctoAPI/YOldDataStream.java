@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOldDataStream.java 18339 2014-11-12 10:08:56Z seb $
+ * $Id: YOldDataStream.java 19328 2015-02-17 17:30:45Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *

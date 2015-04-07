@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI.java 19101 2015-01-27 14:13:32Z seb $
+ * $Id: YAPI.java 19535 2015-03-02 11:48:21Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -41,6 +41,7 @@ package com.yoctopuce.YoctoAPI;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -56,7 +57,7 @@ public class YAPI {
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "19218";
+    public static final String YOCTO_API_BUILD_STR = "19854";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -81,6 +82,7 @@ public class YAPI {
 
 //--- (end of generated code: YFunction return codes)
     static final String DefaultEncoding = "ISO-8859-1";
+    static Charset DeviceCharset;
 
     // Encoding types
     static final int YOCTO_CALIB_TYPE_OFS = 30;
@@ -688,7 +690,8 @@ public class YAPI {
     void setFunctionValue(String hwid, String pubval)
     {
         String classname = functionClass(hwid);
-        getFnByType(classname).setFunctionValue(hwid, pubval);
+        YFunctionType fnByType = getFnByType(classname);
+        fnByType.setFunctionValue(hwid, pubval);
     }
 
     // Set a function advertised value by hardware id
@@ -943,6 +946,11 @@ public class YAPI {
 
     YAPI()
     {
+        try {
+            DeviceCharset = Charset.forName(DefaultEncoding);
+        } catch (Exception dummy) {
+            DeviceCharset = Charset.defaultCharset();
+        }
         DefaultCacheValidity = 5;
         _hubs = new ArrayList<YGenericHub>();
         _devs = new HashMap<String, YDevice>();
@@ -1128,7 +1136,7 @@ public class YAPI {
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".19218";
+        return YOCTO_API_VERSION_STR + ".19854";
     }
 
     /**
@@ -1152,7 +1160,6 @@ public class YAPI {
      */
     public static int InitAPI(int mode) throws YAPI_Exception
     {
-
         YAPI yapi = SafeYAPI();
         if ((mode & YAPI.DETECT_NET) != 0) {
             yapi._RegisterHub("net");

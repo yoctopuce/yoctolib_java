@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFunction.java 18339 2014-11-12 10:08:56Z seb $
+ * $Id: YFunction.java 19670 2015-03-10 17:24:07Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -49,6 +49,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static com.yoctopuce.YoctoAPI.YAPI.DeviceCharset;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YFunction class start)
@@ -246,9 +247,9 @@ public class YFunction
     }
 
     /**
-     * Returns the current value of the function (no more than 6 characters).
+     * Returns a short string representing the current state of the function.
      *
-     * @return a string corresponding to the current value of the function (no more than 6 characters)
+     * @return a string corresponding to a short string representing the current state of the function
      *
      * @throws YAPI_Exception on error
      */
@@ -263,9 +264,9 @@ public class YFunction
     }
 
     /**
-     * Returns the current value of the function (no more than 6 characters).
+     * Returns a short string representing the current state of the function.
      *
-     * @return a string corresponding to the current value of the function (no more than 6 characters)
+     * @return a string corresponding to a short string representing the current state of the function
      *
      * @throws YAPI_Exception on error
      */
@@ -489,13 +490,13 @@ public class YFunction
     protected String _escapeAttr(String newval) throws YAPI_Exception
     {
         try {
-            String escaped = URLEncoder.encode(newval, "ISO-8859-1");
-            escaped = escaped.replaceAll("%21", "!")
-                    .replaceAll("%23", "#").replaceAll("%24", "$")
-                    .replaceAll("%27", "'").replaceAll("%28", "(").replaceAll("%29", ")")
-                    .replaceAll("%2C", ",").replaceAll("%2F", "/")
-                    .replaceAll("%3A", ":").replaceAll("%3B", ";").replaceAll("%3F", "?")
-                    .replaceAll("%40", "@").replaceAll("%5B", "[").replaceAll("%5D", "]");
+            String escaped = URLEncoder.encode(newval, YAPI.DefaultEncoding);
+            escaped = escaped.replace("%21", "!")
+                    .replace("%23", "#").replace("%24", "$")
+                    .replace("%27", "'").replace("%28", "(").replace("%29", ")")
+                    .replace("%2C", ",").replace("%2F", "/")
+                    .replace("%3A", ":").replace("%3B", ";").replace("%3F", "?")
+                    .replace("%40", "@").replace("%5B", "[").replace("%5D", "]");
             return escaped;
         } catch (UnsupportedEncodingException ex) {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Unsupported Encoding");
@@ -511,7 +512,7 @@ public class YFunction
         }
         String attrname;
         try {
-            attrname = URLEncoder.encode(attr, "ISO-8859-1");
+            attrname = URLEncoder.encode(attr, YAPI.DefaultEncoding);
         } catch (UnsupportedEncodingException ex) {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Unsupported Encoding");
         }
@@ -555,10 +556,8 @@ public class YFunction
     {
         JSONObject obj = null;
         try {
-            obj = new JSONObject(new String(json, "ISO-8859-1"));
+            obj = new JSONObject(new String(json, YAPI.DeviceCharset));
         } catch (JSONException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
-        } catch (UnsupportedEncodingException ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         if (obj.has(key)) {
@@ -574,11 +573,9 @@ public class YFunction
     {
         JSONArray array = null;
         try {
-            String s = new String(json, "ISO-8859-1");
+            String s = new String(json, YAPI.DeviceCharset);
             array = new JSONArray("[" + s + "]");
         } catch (JSONException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
-        } catch (UnsupportedEncodingException ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         try {
@@ -592,10 +589,8 @@ public class YFunction
     {
         JSONArray array = null;
         try {
-            array = new JSONArray(new String(json, "ISO-8859-1"));
+            array = new JSONArray(new String(json, DeviceCharset));
         } catch (JSONException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
-        } catch (UnsupportedEncodingException ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         ArrayList<String> list = new ArrayList<String>();
@@ -646,7 +641,7 @@ public class YFunction
             // request specified function only to minimize traffic
             if (extra.equals("")) {
                 String httpreq = "GET /api/" + _funId + ".json";
-                String yreq = new String(dev.requestHTTPSync(httpreq, null));
+                String yreq = dev.requestHTTPSyncAsString(httpreq, null);
                 try {
                     loadval = new JSONObject(yreq);
                 } catch (JSONException ex) {

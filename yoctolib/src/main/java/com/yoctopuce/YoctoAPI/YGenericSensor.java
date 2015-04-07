@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.java 18466 2014-11-21 08:19:59Z seb $
+ * $Id: YGenericSensor.java 19582 2015-03-04 10:58:07Z seb $
  *
  * Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -48,8 +48,11 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 /**
  * YGenericSensor Class: GenericSensor function interface
  *
- * The Yoctopuce application programming interface allows you to read an instant
- * measure of the sensor, as well as the minimal and maximal values observed.
+ * The YGenericSensor class allows you to read and configure Yoctopuce signal
+ * transducers. It inherits from YSensor class the core functions to read measurements,
+ * register callback functions, access to the autonomous datalogger.
+ * This class adds the ability to configure the automatic conversion between the
+ * measured signal and the corresponding engineering unit.
  */
  @SuppressWarnings("UnusedDeclaration")
 public class YGenericSensor extends YSensor

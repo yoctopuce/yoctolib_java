@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 18330 2014-11-11 16:26:36Z mvuilleu $
+ * $Id: YFiles.java 19328 2015-02-17 17:30:45Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *

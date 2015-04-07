@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 19092 2015-01-27 11:07:59Z seb $
+ * $Id: YModule.java 19854 2015-03-26 10:17:46Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -248,10 +248,8 @@ public class YModule extends YFunction
         JSONObject json = null;
         JSONArray out = new JSONArray();
         try {
-            json = new JSONObject(new String(actualSettings, "ISO-8859-1"));
+            json = new JSONObject(new String(actualSettings, YAPI.DeviceCharset));
         } catch (JSONException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
-        } catch (UnsupportedEncodingException ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         Iterator functionList = json.keys();
@@ -1052,7 +1050,7 @@ public class YModule extends YFunction
         return 32767;
     }
 
-    public String calibConvert(String param,String calibrationParam,String unit_name,String sensorType)
+    public String calibConvert(String param,String currentFuncValue,String unit_name,String sensorType)
     {
         int paramVer;
         int funVer;
@@ -1072,14 +1070,14 @@ public class YModule extends YFunction
         double wordVal;
         // Initial guess for parameter encoding
         paramVer = calibVersion(param);
-        funVer = calibVersion(calibrationParam);
+        funVer = calibVersion(currentFuncValue);
         funScale = calibScale(unit_name, sensorType);
         funOffset = calibOffset(unit_name);
         paramScale = funScale;
         paramOffset = funOffset;
         if (funVer < 3) {
             if (funVer == 2) {
-                words = SafeYAPI()._decodeWords(calibrationParam);
+                words = SafeYAPI()._decodeWords(currentFuncValue);
                 if ((words.get(0).intValue() == 1366) && (words.get(1).intValue() == 12500)) {
                     funScale = 1;
                     funOffset = 0;
@@ -1089,7 +1087,7 @@ public class YModule extends YFunction
                 }
             } else {
                 if (funVer == 1) {
-                    if (calibrationParam.equals("") || (Integer.valueOf(calibrationParam) > 10)) {
+                    if (currentFuncValue.equals("") || (Integer.valueOf(currentFuncValue) > 10)) {
                         funScale = 0;
                     }
                 }
@@ -1213,7 +1211,8 @@ public class YModule extends YFunction
 
     /**
      * Restores all the settings of the module. Useful to restore all the logical names and calibrations parameters
-     * of a module from a backup.
+     * of a module from a backup.Remember to call the saveToFlash() method of the module if the
+     * modifications must be kept.
      *
      * @param settings : a binary buffer with all the settings.
      *
@@ -1252,6 +1251,7 @@ public class YModule extends YFunction
         String newval;
         String oldval;
         String old_calib;
+        String each_str;
         boolean do_update;
         boolean found;
         oldval = "";
@@ -1259,16 +1259,16 @@ public class YModule extends YFunction
         old_json_flat = _flattenJsonStruct(settings);
         old_dslist = _json_get_array(old_json_flat);
         for (String ii:old_dslist) {
-            ii = _json_get_string(ii.getBytes());
-            leng = (ii).length();
-            eqpos = (ii).indexOf("=");
+            each_str = _json_get_string(ii.getBytes());
+            leng = (each_str).length();
+            eqpos = (each_str).indexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
                 _throw(YAPI.INVALID_ARGUMENT, "Invalid settings");
                 return YAPI.INVALID_ARGUMENT;
             }
-            jpath = (ii).substring( 0,  0 + eqpos);
+            jpath = (each_str).substring( 0,  0 + eqpos);
             eqpos = eqpos + 1;
-            value = (ii).substring( eqpos,  eqpos + leng - eqpos);
+            value = (each_str).substring( eqpos,  eqpos + leng - eqpos);
             old_jpath.add(jpath);
             old_jpath_len.add((jpath).length());
             old_val_arr.add(value);
@@ -1278,16 +1278,16 @@ public class YModule extends YFunction
         actualSettings = _flattenJsonStruct(actualSettings);
         new_dslist = _json_get_array(actualSettings);
         for (String ii:new_dslist) {
-            ii = _json_get_string(ii.getBytes());
-            leng = (ii).length();
-            eqpos = (ii).indexOf("=");
+            each_str = _json_get_string(ii.getBytes());
+            leng = (each_str).length();
+            eqpos = (each_str).indexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
                 _throw(YAPI.INVALID_ARGUMENT, "Invalid settings");
                 return YAPI.INVALID_ARGUMENT;
             }
-            jpath = (ii).substring( 0,  0 + eqpos);
+            jpath = (each_str).substring( 0,  0 + eqpos);
             eqpos = eqpos + 1;
-            value = (ii).substring( eqpos,  eqpos + leng - eqpos);
+            value = (each_str).substring( eqpos,  eqpos + leng - eqpos);
             new_jpath.add(jpath);
             new_jpath_len.add((jpath).length());
             new_val_arr.add(value);
@@ -1452,7 +1452,7 @@ public class YModule extends YFunction
                     while ((j < new_jpath.size()) && !(found)) {
                         if (tmp.equals(new_jpath.get(j))) {
                             found = true;
-                            unit_name = new_jpath.get(j);
+                            unit_name = new_val_arr.get(j);
                         }
                         j = j + 1;
                     }
@@ -1462,11 +1462,11 @@ public class YModule extends YFunction
                     while ((j < new_jpath.size()) && !(found)) {
                         if (tmp.equals(new_jpath.get(j))) {
                             found = true;
-                            sensorType = new_jpath.get(j);
+                            sensorType = new_val_arr.get(j);
                         }
                         j = j + 1;
                     }
-                    newval = calibConvert(new_val_arr.get(i), old_calib, unit_name, sensorType);
+                    newval = calibConvert(old_calib, new_val_arr.get(i), unit_name, sensorType);
                     url = "api/" + fun + ".json?" + attr + "=" + _escapeAttr(newval);
                     _download(url);
                 } else {

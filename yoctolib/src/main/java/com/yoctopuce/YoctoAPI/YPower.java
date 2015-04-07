@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPower.java 18466 2014-11-21 08:19:59Z seb $
+ * $Id: YPower.java 19582 2015-03-04 10:58:07Z seb $
  *
  * Implements FindPower(), the high-level API for Power functions
  *
@@ -48,8 +48,10 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 /**
  * YPower Class: Power function interface
  *
- * The Yoctopuce application programming interface allows you to read an instant
- * measure of the sensor, as well as the minimal and maximal values observed.
+ * The Yoctopuce class YPower allows you to read and configure Yoctopuce power
+ * sensors. It inherits from YSensor class the core functions to read measurements,
+ * register callback functions, access to the autonomous datalogger.
+ * This class adds the ability to access the energy counter and the power factor.
  */
  @SuppressWarnings("UnusedDeclaration")
 public class YPower extends YSensor

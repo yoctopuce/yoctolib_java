@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFileRecord.java 17570 2014-09-10 08:16:37Z seb $
+ * $Id: YFileRecord.java 19328 2015-02-17 17:30:45Z seb $
  *
  * YFileRecord Class: Description of a file on the device filesystem
  *

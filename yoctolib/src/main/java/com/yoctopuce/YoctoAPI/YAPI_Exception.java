@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI_Exception.java 18339 2014-11-12 10:08:56Z seb $
+ * $Id: YAPI_Exception.java 19328 2015-02-17 17:30:45Z seb $
  *
  * Class used to report exceptions within Yocto-API
  *

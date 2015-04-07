@@ -79,7 +79,6 @@ public class YFirmwareFile {
     public static YFirmwareFile Parse(String path, byte[] data) throws YAPI_Exception
     {
         int i;
-        Charset charSet = Charset.forName("ISO-8859-1");
         ByteBuffer buffer = ByteBuffer.wrap(data);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         if (buffer.get() != 'B' || buffer.get() != 'Y' || buffer.get() != 'N' || buffer.get() != 0) {
@@ -181,12 +180,11 @@ public class YFirmwareFile {
 
     private static String getString(byte[] serial_buf)
     {
-        Charset charSet = Charset.forName("ISO-8859-1");
         int i;
         for (i = 0; i < serial_buf.length && serial_buf[i] != 0; ) {
             i++;
         }
-        return new String(serial_buf, 0, i, charSet);
+        return new String(serial_buf, 0, i, YAPI.DeviceCharset);
     }
 
     private static String checkProgField(byte[] prog_buf) throws YAPI_Exception

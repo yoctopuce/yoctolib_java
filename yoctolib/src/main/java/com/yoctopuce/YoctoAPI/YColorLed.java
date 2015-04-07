@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 18524 2014-11-25 17:09:56Z seb $
+ * $Id: YColorLed.java 19328 2015-02-17 17:30:45Z seb $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.java 18466 2014-11-21 08:19:59Z seb $
+ * $Id: YLightSensor.java 19582 2015-03-04 10:58:07Z seb $
  *
  * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -48,8 +48,13 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 /**
  * YLightSensor Class: LightSensor function interface
  *
- * The Yoctopuce application programming interface allows you to read an instant
- * measure of the sensor, as well as the minimal and maximal values observed.
+ * The Yoctopuce class YLightSensor allows you to read and configure Yoctopuce light
+ * sensors. It inherits from YSensor class the core functions to read measurements,
+ * register callback functions, access to the autonomous datalogger.
+ * This class adds the ability to easily perform a one-point linear calibration
+ * to compensate the effect of a glass or filter placed in front of the sensor.
+ * For some light sensors with several working modes, this class can select the
+ * desired working mode.
  */
  @SuppressWarnings("UnusedDeclaration")
 public class YLightSensor extends YSensor

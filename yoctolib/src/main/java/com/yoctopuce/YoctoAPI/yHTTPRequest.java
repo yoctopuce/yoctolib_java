@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yHTTPRequest.java 18339 2014-11-12 10:08:56Z seb $
+ * $Id: yHTTPRequest.java 19452 2015-02-20 09:52:13Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -39,10 +39,7 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -254,13 +251,13 @@ class yHTTPRequest implements Runnable {
                 _lastReceiveTime = new Date().getTime();
                 synchronized (_result) {
                     if (!_header_found) {
-                        String partial_head = new String(buffer, 0, read);
+                        String partial_head = new String(buffer, 0, read, YAPI.DeviceCharset);
                         _header.append(partial_head);
                         int pos = _header.indexOf("\r\n\r\n");
                         if (pos > 0) {
                             pos += 4;
                             try {
-                                _result.write(_header.substring(pos).getBytes("ISO-8859-1"));
+                                _result.write(_header.substring(pos).getBytes(YAPI.DeviceCharset));
                             } catch (IOException ex) {
                                 throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
                             }

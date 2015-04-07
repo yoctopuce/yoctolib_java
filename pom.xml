@@ -7,7 +7,7 @@
     <groupId>com.yoctopuce.java</groupId>
     <artifactId>javabundle</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.19218-SNAPSHOT</version>
+    <version>1.10.19854-SNAPSHOT</version>
     <name>Yoctopuce Java API (with examples)</name>
     <description>Official Yoctopuce Library for Java with examples</description>
     <url>http://www.yoctopuce.com</url>
@@ -24,6 +24,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-Color</module>
         <module>Examples/Doc-GettingStarted-Yocto-Demo</module>
         <module>Examples/Doc-GettingStarted-Yocto-Display</module>
+        <module>Examples/Doc-GettingStarted-Yocto-GPS</module>
         <module>Examples/Doc-GettingStarted-Yocto-Knob</module>
         <module>Examples/Doc-GettingStarted-Yocto-LatchedRelay</module>
         <module>Examples/Doc-GettingStarted-Yocto-Light</module>
@@ -43,6 +44,8 @@
         <module>Examples/Doc-GettingStarted-Yocto-PWM-Tx</module>
         <module>Examples/Doc-GettingStarted-Yocto-Relay</module>
         <module>Examples/Doc-GettingStarted-Yocto-RS232</module>
+        <module>Examples/Doc-GettingStarted-Yocto-RS485</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Serial</module>
         <module>Examples/Doc-GettingStarted-Yocto-Servo</module>
         <module>Examples/Doc-GettingStarted-Yocto-Temperature</module>
         <module>Examples/Doc-GettingStarted-Yocto-Thermocouple</module>

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 18524 2014-11-25 17:09:56Z seb $
+ * $Id: YDisplayLayer.java 19328 2015-02-17 17:30:45Z seb $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *

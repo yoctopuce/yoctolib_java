@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFunctionType.java 18339 2014-11-12 10:08:56Z seb $
+ * $Id: YFunctionType.java 19328 2015-02-17 17:30:45Z seb $
  *
  * Internal YFunctionType object
  *

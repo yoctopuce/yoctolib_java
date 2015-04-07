@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 19192 2015-01-30 16:30:16Z mvuilleu $
+ * $Id: YSerialPort.java 19817 2015-03-23 16:49:57Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -344,6 +344,8 @@ public class YSerialPort extends YFunction
      * "Modbus-RTU" for MODBUS messages in RTU mode,
      * "Char" for a continuous ASCII stream or
      * "Byte" for a continuous binary stream.
+     * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
+     * is always at lest the specified number of milliseconds between each bytes sent.
      *
      * @param newval : a string corresponding to the type of protocol used over the serial line
      *
@@ -367,6 +369,8 @@ public class YSerialPort extends YFunction
      * "Modbus-RTU" for MODBUS messages in RTU mode,
      * "Char" for a continuous ASCII stream or
      * "Byte" for a continuous binary stream.
+     * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
+     * is always at lest the specified number of milliseconds between each bytes sent.
      *
      * @param newval : a string corresponding to the type of protocol used over the serial line
      *
@@ -922,6 +926,20 @@ public class YSerialPort extends YFunction
     }
 
     /**
+     * Sends a single byte to the serial port.
+     *
+     * @param code : the byte to send
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int writeByte(int code) throws YAPI_Exception
+    {
+        return sendCommand(String.format("$%02x",code));
+    }
+
+    /**
      * Sends an ASCII string to the serial port, as is.
      *
      * @param text : the text string to send
@@ -1086,6 +1104,40 @@ public class YSerialPort extends YFunction
     }
 
     /**
+     * Reads one byte from the receive buffer, starting at current stream position.
+     * If data at current stream position is not available anymore in the receive buffer,
+     * or if there is no data available yet, the function returns YAPI.NO_MORE_DATA.
+     *
+     * @return the next byte
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int readByte() throws YAPI_Exception
+    {
+        byte[] buff;
+        int bufflen;
+        int mult;
+        int endpos;
+        int res;
+        // may throw an exception
+        buff = _download(String.format("rxdata.bin?pos=%d&len=1",_rxptr));
+        bufflen = (buff).length - 1;
+        endpos = 0;
+        mult = 1;
+        while ((bufflen > 0) && (buff[bufflen] != 64)) {
+            endpos = endpos + mult * (buff[bufflen] - 48);
+            mult = mult * 10;
+            bufflen = bufflen - 1;
+        }
+        _rxptr = endpos;
+        if (bufflen == 0) {
+            return YAPI.NO_MORE_DATA;
+        }
+        res = buff[0];
+        return res;
+    }
+
+    /**
      * Reads data from the receive buffer as a string, starting at current stream position.
      * If data at current stream position is not available anymore in the receive buffer, the
      * function performs a short read.
@@ -1102,8 +1154,6 @@ public class YSerialPort extends YFunction
         int bufflen;
         int mult;
         int endpos;
-        int startpos;
-        int missing;
         String res;
         if (nChars > 65535) {
             nChars = 65535;
@@ -1118,21 +1168,94 @@ public class YSerialPort extends YFunction
             mult = mult * 10;
             bufflen = bufflen - 1;
         }
-        startpos = ((endpos - bufflen) & (0x7fffffff));
-        if (startpos != _rxptr) {
-            missing = ((startpos - _rxptr) & (0x7fffffff));
-            if (missing > nChars) {
-                nChars = 0;
-                _rxptr = startpos;
-            } else {
-                nChars = nChars - missing;
-            }
+        _rxptr = endpos;
+        res = (new String(buff)).substring( 0,  0 + bufflen);
+        return res;
+    }
+
+    /**
+     * Reads data from the receive buffer as a binary buffer, starting at current stream position.
+     * If data at current stream position is not available anymore in the receive buffer, the
+     * function performs a short read.
+     *
+     * @param nChars : the maximum number of bytes to read
+     *
+     * @return a binary object with receive buffer contents
+     *
+     * @throws YAPI_Exception on error
+     */
+    public byte[] readBin(int nChars) throws YAPI_Exception
+    {
+        byte[] buff;
+        int bufflen;
+        int mult;
+        int endpos;
+        int idx;
+        byte[] res;
+        if (nChars > 65535) {
+            nChars = 65535;
         }
-        if (nChars > bufflen) {
-            nChars = bufflen;
+        // may throw an exception
+        buff = _download(String.format("rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
+        bufflen = (buff).length - 1;
+        endpos = 0;
+        mult = 1;
+        while ((bufflen > 0) && (buff[bufflen] != 64)) {
+            endpos = endpos + mult * (buff[bufflen] - 48);
+            mult = mult * 10;
+            bufflen = bufflen - 1;
         }
-        _rxptr = endpos - (bufflen - nChars);
-        res = (new String(buff)).substring( 0,  0 + nChars);
+        _rxptr = endpos;
+        res = new byte[bufflen];
+        idx = 0;
+        while (idx < bufflen) {
+            res[idx] = (byte)(buff[idx] & 0xff);
+            idx = idx + 1;
+        }
+        return res;
+    }
+
+    /**
+     * Reads data from the receive buffer as a list of bytes, starting at current stream position.
+     * If data at current stream position is not available anymore in the receive buffer, the
+     * function performs a short read.
+     *
+     * @param nChars : the maximum number of bytes to read
+     *
+     * @return a sequence of bytes with receive buffer contents
+     *
+     * @throws YAPI_Exception on error
+     */
+    public ArrayList<Integer> readArray(int nChars) throws YAPI_Exception
+    {
+        byte[] buff;
+        int bufflen;
+        int mult;
+        int endpos;
+        int idx;
+        int b;
+        ArrayList<Integer> res = new ArrayList<Integer>();
+        if (nChars > 65535) {
+            nChars = 65535;
+        }
+        // may throw an exception
+        buff = _download(String.format("rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
+        bufflen = (buff).length - 1;
+        endpos = 0;
+        mult = 1;
+        while ((bufflen > 0) && (buff[bufflen] != 64)) {
+            endpos = endpos + mult * (buff[bufflen] - 48);
+            mult = mult * 10;
+            bufflen = bufflen - 1;
+        }
+        _rxptr = endpos;
+        res.clear();
+        idx = 0;
+        while (idx < bufflen) {
+            b = buff[idx];
+            res.add(b);
+            idx = idx + 1;
+        }
         return res;
     }
 
@@ -1153,8 +1276,6 @@ public class YSerialPort extends YFunction
         int bufflen;
         int mult;
         int endpos;
-        int startpos;
-        int missing;
         int ofs;
         String res;
         if (nBytes > 65535) {
@@ -1162,7 +1283,7 @@ public class YSerialPort extends YFunction
         }
         // may throw an exception
         buff = _download(String.format("rxdata.bin?pos=%d&len=%d", _rxptr,nBytes));
-        bufflen = (buff).length-1;
+        bufflen = (buff).length - 1;
         endpos = 0;
         mult = 1;
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
@@ -1170,27 +1291,14 @@ public class YSerialPort extends YFunction
             mult = mult * 10;
             bufflen = bufflen - 1;
         }
-        startpos = ((endpos - bufflen) & (0x7fffffff));
-        if (startpos != _rxptr) {
-            missing = ((startpos - _rxptr) & (0x7fffffff));
-            if (missing > nBytes) {
-                nBytes = 0;
-                _rxptr = startpos;
-            } else {
-                nBytes = nBytes - missing;
-            }
-        }
-        if (nBytes > bufflen) {
-            nBytes = bufflen;
-        }
-        _rxptr = endpos - (bufflen - nBytes);
+        _rxptr = endpos;
         res = "";
         ofs = 0;
-        while (ofs+3 < nBytes) {
-            res = String.format("%s%02x%02x%02x%02x", res, buff[ofs], buff[ofs+1], buff[ofs+2],buff[ofs+3]);
+        while (ofs + 3 < bufflen) {
+            res = String.format("%s%02x%02x%02x%02x", res, buff[ofs], buff[ofs + 1], buff[ofs + 2],buff[ofs + 3]);
             ofs = ofs + 4;
         }
-        while (ofs < nBytes) {
+        while (ofs < bufflen) {
             res = String.format("%s%02x", res,buff[ofs]);
             ofs = ofs + 1;
         }
@@ -1306,6 +1414,27 @@ public class YSerialPort extends YFunction
     public int read_tell()
     {
         return _rxptr;
+    }
+
+    /**
+     * Returns the number of bytes available to read in the input buffer starting from the
+     * current absolute stream position pointer of the YSerialPort object.
+     *
+     * @return the number of bytes available to read
+     */
+    public int read_avail() throws YAPI_Exception
+    {
+        byte[] buff;
+        int bufflen;
+        int res;
+        // may throw an exception
+        buff = _download(String.format("rxcnt.bin?pos=%d",_rxptr));
+        bufflen = (buff).length - 1;
+        while ((bufflen > 0) && (buff[bufflen] != 64)) {
+            bufflen = bufflen - 1;
+        }
+        res = Integer.valueOf((new String(buff)).substring( 0,  0 + bufflen));
+        return res;
     }
 
     /**

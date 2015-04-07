@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGyro.java 18339 2014-11-12 10:08:56Z seb $
+ * $Id: YGyro.java 19704 2015-03-13 06:10:37Z mvuilleu $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -50,8 +50,15 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 /**
  * YGyro Class: Gyroscope function interface
  *
- * The Yoctopuce application programming interface allows you to read an instant
- * measure of the sensor, as well as the minimal and maximal values observed.
+ * The YSensor class is the parent class for all Yoctopuce sensors. It can be
+ * used to read the current value and unit of any sensor, read the min/max
+ * value, configure autonomous recording frequency and access recorded data.
+ * It also provide a function to register a callback invoked each time the
+ * observed value changes, or at a predefined interval. Using this class rather
+ * than a specific subclass makes it possible to create generic applications
+ * that work with any Yoctopuce sensor, even those that do not yet exist.
+ * Note: The YAnButton class is the only analog input which does not inherit
+ * from YSensor.
  */
  @SuppressWarnings("UnusedDeclaration")
 public class YGyro extends YSensor
@@ -520,8 +527,9 @@ public class YGyro extends YSensor
      * @return a floating-point number corresponding to the x
      *         component of the quaternion.
      */
-    public double get_quaternionX()
+    public double get_quaternionX() throws YAPI_Exception
     {
+        _loadQuaternion();
         return _x;
     }
 
@@ -535,8 +543,9 @@ public class YGyro extends YSensor
      * @return a floating-point number corresponding to the y
      *         component of the quaternion.
      */
-    public double get_quaternionY()
+    public double get_quaternionY() throws YAPI_Exception
     {
+        _loadQuaternion();
         return _y;
     }
 
@@ -550,8 +559,9 @@ public class YGyro extends YSensor
      * @return a floating-point number corresponding to the z
      *         component of the quaternion.
      */
-    public double get_quaternionZ()
+    public double get_quaternionZ() throws YAPI_Exception
     {
+        _loadQuaternion();
         return _z;
     }
 

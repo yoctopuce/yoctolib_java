@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YUSBHub.java 19135 2015-01-29 16:45:58Z seb $
+ * $Id: YUSBHub.java 19328 2015-02-17 17:30:45Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *

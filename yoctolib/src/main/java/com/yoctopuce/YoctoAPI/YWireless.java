@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 18330 2014-11-11 16:26:36Z mvuilleu $
+ * $Id: YWireless.java 19328 2015-02-17 17:30:45Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *

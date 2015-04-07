@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHumidity.java 18466 2014-11-21 08:19:59Z seb $
+ * $Id: YHumidity.java 19582 2015-03-04 10:58:07Z seb $
  *
  * Implements FindHumidity(), the high-level API for Humidity functions
  *
@@ -48,8 +48,9 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 /**
  * YHumidity Class: Humidity function interface
  *
- * The Yoctopuce application programming interface allows you to read an instant
- * measure of the sensor, as well as the minimal and maximal values observed.
+ * The Yoctopuce class YHumidity allows you to read and configure Yoctopuce humidity
+ * sensors. It inherits from YSensor class the core functions to read measurements,
+ * register callback functions, access to the autonomous datalogger.
  */
  @SuppressWarnings("UnusedDeclaration")
 public class YHumidity extends YSensor

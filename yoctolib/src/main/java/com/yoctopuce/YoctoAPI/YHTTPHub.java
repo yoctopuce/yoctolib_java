@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHTTPHub.java 19201 2015-01-30 18:18:15Z seb $
+ * $Id: YHTTPHub.java 19535 2015-03-02 11:48:21Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -46,6 +46,7 @@ import java.net.SocketException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
@@ -61,6 +62,8 @@ class YHTTPHub extends YGenericHub {
     private final static char NOTIFY_NETPKT_FUNCVAL = '5';
     private final static char NOTIFY_NETPKT_LOG = '7';
     private final static char NOTIFY_NETPKT_FUNCNAMEYDX = '8';
+    private final static char NOTIFY_NETPKT_FLUSHV2YDX = 't';
+    private final static char NOTIFY_NETPKT_FUNCV2YDX = 'u';
     private final static char NOTIFY_NETPKT_TIMEV2YDX = 'v';
     private final static char NOTIFY_NETPKT_DEVLOGYDX = 'w';
     private final static char NOTIFY_NETPKT_TIMEVALYDX = 'x';
@@ -68,6 +71,8 @@ class YHTTPHub extends YGenericHub {
     private final static char NOTIFY_NETPKT_TIMEAVGYDX = 'z';
     private final static char NOTIFY_NETPKT_NOT_SYNC = '@';
     private static final long YPROG_BOOTLOADER_TIMEOUT = 10000;
+    private static final int NOTIFY_NETPKT_STOP = 10;
+
 
     private NotificationHandler _notificationHandler;
     private Thread _thread;
@@ -263,11 +268,56 @@ class YHTTPHub extends YGenericHub {
             return _sendPingNotification && !_connected;
         }
 
+        // Network notification format: 7x7bit (mapped to 7 chars in range 32..159)
+        //                              used to represent 1 flag (RAW6BYTES) + 6 bytes
+        // INPUT:  [R765432][1076543][2107654][3210765][4321076][5432107][6543210]
+        // OUTPUT: 7 bytes array (1 byte for the funcTypeV2 and 6 bytes of USB like data
+        //                     funcTypeV2 + [R][-byte 0][-byte 1-][-byte 2-][-byte 3-][-byte 4-][-byte 5-]
+        //
+        // return null on error
+        //
+        private byte[] decodeNetFuncValV2(byte[] p)
+        {
+            int p_ofs=0;
+            int ch = p[p_ofs] & 0xff;
+            int len = 0;
+            byte[] funcVal = new byte[7];
+            Arrays.fill(funcVal, (byte) 0);
+            if(ch < 32 || ch > 32 + 127) {
+                return null;
+            }
+            // get the 7 first bits
+            ch -= 32;
+            funcVal[0] = (byte) ((ch & 0x40) !=0? NOTIFY_V2_6RAWBYTES : NOTIFY_V2_TYPEDDATA);
+            // clear flag
+            ch &= 0x3f;
+            while(len < YAPI.YOCTO_PUBVAL_SIZE) {
+                p_ofs++;
+                if (p_ofs >= p.length)
+                    break;
+                int newCh = p[p_ofs] & 0xff;
+                if(newCh == NOTIFY_NETPKT_STOP) {
+                    break;
+                }
+                if(newCh < 32 || newCh > 32+127) {
+                    return null;
+                }
+                newCh -= 32;
+                ch = (ch << 7) + newCh;
+                funcVal[len + 1] = (byte) (ch >> (5-len));
+                len++;
+            }
+            return funcVal;
+        }
+
+
+
+
         private void handleNetNotification(String notification_line)
         {
             String ev = notification_line.trim();
 
-            if (ev.length() >= 3 && ev.charAt(0) >= NOTIFY_NETPKT_TIMEV2YDX && ev.charAt(0) <= NOTIFY_NETPKT_TIMEAVGYDX) {
+            if (ev.length() >= 3 && ev.charAt(0) >= NOTIFY_NETPKT_FLUSHV2YDX && ev.charAt(0) <= NOTIFY_NETPKT_TIMEAVGYDX) {
                 // function value ydx (tiny notification)
                 _devListValidity = 10000;
                 _notifRetryCount = 0;
@@ -276,7 +326,8 @@ class YHTTPHub extends YGenericHub {
                 }
                 int devydx = ev.charAt(1) - 65;// from 'A'
                 int funydx = ev.charAt(2) - 48;// from '0'
-                if (funydx >= 64) { // high bit of devydx is on second character
+
+                if ((funydx & 64)!=0) { // high bit of devydx is on second character
                     funydx -= 64;
                     devydx += 128;
                 }
@@ -322,6 +373,19 @@ class YHTTPHub extends YGenericHub {
                                     }
                                 }
                                 break;
+                            case NOTIFY_NETPKT_FUNCV2YDX:
+                                funcid = ydev.getYPEntry(funydx).getFuncId();
+                                if (!funcid.equals("")) {
+                                    byte[] rawval = decodeNetFuncValV2(value.getBytes());
+                                    if (rawval != null) {
+                                        String decodedval = decodePubVal(rawval[0], rawval, 1, 6);
+                                        // function value ydx (tiny notification)
+                                        SafeYAPI().setFunctionValue(serial + "." + funcid, decodedval);
+                                    }
+                                }
+                                break;
+                            case NOTIFY_NETPKT_FLUSHV2YDX:
+                                // To be implemented later
                             default:
                                 break;
                         }
