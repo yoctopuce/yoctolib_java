@@ -1,4 +1,1 @@
-- Add Yocto-RS485 example
-- Add additional functions to handle binary streams
 - Fix bug that corrupt calibration during firmware update
-- Fix empty string that can be returned by GetAllBootLoaders
