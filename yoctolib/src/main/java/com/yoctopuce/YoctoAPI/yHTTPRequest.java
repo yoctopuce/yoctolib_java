@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yHTTPRequest.java 19452 2015-02-20 09:52:13Z seb $
+ * $Id: yHTTPRequest.java 20056 2015-04-15 14:56:45Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -40,15 +40,15 @@
 package com.yoctopuce.YoctoAPI;
 
 import java.io.*;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.Date;
+import java.net.*;
+import java.nio.charset.Charset;
 
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 class yHTTPRequest implements Runnable {
+    public static final int YIO_DEFAULT_TCP_TIMEOUT = 20000;
+    private static final int YIO_IDLE_TCP_TIMEOUT = 5000;
+
     private Object _context;
     private YGenericHub.RequestAsyncResult _resultCallback;
 
@@ -58,16 +58,17 @@ class yHTTPRequest implements Runnable {
     }
 
     private enum State {
-        AVAIL, IN_REQUEST, STOPPED,
+        AVAIL, IN_REQUEST, STOPPED;
     }
 
     public static final int MAX_REQUEST_MS = 5000;
 
     private final YHTTPHub _hub;
+
     private Socket _socket = null;
     private boolean _reuse_socket = false;
-    private BufferedOutputStream _out = null;
-    private BufferedInputStream _in = null;
+    private OutputStream _out = null;
+    private InputStream _in = null;
     private State _state = State.AVAIL;
     private boolean _eof;
     private String _firstLine;
@@ -78,27 +79,15 @@ class yHTTPRequest implements Runnable {
     private final ByteArrayOutputStream _result = new ByteArrayOutputStream(1024);
     private long _startRequestTime;
     private long _lastReceiveTime;
-    private volatile int _noTrafficTimeout = 0;
-    private volatile int _soTimeout = MAX_REQUEST_MS;
+    private long _requestTimeout;
 
-    yHTTPRequest(YHTTPHub hub,String dbglabel)
+    yHTTPRequest(YHTTPHub hub, String dbglabel)
     {
         _hub = hub;
         _dbglabel = dbglabel;
     }
 
-    public void setNoTrafficTimeout(int noTrafficTimeout) throws SocketException {
-        this._noTrafficTimeout = noTrafficTimeout;
-        if (this._soTimeout > noTrafficTimeout) {
-            this._soTimeout = noTrafficTimeout;
-            if (_socket != null) {
-                _socket.setSoTimeout(_soTimeout);
-            }
-        }
-    }
-
-
-    synchronized  void _requestReserve() throws YAPI_Exception
+    synchronized void _requestReserve() throws YAPI_Exception
     {
         long timeout = YAPI.GetTickCount() + MAX_REQUEST_MS + 1000;
         while (timeout > YAPI.GetTickCount() && _state != State.AVAIL) {
@@ -116,18 +105,20 @@ class yHTTPRequest implements Runnable {
 
     synchronized void _requestRelease()
     {
-        _state   = State.AVAIL;
+        _state = State.AVAIL;
         notify();
     }
 
 
-    void _requestStart(String firstLine,byte[] rest_of_request, Object context,
-            YGenericHub.RequestAsyncResult resultCallback) throws YAPI_Exception
+    void _requestStart(String firstLine, byte[] rest_of_request, long mstimeout, Object context,
+                       YGenericHub.RequestAsyncResult resultCallback) throws YAPI_Exception
     {
         byte[] full_request;
         _firstLine = firstLine;
         _rest_of_request = rest_of_request;
         _context = context;
+        _startRequestTime = System.currentTimeMillis();
+        _requestTimeout = mstimeout;
         _resultCallback = resultCallback;
         String persistent_tag = firstLine.substring(firstLine.length() - 2);
         if (persistent_tag.equals("&.")) {
@@ -145,35 +136,66 @@ class yHTTPRequest implements Runnable {
             System.arraycopy(str_request.getBytes(), 0, full_request, 0, len);
             System.arraycopy(rest_of_request, 0, full_request, len, rest_of_request.length);
         }
-        try {
-            if (!_reuse_socket) {
-                _socket = new Socket(_hub.getHost(), _hub.getPort());
-                _socket.setTcpNoDelay(true);
-                _socket.setSoTimeout(_soTimeout);
-                _out = new BufferedOutputStream(_socket.getOutputStream());
-                _in = new BufferedInputStream(_socket.getInputStream());
+        boolean retry;
+        do {
+            retry = false;
+            try {
+                if (!_reuse_socket) {
+                    InetAddress addr = InetAddress.getByName(_hub.getHost());
+                    SocketAddress sockaddr = new InetSocketAddress(addr, _hub.getPort());
+                    // Creates an unconnected socket
+                    _socket = new Socket();
+                    _socket.connect(sockaddr, (int) mstimeout);
+                    _socket.setTcpNoDelay(true);
+                    _out = _socket.getOutputStream();
+                    _in = _socket.getInputStream();
+                }
+                _result.reset();
+                _header.setLength(0);
+                _header_found = false;
+                _eof = false;
+
+            } catch (UnknownHostException e) {
+                _requestStop();
+                throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Unknown host(" + _hub.getHost() + ")");
+            } catch (SocketException e) {
+                _requestStop();
+                throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
+            } catch (IOException e) {
+                _requestStop();
+                throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
             }
-            _result.reset();
-            _header.setLength(0);
-            _header_found = false;
-            _eof = false;
-            _out.write(full_request);
-            _out.flush();
+
+            // write request
+            try {
+                _out.write(full_request);
+                _out.flush();
+                _lastReceiveTime = -1;
+                if (_reuse_socket) {
+                    // it's a reusable socket read some data
+                    // to ensure socket is not closed by remote host
+                    _socket.setSoTimeout(1);
+                    int b = _in.read();
+                    if (b < 0) {
+                        // end of connection
+                        retry = true;
+                    } else {
+                        _header.append((char) b);
+                    }
+                }
+            } catch (SocketTimeoutException ignored) {
+            } catch (IOException e) {
+                e.printStackTrace();
+                if (_reuse_socket) {
+                    retry = true;
+                } else {
+                    _requestStop();
+                    throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
+                }
+            }
             _reuse_socket = false;
-            _lastReceiveTime = -1;
-            _startRequestTime = new Date().getTime();
-        }
-        catch (UnknownHostException e)
-        {
-            _requestStop();
-            throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Unknown host(" + _hub.getHost() + ")");
-        } catch (SocketException e) {
-            _requestStop();
-            throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
-        } catch (IOException e) {
-            _requestStop();
-            throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
-        }
+        } while (retry);
+
     }
 
 
@@ -207,7 +229,7 @@ class yHTTPRequest implements Runnable {
     void _requestReset() throws YAPI_Exception
     {
         _requestStop();
-        _requestStart(_firstLine, _rest_of_request, _context, _resultCallback);
+        _requestStart(_firstLine, _rest_of_request, _requestTimeout, _context, _resultCallback);
     }
 
 
@@ -224,22 +246,33 @@ class yHTTPRequest implements Runnable {
             retry = false;
             byte[] buffer = new byte[1024];
             try {
+                if (_requestTimeout > 0) {
+                    long read_timeout = _startRequestTime + _requestTimeout - System.currentTimeMillis();
+                    if (read_timeout < 0) {
+                        throw new YAPI_Exception(YAPI.TIMEOUT, String.format("Hub did not send data during %dms", System.currentTimeMillis() - _lastReceiveTime));
+                    }
+                    if (read_timeout > YIO_IDLE_TCP_TIMEOUT) {
+                        read_timeout = YIO_IDLE_TCP_TIMEOUT;
+                    }
+                    _socket.setSoTimeout((int) read_timeout);
+                } else {
+                    _socket.setSoTimeout(YIO_IDLE_TCP_TIMEOUT);
+                }
                 read = _in.read(buffer, 0, buffer.length);
             } catch (SocketTimeoutException e) {
-                Date now = new Date();
-                // global request timeout
-                long duration = now.getTime() - _startRequestTime;
-                if (duration > MAX_REQUEST_MS) {
-                    throw new YAPI_Exception(YAPI.TIMEOUT, String.format("TCP request took too long (%dms)", duration));
-                } else if (duration > MAX_REQUEST_MS / 2) {
-                    YAPI.SafeYAPI()._Log(String.format("Slow TCP request on %s (%dms)\n", _hub.getHost(), duration));
-                }
-                if (_lastReceiveTime < 0 || now.getTime() - _lastReceiveTime < _noTrafficTimeout) {
-
+                long nowTime = System.currentTimeMillis();
+                if (_lastReceiveTime < 0 || nowTime - _lastReceiveTime < YIO_IDLE_TCP_TIMEOUT) {
                     retry = true;
                     continue;
                 }
-                throw new YAPI_Exception(YAPI.TIMEOUT, String.format("Hub did not send data during %dms", now.getTime() - _lastReceiveTime));
+                long duration = nowTime - _startRequestTime;
+                // global request timeout
+                if (duration > _requestTimeout) {
+                    throw new YAPI_Exception(YAPI.TIMEOUT, String.format("TCP request on %s took too long (%dms)", _hub.getHost(), duration));
+                } else if (duration > (_requestTimeout - _requestTimeout / 4)) {
+                    YAPI.SafeYAPI()._Log(String.format("Slow TCP request on %s (%dms)\n", _hub.getHost(), duration));
+                }
+                throw new YAPI_Exception(YAPI.TIMEOUT, String.format("Hub did not send data during %dms", nowTime - _lastReceiveTime));
             } catch (IOException e) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
             }
@@ -248,7 +281,7 @@ class yHTTPRequest implements Runnable {
                 _reuse_socket = false;
                 _eof = true;
             } else if (read > 0) {
-                _lastReceiveTime = new Date().getTime();
+                _lastReceiveTime = System.currentTimeMillis();
                 synchronized (_result) {
                     if (!_header_found) {
                         String partial_head = new String(buffer, 0, read, YAPI.DeviceCharset);
@@ -320,12 +353,12 @@ class yHTTPRequest implements Runnable {
     }
 
 
-    byte[] RequestSync(String req_first_line, byte[] req_head_and_body) throws YAPI_Exception
+    byte[] RequestSync(String req_first_line, byte[] req_head_and_body, int mstimeout) throws YAPI_Exception
     {
         byte[] res;
         _requestReserve();
         try {
-            _requestStart(req_first_line, req_head_and_body, null, null);
+            _requestStart(req_first_line, req_head_and_body, mstimeout, null, null);
             int read;
             do {
                 read = _requestProcesss();
@@ -345,8 +378,6 @@ class yHTTPRequest implements Runnable {
         return res;
     }
 
-
-    @Override
     public void run()
     {
         byte[] res = null;
@@ -375,11 +406,11 @@ class yHTTPRequest implements Runnable {
     }
 
 
-    void RequestAsync(String req_first_line, byte[] req_head_and_body,YGenericHub.RequestAsyncResult callback, Object context) throws YAPI_Exception
+    void RequestAsync(String req_first_line, byte[] req_head_and_body, YGenericHub.RequestAsyncResult callback, Object context) throws YAPI_Exception
     {
         _requestReserve();
         try {
-            _requestStart(req_first_line, req_head_and_body, context, callback);
+            _requestStart(req_first_line, req_head_and_body, yHTTPRequest.YIO_DEFAULT_TCP_TIMEOUT, context, callback);
             Thread t = new Thread(this);
             t.setName(_dbglabel);
             t.start();

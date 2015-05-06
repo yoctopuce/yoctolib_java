@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 19727 2015-03-13 16:22:10Z mvuilleu $
+ * $Id: YCellular.java 20167 2015-04-27 14:24:03Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -67,6 +67,10 @@ public class YCellular extends YFunction
      */
     public static final String CELLOPERATOR_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid imsi value
+     */
+    public static final String IMSI_INVALID = YAPI.INVALID_STRING;
+    /**
      * invalid message value
      */
     public static final String MESSAGE_INVALID = YAPI.INVALID_STRING;
@@ -99,6 +103,7 @@ public class YCellular extends YFunction
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _linkQuality = LINKQUALITY_INVALID;
     protected String _cellOperator = CELLOPERATOR_INVALID;
+    protected String _imsi = IMSI_INVALID;
     protected String _message = MESSAGE_INVALID;
     protected String _pin = PIN_INVALID;
     protected String _lockedOperator = LOCKEDOPERATOR_INVALID;
@@ -155,6 +160,9 @@ public class YCellular extends YFunction
         }
         if (json_val.has("cellOperator")) {
             _cellOperator = json_val.getString("cellOperator");
+        }
+        if (json_val.has("imsi")) {
+            _imsi = json_val.getString("imsi");
         }
         if (json_val.has("message")) {
             _message = json_val.getString("message");
@@ -236,6 +244,43 @@ public class YCellular extends YFunction
     public String getCellOperator() throws YAPI_Exception
     {
         return get_cellOperator();
+    }
+
+    /**
+     * Returns an opaque string if a PIN code has been configured in the device to access
+     * the SIM card, or an empty string if none has been configured or if the code provided
+     * was rejected by the SIM card.
+     *
+     * @return a string corresponding to an opaque string if a PIN code has been configured in the device to access
+     *         the SIM card, or an empty string if none has been configured or if the code provided
+     *         was rejected by the SIM card
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_imsi() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return IMSI_INVALID;
+            }
+        }
+        return _imsi;
+    }
+
+    /**
+     * Returns an opaque string if a PIN code has been configured in the device to access
+     * the SIM card, or an empty string if none has been configured or if the code provided
+     * was rejected by the SIM card.
+     *
+     * @return a string corresponding to an opaque string if a PIN code has been configured in the device to access
+     *         the SIM card, or an empty string if none has been configured or if the code provided
+     *         was rejected by the SIM card
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getImsi() throws YAPI_Exception
+    {
+        return get_imsi();
     }
 
     /**

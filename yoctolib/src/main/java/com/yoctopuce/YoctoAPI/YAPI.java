@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI.java 19535 2015-03-02 11:48:21Z seb $
+ * $Id: YAPI.java 20077 2015-04-17 09:03:55Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -57,7 +57,7 @@ public class YAPI {
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "19938";
+    public static final String YOCTO_API_BUILD_STR = "20255";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -831,6 +831,25 @@ public class YAPI {
         return SUCCESS;
     }
 
+    protected synchronized int _TestHub(String url, int mstimeout, InputStream request, OutputStream response) throws YAPI_Exception
+    {
+        YGenericHub newhub;
+        YGenericHub.HTTPParams parsedurl = new YGenericHub.HTTPParams(url);
+        // Add hub to known list
+        if (url.equals("usb")) {
+            YUSBHub.CheckUSBAcces();
+            newhub = new YUSBHub(0);
+        } else if (url.equals("net")) {
+            return SUCCESS;
+        } else if (parsedurl.getHost().equals("callback")) {
+            newhub = new YCallbackHub(0, parsedurl, request, response);
+        } else {
+            newhub = new YHTTPHub(0, parsedurl, true);
+        }
+        return newhub.ping(mstimeout);
+    }
+
+
 
     void _UpdateValueCallbackList(YFunction func, boolean add)
     {
@@ -1136,7 +1155,7 @@ public class YAPI {
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".19938";
+        return YOCTO_API_VERSION_STR + ".20255";
     }
 
     /**
@@ -1288,6 +1307,27 @@ public class YAPI {
     {
         SafeYAPI()._UnregisterHub(url);
     }
+
+
+    /**
+     * Test if the hub is reachable. This method do not register the hub, it only test if the
+     * hub is usable. The url parameter follow the same convention as the RegisterHub
+     * method. This method is useful to verify the authentication parameters for a hub. It
+     * is possible to force this method to return after mstimeout milliseconds.
+     *
+     * @param url : a string containing either "usb","callback" or the
+     *         root URL of the hub to monitor
+     * @param mstimeout : the number of millisecond available to test the connection.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * On failure returns a negative error code.
+     */
+    public static int TestHub(String url, int mstimeout) throws YAPI_Exception
+    {
+        return SafeYAPI()._TestHub(url, mstimeout, null, null);
+    }
+
 
     /**
      * Triggers a (re)detection of connected Yoctopuce modules.

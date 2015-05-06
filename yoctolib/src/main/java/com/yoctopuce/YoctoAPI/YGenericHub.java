@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericHub.java 19535 2015-03-02 11:48:21Z seb $
+ * $Id: YGenericHub.java 20076 2015-04-17 09:03:36Z seb $
  *
  * Internal YGenericHub object
  *
@@ -142,8 +142,9 @@ abstract class YGenericHub
                         }
                         if (endp > 0  && buffer.charAt(endp - 1) == '.') {
                             --endp;
+                            buffer = buffer.substring(0, endp);
                         }
-                        return buffer.substring(0, endp);
+                        return buffer;
                     }
                 case PUBVAL_C_FLOAT:
                     // 32bit (short) float
@@ -155,8 +156,9 @@ abstract class YGenericHub
                     }
                     if (endp > 0  && buffer.charAt(endp - 1) == '.') {
                         --endp;
+                        buffer = buffer.substring(0, endp);
                     }
-                    return buffer.substring(0, endp);
+                    return buffer;
                 default:
                     return "?";
             }
@@ -210,6 +212,8 @@ abstract class YGenericHub
     abstract void updateDeviceList(boolean forceupdate) throws YAPI_Exception;
 
     public abstract ArrayList<String> getBootloaders() throws YAPI_Exception;
+
+    abstract int ping(int mstimeout) throws YAPI_Exception;
 
     interface UpdateProgress
     {
