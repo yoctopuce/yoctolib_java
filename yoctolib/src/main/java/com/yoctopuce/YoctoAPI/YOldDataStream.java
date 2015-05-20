@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOldDataStream.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YOldDataStream.java 20376 2015-05-19 14:18:47Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -39,11 +39,12 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
+import java.util.ArrayList;
 
 /**
  * YOldDataStream Class: Sequence of measured data, returned by the data logger
@@ -58,9 +59,9 @@ import org.json.JSONTokener;
  */
 public class YOldDataStream extends YDataStream
 {
-    YDataLogger     _dataLogger;
-    int             _timeStamp;
-    int             _interval;
+    YDataLogger _dataLogger;
+    int _timeStamp;
+    int _interval;
 
     public YOldDataStream(YDataLogger parent, int run, int stamp, long utc, int itv)
     {

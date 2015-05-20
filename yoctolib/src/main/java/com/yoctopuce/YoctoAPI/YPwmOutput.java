@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmOutput.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YPwmOutput.java 20287 2015-05-08 13:40:21Z seb $
  *
  * Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -46,7 +46,7 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (end of YPwmOutput return codes)
 //--- (YPwmOutput class start)
 /**
- * YPwmOutput Class: Pwm function interface
+ * YPwmOutput Class: PwmOutput function interface
  *
  * The Yoctopuce application programming interface allows you to configure, start, and stop the PWM.
  */

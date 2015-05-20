@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 19619 2015-03-05 18:11:23Z mvuilleu $
+ * $Id: YTemperature.java 20383 2015-05-19 23:44:31Z mvuilleu $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -411,6 +411,40 @@ public class YTemperature extends YSensor
             super._invokeTimedReportCallback(value);
         }
         return 0;
+    }
+
+    /**
+     * Configure NTC thermistor parameters in order to properly compute the temperature from
+     * the measured resistance. For increased precision, you can enter a complete mapping
+     * table using set_thermistorResponseTable. This function can only be used with a
+     * temperature sensor based on thermistors.
+     *
+     * @param res25 : thermistor resistance at 25 degrees Celsius
+     * @param beta : Beta value
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_ntcParameters(double res25,double beta) throws YAPI_Exception
+    {
+        double t0;
+        double t1;
+        double res100;
+        ArrayList<Double> tempValues = new ArrayList<Double>();
+        ArrayList<Double> resValues = new ArrayList<Double>();
+        t0 = 25.0+275.15;
+        t1 = 100.0+275.15;
+        res100 = res25 * java.lang.Math.exp(beta*(1.0/t1 - 1.0/t0));
+        tempValues.clear();
+        resValues.clear();
+        tempValues.add(25.0);
+        resValues.add(res25);
+        tempValues.add(100.0);
+        resValues.add(res100);
+        
+        
+        return set_thermistorResponseTable(tempValues, resValues);
     }
 
     /**

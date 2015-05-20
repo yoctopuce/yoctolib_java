@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 20167 2015-04-27 14:24:03Z seb $
+ * $Id: YCellular.java 20376 2015-05-19 14:18:47Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -38,11 +38,14 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YCellular return codes)
 //--- (end of generated code: YCellular return codes)

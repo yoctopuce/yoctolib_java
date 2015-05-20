@@ -1,2 +1,1 @@
-- Fix race condition that drop setXXX on network devices
-- Fix invalid notification value for YGenericDevices
+- Fix truncated notification

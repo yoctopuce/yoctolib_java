@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI.java 20077 2015-04-17 09:03:55Z seb $
+ * $Id: YAPI.java 20376 2015-05-19 14:18:47Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -42,7 +42,11 @@ package com.yoctopuce.YoctoAPI;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Queue;
 
 /**
  *
@@ -57,7 +61,7 @@ public class YAPI {
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "20255";
+    public static final String YOCTO_API_BUILD_STR = "20384";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -104,7 +108,10 @@ public class YAPI {
     public static final int DETECT_NONE = 0;
     public static final int DETECT_USB = 1;
     public static final int DETECT_NET = 2;
+    public static final int RESEND_MISSING_PKT = 4;
     public static final int DETECT_ALL = DETECT_USB | DETECT_NET;
+    public static final int DEFAULT_PKT_RESEND_DELAY = 50;
+    static int pktAckDelay = DEFAULT_PKT_RESEND_DELAY;
 
 
     private final YSSDP.YSSDPReportInterface _ssdpCallback = new YSSDP.YSSDPReportInterface() {
@@ -1155,7 +1162,7 @@ public class YAPI {
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".20255";
+        return YOCTO_API_VERSION_STR + ".20384";
     }
 
     /**
@@ -1182,6 +1189,9 @@ public class YAPI {
         YAPI yapi = SafeYAPI();
         if ((mode & YAPI.DETECT_NET) != 0) {
             yapi._RegisterHub("net");
+        }
+        if ((mode & YAPI.RESEND_MISSING_PKT) != 0) {
+            YAPI.pktAckDelay = DEFAULT_PKT_RESEND_DELAY;
         }
         if ((mode & YAPI.DETECT_USB) != 0) {
             yapi._RegisterHub("usb");

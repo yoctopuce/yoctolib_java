@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellRecord.java 19678 2015-03-11 07:44:40Z mvuilleu $
+ * $Id: YCellRecord.java 20376 2015-05-19 14:18:47Z seb $
  *
  * Implements FindCellRecord(), the high-level API for CellRecord functions
  *
@@ -38,10 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
-
 //--- (generated code: YCellRecord return codes)
 //--- (end of generated code: YCellRecord return codes)
 //--- (generated code: YCellRecord class start)

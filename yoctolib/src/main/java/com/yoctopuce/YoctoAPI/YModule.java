@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 19854 2015-03-26 10:17:46Z seb $
+ * $Id: YModule.java 20376 2015-05-19 14:18:47Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -38,12 +38,11 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;

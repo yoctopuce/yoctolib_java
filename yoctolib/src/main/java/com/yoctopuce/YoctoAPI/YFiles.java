@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YFiles.java 20376 2015-05-19 14:18:47Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -39,10 +39,12 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
-import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YFiles class start)
 /**

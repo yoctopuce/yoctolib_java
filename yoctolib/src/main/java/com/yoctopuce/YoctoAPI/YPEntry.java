@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPEntry.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YPEntry.java 20376 2015-05-19 14:18:47Z seb $
  *
  * Yellow page implementation
  *
@@ -39,9 +39,10 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 
 class YPEntry {

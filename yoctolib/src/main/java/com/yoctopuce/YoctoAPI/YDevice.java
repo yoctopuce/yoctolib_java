@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDevice.java 19452 2015-02-20 09:52:13Z seb $
+ * $Id: YDevice.java 20376 2015-05-19 14:18:47Z seb $
  *
  * Internal YDevice class
  *
@@ -42,7 +42,6 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

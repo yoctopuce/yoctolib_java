@@ -1,9 +1,7 @@
 package com.yoctopuce.YoctoAPI;
 
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -195,7 +193,7 @@ public class YFirmwareFile {
             try {
                 int tools = Integer.parseInt(YAPI.YOCTO_API_BUILD_STR);
                 if (byn > tools) {
-                    throw new YAPI_Exception(YAPI.VERSION_MISMATCH, "Please upgrade the hub device first");
+                    throw new YAPI_Exception(YAPI.VERSION_MISMATCH, "Too recent firmware. Please update the yoctopuce library");
                 }
             } catch (NumberFormatException ignore) {
             }

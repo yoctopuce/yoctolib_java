@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YDisplay.java 20376 2015-05-19 14:18:47Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -39,9 +39,10 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YDisplay class start)
 /**
@@ -976,7 +977,7 @@ public class YDisplay extends YFunction
      */
     public synchronized YDisplayLayer get_displayLayer(int layerId) throws YAPI_Exception
     {
-        if (_allDisplayLayers==null) {
+        if (_allDisplayLayers == null) {
             int nb_display_layer = this.get_layerCount();
             _allDisplayLayers = new YDisplayLayer[nb_display_layer];
             for (int i = 0; i < nb_display_layer; i++) {

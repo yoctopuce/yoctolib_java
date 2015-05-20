@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yHTTPRequest.java 20056 2015-04-15 14:56:45Z seb $
+ * $Id: yHTTPRequest.java 20376 2015-05-19 14:18:47Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -39,9 +39,17 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import java.io.*;
-import java.net.*;
-import java.nio.charset.Charset;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 

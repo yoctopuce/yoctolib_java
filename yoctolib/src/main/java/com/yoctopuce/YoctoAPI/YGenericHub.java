@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericHub.java 20076 2015-04-17 09:03:36Z seb $
+ * $Id: YGenericHub.java 20376 2015-05-19 14:18:47Z seb $
  *
  * Internal YGenericHub object
  *
@@ -167,11 +167,11 @@ abstract class YGenericHub
         // Legacy handling: just pad with NUL up to 7 chars
         int len = 0;
         while (len < YAPI.YOCTO_PUBVAL_SIZE && len < funcvallen) {
-            if (funcval[len] == 0)
+            if (funcval[len + ofs] == 0)
                 break;
             len++;
         }
-        return new String(funcval, 0, len);
+        return new String(funcval, ofs, len);
     }
 
 

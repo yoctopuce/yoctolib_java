@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YWireless.java 20376 2015-05-19 14:18:47Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -39,10 +39,12 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
-import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YWireless class start)
 /**

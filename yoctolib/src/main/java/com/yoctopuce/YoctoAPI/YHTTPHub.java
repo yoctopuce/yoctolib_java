@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHTTPHub.java 20056 2015-04-15 14:56:45Z seb $
+ * $Id: YHTTPHub.java 20376 2015-05-19 14:18:47Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -42,7 +42,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.SocketException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -50,8 +49,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
