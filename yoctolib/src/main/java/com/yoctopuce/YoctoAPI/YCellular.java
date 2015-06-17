@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 20376 2015-05-19 14:18:47Z seb $
+ * $Id: YCellular.java 20468 2015-05-29 10:24:28Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -789,7 +789,6 @@ public class YCellular extends YFunction
     public int sendPUK(String puk,String newPin) throws YAPI_Exception
     {
         String gsmMsg;
-        
         gsmMsg = get_message();
         if (!(gsmMsg.equals("Enter SIM PUK"))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,  "PUK not expected at this time");}
         if (newPin.equals("")) {
@@ -850,7 +849,6 @@ public class YCellular extends YFunction
             cmdLen = cmdLen + 2;
             chrPos = (cmd).indexOf("=");
         }
-        
         // may throw an exception
         content = _download(String.format("at.txt?cmd=%s",cmd));
         return new String(content);
@@ -890,7 +888,7 @@ public class YCellular extends YFunction
         if ((mccs).substring(0, 0 + 1).equals("0")) {
             mccs = (mccs).substring(1, 1 + 1);
         }
-        mcc = Integer.valueOf(mccs);
+        mcc = YAPI._atoi(mccs);
         mncs = (moni).substring(11, 11 + 3);
         if ((mncs).substring(2, 2 + 1).equals(",")) {
             mncs = (mncs).substring(0, 0 + 2);
@@ -898,7 +896,7 @@ public class YCellular extends YFunction
         if ((mncs).substring(0, 0 + 1).equals("0")) {
             mncs = (mncs).substring(1, 1 + (mncs).length()-1);
         }
-        mnc = Integer.valueOf(mncs);
+        mnc = YAPI._atoi(mncs);
         recs = new ArrayList<String>(Arrays.asList(moni.split("#")));
         // process each line in turn
         res.clear();
@@ -912,13 +910,13 @@ public class YCellular extends YFunction
                     if ((dbms).substring(0, 0 + 1).equals(" ")) {
                         dbms = (dbms).substring(1, 1 + 3);
                     }
-                    dbm = Integer.valueOf(dbms);
+                    dbm = YAPI._atoi(dbms);
                     if (llen > 66) {
                         tads = (ii).substring(54, 54 + 2);
                         if ((tads).substring(0, 0 + 1).equals(" ")) {
                             tads = (tads).substring(1, 1 + 3);
                         }
-                        tad = Integer.valueOf(tads);
+                        tad = YAPI._atoi(tads);
                         oper = (ii).substring(66, 66 + llen-66);
                     } else {
                         tad = -1;

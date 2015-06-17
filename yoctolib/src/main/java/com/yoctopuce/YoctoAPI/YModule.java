@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 20376 2015-05-19 14:18:47Z seb $
+ * $Id: YModule.java 20468 2015-05-29 10:24:28Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -951,7 +951,7 @@ public class YModule extends YFunction
         int release;
         String tmp_res;
         if (onlynew) {
-            release = Integer.valueOf(get_firmwareRelease());
+            release = YAPI._atoi(get_firmwareRelease());
         } else {
             release = 0;
         }
@@ -1029,7 +1029,7 @@ public class YModule extends YFunction
             if (sensorType.equals("")) {
                 return 16;
             }
-            if (Integer.valueOf(sensorType) < 8) {
+            if (YAPI._atoi(sensorType) < 8) {
                 return 16;
             } else {
                 return 100;
@@ -1086,7 +1086,7 @@ public class YModule extends YFunction
                 }
             } else {
                 if (funVer == 1) {
-                    if (currentFuncValue.equals("") || (Integer.valueOf(currentFuncValue) > 10)) {
+                    if (currentFuncValue.equals("") || (YAPI._atoi(currentFuncValue) > 10)) {
                         funScale = 0;
                     }
                 }
@@ -1119,7 +1119,7 @@ public class YModule extends YFunction
                 if (paramVer == 1) {
                     words_str = new ArrayList<String>(Arrays.asList(param.split(",")));
                     for (String ii:words_str) {
-                        words.add(Integer.valueOf(ii));
+                        words.add(YAPI._atoi(ii));
                     }
                     if (param.equals("") || (words.get(0).intValue() > 10)) {
                         paramScale = 0;

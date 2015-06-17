@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 19817 2015-03-23 16:49:57Z seb $
+ * $Id: YSerialPort.java 20468 2015-05-29 10:24:28Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -1335,7 +1335,7 @@ public class YSerialPort extends YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        _rxptr = Integer.valueOf(msgarr.get(msglen));
+        _rxptr = YAPI._atoi(msgarr.get(msglen));
         if (msglen == 0) {
             return "";
         }
@@ -1382,7 +1382,7 @@ public class YSerialPort extends YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        _rxptr = Integer.valueOf(msgarr.get(msglen));
+        _rxptr = YAPI._atoi(msgarr.get(msglen));
         idx = 0;
         while (idx < msglen) {
             res.add(_json_get_string(msgarr.get(idx).getBytes()));
@@ -1433,7 +1433,7 @@ public class YSerialPort extends YFunction
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
             bufflen = bufflen - 1;
         }
-        res = Integer.valueOf((new String(buff)).substring( 0,  0 + bufflen));
+        res = YAPI._atoi((new String(buff)).substring( 0,  0 + bufflen));
         return res;
     }
 
@@ -1466,7 +1466,7 @@ public class YSerialPort extends YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        _rxptr = Integer.valueOf(msgarr.get(msglen));
+        _rxptr = YAPI._atoi(msgarr.get(msglen));
         if (msglen == 0) {
             return "";
         }

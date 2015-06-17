@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBluetoothLink.java 20326 2015-05-12 15:35:18Z seb $
+ * $Id: YBluetoothLink.java 20644 2015-06-12 16:04:33Z seb $
  *
  * Implements FindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -69,9 +69,37 @@ public class YBluetoothLink extends YFunction
      */
     public static final String REMOTEADDRESS_INVALID = YAPI.INVALID_STRING;
     /**
-     * invalid message value
+     * invalid remoteName value
      */
-    public static final String MESSAGE_INVALID = YAPI.INVALID_STRING;
+    public static final String REMOTENAME_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid mute value
+     */
+    public static final int MUTE_FALSE = 0;
+    public static final int MUTE_TRUE = 1;
+    public static final int MUTE_INVALID = -1;
+    /**
+     * invalid preAmplifier value
+     */
+    public static final int PREAMPLIFIER_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid volume value
+     */
+    public static final int VOLUME_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid linkState value
+     */
+    public static final int LINKSTATE_DOWN = 0;
+    public static final int LINKSTATE_FREE = 1;
+    public static final int LINKSTATE_SEARCH = 2;
+    public static final int LINKSTATE_EXISTS = 3;
+    public static final int LINKSTATE_LINKED = 4;
+    public static final int LINKSTATE_PLAY = 5;
+    public static final int LINKSTATE_INVALID = -1;
+    /**
+     * invalid linkQuality value
+     */
+    public static final int LINKQUALITY_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid command value
      */
@@ -79,7 +107,12 @@ public class YBluetoothLink extends YFunction
     protected String _ownAddress = OWNADDRESS_INVALID;
     protected String _pairingPin = PAIRINGPIN_INVALID;
     protected String _remoteAddress = REMOTEADDRESS_INVALID;
-    protected String _message = MESSAGE_INVALID;
+    protected String _remoteName = REMOTENAME_INVALID;
+    protected int _mute = MUTE_INVALID;
+    protected int _preAmplifier = PREAMPLIFIER_INVALID;
+    protected int _volume = VOLUME_INVALID;
+    protected int _linkState = LINKSTATE_INVALID;
+    protected int _linkQuality = LINKQUALITY_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackBluetoothLink = null;
 
@@ -134,8 +167,23 @@ public class YBluetoothLink extends YFunction
         if (json_val.has("remoteAddress")) {
             _remoteAddress = json_val.getString("remoteAddress");
         }
-        if (json_val.has("message")) {
-            _message = json_val.getString("message");
+        if (json_val.has("remoteName")) {
+            _remoteName = json_val.getString("remoteName");
+        }
+        if (json_val.has("mute")) {
+            _mute = json_val.getInt("mute") > 0 ? 1 : 0;
+        }
+        if (json_val.has("preAmplifier")) {
+            _preAmplifier = json_val.getInt("preAmplifier");
+        }
+        if (json_val.has("volume")) {
+            _volume = json_val.getInt("volume");
+        }
+        if (json_val.has("linkState")) {
+            _linkState = json_val.getInt("linkState");
+        }
+        if (json_val.has("linkQuality")) {
+            _linkQuality = json_val.getInt("linkQuality");
         }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
@@ -307,32 +355,279 @@ public class YBluetoothLink extends YFunction
     }
 
     /**
-     * Returns the latest status message from the bluetooth interface.
+     * Returns the bluetooth name the remote device, if found on the bluetooth network.
      *
-     * @return a string corresponding to the latest status message from the bluetooth interface
+     * @return a string corresponding to the bluetooth name the remote device, if found on the bluetooth network
      *
      * @throws YAPI_Exception on error
      */
-    public String get_message() throws YAPI_Exception
+    public String get_remoteName() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
             if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MESSAGE_INVALID;
+                return REMOTENAME_INVALID;
             }
         }
-        return _message;
+        return _remoteName;
     }
 
     /**
-     * Returns the latest status message from the bluetooth interface.
+     * Returns the bluetooth name the remote device, if found on the bluetooth network.
      *
-     * @return a string corresponding to the latest status message from the bluetooth interface
+     * @return a string corresponding to the bluetooth name the remote device, if found on the bluetooth network
      *
      * @throws YAPI_Exception on error
      */
-    public String getMessage() throws YAPI_Exception
+    public String getRemoteName() throws YAPI_Exception
     {
-        return get_message();
+        return get_remoteName();
+    }
+
+    /**
+     * Returns the state of the mute function.
+     *
+     *  @return either YBluetoothLink.MUTE_FALSE or YBluetoothLink.MUTE_TRUE, according to the state of the
+     * mute function
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_mute() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return MUTE_INVALID;
+            }
+        }
+        return _mute;
+    }
+
+    /**
+     * Returns the state of the mute function.
+     *
+     * @return either Y_MUTE_FALSE or Y_MUTE_TRUE, according to the state of the mute function
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getMute() throws YAPI_Exception
+    {
+        return get_mute();
+    }
+
+    /**
+     * Changes the state of the mute function. Remember to call the matching module
+     * saveToFlash() method to save the setting permanently.
+     *
+     *  @param newval : either YBluetoothLink.MUTE_FALSE or YBluetoothLink.MUTE_TRUE, according to the
+     * state of the mute function
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_mute(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        _setAttr("mute",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the state of the mute function. Remember to call the matching module
+     * saveToFlash() method to save the setting permanently.
+     *
+     * @param newval : either Y_MUTE_FALSE or Y_MUTE_TRUE, according to the state of the mute function
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setMute(int newval)  throws YAPI_Exception
+    {
+        return set_mute(newval);
+    }
+
+    /**
+     * Returns the audio pre-amplifier volume, in per cents.
+     *
+     * @return an integer corresponding to the audio pre-amplifier volume, in per cents
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_preAmplifier() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PREAMPLIFIER_INVALID;
+            }
+        }
+        return _preAmplifier;
+    }
+
+    /**
+     * Returns the audio pre-amplifier volume, in per cents.
+     *
+     * @return an integer corresponding to the audio pre-amplifier volume, in per cents
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getPreAmplifier() throws YAPI_Exception
+    {
+        return get_preAmplifier();
+    }
+
+    /**
+     * Changes the audio pre-amplifier volume, in per cents.
+     *
+     * @param newval : an integer corresponding to the audio pre-amplifier volume, in per cents
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_preAmplifier(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("preAmplifier",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the audio pre-amplifier volume, in per cents.
+     *
+     * @param newval : an integer corresponding to the audio pre-amplifier volume, in per cents
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setPreAmplifier(int newval)  throws YAPI_Exception
+    {
+        return set_preAmplifier(newval);
+    }
+
+    /**
+     * Returns the connected headset volume, in per cents.
+     *
+     * @return an integer corresponding to the connected headset volume, in per cents
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_volume() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return VOLUME_INVALID;
+            }
+        }
+        return _volume;
+    }
+
+    /**
+     * Returns the connected headset volume, in per cents.
+     *
+     * @return an integer corresponding to the connected headset volume, in per cents
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getVolume() throws YAPI_Exception
+    {
+        return get_volume();
+    }
+
+    /**
+     * Changes the connected headset volume, in per cents.
+     *
+     * @param newval : an integer corresponding to the connected headset volume, in per cents
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_volume(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("volume",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the connected headset volume, in per cents.
+     *
+     * @param newval : an integer corresponding to the connected headset volume, in per cents
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setVolume(int newval)  throws YAPI_Exception
+    {
+        return set_volume(newval);
+    }
+
+    /**
+     * Returns the bluetooth link state.
+     *
+     *  @return a value among YBluetoothLink.LINKSTATE_DOWN, YBluetoothLink.LINKSTATE_FREE,
+     *  YBluetoothLink.LINKSTATE_SEARCH, YBluetoothLink.LINKSTATE_EXISTS, YBluetoothLink.LINKSTATE_LINKED
+     * and YBluetoothLink.LINKSTATE_PLAY corresponding to the bluetooth link state
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_linkState() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return LINKSTATE_INVALID;
+            }
+        }
+        return _linkState;
+    }
+
+    /**
+     * Returns the bluetooth link state.
+     *
+     *  @return a value among Y_LINKSTATE_DOWN, Y_LINKSTATE_FREE, Y_LINKSTATE_SEARCH, Y_LINKSTATE_EXISTS,
+     * Y_LINKSTATE_LINKED and Y_LINKSTATE_PLAY corresponding to the bluetooth link state
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getLinkState() throws YAPI_Exception
+    {
+        return get_linkState();
+    }
+
+    /**
+     * Returns the bluetooth receiver signal strength, in pourcents, or 0 if no connection is established.
+     *
+     *  @return an integer corresponding to the bluetooth receiver signal strength, in pourcents, or 0 if
+     * no connection is established
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_linkQuality() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return LINKQUALITY_INVALID;
+            }
+        }
+        return _linkQuality;
+    }
+
+    /**
+     * Returns the bluetooth receiver signal strength, in pourcents, or 0 if no connection is established.
+     *
+     *  @return an integer corresponding to the bluetooth receiver signal strength, in pourcents, or 0 if
+     * no connection is established
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getLinkQuality() throws YAPI_Exception
+    {
+        return get_linkQuality();
     }
 
     /**

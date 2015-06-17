@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YRefFrame.java 20468 2015-05-29 10:24:28Z seb $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -642,9 +642,9 @@ public class YRefFrame extends YFunction
         _calibStageHint = "Set down the device on a steady horizontal surface";
         _calibPrevTick = ((currTick + 500) & (0x7FFFFFFF));
         jsonData = _download("api/accelerometer.json");
-        xVal = Integer.valueOf(_json_get_key(jsonData, "xValue")) / 65536.0;
-        yVal = Integer.valueOf(_json_get_key(jsonData, "yValue")) / 65536.0;
-        zVal = Integer.valueOf(_json_get_key(jsonData, "zValue")) / 65536.0;
+        xVal = YAPI._atoi(_json_get_key(jsonData, "xValue")) / 65536.0;
+        yVal = YAPI._atoi(_json_get_key(jsonData, "yValue")) / 65536.0;
+        zVal = YAPI._atoi(_json_get_key(jsonData, "zValue")) / 65536.0;
         xSq = xVal * xVal;
         if (xSq >= 0.04 && xSq < 0.64) {
             return YAPI.SUCCESS;

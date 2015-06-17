@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YAudioOut.java 20565 2015-06-04 09:59:10Z seb $
+ * $Id: pic24config.php 20612 2015-06-09 01:27:02Z mvuilleu $
  *
- * Implements FindAudioOut(), the high-level API for AudioOut functions
+ * Implements FindAudioIn(), the high-level API for AudioIn functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,19 +42,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-//--- (YAudioOut return codes)
-//--- (end of YAudioOut return codes)
-//--- (YAudioOut class start)
+//--- (YAudioIn return codes)
+//--- (end of YAudioIn return codes)
+//--- (YAudioIn class start)
 /**
- * YAudioOut Class: AudioOut function interface
+ * YAudioIn Class: AudioIn function interface
  *
- * The Yoctopuce application programming interface allows you to configure the volume of the outout.
+ * The Yoctopuce application programming interface allows you to configure the volume of the input channel.
  */
  @SuppressWarnings("UnusedDeclaration")
-public class YAudioOut extends YFunction
+public class YAudioIn extends YFunction
 {
-//--- (end of YAudioOut class start)
-//--- (YAudioOut definitions)
+//--- (end of YAudioIn class start)
+//--- (YAudioIn definitions)
     /**
      * invalid volume value
      */
@@ -77,10 +77,10 @@ public class YAudioOut extends YFunction
     protected int _mute = MUTE_INVALID;
     protected int _signal = SIGNAL_INVALID;
     protected int _noSignalFor = NOSIGNALFOR_INVALID;
-    protected UpdateCallback _valueCallbackAudioOut = null;
+    protected UpdateCallback _valueCallbackAudioIn = null;
 
     /**
-     * Deprecated UpdateCallback for AudioOut
+     * Deprecated UpdateCallback for AudioIn
      */
     public interface UpdateCallback {
         /**
@@ -88,11 +88,11 @@ public class YAudioOut extends YFunction
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
-        void yNewValue(YAudioOut function, String functionValue);
+        void yNewValue(YAudioIn function, String functionValue);
     }
 
     /**
-     * TimedReportCallback for AudioOut
+     * TimedReportCallback for AudioIn
      */
     public interface TimedReportCallback {
         /**
@@ -100,24 +100,24 @@ public class YAudioOut extends YFunction
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
-        void timedReportCallback(YAudioOut  function, YMeasure measure);
+        void timedReportCallback(YAudioIn  function, YMeasure measure);
     }
-    //--- (end of YAudioOut definitions)
+    //--- (end of YAudioIn definitions)
 
 
     /**
      *
      * @param func : functionid
      */
-    protected YAudioOut(String func)
+    protected YAudioIn(String func)
     {
         super(func);
-        _className = "AudioOut";
-        //--- (YAudioOut attributes initialization)
-        //--- (end of YAudioOut attributes initialization)
+        _className = "AudioIn";
+        //--- (YAudioIn attributes initialization)
+        //--- (end of YAudioIn attributes initialization)
     }
 
-    //--- (YAudioOut implementation)
+    //--- (YAudioIn implementation)
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -137,9 +137,9 @@ public class YAudioOut extends YFunction
     }
 
     /**
-     * Returns audio output volume, in per cents.
+     * Returns audio input gain, in per cents.
      *
-     * @return an integer corresponding to audio output volume, in per cents
+     * @return an integer corresponding to audio input gain, in per cents
      *
      * @throws YAPI_Exception on error
      */
@@ -154,9 +154,9 @@ public class YAudioOut extends YFunction
     }
 
     /**
-     * Returns audio output volume, in per cents.
+     * Returns audio input gain, in per cents.
      *
-     * @return an integer corresponding to audio output volume, in per cents
+     * @return an integer corresponding to audio input gain, in per cents
      *
      * @throws YAPI_Exception on error
      */
@@ -166,9 +166,9 @@ public class YAudioOut extends YFunction
     }
 
     /**
-     * Changes audio output volume, in per cents.
+     * Changes audio input gain, in per cents.
      *
-     * @param newval : an integer corresponding to audio output volume, in per cents
+     * @param newval : an integer corresponding to audio input gain, in per cents
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -183,9 +183,9 @@ public class YAudioOut extends YFunction
     }
 
     /**
-     * Changes audio output volume, in per cents.
+     * Changes audio input gain, in per cents.
      *
-     * @param newval : an integer corresponding to audio output volume, in per cents
+     * @param newval : an integer corresponding to audio input gain, in per cents
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -199,7 +199,7 @@ public class YAudioOut extends YFunction
     /**
      * Returns the state of the mute function.
      *
-     * @return either YAudioOut.MUTE_FALSE or YAudioOut.MUTE_TRUE, according to the state of the mute function
+     * @return either YAudioIn.MUTE_FALSE or YAudioIn.MUTE_TRUE, according to the state of the mute function
      *
      * @throws YAPI_Exception on error
      */
@@ -229,7 +229,7 @@ public class YAudioOut extends YFunction
      * Changes the state of the mute function. Remember to call the matching module
      * saveToFlash() method to save the setting permanently.
      *
-     * @param newval : either YAudioOut.MUTE_FALSE or YAudioOut.MUTE_TRUE, according to the state of the mute function
+     * @param newval : either YAudioIn.MUTE_FALSE or YAudioIn.MUTE_TRUE, according to the state of the mute function
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -259,9 +259,9 @@ public class YAudioOut extends YFunction
     }
 
     /**
-     * Returns the detected output current level.
+     * Returns the detected input signal level.
      *
-     * @return an integer corresponding to the detected output current level
+     * @return an integer corresponding to the detected input signal level
      *
      * @throws YAPI_Exception on error
      */
@@ -276,9 +276,9 @@ public class YAudioOut extends YFunction
     }
 
     /**
-     * Returns the detected output current level.
+     * Returns the detected input signal level.
      *
-     * @return an integer corresponding to the detected output current level
+     * @return an integer corresponding to the detected input signal level
      *
      * @throws YAPI_Exception on error
      */
@@ -317,7 +317,7 @@ public class YAudioOut extends YFunction
     }
 
     /**
-     * Retrieves an audio output for a given identifier.
+     * Retrieves an audio input for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -327,25 +327,25 @@ public class YAudioOut extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the audio output is online at the time
+     * This function does not require that the audio input is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YAudioOut.isOnline() to test if the audio output is
+     * Use the method YAudioIn.isOnline() to test if the audio input is
      * indeed online at a given time. In case of ambiguity when looking for
-     * an audio output by logical name, no error is notified: the first instance
+     * an audio input by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
-     * @param func : a string that uniquely characterizes the audio output
+     * @param func : a string that uniquely characterizes the audio input
      *
-     * @return a YAudioOut object allowing you to drive the audio output.
+     * @return a YAudioIn object allowing you to drive the audio input.
      */
-    public static YAudioOut FindAudioOut(String func)
+    public static YAudioIn FindAudioIn(String func)
     {
-        YAudioOut obj;
-        obj = (YAudioOut) YFunction._FindFromCache("AudioOut", func);
+        YAudioIn obj;
+        obj = (YAudioIn) YFunction._FindFromCache("AudioIn", func);
         if (obj == null) {
-            obj = new YAudioOut(func);
-            YFunction._AddToCache("AudioOut", func, obj);
+            obj = new YAudioIn(func);
+            YFunction._AddToCache("AudioIn", func, obj);
         }
         return obj;
     }
@@ -369,7 +369,7 @@ public class YAudioOut extends YFunction
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
-        _valueCallbackAudioOut = callback;
+        _valueCallbackAudioIn = callback;
         // Immediately invoke value callback with current value
         if (callback != null && isOnline()) {
             val = _advertisedValue;
@@ -383,8 +383,8 @@ public class YAudioOut extends YFunction
     @Override
     public int _invokeValueCallback(String value)
     {
-        if (_valueCallbackAudioOut != null) {
-            _valueCallbackAudioOut.yNewValue(this, value);
+        if (_valueCallbackAudioIn != null) {
+            _valueCallbackAudioIn.yNewValue(this, value);
         } else {
             super._invokeValueCallback(value);
         }
@@ -392,13 +392,13 @@ public class YAudioOut extends YFunction
     }
 
     /**
-     * Continues the enumeration of audio outputs started using yFirstAudioOut().
+     * Continues the enumeration of audio inputs started using yFirstAudioIn().
      *
-     * @return a pointer to a YAudioOut object, corresponding to
-     *         an audio output currently online, or a null pointer
-     *         if there are no more audio outputs to enumerate.
+     * @return a pointer to a YAudioIn object, corresponding to
+     *         an audio input currently online, or a null pointer
+     *         if there are no more audio inputs to enumerate.
      */
-    public  YAudioOut nextAudioOut()
+    public  YAudioIn nextAudioIn()
     {
         String next_hwid;
         try {
@@ -408,25 +408,25 @@ public class YAudioOut extends YFunction
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindAudioOut(next_hwid);
+        return FindAudioIn(next_hwid);
     }
 
     /**
-     * Starts the enumeration of audio outputs currently accessible.
-     * Use the method YAudioOut.nextAudioOut() to iterate on
-     * next audio outputs.
+     * Starts the enumeration of audio inputs currently accessible.
+     * Use the method YAudioIn.nextAudioIn() to iterate on
+     * next audio inputs.
      *
-     * @return a pointer to a YAudioOut object, corresponding to
-     *         the first audio output currently online, or a null pointer
+     * @return a pointer to a YAudioIn object, corresponding to
+     *         the first audio input currently online, or a null pointer
      *         if there are none.
      */
-    public static YAudioOut FirstAudioOut()
+    public static YAudioIn FirstAudioIn()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("AudioOut");
+        String next_hwid = SafeYAPI().getFirstHardwareId("AudioIn");
         if (next_hwid == null)  return null;
-        return FindAudioOut(next_hwid);
+        return FindAudioIn(next_hwid);
     }
 
-    //--- (end of YAudioOut implementation)
+    //--- (end of YAudioIn implementation)
 }
 

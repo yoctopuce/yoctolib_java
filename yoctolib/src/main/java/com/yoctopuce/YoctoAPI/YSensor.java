@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 20376 2015-05-19 14:18:47Z seb $
+ * $Id: YSensor.java 20412 2015-05-22 08:52:39Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -102,6 +102,10 @@ public class YSensor extends YFunction
      * invalid resolution value
      */
     public static final double RESOLUTION_INVALID = YAPI.INVALID_DOUBLE;
+    /**
+     * invalid sensorState value
+     */
+    public static final int SENSORSTATE_INVALID = YAPI.INVALID_INT;
     protected String _unit = UNIT_INVALID;
     protected double _currentValue = CURRENTVALUE_INVALID;
     protected double _lowestValue = LOWESTVALUE_INVALID;
@@ -111,6 +115,7 @@ public class YSensor extends YFunction
     protected String _reportFrequency = REPORTFREQUENCY_INVALID;
     protected String _calibrationParam = CALIBRATIONPARAM_INVALID;
     protected double _resolution = RESOLUTION_INVALID;
+    protected int _sensorState = SENSORSTATE_INVALID;
     protected UpdateCallback _valueCallbackSensor = null;
     protected TimedReportCallback _timedReportCallbackSensor = null;
     protected double _prevTimedReport = 0;
@@ -302,6 +307,9 @@ public class YSensor extends YFunction
         }
         if (json_val.has("resolution")) {
             _resolution = Math.round(json_val.getDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
+        }
+        if (json_val.has("sensorState")) {
+            _sensorState = json_val.getInt("sensorState");
         }
         super._parseAttr(json_val);
     }
@@ -776,6 +784,41 @@ public class YSensor extends YFunction
     }
 
     /**
+     * Returns the sensor health state code, which is zero when there is an up-to-date measure
+     * available or a positive code if the sensor is not able to provide a measure right now.
+     *
+     *  @return an integer corresponding to the sensor health state code, which is zero when there is an
+     * up-to-date measure
+     *         available or a positive code if the sensor is not able to provide a measure right now
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_sensorState() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SENSORSTATE_INVALID;
+            }
+        }
+        return _sensorState;
+    }
+
+    /**
+     * Returns the sensor health state code, which is zero when there is an up-to-date measure
+     * available or a positive code if the sensor is not able to provide a measure right now.
+     *
+     *  @return an integer corresponding to the sensor health state code, which is zero when there is an
+     * up-to-date measure
+     *         available or a positive code if the sensor is not able to provide a measure right now
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getSensorState() throws YAPI_Exception
+    {
+        return get_sensorState();
+    }
+
+    /**
      * Retrieves a sensor for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
@@ -982,6 +1025,25 @@ public class YSensor extends YFunction
             }
         }
         return 0;
+    }
+
+    /**
+     * Checks if the sensor is currently able to provide an up-to-date measure.
+     * Returns false if the device is unreachable, or if the sensor does not have
+     * a current measure to transmit. No exception is raised if there is an error
+     * while trying to contact the device hosting $THEFUNCTION$.
+     *
+     * @return true if the sensor can provide an up-to-date measure, and false otherwise
+     */
+    public boolean isSensorReady()
+    {
+        if (!(isOnline())) {
+            return false;
+        }
+        if (!(_sensorState == 0)) {
+            return false;
+        }
+        return true;
     }
 
     /**

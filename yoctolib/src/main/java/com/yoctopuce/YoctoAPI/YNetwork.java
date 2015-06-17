@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YNetwork.java 20599 2015-06-08 12:16:39Z seb $
  *
  * Implements FindNetwork(), the high-level API for Network functions
  *
@@ -94,6 +94,10 @@ public class YNetwork extends YFunction
      */
     public static final String SECONDARYDNS_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid ntpServer value
+     */
+    public static final String NTPSERVER_INVALID = YAPI.INVALID_STRING;
+    /**
      * invalid userPassword value
      */
     public static final String USERPASSWORD_INVALID = YAPI.INVALID_STRING;
@@ -101,6 +105,14 @@ public class YNetwork extends YFunction
      * invalid adminPassword value
      */
     public static final String ADMINPASSWORD_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid httpPort value
+     */
+    public static final int HTTPPORT_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid defaultPage value
+     */
+    public static final String DEFAULTPAGE_INVALID = YAPI.INVALID_STRING;
     /**
      * invalid discoverable value
      */
@@ -130,6 +142,8 @@ public class YNetwork extends YFunction
     public static final int CALLBACKENCODING_JSON_ARRAY = 2;
     public static final int CALLBACKENCODING_CSV = 3;
     public static final int CALLBACKENCODING_YOCTO_API = 4;
+    public static final int CALLBACKENCODING_JSON_NUM = 5;
+    public static final int CALLBACKENCODING_EMONCMS = 6;
     public static final int CALLBACKENCODING_INVALID = -1;
     /**
      * invalid callbackCredentials value
@@ -155,8 +169,11 @@ public class YNetwork extends YFunction
     protected String _ipConfig = IPCONFIG_INVALID;
     protected String _primaryDNS = PRIMARYDNS_INVALID;
     protected String _secondaryDNS = SECONDARYDNS_INVALID;
+    protected String _ntpServer = NTPSERVER_INVALID;
     protected String _userPassword = USERPASSWORD_INVALID;
     protected String _adminPassword = ADMINPASSWORD_INVALID;
+    protected int _httpPort = HTTPPORT_INVALID;
+    protected String _defaultPage = DEFAULTPAGE_INVALID;
     protected int _discoverable = DISCOVERABLE_INVALID;
     protected int _wwwWatchdogDelay = WWWWATCHDOGDELAY_INVALID;
     protected String _callbackUrl = CALLBACKURL_INVALID;
@@ -234,11 +251,20 @@ public class YNetwork extends YFunction
         if (json_val.has("secondaryDNS")) {
             _secondaryDNS = json_val.getString("secondaryDNS");
         }
+        if (json_val.has("ntpServer")) {
+            _ntpServer = json_val.getString("ntpServer");
+        }
         if (json_val.has("userPassword")) {
             _userPassword = json_val.getString("userPassword");
         }
         if (json_val.has("adminPassword")) {
             _adminPassword = json_val.getString("adminPassword");
+        }
+        if (json_val.has("httpPort")) {
+            _httpPort = json_val.getInt("httpPort");
+        }
+        if (json_val.has("defaultPage")) {
+            _defaultPage = json_val.getString("defaultPage");
         }
         if (json_val.has("discoverable")) {
             _discoverable = json_val.getInt("discoverable") > 0 ? 1 : 0;
@@ -611,6 +637,68 @@ public class YNetwork extends YFunction
     }
 
     /**
+     * Returns the IP address of the NTP server to be used by the device.
+     *
+     * @return a string corresponding to the IP address of the NTP server to be used by the device
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_ntpServer() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return NTPSERVER_INVALID;
+            }
+        }
+        return _ntpServer;
+    }
+
+    /**
+     * Returns the IP address of the NTP server to be used by the device.
+     *
+     * @return a string corresponding to the IP address of the NTP server to be used by the device
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getNtpServer() throws YAPI_Exception
+    {
+        return get_ntpServer();
+    }
+
+    /**
+     * Changes the IP address of the NTP server to be used by the module.
+     * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
+     *
+     * @param newval : a string corresponding to the IP address of the NTP server to be used by the module
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_ntpServer(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = newval;
+        _setAttr("ntpServer",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the IP address of the NTP server to be used by the module.
+     * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
+     *
+     * @param newval : a string corresponding to the IP address of the NTP server to be used by the module
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setNtpServer(String newval)  throws YAPI_Exception
+    {
+        return set_ntpServer(newval);
+    }
+
+    /**
      * Returns a hash string if a password has been set for "user" user,
      * or an empty string otherwise.
      *
@@ -752,6 +840,134 @@ public class YNetwork extends YFunction
     public int setAdminPassword(String newval)  throws YAPI_Exception
     {
         return set_adminPassword(newval);
+    }
+
+    /**
+     * Returns the HTML page to serve for the URL "/"" of the hub.
+     *
+     * @return an integer corresponding to the HTML page to serve for the URL "/"" of the hub
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_httpPort() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return HTTPPORT_INVALID;
+            }
+        }
+        return _httpPort;
+    }
+
+    /**
+     * Returns the HTML page to serve for the URL "/"" of the hub.
+     *
+     * @return an integer corresponding to the HTML page to serve for the URL "/"" of the hub
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getHttpPort() throws YAPI_Exception
+    {
+        return get_httpPort();
+    }
+
+    /**
+     * Changes the default HTML page returned by the hub. If not value are set the hub return
+     * "index.html" which is the web interface of the hub. It is possible de change this page
+     * for file that has been uploaded on the hub.
+     *
+     * @param newval : an integer corresponding to the default HTML page returned by the hub
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_httpPort(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("httpPort",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the default HTML page returned by the hub. If not value are set the hub return
+     * "index.html" which is the web interface of the hub. It is possible de change this page
+     * for file that has been uploaded on the hub.
+     *
+     * @param newval : an integer corresponding to the default HTML page returned by the hub
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setHttpPort(int newval)  throws YAPI_Exception
+    {
+        return set_httpPort(newval);
+    }
+
+    /**
+     * Returns the HTML page to serve for the URL "/"" of the hub.
+     *
+     * @return a string corresponding to the HTML page to serve for the URL "/"" of the hub
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_defaultPage() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return DEFAULTPAGE_INVALID;
+            }
+        }
+        return _defaultPage;
+    }
+
+    /**
+     * Returns the HTML page to serve for the URL "/"" of the hub.
+     *
+     * @return a string corresponding to the HTML page to serve for the URL "/"" of the hub
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getDefaultPage() throws YAPI_Exception
+    {
+        return get_defaultPage();
+    }
+
+    /**
+     * Changes the default HTML page returned by the hub. If not value are set the hub return
+     * "index.html" which is the web interface of the hub. It is possible de change this page
+     * for file that has been uploaded on the hub.
+     *
+     * @param newval : a string corresponding to the default HTML page returned by the hub
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_defaultPage(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = newval;
+        _setAttr("defaultPage",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the default HTML page returned by the hub. If not value are set the hub return
+     * "index.html" which is the web interface of the hub. It is possible de change this page
+     * for file that has been uploaded on the hub.
+     *
+     * @param newval : a string corresponding to the default HTML page returned by the hub
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setDefaultPage(String newval)  throws YAPI_Exception
+    {
+        return set_defaultPage(newval);
     }
 
     /**
@@ -1036,8 +1252,9 @@ public class YNetwork extends YFunction
      * Returns the encoding standard to use for representing notification values.
      *
      *  @return a value among YNetwork.CALLBACKENCODING_FORM, YNetwork.CALLBACKENCODING_JSON,
-     *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV and
-     *  YNetwork.CALLBACKENCODING_YOCTO_API corresponding to the encoding standard to use for representing
+     *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV,
+     *  YNetwork.CALLBACKENCODING_YOCTO_API, YNetwork.CALLBACKENCODING_JSON_NUM and
+     *  YNetwork.CALLBACKENCODING_EMONCMS corresponding to the encoding standard to use for representing
      * notification values
      *
      * @throws YAPI_Exception on error
@@ -1056,8 +1273,9 @@ public class YNetwork extends YFunction
      * Returns the encoding standard to use for representing notification values.
      *
      *  @return a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
-     *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV and Y_CALLBACKENCODING_YOCTO_API
-     * corresponding to the encoding standard to use for representing notification values
+     *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV, Y_CALLBACKENCODING_YOCTO_API,
+     *  Y_CALLBACKENCODING_JSON_NUM and Y_CALLBACKENCODING_EMONCMS corresponding to the encoding standard
+     * to use for representing notification values
      *
      * @throws YAPI_Exception on error
      */
@@ -1070,8 +1288,9 @@ public class YNetwork extends YFunction
      * Changes the encoding standard to use for representing notification values.
      *
      *  @param newval : a value among YNetwork.CALLBACKENCODING_FORM, YNetwork.CALLBACKENCODING_JSON,
-     *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV and
-     *  YNetwork.CALLBACKENCODING_YOCTO_API corresponding to the encoding standard to use for representing
+     *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV,
+     *  YNetwork.CALLBACKENCODING_YOCTO_API, YNetwork.CALLBACKENCODING_JSON_NUM and
+     *  YNetwork.CALLBACKENCODING_EMONCMS corresponding to the encoding standard to use for representing
      * notification values
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -1090,8 +1309,9 @@ public class YNetwork extends YFunction
      * Changes the encoding standard to use for representing notification values.
      *
      *  @param newval : a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
-     *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV and Y_CALLBACKENCODING_YOCTO_API
-     * corresponding to the encoding standard to use for representing notification values
+     *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV, Y_CALLBACKENCODING_YOCTO_API,
+     *  Y_CALLBACKENCODING_JSON_NUM and Y_CALLBACKENCODING_EMONCMS corresponding to the encoding standard
+     * to use for representing notification values
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

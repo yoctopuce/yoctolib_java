@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 20383 2015-05-19 23:44:31Z mvuilleu $
+ * $Id: YTemperature.java 20410 2015-05-22 08:30:27Z seb $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -442,8 +442,6 @@ public class YTemperature extends YSensor
         resValues.add(res25);
         tempValues.add(100.0);
         resValues.add(res100);
-        
-        
         return set_thermistorResponseTable(tempValues, resValues);
     }
 
@@ -476,11 +474,9 @@ public class YTemperature extends YSensor
         siz = tempValues.size();
         if (!(siz >= 2)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "thermistor response table must have at least two points");}
         if (!(siz == resValues.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "table sizes mismatch");}
-        
         // may throw an exception
         res = set_command("Z");
         if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermistor parameters");}
-        
         // add records in growing resistance value
         found = 1;
         prev = 0.0;
@@ -536,10 +532,8 @@ public class YTemperature extends YSensor
         double prev;
         double curr;
         double currRes;
-        
         tempValues.clear();
         resValues.clear();
-        
         // may throw an exception
         id = get_functionId();
         id = (id).substring( 11,  11 + (id).length()-1);
@@ -579,7 +573,6 @@ public class YTemperature extends YSensor
                 prev = curr;
             }
         }
-        
         return YAPI.SUCCESS;
     }
 
