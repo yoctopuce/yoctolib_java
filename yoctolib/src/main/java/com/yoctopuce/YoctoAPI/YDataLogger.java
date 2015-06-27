@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataLogger.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YDataLogger.java 20704 2015-06-20 19:43:34Z mvuilleu $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -75,6 +75,7 @@ public class YDataLogger extends YFunction
      */
     public static final int RECORDING_OFF = 0;
     public static final int RECORDING_ON = 1;
+    public static final int RECORDING_PENDING = 2;
     public static final int RECORDING_INVALID = -1;
     /**
      * invalid autoStart value
@@ -241,7 +242,7 @@ public class YDataLogger extends YFunction
             _timeUTC = json_val.getLong("timeUTC");
         }
         if (json_val.has("recording")) {
-            _recording = json_val.getInt("recording") > 0 ? 1 : 0;
+            _recording = json_val.getInt("recording");
         }
         if (json_val.has("autoStart")) {
             _autoStart = json_val.getInt("autoStart") > 0 ? 1 : 0;
@@ -351,8 +352,8 @@ public class YDataLogger extends YFunction
     /**
      * Returns the current activation state of the data logger.
      *
-     *  @return either YDataLogger.RECORDING_OFF or YDataLogger.RECORDING_ON, according to the current
-     * activation state of the data logger
+     *  @return a value among YDataLogger.RECORDING_OFF, YDataLogger.RECORDING_ON and
+     * YDataLogger.RECORDING_PENDING corresponding to the current activation state of the data logger
      *
      * @throws YAPI_Exception on error
      */
@@ -369,7 +370,8 @@ public class YDataLogger extends YFunction
     /**
      * Returns the current activation state of the data logger.
      *
-     * @return either Y_RECORDING_OFF or Y_RECORDING_ON, according to the current activation state of the data logger
+     *  @return a value among Y_RECORDING_OFF, Y_RECORDING_ON and Y_RECORDING_PENDING corresponding to the
+     * current activation state of the data logger
      *
      * @throws YAPI_Exception on error
      */
@@ -381,8 +383,9 @@ public class YDataLogger extends YFunction
     /**
      * Changes the activation state of the data logger to start/stop recording data.
      *
-     *  @param newval : either YDataLogger.RECORDING_OFF or YDataLogger.RECORDING_ON, according to the
-     * activation state of the data logger to start/stop recording data
+     *  @param newval : a value among YDataLogger.RECORDING_OFF, YDataLogger.RECORDING_ON and
+     *  YDataLogger.RECORDING_PENDING corresponding to the activation state of the data logger to
+     * start/stop recording data
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -391,7 +394,7 @@ public class YDataLogger extends YFunction
     public int set_recording(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
+        rest_val = Integer.toString(newval);
         _setAttr("recording",rest_val);
         return YAPI.SUCCESS;
     }
@@ -399,8 +402,8 @@ public class YDataLogger extends YFunction
     /**
      * Changes the activation state of the data logger to start/stop recording data.
      *
-     *  @param newval : either Y_RECORDING_OFF or Y_RECORDING_ON, according to the activation state of the
-     * data logger to start/stop recording data
+     *  @param newval : a value among Y_RECORDING_OFF, Y_RECORDING_ON and Y_RECORDING_PENDING corresponding
+     * to the activation state of the data logger to start/stop recording data
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

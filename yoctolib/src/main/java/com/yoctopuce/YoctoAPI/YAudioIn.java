@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 20612 2015-06-09 01:27:02Z mvuilleu $
+ * $Id: YAudioIn.java 20746 2015-06-25 11:15:45Z seb $
  *
  * Implements FindAudioIn(), the high-level API for AudioIn functions
  *

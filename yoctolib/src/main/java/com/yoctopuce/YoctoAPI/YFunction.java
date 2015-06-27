@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFunction.java 19670 2015-03-10 17:24:07Z seb $
+ * $Id: YFunction.java 20750 2015-06-25 13:57:05Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *

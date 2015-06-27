@@ -1,5 +1,5 @@
-- Add isSensorReady function on YSensor class
-- Add defaultPage attribute on YNetwork class
-- Add ntpServer attribute on YNetwork class
-- Add httpPort attribute on YNetwork class
-- Add JSON-Num and EMONCMS callback encoding in YNetwork class
+- Add datalogger PENDING status
+- Fix datalogger retrieval in case of time singularity
+- Fix restore settings for devices with many functions
+- Fix race condition with network detection that may lead to NullPointerException
+- Fix network discovery on host with multiples network interfaces

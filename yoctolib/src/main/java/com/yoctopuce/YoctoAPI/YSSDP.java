@@ -1,13 +1,8 @@
 package com.yoctopuce.YoctoAPI;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import java.net.*;
+import java.util.*;
 
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
@@ -18,6 +13,8 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
  */
 public class YSSDP {
 
+
+    private ArrayList<NetworkInterface> _netInterfaces;
 
     interface YSSDPReportInterface {
         /**
@@ -42,23 +39,28 @@ public class YSSDP {
     private static final String SSDP_HTTP = "HTTP/1.1 200 OK";
 
 
-    private HashMap<String, YSSDPCacheEntry> mCache = new HashMap<String, YSSDPCacheEntry>();
+    private HashMap<String, YSSDPCacheEntry> _cache = new HashMap<String, YSSDPCacheEntry>();
     private InetAddress mMcastAddr;
-    private boolean mListening;
-    private MulticastSocket mSocketReception;
+    private boolean _Listening;
     private YSSDPReportInterface _callbacks;
+    private Thread[] _listenMSearchThread;
+    private Thread[] _listenBcastThread;
 
-    YSSDP() {
-        mListening = false;
+    YSSDP()
+    {
+
+        _Listening = false;
+        _netInterfaces = new ArrayList<NetworkInterface>(1);
     }
 
 
-    synchronized void addCallback(YSSDPReportInterface callback) throws YAPI_Exception {
+    synchronized void addCallback(YSSDPReportInterface callback) throws YAPI_Exception
+    {
         if (_callbacks == callback)
             // already started
             return;
         _callbacks = callback;
-        if (!mListening) {
+        if (!_Listening) {
             try {
                 startListening();
             } catch (IOException e) {
@@ -68,13 +70,14 @@ public class YSSDP {
     }
 
 
-    private synchronized void updateCache(String uuid, String url, int cacheValidity) {
+    private synchronized void updateCache(String uuid, String url, int cacheValidity)
+    {
         if (cacheValidity <= 0)
             cacheValidity = 1800;
         cacheValidity *= 1000;
 
-        if (mCache.containsKey(uuid)) {
-            YSSDPCacheEntry entry = mCache.get(uuid);
+        if (_cache.containsKey(uuid)) {
+            YSSDPCacheEntry entry = _cache.get(uuid);
             if (!entry.getURL().equals(url)) {
                 _callbacks.HubDiscoveryCallback(entry.getSerial(), url, entry.getURL());
                 entry.setURL(url);
@@ -85,68 +88,137 @@ public class YSSDP {
             return;
         }
         YSSDPCacheEntry entry = new YSSDPCacheEntry(uuid, url, cacheValidity);
-        mCache.put(uuid, entry);
+        _cache.put(uuid, entry);
         _callbacks.HubDiscoveryCallback(entry.getSerial(), entry.getURL(), null);
     }
 
-    private synchronized void checkCacheExpiration() {
+    private synchronized void checkCacheExpiration()
+    {
         ArrayList<String> to_remove = new ArrayList<String>();
-        for (YSSDPCacheEntry entry : mCache.values()) {
+        for (YSSDPCacheEntry entry : _cache.values()) {
             if (entry.hasExpired()) {
                 _callbacks.HubDiscoveryCallback(entry.getSerial(), null, entry.getURL());
                 to_remove.add(entry.getUUID());
             }
         }
-        for (String uuid :to_remove) {
-            mCache.remove(uuid);
+        for (String uuid : to_remove) {
+            _cache.remove(uuid);
         }
     }
 
-    private Thread mListenBcastThread = new Thread(new Runnable() {
-        @Override
-        public void run() {
-            DatagramPacket pkt;
-            byte[] pktContent;
-            String ssdpMessage;
 
-            while (mListening) {
-                pktContent = new byte[1536];
-                pkt = new DatagramPacket(pktContent, pktContent.length);
-                try {
-                    mSocketReception.receive(pkt);
-                    ssdpMessage = new String(pktContent, pkt.getOffset(), pkt.getLength());
-                    parseIncomingMessage(ssdpMessage);
-                } catch (SocketTimeoutException ignored) {
-                } catch (IOException e) {
-                    SafeYAPI()._Log("SSDP:" + e.getLocalizedMessage());
-                }
-                checkCacheExpiration();
+    private void startListening() throws IOException
+    {
+
+
+        Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+        for (NetworkInterface netint : Collections.list(nets)) {
+            if (netint.isUp() && !netint.isLoopback() && netint.supportsMulticast()) {
+                _netInterfaces.add(netint);
             }
         }
-    });
 
-
-    private void startListening() throws IOException {
         mMcastAddr = InetAddress.getByName(SSDP_MCAST_ADDR);
-        mSocketReception = new MulticastSocket(SSDP_PORT);
-        mListening = false;
-        mSocketReception.joinGroup(mMcastAddr);
-        mSocketReception.setSoTimeout(10000);
-        mListening = true;
-        mListenBcastThread.start();
-        mListenMSearchThread.start();
+        int size = _netInterfaces.size();
+        _listenBcastThread = new Thread[size];
+        _listenMSearchThread = new Thread[size];
+        _Listening = false;
+        for (int i = 0; i < size; i++) {
+            final NetworkInterface netIf = _netInterfaces.get(i);
+            _listenBcastThread[i] = new Thread(new Runnable() {
+                public void run()
+                {
+                    DatagramPacket pkt;
+                    byte[] pktContent;
+                    String ssdpMessage;
+                    MulticastSocket socketReception = null;
+                    try {
+                        socketReception = new MulticastSocket(SSDP_PORT);
+                        socketReception.joinGroup(mMcastAddr);
+                        socketReception.setSoTimeout(10000);
+                        socketReception.setNetworkInterface(netIf);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        //fixme: better error handling
+                        return;
+                    }
+
+                    while (_Listening) {
+                        pktContent = new byte[1536];
+                        pkt = new DatagramPacket(pktContent, pktContent.length);
+                        try {
+                            socketReception.receive(pkt);
+                            ssdpMessage = new String(pktContent, pkt.getOffset(), pkt.getLength());
+                            parseIncomingMessage(ssdpMessage);
+                        } catch (SocketTimeoutException ignored) {
+                        } catch (IOException e) {
+                            SafeYAPI()._Log("SSDP:" + e.getLocalizedMessage());
+                        }
+                        checkCacheExpiration();
+                    }
+                }
+            });
+            _listenBcastThread[i].start();
+            _listenMSearchThread[i] = new Thread(new Runnable() {
+                public void run()
+                {
+                    DatagramPacket pkt;
+                    byte[] pktContent;
+                    String ssdpMessage;
+                    Date date = new Date();
+
+                    MulticastSocket msearchSocket;
+                    try {
+                        msearchSocket = new MulticastSocket();
+                        msearchSocket.setTimeToLive(15);
+                        msearchSocket.setNetworkInterface(netIf);
+                        byte[] outPktContent = SSDP_DISCOVERY_MESSAGE.getBytes();
+                        DatagramPacket outPkt = new DatagramPacket(outPktContent, outPktContent.length, mMcastAddr, SSDP_PORT);
+                        msearchSocket.send(outPkt);
+                    } catch (IOException ex) {
+                        //todo: more user friendy error report
+                        YAPI.SafeYAPI()._Log("Unable to Send SSDP mSearch:" + ex.getLocalizedMessage());
+                        return;
+                    }
+
+                    //look for response only during 3 minutes
+                    while (_Listening && (new Date().getTime() - date.getTime()) < 180000) {
+                        pktContent = new byte[1536];
+                        pkt = new DatagramPacket(pktContent, pktContent.length);
+                        try {
+                            msearchSocket.receive(pkt);
+                            ssdpMessage = new String(pktContent, pkt.getOffset(), pkt.getLength());
+                            parseIncomingMessage(ssdpMessage);
+                        } catch (IOException ex) {
+                            //todo: more user friendy error report
+                            YAPI.SafeYAPI()._Log("SSDP error:" + ex.getLocalizedMessage());
+                            return;
+                        }
+                    }
+                }
+            });
+            _listenMSearchThread[i].start();
+        }
+        _Listening = true;
     }
 
-    void Stop() {
-        mListening = false;
-        if (mListenMSearchThread.isAlive())
-            mListenMSearchThread.interrupt();
-        if (mListenBcastThread.isAlive())
-            mListenBcastThread.interrupt();
+
+    void Stop()
+    {
+        _Listening = false;
+        for (int i = 0; i < _netInterfaces.size(); i++) {
+            if (_listenMSearchThread[i].isAlive())
+                _listenMSearchThread[i].interrupt();
+            _listenMSearchThread[i] = null;
+            if (_listenBcastThread[i].isAlive())
+                _listenBcastThread[i].interrupt();
+            _listenBcastThread[i] = null;
+        }
     }
 
 
-    private void parseIncomingMessage(String message) {
+    private void parseIncomingMessage(String message)
+    {
         int i = 0;
         String location = null;
         String usn = null;
@@ -199,44 +271,5 @@ public class YSSDP {
             updateCache(uuid, location, cacheVal);
         }
     }
-
-
-    private Thread mListenMSearchThread = new Thread(new Runnable() {
-        @Override
-        public void run() {
-            DatagramPacket pkt;
-            byte[] pktContent;
-            String ssdpMessage;
-            Date date = new Date();
-
-            MulticastSocket mMsearchSocket;
-            try {
-                mMsearchSocket = new MulticastSocket();
-                mMsearchSocket.setTimeToLive(15);
-                byte[] outPktContent = SSDP_DISCOVERY_MESSAGE.getBytes();
-                DatagramPacket outPkt = new DatagramPacket(outPktContent, outPktContent.length, mMcastAddr, SSDP_PORT);
-                mMsearchSocket.send(outPkt);
-            } catch (IOException ex) {
-                //todo: more user friendy error report
-                YAPI.SafeYAPI()._Log("Unable to Send SSDP mSearch:" + ex.getLocalizedMessage());
-                return;
-            }
-
-            //look for response only during 3 minutes
-            while (mListening && (new Date().getTime() - date.getTime()) < 180000) {
-                pktContent = new byte[1536];
-                pkt = new DatagramPacket(pktContent, pktContent.length);
-                try {
-                    mMsearchSocket.receive(pkt);
-                    ssdpMessage = new String(pktContent, pkt.getOffset(), pkt.getLength());
-                    parseIncomingMessage(ssdpMessage);
-                } catch (IOException ex) {
-                    //todo: more user friendy error report
-                    YAPI.SafeYAPI()._Log("SSDP error:" + ex.getLocalizedMessage());
-                    return;
-                }
-            }
-        }
-    });
 
 }
