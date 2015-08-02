@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAudioIn.java 20746 2015-06-25 11:15:45Z seb $
+ * $Id: YAudioIn.java 20797 2015-07-06 16:49:40Z mvuilleu $
  *
  * Implements FindAudioIn(), the high-level API for AudioIn functions
  *
@@ -66,6 +66,10 @@ public class YAudioIn extends YFunction
     public static final int MUTE_TRUE = 1;
     public static final int MUTE_INVALID = -1;
     /**
+     * invalid volumeRange value
+     */
+    public static final String VOLUMERANGE_INVALID = YAPI.INVALID_STRING;
+    /**
      * invalid signal value
      */
     public static final int SIGNAL_INVALID = YAPI.INVALID_INT;
@@ -75,6 +79,7 @@ public class YAudioIn extends YFunction
     public static final int NOSIGNALFOR_INVALID = YAPI.INVALID_INT;
     protected int _volume = VOLUME_INVALID;
     protected int _mute = MUTE_INVALID;
+    protected String _volumeRange = VOLUMERANGE_INVALID;
     protected int _signal = SIGNAL_INVALID;
     protected int _noSignalFor = NOSIGNALFOR_INVALID;
     protected UpdateCallback _valueCallbackAudioIn = null;
@@ -126,6 +131,9 @@ public class YAudioIn extends YFunction
         }
         if (json_val.has("mute")) {
             _mute = json_val.getInt("mute") > 0 ? 1 : 0;
+        }
+        if (json_val.has("volumeRange")) {
+            _volumeRange = json_val.getString("volumeRange");
         }
         if (json_val.has("signal")) {
             _signal = json_val.getInt("signal");
@@ -256,6 +264,41 @@ public class YAudioIn extends YFunction
     public int setMute(int newval)  throws YAPI_Exception
     {
         return set_mute(newval);
+    }
+
+    /**
+     * Returns the supported volume range. The low value of the
+     * range corresponds to the minimal audible value. To
+     * completely mute the sound, use set_mute()
+     * instead of the set_volume().
+     *
+     * @return a string corresponding to the supported volume range
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_volumeRange() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+                return VOLUMERANGE_INVALID;
+            }
+        }
+        return _volumeRange;
+    }
+
+    /**
+     * Returns the supported volume range. The low value of the
+     * range corresponds to the minimal audible value. To
+     * completely mute the sound, use set_mute()
+     * instead of the set_volume().
+     *
+     * @return a string corresponding to the supported volume range
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getVolumeRange() throws YAPI_Exception
+    {
+        return get_volumeRange();
     }
 
     /**

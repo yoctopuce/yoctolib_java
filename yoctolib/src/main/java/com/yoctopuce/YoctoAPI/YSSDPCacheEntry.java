@@ -18,28 +18,27 @@ class YSSDPCacheEntry {
         mRegistered = false;
 
         StringBuilder serial = new StringBuilder(YAPI.YOCTO_SERIAL_LEN);
-        int i,j;
-        for (i=0,j=0; i< 4 ;i++,j+=2){
-            String ch = uuid.substring(j, j+2);
+        int i, j;
+        for (i = 0, j = 0; i < 4; i++, j += 2) {
+            String ch = uuid.substring(j, j + 2);
             serial.append((char) Integer.parseInt(ch, 16));
         }
         j++;
-        for (; i< 6 ;i++,j+=2){
-            String ch = uuid.substring(j, j+2);
+        for (; i < 6; i++, j += 2) {
+            String ch = uuid.substring(j, j + 2);
             serial.append((char) Integer.parseInt(ch, 16));
         }
         j++;
-        for (; i< 8 ;i++,j+=2){
-            String ch = uuid.substring(j, j+2);
+        for (; i < 8; i++, j += 2) {
+            String ch = uuid.substring(j, j + 2);
             serial.append((char) Integer.parseInt(ch, 16));
         }
         serial.append('-');
-        //noinspection SpellCheckingInspection
         i = uuid.indexOf("-COFF-EE");
         i += 8;
-        while(uuid.charAt(i) == '0') i++;
+        while (uuid.charAt(i) == '0') i++;
         String numPart = uuid.substring(i);
-        for(i=numPart.length();i<5;i++){
+        for (i = numPart.length(); i < 5; i++) {
             serial.append('0');
         }
         serial.append(numPart);
@@ -77,7 +76,7 @@ class YSSDPCacheEntry {
 
     boolean hasExpired() {
         Date now = new Date();
-        if ((now.getTime() - mDetectedTime.getTime())> mMaxAgeInMS)
+        if ((now.getTime() - mDetectedTime.getTime()) > mMaxAgeInMS)
             return true;
         return false;  //To change body of created methods use File | Settings | File Templates.
     }

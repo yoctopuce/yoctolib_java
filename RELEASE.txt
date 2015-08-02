@@ -1,5 +1,1 @@
-- Add datalogger PENDING status
-- Fix datalogger retrieval in case of time singularity
-- Fix restore settings for devices with many functions
-- Fix race condition with network detection that may lead to NullPointerException
-- Fix network discovery on host with multiples network interfaces
+(Misc)- yoctoapi js:add get_measuresAt_async method

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 20468 2015-05-29 10:24:28Z seb $
+ * $Id: YModule.java 20916 2015-07-23 08:54:20Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -203,6 +203,13 @@ public class YModule extends YFunction
     {
         YDevice dev = _getDev();
         return dev.getYPEntry(functionIndex).getFuncId();
+    }
+
+    // Retrieve the Hardware Id of the nth function (beside "module") in the device
+    public String functionType(int functionIndex) throws YAPI_Exception
+    {
+        YDevice dev = _getDev();
+        return dev.getYPEntry(functionIndex).getClassname();
     }
 
     // Retrieve the name of the nth function (beside "module") in the device
@@ -993,6 +1000,43 @@ public class YModule extends YFunction
     public byte[] get_allSettings() throws YAPI_Exception
     {
         return _download("api.json");
+    }
+
+    public boolean hasFunction(String funcId) throws YAPI_Exception
+    {
+        int count;
+        int i;
+        String fid;
+        // may throw an exception
+        count  = functionCount();
+        i = 0;
+        while (i < count) {
+            fid  = functionId(i);
+            if (fid.equals(funcId)) {
+                return true;
+            }
+            i = i + 1;
+        }
+        return false;
+    }
+
+    public ArrayList<String> get_functionIds(String funType) throws YAPI_Exception
+    {
+        int count;
+        int i;
+        String ftype;
+        ArrayList<String> res = new ArrayList<String>();
+        // may throw an exception
+        count = functionCount();
+        i = 0;
+        while (i < count) {
+            ftype  = functionType(i);
+            if (ftype.equals(funType)) {
+                res.add(functionId(i));
+            }
+            i = i + 1;
+        }
+        return res;
     }
 
     //cannot be generated for Java:

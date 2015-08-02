@@ -1,40 +1,38 @@
 /*********************************************************************
- *
- * $Id: YDataSet.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YDataSet.java 20869 2015-07-17 12:32:45Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
- *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
- *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ * Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ * non-exclusive license to use, modify, copy and integrate this
+ * file into your software for the sole purpose of interfacing
+ * with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
- *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
- *  this notice in the distributed source file.
+ * You may reproduce and distribute copies of this file in
+ * source or object form, as long as the sole purpose of this
+ * code is to interface with Yoctopuce products. You must retain
+ * this notice in the distributed source file.
  *
- *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
- *  obligations.
+ * You should refer to Yoctopuce General Terms and Conditions
+ * for additional information regarding your rights and
+ * obligations.
  *
- *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *  WARRANTY, OR OTHERWISE.
- *
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ * EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ * COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ * SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
+ * LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ * WARRANTY, OR OTHERWISE.
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
@@ -119,6 +117,10 @@ public class YDataSet
         double summaryMaxVal = Double.MIN_VALUE;
         double summaryTotalTime = 0;
         double summaryTotalAvg = 0;
+        long streamStartTime;
+        long streamEndTime;
+        long startTime = 0x7fffffff;
+        long endTime = 0;
 
         try {
             json = new JSONObject(json_str);
@@ -136,14 +138,23 @@ public class YDataSet
             jstreams = json.getJSONArray("streams");
             for (int i = 0; i < jstreams.length(); i++) {
                 YDataStream stream = _parent._findDataStream(this, jstreams.getString(i));
-                if (_startTime > 0 && stream.get_startTimeUTC() + stream.get_duration() <= _startTime) {
+                streamStartTime = stream.get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
+                streamEndTime = stream.get_startTimeUTC() + stream.get_duration();
+                if (_startTime > 0 && streamEndTime <= _startTime) {
                     // this stream is too early, drop it
                 } else if (_endTime > 0 && stream.get_startTimeUTC() > _endTime) {
                     // this stream is too late, drop it
                 } else {
                     _streams.add(stream);
+                    if (startTime > streamStartTime) {
+                        startTime = streamStartTime;
+                    }
+                    if (endTime < streamEndTime) {
+                        endTime = streamEndTime;
+                    }
+
                     if (stream.isClosed() && stream.get_startTimeUTC() >= _startTime &&
-                            (_endTime == 0 || stream.get_startTimeUTC() + stream.get_duration() <= _endTime)) {
+                            (_endTime == 0 || streamEndTime <= _endTime)) {
                         if (summaryMinVal > stream.get_minValue())
                             summaryMinVal = stream.get_minValue();
                         if (summaryMaxVal < stream.get_maxValue())
@@ -152,7 +163,7 @@ public class YDataSet
                         summaryTotalTime += stream.get_duration();
 
                         YMeasure rec = new YMeasure(stream.get_startTimeUTC(),
-                                stream.get_startTimeUTC() + stream.get_duration(),
+                                streamEndTime,
                                 stream.get_minValue(),
                                 stream.get_averageValue(),
                                 stream.get_maxValue());
@@ -162,14 +173,11 @@ public class YDataSet
             }
             if ((_streams.size() > 0) && (summaryTotalTime > 0)) {
                 // update time boundaries with actual data
-                YDataStream stream = _streams.get(_streams.size() - 1);
-                long endtime = stream.get_startTimeUTC() + stream.get_duration();
-                long startTime = _streams.get(0).get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
                 if (_startTime < startTime) {
                     _startTime = startTime;
                 }
-                if (_endTime == 0 || _endTime > endtime) {
-                    _endTime = endtime;
+                if (_endTime == 0 || _endTime > endTime) {
+                    _endTime = endTime;
                 }
                 _summary = new YMeasure(_startTime, _endTime, summaryMinVal, summaryTotalAvg / summaryTotalTime, summaryMaxVal);
             }
@@ -414,6 +422,73 @@ public class YDataSet
     public ArrayList<YMeasure> get_preview() throws YAPI_Exception
     {
         return _preview;
+    }
+
+    /**
+     * Returns the detailed set of measures for the time interval corresponding
+     * to a given condensed measures previously returned by get_preview().
+     * The result is provided as a list of YMeasure objects.
+     *
+     * @param measure : condensed measure from the list previously returned by
+     *         get_preview().
+     *
+     * @return a table of records, where each record depicts the
+     *         measured values during a time interval
+     *
+     * @throws YAPI_Exception on error
+     */
+    public ArrayList<YMeasure> get_measuresAt(YMeasure measure) throws YAPI_Exception
+    {
+        long startUtc;
+        YDataStream stream;
+        ArrayList<ArrayList<Double>> dataRows = new ArrayList<ArrayList<Double>>();
+        ArrayList<YMeasure> measures = new ArrayList<YMeasure>();
+        double tim;
+        double itv;
+        int nCols;
+        int minCol;
+        int avgCol;
+        int maxCol;
+        // may throw an exception
+        startUtc = (long) (double)Math.round(measure.get_startTimeUTC());
+        stream = null;
+        for (YDataStream ii:_streams) {
+            if (ii.get_startTimeUTC() == startUtc) {
+                stream = ii;
+            }
+        }
+        if (stream == null) {
+            return measures;
+        }
+        dataRows = stream.get_dataRows();
+        if (dataRows.size() == 0) {
+            return measures;
+        }
+        tim = (double) stream.get_startTimeUTC();
+        itv = stream.get_dataSamplesInterval();
+        if (tim < itv) {
+            tim = itv;
+        }
+        nCols = dataRows.get(0).size();
+        minCol = 0;
+        if (nCols > 2) {
+            avgCol = 1;
+        } else {
+            avgCol = 0;
+        }
+        if (nCols > 2) {
+            maxCol = 2;
+        } else {
+            maxCol = 0;
+        }
+        
+        for (ArrayList<Double> ii:dataRows) {
+            if ((tim >= _startTime) && ((_endTime == 0) || (tim <= _endTime))) {
+                measures.add(new YMeasure(tim - itv, tim, ii.get(minCol).doubleValue(), ii.get(avgCol).doubleValue(), ii.get(maxCol).doubleValue()));
+            }
+            tim = tim + itv;
+        }
+        return measures;
     }
 
     /**

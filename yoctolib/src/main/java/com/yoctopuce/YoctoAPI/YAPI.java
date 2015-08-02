@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 20720 2015-06-23 16:35:09Z seb $
+ * $Id: YAPI.java 20831 2015-07-15 15:21:38Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -37,8 +37,6 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -51,7 +49,8 @@ import java.util.Queue;
 /**
  *
  */
-public class YAPI {
+public class YAPI
+{
 
 
     // Return value for invalid strings
@@ -61,7 +60,7 @@ public class YAPI {
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "20773";
+    public static final String YOCTO_API_BUILD_STR = "20971";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -114,7 +113,8 @@ public class YAPI {
     static int pktAckDelay = DEFAULT_PKT_RESEND_DELAY;
 
 
-    private final YSSDP.YSSDPReportInterface _ssdpCallback = new YSSDP.YSSDPReportInterface() {
+    private final YSSDP.YSSDPReportInterface _ssdpCallback = new YSSDP.YSSDPReportInterface()
+    {
         @Override
         public void HubDiscoveryCallback(String serial, String urlToRegister, String urlToUnregister)
         {
@@ -143,27 +143,32 @@ public class YAPI {
     /**
      *
      */
-    public interface DeviceArrivalCallback {
+    public interface DeviceArrivalCallback
+    {
 
         void yDeviceArrival(YModule module);
     }
 
-    public interface DeviceRemovalCallback {
+    public interface DeviceRemovalCallback
+    {
 
         void yDeviceRemoval(YModule module);
     }
 
-    public interface DeviceChangeCallback {
+    public interface DeviceChangeCallback
+    {
 
         void yDeviceChange(YModule module);
     }
 
-    public interface LogCallback {
+    public interface LogCallback
+    {
 
         void yLog(String line);
     }
 
-    public interface CalibrationHandlerCallback {
+    public interface CalibrationHandlerCallback
+    {
 
         double yCalibrationHandler(double rawValue, int calibType,
                                    ArrayList<Integer> params, ArrayList<Double> rawValues, ArrayList<Double> refValues);
@@ -178,7 +183,8 @@ public class YAPI {
     }
 
 
-    private final static CalibrationHandlerCallback linearCalibrationHandler = new CalibrationHandlerCallback() {
+    private final static CalibrationHandlerCallback linearCalibrationHandler = new CalibrationHandlerCallback()
+    {
 
         @Override
         public double yCalibrationHandler(double rawValue, int calibType, ArrayList<Integer> params, ArrayList<Double> rawValues, ArrayList<Double> refValues)
@@ -242,7 +248,8 @@ public class YAPI {
     // YDevice cache
     //public static ArrayList<YDevice> _devCache = new ArrayList<YDevice>();// Device cache entries
 
-    public interface HubDiscoveryCallback {
+    public interface HubDiscoveryCallback
+    {
         /**
          * @param serial : the serial number of the discovered Hub
          * @param url    : the URL (with port number) of the discoveredHub
@@ -251,7 +258,8 @@ public class YAPI {
     }
 
 
-    static class DataEvent {
+    static class DataEvent
+    {
 
         private final YFunction _fun;
         private final String _value;
@@ -288,9 +296,11 @@ public class YAPI {
 
     }
 
-    static class PlugEvent {
+    static class PlugEvent
+    {
 
-        public static enum Event {
+        public static enum Event
+        {
 
             PLUG, UNPLUG, CHANGE
         }
@@ -572,14 +582,14 @@ public class YAPI {
         return Integer.valueOf(str);
     }
 
-    final protected static char[] _hexArray = "0123456789abcdef".toCharArray();
+    final protected static char[] _hexArray = "0123456789ABCDEF".toCharArray();
 
     static String _bytesToHexStr(byte[] bytes, int offset, int len)
     {
         char[] hexChars = new char[len * 2];
         for (int j = 0; j < len; j++) {
             int v = bytes[offset + j] & 0xFF;
-            hexChars[j * 2] = _hexArray[v >>> 4];
+            hexChars[j * 2] = _hexArray[v >> 4];
             hexChars[j * 2 + 1] = _hexArray[v & 0x0F];
         }
         return new String(hexChars);
@@ -860,7 +870,10 @@ public class YAPI {
         // Add hub to known list
         if (url.equals("usb")) {
             YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(_hubs.size());
+            newhub = new YUSBHub(_hubs.size(), true);
+        } else if (url.equals("usb_silent")) {
+            YUSBHub.CheckUSBAcces();
+            newhub = new YUSBHub(_hubs.size(), false);
         } else if (url.equals("net")) {
             if ((_apiMode & DETECT_NET) == 0) {
                 if (YUSBHub.RegisterLocalhost()) {
@@ -889,7 +902,7 @@ public class YAPI {
         // Add hub to known list
         if (url.equals("usb")) {
             YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(0);
+            newhub = new YUSBHub(0, true);
         } else if (url.equals("net")) {
             return SUCCESS;
         } else if (parsedurl.getHost().equals("callback")) {
@@ -1208,7 +1221,7 @@ public class YAPI {
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".20773";
+        return YOCTO_API_VERSION_STR + ".20971";
     }
 
     /**

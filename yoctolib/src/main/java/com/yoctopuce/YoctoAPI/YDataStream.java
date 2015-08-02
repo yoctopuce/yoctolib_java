@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 20376 2015-05-19 14:18:47Z seb $
+ * $Id: YDataStream.java 20888 2015-07-20 18:13:03Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -235,6 +235,10 @@ public class YDataStream
         int idx;
         ArrayList<Integer> udat = new ArrayList<Integer>();
         ArrayList<Double> dat = new ArrayList<Double>();
+        if ((sdata).length == 0) {
+            _nRows = 0;
+            return YAPI.SUCCESS;
+        }
         // may throw an exception
         udat = SafeYAPI()._decodeWords(_parent._json_get_string(sdata));
         _values.clear();
