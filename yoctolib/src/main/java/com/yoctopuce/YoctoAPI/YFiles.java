@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 20376 2015-05-19 14:18:47Z seb $
+ * $Id: YFiles.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -76,7 +76,8 @@ public class YFiles extends YFunction
     /**
      * Deprecated UpdateCallback for Files
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -88,7 +89,8 @@ public class YFiles extends YFunction
     /**
      * TimedReportCallback for Files
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -133,7 +135,7 @@ public class YFiles extends YFunction
     public int get_filesCount() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FILESCOUNT_INVALID;
             }
         }
@@ -162,7 +164,7 @@ public class YFiles extends YFunction
     public int get_freeSpace() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREESPACE_INVALID;
             }
         }

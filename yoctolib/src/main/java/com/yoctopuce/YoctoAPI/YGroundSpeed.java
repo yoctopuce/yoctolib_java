@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGroundSpeed.java 19746 2015-03-17 10:34:00Z seb $
+ * $Id: YGroundSpeed.java 21117 2015-08-17 12:36:50Z seb $
  *
  * Implements FindGroundSpeed(), the high-level API for GroundSpeed functions
  *
@@ -64,7 +64,8 @@ public class YGroundSpeed extends YSensor
     /**
      * Deprecated UpdateCallback for GroundSpeed
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -76,7 +77,8 @@ public class YGroundSpeed extends YSensor
     /**
      * TimedReportCallback for GroundSpeed
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed

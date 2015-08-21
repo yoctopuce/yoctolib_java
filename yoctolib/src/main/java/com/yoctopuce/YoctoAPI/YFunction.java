@@ -1,40 +1,38 @@
 /*********************************************************************
- *
- * $Id: YFunction.java 20750 2015-06-25 13:57:05Z seb $
+ * $Id: YFunction.java 21199 2015-08-19 13:06:55Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
- *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
- *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing
- *  with Yoctopuce products.
+ * Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ * non-exclusive license to use, modify, copy and integrate this
+ * file into your software for the sole purpose of interfacing
+ * with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in
- *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain
- *  this notice in the distributed source file.
+ * You may reproduce and distribute copies of this file in
+ * source or object form, as long as the sole purpose of this
+ * code is to interface with Yoctopuce products. You must retain
+ * this notice in the distributed source file.
  *
- *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and
- *  obligations.
+ * You should refer to Yoctopuce General Terms and Conditions
+ * for additional information regarding your rights and
+ * obligations.
  *
- *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
- *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
- *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *  WARRANTY, OR OTHERWISE.
- *
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ * EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ * COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ * SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
+ * LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ * WARRANTY, OR OTHERWISE.
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
@@ -102,7 +100,8 @@ public class YFunction
     /**
      * Deprecated UpdateCallback for Function
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -114,7 +113,8 @@ public class YFunction
     /**
      * TimedReportCallback for Function
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -140,7 +140,8 @@ public class YFunction
         //--- (end of generated code: YFunction attributes initialization)
     }
 
-    protected void _throw(int error, String message) throws YAPI_Exception {
+    protected void _throw(int error, String message) throws YAPI_Exception
+    {
         throw new YAPI_Exception(error, message);
     }
 
@@ -188,7 +189,7 @@ public class YFunction
     public String get_logicalName() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOGICALNAME_INVALID;
             }
         }
@@ -256,7 +257,7 @@ public class YFunction
     public String get_advertisedValue() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ADVERTISEDVALUE_INVALID;
             }
         }
@@ -477,7 +478,8 @@ public class YFunction
         return describe();
     }
 
-    protected void _parse(JSONObject json, long msValidity) throws YAPI_Exception {
+    protected void _parse(JSONObject json, long msValidity) throws YAPI_Exception
+    {
         _cacheExpiration = YAPI.GetTickCount() + msValidity;
         try {
             _parseAttr(json);
@@ -524,7 +526,7 @@ public class YFunction
         return YAPI.SUCCESS;
     }
 
-    private byte[] _request(String req_first_line,byte[] req_head_and_body) throws YAPI_Exception
+    private byte[] _request(String req_first_line, byte[] req_head_and_body) throws YAPI_Exception
     {
         YDevice dev = getYDevice();
         return dev.requestHTTPSync(req_first_line, req_head_and_body);
@@ -611,6 +613,125 @@ public class YFunction
         return list;
     }
 
+
+    protected String _get_json_path_struct(JSONObject jsonObject, String[] paths, int ofs)
+    {
+
+        String key = paths[ofs];
+        if (!jsonObject.has(key)) {
+            return "";
+        }
+
+        Object obj = jsonObject.opt(key);
+        if (obj != null) {
+            if (paths.length == ofs + 1) {
+                if (obj instanceof Integer) {
+                    return jsonObject.optString(key);
+                } else if (obj instanceof String) {
+                    return JSONObject.quote(jsonObject.optString(key));
+                } else if (obj instanceof JSONArray) {
+                    JSONArray jobj = (JSONArray) obj;
+                    try {
+                        return jobj.toString(0);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return "";
+                    }
+                } else if (obj instanceof JSONObject) {
+                    JSONObject jobj = (JSONObject) obj;
+                    try {
+                        return jobj.toString(0);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return "";
+                    }
+                } else {
+                    System.out.println("instance of " + obj.toString());
+                }
+            }
+
+            if (obj instanceof JSONArray) {
+                return _get_json_path_array(jsonObject.optJSONArray(key), paths, ofs + 1);
+            } else if (obj instanceof JSONObject) {
+                return _get_json_path_struct(jsonObject.optJSONObject(key), paths, ofs + 1);
+            } else {
+                System.out.println("instance of " + obj.toString());
+            }
+        }
+        return "";
+    }
+
+    private String _get_json_path_array(JSONArray jsonArray, String[] paths, int ofs)
+    {
+        int key = Integer.valueOf(paths[ofs]);
+        if (jsonArray.length() <= key) {
+            return "";
+        }
+
+        Object obj = jsonArray.opt(key);
+        if (obj != null) {
+            if (paths.length == ofs + 1) {
+                if (obj instanceof Integer) {
+                    return jsonArray.optString(key);
+                } else if (obj instanceof String) {
+                    return JSONObject.quote(jsonArray.optString(key));
+                } else if (obj instanceof JSONArray) {
+                    JSONArray jobj = (JSONArray) obj;
+                    try {
+                        return jobj.toString(0);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return "";
+                    }
+                } else if (obj instanceof JSONObject) {
+                    JSONObject jobj = (JSONObject) obj;
+                    try {
+                        return jobj.toString(0);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return "";
+                    }
+                }
+            }
+
+            if (obj instanceof JSONArray) {
+                return _get_json_path_array(jsonArray.optJSONArray(key), paths, ofs + 1);
+            } else if (obj instanceof JSONObject) {
+                return _get_json_path_struct(jsonArray.optJSONObject(key), paths, ofs + 1);
+            } else {
+                System.out.println("instance of " + obj.toString());
+            }
+        }
+        return "";
+    }
+
+
+    protected String _get_json_path(String json, String path)
+    {
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(json);
+        } catch (JSONException ex) {
+            return "";
+        }
+
+        String[] split = path.split("\\|");
+        int ofs = 0;
+
+        return _get_json_path_struct(jsonObject, split, 0);
+    }
+
+    String _decode_json_string(String json)
+    {
+
+        try {
+            JSONArray array = new JSONArray("[" + json + "]");
+            return array.getString(0);
+        } catch (JSONException ex) {
+            return "";
+        }
+    }
+
     // Load and parse the REST API for a function given by class name and
     // identifier, possibly applying changes
     // Device cache will be preloaded when loading function "module" and
@@ -674,6 +795,12 @@ public class YFunction
         YDataStream newDataStream = new YDataStream(this, dataset, YAPI._decodeWords(def));
         _dataStreams.put(key, newDataStream);
         return newDataStream;
+    }
+
+    // Method used to clear cache of DataStream object (undocumented)
+    public void _clearDataStreamCache()
+    {
+        _dataStreams.clear();
     }
 
     /**

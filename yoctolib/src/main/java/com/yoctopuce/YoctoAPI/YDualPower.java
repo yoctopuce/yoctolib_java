@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDualPower.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YDualPower.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindDualPower(), the high-level API for DualPower functions
  *
@@ -86,7 +86,8 @@ public class YDualPower extends YFunction
     /**
      * Deprecated UpdateCallback for DualPower
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -98,7 +99,8 @@ public class YDualPower extends YFunction
     /**
      * TimedReportCallback for DualPower
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -149,7 +151,7 @@ public class YDualPower extends YFunction
     public int get_powerState() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWERSTATE_INVALID;
             }
         }
@@ -181,7 +183,7 @@ public class YDualPower extends YFunction
     public int get_powerControl() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWERCONTROL_INVALID;
             }
         }
@@ -246,7 +248,7 @@ public class YDualPower extends YFunction
     public int get_extVoltage() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return EXTVOLTAGE_INVALID;
             }
         }

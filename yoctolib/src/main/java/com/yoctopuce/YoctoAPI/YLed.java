@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLed.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YLed.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindLed(), the high-level API for Led functions
  *
@@ -85,7 +85,8 @@ public class YLed extends YFunction
     /**
      * Deprecated UpdateCallback for Led
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -97,7 +98,8 @@ public class YLed extends YFunction
     /**
      * TimedReportCallback for Led
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -146,7 +148,7 @@ public class YLed extends YFunction
     public int get_power() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWER_INVALID;
             }
         }
@@ -206,7 +208,7 @@ public class YLed extends YFunction
     public int get_luminosity() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LUMINOSITY_INVALID;
             }
         }
@@ -267,7 +269,7 @@ public class YLed extends YFunction
     public int get_blinking() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BLINKING_INVALID;
             }
         }

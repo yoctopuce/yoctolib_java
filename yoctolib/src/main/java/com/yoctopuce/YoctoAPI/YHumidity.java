@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHumidity.java 19582 2015-03-04 10:58:07Z seb $
+ * $Id: YHumidity.java 21211 2015-08-19 16:03:29Z seb $
  *
  * Implements FindHumidity(), the high-level API for Humidity functions
  *
@@ -57,13 +57,24 @@ public class YHumidity extends YSensor
 {
 //--- (end of YHumidity class start)
 //--- (YHumidity definitions)
+    /**
+     * invalid relHum value
+     */
+    public static final double RELHUM_INVALID = YAPI.INVALID_DOUBLE;
+    /**
+     * invalid absHum value
+     */
+    public static final double ABSHUM_INVALID = YAPI.INVALID_DOUBLE;
+    protected double _relHum = RELHUM_INVALID;
+    protected double _absHum = ABSHUM_INVALID;
     protected UpdateCallback _valueCallbackHumidity = null;
     protected TimedReportCallback _timedReportCallbackHumidity = null;
 
     /**
      * Deprecated UpdateCallback for Humidity
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -75,7 +86,8 @@ public class YHumidity extends YSensor
     /**
      * TimedReportCallback for Humidity
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -102,7 +114,114 @@ public class YHumidity extends YSensor
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
+        if (json_val.has("relHum")) {
+            _relHum = Math.round(json_val.getDouble("relHum") * 1000.0 / 65536.0) / 1000.0;
+        }
+        if (json_val.has("absHum")) {
+            _absHum = Math.round(json_val.getDouble("absHum") * 1000.0 / 65536.0) / 1000.0;
+        }
         super._parseAttr(json_val);
+    }
+
+    /**
+     * Changes the primary unit for measuring humidity. That unit is a string.
+     * If that strings starts with the letter 'g', the primary measured value is the absolute
+     * humidity, in g/m3. Otherwise, the primary measured value will be the relative humidity
+     * (RH), in per cents.
+     *
+     * Remember to call the saveToFlash() method of the module if the modification
+     * must be kept.
+     *
+     * @param newval : a string corresponding to the primary unit for measuring humidity
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_unit(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = newval;
+        _setAttr("unit",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the primary unit for measuring humidity. That unit is a string.
+     * If that strings starts with the letter 'g', the primary measured value is the absolute
+     * humidity, in g/m3. Otherwise, the primary measured value will be the relative humidity
+     * (RH), in per cents.
+     *
+     * Remember to call the saveToFlash() method of the module if the modification
+     * must be kept.
+     *
+     * @param newval : a string corresponding to the primary unit for measuring humidity
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setUnit(String newval)  throws YAPI_Exception
+    {
+        return set_unit(newval);
+    }
+
+    /**
+     * Returns the current relative humidity, in per cents.
+     *
+     * @return a floating point number corresponding to the current relative humidity, in per cents
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_relHum() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return RELHUM_INVALID;
+            }
+        }
+        return _relHum;
+    }
+
+    /**
+     * Returns the current relative humidity, in per cents.
+     *
+     * @return a floating point number corresponding to the current relative humidity, in per cents
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getRelHum() throws YAPI_Exception
+    {
+        return get_relHum();
+    }
+
+    /**
+     * Returns the current absolute humidity, in grams per cubic meter of air.
+     *
+     * @return a floating point number corresponding to the current absolute humidity, in grams per cubic meter of air
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_absHum() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ABSHUM_INVALID;
+            }
+        }
+        return _absHum;
+    }
+
+    /**
+     * Returns the current absolute humidity, in grams per cubic meter of air.
+     *
+     * @return a floating point number corresponding to the current absolute humidity, in grams per cubic meter of air
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getAbsHum() throws YAPI_Exception
+    {
+        return get_absHum();
     }
 
     /**

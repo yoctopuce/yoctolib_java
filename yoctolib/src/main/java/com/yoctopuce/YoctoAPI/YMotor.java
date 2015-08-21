@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMotor.java 18466 2014-11-21 08:19:59Z seb $
+ * $Id: YMotor.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindMotor(), the high-level API for Motor functions
  *
@@ -117,7 +117,8 @@ public class YMotor extends YFunction
     /**
      * Deprecated UpdateCallback for Motor
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -129,7 +130,8 @@ public class YMotor extends YFunction
     /**
      * TimedReportCallback for Motor
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -209,7 +211,7 @@ public class YMotor extends YFunction
     public int get_motorStatus() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MOTORSTATUS_INVALID;
             }
         }
@@ -303,7 +305,7 @@ public class YMotor extends YFunction
     public double get_drivingForce() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DRIVINGFORCE_INVALID;
             }
         }
@@ -371,7 +373,7 @@ public class YMotor extends YFunction
     public double get_brakingForce() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BRAKINGFORCE_INVALID;
             }
         }
@@ -448,7 +450,7 @@ public class YMotor extends YFunction
     public double get_cutOffVoltage() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CUTOFFVOLTAGE_INVALID;
             }
         }
@@ -483,7 +485,7 @@ public class YMotor extends YFunction
     public int get_overCurrentLimit() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OVERCURRENTLIMIT_INVALID;
             }
         }
@@ -592,7 +594,7 @@ public class YMotor extends YFunction
     public double get_frequency() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREQUENCY_INVALID;
             }
         }
@@ -624,7 +626,7 @@ public class YMotor extends YFunction
     public int get_starterTime() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STARTERTIME_INVALID;
             }
         }
@@ -698,7 +700,7 @@ public class YMotor extends YFunction
     public int get_failSafeTimeout() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FAILSAFETIMEOUT_INVALID;
             }
         }
@@ -769,7 +771,7 @@ public class YMotor extends YFunction
     public String get_command() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }

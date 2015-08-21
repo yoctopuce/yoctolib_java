@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.java 19582 2015-03-04 10:58:07Z seb $
+ * $Id: YLightSensor.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -77,7 +77,8 @@ public class YLightSensor extends YSensor
     /**
      * Deprecated UpdateCallback for LightSensor
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -89,7 +90,8 @@ public class YLightSensor extends YSensor
     /**
      * TimedReportCallback for LightSensor
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -168,7 +170,7 @@ public class YLightSensor extends YSensor
     public int get_measureType() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MEASURETYPE_INVALID;
             }
         }

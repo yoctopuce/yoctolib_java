@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmPowerSource.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YPwmPowerSource.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -70,7 +70,8 @@ public class YPwmPowerSource extends YFunction
     /**
      * Deprecated UpdateCallback for PwmPowerSource
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -82,7 +83,8 @@ public class YPwmPowerSource extends YFunction
     /**
      * TimedReportCallback for PwmPowerSource
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -127,7 +129,7 @@ public class YPwmPowerSource extends YFunction
     public int get_powerMode() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWERMODE_INVALID;
             }
         }

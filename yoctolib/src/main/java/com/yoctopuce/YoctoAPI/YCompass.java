@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCompass.java 19582 2015-03-04 10:58:07Z seb $
+ * $Id: YCompass.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindCompass(), the high-level API for Compass functions
  *
@@ -82,7 +82,8 @@ public class YCompass extends YSensor
     /**
      * Deprecated UpdateCallback for Compass
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -94,7 +95,8 @@ public class YCompass extends YSensor
     /**
      * TimedReportCallback for Compass
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -136,7 +138,7 @@ public class YCompass extends YSensor
     public int get_axis() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AXIS_INVALID;
             }
         }
@@ -161,7 +163,7 @@ public class YCompass extends YSensor
     public double get_magneticHeading() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAGNETICHEADING_INVALID;
             }
         }

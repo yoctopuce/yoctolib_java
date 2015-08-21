@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLatitude.java 19746 2015-03-17 10:34:00Z seb $
+ * $Id: YLatitude.java 21117 2015-08-17 12:36:50Z seb $
  *
  * Implements FindLatitude(), the high-level API for Latitude functions
  *
@@ -64,7 +64,8 @@ public class YLatitude extends YSensor
     /**
      * Deprecated UpdateCallback for Latitude
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -76,7 +77,8 @@ public class YLatitude extends YSensor
     /**
      * TimedReportCallback for Latitude
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed

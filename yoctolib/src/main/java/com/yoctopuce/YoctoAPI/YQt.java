@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YQt.java 21117 2015-08-17 12:36:50Z seb $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -63,7 +63,8 @@ public class YQt extends YSensor
     /**
      * Deprecated UpdateCallback for Qt
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -75,7 +76,8 @@ public class YQt extends YSensor
     /**
      * TimedReportCallback for Qt
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed

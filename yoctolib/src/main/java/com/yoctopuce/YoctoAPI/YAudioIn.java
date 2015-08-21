@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAudioIn.java 20797 2015-07-06 16:49:40Z mvuilleu $
+ * $Id: YAudioIn.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindAudioIn(), the high-level API for AudioIn functions
  *
@@ -87,7 +87,8 @@ public class YAudioIn extends YFunction
     /**
      * Deprecated UpdateCallback for AudioIn
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -99,7 +100,8 @@ public class YAudioIn extends YFunction
     /**
      * TimedReportCallback for AudioIn
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -154,7 +156,7 @@ public class YAudioIn extends YFunction
     public int get_volume() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLUME_INVALID;
             }
         }
@@ -214,7 +216,7 @@ public class YAudioIn extends YFunction
     public int get_mute() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MUTE_INVALID;
             }
         }
@@ -279,7 +281,7 @@ public class YAudioIn extends YFunction
     public String get_volumeRange() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLUMERANGE_INVALID;
             }
         }
@@ -311,7 +313,7 @@ public class YAudioIn extends YFunction
     public int get_signal() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNAL_INVALID;
             }
         }
@@ -340,7 +342,7 @@ public class YAudioIn extends YFunction
     public int get_noSignalFor() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return NOSIGNALFOR_INVALID;
             }
         }

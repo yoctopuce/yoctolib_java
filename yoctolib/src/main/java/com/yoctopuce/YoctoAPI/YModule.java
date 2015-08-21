@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 20916 2015-07-23 08:54:20Z seb $
+ * $Id: YModule.java 21199 2015-08-19 13:06:55Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -143,7 +143,8 @@ public class YModule extends YFunction
     /**
      * Deprecated UpdateCallback for Module
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -155,7 +156,8 @@ public class YModule extends YFunction
     /**
      * TimedReportCallback for Module
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -339,7 +341,7 @@ public class YModule extends YFunction
     public String get_productName() throws YAPI_Exception
     {
         if (_cacheExpiration == 0) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PRODUCTNAME_INVALID;
             }
         }
@@ -368,7 +370,7 @@ public class YModule extends YFunction
     public String get_serialNumber() throws YAPI_Exception
     {
         if (_cacheExpiration == 0) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SERIALNUMBER_INVALID;
             }
         }
@@ -397,7 +399,7 @@ public class YModule extends YFunction
     public int get_productId() throws YAPI_Exception
     {
         if (_cacheExpiration == 0) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PRODUCTID_INVALID;
             }
         }
@@ -426,7 +428,7 @@ public class YModule extends YFunction
     public int get_productRelease() throws YAPI_Exception
     {
         if (_cacheExpiration == 0) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PRODUCTRELEASE_INVALID;
             }
         }
@@ -455,7 +457,7 @@ public class YModule extends YFunction
     public String get_firmwareRelease() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FIRMWARERELEASE_INVALID;
             }
         }
@@ -485,7 +487,7 @@ public class YModule extends YFunction
     public int get_persistentSettings() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PERSISTENTSETTINGS_INVALID;
             }
         }
@@ -528,7 +530,7 @@ public class YModule extends YFunction
     public int get_luminosity() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LUMINOSITY_INVALID;
             }
         }
@@ -594,7 +596,7 @@ public class YModule extends YFunction
     public int get_beacon() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BEACON_INVALID;
             }
         }
@@ -654,7 +656,7 @@ public class YModule extends YFunction
     public long get_upTime() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UPTIME_INVALID;
             }
         }
@@ -683,7 +685,7 @@ public class YModule extends YFunction
     public int get_usbCurrent() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return USBCURRENT_INVALID;
             }
         }
@@ -714,7 +716,7 @@ public class YModule extends YFunction
     public int get_rebootCountdown() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return REBOOTCOUNTDOWN_INVALID;
             }
         }
@@ -759,7 +761,7 @@ public class YModule extends YFunction
     public int get_userVar() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return USERVAR_INVALID;
             }
         }
@@ -1002,6 +1004,88 @@ public class YModule extends YFunction
         return _download("api.json");
     }
 
+    public byte[] get_allSettings_dev() throws YAPI_Exception
+    {
+        byte[] settings;
+        byte[] json;
+        byte[] res;
+        String sep;
+        String name;
+        String file_data;
+        byte[] file_data_bin;
+        String all_file_data;
+        ArrayList<String> filelist = new ArrayList<String>();
+        // may throw an exception
+        settings = _download("api.json");
+        all_file_data = ", \"files\":[";
+        if (hasFunction("files")) {
+            json = _download("files.json?a=dir&f=");
+            filelist = _json_get_array(json);
+            sep = "";
+            for (String ii: filelist) {
+                name = _json_get_key(ii.getBytes(), "name");
+                file_data_bin = _download(_escapeAttr(name));
+                file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.length);
+                file_data = String.format("%s{\"name\":\"%s\", \"data\":\"%s\"}\n", sep, name,file_data);
+                sep = ",";
+                all_file_data = all_file_data + file_data;
+            }
+        }
+        all_file_data = all_file_data + "]}";
+        res = YAPI._bytesMerge("{ \"api\":".getBytes(), YAPI._bytesMerge(settings, all_file_data.getBytes()));
+        return res;
+    }
+
+    /**
+     * Restores all the settings of the module. Useful to restore all the logical names and calibrations parameters
+     * of a module from a backup.Remember to call the saveToFlash() method of the module if the
+     * modifications must be kept.
+     *
+     * @param settings : a binary buffer with all the settings.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_allSettings_dev(byte[] settings) throws YAPI_Exception
+    {
+        byte[] down;
+        String json;
+        String json_api;
+        String json_files;
+        json = new String(settings);
+        json_api = _get_json_path(json, "api");
+        set_allSettings(json_api.getBytes());
+        if (hasFunction("files")) {
+            ArrayList<String> files = new ArrayList<String>();
+            String res;
+            String name;
+            String data;
+            down = _download("files.json?a=format");
+            res = _get_json_path(new String(down), "res");
+            res = _decode_json_string(res);
+            if (!(res.equals("ok"))) { throw new YAPI_Exception( YAPI.IO_ERROR,  "format failed");}
+            json_files = _get_json_path(json, "files");
+            files = _json_get_array(json_files.getBytes());
+            for (String ii: files) {
+                name = _get_json_path(ii, "name");
+                name = _decode_json_string(name);
+                data = _get_json_path(ii, "data");
+                data = _decode_json_string(data);
+                _upload(name, YAPI._hexStrToBin(data));
+            }
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Test if the device has a specific function. This method took an function identifier
+     * and return a boolean.
+     *
+     * @param funcId : the requested function identifier
+     *
+     * @return : true if the device has the function identifier
+     */
     public boolean hasFunction(String funcId) throws YAPI_Exception
     {
         int count;
@@ -1020,6 +1104,13 @@ public class YModule extends YFunction
         return false;
     }
 
+    /**
+     * Retrieve all hardware identifier that match the type passed in argument.
+     *
+     * @param funType : The type of function (Relay, LightSensor, Voltage,...)
+     *
+     * @return : A array of string.
+     */
     public ArrayList<String> get_functionIds(String funType) throws YAPI_Exception
     {
         int count;

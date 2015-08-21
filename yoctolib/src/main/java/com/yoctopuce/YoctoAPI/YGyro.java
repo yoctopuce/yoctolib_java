@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGyro.java 19704 2015-03-13 06:10:37Z mvuilleu $
+ * $Id: YGyro.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -125,7 +125,8 @@ public class YGyro extends YSensor
     /**
      * Deprecated UpdateCallback for Gyro
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -137,7 +138,8 @@ public class YGyro extends YSensor
     /**
      * TimedReportCallback for Gyro
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -186,7 +188,7 @@ public class YGyro extends YSensor
     public double get_xValue() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return XVALUE_INVALID;
             }
         }
@@ -217,7 +219,7 @@ public class YGyro extends YSensor
     public double get_yValue() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YVALUE_INVALID;
             }
         }
@@ -248,7 +250,7 @@ public class YGyro extends YSensor
     public double get_zValue() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ZVALUE_INVALID;
             }
         }

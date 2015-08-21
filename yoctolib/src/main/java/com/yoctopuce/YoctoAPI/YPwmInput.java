@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmInput.java 19582 2015-03-04 10:58:07Z seb $
+ * $Id: YPwmInput.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -104,7 +104,8 @@ public class YPwmInput extends YSensor
     /**
      * Deprecated UpdateCallback for PwmInput
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -116,7 +117,8 @@ public class YPwmInput extends YSensor
     /**
      * TimedReportCallback for PwmInput
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -177,7 +179,7 @@ public class YPwmInput extends YSensor
     public double get_dutyCycle() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DUTYCYCLE_INVALID;
             }
         }
@@ -207,7 +209,7 @@ public class YPwmInput extends YSensor
     public double get_pulseDuration() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSEDURATION_INVALID;
             }
         }
@@ -237,7 +239,7 @@ public class YPwmInput extends YSensor
     public double get_frequency() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREQUENCY_INVALID;
             }
         }
@@ -266,7 +268,7 @@ public class YPwmInput extends YSensor
     public double get_period() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PERIOD_INVALID;
             }
         }
@@ -297,7 +299,7 @@ public class YPwmInput extends YSensor
     public long get_pulseCounter() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSECOUNTER_INVALID;
             }
         }
@@ -341,7 +343,7 @@ public class YPwmInput extends YSensor
     public long get_pulseTimer() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSETIMER_INVALID;
             }
         }
@@ -374,7 +376,7 @@ public class YPwmInput extends YSensor
     public int get_pwmReportMode() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PWMREPORTMODE_INVALID;
             }
         }

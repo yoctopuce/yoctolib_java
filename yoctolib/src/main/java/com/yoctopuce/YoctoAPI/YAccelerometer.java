@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAccelerometer.java 19582 2015-03-04 10:58:07Z seb $
+ * $Id: YAccelerometer.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -91,7 +91,8 @@ public class YAccelerometer extends YSensor
     /**
      * Deprecated UpdateCallback for Accelerometer
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -103,7 +104,8 @@ public class YAccelerometer extends YSensor
     /**
      * TimedReportCallback for Accelerometer
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -155,7 +157,7 @@ public class YAccelerometer extends YSensor
     public double get_xValue() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return XVALUE_INVALID;
             }
         }
@@ -184,7 +186,7 @@ public class YAccelerometer extends YSensor
     public double get_yValue() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YVALUE_INVALID;
             }
         }
@@ -213,7 +215,7 @@ public class YAccelerometer extends YSensor
     public double get_zValue() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ZVALUE_INVALID;
             }
         }
@@ -238,7 +240,7 @@ public class YAccelerometer extends YSensor
     public int get_gravityCancellation() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return GRAVITYCANCELLATION_INVALID;
             }
         }

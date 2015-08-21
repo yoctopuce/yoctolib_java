@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPowerOutput.java 19484 2015-02-23 17:07:51Z seb $
+ * $Id: YPowerOutput.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -69,7 +69,8 @@ public class YPowerOutput extends YFunction
     /**
      * Deprecated UpdateCallback for PowerOutput
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -81,7 +82,8 @@ public class YPowerOutput extends YFunction
     /**
      * TimedReportCallback for PowerOutput
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -127,7 +129,7 @@ public class YPowerOutput extends YFunction
     public int get_voltage() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLTAGE_INVALID;
             }
         }

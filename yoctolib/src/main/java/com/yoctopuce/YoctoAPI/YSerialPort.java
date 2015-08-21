@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 20468 2015-05-29 10:24:28Z seb $
+ * $Id: YSerialPort.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -133,7 +133,8 @@ public class YSerialPort extends YFunction
     /**
      * Deprecated UpdateCallback for SerialPort
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -145,7 +146,8 @@ public class YSerialPort extends YFunction
     /**
      * TimedReportCallback for SerialPort
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -227,7 +229,7 @@ public class YSerialPort extends YFunction
     public String get_serialMode() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SERIALMODE_INVALID;
             }
         }
@@ -311,7 +313,7 @@ public class YSerialPort extends YFunction
     public String get_protocol() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PROTOCOL_INVALID;
             }
         }
@@ -396,7 +398,7 @@ public class YSerialPort extends YFunction
     public int get_voltageLevel() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLTAGELEVEL_INVALID;
             }
         }
@@ -471,7 +473,7 @@ public class YSerialPort extends YFunction
     public int get_rxCount() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RXCOUNT_INVALID;
             }
         }
@@ -500,7 +502,7 @@ public class YSerialPort extends YFunction
     public int get_txCount() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TXCOUNT_INVALID;
             }
         }
@@ -529,7 +531,7 @@ public class YSerialPort extends YFunction
     public int get_errCount() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ERRCOUNT_INVALID;
             }
         }
@@ -558,7 +560,7 @@ public class YSerialPort extends YFunction
     public int get_rxMsgCount() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RXMSGCOUNT_INVALID;
             }
         }
@@ -587,7 +589,7 @@ public class YSerialPort extends YFunction
     public int get_txMsgCount() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TXMSGCOUNT_INVALID;
             }
         }
@@ -616,7 +618,7 @@ public class YSerialPort extends YFunction
     public String get_lastMsg() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LASTMSG_INVALID;
             }
         }
@@ -645,7 +647,7 @@ public class YSerialPort extends YFunction
     public String get_currentJob() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTJOB_INVALID;
             }
         }
@@ -709,7 +711,7 @@ public class YSerialPort extends YFunction
     public String get_startupJob() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STARTUPJOB_INVALID;
             }
         }
@@ -769,7 +771,7 @@ public class YSerialPort extends YFunction
     public String get_command() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }

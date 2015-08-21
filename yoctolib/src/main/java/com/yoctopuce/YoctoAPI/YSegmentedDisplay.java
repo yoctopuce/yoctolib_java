@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSegmentedDisplay.java 18762 2014-12-16 16:00:39Z seb $
+ * $Id: YSegmentedDisplay.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -74,7 +74,8 @@ public class YSegmentedDisplay extends YFunction
     /**
      * Deprecated UpdateCallback for SegmentedDisplay
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -86,7 +87,8 @@ public class YSegmentedDisplay extends YFunction
     /**
      * TimedReportCallback for SegmentedDisplay
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -132,7 +134,7 @@ public class YSegmentedDisplay extends YFunction
     public String get_displayedText() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYEDTEXT_INVALID;
             }
         }
@@ -188,7 +190,7 @@ public class YSegmentedDisplay extends YFunction
     public int get_displayMode() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYMODE_INVALID;
             }
         }

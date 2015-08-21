@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoc.java 19582 2015-03-04 10:58:07Z seb $
+ * $Id: YVoc.java 21117 2015-08-17 12:36:50Z seb $
  *
  * Implements FindVoc(), the high-level API for Voc functions
  *
@@ -63,7 +63,8 @@ public class YVoc extends YSensor
     /**
      * Deprecated UpdateCallback for Voc
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -75,7 +76,8 @@ public class YVoc extends YSensor
     /**
      * TimedReportCallback for Voc
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed

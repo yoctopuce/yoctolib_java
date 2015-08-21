@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTilt.java 19582 2015-03-04 10:58:07Z seb $
+ * $Id: YTilt.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindTilt(), the high-level API for Tilt functions
  *
@@ -77,7 +77,8 @@ public class YTilt extends YSensor
     /**
      * Deprecated UpdateCallback for Tilt
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -89,7 +90,8 @@ public class YTilt extends YSensor
     /**
      * TimedReportCallback for Tilt
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -128,7 +130,7 @@ public class YTilt extends YSensor
     public int get_axis() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AXIS_INVALID;
             }
         }

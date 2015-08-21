@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 20410 2015-05-22 08:30:27Z seb $
+ * $Id: YTemperature.java 21211 2015-08-19 16:03:29Z seb $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -90,7 +90,8 @@ public class YTemperature extends YSensor
     /**
      * Deprecated UpdateCallback for Temperature
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -102,7 +103,8 @@ public class YTemperature extends YSensor
     /**
      * TimedReportCallback for Temperature
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -142,7 +144,7 @@ public class YTemperature extends YSensor
      * Changes the measuring unit for the measured temperature. That unit is a string.
      * If that strings end with the letter F all temperatures values will returned in
      * Fahrenheit degrees. If that String ends with the letter K all values will be
-     * returned in Kelvin degrees. If that String ends with the letter C all values will be
+     * returned in Kelvin degrees. If that string ends with the letter C all values will be
      * returned in Celsius degrees.  If the string ends with any other character the
      * change will be ignored. Remember to call the
      * saveToFlash() method of the module if the modification must be kept.
@@ -167,7 +169,7 @@ public class YTemperature extends YSensor
      * Changes the measuring unit for the measured temperature. That unit is a string.
      * If that strings end with the letter F all temperatures values will returned in
      * Fahrenheit degrees. If that String ends with the letter K all values will be
-     * returned in Kelvin degrees. If that String ends with the letter C all values will be
+     * returned in Kelvin degrees. If that string ends with the letter C all values will be
      * returned in Celsius degrees.  If the string ends with any other character the
      * change will be ignored. Remember to call the
      * saveToFlash() method of the module if the modification must be kept.
@@ -201,7 +203,7 @@ public class YTemperature extends YSensor
     public int get_sensorType() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SENSORTYPE_INVALID;
             }
         }
@@ -277,7 +279,7 @@ public class YTemperature extends YSensor
     public String get_command() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }

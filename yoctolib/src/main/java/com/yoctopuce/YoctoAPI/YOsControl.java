@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOsControl.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YOsControl.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -67,7 +67,8 @@ public class YOsControl extends YFunction
     /**
      * Deprecated UpdateCallback for OsControl
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -79,7 +80,8 @@ public class YOsControl extends YFunction
     /**
      * TimedReportCallback for OsControl
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -124,7 +126,7 @@ public class YOsControl extends YFunction
     public int get_shutdownCountdown() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SHUTDOWNCOUNTDOWN_INVALID;
             }
         }

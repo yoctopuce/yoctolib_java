@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBuzzer.java 18762 2014-12-16 16:00:39Z seb $
+ * $Id: YBuzzer.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -92,7 +92,8 @@ public class YBuzzer extends YFunction
     /**
      * Deprecated UpdateCallback for Buzzer
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -104,7 +105,8 @@ public class YBuzzer extends YFunction
     /**
      * TimedReportCallback for Buzzer
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -193,7 +195,7 @@ public class YBuzzer extends YFunction
     public double get_frequency() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREQUENCY_INVALID;
             }
         }
@@ -222,7 +224,7 @@ public class YBuzzer extends YFunction
     public int get_volume() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLUME_INVALID;
             }
         }
@@ -282,7 +284,7 @@ public class YBuzzer extends YFunction
     public int get_playSeqSize() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PLAYSEQSIZE_INVALID;
             }
         }
@@ -311,7 +313,7 @@ public class YBuzzer extends YFunction
     public int get_playSeqMaxSize() throws YAPI_Exception
     {
         if (_cacheExpiration == 0) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PLAYSEQMAXSIZE_INVALID;
             }
         }
@@ -343,7 +345,7 @@ public class YBuzzer extends YFunction
     public int get_playSeqSignature() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PLAYSEQSIGNATURE_INVALID;
             }
         }
@@ -371,7 +373,7 @@ public class YBuzzer extends YFunction
     public String get_command() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }

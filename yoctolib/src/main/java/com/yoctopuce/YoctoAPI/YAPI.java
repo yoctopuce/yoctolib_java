@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 20831 2015-07-15 15:21:38Z seb $
+ * $Id: YAPI.java 21199 2015-08-19 13:06:55Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -51,7 +51,11 @@ import java.util.Queue;
  */
 public class YAPI
 {
-
+    // Default cache validity (in [ms]) before reloading data from device. This
+    // saves a lots of traffic.
+    // Note that a value under 2 ms makes little sense since a USB bus itself
+    // has a 2ms round trip period
+    public static int DefaultCacheValidity = 5;
 
     // Return value for invalid strings
     public static final String INVALID_STRING = "!INVALID!";
@@ -60,7 +64,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "20983";
+    public static final String YOCTO_API_BUILD_STR = "21242";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -219,11 +223,6 @@ public class YAPI
 
 
     // Non static Variable
-    // Default cache validity (in [ms]) before reloading data from device. This
-    // saves a lots of traffic.
-    // Note that a value under 2 ms makes little sense since a USB bus itself
-    // has a 2ms round trip period
-    public int DefaultCacheValidity;
     private int _apiMode;
     ArrayList<YGenericHub> _hubs; // array of root urls
     private HashMap<String, YDevice> _devs; // hash table of devices, by serial number
@@ -565,8 +564,12 @@ public class YAPI
         if (str.length() == 0) {
             return 0;
         }
-        int i = 0;
-        if (str.charAt(i) == '-' || str.charAt(i) == '+') {
+        int s = 0;
+        if (str.charAt(s) == '+') {
+            s++;
+        }
+        int i = s;
+        if (str.charAt(i) == '-' ) {
             i++;
         }
         for (; i < str.length(); i++) {
@@ -578,7 +581,7 @@ public class YAPI
         if (i == 0) {
             return 0;
         }
-        str = str.substring(0, i);
+        str = str.substring(s, i);
         return Integer.valueOf(str);
     }
 
@@ -1035,7 +1038,6 @@ public class YAPI
         } catch (Exception dummy) {
             DeviceCharset = Charset.defaultCharset();
         }
-        DefaultCacheValidity = 5;
         _hubs = new ArrayList<YGenericHub>();
         _devs = new HashMap<String, YDevice>();
         _snByUrl = new HashMap<String, String>();
@@ -1221,7 +1223,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".20983";
+        return YOCTO_API_VERSION_STR + ".21242";
     }
 
     /**

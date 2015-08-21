@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YRealTimeClock.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -85,7 +85,8 @@ public class YRealTimeClock extends YFunction
     /**
      * Deprecated UpdateCallback for RealTimeClock
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -97,7 +98,8 @@ public class YRealTimeClock extends YFunction
     /**
      * TimedReportCallback for RealTimeClock
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -150,7 +152,7 @@ public class YRealTimeClock extends YFunction
     public long get_unixTime() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UNIXTIME_INVALID;
             }
         }
@@ -213,7 +215,7 @@ public class YRealTimeClock extends YFunction
     public String get_dateTime() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DATETIME_INVALID;
             }
         }
@@ -242,7 +244,7 @@ public class YRealTimeClock extends YFunction
     public int get_utcOffset() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UTCOFFSET_INVALID;
             }
         }
@@ -309,7 +311,7 @@ public class YRealTimeClock extends YFunction
     public int get_timeSet() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TIMESET_INVALID;
             }
         }

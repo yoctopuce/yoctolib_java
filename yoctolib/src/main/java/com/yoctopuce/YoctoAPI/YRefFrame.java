@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 20468 2015-05-29 10:24:28Z seb $
+ * $Id: YRefFrame.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -158,7 +158,8 @@ public class YRefFrame extends YFunction
     /**
      * Deprecated UpdateCallback for RefFrame
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -170,7 +171,8 @@ public class YRefFrame extends YFunction
     /**
      * TimedReportCallback for RefFrame
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -215,7 +217,7 @@ public class YRefFrame extends YFunction
     public int get_mountPos() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MOUNTPOS_INVALID;
             }
         }
@@ -312,7 +314,7 @@ public class YRefFrame extends YFunction
     public double get_bearing() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BEARING_INVALID;
             }
         }
@@ -339,7 +341,7 @@ public class YRefFrame extends YFunction
     public String get_calibrationParam() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATIONPARAM_INVALID;
             }
         }

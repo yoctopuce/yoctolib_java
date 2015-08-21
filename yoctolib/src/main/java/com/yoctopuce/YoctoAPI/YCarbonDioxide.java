@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCarbonDioxide.java 19619 2015-03-05 18:11:23Z mvuilleu $
+ * $Id: YCarbonDioxide.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -74,7 +74,8 @@ public class YCarbonDioxide extends YSensor
     /**
      * Deprecated UpdateCallback for CarbonDioxide
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -86,7 +87,8 @@ public class YCarbonDioxide extends YSensor
     /**
      * TimedReportCallback for CarbonDioxide
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -133,7 +135,7 @@ public class YCarbonDioxide extends YSensor
     public int get_abcPeriod() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ABCPERIOD_INVALID;
             }
         }
@@ -198,7 +200,7 @@ public class YCarbonDioxide extends YSensor
     public String get_command() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 20468 2015-05-29 10:24:28Z seb $
+ * $Id: YCellular.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -119,7 +119,8 @@ public class YCellular extends YFunction
     /**
      * Deprecated UpdateCallback for Cellular
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -131,7 +132,8 @@ public class YCellular extends YFunction
     /**
      * TimedReportCallback for Cellular
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -201,7 +203,7 @@ public class YCellular extends YFunction
     public int get_linkQuality() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LINKQUALITY_INVALID;
             }
         }
@@ -230,7 +232,7 @@ public class YCellular extends YFunction
     public String get_cellOperator() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CELLOPERATOR_INVALID;
             }
         }
@@ -263,7 +265,7 @@ public class YCellular extends YFunction
     public String get_imsi() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return IMSI_INVALID;
             }
         }
@@ -296,7 +298,7 @@ public class YCellular extends YFunction
     public String get_message() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MESSAGE_INVALID;
             }
         }
@@ -329,7 +331,7 @@ public class YCellular extends YFunction
     public String get_pin() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PIN_INVALID;
             }
         }
@@ -417,7 +419,7 @@ public class YCellular extends YFunction
     public String get_lockedOperator() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOCKEDOPERATOR_INVALID;
             }
         }
@@ -487,7 +489,7 @@ public class YCellular extends YFunction
     public int get_enableData() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLEDATA_INVALID;
             }
         }
@@ -562,7 +564,7 @@ public class YCellular extends YFunction
     public String get_apn() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return APN_INVALID;
             }
         }
@@ -628,7 +630,7 @@ public class YCellular extends YFunction
     public String get_apnSecret() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return APNSECRET_INVALID;
             }
         }
@@ -669,7 +671,7 @@ public class YCellular extends YFunction
     public String get_command() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
         }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAltitude.java 19746 2015-03-17 10:34:00Z seb $
+ * $Id: YAltitude.java 21199 2015-08-19 13:06:55Z seb $
  *
  * Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -75,7 +75,8 @@ public class YAltitude extends YSensor
     /**
      * Deprecated UpdateCallback for Altitude
      */
-    public interface UpdateCallback {
+    public interface UpdateCallback
+    {
         /**
          *
          * @param function      : the function object of which the value has changed
@@ -87,7 +88,8 @@ public class YAltitude extends YSensor
     /**
      * TimedReportCallback for Altitude
      */
-    public interface TimedReportCallback {
+    public interface TimedReportCallback
+    {
         /**
          *
          * @param function : the function object of which the value has changed
@@ -207,7 +209,7 @@ public class YAltitude extends YSensor
     public double get_qnh() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return QNH_INVALID;
             }
         }
@@ -240,7 +242,7 @@ public class YAltitude extends YSensor
     public String get_technology() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.SafeYAPI().DefaultCacheValidity) != YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TECHNOLOGY_INVALID;
             }
         }
