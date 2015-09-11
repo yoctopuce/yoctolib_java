@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 21199 2015-08-19 13:06:55Z seb $
+ * $Id: YCellular.java 21485 2015-09-11 14:10:22Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -70,6 +70,10 @@ public class YCellular extends YFunction
      */
     public static final String CELLOPERATOR_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid cellIdentifier value
+     */
+    public static final String CELLIDENTIFIER_INVALID = YAPI.INVALID_STRING;
+    /**
      * invalid imsi value
      */
     public static final String IMSI_INVALID = YAPI.INVALID_STRING;
@@ -106,6 +110,7 @@ public class YCellular extends YFunction
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _linkQuality = LINKQUALITY_INVALID;
     protected String _cellOperator = CELLOPERATOR_INVALID;
+    protected String _cellIdentifier = CELLIDENTIFIER_INVALID;
     protected String _imsi = IMSI_INVALID;
     protected String _message = MESSAGE_INVALID;
     protected String _pin = PIN_INVALID;
@@ -165,6 +170,9 @@ public class YCellular extends YFunction
         }
         if (json_val.has("cellOperator")) {
             _cellOperator = json_val.getString("cellOperator");
+        }
+        if (json_val.has("cellIdentifier")) {
+            _cellIdentifier = json_val.getString("cellIdentifier");
         }
         if (json_val.has("imsi")) {
             _imsi = json_val.getString("imsi");
@@ -249,6 +257,37 @@ public class YCellular extends YFunction
     public String getCellOperator() throws YAPI_Exception
     {
         return get_cellOperator();
+    }
+
+    /**
+     * Returns the unique identifier of the cellular antenna in use: MCC, MNC, LAC and Cell ID.
+     *
+     *  @return a string corresponding to the unique identifier of the cellular antenna in use: MCC, MNC,
+     * LAC and Cell ID
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_cellIdentifier() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return CELLIDENTIFIER_INVALID;
+            }
+        }
+        return _cellIdentifier;
+    }
+
+    /**
+     * Returns the unique identifier of the cellular antenna in use: MCC, MNC, LAC and Cell ID.
+     *
+     *  @return a string corresponding to the unique identifier of the cellular antenna in use: MCC, MNC,
+     * LAC and Cell ID
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getCellIdentifier() throws YAPI_Exception
+    {
+        return get_cellIdentifier();
     }
 
     /**

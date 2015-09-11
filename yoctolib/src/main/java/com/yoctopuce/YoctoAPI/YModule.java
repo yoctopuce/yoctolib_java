@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 21199 2015-08-19 13:06:55Z seb $
+ * $Id: YModule.java 21368 2015-08-31 10:10:55Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -992,19 +992,15 @@ public class YModule extends YFunction
     }
 
     /**
-     * Returns all the settings of the module. Useful to backup all the logical names and calibrations parameters
-     * of a connected module.
+     *  Returns all the settings and uploaded files of the module. Useful to backup all the logical names,
+     * calibrations parameters,
+     * and uploaded files of a connected module.
      *
      * @return a binary buffer with all the settings.
      *
      * @throws YAPI_Exception on error
      */
     public byte[] get_allSettings() throws YAPI_Exception
-    {
-        return _download("api.json");
-    }
-
-    public byte[] get_allSettings_dev() throws YAPI_Exception
     {
         byte[] settings;
         byte[] json;
@@ -1037,8 +1033,9 @@ public class YModule extends YFunction
     }
 
     /**
-     * Restores all the settings of the module. Useful to restore all the logical names and calibrations parameters
-     * of a module from a backup.Remember to call the saveToFlash() method of the module if the
+     *  Restores all the settings and uploaded files of the module. Useful to restore all the logical names
+     * and calibrations parameters, uploaded
+     * files etc.. of a module from a backup.Remember to call the saveToFlash() method of the module if the
      * modifications must be kept.
      *
      * @param settings : a binary buffer with all the settings.
@@ -1047,7 +1044,7 @@ public class YModule extends YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public int set_allSettings_dev(byte[] settings) throws YAPI_Exception
+    public int set_allSettingsAndFiles(byte[] settings) throws YAPI_Exception
     {
         byte[] down;
         String json;
@@ -1055,6 +1052,9 @@ public class YModule extends YFunction
         String json_files;
         json = new String(settings);
         json_api = _get_json_path(json, "api");
+        if (json_api.equals("")) {
+            return set_allSettings(settings);
+        }
         set_allSettings(json_api.getBytes());
         if (hasFunction("files")) {
             ArrayList<String> files = new ArrayList<String>();
@@ -1388,6 +1388,11 @@ public class YModule extends YFunction
         String each_str;
         boolean do_update;
         boolean found;
+        tmp = new String(settings);
+        tmp = _get_json_path(tmp, "api");
+        if (!(tmp.equals(""))) {
+            settings = tmp.getBytes();
+        }
         oldval = "";
         newval = "";
         old_json_flat = _flattenJsonStruct(settings);

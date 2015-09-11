@@ -1,1 +1,1 @@
-- Minor bug fixes
+- Add new methods set_allSettingsAndFiles() that restore settings and files
