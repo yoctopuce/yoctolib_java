@@ -1,1 +1,5 @@
-- Add new methods set_allSettingsAndFiles() that restore settings and files
+- Add native USB Access
+- Detect invalid settings before updating firmware
+- Add clearCache() method to YFunctions object
+- Fix loadThermistorResponseTable() method
+- Save thermistor response table during firmware update

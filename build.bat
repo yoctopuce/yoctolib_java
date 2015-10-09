@@ -8,11 +8,11 @@ jar -cvf yoctoAPI.jar org\json\*.class com\yoctopuce\YoctoAPI\*.class || exit /b
 IF "%1" == "" goto apidone
 rd /s /q com
 rd /s /q org
- 
+goto end
 :apidone
 cd ..
 echo done
-
+goto end
 
 set failled=
 FOR /D %%A IN (Examples\*) DO (call:BuildDir %%A %1)
@@ -27,7 +27,7 @@ goto error
 echo build %~1 %~2
 cd %~1
 call buildExample.bat %~2
-IF ERRORLEVEL 1 set failled=%failled% %~1 - 
+IF ERRORLEVEL 1 set failled=%failled% %~1 -
 cd ..\..\
 echo done
 GOTO:EOF

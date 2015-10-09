@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFunctionType.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YFunctionType.java 21650 2015-09-30 15:35:28Z seb $
  *
  * Internal YFunctionType object
  *
@@ -259,9 +259,10 @@ class YFunctionType {
             return;
         }
         yp.setAdvertisedValue(pubval);
-        YFunction conn_fn = SafeYAPI()._GetValueCallback(hwid);
+        YAPI yapi = SafeYAPI();
+        YFunction conn_fn = yapi._GetValueCallback(hwid);
         if (conn_fn != null) {
-            SafeYAPI()._PushDataEvent(new YAPI.DataEvent(conn_fn, pubval));
+            yapi._PushDataEvent(new YAPI.DataEvent(conn_fn, pubval));
         }
     }
 

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDevice.java 21071 2015-08-11 16:37:59Z seb $
+ * $Id: YDevice.java 21675 2015-10-01 16:59:42Z seb $
  *
  * Internal YDevice class
  *
@@ -42,10 +42,7 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
@@ -84,10 +81,11 @@ public class YDevice
         _wpRec = wpRec;
         _cache_expiration = 0;
         _cache_json = "";
-        _moduleYPEntry = new YPEntry(wpRec.getSerialNumber(), "module");
+        _moduleYPEntry = new YPEntry(wpRec.getSerialNumber(), "module", YPEntry.BaseClass.Function);
         _moduleYPEntry.setLogicalName(wpRec.getLogicalName());
         _ypRecs = new HashMap<Integer, YPEntry>();
-        for (String categ : ypRecs.keySet()) {
+        Set<String> keySet = ypRecs.keySet();
+        for (String categ : keySet) {
             for (YPEntry rec : ypRecs.get(categ)) {
                 if (rec.getSerial().equals(wpRec.getSerialNumber())) {
                     int funydx = rec.getIndex();
@@ -138,13 +136,6 @@ public class YDevice
         return _wpRec.getBeacon();
     }
 
-    // Return the hub-specific devYdx of the device, as found during discovery
-    public int getDevYdx()
-    {
-        return _wpRec.getIndex();
-    }
-
-
     // Get the whole REST API string for a device, from cache if possible
     public String requestAPI() throws YAPI_Exception
     {
@@ -152,7 +143,7 @@ public class YDevice
             return _cache_json;
         }
         String yreq = requestHTTPSyncAsString("GET /api.json", null);
-        this._cache_expiration = YAPI.GetTickCount() + SafeYAPI().DefaultCacheValidity;
+        this._cache_expiration = YAPI.GetTickCount() + YAPI.DefaultCacheValidity;
         this._cache_json = yreq;
         return yreq;
     }
@@ -168,7 +159,7 @@ public class YDevice
             loadval = new JSONObject(result);
 
 
-            _cache_expiration = YAPI.GetTickCount() + SafeYAPI().DefaultCacheValidity;
+            _cache_expiration = YAPI.GetTickCount() + YAPI.DefaultCacheValidity;
             _cache_json = result;
 
             // parse module and refresh names if needed
@@ -217,7 +208,7 @@ public class YDevice
     }
 
     // Force the REST API string in cache to expire immediately
-    public void dropCache()
+    public void clearCache()
     {
         _cache_expiration = 0;
     }

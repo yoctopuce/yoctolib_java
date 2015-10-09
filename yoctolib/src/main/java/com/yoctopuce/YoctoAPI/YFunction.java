@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 21199 2015-08-19 13:06:55Z seb $
+ * $Id: YFunction.java 21680 2015-10-02 13:42:44Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -756,7 +756,7 @@ public class YFunction
                         "Request failed, could not parse API result for " + dev);
             }
         } else {
-            dev.dropCache();
+            dev.clearCache();
         }
         if (loadval == null) {
             // request specified function only to minimize traffic
@@ -883,6 +883,26 @@ public class YFunction
         return _lastErrorMsg;
     }
 
+
+    /**
+     * Invalidate the cache. Invalidate the cache of the function attributes. Force the
+     * next call to get_xxx() or loadxxx() to use value that come from the device..
+     *
+     *
+     */
+    public void clearCache()
+    {
+        try {
+            YDevice dev = getYDevice();
+            dev.clearCache();
+        } catch (YAPI_Exception ignore) {
+        }
+        if (_cacheExpiration != 0) {
+            _cacheExpiration = YAPI.GetTickCount();
+        }
+    }
+
+
     /**
      * Preloads the function cache with a specified validity duration.
      * By default, whenever accessing a device, all function attributes
@@ -927,7 +947,7 @@ public class YFunction
         }
         try {
             // device not resolved for now, force a communication for a last chance resolution
-            if (load(SafeYAPI().DefaultCacheValidity) == YAPI.SUCCESS) {
+            if (load(YAPI.DefaultCacheValidity) == YAPI.SUCCESS) {
                 ypEntry = SafeYAPI().resolveFunction(_className, _func);
                 return YModule.FindModule(ypEntry.getSerial() + ".module");
             }

@@ -11,7 +11,10 @@ public class Demo {
         @Override
         public void yNewValue(YAnButton fct, String value) {
             try {
-                System.out.println(fct.get_hardwareId() + ": " + value + " (new value)");
+                int apival = fct.get_calibratedValue();
+                fct.clearCache();
+                int value1 = fct.get_calibratedValue();
+                System.out.println(String.format("%s: %s=%d (%d)", fct.get_hardwareId(), value,  value1,apival));
             } catch (YAPI_Exception ex) {
                 Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -80,9 +83,10 @@ public class Demo {
 
     public static void main(String[] args) {
         try {
+            YAPI.DefaultCacheValidity = 5000;
             try {
                 // setup the API to use local VirtualHub
-                YAPI.RegisterHub("127.0.0.1");
+                YAPI.RegisterHub("localhost");
             } catch (YAPI_Exception ex) {
                 System.out.println("Cannot contact VirtualHub on 127.0.0.1 (" + ex.getLocalizedMessage() + ")");
                 System.out.println("Ensure that the VirtualHub application is running");

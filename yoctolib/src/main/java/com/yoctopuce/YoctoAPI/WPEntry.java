@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: WPEntry.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: WPEntry.java 21650 2015-09-30 15:35:28Z seb $
  *
  * White page implementation
  *
@@ -48,7 +48,6 @@ class WPEntry {
     private int _productId = -1;
     private final String _networkUrl;
     private int _beacon;
-    private final int _index;
     private boolean _isValid;
     private final String _serialNumber;
 
@@ -63,27 +62,56 @@ class WPEntry {
         //Remove the /api of the network URL
         _networkUrl = networkUrl.substring(0, networkUrl.length() - 4);
         _beacon = json.getInt("beacon");
-        if (json.has("index")) {
-            _index = json.getInt("index");
-        } else {
-            _index = -1;
-        }
         _isValid = true;
     }
 
     @Override
     public String toString()
     {
-        return "WPEntry [_index=" + _index + ", _serialNumber=" + _serialNumber + ", _logicalName=" + _logicalName + ", _productName=" + _productName + ", _productId=" + _productId + ", _networkUrl=" + _networkUrl + ", _beacon=" + _beacon + ", _isValid=" + _isValid + "]";
+        return "WPEntry [serialNumber=" + _serialNumber + ", logicalName=" + _logicalName + ", productName=" + _productName + ", productId=" + _productId + ", networkUrl=" + _networkUrl + ", beacon=" + _beacon + ", isValid=" + _isValid + "]";
     }
 
-    public WPEntry(int index, String serial, String netUrl)
+    public WPEntry(String serial, String netUrl)
     {
         super();
         _serialNumber = serial;
         _networkUrl = netUrl;
-        _index = index;
         _isValid = false;
+    }
+
+
+    public WPEntry(int test,String productName)
+    {
+        _logicalName = "logicalName";
+        //_productName = productName;
+        _productId = -1;
+        _networkUrl = "networkUrl";
+        _beacon = 0;
+        _serialNumber = "serialNumber";
+        _isValid = false;
+    }
+
+    public WPEntry(int productId, int beacon )
+    {
+        _logicalName = "logicalName";
+        _productName = "productName";
+        _productId = productId;
+        _networkUrl = "networkUrl";
+        _beacon = beacon;
+        _serialNumber = "serialNumber";
+        _isValid = false;
+    }
+
+
+    public WPEntry(String logicalName, String productName, int productId, String networkUrl, int beacon, String serialNumber)
+    {
+        _logicalName = logicalName;
+        _productName = productName;
+        _productId = productId;
+        _networkUrl = networkUrl;
+        _beacon = beacon;
+        _serialNumber = serialNumber;
+        _isValid = true;
     }
 
     public boolean isValid()
@@ -94,11 +122,6 @@ class WPEntry {
     public void validate()
     {
         _isValid = true;
-    }
-
-    public int getIndex()
-    {
-        return _index;
     }
 
     public int getBeacon()

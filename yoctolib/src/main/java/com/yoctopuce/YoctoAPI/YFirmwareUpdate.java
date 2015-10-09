@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 20376 2015-05-19 14:18:47Z seb $
+ * $Id: YFirmwareUpdate.java 21601 2015-09-23 08:22:34Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -388,7 +388,9 @@ public class YFirmwareUpdate
      */
     public int get_progress()
     {
-        _processMore(0);
+        if (_progress >= 0) {
+            _processMore(0);
+        }
         return _progress;
     }
 
@@ -415,9 +417,18 @@ public class YFirmwareUpdate
      */
     public int startUpdate()
     {
-        _progress = 0;
-        _progress_c = 0;
-        _processMore(1);
+        String err;
+        int leng;
+        err = new String(_settings);
+        leng = (err).length();
+        if (( leng >= 6) && ("error:".equals((err).substring(0, 0 + 6)))) {
+            _progress = -1;
+            _progress_msg = (err).substring( 6,  6 + leng - 6);
+        } else {
+            _progress = 0;
+            _progress_c = 0;
+            _processMore(1);
+        }
         return _progress;
     }
 

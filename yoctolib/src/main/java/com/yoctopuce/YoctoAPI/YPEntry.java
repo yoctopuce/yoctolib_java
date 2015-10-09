@@ -1,40 +1,38 @@
 /*********************************************************************
- *
- * $Id: YPEntry.java 20376 2015-05-19 14:18:47Z seb $
+ * $Id: YPEntry.java 21659 2015-10-01 12:39:02Z seb $
  *
  * Yellow page implementation
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
- *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
- *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ * Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ * non-exclusive license to use, modify, copy and integrate this
+ * file into your software for the sole purpose of interfacing
+ * with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
- *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
- *  this notice in the distributed source file.
+ * You may reproduce and distribute copies of this file in
+ * source or object form, as long as the sole purpose of this
+ * code is to interface with Yoctopuce products. You must retain
+ * this notice in the distributed source file.
  *
- *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
- *  obligations.
+ * You should refer to Yoctopuce General Terms and Conditions
+ * for additional information regarding your rights and
+ * obligations.
  *
- *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *  WARRANTY, OR OTHERWISE.
- *
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ * EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ * COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ * SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
+ * LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ * WARRANTY, OR OTHERWISE.
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
@@ -45,33 +43,36 @@ import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 
-class YPEntry {
+class YPEntry
+{
 
 
-    enum BaseClass {
+    enum BaseClass
+    {
         Function(0),
         Sensor(1);
 
         private int _intval = 0;
 
-        BaseClass(int intval) {
+        BaseClass(int intval)
+        {
             _intval = intval;
         }
 
-        public static BaseClass forByte(byte bval) {
+        public static BaseClass forByte(byte bval)
+        {
             return values()[bval];
         }
 
     }
 
-    private String _classname;
-    private String _serial = "";
-    private String _funcId = "";
+    private final String _classname;
+    private final String _serial;
+    private final String _funcId;
     private String _logicalName = "";
     private String _advertisedValue = "";
     private int _index = -1;
-    private BaseClass _baseclass = BaseClass.Function;
-    private String _categ = "";
+    private final BaseClass _baseclass;
 
     public YPEntry(JSONObject json) throws JSONException
     {
@@ -80,7 +81,6 @@ class YPEntry {
         _serial = hardwareId.substring(0, pos);
         _funcId = hardwareId.substring(pos + 1);
         _classname = SafeYAPI().functionClass(_funcId);
-        _categ = SafeYAPI().functionClass(_funcId);
         _logicalName = json.getString("logicalName");
         _advertisedValue = json.getString("advertisedValue");
         try {
@@ -91,26 +91,43 @@ class YPEntry {
 
         if (json.has("baseType")) {
             _baseclass = BaseClass.values()[json.getInt("baseType")];
+        } else {
+            _baseclass = BaseClass.Function;
         }
     }
 
-    public YPEntry(String serial, String functionID)
+    public YPEntry(String serial, String functionID, BaseClass baseclass)
     {
         _serial = serial;
         _funcId = functionID;
+        _baseclass = baseclass;
         _classname = SafeYAPI().functionClass(_funcId);
-        _categ = SafeYAPI().functionClass(_funcId);
+    }
+
+    //called from Jni
+    public YPEntry(String classname, String serial, String funcId, String logicalName, String advertisedValue, int baseType, int funYdx)
+    {
+        _serial = serial;
+        _funcId = funcId;
+        _logicalName = logicalName;
+        _advertisedValue = advertisedValue;
+        _baseclass = BaseClass.values()[baseType];
+        _index = funYdx;
+        _classname = classname;
     }
 
     @Override
     public String toString()
     {
-        return "YPEntry [_categ=" + _categ + ", _index=" + _index + ", _serial=" + _serial + ", _funcId=" + _funcId + ", _logicalName=" + _logicalName + ", _advertisedValue=" + _advertisedValue + "]";
-    }
-
-    public String getCateg()
-    {
-        return _categ;
+        return "YPEntry{" +
+                "_classname='" + _classname + '\'' +
+                ", _serial='" + _serial + '\'' +
+                ", _funcId='" + _funcId + '\'' +
+                ", _logicalName='" + _logicalName + '\'' +
+                ", _advertisedValue='" + _advertisedValue + '\'' +
+                ", _index=" + _index +
+                ", _baseclass=" + _baseclass +
+                '}';
     }
 
     public String getAdvertisedValue()
@@ -121,12 +138,11 @@ class YPEntry {
     public void setAdvertisedValue(String _advertisedValue)
     {
         this._advertisedValue = _advertisedValue;
-
     }
 
     public String getHardwareId()
     {
-        return  _serial+"."+_funcId;
+        return _serial + "." + _funcId;
     }
 
     public String getSerial()
@@ -154,10 +170,6 @@ class YPEntry {
         return _baseclass;
     }
 
-    public void setBaseclass(BaseClass bclass)
-    {
-        _baseclass = bclass;
-    }
 
     public String getLogicalName()
     {

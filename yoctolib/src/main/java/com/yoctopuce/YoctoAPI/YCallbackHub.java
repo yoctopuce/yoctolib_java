@@ -1,40 +1,38 @@
 /*********************************************************************
- *
- * $Id: YCallbackHub.java 20332 2015-05-12 15:57:31Z seb $
+ * $Id: YCallbackHub.java 21650 2015-09-30 15:35:28Z seb $
  *
  * Internal YHTTPHUB object
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
- *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
- *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ * Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ * non-exclusive license to use, modify, copy and integrate this
+ * file into your software for the sole purpose of interfacing
+ * with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
- *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
- *  this notice in the distributed source file.
+ * You may reproduce and distribute copies of this file in
+ * source or object form, as long as the sole purpose of this
+ * code is to interface with Yoctopuce products. You must retain
+ * this notice in the distributed source file.
  *
- *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
- *  obligations.
+ * You should refer to Yoctopuce General Terms and Conditions
+ * for additional information regarding your rights and
+ * obligations.
  *
- *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *  WARRANTY, OR OTHERWISE.
- *
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ * EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ * COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ * SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
+ * LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ * WARRANTY, OR OTHERWISE.
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
@@ -283,22 +281,23 @@ public class YCallbackHub extends YGenericHub
             Iterator<?> keys = yellowPages_json.keys();
             while (keys.hasNext()) {
                 String classname = keys.next().toString();
-                YFunctionType ftype = SafeYAPI().getFnByType(classname);
                 JSONArray yprecs_json = yellowPages_json.getJSONArray(classname);
                 ArrayList<YPEntry> yprecs_arr = new ArrayList<YPEntry>(
                         yprecs_json.length());
                 for (int i = 0; i < yprecs_json.length(); i++) {
                     YPEntry yprec = new YPEntry(yprecs_json.getJSONObject(i));
                     yprecs_arr.add(yprec);
-                    ftype.reindexFunction(yprec);
+
                 }
                 yellowPages.put(classname, yprecs_arr);
             }
 
             // Reindex all devices from white pages
             for (int i = 0; i < whitePages_json.length(); i++) {
-                WPEntry devinfo = new WPEntry(whitePages_json.getJSONObject(i));
-                _serialByYdx.put(devinfo.getIndex(), devinfo.getSerialNumber());
+                JSONObject jsonObject = whitePages_json.getJSONObject(i);
+                WPEntry devinfo = new WPEntry(jsonObject);
+                int index = jsonObject.getInt("index");
+                _serialByYdx.put(index, devinfo.getSerialNumber());
                 whitePages.add(devinfo);
             }
         } catch (JSONException e) {

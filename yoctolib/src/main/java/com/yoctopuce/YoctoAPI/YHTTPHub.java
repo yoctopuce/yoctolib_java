@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHTTPHub.java 20376 2015-05-19 14:18:47Z seb $
+ * $Id: YHTTPHub.java 21680 2015-10-02 13:42:44Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -335,7 +335,7 @@ class YHTTPHub extends YGenericHub {
                                 funcid = ydev.getYPEntry(funydx).getFuncId();
                                 if (!funcid.equals("")) {
                                     // function value ydx (tiny notification)
-                                    SafeYAPI().setFunctionValue(serial + "." + funcid, value);
+                                    handleValueNotification(serial, funcid, value);
                                 }
                                 break;
                             case NOTIFY_NETPKT_DEVLOGYDX:
@@ -362,7 +362,7 @@ class YHTTPHub extends YGenericHub {
                                             int intval = Integer.parseInt(value.substring(pos, pos + 2), 16);
                                             report.add(intval);
                                         }
-                                        SafeYAPI().setTimedReport(serial + "." + funcid, ydev.getDeviceTime(), report);
+                                        handleTimedNotification(serial, funcid, ydev.getDeviceTime(), report);
                                     }
                                 }
                                 break;
@@ -373,7 +373,7 @@ class YHTTPHub extends YGenericHub {
                                     if (rawval != null) {
                                         String decodedval = decodePubVal(rawval[0], rawval, 1, 6);
                                         // function value ydx (tiny notification)
-                                        SafeYAPI().setFunctionValue(serial + "." + funcid, decodedval);
+                                        handleValueNotification(serial, funcid, decodedval);
                                     }
                                 }
                                 break;
@@ -403,8 +403,7 @@ class YHTTPHub extends YGenericHub {
                             break;
                         case NOTIFY_NETPKT_FUNCVAL: // function value (long notification)
                             String[] parts = ev.substring(5).split(",");
-                            SafeYAPI().setFunctionValue(parts[0] + "." + parts[1],
-                                    parts[2]);
+                            handleValueNotification(parts[0], parts[1], parts[2]);
                             break;
                     }
                 }
@@ -532,14 +531,12 @@ class YHTTPHub extends YGenericHub {
             Iterator<?> keys = yellowPages_json.keys();
             while (keys.hasNext()) {
                 String classname = keys.next().toString();
-                YFunctionType ftype = SafeYAPI().getFnByType(classname);
                 JSONArray yprecs_json = yellowPages_json.getJSONArray(classname);
                 ArrayList<YPEntry> yprecs_arr = new ArrayList<YPEntry>(
                         yprecs_json.length());
                 for (int i = 0; i < yprecs_json.length(); i++) {
                     YPEntry yprec = new YPEntry(yprecs_json.getJSONObject(i));
                     yprecs_arr.add(yprec);
-                    ftype.reindexFunction(yprec);
                 }
                 yellowPages.put(classname, yprecs_arr);
             }
@@ -547,8 +544,10 @@ class YHTTPHub extends YGenericHub {
             _serialByYdx.clear();
             // Reindex all devices from white pages
             for (int i = 0; i < whitePages_json.length(); i++) {
-                WPEntry devinfo = new WPEntry(whitePages_json.getJSONObject(i));
-                _serialByYdx.put(devinfo.getIndex(), devinfo.getSerialNumber());
+                JSONObject jsonObject = whitePages_json.getJSONObject(i);
+                WPEntry devinfo = new WPEntry(jsonObject);
+                int index = jsonObject.getInt("index");
+                _serialByYdx.put(index, devinfo.getSerialNumber());
                 whitePages.add(devinfo);
             }
         } catch (JSONException e) {

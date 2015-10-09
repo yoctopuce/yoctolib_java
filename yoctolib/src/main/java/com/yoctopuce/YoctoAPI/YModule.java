@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 21368 2015-08-31 10:10:55Z seb $
+ * $Id: YModule.java 21587 2015-09-22 15:45:27Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -979,7 +979,7 @@ public class YModule extends YFunction
      *
      * @param path : the path of the byn file to use.
      *
-     * @return : A YFirmwareUpdate object.
+     * @return : A YFirmwareUpdate object or NULL on error.
      */
     public YFirmwareUpdate updateFirmware(String path) throws YAPI_Exception
     {
@@ -988,6 +988,10 @@ public class YModule extends YFunction
         // may throw an exception
         serial = get_serialNumber();
         settings = get_allSettings();
+        if ((settings).length == 0) {
+            _throw(YAPI.IO_ERROR, "Unable to get device settings");
+            settings = "error:Unable to get device settings".getBytes();
+        }
         return new YFirmwareUpdate(serial, path, settings);
     }
 
@@ -1007,29 +1011,105 @@ public class YModule extends YFunction
         byte[] res;
         String sep;
         String name;
+        String item;
+        String t_type;
+        String id;
+        String url;
         String file_data;
         byte[] file_data_bin;
-        String all_file_data;
+        byte[] temp_data_bin;
+        String ext_settings;
         ArrayList<String> filelist = new ArrayList<String>();
+        ArrayList<String> templist = new ArrayList<String>();
         // may throw an exception
         settings = _download("api.json");
-        all_file_data = ", \"files\":[";
+        if ((settings).length == 0) {
+            return settings;
+        }
+        ext_settings = ", \"extras\":[";
+        templist = get_functionIds("Temperature");
+        sep = "";
+        for (String ii: templist) {
+            if (YAPI._atoi(get_firmwareRelease()) > 9000) {
+                url = String.format("api/%s/sensorType",ii);
+                t_type = new String(_download(url));
+                if (t_type.equals("RES_NTC")) {
+                    id = (ii).substring( 11,  11 + (ii).length() - 11);
+                    temp_data_bin = _download(String.format("extra.json?page=%s",id));
+                    if ((temp_data_bin).length == 0) {
+                        return temp_data_bin;
+                    }
+                    item = String.format("%s{\"fid\":\"%s\", \"json\":%s}\n", sep, ii,new String(temp_data_bin));
+                    ext_settings = ext_settings + item;
+                    sep = ",";
+                }
+            }
+        }
+        ext_settings =  ext_settings + "],\n\"files\":[";
         if (hasFunction("files")) {
             json = _download("files.json?a=dir&f=");
+            if ((json).length == 0) {
+                return json;
+            }
             filelist = _json_get_array(json);
             sep = "";
             for (String ii: filelist) {
                 name = _json_get_key(ii.getBytes(), "name");
+                if ((name).length() == 0) {
+                    return name.getBytes();
+                }
                 file_data_bin = _download(_escapeAttr(name));
                 file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.length);
-                file_data = String.format("%s{\"name\":\"%s\", \"data\":\"%s\"}\n", sep, name,file_data);
+                item = String.format("%s{\"name\":\"%s\", \"data\":\"%s\"}\n", sep, name,file_data);
+                ext_settings = ext_settings + item;
                 sep = ",";
-                all_file_data = all_file_data + file_data;
             }
         }
-        all_file_data = all_file_data + "]}";
-        res = YAPI._bytesMerge("{ \"api\":".getBytes(), YAPI._bytesMerge(settings, all_file_data.getBytes()));
+        ext_settings = ext_settings + "]}";
+        res = YAPI._bytesMerge("{ \"api\":".getBytes(), YAPI._bytesMerge(settings, ext_settings.getBytes()));
         return res;
+    }
+
+    public int loadThermistorExtra(String funcId,String jsonExtra) throws YAPI_Exception
+    {
+        ArrayList<String> values = new ArrayList<String>();
+        String url;
+        String curr;
+        String currTemp;
+        int ofs;
+        int size;
+        url = "api/" + funcId + ".json?command=Z";
+        // may throw an exception
+        _download(url);
+        // add records in growing resistance value
+        values = _json_get_array(jsonExtra.getBytes());
+        ofs = 0;
+        size = values.size();
+        while (ofs + 1 < size) {
+            curr = values.get(ofs);
+            currTemp = values.get(ofs + 1);
+            url = String.format("api/%s/.json?command=m%s:%s",  funcId, curr,currTemp);
+            _download(url);
+            ofs = ofs + 2;
+        }
+        return YAPI.SUCCESS;
+    }
+
+    public int set_extraSettings(String jsonExtra) throws YAPI_Exception
+    {
+        ArrayList<String> extras = new ArrayList<String>();
+        String functionId;
+        String data;
+        extras = _json_get_array(jsonExtra.getBytes());
+        for (String ii: extras) {
+            functionId = _get_json_path(ii, "fid");
+            functionId = _decode_json_string(functionId);
+            data = _get_json_path(ii, "json");
+            if (hasFunction(functionId)) {
+                loadThermistorExtra(functionId, data);
+            }
+        }
+        return YAPI.SUCCESS;
     }
 
     /**
@@ -1050,10 +1130,15 @@ public class YModule extends YFunction
         String json;
         String json_api;
         String json_files;
+        String json_extra;
         json = new String(settings);
         json_api = _get_json_path(json, "api");
         if (json_api.equals("")) {
             return set_allSettings(settings);
+        }
+        json_extra = _get_json_path(json, "extras");
+        if (!(json_extra.equals(""))) {
+            set_extraSettings(json_extra);
         }
         set_allSettings(json_api.getBytes());
         if (hasFunction("files")) {

@@ -1,4 +1,8 @@
 #!/bin/bash
-./buildExample.sh
+mkdir -p classes
+echo -e "compiling all classes..."
+javac -d classes/ ../../JsonParser/org/json/*.java
+javac -d classes/ ../../yoctolib/src/main/java/com/yoctopuce/YoctoAPI/*.java -cp classes/
+javac -d classes/ src/main/java/Demo.java -cp classes/
 echo -e "starting the example..."
-java -classpath ../../Binaries/yoctoAPI.jar:./src/main/java/ Demo $*
+java -cp classes Demo $*

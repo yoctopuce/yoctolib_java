@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 21485 2015-09-11 14:10:22Z seb $
+ * $Id: YCellular.java 21511 2015-09-14 16:25:19Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -869,7 +869,14 @@ public class YCellular extends YFunction
     {
         int chrPos;
         int cmdLen;
-        byte[] content;
+        int waitMore;
+        String res;
+        byte[] buff;
+        int bufflen;
+        String buffstr;
+        int buffstrlen;
+        int idx;
+        int suffixlen;
         // quote dangerous characters used in AT commands
         cmdLen = (cmd).length();
         chrPos = (cmd).indexOf("#");
@@ -890,9 +897,67 @@ public class YCellular extends YFunction
             cmdLen = cmdLen + 2;
             chrPos = (cmd).indexOf("=");
         }
+        cmd = String.format("at.txt?cmd=%s",cmd);
+        res = String.format("");
+        // max 2 minutes (each iteration may take up to 5 seconds if waiting)
+        waitMore = 24;
+        while (waitMore > 0) {
+            buff = _download(cmd);
+            bufflen = (buff).length;
+            buffstr = new String(buff);
+            buffstrlen = (buffstr).length();
+            idx = bufflen - 1;
+            while ((idx > 0) && (buff[idx] != 64) && (buff[idx] != 10) && (buff[idx] != 13)) {
+                idx = idx - 1;
+            }
+            if (buff[idx] == 64) {
+                suffixlen = bufflen - idx;
+                cmd = String.format("at.txt?cmd=%s",(buffstr).substring( buffstrlen - suffixlen,  buffstrlen - suffixlen + suffixlen));
+                buffstr = (buffstr).substring( 0,  0 + buffstrlen - suffixlen);
+                waitMore = waitMore - 1;
+            } else {
+                waitMore = 0;
+            }
+            res = String.format("%s%s", res,buffstr);
+        }
+        return res;
+    }
+
+    /**
+     * Returns the list detected cell operators in the neighborhood.
+     * This function will typically take between 30 seconds to 1 minute to
+     * return. Note that any SIM card can usually only connect to specific
+     * operators. All networks returned by this function might therefore
+     * not be available for connection.
+     *
+     * @return a list of string (cell operator names).
+     */
+    public ArrayList<String> get_availableOperators() throws YAPI_Exception
+    {
+        String cops;
+        int idx;
+        int slen;
+        ArrayList<String> res = new ArrayList<String>();
         // may throw an exception
-        content = _download(String.format("at.txt?cmd=%s",cmd));
-        return new String(content);
+        cops = _AT("+COPS=?");
+        slen = (cops).length();
+        res.clear();
+        idx = (cops).indexOf("(");
+        while (idx >= 0) {
+            slen = slen - (idx+1);
+            cops = (cops).substring( idx+1,  idx+1 + slen);
+            idx = (cops).indexOf("\"");
+            if (idx > 0) {
+                slen = slen - (idx+1);
+                cops = (cops).substring( idx+1,  idx+1 + slen);
+                idx = (cops).indexOf("\"");
+                if (idx > 0) {
+                    res.add((cops).substring( 0,  0 + idx));
+                }
+            }
+            idx = (cops).indexOf("(");
+        }
+        return res;
     }
 
     /**
