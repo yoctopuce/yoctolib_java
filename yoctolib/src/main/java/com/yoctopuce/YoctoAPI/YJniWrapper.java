@@ -20,14 +20,14 @@ public class YJniWrapper
                     try {
                         System.loadLibrary("yapi");
                     } catch (UnsatisfiedLinkError ex) {
-                        throw new YAPI_Exception(YAPI.IO_ERROR, "USB access require that yapi.dll is in you class path");
+                        throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot load yapi.dll. Check your java.library.path property.");
                     }
                     loaded = true;
                 } else if (os_arch.equals("amd64")) {
                     try {
                         System.loadLibrary("yapi64");
                     } catch (UnsatisfiedLinkError ex) {
-                        throw new YAPI_Exception(YAPI.IO_ERROR, "USB access require that yapi64.dll is in you class path");
+                        throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot load yapi64.dll. Check your java.library.path property.");
                     }
                     loaded = true;
                 } else {
@@ -39,14 +39,21 @@ public class YJniWrapper
                     try {
                         System.loadLibrary("yapi-i386");
                     } catch (UnsatisfiedLinkError ex) {
-                        throw new YAPI_Exception(YAPI.IO_ERROR, "USB access require that libyapi-i386.so is in you class path");
+                        throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot load libyapi-i386.so. Check your java.library.path property.");
                     }
                     loaded = true;
                 } else if (os_arch.equals("amd64")) {
                     try {
                         System.loadLibrary("yapi-amd64");
                     } catch (UnsatisfiedLinkError ex) {
-                        throw new YAPI_Exception(YAPI.IO_ERROR, "USB access require that libyapi-amd64.so is in you class path");
+                        throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot load libyapi-amd64.so Check your java.library.path property.");
+                    }
+                    loaded = true;
+                 } else if (os_arch.equals("arm")) {
+                    try {
+                        System.loadLibrary("yapi-armhf");
+                    } catch (UnsatisfiedLinkError ex) {
+                        throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot load libyapi-armhf.so. Check your java.library.path property.");
                     }
                     loaded = true;
                 } else {
@@ -58,7 +65,7 @@ public class YJniWrapper
                     try {
                         System.loadLibrary("yapi");
                     } catch (UnsatisfiedLinkError ex) {
-                        throw new YAPI_Exception(YAPI.IO_ERROR, "USB access require that libyapi.dylib is in you class path");
+                        throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot load libyapi.dylib. Check your java.library.path property.");
                     }
                     loaded = true;
                 } else {
