@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 21650 2015-09-30 15:35:28Z seb $
+ * $Id: YGenericHub.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Internal YGenericHub object
  *
@@ -179,6 +179,7 @@ abstract class YGenericHub
         // by default consider all known device as unplugged
         ArrayList<YDevice> toRemove = new ArrayList<YDevice>(_devices.values());
 
+        YAPI yapi = SafeYAPI();
         for (WPEntry wp : whitePages) {
             String serial = wp.getSerialNumber();
             if (_devices.containsKey(serial)) {
@@ -187,40 +188,41 @@ abstract class YGenericHub
                 if (!currdev.getLogicalName().equals(wp.getLogicalName())) {
                     // Reindex device from its own data
                     currdev.refresh();
-                    SafeYAPI().pushPlugEvent(Event.CHANGE, serial);
+                    yapi.pushPlugEvent(Event.CHANGE, serial);
                 } else if (currdev.getBeacon() > 0 != wp.getBeacon() > 0) {
                     currdev.refresh();
                 }
                 toRemove.remove(currdev);
             } else {
                 YDevice dev = new YDevice(this, wp, yellowPages);
+                yapi._yHash.reindexDevice(dev);
                 _devices.put(serial, dev);
-                SafeYAPI().pushPlugEvent(Event.PLUG, serial);
-                SafeYAPI()._Log("HUB: device " + serial + " has been plugged\n");
+                yapi.pushPlugEvent(Event.PLUG, serial);
+                yapi._Log("HUB: device " + serial + " has been plugged\n");
             }
         }
 
         for (YDevice dev : toRemove) {
             String serial = dev.getSerialNumber();
-            SafeYAPI().pushPlugEvent(Event.UNPLUG, serial);
-            SafeYAPI()._Log("HUB: device " + serial + " has been unplugged\n");
+            yapi.pushPlugEvent(Event.UNPLUG, serial);
+            yapi._Log("HUB: device " + serial + " has been unplugged\n");
             _devices.remove(serial);
         }
 
-        // reindex all Yellow pages
-        for (String classname : yellowPages.keySet()) {
-            YFunctionType ftype = SafeYAPI().getFnByType(classname);
-            for (YPEntry yprec : yellowPages.get(classname)) {
-                ftype.reindexFunction(yprec);
-            }
-        }
-
+        yapi._yHash.reindexYellowPages(yellowPages);
 
     }
 
     protected void handleValueNotification(String serial, String funcid, String value)
     {
-        SafeYAPI().setFunctionValue(serial + "." + funcid, value);
+        String hwid = serial + "." + funcid;
+        SafeYAPI()._yHash.setFunctionValue(hwid, value);
+        YAPI yapi = SafeYAPI();
+        YFunction conn_fn = yapi._GetValueCallback(hwid);
+        if (conn_fn != null) {
+            yapi._PushDataEvent(new YAPI.DataEvent(conn_fn, value));
+        }
+
     }
 
     //called from Jni
@@ -231,13 +233,17 @@ abstract class YGenericHub
             int i = b & 0xff;
             arrayList.add(i);
         }
-        SafeYAPI().setTimedReport(serial + "." + funcid, deviceTime, arrayList);
+        handleTimedNotification(serial,funcid,deviceTime,arrayList);
     }
 
 
     protected void handleTimedNotification(String serial, String funcid, double deviceTime, ArrayList<Integer> report)
     {
-        SafeYAPI().setTimedReport(serial + "." + funcid, deviceTime, report);
+        String hwid = serial + "." + funcid;
+        YFunction func = SafeYAPI()._GetTimedReportCallback(hwid);
+        if (func != null) {
+            SafeYAPI()._PushDataEvent(new YAPI.DataEvent(func, deviceTime, report));
+        }
     }
 
     abstract void updateDeviceList(boolean forceupdate) throws YAPI_Exception;

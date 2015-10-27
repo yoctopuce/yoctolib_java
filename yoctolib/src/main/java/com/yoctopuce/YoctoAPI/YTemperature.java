@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 21576 2015-09-21 13:17:28Z seb $
+ * $Id: YTemperature.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -589,8 +589,8 @@ public class YTemperature extends YSensor
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -609,7 +609,7 @@ public class YTemperature extends YSensor
      */
     public static YTemperature FirstTemperature()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("Temperature");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Temperature");
         if (next_hwid == null)  return null;
         return FindTemperature(next_hwid);
     }

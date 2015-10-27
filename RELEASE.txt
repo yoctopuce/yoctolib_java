@@ -1,5 +1,3 @@
-- Add native USB Access
-- Detect invalid settings before updating firmware
-- Add clearCache() method to YFunctions object
-- Fix loadThermistorResponseTable() method
-- Save thermistor response table during firmware update
+- Fix Exception thrown by YAPI.GetAPIVersion if no dll are present
+- Improve Library performance
+- Free callback reference on YAPI.FreeAPI

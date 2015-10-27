@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmInput.java 21199 2015-08-19 13:06:55Z seb $
+ * $Id: YPwmInput.java 21776 2015-10-15 16:57:56Z mvuilleu $
  *
  * Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -52,7 +52,7 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
  * sensors. It inherits from YSensor class the core functions to read measurements,
  * register callback functions, access to the autonomous datalogger.
  * This class adds the ability to configure the signal parameter used to transmit
- * information: the duty cacle, the frequency or the pulse width.
+ * information: the duty cycle, the frequency or the pulse width.
  */
  @SuppressWarnings("UnusedDeclaration")
 public class YPwmInput extends YSensor
@@ -569,8 +569,8 @@ public class YPwmInput extends YSensor
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -589,7 +589,7 @@ public class YPwmInput extends YSensor
      */
     public static YPwmInput FirstPwmInput()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("PwmInput");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("PwmInput");
         if (next_hwid == null)  return null;
         return FindPwmInput(next_hwid);
     }

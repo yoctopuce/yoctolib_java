@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 21199 2015-08-19 13:06:55Z seb $
+ * $Id: YRealTimeClock.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -417,8 +417,8 @@ public class YRealTimeClock extends YFunction
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -437,7 +437,7 @@ public class YRealTimeClock extends YFunction
      */
     public static YRealTimeClock FirstRealTimeClock()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("RealTimeClock");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("RealTimeClock");
         if (next_hwid == null)  return null;
         return FindRealTimeClock(next_hwid);
     }

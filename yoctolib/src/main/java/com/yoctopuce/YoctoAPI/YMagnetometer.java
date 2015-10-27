@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMagnetometer.java 21199 2015-08-19 13:06:55Z seb $
+ * $Id: YMagnetometer.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Implements FindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -349,8 +349,8 @@ public class YMagnetometer extends YSensor
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -369,7 +369,7 @@ public class YMagnetometer extends YSensor
      */
     public static YMagnetometer FirstMagnetometer()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("Magnetometer");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Magnetometer");
         if (next_hwid == null)  return null;
         return FindMagnetometer(next_hwid);
     }

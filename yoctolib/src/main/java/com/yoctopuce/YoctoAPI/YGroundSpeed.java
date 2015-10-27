@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGroundSpeed.java 21117 2015-08-17 12:36:50Z seb $
+ * $Id: YGroundSpeed.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Implements FindGroundSpeed(), the high-level API for GroundSpeed functions
  *
@@ -227,8 +227,8 @@ public class YGroundSpeed extends YSensor
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -247,7 +247,7 @@ public class YGroundSpeed extends YSensor
      */
     public static YGroundSpeed FirstGroundSpeed()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("GroundSpeed");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("GroundSpeed");
         if (next_hwid == null)  return null;
         return FindGroundSpeed(next_hwid);
     }

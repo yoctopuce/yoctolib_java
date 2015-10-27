@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGps.java 21199 2015-08-19 13:06:55Z seb $
+ * $Id: YGps.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Implements FindGps(), the high-level API for Gps functions
  *
@@ -771,8 +771,8 @@ public class YGps extends YFunction
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -791,7 +791,7 @@ public class YGps extends YFunction
      */
     public static YGps FirstGps()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("Gps");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Gps");
         if (next_hwid == null)  return null;
         return FindGps(next_hwid);
     }

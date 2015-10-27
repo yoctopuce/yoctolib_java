@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 21587 2015-09-22 15:45:27Z seb $
+ * $Id: YModule.java 21748 2015-10-13 14:05:38Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -174,7 +174,7 @@ public class YModule extends YFunction
         String devid = _func;
         int dotidx = devid.indexOf('.');
         if (dotidx >= 0) devid = devid.substring(0, dotidx);
-        YDevice dev = SafeYAPI().getDevice(devid);
+        YDevice dev = SafeYAPI()._yHash.getDevice(devid);
         if (dev == null) {
             throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "Device [" + devid + "] is not online");
         }
@@ -207,7 +207,8 @@ public class YModule extends YFunction
         return dev.getYPEntry(functionIndex).getFuncId();
     }
 
-    // Retrieve the Hardware Id of the nth function (beside "module") in the device
+
+    // Retrieve the function type of the nth function (beside "module") in the device
     public String functionType(int functionIndex) throws YAPI_Exception
     {
         YDevice dev = _getDev();
@@ -239,7 +240,7 @@ public class YModule extends YFunction
     public void registerLogCallback(LogCallback callback)
     {
         _logCallback = callback;
-        YDevice ydev = SafeYAPI().getDevice(_serial);
+        YDevice ydev = SafeYAPI()._yHash.getDevice(_serial);
         if (ydev != null) {
             ydev.registerLogCallback(callback);
         }
@@ -1762,8 +1763,8 @@ public class YModule extends YFunction
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -1782,7 +1783,7 @@ public class YModule extends YFunction
      */
     public static YModule FirstModule()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("Module");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Module");
         if (next_hwid == null)  return null;
         return FindModule(next_hwid);
     }

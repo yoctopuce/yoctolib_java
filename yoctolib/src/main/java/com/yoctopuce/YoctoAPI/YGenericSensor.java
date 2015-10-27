@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.java 21199 2015-08-19 13:06:55Z seb $
+ * $Id: YGenericSensor.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -668,8 +668,8 @@ public class YGenericSensor extends YSensor
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -688,7 +688,7 @@ public class YGenericSensor extends YSensor
      */
     public static YGenericSensor FirstGenericSensor()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("GenericSensor");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("GenericSensor");
         if (next_hwid == null)  return null;
         return FindGenericSensor(next_hwid);
     }

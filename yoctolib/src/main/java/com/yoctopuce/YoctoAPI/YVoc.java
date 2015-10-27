@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoc.java 21117 2015-08-17 12:36:50Z seb $
+ * $Id: YVoc.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Implements FindVoc(), the high-level API for Voc functions
  *
@@ -226,8 +226,8 @@ public class YVoc extends YSensor
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -246,7 +246,7 @@ public class YVoc extends YSensor
      */
     public static YVoc FirstVoc()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("Voc");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Voc");
         if (next_hwid == null)  return null;
         return FindVoc(next_hwid);
     }

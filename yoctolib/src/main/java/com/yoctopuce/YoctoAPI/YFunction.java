@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 21680 2015-10-02 13:42:44Z seb $
+ * $Id: YFunction.java 21748 2015-10-13 14:05:38Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -147,12 +147,12 @@ public class YFunction
 
     protected static YFunction _FindFromCache(String className, String func)
     {
-        return SafeYAPI().getFunction(className, func);
+        return SafeYAPI()._yHash.getFunction(className, func);
     }
 
     protected static void _AddToCache(String className, String func, YFunction obj)
     {
-        SafeYAPI().setFunction(className, func, obj);
+        SafeYAPI()._yHash.setFunction(className, func, obj);
     }
 
 
@@ -361,8 +361,8 @@ public class YFunction
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -375,7 +375,7 @@ public class YFunction
      */
     public static YFunction FirstFunction()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("Function");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Function");
         if (next_hwid == null)  return null;
         return FindFunction(next_hwid);
     }
@@ -401,7 +401,7 @@ public class YFunction
     public String describe()
     {
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
             return _className + "(" + _func + ")=" + hwid;
         } catch (YAPI_Exception ignored) {
         }
@@ -421,12 +421,12 @@ public class YFunction
      */
     public String get_hardwareId() throws YAPI_Exception
     {
-        return SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+        return SafeYAPI()._yHash.resolveHwID(_className, _func);
     }
 
     public String getHardwareId() throws YAPI_Exception
     {
-        return SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+        return SafeYAPI()._yHash.resolveHwID(_className, _func);
     }
 
 
@@ -440,12 +440,12 @@ public class YFunction
      */
     public String get_functionId() throws YAPI_Exception
     {
-        return SafeYAPI().resolveFunction(_className, _func).getFuncId();
+        return SafeYAPI()._yHash.resolveFuncId(_className, _func);
     }
 
     public String getFunctionId() throws YAPI_Exception
     {
-        return SafeYAPI().resolveFunction(_className, _func).getFuncId();
+        return SafeYAPI()._yHash.resolveFuncId(_className, _func);
     }
 
 
@@ -462,8 +462,25 @@ public class YFunction
      */
     public String get_friendlyName() throws YAPI_Exception
     {
-        YPEntry yp = SafeYAPI().resolveFunction(_className, _func);
-        return yp.getFriendlyName();
+        SafeYAPI()._yHash.resolveHwID(_className, _func);
+
+        if (_className.equals("Module")) {
+            if (_logicalName.equals(""))
+                return _serial + ".module";
+            else
+                return _logicalName + ".module";
+        } else {
+            String moduleHwId = SafeYAPI()._yHash.resolveHwID("Module", _serial);
+            YModule module = YModule.FindModule(moduleHwId);
+            String modname = module.get_logicalName();
+            if (modname.equals("")) {
+                modname = module.get_serialNumber();
+            }
+            if (_logicalName.equals(""))
+                return modname + "." + _funId;
+            else
+                return modname + "." + _logicalName;
+        }
     }
 
     public String getFriendlyName() throws YAPI_Exception
@@ -739,10 +756,10 @@ public class YFunction
     protected JSONObject _devRequest(String extra) throws YAPI_Exception
     {
         YDevice dev = getYDevice();
-        YPEntry yp = SafeYAPI().resolveFunction(_className, _func);
-        _hwId = yp.getHardwareId();
-        _funId = yp.getFuncId();
-        _serial = yp.getSerial();
+        _hwId = SafeYAPI()._yHash.resolveHwID(_className, _func);
+        String[] split = _hwId.split("\\.");
+        _funId = split[1];
+        _serial = split[0];
         JSONObject loadval = null;
         if (extra.equals("")) {
             // use a cached API string, without reloading unless module is
@@ -933,23 +950,22 @@ public class YFunction
      */
     public YModule get_module()
     {
-        YPEntry ypEntry;
         // try to resolve the function name to a device id without query
         if (_serial != null && !_serial.equals("")) {
             return YModule.FindModule(_serial + ".module");
         }
         if (_func.indexOf('.') == -1) {
             try {
-                ypEntry = SafeYAPI().resolveFunction(_className, _func);
-                return YModule.FindModule(ypEntry.getSerial() + ".module");
+                String serial = SafeYAPI()._yHash.resolveSerial(_className, _func);
+                return YModule.FindModule(serial + ".module");
             } catch (YAPI_Exception ignored) {
             }
         }
         try {
             // device not resolved for now, force a communication for a last chance resolution
             if (load(YAPI.DefaultCacheValidity) == YAPI.SUCCESS) {
-                ypEntry = SafeYAPI().resolveFunction(_className, _func);
-                return YModule.FindModule(ypEntry.getSerial() + ".module");
+                String serial = SafeYAPI()._yHash.resolveSerial(_className, _func);
+                return YModule.FindModule(serial + ".module");
             }
         } catch (YAPI_Exception ignored) {
         }
@@ -980,7 +996,7 @@ public class YFunction
     {
         // try to resolve the function name to a device id without query
         try {
-            return SafeYAPI().resolveFunction(_className, _func).getHardwareId();
+            return SafeYAPI()._yHash.resolveHwID(_className, _func);
         } catch (YAPI_Exception ignored) {
             return FUNCTIONDESCRIPTOR_INVALID;
         }

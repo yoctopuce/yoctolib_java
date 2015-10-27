@@ -1,45 +1,42 @@
 /*********************************************************************
- *
- * $Id: YFunctionType.java 21650 2015-09-30 15:35:28Z seb $
+ * $Id: YFunctionType.java 21749 2015-10-13 15:14:03Z seb $
  *
  * Internal YFunctionType object
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
- *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
- *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ * Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ * non-exclusive license to use, modify, copy and integrate this
+ * file into your software for the sole purpose of interfacing
+ * with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
- *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
- *  this notice in the distributed source file.
+ * You may reproduce and distribute copies of this file in
+ * source or object form, as long as the sole purpose of this
+ * code is to interface with Yoctopuce products. You must retain
+ * this notice in the distributed source file.
  *
- *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
- *  obligations.
+ * You should refer to Yoctopuce General Terms and Conditions
+ * for additional information regarding your rights and
+ * obligations.
  *
- *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *  WARRANTY, OR OTHERWISE.
- *
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ * EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ * COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ * SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
+ * LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ * WARRANTY, OR OTHERWISE.
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
@@ -54,27 +51,31 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 // mechanism, implemented using the yellow pages, and the storage and retrieval of
 // existing YFunction instances.
 //
-class YFunctionType {
+class YFunctionType
+{
 
     // private attributes, to be used within yocto_api only
     private String _className;
-    private HashMap<String, YPEntry> _ypEntries = new HashMap<String, YPEntry>();               // Yellow page by Hardware Id
-    private HashMap<String, YFunction> _connectedFns = new HashMap<String, YFunction>();           // functions requested and available, by Hardware Id
-    private HashMap<String, YFunction> _requestedFns = new HashMap<String, YFunction>();           // functions requested but not yet known, by any type of name
-    private HashMap<String, String> _hwIdByName = new HashMap<String, String>();                // hash table of function Hardware Id by logical name
+    private final HashMap<String, YPEntry> _ypEntries = new HashMap<String, YPEntry>();               // Yellow page by Hardware Id
+    private final HashMap<String, YFunction> _connectedFns = new HashMap<String, YFunction>();           // functions requested and available, by Hardware Id
+    private final HashMap<String, YFunction> _requestedFns = new HashMap<String, YFunction>();           // functions requested but not yet known, by any type of name
+    private final HashMap<String, String> _hwIdByName = new HashMap<String, String>();                // hash table of function Hardware Id by logical name
 
 
     // class used to store module.function (can be serial or logical name)
-    public static class HWID {
+    public static class HWID
+    {
 
         private final String module;
         private final String function;
 
-        public String getModule() {
+        public String getModule()
+        {
             return module;
         }
 
-        public String getFunction() {
+        public String getFunction()
+        {
             return function;
         }
 
@@ -172,7 +173,7 @@ class YFunctionType {
         if (hwid.module.length() > 0) {
 
             // either the device id is a logical name, or the function is unknown
-            YDevice dev = SafeYAPI().getDevice(hwid.module);
+            YDevice dev = SafeYAPI()._yHash.getDevice(hwid.module);
             if (dev == null) {
                 throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "Device [" + hwid.module + "] not online");
             }
@@ -259,20 +260,6 @@ class YFunctionType {
             return;
         }
         yp.setAdvertisedValue(pubval);
-        YAPI yapi = SafeYAPI();
-        YFunction conn_fn = yapi._GetValueCallback(hwid);
-        if (conn_fn != null) {
-            yapi._PushDataEvent(new YAPI.DataEvent(conn_fn, pubval));
-        }
-    }
-
-    // Stores a function timed value by hardware id, queue an event if needed
-    public void setTimedReport(String hwid, double timestamp, ArrayList<Integer> report)
-    {
-        YFunction func = SafeYAPI()._GetTimedReportCallback(hwid);
-        if (func != null) {
-            SafeYAPI()._PushDataEvent(new YAPI.DataEvent(func, timestamp, report));
-        }
     }
 
     // Find the the hardwareId of the first instance of a given function class
@@ -298,6 +285,5 @@ class YFunctionType {
         }
         return null; // no more instance found
     }
-
 
 }

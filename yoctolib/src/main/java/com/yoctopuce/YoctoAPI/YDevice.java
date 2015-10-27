@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDevice.java 21675 2015-10-01 16:59:42Z seb $
+ * $Id: YDevice.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Internal YDevice class
  *
@@ -66,7 +66,7 @@ public class YDevice
     private WPEntry _wpRec;
     private long _cache_expiration;
     private String _cache_json;
-    private HashMap<Integer, YPEntry> _ypRecs;
+    private final HashMap<Integer, YPEntry> _ypRecs;
     private double _deviceTime;
     private YPEntry _moduleYPEntry;
     private YModule.LogCallback _logCallback = null;
@@ -93,7 +93,6 @@ public class YDevice
                 }
             }
         }
-        SafeYAPI().reindexDevice(this);
     }
 
     YGenericHub getHub()
@@ -184,7 +183,7 @@ public class YDevice
                     }
                     if (func.has("advertisedValue")) {
                         String pubval = func.getString("advertisedValue");
-                        SafeYAPI().setFunctionValue(_wpRec.getSerialNumber(), pubval);
+                        SafeYAPI()._yHash.setFunctionValue(_wpRec.getSerialNumber(), pubval);
                     }
                     for (int f = 0; f < _ypRecs.size(); f++) {
                         if (_ypRecs.get(f).getFuncId().equals(key)) {
@@ -202,7 +201,7 @@ public class YDevice
         }
 
         if (reindex) {
-            SafeYAPI().reindexDevice(this);
+            SafeYAPI()._yHash.reindexDevice(this);
         }
         return YAPI.SUCCESS;
     }
@@ -219,7 +218,6 @@ public class YDevice
         return _ypRecs.size();
     }
 
-
     YPEntry getYPEntry(int idx)
     {
         if (idx < _ypRecs.size()) {
@@ -227,7 +225,6 @@ public class YDevice
         }
         return null;
     }
-
 
     byte[] requestHTTPSync(String request, byte[] rest_of_request) throws YAPI_Exception
     {
@@ -329,7 +326,6 @@ public class YDevice
         _logCallback = callback;
         triggerLogPull();
     }
-
 
     static byte[] formatHTTPUpload(String path, byte[] content) throws YAPI_Exception
     {

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 21511 2015-09-14 16:25:19Z seb $
+ * $Id: YCellular.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -1048,8 +1048,8 @@ public class YCellular extends YFunction
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -1068,7 +1068,7 @@ public class YCellular extends YFunction
      */
     public static YCellular FirstCellular()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("Cellular");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Cellular");
         if (next_hwid == null)  return null;
         return FindCellular(next_hwid);
     }

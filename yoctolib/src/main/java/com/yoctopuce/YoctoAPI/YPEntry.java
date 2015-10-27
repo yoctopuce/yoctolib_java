@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YPEntry.java 21659 2015-10-01 12:39:02Z seb $
+ * $Id: YPEntry.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Yellow page implementation
  *
@@ -45,8 +45,6 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 class YPEntry
 {
-
-
     enum BaseClass
     {
         Function(0),
@@ -80,7 +78,7 @@ class YPEntry
         int pos = hardwareId.indexOf('.');
         _serial = hardwareId.substring(0, pos);
         _funcId = hardwareId.substring(pos + 1);
-        _classname = SafeYAPI().functionClass(_funcId);
+        _classname = YAPI.functionClass(_funcId);
         _logicalName = json.getString("logicalName");
         _advertisedValue = json.getString("advertisedValue");
         try {
@@ -101,7 +99,7 @@ class YPEntry
         _serial = serial;
         _funcId = functionID;
         _baseclass = baseclass;
-        _classname = SafeYAPI().functionClass(_funcId);
+        _classname = YAPI.functionClass(_funcId);
     }
 
     //called from Jni
@@ -184,29 +182,6 @@ class YPEntry
     public String getClassname()
     {
         return _classname;
-    }
-
-
-    // Find the exact Hardware Id of the specified function, if currently connected
-    // If device is not known as connected, return a clean error
-    // This function will not cause any network access
-    public String getFriendlyName() throws YAPI_Exception
-    {
-        if (_classname.equals("Module")) {
-            if (_logicalName.equals(""))
-                return _serial + ".module";
-            else
-                return _logicalName + ".module";
-        } else {
-            YPEntry moduleYP = SafeYAPI().resolveFunction("Module", _serial);
-            String module = moduleYP.getFriendlyName();
-            int pos = module.indexOf(".");
-            module = module.substring(0, pos);
-            if (_logicalName.equals(""))
-                return module + "." + _funcId;
-            else
-                return module + "." + _logicalName;
-        }
     }
 
 

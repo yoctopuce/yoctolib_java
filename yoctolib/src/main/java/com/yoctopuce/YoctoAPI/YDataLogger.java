@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataLogger.java 21199 2015-08-19 13:06:55Z seb $
+ * $Id: YDataLogger.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -149,7 +149,7 @@ public class YDataLogger extends YFunction
             httpreq += String.format("?run=%d&time=%d", runIdx, timeIdx);
         }
         String result;
-        YDevice dev = SafeYAPI().getDevice(devid);
+        YDevice dev = SafeYAPI()._yHash.getDevice(devid);
         try {
             result = dev.requestHTTPSyncAsString(httpreq, null);
         } catch (YAPI_Exception ex) {
@@ -713,8 +713,8 @@ public class YDataLogger extends YFunction
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -733,7 +733,7 @@ public class YDataLogger extends YFunction
      */
     public static YDataLogger FirstDataLogger()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("DataLogger");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("DataLogger");
         if (next_hwid == null)  return null;
         return FindDataLogger(next_hwid);
     }

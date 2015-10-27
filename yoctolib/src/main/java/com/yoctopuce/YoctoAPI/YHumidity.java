@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHumidity.java 21211 2015-08-19 16:03:29Z seb $
+ * $Id: YHumidity.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Implements FindHumidity(), the high-level API for Humidity functions
  *
@@ -343,8 +343,8 @@ public class YHumidity extends YSensor
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -363,7 +363,7 @@ public class YHumidity extends YSensor
      */
     public static YHumidity FirstHumidity()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("Humidity");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Humidity");
         if (next_hwid == null)  return null;
         return FindHumidity(next_hwid);
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPressure.java 21117 2015-08-17 12:36:50Z seb $
+ * $Id: YPressure.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Implements FindPressure(), the high-level API for Pressure functions
  *
@@ -226,8 +226,8 @@ public class YPressure extends YSensor
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -246,7 +246,7 @@ public class YPressure extends YSensor
      */
     public static YPressure FirstPressure()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("Pressure");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Pressure");
         if (next_hwid == null)  return null;
         return FindPressure(next_hwid);
     }

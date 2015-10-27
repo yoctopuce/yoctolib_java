@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 21650 2015-09-30 15:35:28Z seb $
+ * $Id: YAPI.java 21754 2015-10-13 16:26:52Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -64,7 +64,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "21735";
+    public static final String YOCTO_API_BUILD_STR = "21850";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -142,6 +142,7 @@ public class YAPI
             }
         }
     };
+    final YHash _yHash;
 
 
     /**
@@ -178,7 +179,7 @@ public class YAPI
                                    ArrayList<Integer> params, ArrayList<Double> rawValues, ArrayList<Double> refValues);
     }
 
-    private static final HashMap<String, YPEntry.BaseClass> _BaseType;
+    static final HashMap<String, YPEntry.BaseClass> _BaseType;
 
     static {
         _BaseType = new HashMap<String, YPEntry.BaseClass>();
@@ -224,11 +225,9 @@ public class YAPI
 
     // Non static Variable
     private int _apiMode;
-    ArrayList<YGenericHub> _hubs; // array of root urls
-    private HashMap<String, YDevice> _devs; // hash table of devices, by serial number
-    private HashMap<String, String> _snByUrl; // serial number for each device, by URL
-    private HashMap<String, String> _snByName; // serial number for each device, by name
-    private HashMap<String, YFunctionType> _fnByType; // functions by type
+
+    final ArrayList<YGenericHub> _hubs; // array of root urls
+
     private boolean _firstArrival;
     private final Queue<PlugEvent> _pendingCallbacks = new LinkedList<PlugEvent>();
     private final Queue<DataEvent> _data_events = new LinkedList<DataEvent>();
@@ -357,7 +356,7 @@ public class YAPI
                         if (_removalCallback != null) {
                             _removalCallback.yDeviceRemoval(evt.module);
                         }
-                        forgetDevice(_devs.get(evt.module.get_serialNumber()));
+                        _yHash.forgetDevice(evt.module.get_serialNumber());
                         break;
                 }
             }
@@ -569,7 +568,7 @@ public class YAPI
             s++;
         }
         int i = s;
-        if (str.charAt(i) == '-' ) {
+        if (str.charAt(i) == '-') {
             i++;
         }
         for (; i < str.length(); i++) {
@@ -617,37 +616,9 @@ public class YAPI
         return res;
     }
 
-    // Return a Device object for a specified URL, serial number or logical
-    // device name
-    // This function will not cause any network access
-    YDevice getDevice(String device)
-    {
-        YDevice dev = null;
-        if (device.startsWith("http://")) {
-            if (_snByUrl.containsKey(device)) {
-                String serial = _snByUrl.get(device);
-                if (_devs.containsKey(serial)) {
-                    dev = _devs.get(serial);
-                }
-            }
-        } else {
-            // lookup by serial
-            if (_devs.containsKey(device)) {
-                dev = _devs.get(device);
-            } else {
-                // fallback to lookup by logical name
-                if (_snByName.containsKey(device)) {
-                    String serial = _snByName.get(device);
-                    dev = _devs.get(serial);
-                }
-            }
-        }
-        return dev;
-    }
 
     // Return the class name for a given function ID or full Hardware Id
-    // Also make sure that the function type is registered in the API
-    String functionClass(String funcid)
+    static String functionClass(String funcid)
     {
         int dotpos = funcid.indexOf('.');
 
@@ -660,109 +631,8 @@ public class YAPI
             classlen--;
         }
 
-        String classname = funcid.substring(0, 1).toUpperCase(Locale.US)
+        return funcid.substring(0, 1).toUpperCase(Locale.US)
                 + funcid.substring(1, classlen);
-        getFnByType(classname);
-
-        return classname;
-    }
-
-    // Reindex a device in YAPI after a name change detected by device refresh
-    void reindexDevice(YDevice dev)
-    {
-        String serial = dev.getSerialNumber();
-        String lname = dev.getLogicalName();
-        _devs.put(serial, dev);
-
-        if (!lname.equals("")) {
-            _snByName.put(lname, serial);
-        }
-
-        _fnByType.get("Module").reindexFunction(dev.getModuleYPEntry());
-        int count = dev.functionCount();
-        for (int i = 0; i < count; i++) {
-            YPEntry yp = dev.getYPEntry(i);
-            _fnByType.get(yp.getClassname()).reindexFunction(yp);
-        }
-    }
-
-    // Remove a device from YAPI after an unplug detected by device refresh
-    void forgetDevice(YDevice dev)
-    {
-        String serial = dev.getSerialNumber();
-        String lname = dev.getLogicalName();
-        _devs.remove(serial);
-        if (_snByName.containsKey(lname) && _snByName.get(lname).equals(serial)) {
-            _snByName.remove(lname);
-        }
-
-        _fnByType.get("Module").forgetFunction(serial + ".module");
-        int count = dev.functionCount();
-        for (int i = 0; i < count; i++) {
-            YPEntry yp = dev.getYPEntry(i);
-            _fnByType.get(yp.getClassname()).forgetFunction(yp.getHardwareId());
-        }
-    }
-
-    YFunctionType getFnByType(String className)
-    {
-        if (!_fnByType.containsKey(className)) {
-            _fnByType.put(className, new YFunctionType(className));
-        }
-        return _fnByType.get(className);
-    }
-
-    // Find the best known identifier (hardware Id) for a given function
-    YPEntry resolveFunction(String className, String func)
-            throws YAPI_Exception
-    {
-        if (!_BaseType.containsKey(className)) {
-            return getFnByType(className).getYPEntry(func);
-        } else {
-            // using an abstract baseType
-            YPEntry.BaseClass baseType = _BaseType.get(className);
-            for (YFunctionType subClassType : _fnByType.values()) {
-                try {
-                    YPEntry yp = subClassType.getYPEntry(func);
-                    if (yp.getBaseclass().equals(baseType)) {
-                        return yp;
-                    }
-                } catch (YAPI_Exception ignore) {
-                }
-            }
-        }
-        throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "No function of type " + className + " found");
-    }
-
-
-    // Retrieve a function object by hardware id, updating the indexes on the
-    // fly if needed
-    void setFunction(String className, String func, YFunction yfunc)
-    {
-        getFnByType(className).setFunction(func, yfunc);
-    }
-
-    // Retrieve a function object by hardware id, logicalname, updating the indexes on the
-    // fly if needed
-    YFunction getFunction(String className, String func)
-    {
-
-        return getFnByType(className).getFunction(func);
-    }
-
-    // Set a function advertised value by hardware id
-    void setFunctionValue(String hwid, String pubval)
-    {
-        String classname = functionClass(hwid);
-        YFunctionType fnByType = getFnByType(classname);
-        fnByType.setFunctionValue(hwid, pubval);
-    }
-
-    // Set a function advertised value by hardware id
-    void setTimedReport(String hwid, double deviceTime, ArrayList<Integer> report)
-    {
-        String classname = functionClass(hwid);
-        getFnByType(classname).setTimedReport(hwid, deviceTime, report);
     }
 
     // Queue a function data event (timed report of notification value)
@@ -773,87 +643,29 @@ public class YAPI
         }
     }
 
-    // Find the hardwareId for the first instance of a given function class
-    String getFirstHardwareId(String className)
-    {
-
-        if (!_BaseType.containsKey(className)) {
-            YFunctionType ft = getFnByType(className);
-            YPEntry yp = ft.getFirstYPEntry();
-            if (yp == null)
-                return null;
-            return yp.getHardwareId();
-        } else {
-            // using an abstract baseType
-            YPEntry.BaseClass baseType = _BaseType.get(className);
-            for (YFunctionType subClassType : _fnByType.values()) {
-                YPEntry yp = subClassType.getFirstYPEntry();
-                if (yp != null && yp.getBaseclass().equals(baseType)) {
-                    return yp.getHardwareId();
-                }
-            }
-            return null;
-        }
-    }
-
-    // Find the hardwareId for the next instance of a given function class
-    String getNextHardwareId(String className, String hwid)
-    {
-        if (!_BaseType.containsKey(className)) {
-            YFunctionType ft = getFnByType(className);
-            YPEntry yp = ft.getNextYPEntry(hwid);
-            if (yp == null)
-                return null;
-            return yp.getHardwareId();
-        } else {
-            // enumeration of an abstract class
-            YPEntry.BaseClass baseType = _BaseType.get(className);
-            String prevclass = functionClass(hwid);
-            YPEntry res = getFnByType(prevclass).getNextYPEntry(hwid);
-            if (res != null)
-                return res.getHardwareId();
-            for (String altClassName : _fnByType.keySet()) {
-                if (!prevclass.equals("")) {
-                    if (!altClassName.equals(prevclass))
-                        continue;
-                    prevclass = "";
-                    continue;
-                }
-                res = _fnByType.get(altClassName).getFirstYPEntry();
-                if (res != null && res.getBaseclass().equals(baseType)) {
-                    return res.getHardwareId();
-                }
-            }
-            return null;
-        }
-    }
 
     YDevice funcGetDevice(String className, String func) throws YAPI_Exception
     {
-        YPEntry resolved;
+        String resolved;
         try {
-            resolved = resolveFunction(className, func);
+            resolved = _yHash.resolveSerial(className, func);
         } catch (YAPI_Exception ex) {
             if (ex.errorType == DEVICE_NOT_FOUND && _hubs.isEmpty()) {
-                // when USB is supported, check if no USB device is connected
-                // before outputting this message
                 throw new YAPI_Exception(ex.errorType,
                         "Impossible to contact any device because no hub has been registered");
             } else {
                 _updateDeviceList_internal(true, false);
-                resolved = resolveFunction(className, func);
+                resolved = _yHash.resolveSerial(className, func);
             }
         }
-        String devid = resolved.getSerial();
-        YDevice dev = getDevice(devid);
+        YDevice dev = _yHash.getDevice(resolved);
         if (dev == null) {
             // try to force a device list update to check if the device arrived
             // in between
             _updateDeviceList_internal(true, false);
-            dev = getDevice(devid);
+            dev = _yHash.getDevice(resolved);
             if (dev == null) {
-                throw new YAPI_Exception(DEVICE_NOT_FOUND, "Device [" + devid
-                        + "] not online");
+                throw new YAPI_Exception(DEVICE_NOT_FOUND, "Device [" + resolved + "] not online");
             }
 
         }
@@ -1039,16 +851,12 @@ public class YAPI
             DeviceCharset = Charset.defaultCharset();
         }
         _hubs = new ArrayList<YGenericHub>();
-        _devs = new HashMap<String, YDevice>();
-        _snByUrl = new HashMap<String, String>();
-        _snByName = new HashMap<String, String>();
-        _fnByType = new HashMap<String, YFunctionType>(2);
+        _yHash = new YHash();
         _firstArrival = true;
         _pendingCallbacks.clear();
         _data_events.clear();
         _ssdp = null;
 
-        _fnByType.put("Module", new YFunctionType("Module"));
         for (int i = 1; i <= 20; i++) {
             _calibHandlers.put(i, linearCalibrationHandler);
         }
@@ -1061,6 +869,11 @@ public class YAPI
         if ((_apiMode & DETECT_NET) != 0) {
             _ssdp.Stop();
         }
+
+        _yHash.clear();
+        _ValueCallbackList.clear();
+        _TimedReportCallbackList.clear();
+
         for (YGenericHub h : _hubs) {
             h.stopNotifications();
             h.release();
@@ -1103,7 +916,7 @@ public class YAPI
             if (h.isSameRootUrl(url)) {
                 h.stopNotifications();
                 for (String serial : h._serialByYdx.values()) {
-                    forgetDevice(_devs.get(serial));
+                    _yHash.forgetDevice(serial);
                 }
                 h.release();
                 _hubs.remove(h);
@@ -1223,7 +1036,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".21735"+ YUSBHub.getAPIVersion() ;
+        return YOCTO_API_VERSION_STR + ".21850" + YUSBHub.getAPIVersion();
     }
 
     /**

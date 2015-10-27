@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 21659 2015-10-01 12:39:02Z seb $
+ * $Id: YUSBHub.java 21747 2015-10-13 14:03:18Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -40,7 +40,6 @@ package com.yoctopuce.YoctoAPI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Objects;
 
 public class YUSBHub extends YGenericHub
 {
@@ -60,7 +59,12 @@ public class YUSBHub extends YGenericHub
 
     public static String getAPIVersion()
     {
-        return " (" + YJniWrapper.getAPIVersion() + ")";
+        try {
+            YJniWrapper.Check();
+            return " (" + YJniWrapper.getAPIVersion() + ")";
+        } catch (YAPI_Exception e) {
+            return "";
+        }
     }
 
     public YUSBHub(int idx, boolean requestPermission) throws YAPI_Exception

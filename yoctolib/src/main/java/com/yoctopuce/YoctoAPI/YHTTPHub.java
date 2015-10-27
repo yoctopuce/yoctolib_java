@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHTTPHub.java 21680 2015-10-02 13:42:44Z seb $
+ * $Id: YHTTPHub.java 21748 2015-10-13 14:05:38Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -328,7 +328,7 @@ class YHTTPHub extends YGenericHub {
                 String serial = getSerialFromYDX(devydx);
                 String funcid;
                 if (serial != null) {
-                    YDevice ydev = SafeYAPI().getDevice(serial);
+                    YDevice ydev = SafeYAPI()._yHash.getDevice(serial);
                     if (ydev != null) {
                         switch (ev.charAt(0)) {
                             case NOTIFY_NETPKT_FUNCVALYDX:

@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YAltitude.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YQuadratureDecoder.java 21782 2015-10-16 07:53:41Z seb $
  *
- * Implements FindAltitude(), the high-level API for Altitude functions
+ * Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,38 +42,38 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-//--- (YAltitude return codes)
-//--- (end of YAltitude return codes)
-//--- (YAltitude class start)
+//--- (YQuadratureDecoder return codes)
+//--- (end of YQuadratureDecoder return codes)
+//--- (YQuadratureDecoder class start)
 /**
- * YAltitude Class: Altitude function interface
+ * YQuadratureDecoder Class: QuadratureDecoder function interface
  *
- * The Yoctopuce class YAltitude allows you to read and configure Yoctopuce altitude
- * sensors. It inherits from the YSensor class the core functions to read measurements,
+ * The class YQuadratureDecoder allows you to decode a two-wire signal produced by a
+ * quadrature encoder. It inherits from YSensor class the core functions to read measurements,
  * register callback functions, access to the autonomous datalogger.
- * This class adds the ability to configure the barometric pressure adjusted to
- * sea level (QNH) for barometric sensors.
  */
  @SuppressWarnings("UnusedDeclaration")
-public class YAltitude extends YSensor
+public class YQuadratureDecoder extends YSensor
 {
-//--- (end of YAltitude class start)
-//--- (YAltitude definitions)
+//--- (end of YQuadratureDecoder class start)
+//--- (YQuadratureDecoder definitions)
     /**
-     * invalid qnh value
+     * invalid speed value
      */
-    public static final double QNH_INVALID = YAPI.INVALID_DOUBLE;
+    public static final double SPEED_INVALID = YAPI.INVALID_DOUBLE;
     /**
-     * invalid technology value
+     * invalid decoding value
      */
-    public static final String TECHNOLOGY_INVALID = YAPI.INVALID_STRING;
-    protected double _qnh = QNH_INVALID;
-    protected String _technology = TECHNOLOGY_INVALID;
-    protected UpdateCallback _valueCallbackAltitude = null;
-    protected TimedReportCallback _timedReportCallbackAltitude = null;
+    public static final int DECODING_OFF = 0;
+    public static final int DECODING_ON = 1;
+    public static final int DECODING_INVALID = -1;
+    protected double _speed = SPEED_INVALID;
+    protected int _decoding = DECODING_INVALID;
+    protected UpdateCallback _valueCallbackQuadratureDecoder = null;
+    protected TimedReportCallback _timedReportCallbackQuadratureDecoder = null;
 
     /**
-     * Deprecated UpdateCallback for Altitude
+     * Deprecated UpdateCallback for QuadratureDecoder
      */
     public interface UpdateCallback
     {
@@ -82,11 +82,11 @@ public class YAltitude extends YSensor
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
-        void yNewValue(YAltitude function, String functionValue);
+        void yNewValue(YQuadratureDecoder function, String functionValue);
     }
 
     /**
-     * TimedReportCallback for Altitude
+     * TimedReportCallback for QuadratureDecoder
      */
     public interface TimedReportCallback
     {
@@ -95,41 +95,41 @@ public class YAltitude extends YSensor
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
-        void timedReportCallback(YAltitude  function, YMeasure measure);
+        void timedReportCallback(YQuadratureDecoder  function, YMeasure measure);
     }
-    //--- (end of YAltitude definitions)
+    //--- (end of YQuadratureDecoder definitions)
 
 
     /**
      *
      * @param func : functionid
      */
-    protected YAltitude(String func)
+    protected YQuadratureDecoder(String func)
     {
         super(func);
-        _className = "Altitude";
-        //--- (YAltitude attributes initialization)
-        //--- (end of YAltitude attributes initialization)
+        _className = "QuadratureDecoder";
+        //--- (YQuadratureDecoder attributes initialization)
+        //--- (end of YQuadratureDecoder attributes initialization)
     }
 
-    //--- (YAltitude implementation)
+    //--- (YQuadratureDecoder implementation)
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
-        if (json_val.has("qnh")) {
-            _qnh = Math.round(json_val.getDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("speed")) {
+            _speed = Math.round(json_val.getDouble("speed") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.has("technology")) {
-            _technology = json_val.getString("technology");
+        if (json_val.has("decoding")) {
+            _decoding = json_val.getInt("decoding") > 0 ? 1 : 0;
         }
         super._parseAttr(json_val);
     }
 
     /**
-     * Changes the current estimated altitude. This allows to compensate for
-     * ambient pressure variations and to work in relative mode.
+     * Changes the current expected position of the quadrature decoder.
+     * Invoking this function implicitely activates the quadrature decoder.
      *
-     * @param newval : a floating point number corresponding to the current estimated altitude
+     * @param newval : a floating point number corresponding to the current expected position of the quadrature decoder
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -144,10 +144,10 @@ public class YAltitude extends YSensor
     }
 
     /**
-     * Changes the current estimated altitude. This allows to compensate for
-     * ambient pressure variations and to work in relative mode.
+     * Changes the current expected position of the quadrature decoder.
+     * Invoking this function implicitely activates the quadrature decoder.
      *
-     * @param newval : a floating point number corresponding to the current estimated altitude
+     * @param newval : a floating point number corresponding to the current expected position of the quadrature decoder
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -159,112 +159,100 @@ public class YAltitude extends YSensor
     }
 
     /**
-     * Changes the barometric pressure adjusted to sea level used to compute
-     * the altitude (QNH). This enables you to compensate for atmospheric pressure
-     * changes due to weather conditions.
+     * Returns the PWM frequency in Hz.
      *
-     *  @param newval : a floating point number corresponding to the barometric pressure adjusted to sea
-     * level used to compute
-     *         the altitude (QNH)
+     * @return a floating point number corresponding to the PWM frequency in Hz
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_speed() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SPEED_INVALID;
+            }
+        }
+        return _speed;
+    }
+
+    /**
+     * Returns the PWM frequency in Hz.
+     *
+     * @return a floating point number corresponding to the PWM frequency in Hz
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getSpeed() throws YAPI_Exception
+    {
+        return get_speed();
+    }
+
+    /**
+     * Returns the current activation state of the quadrature decoder.
+     *
+     *  @return either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according to the
+     * current activation state of the quadrature decoder
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_decoding() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPI.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return DECODING_INVALID;
+            }
+        }
+        return _decoding;
+    }
+
+    /**
+     * Returns the current activation state of the quadrature decoder.
+     *
+     *  @return either Y_DECODING_OFF or Y_DECODING_ON, according to the current activation state of the
+     * quadrature decoder
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getDecoding() throws YAPI_Exception
+    {
+        return get_decoding();
+    }
+
+    /**
+     * Changes the activation state of the quadrature decoder.
+     *
+     *  @param newval : either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according
+     * to the activation state of the quadrature decoder
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int set_qnh(double  newval)  throws YAPI_Exception
+    public int set_decoding(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("qnh",rest_val);
+        rest_val = (newval > 0 ? "1" : "0");
+        _setAttr("decoding",rest_val);
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes the barometric pressure adjusted to sea level used to compute
-     * the altitude (QNH). This enables you to compensate for atmospheric pressure
-     * changes due to weather conditions.
+     * Changes the activation state of the quadrature decoder.
      *
-     *  @param newval : a floating point number corresponding to the barometric pressure adjusted to sea
-     * level used to compute
-     *         the altitude (QNH)
+     *  @param newval : either Y_DECODING_OFF or Y_DECODING_ON, according to the activation state of the
+     * quadrature decoder
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int setQnh(double newval)  throws YAPI_Exception
+    public int setDecoding(int newval)  throws YAPI_Exception
     {
-        return set_qnh(newval);
+        return set_decoding(newval);
     }
 
     /**
-     * Returns the barometric pressure adjusted to sea level used to compute
-     * the altitude (QNH).
-     *
-     * @return a floating point number corresponding to the barometric pressure adjusted to sea level used to compute
-     *         the altitude (QNH)
-     *
-     * @throws YAPI_Exception on error
-     */
-    public double get_qnh() throws YAPI_Exception
-    {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return QNH_INVALID;
-            }
-        }
-        return _qnh;
-    }
-
-    /**
-     * Returns the barometric pressure adjusted to sea level used to compute
-     * the altitude (QNH).
-     *
-     * @return a floating point number corresponding to the barometric pressure adjusted to sea level used to compute
-     *         the altitude (QNH)
-     *
-     * @throws YAPI_Exception on error
-     */
-    public double getQnh() throws YAPI_Exception
-    {
-        return get_qnh();
-    }
-
-    /**
-     * Returns the technology used by the sesnor to compute
-     * altitude. Possibles values are  "barometric" and "gps"
-     *
-     * @return a string corresponding to the technology used by the sesnor to compute
-     *         altitude
-     *
-     * @throws YAPI_Exception on error
-     */
-    public String get_technology() throws YAPI_Exception
-    {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TECHNOLOGY_INVALID;
-            }
-        }
-        return _technology;
-    }
-
-    /**
-     * Returns the technology used by the sesnor to compute
-     * altitude. Possibles values are  "barometric" and "gps"
-     *
-     * @return a string corresponding to the technology used by the sesnor to compute
-     *         altitude
-     *
-     * @throws YAPI_Exception on error
-     */
-    public String getTechnology() throws YAPI_Exception
-    {
-        return get_technology();
-    }
-
-    /**
-     * Retrieves an altimeter for a given identifier.
+     * Retrieves a quadrature decoder for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -274,25 +262,25 @@ public class YAltitude extends YSensor
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the altimeter is online at the time
+     * This function does not require that the quadrature decoder is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YAltitude.isOnline() to test if the altimeter is
+     * Use the method YQuadratureDecoder.isOnline() to test if the quadrature decoder is
      * indeed online at a given time. In case of ambiguity when looking for
-     * an altimeter by logical name, no error is notified: the first instance
+     * a quadrature decoder by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
-     * @param func : a string that uniquely characterizes the altimeter
+     * @param func : a string that uniquely characterizes the quadrature decoder
      *
-     * @return a YAltitude object allowing you to drive the altimeter.
+     * @return a YQuadratureDecoder object allowing you to drive the quadrature decoder.
      */
-    public static YAltitude FindAltitude(String func)
+    public static YQuadratureDecoder FindQuadratureDecoder(String func)
     {
-        YAltitude obj;
-        obj = (YAltitude) YFunction._FindFromCache("Altitude", func);
+        YQuadratureDecoder obj;
+        obj = (YQuadratureDecoder) YFunction._FindFromCache("QuadratureDecoder", func);
         if (obj == null) {
-            obj = new YAltitude(func);
-            YFunction._AddToCache("Altitude", func, obj);
+            obj = new YQuadratureDecoder(func);
+            YFunction._AddToCache("QuadratureDecoder", func, obj);
         }
         return obj;
     }
@@ -316,7 +304,7 @@ public class YAltitude extends YSensor
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
-        _valueCallbackAltitude = callback;
+        _valueCallbackQuadratureDecoder = callback;
         // Immediately invoke value callback with current value
         if (callback != null && isOnline()) {
             val = _advertisedValue;
@@ -330,8 +318,8 @@ public class YAltitude extends YSensor
     @Override
     public int _invokeValueCallback(String value)
     {
-        if (_valueCallbackAltitude != null) {
-            _valueCallbackAltitude.yNewValue(this, value);
+        if (_valueCallbackQuadratureDecoder != null) {
+            _valueCallbackQuadratureDecoder.yNewValue(this, value);
         } else {
             super._invokeValueCallback(value);
         }
@@ -356,15 +344,15 @@ public class YAltitude extends YSensor
         } else {
             YFunction._UpdateTimedReportCallbackList(this, false);
         }
-        _timedReportCallbackAltitude = callback;
+        _timedReportCallbackQuadratureDecoder = callback;
         return 0;
     }
 
     @Override
     public int _invokeTimedReportCallback(YMeasure value)
     {
-        if (_timedReportCallbackAltitude != null) {
-            _timedReportCallbackAltitude.timedReportCallback(this, value);
+        if (_timedReportCallbackQuadratureDecoder != null) {
+            _timedReportCallbackQuadratureDecoder.timedReportCallback(this, value);
         } else {
             super._invokeTimedReportCallback(value);
         }
@@ -372,13 +360,13 @@ public class YAltitude extends YSensor
     }
 
     /**
-     * Continues the enumeration of altimeters started using yFirstAltitude().
+     * Continues the enumeration of quadrature decoders started using yFirstQuadratureDecoder().
      *
-     * @return a pointer to a YAltitude object, corresponding to
-     *         an altimeter currently online, or a null pointer
-     *         if there are no more altimeters to enumerate.
+     * @return a pointer to a YQuadratureDecoder object, corresponding to
+     *         a quadrature decoder currently online, or a null pointer
+     *         if there are no more quadrature decoders to enumerate.
      */
-    public  YAltitude nextAltitude()
+    public  YQuadratureDecoder nextQuadratureDecoder()
     {
         String next_hwid;
         try {
@@ -388,25 +376,25 @@ public class YAltitude extends YSensor
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindAltitude(next_hwid);
+        return FindQuadratureDecoder(next_hwid);
     }
 
     /**
-     * Starts the enumeration of altimeters currently accessible.
-     * Use the method YAltitude.nextAltitude() to iterate on
-     * next altimeters.
+     * Starts the enumeration of quadrature decoders currently accessible.
+     * Use the method YQuadratureDecoder.nextQuadratureDecoder() to iterate on
+     * next quadrature decoders.
      *
-     * @return a pointer to a YAltitude object, corresponding to
-     *         the first altimeter currently online, or a null pointer
+     * @return a pointer to a YQuadratureDecoder object, corresponding to
+     *         the first quadrature decoder currently online, or a null pointer
      *         if there are none.
      */
-    public static YAltitude FirstAltitude()
+    public static YQuadratureDecoder FirstQuadratureDecoder()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Altitude");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("QuadratureDecoder");
         if (next_hwid == null)  return null;
-        return FindAltitude(next_hwid);
+        return FindQuadratureDecoder(next_hwid);
     }
 
-    //--- (end of YAltitude implementation)
+    //--- (end of YQuadratureDecoder implementation)
 }
 

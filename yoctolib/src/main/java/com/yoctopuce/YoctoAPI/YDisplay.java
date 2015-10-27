@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 21199 2015-08-19 13:06:55Z seb $
+ * $Id: YDisplay.java 21763 2015-10-15 12:16:50Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -936,8 +936,8 @@ public class YDisplay extends YFunction
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI().resolveFunction(_className, _func).getHardwareId();
-            next_hwid = SafeYAPI().getNextHardwareId(_className, hwid);
+            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
@@ -956,7 +956,7 @@ public class YDisplay extends YFunction
      */
     public static YDisplay FirstDisplay()
     {
-        String next_hwid = SafeYAPI().getFirstHardwareId("Display");
+        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Display");
         if (next_hwid == null)  return null;
         return FindDisplay(next_hwid);
     }
