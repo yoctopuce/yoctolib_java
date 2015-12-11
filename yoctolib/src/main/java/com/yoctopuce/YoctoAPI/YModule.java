@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YModule.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YModule.java 21937 2015-11-06 10:57:10Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -213,6 +213,13 @@ public class YModule extends YFunction
     {
         YDevice dev = _getDev();
         return dev.getYPEntry(functionIndex).getClassname();
+    }
+
+    // Retrieve the function base type of the nth function (beside "module") in the device
+    public String functionBaseType(int functionIndex) throws YAPI_Exception
+    {
+        YDevice dev = _getDev();
+        return dev.getYPEntry(functionIndex).getBaseType();
     }
 
     // Retrieve the name of the nth function (beside "module") in the device
@@ -1207,9 +1214,14 @@ public class YModule extends YFunction
         count = functionCount();
         i = 0;
         while (i < count) {
-            ftype  = functionType(i);
+            ftype = functionType(i);
             if (ftype.equals(funType)) {
                 res.add(functionId(i));
+            } else {
+                ftype = functionBaseType(i);
+                if (ftype.equals(funType)) {
+                    res.add(functionId(i));
+                }
             }
             i = i + 1;
         }

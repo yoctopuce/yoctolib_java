@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YRealTimeClock.java 22191 2015-12-02 06:49:31Z mvuilleu $
  *
  * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -174,7 +174,6 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Changes the current time. Time is specifid in Unix format (number of elapsed seconds since Jan 1st, 1970).
-     * If current UTC time is known, utcOffset will be automatically adjusted for the new specified time.
      *
      * @param newval : an integer corresponding to the current time
      *
@@ -192,7 +191,6 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Changes the current time. Time is specifid in Unix format (number of elapsed seconds since Jan 1st, 1970).
-     * If current UTC time is known, utcOffset will be automatically adjusted for the new specified time.
      *
      * @param newval : an integer corresponding to the current time
      *
@@ -266,8 +264,6 @@ public class YRealTimeClock extends YFunction
     /**
      * Changes the number of seconds between current time and UTC time (time zone).
      * The timezone is automatically rounded to the nearest multiple of 15 minutes.
-     *  If current UTC time is known, the current time will automatically be updated according to the
-     * selected time zone.
      *
      * @param newval : an integer corresponding to the number of seconds between current time and UTC time (time zone)
      *
@@ -286,8 +282,6 @@ public class YRealTimeClock extends YFunction
     /**
      * Changes the number of seconds between current time and UTC time (time zone).
      * The timezone is automatically rounded to the nearest multiple of 15 minutes.
-     *  If current UTC time is known, the current time will automatically be updated according to the
-     * selected time zone.
      *
      * @param newval : an integer corresponding to the number of seconds between current time and UTC time (time zone)
      *

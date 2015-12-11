@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataSet.java 20869 2015-07-17 12:32:45Z seb $
+ * $Id: YDataSet.java 22191 2015-12-02 06:49:31Z mvuilleu $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -98,14 +98,13 @@ public class YDataSet
     }
 
     // YDataSet constructor for the new datalogger
-    public YDataSet(YFunction parent, String json) throws YAPI_Exception
+    public YDataSet(YFunction parent) throws YAPI_Exception
     {
         _parent = parent;
         _startTime = 0;
         _endTime = 0;
         _hardwareId = "";
         _summary = new YMeasure();
-        this._parse(json);
     }
 
     // YDataSet parser for stream list
@@ -190,7 +189,7 @@ public class YDataSet
 
     //--- (generated code: YDataSet implementation)
 
-    public ArrayList<Integer> get_calibration()
+    public ArrayList<Integer> _get_calibration()
     {
         return _calib;
     }
@@ -219,7 +218,7 @@ public class YDataSet
             return _parse(strdata);
         }
         stream = _streams.get(_progress);
-        stream.parse(data);
+        stream._parseStream(data);
         dataRows = stream.get_dataRows();
         _progress = _progress + 1;
         if (dataRows.size() == 0) {
@@ -376,7 +375,7 @@ public class YDataSet
                 return 100;
             } else {
                 stream = _streams.get(_progress);
-                url = stream.get_url();
+                url = stream._get_url();
             }
         }
         return processMore(_progress, _parent._download(url));

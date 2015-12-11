@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 21763 2015-10-15 12:16:50Z seb $
+ * $Id: YDataStream.java 22191 2015-12-02 06:49:31Z mvuilleu $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -156,7 +156,7 @@ public class YDataStream
                 i = i + 1;
             }
         }
-        iCalib = dataset.get_calibration();
+        iCalib = dataset._get_calibration();
         _caltyp = iCalib.get(0).intValue();
         if (_caltyp != 0) {
             _calhdl = SafeYAPI()._getCalibrationHandler(_caltyp);
@@ -230,7 +230,7 @@ public class YDataStream
         return 0;
     }
 
-    public int parse(byte[] sdata) throws YAPI_Exception
+    public int _parseStream(byte[] sdata) throws YAPI_Exception
     {
         int idx;
         ArrayList<Integer> udat = new ArrayList<Integer>();
@@ -281,7 +281,7 @@ public class YDataStream
         return YAPI.SUCCESS;
     }
 
-    public String get_url()
+    public String _get_url()
     {
         String url;
         url = String.format("logger.json?id=%s&run=%d&utc=%d",
@@ -291,7 +291,7 @@ public class YDataStream
 
     public int loadStream() throws YAPI_Exception
     {
-        return parse(_parent._download(get_url()));
+        return _parseStream(_parent._download(_get_url()));
     }
 
     public double _decodeVal(int w)

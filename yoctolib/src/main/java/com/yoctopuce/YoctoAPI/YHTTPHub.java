@@ -1,40 +1,38 @@
 /*********************************************************************
- *
- * $Id: YHTTPHub.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YHTTPHub.java 22318 2015-12-11 09:10:27Z seb $
  *
  * Internal YHTTPHUB object
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
- *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
- *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ * Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ * non-exclusive license to use, modify, copy and integrate this
+ * file into your software for the sole purpose of interfacing
+ * with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
- *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
- *  this notice in the distributed source file.
+ * You may reproduce and distribute copies of this file in
+ * source or object form, as long as the sole purpose of this
+ * code is to interface with Yoctopuce products. You must retain
+ * this notice in the distributed source file.
  *
- *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
- *  obligations.
+ * You should refer to Yoctopuce General Terms and Conditions
+ * for additional information regarding your rights and
+ * obligations.
  *
- *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *  WARRANTY, OR OTHERWISE.
- *
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ * EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ * COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ * SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
+ * LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ * WARRANTY, OR OTHERWISE.
  *********************************************************************/
 package com.yoctopuce.YoctoAPI;
 
@@ -52,7 +50,8 @@ import java.util.Random;
 
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-class YHTTPHub extends YGenericHub {
+class YHTTPHub extends YGenericHub
+{
     private final static char NOTIFY_NETPKT_NAME = '0';
     private final static char NOTIFY_NETPKT_CHILD = '2';
     private final static char NOTIFY_NETPKT_FUNCNAME = '4';
@@ -194,13 +193,6 @@ class YHTTPHub extends YGenericHub {
         }
     }
 
-    synchronized String getSerialFromYDX(int devydx)
-    {
-        if (_serialByYdx.containsKey(devydx)) {
-            return _serialByYdx.get(devydx);
-        }
-        return null;
-    }
 
     @Override
     synchronized void startNotifications() throws YAPI_Exception
@@ -249,7 +241,8 @@ class YHTTPHub extends YGenericHub {
         return params.getUrl().equals(_http_params.getUrl());
     }
 
-    private class NotificationHandler implements Runnable {
+    private class NotificationHandler implements Runnable
+    {
         private static final int NET_HUB_NOT_CONNECTION_TIMEOUT = 6000;
         private long _notifyPos = -1;
         private int _notifRetryCount = 0;
@@ -325,7 +318,7 @@ class YHTTPHub extends YGenericHub {
                     devydx += 128;
                 }
                 String value = ev.substring(3);
-                String serial = getSerialFromYDX(devydx);
+                String serial = _serialByYdx.get(devydx);
                 String funcid;
                 if (serial != null) {
                     YDevice ydev = SafeYAPI()._yHash.getDevice(serial);

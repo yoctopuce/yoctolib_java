@@ -1,3 +1,7 @@
-- Fix Exception thrown by YAPI.GetAPIVersion if no dll  are present
+- Add YCurrentLoopOutput class
+- Add doc example for Yocto-4-20mA-Tx
 - Improve Library performance
+- Fix Exception thrown by YAPI.GetAPIVersion if no dll are present
+- Fix get_functionsIds() method that was not working with "Sensor" as argument
+- Fix timeout in YAPI.FreeAPI()
 - Free callback reference on YAPI.FreeAPI

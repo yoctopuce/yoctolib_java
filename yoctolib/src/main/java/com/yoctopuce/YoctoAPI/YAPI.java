@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 21754 2015-10-13 16:26:52Z seb $
+ * $Id: YAPI.java 22318 2015-12-11 09:10:27Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -64,7 +64,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "21865";
+    public static final String YOCTO_API_BUILD_STR = "22324";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -1036,7 +1036,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".21865" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".22324" + YUSBHub.getAPIVersion();
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmPowerSource.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YPwmPowerSource.java 22191 2015-12-02 06:49:31Z mvuilleu $
  *
  * Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *

@@ -3,8 +3,6 @@ package com.yoctopuce.YoctoAPI;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
-
 public class YHash
 {
 
@@ -109,7 +107,7 @@ public class YHash
             for (YFunctionType subClassType : _fnByType.values()) {
                 try {
                     YPEntry yp = subClassType.getYPEntry(func);
-                    if (yp.getBaseclass().equals(baseType)) {
+                    if (yp.getBaseClass().equals(baseType)) {
                         return yp;
                     }
                 } catch (YAPI_Exception ignore) {
@@ -178,7 +176,7 @@ public class YHash
             YPEntry.BaseClass baseType = YAPI._BaseType.get(className);
             for (YFunctionType subClassType : _fnByType.values()) {
                 YPEntry yp = subClassType.getFirstYPEntry();
-                if (yp != null && yp.getBaseclass().equals(baseType)) {
+                if (yp != null && yp.getBaseClass().equals(baseType)) {
                     return yp.getHardwareId();
                 }
             }
@@ -211,7 +209,7 @@ public class YHash
                 }
                 YFunctionType functionType = _fnByType.get(altClassName);
                 res = functionType.getFirstYPEntry();
-                if (res != null && res.getBaseclass().equals(baseType)) {
+                if (res != null && res.getBaseClass().equals(baseType)) {
                     return res.getHardwareId();
                 }
             }

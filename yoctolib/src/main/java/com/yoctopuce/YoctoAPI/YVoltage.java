@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoltage.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YVoltage.java 22191 2015-12-02 06:49:31Z mvuilleu $
  *
  * Implements FindVoltage(), the high-level API for Voltage functions
  *

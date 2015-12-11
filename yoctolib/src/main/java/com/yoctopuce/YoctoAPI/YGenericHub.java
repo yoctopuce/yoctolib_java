@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YGenericHub.java 22318 2015-12-11 09:10:27Z seb $
  *
  * Internal YGenericHub object
  *
@@ -43,6 +43,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
@@ -71,7 +72,7 @@ abstract class YGenericHub
     protected Object _notifyHandle = null;
     protected volatile long _devListValidity = 500;
     protected long _devListExpires = 0;
-    protected HashMap<Integer, String> _serialByYdx = new HashMap<Integer, String>();
+    protected final ConcurrentHashMap<Integer, String> _serialByYdx = new ConcurrentHashMap <Integer, String>();
     protected HashMap<String, YDevice> _devices = new HashMap<String, YDevice>();
     protected final boolean _reportConnnectionLost;
 

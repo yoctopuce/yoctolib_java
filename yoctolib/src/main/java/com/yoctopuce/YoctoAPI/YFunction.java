@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YFunction.java 22191 2015-12-02 06:49:31Z mvuilleu $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -276,6 +276,19 @@ public class YFunction
         return get_advertisedValue();
     }
 
+    public int set_advertisedValue(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = newval;
+        _setAttr("advertisedValue",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    public int setAdvertisedValue(String newval)  throws YAPI_Exception
+    {
+        return set_advertisedValue(newval);
+    }
+
     /**
      * Retrieves a function for a given identifier.
      * The identifier can be specified using several formats:
@@ -347,6 +360,37 @@ public class YFunction
         } else {
         }
         return 0;
+    }
+
+    /**
+     * Disable the propagation of every new advertised value to the parent hub.
+     * You can use this function to save bandwidth and CPU on computers with limited
+     * resources, or to prevent unwanted invocations of the HTTP callback.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int muteValueCallbacks() throws YAPI_Exception
+    {
+        return set_advertisedValue("SILENT");
+    }
+
+    /**
+     * Re-enable the propagation of every new advertised value to the parent hub.
+     * This function reverts the effect of a previous call to muteValueCallbacks().
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int unmuteValueCallbacks() throws YAPI_Exception
+    {
+        return set_advertisedValue("");
     }
 
     public int _parserHelper()
@@ -902,8 +946,8 @@ public class YFunction
 
 
     /**
-     * Invalidate the cache. Invalidate the cache of the function attributes. Force the
-     * next call to get_xxx() or loadxxx() to use value that come from the device..
+     * Invalidates the cache. Invalidates the cache of the function attributes. Forces the
+     * next call to get_xxx() or loadxxx() to use values that come from the device.
      *
      *
      */

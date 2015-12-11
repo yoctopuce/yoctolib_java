@@ -1,9 +1,11 @@
 
 import com.yoctopuce.YoctoAPI.*;
 
-public class Demo {
+public class Demo
+{
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         try {
             // setup the API to use local VirtualHub
             YAPI.RegisterHub("127.0.0.1");
@@ -28,15 +30,13 @@ public class Demo {
             YGenericSensor s1 = YGenericSensor.FindGenericSensor(sensor.get_module().get_serialNumber() + ".genericSensor1");
             YGenericSensor s2 = YGenericSensor.FindGenericSensor(sensor.get_module().get_serialNumber() + ".genericSensor2");
 
-            while (s1.isOnline() && s2.isOnline()) {   
-                double value =s1.get_currentValue();
-                System.out.println("Channel 1 :" + s1.get_currentValue() + " " + s1.get_unit());		
-                value = s2.get_currentValue();
+            while (s1.isOnline() && s2.isOnline()) {
+                System.out.println("Channel 1 :" + s1.get_currentValue() + " " + s1.get_unit());
                 System.out.println("Channel 2 : " + s2.get_currentValue() + " " + s2.get_unit());
                 System.out.println("  (press Ctrl-C to exit)");
                 YAPI.Sleep(1000);
             }
-    
+
         } catch (YAPI_Exception ex) {
             System.out.println("Module " + sensor.describe() + " disconnected (check identification and USB cable)");
         }

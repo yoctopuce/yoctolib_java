@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YPEntry.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YPEntry.java 21937 2015-11-06 10:57:10Z seb $
  *
  * Yellow page implementation
  *
@@ -55,6 +55,15 @@ class YPEntry
         BaseClass(int intval)
         {
             _intval = intval;
+        }
+
+        @Override
+        public String toString()
+        {
+            if (this == Sensor)
+                return "Sensor";
+            else
+                return "Function";
         }
 
         public static BaseClass forByte(byte bval)
@@ -163,11 +172,15 @@ class YPEntry
         _index = index;
     }
 
-    public BaseClass getBaseclass()
+    public BaseClass getBaseClass()
     {
         return _baseclass;
     }
 
+    public String getBaseType()
+    {
+        return _baseclass.toString();
+    }
 
     public String getLogicalName()
     {

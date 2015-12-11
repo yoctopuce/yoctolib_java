@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: yHTTPRequest.java 20376 2015-05-19 14:18:47Z seb $
+ * $Id: yHTTPRequest.java 22318 2015-12-11 09:10:27Z seb $
  *
  * internal yHTTPRequest object
  *
