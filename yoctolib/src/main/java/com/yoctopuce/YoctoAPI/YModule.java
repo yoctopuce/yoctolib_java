@@ -1,40 +1,38 @@
 /*********************************************************************
- *
- * $Id: YModule.java 21937 2015-11-06 10:57:10Z seb $
+ * $Id: YModule.java 22743 2016-01-14 09:54:52Z seb $
  *
  * YModule Class: Module control interface
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
- *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
- *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ * Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ * non-exclusive license to use, modify, copy and integrate this
+ * file into your software for the sole purpose of interfacing
+ * with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
- *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
- *  this notice in the distributed source file.
+ * You may reproduce and distribute copies of this file in
+ * source or object form, as long as the sole purpose of this
+ * code is to interface with Yoctopuce products. You must retain
+ * this notice in the distributed source file.
  *
- *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
- *  obligations.
+ * You should refer to Yoctopuce General Terms and Conditions
+ * for additional information regarding your rights and
+ * obligations.
  *
- *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *  WARRANTY, OR OTHERWISE.
- *
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ * EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ * COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ * SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
+ * LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ * WARRANTY, OR OTHERWISE.
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
@@ -47,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YModule class start)
 /**
@@ -132,7 +129,8 @@ public class YModule extends YFunction
     protected UpdateCallback _valueCallbackModule = null;
     protected YModule.LogCallback _logCallback = null;
 
-    public interface LogCallback {
+    public interface LogCallback
+    {
         /**
          *
          * @param module  : the module object of the device
@@ -174,7 +172,7 @@ public class YModule extends YFunction
         String devid = _func;
         int dotidx = devid.indexOf('.');
         if (dotidx >= 0) devid = devid.substring(0, dotidx);
-        YDevice dev = SafeYAPI()._yHash.getDevice(devid);
+        YDevice dev = _yapi._yHash.getDevice(devid);
         if (dev == null) {
             throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "Device [" + devid + "] is not online");
         }
@@ -184,52 +182,107 @@ public class YModule extends YFunction
     /**
      * @param func : functionid
      */
-    protected YModule(String func)
+    protected YModule(YAPIContext yctx, String func)
     {
-        super(func);
+        super(yctx, func);
         _className = "Module";
         //--- (generated code: YModule attributes initialization)
         //--- (end of generated code: YModule attributes initialization)
     }
 
+    protected YModule(String func)
+    {
+        this(YAPI.GetYCtx(),func);
+    }
 
-    // Return the number of functions (beside "module") available on the device
+
+    /**
+     * Returns the number of functions (beside the "module" interface) available on the module.
+     *
+     * @return the number of functions on the module
+     *
+     * @throws YAPI_Exception on error
+     */
     public int functionCount() throws YAPI_Exception
     {
         YDevice dev = _getDev();
         return dev.functionCount();
     }
 
-    // Retrieve the Hardware Id of the nth function (beside "module") in the device
+    /**
+     * Retrieves the hardware identifier of the <i>n</i>th function on the module.
+     *
+     *  @param functionIndex : the index of the function for which the information is desired, starting at
+     * 0 for the first function.
+     *
+     * @return a string corresponding to the unambiguous hardware identifier of the requested module function
+     *
+     * @throws YAPI_Exception on error
+     */
     public String functionId(int functionIndex) throws YAPI_Exception
     {
         YDevice dev = _getDev();
         return dev.getYPEntry(functionIndex).getFuncId();
     }
 
-
-    // Retrieve the function type of the nth function (beside "module") in the device
+    /**
+     * Retrieves the type of the <i>n</i>th function on the module.
+     *
+     *  @param functionIndex : the index of the function for which the information is desired, starting at
+     * 0 for the first function.
+     *
+     * @return a the type of the function
+     *
+     * @throws YAPI_Exception on error
+     */
     public String functionType(int functionIndex) throws YAPI_Exception
     {
         YDevice dev = _getDev();
         return dev.getYPEntry(functionIndex).getClassname();
     }
 
-    // Retrieve the function base type of the nth function (beside "module") in the device
+    /**
+     * Retrieve the function base type of the nth function (beside "module") in the device
+     *  @param functionIndex : the index of the function for which the information is desired, starting at
+     * 0 for the first function.
+     *
+     * @return a the type of the function
+     *
+     * @throws YAPI_Exception on error
+     */
     public String functionBaseType(int functionIndex) throws YAPI_Exception
     {
         YDevice dev = _getDev();
         return dev.getYPEntry(functionIndex).getBaseType();
     }
 
-    // Retrieve the name of the nth function (beside "module") in the device
+    /**
+     * Retrieves the logical name of the <i>n</i>th function on the module.
+     *
+     *  @param functionIndex : the index of the function for which the information is desired, starting at
+     * 0 for the first function.
+     *
+     * @return a string corresponding to the logical name of the requested module function
+     *
+     * @throws YAPI_Exception on error
+     */
     public String functionName(int functionIndex) throws YAPI_Exception
     {
         YDevice dev = _getDev();
         return dev.getYPEntry(functionIndex).getLogicalName();
     }
 
-    // Retrieve the advertised value of the nth function (beside "module") in the device
+    /**
+     * Retrieves the advertised value of the <i>n</i>th function on the module.
+     *
+     *  @param functionIndex : the index of the function for which the information is desired, starting at
+     * 0 for the first function.
+     *
+     *  @return a short string (up to 6 characters) corresponding to the advertised value of the requested
+     * module function
+     *
+     * @throws YAPI_Exception on error
+     */
     public String functionValue(int functionIndex) throws YAPI_Exception
     {
         YDevice dev = _getDev();
@@ -247,7 +300,7 @@ public class YModule extends YFunction
     public void registerLogCallback(LogCallback callback)
     {
         _logCallback = callback;
-        YDevice ydev = SafeYAPI()._yHash.getDevice(_serial);
+        YDevice ydev = _yapi._yHash.getDevice(_serial);
         if (ydev != null) {
             ydev.registerLogCallback(callback);
         }
@@ -264,7 +317,7 @@ public class YModule extends YFunction
         JSONObject json = null;
         JSONArray out = new JSONArray();
         try {
-            json = new JSONObject(new String(actualSettings, YAPI.DeviceCharset));
+            json = new JSONObject(new String(actualSettings, _yapi._deviceCharset));
         } catch (JSONException ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
@@ -293,6 +346,54 @@ public class YModule extends YFunction
 
         }
         return out.toString().getBytes();
+    }
+
+
+    /**
+     * Returns a list of all the modules that are plugged into the current module. This
+     * method is only useful on a YoctoHub/VirtualHub. This method return the serial number of all
+     * module connected to a YoctoHub. Calling this method on a standard device is not an
+     * error, and an empty array will be returned.
+     *
+     * @return an array of strings containing the sub modules.
+     */
+    public ArrayList<String> get_subDevices() throws YAPI_Exception
+    {
+        YDevice dev = _getDev();
+        YGenericHub hub = dev.getHub();
+        return hub.get_subDeviceOf(_serialNumber);
+    }
+
+
+    /**
+     * Returns the serial number of the YoctoHub on which this module is connected.
+     * If the module is connected by USB or if the module is the root YoctoHub an
+     * empty string is returned.
+     *
+     * @return a string with the serial number of the YoctoHub or an empty string
+     */
+    public String get_parentHub() throws YAPI_Exception
+    {
+        YDevice dev = _getDev();
+        YGenericHub hub = dev.getHub();
+        String hubSerial = hub.getSerialNumber();
+        if (hubSerial.equals(_serialNumber))
+            return "";
+        return hubSerial;
+    }
+
+
+    /**
+     * Returns the URL used to access the module. If the module is connected by USB the
+     * string 'usb' is returned.
+     *
+     * @return a string with the URL of the module.
+     */
+    public String get_url() throws YAPI_Exception
+    {
+        YDevice dev = _getDev();
+        YGenericHub hub = dev.getHub();
+        return hub.get_urlOf(_serialNumber);
     }
 
 
@@ -464,7 +565,7 @@ public class YModule extends YFunction
      */
     public String get_firmwareRelease() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FIRMWARERELEASE_INVALID;
             }
@@ -494,7 +595,7 @@ public class YModule extends YFunction
      */
     public int get_persistentSettings() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PERSISTENTSETTINGS_INVALID;
             }
@@ -537,7 +638,7 @@ public class YModule extends YFunction
      */
     public int get_luminosity() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LUMINOSITY_INVALID;
             }
@@ -603,7 +704,7 @@ public class YModule extends YFunction
      */
     public int get_beacon() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BEACON_INVALID;
             }
@@ -663,7 +764,7 @@ public class YModule extends YFunction
      */
     public long get_upTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UPTIME_INVALID;
             }
@@ -692,7 +793,7 @@ public class YModule extends YFunction
      */
     public int get_usbCurrent() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return USBCURRENT_INVALID;
             }
@@ -723,7 +824,7 @@ public class YModule extends YFunction
      */
     public int get_rebootCountdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return REBOOTCOUNTDOWN_INVALID;
             }
@@ -768,7 +869,7 @@ public class YModule extends YFunction
      */
     public int get_userVar() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return USERVAR_INVALID;
             }
@@ -845,6 +946,41 @@ public class YModule extends YFunction
         obj = (YModule) YFunction._FindFromCache("Module", func);
         if (obj == null) {
             obj = new YModule(func);
+            YFunction._AddToCache("Module", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a module for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the module is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YModule.isOnline() to test if the module is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a module by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the module
+     *
+     * @return a YModule object allowing you to drive the module.
+     */
+    public static YModule FindModuleInContext(YAPIContext yctx,String func)
+    {
+        YModule obj;
+        obj = (YModule) YFunction._FindFromCacheInContext(yctx, "Module", func);
+        if (obj == null) {
+            obj = new YModule(yctx, func);
             YFunction._AddToCache("Module", func, obj);
         }
         return obj;
@@ -955,7 +1091,7 @@ public class YModule extends YFunction
      * older or equal to
      * the installed firmware.
      *
-     * @param path    : the path of a byn file or a directory that contains byn files
+     * @param path : the path of a byn file or a directory that contains byn files
      * @param onlynew : returns only files that are strictly newer
      *
      * @return : the path of the byn file to use or a empty string if no byn files matches the requirement
@@ -968,7 +1104,7 @@ public class YModule extends YFunction
         int release;
         String tmp_res;
         if (onlynew) {
-            release = YAPI._atoi(get_firmwareRelease());
+            release = YAPIContext._atoi(get_firmwareRelease());
         } else {
             release = 0;
         }
@@ -1000,7 +1136,7 @@ public class YModule extends YFunction
             _throw(YAPI.IO_ERROR, "Unable to get device settings");
             settings = "error:Unable to get device settings".getBytes();
         }
-        return new YFirmwareUpdate(serial, path, settings);
+        return new YFirmwareUpdate(_yapi, serial, path, settings);
     }
 
     /**
@@ -1038,7 +1174,7 @@ public class YModule extends YFunction
         templist = get_functionIds("Temperature");
         sep = "";
         for (String ii: templist) {
-            if (YAPI._atoi(get_firmwareRelease()) > 9000) {
+            if (YAPIContext._atoi(get_firmwareRelease()) > 9000) {
                 url = String.format("api/%s/sensorType",ii);
                 t_type = new String(_download(url));
                 if (t_type.equals("RES_NTC")) {
@@ -1067,14 +1203,14 @@ public class YModule extends YFunction
                     return name.getBytes();
                 }
                 file_data_bin = _download(_escapeAttr(name));
-                file_data = YAPI._bytesToHexStr(file_data_bin, 0, file_data_bin.length);
+                file_data = YAPIContext._bytesToHexStr(file_data_bin, 0, file_data_bin.length);
                 item = String.format("%s{\"name\":\"%s\", \"data\":\"%s\"}\n", sep, name,file_data);
                 ext_settings = ext_settings + item;
                 sep = ",";
             }
         }
         ext_settings = ext_settings + "]}";
-        res = YAPI._bytesMerge("{ \"api\":".getBytes(), YAPI._bytesMerge(settings, ext_settings.getBytes()));
+        res = YAPIContext._bytesMerge("{ \"api\":".getBytes(), YAPIContext._bytesMerge(settings, ext_settings.getBytes()));
         return res;
     }
 
@@ -1165,7 +1301,7 @@ public class YModule extends YFunction
                 name = _decode_json_string(name);
                 data = _get_json_path(ii, "data");
                 data = _decode_json_string(data);
-                _upload(name, YAPI._hexStrToBin(data));
+                _upload(name, YAPIContext._hexStrToBin(data));
             }
         }
         return YAPI.SUCCESS;
@@ -1262,7 +1398,7 @@ public class YModule extends YFunction
             if (sensorType.equals("")) {
                 return 16;
             }
-            if (YAPI._atoi(sensorType) < 8) {
+            if (YAPIContext._atoi(sensorType) < 8) {
                 return 16;
             } else {
                 return 100;
@@ -1309,7 +1445,7 @@ public class YModule extends YFunction
         paramOffset = funOffset;
         if (funVer < 3) {
             if (funVer == 2) {
-                words = SafeYAPI()._decodeWords(currentFuncValue);
+                words = YAPIContext._decodeWords(currentFuncValue);
                 if ((words.get(0).intValue() == 1366) && (words.get(1).intValue() == 12500)) {
                     funScale = 1;
                     funOffset = 0;
@@ -1319,7 +1455,7 @@ public class YModule extends YFunction
                 }
             } else {
                 if (funVer == 1) {
-                    if (currentFuncValue.equals("") || (YAPI._atoi(currentFuncValue) > 10)) {
+                    if (currentFuncValue.equals("") || (YAPIContext._atoi(currentFuncValue) > 10)) {
                         funScale = 0;
                     }
                 }
@@ -1329,7 +1465,7 @@ public class YModule extends YFunction
         calibType = 0;
         if (paramVer < 3) {
             if (paramVer == 2) {
-                words = SafeYAPI()._decodeWords(param);
+                words = YAPIContext._decodeWords(param);
                 if ((words.get(0).intValue() == 1366) && (words.get(1).intValue() == 12500)) {
                     paramScale = 1;
                     paramOffset = 0;
@@ -1352,7 +1488,7 @@ public class YModule extends YFunction
                 if (paramVer == 1) {
                     words_str = new ArrayList<String>(Arrays.asList(param.split(",")));
                     for (String ii:words_str) {
-                        words.add(YAPI._atoi(ii));
+                        words.add(YAPIContext._atoi(ii));
                     }
                     if (param.equals("") || (words.get(0).intValue() > 10)) {
                         paramScale = 0;
@@ -1385,12 +1521,12 @@ public class YModule extends YFunction
                 if (paramScale > 0) {
                     calibData.set( i, (calibData.get(i).doubleValue() - paramOffset) / paramScale);
                 } else {
-                    calibData.set( i, SafeYAPI()._decimalToDouble((int) (double)Math.round(calibData.get(i).doubleValue())));
+                    calibData.set( i, YAPIContext._decimalToDouble((int) (double)Math.round(calibData.get(i).doubleValue())));
                 }
                 i = i + 1;
             }
         } else {
-            iCalib = SafeYAPI()._decodeFloats(param);
+            iCalib = YAPIContext._decodeFloats(param);
             calibType = (int) (double)Math.round(iCalib.get(0).doubleValue() / 1000.0);
             if (calibType >= 30) {
                 calibType = calibType - 30;
@@ -1425,7 +1561,7 @@ public class YModule extends YFunction
                 i = 0;
                 while (i < 2 * nPoints) {
                     if (funScale == 0) {
-                        wordVal = SafeYAPI()._doubleToDecimal((int) (double)Math.round(calibData.get(i).doubleValue()));
+                        wordVal = YAPIContext._doubleToDecimal((int) (double)Math.round(calibData.get(i).doubleValue()));
                     } else {
                         wordVal = calibData.get(i).doubleValue() * funScale + funOffset;
                     }
@@ -1764,6 +1900,15 @@ public class YModule extends YFunction
         return new String(content);
     }
 
+    //cannot be generated for Java:
+    //public ArrayList<String> get_subDevices() throws YAPI_Exception
+
+    //cannot be generated for Java:
+    //public String get_parentHub() throws YAPI_Exception
+
+    //cannot be generated for Java:
+    //public String get_url() throws YAPI_Exception
+
     /**
      * Continues the module enumeration started using yFirstModule().
      *
@@ -1771,17 +1916,17 @@ public class YModule extends YFunction
      *         the next module found, or a null pointer
      *         if there are no more modules to enumerate.
      */
-    public  YModule nextModule()
+    public YModule nextModule()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindModule(next_hwid);
+        return FindModuleInContext(_yapi, next_hwid);
     }
 
     /**
@@ -1795,12 +1940,23 @@ public class YModule extends YFunction
      */
     public static YModule FirstModule()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Module");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Module");
         if (next_hwid == null)  return null;
-        return FindModule(next_hwid);
+        return FindModuleInContext(yctx, next_hwid);
+    }
+
+    /**
+     * comment from .yc definition
+     */
+    public static YModule FirstModuleInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Module");
+        if (next_hwid == null)  return null;
+        return FindModuleInContext(yctx, next_hwid);
     }
 
     //--- (end of generated code: YModule implementation)
 
-    
+
 }

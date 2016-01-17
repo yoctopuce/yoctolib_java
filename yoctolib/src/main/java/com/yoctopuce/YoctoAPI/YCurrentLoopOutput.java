@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrentLoopOutput.java 22182 2015-11-30 21:48:04Z mvuilleu $
+ * $Id: YCurrentLoopOutput.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YCurrentLoopOutput return codes)
 //--- (end of YCurrentLoopOutput return codes)
@@ -113,12 +112,21 @@ public class YCurrentLoopOutput extends YFunction
      *
      * @param func : functionid
      */
-    protected YCurrentLoopOutput(String func)
+    protected YCurrentLoopOutput(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "CurrentLoopOutput";
         //--- (YCurrentLoopOutput attributes initialization)
         //--- (end of YCurrentLoopOutput attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YCurrentLoopOutput(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YCurrentLoopOutput implementation)
@@ -184,7 +192,7 @@ public class YCurrentLoopOutput extends YFunction
      */
     public double get_current() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENT_INVALID;
             }
@@ -209,7 +217,7 @@ public class YCurrentLoopOutput extends YFunction
      */
     public String get_currentTransition() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTTRANSITION_INVALID;
             }
@@ -280,7 +288,7 @@ public class YCurrentLoopOutput extends YFunction
      */
     public double get_currentAtStartUp() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTATSTARTUP_INVALID;
             }
@@ -312,7 +320,7 @@ public class YCurrentLoopOutput extends YFunction
      */
     public int get_loopPower() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOOPPOWER_INVALID;
             }
@@ -364,6 +372,41 @@ public class YCurrentLoopOutput extends YFunction
         obj = (YCurrentLoopOutput) YFunction._FindFromCache("CurrentLoopOutput", func);
         if (obj == null) {
             obj = new YCurrentLoopOutput(func);
+            YFunction._AddToCache("CurrentLoopOutput", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a 4-20mA output for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the 4-20mA output is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YCurrentLoopOutput.isOnline() to test if the 4-20mA output is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a 4-20mA output by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the 4-20mA output
+     *
+     * @return a YCurrentLoopOutput object allowing you to drive the 4-20mA output.
+     */
+    public static YCurrentLoopOutput FindCurrentLoopOutputInContext(YAPIContext yctx,String func)
+    {
+        YCurrentLoopOutput obj;
+        obj = (YCurrentLoopOutput) YFunction._FindFromCacheInContext(yctx, "CurrentLoopOutput", func);
+        if (obj == null) {
+            obj = new YCurrentLoopOutput(yctx, func);
             YFunction._AddToCache("CurrentLoopOutput", func, obj);
         }
         return obj;
@@ -441,17 +484,17 @@ public class YCurrentLoopOutput extends YFunction
      *         a 4-20mA output currently online, or a null pointer
      *         if there are no more 4-20mA outputs to enumerate.
      */
-    public  YCurrentLoopOutput nextCurrentLoopOutput()
+    public YCurrentLoopOutput nextCurrentLoopOutput()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindCurrentLoopOutput(next_hwid);
+        return FindCurrentLoopOutputInContext(_yapi, next_hwid);
     }
 
     /**
@@ -465,9 +508,28 @@ public class YCurrentLoopOutput extends YFunction
      */
     public static YCurrentLoopOutput FirstCurrentLoopOutput()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("CurrentLoopOutput");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("CurrentLoopOutput");
         if (next_hwid == null)  return null;
-        return FindCurrentLoopOutput(next_hwid);
+        return FindCurrentLoopOutputInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of 4-20mA outputs currently accessible.
+     * Use the method YCurrentLoopOutput.nextCurrentLoopOutput() to iterate on
+     * next 4-20mA outputs.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YCurrentLoopOutput object, corresponding to
+     *         the first 4-20mA output currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YCurrentLoopOutput FirstCurrentLoopOutputInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("CurrentLoopOutput");
+        if (next_hwid == null)  return null;
+        return FindCurrentLoopOutputInContext(yctx, next_hwid);
     }
 
     //--- (end of YCurrentLoopOutput implementation)

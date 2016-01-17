@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAccelerometer.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YAccelerometer.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YAccelerometer return codes)
 //--- (end of YAccelerometer return codes)
@@ -120,12 +119,21 @@ public class YAccelerometer extends YSensor
      *
      * @param func : functionid
      */
-    protected YAccelerometer(String func)
+    protected YAccelerometer(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Accelerometer";
         //--- (YAccelerometer attributes initialization)
         //--- (end of YAccelerometer attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YAccelerometer(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YAccelerometer implementation)
@@ -156,7 +164,7 @@ public class YAccelerometer extends YSensor
      */
     public double get_xValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return XVALUE_INVALID;
             }
@@ -185,7 +193,7 @@ public class YAccelerometer extends YSensor
      */
     public double get_yValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YVALUE_INVALID;
             }
@@ -214,7 +222,7 @@ public class YAccelerometer extends YSensor
      */
     public double get_zValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ZVALUE_INVALID;
             }
@@ -239,7 +247,7 @@ public class YAccelerometer extends YSensor
      */
     public int get_gravityCancellation() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return GRAVITYCANCELLATION_INVALID;
             }
@@ -303,6 +311,41 @@ public class YAccelerometer extends YSensor
     }
 
     /**
+     * Retrieves an accelerometer for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the accelerometer is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YAccelerometer.isOnline() to test if the accelerometer is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * an accelerometer by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the accelerometer
+     *
+     * @return a YAccelerometer object allowing you to drive the accelerometer.
+     */
+    public static YAccelerometer FindAccelerometerInContext(YAPIContext yctx,String func)
+    {
+        YAccelerometer obj;
+        obj = (YAccelerometer) YFunction._FindFromCacheInContext(yctx, "Accelerometer", func);
+        if (obj == null) {
+            obj = new YAccelerometer(yctx, func);
+            YFunction._AddToCache("Accelerometer", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -356,10 +399,12 @@ public class YAccelerometer extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackAccelerometer = callback;
         return 0;
@@ -383,17 +428,17 @@ public class YAccelerometer extends YSensor
      *         an accelerometer currently online, or a null pointer
      *         if there are no more accelerometers to enumerate.
      */
-    public  YAccelerometer nextAccelerometer()
+    public YAccelerometer nextAccelerometer()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindAccelerometer(next_hwid);
+        return FindAccelerometerInContext(_yapi, next_hwid);
     }
 
     /**
@@ -407,9 +452,28 @@ public class YAccelerometer extends YSensor
      */
     public static YAccelerometer FirstAccelerometer()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Accelerometer");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Accelerometer");
         if (next_hwid == null)  return null;
-        return FindAccelerometer(next_hwid);
+        return FindAccelerometerInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of accelerometers currently accessible.
+     * Use the method YAccelerometer.nextAccelerometer() to iterate on
+     * next accelerometers.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YAccelerometer object, corresponding to
+     *         the first accelerometer currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YAccelerometer FirstAccelerometerInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Accelerometer");
+        if (next_hwid == null)  return null;
+        return FindAccelerometerInContext(yctx, next_hwid);
     }
 
     //--- (end of YAccelerometer implementation)

@@ -7,7 +7,7 @@
     <groupId>com.yoctopuce.java</groupId>
     <artifactId>javabundle</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.22324-SNAPSHOT</version>
+    <version>1.10.22835-SNAPSHOT</version>
     <name>Yoctopuce Java API (with examples)</name>
     <description>Official Yoctopuce Library for Java with examples</description>
     <url>http://www.yoctopuce.com</url>
@@ -66,6 +66,7 @@
         <module>Examples/Prog-HTTPCallback</module>
         <module>Examples/Prog-HubDiscovery-method1</module>
         <module>Examples/Prog-HubDiscovery-method2</module>
+        <module>Examples/Prog-DevicesTree</module>
         <module>Examples/Prog-MODBUS</module>
         <module>Examples/Prog-OldDataLogger</module>
         <module>Examples/Prog-FirmwareUpdate</module>

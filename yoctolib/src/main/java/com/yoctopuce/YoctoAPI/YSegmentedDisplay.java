@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSegmentedDisplay.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YSegmentedDisplay.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YSegmentedDisplay return codes)
 //--- (end of YSegmentedDisplay return codes)
@@ -103,12 +102,21 @@ public class YSegmentedDisplay extends YFunction
      *
      * @param func : functionid
      */
-    protected YSegmentedDisplay(String func)
+    protected YSegmentedDisplay(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "SegmentedDisplay";
         //--- (YSegmentedDisplay attributes initialization)
         //--- (end of YSegmentedDisplay attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YSegmentedDisplay(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YSegmentedDisplay implementation)
@@ -133,7 +141,7 @@ public class YSegmentedDisplay extends YFunction
      */
     public String get_displayedText() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYEDTEXT_INVALID;
             }
@@ -189,7 +197,7 @@ public class YSegmentedDisplay extends YFunction
      */
     public int get_displayMode() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYMODE_INVALID;
             }
@@ -253,6 +261,41 @@ public class YSegmentedDisplay extends YFunction
     }
 
     /**
+     * Retrieves a segmented display for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the segmented displays is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YSegmentedDisplay.isOnline() to test if the segmented displays is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a segmented display by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the segmented displays
+     *
+     * @return a YSegmentedDisplay object allowing you to drive the segmented displays.
+     */
+    public static YSegmentedDisplay FindSegmentedDisplayInContext(YAPIContext yctx,String func)
+    {
+        YSegmentedDisplay obj;
+        obj = (YSegmentedDisplay) YFunction._FindFromCacheInContext(yctx, "SegmentedDisplay", func);
+        if (obj == null) {
+            obj = new YSegmentedDisplay(yctx, func);
+            YFunction._AddToCache("SegmentedDisplay", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -300,17 +343,17 @@ public class YSegmentedDisplay extends YFunction
      *         a segmented display currently online, or a null pointer
      *         if there are no more segmented displays to enumerate.
      */
-    public  YSegmentedDisplay nextSegmentedDisplay()
+    public YSegmentedDisplay nextSegmentedDisplay()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindSegmentedDisplay(next_hwid);
+        return FindSegmentedDisplayInContext(_yapi, next_hwid);
     }
 
     /**
@@ -324,9 +367,28 @@ public class YSegmentedDisplay extends YFunction
      */
     public static YSegmentedDisplay FirstSegmentedDisplay()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("SegmentedDisplay");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("SegmentedDisplay");
         if (next_hwid == null)  return null;
-        return FindSegmentedDisplay(next_hwid);
+        return FindSegmentedDisplayInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of segmented displays currently accessible.
+     * Use the method YSegmentedDisplay.nextSegmentedDisplay() to iterate on
+     * next segmented displays.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YSegmentedDisplay object, corresponding to
+     *         the first segmented displays currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YSegmentedDisplay FirstSegmentedDisplayInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("SegmentedDisplay");
+        if (next_hwid == null)  return null;
+        return FindSegmentedDisplayInContext(yctx, next_hwid);
     }
 
     //--- (end of YSegmentedDisplay implementation)

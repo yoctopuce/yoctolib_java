@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHubPort.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YHubPort.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindHubPort(), the high-level API for HubPort functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YHubPort return codes)
 //--- (end of YHubPort return codes)
@@ -114,12 +113,21 @@ public class YHubPort extends YFunction
      *
      * @param func : functionid
      */
-    protected YHubPort(String func)
+    protected YHubPort(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "HubPort";
         //--- (YHubPort attributes initialization)
         //--- (end of YHubPort attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YHubPort(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YHubPort implementation)
@@ -148,7 +156,7 @@ public class YHubPort extends YFunction
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLED_INVALID;
             }
@@ -213,7 +221,7 @@ public class YHubPort extends YFunction
      */
     public int get_portState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTSTATE_INVALID;
             }
@@ -245,7 +253,7 @@ public class YHubPort extends YFunction
      */
     public int get_baudRate() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BAUDRATE_INVALID;
             }
@@ -302,6 +310,41 @@ public class YHubPort extends YFunction
     }
 
     /**
+     * Retrieves a Yocto-hub port for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the Yocto-hub port is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YHubPort.isOnline() to test if the Yocto-hub port is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a Yocto-hub port by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the Yocto-hub port
+     *
+     * @return a YHubPort object allowing you to drive the Yocto-hub port.
+     */
+    public static YHubPort FindHubPortInContext(YAPIContext yctx,String func)
+    {
+        YHubPort obj;
+        obj = (YHubPort) YFunction._FindFromCacheInContext(yctx, "HubPort", func);
+        if (obj == null) {
+            obj = new YHubPort(yctx, func);
+            YFunction._AddToCache("HubPort", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -349,17 +392,17 @@ public class YHubPort extends YFunction
      *         a Yocto-hub port currently online, or a null pointer
      *         if there are no more Yocto-hub ports to enumerate.
      */
-    public  YHubPort nextHubPort()
+    public YHubPort nextHubPort()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindHubPort(next_hwid);
+        return FindHubPortInContext(_yapi, next_hwid);
     }
 
     /**
@@ -373,9 +416,28 @@ public class YHubPort extends YFunction
      */
     public static YHubPort FirstHubPort()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("HubPort");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("HubPort");
         if (next_hwid == null)  return null;
-        return FindHubPort(next_hwid);
+        return FindHubPortInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of Yocto-hub ports currently accessible.
+     * Use the method YHubPort.nextHubPort() to iterate on
+     * next Yocto-hub ports.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YHubPort object, corresponding to
+     *         the first Yocto-hub port currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YHubPort FirstHubPortInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("HubPort");
+        if (next_hwid == null)  return null;
+        return FindHubPortInContext(yctx, next_hwid);
     }
 
     //--- (end of YHubPort implementation)

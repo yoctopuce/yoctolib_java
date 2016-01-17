@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 22318 2015-12-11 09:10:27Z seb $
+ * $Id: YAPI.java 22390 2015-12-16 11:31:40Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -39,12 +39,8 @@ package com.yoctopuce.YoctoAPI;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Queue;
 
 /**
  *
@@ -55,6 +51,7 @@ public class YAPI
     // saves a lots of traffic.
     // Note that a value under 2 ms makes little sense since a USB bus itself
     // has a 2ms round trip period
+    //fixme generated code must use defautl cachevalidity form YAPIContext
     public static int DefaultCacheValidity = 5;
 
     // Return value for invalid strings
@@ -64,7 +61,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "22324";
+    public static final String YOCTO_API_BUILD_STR = "22835";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -89,7 +86,6 @@ public class YAPI
 
 //--- (end of generated code: YFunction return codes)
     static final String DefaultEncoding = "ISO-8859-1";
-    static Charset DeviceCharset;
 
     // Encoding types
     static final int YOCTO_CALIB_TYPE_OFS = 30;
@@ -108,6 +104,8 @@ public class YAPI
     static final int YOCTO_REALM_LEN = 20;
 
     // yInitAPI argument
+    // fixme copy to YAPIContex
+
     public static final int DETECT_NONE = 0;
     public static final int DETECT_USB = 1;
     public static final int DETECT_NET = 2;
@@ -115,34 +113,6 @@ public class YAPI
     public static final int DETECT_ALL = DETECT_USB | DETECT_NET;
     public static final int DEFAULT_PKT_RESEND_DELAY = 50;
     static int pktAckDelay = DEFAULT_PKT_RESEND_DELAY;
-
-
-    private final YSSDP.YSSDPReportInterface _ssdpCallback = new YSSDP.YSSDPReportInterface()
-    {
-        @Override
-        public void HubDiscoveryCallback(String serial, String urlToRegister, String urlToUnregister)
-        {
-            if (urlToRegister != null) {
-                synchronized (_newHubCallbackLock) {
-                    if (_HubDiscoveryCallback != null)
-                        _HubDiscoveryCallback.yHubDiscoveryCallback(serial, urlToRegister);
-                }
-            }
-            if ((_apiMode & DETECT_NET) != 0) {
-                if (urlToRegister != null) {
-                    if (urlToUnregister != null) {
-                        _UnregisterHub(urlToUnregister);
-                    }
-                    try {
-                        _PreregisterHub(urlToRegister);
-                    } catch (YAPI_Exception ex) {
-                        _Log("Unable to register hub " + urlToRegister + " detected by SSDP:" + ex.toString());
-                    }
-                }
-            }
-        }
-    };
-    final YHash _yHash;
 
 
     /**
@@ -188,64 +158,6 @@ public class YAPI
     }
 
 
-    private final static CalibrationHandlerCallback linearCalibrationHandler = new CalibrationHandlerCallback()
-    {
-
-        @Override
-        public double yCalibrationHandler(double rawValue, int calibType, ArrayList<Integer> params, ArrayList<Double> rawValues, ArrayList<Double> refValues)
-        {
-            // calibration types n=1..10 and 11.20 are meant for linear calibration using n points
-            int npt;
-            double x = rawValues.get(0);
-            double adj = refValues.get(0) - x;
-            int i = 0;
-
-            if (calibType < YAPI.YOCTO_CALIB_TYPE_OFS) {
-                npt = calibType % 10;
-                if (npt > rawValues.size()) npt = rawValues.size();
-                if (npt > refValues.size()) npt = refValues.size();
-            } else {
-                npt = refValues.size();
-            }
-            while (rawValue > rawValues.get(i) && ++i < npt) {
-                double x2 = x;
-                double adj2 = adj;
-
-                x = rawValues.get(i);
-                adj = refValues.get(i) - x;
-
-                if (rawValue < x && x > x2) {
-                    adj = adj2 + (adj - adj2) * (rawValue - x2) / (x - x2);
-                }
-            }
-            return rawValue + adj;
-        }
-    };
-
-
-    // Non static Variable
-    private int _apiMode;
-
-    final ArrayList<YGenericHub> _hubs; // array of root urls
-
-    private boolean _firstArrival;
-    private final Queue<PlugEvent> _pendingCallbacks = new LinkedList<PlugEvent>();
-    private final Queue<DataEvent> _data_events = new LinkedList<DataEvent>();
-    private DeviceArrivalCallback _arrivalCallback = null;
-    private DeviceChangeCallback _namechgCallback = null;
-    private DeviceRemovalCallback _removalCallback = null;
-    private LogCallback _logCallback = null;
-    private final Object _newHubCallbackLock = new Object();
-    private HubDiscoveryCallback _HubDiscoveryCallback = null;
-    private HashMap<Integer, CalibrationHandlerCallback> _calibHandlers = new HashMap<Integer, YAPI.CalibrationHandlerCallback>();
-    private YSSDP _ssdp;
-
-    //YFunction Callback list
-    private static final ArrayList<YFunction> _ValueCallbackList = new ArrayList<YFunction>();
-    private static final ArrayList<YFunction> _TimedReportCallbackList = new ArrayList<YFunction>();
-    // YDevice cache
-    //public static ArrayList<YDevice> _devCache = new ArrayList<YDevice>();// Device cache entries
-
     public interface HubDiscoveryCallback
     {
         /**
@@ -256,545 +168,8 @@ public class YAPI
     }
 
 
-    static class DataEvent
-    {
-
-        private final YFunction _fun;
-        private final String _value;
-        private final ArrayList<Integer> _report;
-        private final double _timestamp;
-
-        public DataEvent(YFunction fun, String value)
-        {
-            _fun = fun;
-            _value = value;
-            _report = null;
-            _timestamp = 0;
-        }
-
-        public DataEvent(YFunction fun, double timestamp, ArrayList<Integer> report)
-        {
-            _fun = fun;
-            _value = null;
-            _timestamp = timestamp;
-            _report = report;
-        }
-
-        public void invoke()
-        {
-            if (_value == null) {
-                YSensor sensor = (YSensor) _fun;
-                YMeasure mesure = sensor._decodeTimedReport(_timestamp, _report);
-                sensor._invokeTimedReportCallback(mesure);
-            } else {
-                // new value
-                _fun._invokeValueCallback(_value);
-            }
-        }
-
-    }
-
-    static class PlugEvent
-    {
-
-        public static enum Event
-        {
-
-            PLUG, UNPLUG, CHANGE
-        }
-
-        public Event ev;
-        public YModule module;
-
-        public PlugEvent(Event ev, String serial)
-        {
-            this.ev = ev;
-            this.module = YModule.FindModule(serial + ".module");
-        }
-    }
-
-    void pushPlugEvent(PlugEvent.Event ev, String serial)
-    {
-        synchronized (_pendingCallbacks) {
-            _pendingCallbacks.add(new PlugEvent(ev, serial));
-        }
-    }
-
-    private synchronized void _updateDeviceList_internal(boolean forceupdate, boolean invokecallbacks) throws YAPI_Exception
-    {
-        if (_firstArrival && invokecallbacks && _arrivalCallback != null) {
-            forceupdate = true;
-        }
-
-        // Rescan all hubs and update list of online devices
-        for (YGenericHub h : _hubs) {
-            h.updateDeviceList(forceupdate);
-        }
-
-        // after processing all hubs, invoke pending callbacks if required
-        if (invokecallbacks) {
-            while (true) {
-                PlugEvent evt;
-                synchronized (_pendingCallbacks) {
-                    if (_pendingCallbacks.isEmpty()) {
-                        break;
-                    }
-                    evt = _pendingCallbacks.poll();
-                }
-                switch (evt.ev) {
-                    case PLUG:
-                        if (_arrivalCallback != null) {
-                            _arrivalCallback.yDeviceArrival(evt.module);
-                        }
-                        break;
-                    case CHANGE:
-                        if (_namechgCallback != null) {
-                            _namechgCallback.yDeviceChange(evt.module);
-                        }
-                        break;
-                    case UNPLUG:
-                        if (_removalCallback != null) {
-                            _removalCallback.yDeviceRemoval(evt.module);
-                        }
-                        _yHash.forgetDevice(evt.module.get_serialNumber());
-                        break;
-                }
-            }
-            if (_arrivalCallback != null && _firstArrival) {
-                _firstArrival = false;
-            }
-        }
-    }
-
-    /*
-     * Return a the calibration handler for a given type
-     */
-    CalibrationHandlerCallback _getCalibrationHandler(int calibType)
-    {
-        if (!_calibHandlers.containsKey(calibType)) {
-            return null;
-        }
-        return _calibHandlers.get(calibType);
-    }
-
-
-    private final static double decExp[] = new double[]{
-            1.0e-6, 1.0e-5, 1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1.0,
-            1.0e1, 1.0e2, 1.0e3, 1.0e4, 1.0e5, 1.0e6, 1.0e7, 1.0e8, 1.0e9};
-
-    // Convert Yoctopuce 16-bit decimal floats to standard double-precision floats
-    //
-    static double _decimalToDouble(int val)
-    {
-        boolean negate = false;
-        double res;
-        int mantis = val & 2047;
-
-        if (mantis == 0) {
-            return 0.0;
-        }
-        if (val > 32767) {
-            negate = true;
-            val = 65536 - val;
-        } else if (val < 0) {
-            negate = true;
-            val = -val;
-        }
-        int exp = val >> 11;
-        res = (double) mantis * decExp[exp];
-        return (negate ? -res : res);
-    }
-
-    // Convert standard double-precision floats to Yoctopuce 16-bit decimal floats
-    //
-    static long _doubleToDecimal(double val)
-    {
-        int negate = 0;
-        double comp, mant;
-        int decpow;
-        long res;
-
-        if (val == 0.0) {
-            return 0;
-        }
-        if (val < 0) {
-            negate = 1;
-            val = -val;
-        }
-        comp = val / 1999.0;
-        decpow = 0;
-        while (comp > decExp[decpow] && decpow < 15) {
-            decpow++;
-        }
-        mant = val / decExp[decpow];
-        if (decpow == 15 && mant > 2047.0) {
-            res = (15 << 11) + 2047; // overflow
-        } else {
-            res = (decpow << 11) + Math.round(mant);
-        }
-        return (negate != 0 ? -res : res);
-    }
-
-    // Parse an array of u16 encoded in a base64-like string with memory-based compression
-    static ArrayList<Integer> _decodeWords(String data)
-    {
-        ArrayList<Integer> udata = new ArrayList<Integer>();
-        int datalen = data.length();
-        int p = 0;
-        while (p < datalen) {
-            int val;
-            int c = data.charAt(p++);
-            if (c == (int) '*') {
-                val = 0;
-            } else if (c == (int) 'X') {
-                val = 0xffff;
-            } else if (c == (int) 'Y') {
-                val = 0x7fff;
-            } else if (c >= (int) 'a') {
-                int srcpos = udata.size() - 1 - (c - (int) 'a');
-                if (srcpos < 0) {
-                    val = 0;
-                } else {
-                    val = udata.get(srcpos);
-                }
-            } else {
-                if (p + 2 > datalen) {
-                    return udata;
-                }
-                val = c - (int) '0';
-                c = data.charAt(p++);
-                val += (c - (int) '0') << 5;
-                c = data.charAt(p++);
-                if (c == (int) 'z') {
-                    c = '\\';
-                }
-                val += (c - (int) '0') << 10;
-            }
-            udata.add(val);
-        }
-        return udata;
-    }
-
-    // Parse an array of u16 encoded in a base64-like string with memory-based compression
-    static ArrayList<Integer> _decodeFloats(String data)
-    {
-        ArrayList<Integer> idata = new ArrayList<Integer>();
-        int datalen = data.length();
-        int p = 0;
-        while (p < datalen) {
-            int val = 0;
-            int sign = 1;
-            int dec = 0;
-            int decInc = 0;
-            int c = data.charAt(p++);
-            while (c != (int) '-' && (c < (int) '0' || c > (int) '9')) {
-                if (p >= datalen) {
-                    return idata;
-                }
-                c = data.charAt(p++);
-            }
-            if (c == '-') {
-                if (p >= datalen) {
-                    return idata;
-                }
-                sign = -sign;
-                c = data.charAt(p++);
-            }
-            while ((c >= '0' && c <= '9') || c == '.') {
-                if (c == '.') {
-                    decInc = 1;
-                } else if (dec < 3) {
-                    val = val * 10 + (c - '0');
-                    dec += decInc;
-                }
-                if (p < datalen) {
-                    c = data.charAt(p++);
-                } else {
-                    c = 0;
-                }
-            }
-            if (dec < 3) {
-                if (dec == 0) val *= 1000;
-                else if (dec == 1) val *= 100;
-                else val *= 10;
-            }
-            idata.add(sign * val);
-        }
-        return idata;
-    }
-
-    // helper function to find pattern in byte[]
-    static int _find_in_bytes(byte[] source, byte[] match)
-    {
-        // sanity checks
-        if (source == null || match == null) {
-            return -1;
-        }
-        if (source.length == 0 || match.length == 0) {
-            return -1;
-        }
-        int ret = -1;
-        int spos = 0;
-        int mpos = 0;
-        byte m = match[mpos];
-        for (; spos < source.length; spos++) {
-            if (m == source[spos]) {
-                // starting match
-                if (mpos == 0) {
-                    ret = spos;
-                } // finishing match
-                else if (mpos == match.length - 1) {
-                    return ret;
-                }
-                mpos++;
-                m = match[mpos];
-            } else {
-                ret = -1;
-                mpos = 0;
-                m = match[mpos];
-            }
-        }
-        return ret;
-    }
-
-    public static int _atoi(String str)
-    {
-        str = str.trim();
-        if (str.length() == 0) {
-            return 0;
-        }
-        int s = 0;
-        if (str.charAt(s) == '+') {
-            s++;
-        }
-        int i = s;
-        if (str.charAt(i) == '-') {
-            i++;
-        }
-        for (; i < str.length(); i++) {
-
-            //If we find a non-digit character we return false.
-            if (!Character.isDigit(str.charAt(i)))
-                break;
-        }
-        if (i == 0) {
-            return 0;
-        }
-        str = str.substring(s, i);
-        return Integer.valueOf(str);
-    }
-
-    final protected static char[] _hexArray = "0123456789ABCDEF".toCharArray();
-
-    static String _bytesToHexStr(byte[] bytes, int offset, int len)
-    {
-        char[] hexChars = new char[len * 2];
-        for (int j = 0; j < len; j++) {
-            int v = bytes[offset + j] & 0xFF;
-            hexChars[j * 2] = _hexArray[v >> 4];
-            hexChars[j * 2 + 1] = _hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
-
-    public static byte[] _hexStrToBin(String hex_str)
-    {
-        int len = hex_str.length() / 2;
-        byte[] res = new byte[len];
-        for (int i = 0; i < len; i++) {
-            res[i] = (byte) ((Character.digit(hex_str.charAt(i * 2), 16) << 4)
-                    + Character.digit(hex_str.charAt(i * 2 + 1), 16));
-        }
-        return res;
-    }
-
-    public static byte[] _bytesMerge(byte[] array_a, byte[] array_b)
-    {
-        byte[] res = new byte[array_a.length + array_b.length];
-        System.arraycopy(array_a, 0, res, 0, array_a.length);
-        System.arraycopy(array_b, 0, res, array_a.length, array_b.length);
-        return res;
-    }
-
-
-    // Return the class name for a given function ID or full Hardware Id
-    static String functionClass(String funcid)
-    {
-        int dotpos = funcid.indexOf('.');
-
-        if (dotpos >= 0) {
-            funcid = funcid.substring(dotpos + 1);
-        }
-        int classlen = funcid.length();
-
-        while (funcid.charAt(classlen - 1) <= 57) {
-            classlen--;
-        }
-
-        return funcid.substring(0, 1).toUpperCase(Locale.US)
-                + funcid.substring(1, classlen);
-    }
-
-    // Queue a function data event (timed report of notification value)
-    void _PushDataEvent(DataEvent ev)
-    {
-        synchronized (_data_events) {
-            _data_events.add(ev);
-        }
-    }
-
-
-    YDevice funcGetDevice(String className, String func) throws YAPI_Exception
-    {
-        String resolved;
-        try {
-            resolved = _yHash.resolveSerial(className, func);
-        } catch (YAPI_Exception ex) {
-            if (ex.errorType == DEVICE_NOT_FOUND && _hubs.isEmpty()) {
-                throw new YAPI_Exception(ex.errorType,
-                        "Impossible to contact any device because no hub has been registered");
-            } else {
-                _updateDeviceList_internal(true, false);
-                resolved = _yHash.resolveSerial(className, func);
-            }
-        }
-        YDevice dev = _yHash.getDevice(resolved);
-        if (dev == null) {
-            // try to force a device list update to check if the device arrived
-            // in between
-            _updateDeviceList_internal(true, false);
-            dev = _yHash.getDevice(resolved);
-            if (dev == null) {
-                throw new YAPI_Exception(DEVICE_NOT_FOUND, "Device [" + resolved + "] not online");
-            }
-
-        }
-        return dev;
-    }
-
-    protected synchronized int _AddNewHub(String url, boolean reportConnnectionLost, InputStream request, OutputStream response) throws YAPI_Exception
-    {
-        for (YGenericHub h : _hubs) {
-            if (h.isSameRootUrl(url)) {
-                return SUCCESS;
-            }
-        }
-        YGenericHub newhub;
-        YGenericHub.HTTPParams parsedurl;
-        parsedurl = new YGenericHub.HTTPParams(url);
-        // Add hub to known list
-        if (url.equals("usb")) {
-            YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(_hubs.size(), true);
-        } else if (url.equals("usb_silent")) {
-            YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(_hubs.size(), false);
-        } else if (url.equals("net")) {
-            if ((_apiMode & DETECT_NET) == 0) {
-                if (YUSBHub.RegisterLocalhost()) {
-                    newhub = new YHTTPHub(_hubs.size(), new YGenericHub.HTTPParams("localhost"), false);
-                    _hubs.add(newhub);
-                    newhub.startNotifications();
-                }
-                _apiMode |= DETECT_NET;
-                _ssdp.addCallback(_ssdpCallback);
-            }
-            return SUCCESS;
-        } else if (parsedurl.getHost().equals("callback")) {
-            newhub = new YCallbackHub(_hubs.size(), parsedurl, request, response);
-        } else {
-            newhub = new YHTTPHub(_hubs.size(), parsedurl, reportConnnectionLost);
-        }
-        _hubs.add(newhub);
-        newhub.startNotifications();
-        return SUCCESS;
-    }
-
-    protected synchronized int _TestHub(String url, int mstimeout, InputStream request, OutputStream response) throws YAPI_Exception
-    {
-        YGenericHub newhub;
-        YGenericHub.HTTPParams parsedurl = new YGenericHub.HTTPParams(url);
-        // Add hub to known list
-        if (url.equals("usb")) {
-            YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(0, true);
-        } else if (url.equals("net")) {
-            return SUCCESS;
-        } else if (parsedurl.getHost().equals("callback")) {
-            newhub = new YCallbackHub(0, parsedurl, request, response);
-        } else {
-            newhub = new YHTTPHub(0, parsedurl, true);
-        }
-        return newhub.ping(mstimeout);
-    }
-
-
-    void _UpdateValueCallbackList(YFunction func, boolean add)
-    {
-        if (add) {
-            func.isOnline();
-            synchronized (_ValueCallbackList) {
-                if (!_ValueCallbackList.contains(func)) {
-                    _ValueCallbackList.add(func);
-                }
-            }
-        } else {
-            synchronized (_ValueCallbackList) {
-                _ValueCallbackList.remove(func);
-            }
-        }
-    }
-
-    YFunction _GetValueCallback(String hwid)
-    {
-        synchronized (_ValueCallbackList) {
-            for (YFunction func : _ValueCallbackList) {
-                try {
-                    if (func.getHardwareId().equals(hwid)) {
-                        return func;
-                    }
-                } catch (YAPI_Exception ignore) {
-                }
-            }
-        }
-        return null;
-    }
-
-
-    void _UpdateTimedReportCallbackList(YFunction func, boolean add)
-    {
-        if (add) {
-            func.isOnline();
-            synchronized (_TimedReportCallbackList) {
-                if (!_TimedReportCallbackList.contains(func)) {
-                    _TimedReportCallbackList.add(func);
-                }
-            }
-        } else {
-            synchronized (_TimedReportCallbackList) {
-                _TimedReportCallbackList.remove(func);
-            }
-        }
-    }
-
-    YFunction _GetTimedReportCallback(String hwid)
-    {
-        synchronized (_TimedReportCallbackList) {
-            for (YFunction func : _TimedReportCallbackList) {
-                try {
-                    if (func.getHardwareId().equals(hwid)) {
-                        return func;
-                    }
-                } catch (YAPI_Exception ignore) {
-                }
-            }
-        }
-        return null;
-    }
-
-
-    private static HashMap<Long, YAPI> _MultipleYAPI = null;
-    private static YAPI _SingleYAPI = null;
+    private static HashMap<Long, YAPIContext> _MultipleYAPI = null;
+    private static YAPIContext _SingleYAPI = null;
 
 
     @SuppressWarnings("UnusedDeclaration")
@@ -802,216 +177,33 @@ public class YAPI
     {
         if (_SingleYAPI != null)
             throw new YAPI_Exception(INVALID_ARGUMENT, "SetSingleThreadMode must be called before start using the Yoctopuce API");
-        _MultipleYAPI = new HashMap<Long, YAPI>();
+        _MultipleYAPI = new HashMap<Long, YAPIContext>();
     }
 
-    static synchronized YAPI GetYAPI()
+
+    static synchronized YAPIContext GetYCtx()
     {
         if (_MultipleYAPI != null) {
-            return _MultipleYAPI.get(Thread.currentThread().getId());
+            YAPIContext context = _MultipleYAPI.get(Thread.currentThread().getId());
+            if (context == null) {
+                context = new YAPIContext();
+                _MultipleYAPI.put(Thread.currentThread().getId(), context);
+            }
+            return context;
         } else {
+            if (_SingleYAPI == null) {
+                _SingleYAPI = new YAPIContext();
+            }
             return _SingleYAPI;
         }
     }
 
-    static synchronized YAPI SafeYAPI()
-    {
-        YAPI yapi = GetYAPI();
-        if (yapi == null) {
-            yapi = new YAPI();
-            AddYAPI(yapi);
-        }
-        return yapi;
-    }
-
-    static synchronized void AddYAPI(YAPI yapi)
+    static synchronized void AddYCtx(YAPIContext yapi)
     {
         if (_MultipleYAPI != null) {
             _MultipleYAPI.put(Thread.currentThread().getId(), yapi);
         } else {
             _SingleYAPI = yapi;
-        }
-    }
-
-    static synchronized void RemoveYAPI()
-    {
-        if (_MultipleYAPI != null) {
-            _MultipleYAPI.remove(Thread.currentThread().getId());
-        } else {
-            _SingleYAPI = null;
-        }
-    }
-
-
-    YAPI()
-    {
-        try {
-            DeviceCharset = Charset.forName(DefaultEncoding);
-        } catch (Exception dummy) {
-            DeviceCharset = Charset.defaultCharset();
-        }
-        _hubs = new ArrayList<YGenericHub>();
-        _yHash = new YHash();
-        _firstArrival = true;
-        _pendingCallbacks.clear();
-        _data_events.clear();
-        _ssdp = null;
-
-        for (int i = 1; i <= 20; i++) {
-            _calibHandlers.put(i, linearCalibrationHandler);
-        }
-        _calibHandlers.put(YAPI.YOCTO_CALIB_TYPE_OFS, linearCalibrationHandler);
-        _ssdp = new YSSDP();
-    }
-
-    void _FreeAPI()
-    {
-        if ((_apiMode & DETECT_NET) != 0) {
-            _ssdp.Stop();
-        }
-
-        _yHash.clear();
-        _ValueCallbackList.clear();
-        _TimedReportCallbackList.clear();
-
-        for (YGenericHub h : _hubs) {
-            h.stopNotifications();
-            h.release();
-        }
-    }
-
-
-    public synchronized int _RegisterHub(String url) throws YAPI_Exception
-    {
-        _AddNewHub(url, true, null, null);
-        // Register device list
-        _updateDeviceList_internal(true, false);
-        return SUCCESS;
-    }
-
-
-    public synchronized int _RegisterHub(String url, InputStream request, OutputStream response) throws YAPI_Exception
-    {
-        _AddNewHub(url, true, request, response);
-        // Register device list
-        _updateDeviceList_internal(true, false);
-        return SUCCESS;
-    }
-
-
-    public synchronized int _PreregisterHub(String url) throws YAPI_Exception
-    {
-        _AddNewHub(url, false, null, null);
-        return SUCCESS;
-    }
-
-    public synchronized void _UnregisterHub(String url)
-    {
-        if (url.equals("net")) {
-            _apiMode &= ~DETECT_NET;
-            return;
-        }
-
-        for (YGenericHub h : _hubs) {
-            if (h.isSameRootUrl(url)) {
-                h.stopNotifications();
-                for (String serial : h._serialByYdx.values()) {
-                    _yHash.forgetDevice(serial);
-                }
-                h.release();
-                _hubs.remove(h);
-                return;
-            }
-        }
-    }
-
-    public synchronized int _UpdateDeviceList() throws YAPI_Exception
-    {
-        _updateDeviceList_internal(false, true);
-        return SUCCESS;
-    }
-
-    public int _HandleEvents() throws YAPI_Exception
-    {
-        // handle pending events
-        while (true) {
-            DataEvent pv;
-            synchronized (_data_events) {
-                if (_data_events.isEmpty()) {
-                    break;
-                }
-                pv = _data_events.poll();
-            }
-            pv.invoke();
-        }
-        return SUCCESS;
-    }
-
-
-    public int _Sleep(long ms_duration) throws YAPI_Exception
-    {
-        long end = GetTickCount() + ms_duration;
-
-        do {
-            _HandleEvents();
-            if (end > GetTickCount()) {
-                try {
-                    Thread.sleep(2);
-                } catch (InterruptedException ex) {
-                    throw new YAPI_Exception(YAPI.IO_ERROR,
-                            "Thread has been interrupted");
-                }
-            }
-        } while (end > GetTickCount());
-        return SUCCESS;
-    }
-
-    public int _TriggerHubDiscovery() throws YAPI_Exception
-    {
-        // Register device list
-        _ssdp.addCallback(_ssdpCallback);
-        return YAPI.SUCCESS;
-    }
-
-
-    public void _RegisterDeviceArrivalCallback(
-            YAPI.DeviceArrivalCallback arrivalCallback)
-    {
-        _arrivalCallback = arrivalCallback;
-    }
-
-    public void _RegisterDeviceChangeCallback(
-            YAPI.DeviceChangeCallback changeCallback)
-    {
-        _namechgCallback = changeCallback;
-    }
-
-    public synchronized void _RegisterDeviceRemovalCallback(
-            YAPI.DeviceRemovalCallback removalCallback)
-    {
-        _removalCallback = removalCallback;
-    }
-
-    public void _RegisterHubDiscoveryCallback(HubDiscoveryCallback hubDiscoveryCallback)
-    {
-        synchronized (_newHubCallbackLock) {
-            _HubDiscoveryCallback = hubDiscoveryCallback;
-        }
-        try {
-            _TriggerHubDiscovery();
-        } catch (YAPI_Exception ignore) {
-        }
-    }
-
-    public void _RegisterLogFunction(YAPI.LogCallback logfun)
-    {
-        _logCallback = logfun;
-    }
-
-    void _Log(String message)
-    {
-        if (_logCallback != null) {
-            _logCallback.yLog(message);
         }
     }
 
@@ -1036,7 +228,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".22324" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".22835" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -1060,17 +252,8 @@ public class YAPI
      */
     public static int InitAPI(int mode) throws YAPI_Exception
     {
-        YAPI yapi = SafeYAPI();
-        if ((mode & YAPI.DETECT_NET) != 0) {
-            yapi._RegisterHub("net");
-        }
-        if ((mode & YAPI.RESEND_MISSING_PKT) != 0) {
-            YAPI.pktAckDelay = DEFAULT_PKT_RESEND_DELAY;
-        }
-        if ((mode & YAPI.DETECT_USB) != 0) {
-            yapi._RegisterHub("usb");
-        }
-        return YAPI.SUCCESS;
+        YAPIContext yctx = GetYCtx();
+        return yctx.InitAPI(mode);
     }
 
     /**
@@ -1083,11 +266,21 @@ public class YAPI
      */
     public static void FreeAPI()
     {
-        YAPI yapi = GetYAPI();
-        if (yapi != null) {
-            yapi._FreeAPI();
-            RemoveYAPI();
+        YAPIContext yctx;
+        if (_MultipleYAPI != null) {
+            yctx = _MultipleYAPI.get(Thread.currentThread().getId());
+            if (yctx != null) {
+                yctx.FreeAPI();
+            }
+            _MultipleYAPI.remove(Thread.currentThread().getId());
+        } else {
+            yctx = _SingleYAPI;
+            if (yctx != null) {
+                yctx.FreeAPI();
+            }
+            _SingleYAPI = null;
         }
+
     }
 
 
@@ -1136,13 +329,13 @@ public class YAPI
      */
     public static int RegisterHub(String url) throws YAPI_Exception
     {
-        return SafeYAPI()._RegisterHub(url);
+        return GetYCtx().RegisterHub(url);
     }
 
 
     public static int RegisterHub(String url, InputStream request, OutputStream response) throws YAPI_Exception
     {
-        return SafeYAPI()._RegisterHub(url, request, response);
+        return GetYCtx().RegisterHub(url, request, response);
     }
 
 
@@ -1158,7 +351,7 @@ public class YAPI
      */
     public static void EnableUSBHost(Object osContext) throws YAPI_Exception
     {
-        YUSBHub.SetContextType(osContext);
+        GetYCtx().EnableUSBHost(osContext);
     }
 
     /**
@@ -1177,7 +370,7 @@ public class YAPI
      */
     public static int PreregisterHub(String url) throws YAPI_Exception
     {
-        return SafeYAPI()._PreregisterHub(url);
+        return GetYCtx().PreregisterHub(url);
     }
 
     /**
@@ -1189,7 +382,7 @@ public class YAPI
      */
     public static void UnregisterHub(String url)
     {
-        SafeYAPI()._UnregisterHub(url);
+        GetYCtx().UnregisterHub(url);
     }
 
 
@@ -1209,7 +402,7 @@ public class YAPI
      */
     public static int TestHub(String url, int mstimeout) throws YAPI_Exception
     {
-        return SafeYAPI()._TestHub(url, mstimeout, null, null);
+        return GetYCtx().TestHub(url, mstimeout);
     }
 
 
@@ -1228,7 +421,7 @@ public class YAPI
      */
     public static int UpdateDeviceList() throws YAPI_Exception
     {
-        return SafeYAPI()._UpdateDeviceList();
+        return GetYCtx().UpdateDeviceList();
     }
 
     /**
@@ -1248,7 +441,7 @@ public class YAPI
      */
     public static int HandleEvents() throws YAPI_Exception
     {
-        return SafeYAPI()._HandleEvents();
+        return GetYCtx().HandleEvents();
     }
 
     /**
@@ -1271,7 +464,7 @@ public class YAPI
      */
     public static int Sleep(long ms_duration) throws YAPI_Exception
     {
-        return SafeYAPI()._Sleep(ms_duration);
+        return GetYCtx().Sleep(ms_duration);
     }
 
     /**
@@ -1283,7 +476,7 @@ public class YAPI
      */
     public static int TriggerHubDiscovery() throws YAPI_Exception
     {
-        return SafeYAPI()._TriggerHubDiscovery();
+        return GetYCtx().TriggerHubDiscovery();
     }
 
     /**
@@ -1324,12 +517,12 @@ public class YAPI
      */
     public static void RegisterDeviceArrivalCallback(YAPI.DeviceArrivalCallback arrivalCallback)
     {
-        SafeYAPI()._RegisterDeviceArrivalCallback(arrivalCallback);
+        GetYCtx().RegisterDeviceArrivalCallback(arrivalCallback);
     }
 
     public static void RegisterDeviceChangeCallback(YAPI.DeviceChangeCallback changeCallback)
     {
-        SafeYAPI()._RegisterDeviceChangeCallback(changeCallback);
+        GetYCtx().RegisterDeviceChangeCallback(changeCallback);
     }
 
     /**
@@ -1342,7 +535,7 @@ public class YAPI
      */
     public static void RegisterDeviceRemovalCallback(YAPI.DeviceRemovalCallback removalCallback)
     {
-        SafeYAPI()._RegisterDeviceRemovalCallback(removalCallback);
+        GetYCtx().RegisterDeviceRemovalCallback(removalCallback);
     }
 
     /**
@@ -1355,9 +548,9 @@ public class YAPI
      * @param hubDiscoveryCallback : a procedure taking two string parameter, or null
      *         to unregister a previously registered  callback.
      */
-    public static void RegisterHubDiscoveryCallback(HubDiscoveryCallback hubDiscoveryCallback)
+    public static void RegisterHubDiscoveryCallback(YAPI.HubDiscoveryCallback hubDiscoveryCallback)
     {
-        SafeYAPI()._RegisterHubDiscoveryCallback(hubDiscoveryCallback);
+        GetYCtx().RegisterHubDiscoveryCallback(hubDiscoveryCallback);
     }
 
     /**
@@ -1369,7 +562,7 @@ public class YAPI
      */
     public static void RegisterLogFunction(YAPI.LogCallback logfun)
     {
-        SafeYAPI()._RegisterLogFunction(logfun);
+        GetYCtx().RegisterLogFunction(logfun);
     }
 
 }

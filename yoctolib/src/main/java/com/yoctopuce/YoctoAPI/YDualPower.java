@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDualPower.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YDualPower.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindDualPower(), the high-level API for DualPower functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YDualPower return codes)
 //--- (end of YDualPower return codes)
@@ -115,12 +114,21 @@ public class YDualPower extends YFunction
      *
      * @param func : functionid
      */
-    protected YDualPower(String func)
+    protected YDualPower(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "DualPower";
         //--- (YDualPower attributes initialization)
         //--- (end of YDualPower attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YDualPower(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YDualPower implementation)
@@ -150,7 +158,7 @@ public class YDualPower extends YFunction
      */
     public int get_powerState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWERSTATE_INVALID;
             }
@@ -182,7 +190,7 @@ public class YDualPower extends YFunction
      */
     public int get_powerControl() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWERCONTROL_INVALID;
             }
@@ -247,7 +255,7 @@ public class YDualPower extends YFunction
      */
     public int get_extVoltage() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return EXTVOLTAGE_INVALID;
             }
@@ -302,6 +310,41 @@ public class YDualPower extends YFunction
     }
 
     /**
+     * Retrieves a dual power control for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the power control is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YDualPower.isOnline() to test if the power control is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a dual power control by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the power control
+     *
+     * @return a YDualPower object allowing you to drive the power control.
+     */
+    public static YDualPower FindDualPowerInContext(YAPIContext yctx,String func)
+    {
+        YDualPower obj;
+        obj = (YDualPower) YFunction._FindFromCacheInContext(yctx, "DualPower", func);
+        if (obj == null) {
+            obj = new YDualPower(yctx, func);
+            YFunction._AddToCache("DualPower", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -349,17 +392,17 @@ public class YDualPower extends YFunction
      *         a dual power control currently online, or a null pointer
      *         if there are no more dual power controls to enumerate.
      */
-    public  YDualPower nextDualPower()
+    public YDualPower nextDualPower()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindDualPower(next_hwid);
+        return FindDualPowerInContext(_yapi, next_hwid);
     }
 
     /**
@@ -373,9 +416,28 @@ public class YDualPower extends YFunction
      */
     public static YDualPower FirstDualPower()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("DualPower");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("DualPower");
         if (next_hwid == null)  return null;
-        return FindDualPower(next_hwid);
+        return FindDualPowerInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of dual power controls currently accessible.
+     * Use the method YDualPower.nextDualPower() to iterate on
+     * next dual power controls.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YDualPower object, corresponding to
+     *         the first dual power control currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YDualPower FirstDualPowerInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("DualPower");
+        if (next_hwid == null)  return null;
+        return FindDualPowerInContext(yctx, next_hwid);
     }
 
     //--- (end of YDualPower implementation)

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataLogger.java 22197 2015-12-02 12:58:24Z mvuilleu $
+ * $Id: YDataLogger.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -46,7 +46,6 @@ import org.json.JSONTokener;
 
 import java.util.ArrayList;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YDataLogger class start)
 /**
@@ -149,7 +148,7 @@ public class YDataLogger extends YFunction
             httpreq += String.format("?run=%d&time=%d", runIdx, timeIdx);
         }
         String result;
-        YDevice dev = SafeYAPI()._yHash.getDevice(devid);
+        YDevice dev = _yapi._yHash.getDevice(devid);
         try {
             result = dev.requestHTTPSyncAsString(httpreq, null);
         } catch (YAPI_Exception ex) {
@@ -167,14 +166,18 @@ public class YDataLogger extends YFunction
     /**
      * @param func : functionid
      */
-    protected YDataLogger(String func)
+    protected YDataLogger(YAPIContext yctx, String func)
     {
-        super(func);
+        super(yctx, func);
         _className = "DataLogger";
         //--- (generated code: YDataLogger attributes initialization)
         //--- (end of generated code: YDataLogger attributes initialization)
     }
 
+    protected YDataLogger(String func)
+    {
+        this(YAPI.GetYCtx(), func);
+    }
 
     /**
      * Builds a list of all data streams hold by the data logger (legacy method).
@@ -269,7 +272,7 @@ public class YDataLogger extends YFunction
      */
     public int get_currentRunIndex() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTRUNINDEX_INVALID;
             }
@@ -300,7 +303,7 @@ public class YDataLogger extends YFunction
      */
     public long get_timeUTC() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TIMEUTC_INVALID;
             }
@@ -361,7 +364,7 @@ public class YDataLogger extends YFunction
      */
     public int get_recording() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RECORDING_INVALID;
             }
@@ -426,7 +429,7 @@ public class YDataLogger extends YFunction
      */
     public int get_autoStart() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AUTOSTART_INVALID;
             }
@@ -493,7 +496,7 @@ public class YDataLogger extends YFunction
      */
     public int get_beaconDriven() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BEACONDRIVEN_INVALID;
             }
@@ -555,7 +558,7 @@ public class YDataLogger extends YFunction
      */
     public int get_clearHistory() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CLEARHISTORY_INVALID;
             }
@@ -613,6 +616,41 @@ public class YDataLogger extends YFunction
         obj = (YDataLogger) YFunction._FindFromCache("DataLogger", func);
         if (obj == null) {
             obj = new YDataLogger(func);
+            YFunction._AddToCache("DataLogger", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a data logger for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the data logger is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YDataLogger.isOnline() to test if the data logger is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a data logger by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the data logger
+     *
+     * @return a YDataLogger object allowing you to drive the data logger.
+     */
+    public static YDataLogger FindDataLoggerInContext(YAPIContext yctx,String func)
+    {
+        YDataLogger obj;
+        obj = (YDataLogger) YFunction._FindFromCacheInContext(yctx, "DataLogger", func);
+        if (obj == null) {
+            obj = new YDataLogger(yctx, func);
             YFunction._AddToCache("DataLogger", func, obj);
         }
         return obj;
@@ -712,17 +750,17 @@ public class YDataLogger extends YFunction
      *         a data logger currently online, or a null pointer
      *         if there are no more data loggers to enumerate.
      */
-    public  YDataLogger nextDataLogger()
+    public YDataLogger nextDataLogger()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindDataLogger(next_hwid);
+        return FindDataLoggerInContext(_yapi, next_hwid);
     }
 
     /**
@@ -736,9 +774,28 @@ public class YDataLogger extends YFunction
      */
     public static YDataLogger FirstDataLogger()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("DataLogger");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("DataLogger");
         if (next_hwid == null)  return null;
-        return FindDataLogger(next_hwid);
+        return FindDataLoggerInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of data loggers currently accessible.
+     * Use the method YDataLogger.nextDataLogger() to iterate on
+     * next data loggers.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YDataLogger object, corresponding to
+     *         the first data logger currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YDataLogger FirstDataLoggerInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("DataLogger");
+        if (next_hwid == null)  return null;
+        return FindDataLoggerInContext(yctx, next_hwid);
     }
 
     //--- (end of generated code: YDataLogger implementation)

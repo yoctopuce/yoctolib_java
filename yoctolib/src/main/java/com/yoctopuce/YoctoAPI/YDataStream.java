@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YDataStream.java 22359 2015-12-15 13:30:10Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -40,8 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 
 import java.util.ArrayList;
-
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YDataStream class start)
 /**
@@ -159,7 +157,7 @@ public class YDataStream
         iCalib = dataset._get_calibration();
         _caltyp = iCalib.get(0).intValue();
         if (_caltyp != 0) {
-            _calhdl = SafeYAPI()._getCalibrationHandler(_caltyp);
+            _calhdl = _parent._yapi._getCalibrationHandler(_caltyp);
             maxpos = iCalib.size();
             _calpar.clear();
             _calraw.clear();
@@ -195,8 +193,8 @@ public class YDataStream
                         _calraw.add(fRaw);
                         _calref.add(fRef);
                     } else {
-                        _calraw.add(SafeYAPI()._decimalToDouble(iRaw));
-                        _calref.add(SafeYAPI()._decimalToDouble(iRef));
+                        _calraw.add(YAPIContext._decimalToDouble(iRaw));
+                        _calref.add(YAPIContext._decimalToDouble(iRef));
                     }
                     i = i + 2;
                 }
@@ -240,7 +238,7 @@ public class YDataStream
             return YAPI.SUCCESS;
         }
         // may throw an exception
-        udat = SafeYAPI()._decodeWords(_parent._json_get_string(sdata));
+        udat = YAPIContext._decodeWords(_parent._json_get_string(sdata));
         _values.clear();
         idx = 0;
         if (_isAvg) {
@@ -304,7 +302,7 @@ public class YDataStream
             if (_isScal) {
                 val = (val - _offset) / _scale;
             } else {
-                val = SafeYAPI()._decimalToDouble(w);
+                val = YAPIContext._decimalToDouble(w);
             }
         }
         if (_caltyp != 0) {

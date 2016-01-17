@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YGenericSensor.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YGenericSensor return codes)
 //--- (end of YGenericSensor return codes)
@@ -128,12 +127,21 @@ public class YGenericSensor extends YSensor
      *
      * @param func : functionid
      */
-    protected YGenericSensor(String func)
+    protected YGenericSensor(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "GenericSensor";
         //--- (YGenericSensor attributes initialization)
         //--- (end of YGenericSensor attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YGenericSensor(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YGenericSensor implementation)
@@ -205,7 +213,7 @@ public class YGenericSensor extends YSensor
      */
     public double get_signalValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALVALUE_INVALID;
             }
@@ -263,7 +271,7 @@ public class YGenericSensor extends YSensor
      */
     public String get_signalRange() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALRANGE_INVALID;
             }
@@ -323,7 +331,7 @@ public class YGenericSensor extends YSensor
      */
     public String get_valueRange() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VALUERANGE_INVALID;
             }
@@ -422,7 +430,7 @@ public class YGenericSensor extends YSensor
      */
     public double get_signalBias() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALBIAS_INVALID;
             }
@@ -460,7 +468,7 @@ public class YGenericSensor extends YSensor
      */
     public int get_signalSampling() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNALSAMPLING_INVALID;
             }
@@ -567,6 +575,41 @@ public class YGenericSensor extends YSensor
     }
 
     /**
+     * Retrieves a generic sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the generic sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YGenericSensor.isOnline() to test if the generic sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a generic sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the generic sensor
+     *
+     * @return a YGenericSensor object allowing you to drive the generic sensor.
+     */
+    public static YGenericSensor FindGenericSensorInContext(YAPIContext yctx,String func)
+    {
+        YGenericSensor obj;
+        obj = (YGenericSensor) YFunction._FindFromCacheInContext(yctx, "GenericSensor", func);
+        if (obj == null) {
+            obj = new YGenericSensor(yctx, func);
+            YFunction._AddToCache("GenericSensor", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -620,10 +663,12 @@ public class YGenericSensor extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackGenericSensor = callback;
         return 0;
@@ -664,17 +709,17 @@ public class YGenericSensor extends YSensor
      *         a generic sensor currently online, or a null pointer
      *         if there are no more generic sensors to enumerate.
      */
-    public  YGenericSensor nextGenericSensor()
+    public YGenericSensor nextGenericSensor()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindGenericSensor(next_hwid);
+        return FindGenericSensorInContext(_yapi, next_hwid);
     }
 
     /**
@@ -688,9 +733,28 @@ public class YGenericSensor extends YSensor
      */
     public static YGenericSensor FirstGenericSensor()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("GenericSensor");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("GenericSensor");
         if (next_hwid == null)  return null;
-        return FindGenericSensor(next_hwid);
+        return FindGenericSensorInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of generic sensors currently accessible.
+     * Use the method YGenericSensor.nextGenericSensor() to iterate on
+     * next generic sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YGenericSensor object, corresponding to
+     *         the first generic sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YGenericSensor FirstGenericSensorInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("GenericSensor");
+        if (next_hwid == null)  return null;
+        return FindGenericSensorInContext(yctx, next_hwid);
     }
 
     //--- (end of YGenericSensor implementation)

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpMonitor.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YWakeUpMonitor.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YWakeUpMonitor return codes)
 //--- (end of YWakeUpMonitor return codes)
@@ -129,12 +128,21 @@ public class YWakeUpMonitor extends YFunction
      *
      * @param func : functionid
      */
-    protected YWakeUpMonitor(String func)
+    protected YWakeUpMonitor(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "WakeUpMonitor";
         //--- (YWakeUpMonitor attributes initialization)
         //--- (end of YWakeUpMonitor attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YWakeUpMonitor(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YWakeUpMonitor implementation)
@@ -171,7 +179,7 @@ public class YWakeUpMonitor extends YFunction
      */
     public int get_powerDuration() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWERDURATION_INVALID;
             }
@@ -233,7 +241,7 @@ public class YWakeUpMonitor extends YFunction
      */
     public int get_sleepCountdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SLEEPCOUNTDOWN_INVALID;
             }
@@ -293,7 +301,7 @@ public class YWakeUpMonitor extends YFunction
      */
     public long get_nextWakeUp() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return NEXTWAKEUP_INVALID;
             }
@@ -356,7 +364,7 @@ public class YWakeUpMonitor extends YFunction
      */
     public int get_wakeUpReason() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WAKEUPREASON_INVALID;
             }
@@ -388,7 +396,7 @@ public class YWakeUpMonitor extends YFunction
      */
     public int get_wakeUpState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WAKEUPSTATE_INVALID;
             }
@@ -426,7 +434,7 @@ public class YWakeUpMonitor extends YFunction
      */
     public long get_rtcTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RTCTIME_INVALID;
             }
@@ -471,6 +479,41 @@ public class YWakeUpMonitor extends YFunction
         obj = (YWakeUpMonitor) YFunction._FindFromCache("WakeUpMonitor", func);
         if (obj == null) {
             obj = new YWakeUpMonitor(func);
+            YFunction._AddToCache("WakeUpMonitor", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a monitor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the monitor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YWakeUpMonitor.isOnline() to test if the monitor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a monitor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the monitor
+     *
+     * @return a YWakeUpMonitor object allowing you to drive the monitor.
+     */
+    public static YWakeUpMonitor FindWakeUpMonitorInContext(YAPIContext yctx,String func)
+    {
+        YWakeUpMonitor obj;
+        obj = (YWakeUpMonitor) YFunction._FindFromCacheInContext(yctx, "WakeUpMonitor", func);
+        if (obj == null) {
+            obj = new YWakeUpMonitor(yctx, func);
             YFunction._AddToCache("WakeUpMonitor", func, obj);
         }
         return obj;
@@ -609,17 +652,17 @@ public class YWakeUpMonitor extends YFunction
      *         a monitor currently online, or a null pointer
      *         if there are no more monitors to enumerate.
      */
-    public  YWakeUpMonitor nextWakeUpMonitor()
+    public YWakeUpMonitor nextWakeUpMonitor()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindWakeUpMonitor(next_hwid);
+        return FindWakeUpMonitorInContext(_yapi, next_hwid);
     }
 
     /**
@@ -633,9 +676,28 @@ public class YWakeUpMonitor extends YFunction
      */
     public static YWakeUpMonitor FirstWakeUpMonitor()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("WakeUpMonitor");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("WakeUpMonitor");
         if (next_hwid == null)  return null;
-        return FindWakeUpMonitor(next_hwid);
+        return FindWakeUpMonitorInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of monitors currently accessible.
+     * Use the method YWakeUpMonitor.nextWakeUpMonitor() to iterate on
+     * next monitors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YWakeUpMonitor object, corresponding to
+     *         the first monitor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YWakeUpMonitor FirstWakeUpMonitorInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("WakeUpMonitor");
+        if (next_hwid == null)  return null;
+        return FindWakeUpMonitorInContext(yctx, next_hwid);
     }
 
     //--- (end of YWakeUpMonitor implementation)

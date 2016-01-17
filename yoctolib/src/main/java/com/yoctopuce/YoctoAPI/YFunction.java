@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YFunction.java 22543 2015-12-24 12:16:21Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -47,8 +47,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static com.yoctopuce.YoctoAPI.YAPI.DeviceCharset;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YFunction class start)
 /**
@@ -73,9 +71,9 @@ public class YFunction
 //--- (end of generated code: YFunction class start)
 
     public static final String FUNCTIONDESCRIPTOR_INVALID = "!INVALID!";
-
-    protected String _className;
-    protected String _func;
+    protected final YAPIContext _yapi;
+    protected String _className; // todo: look if we can make this final
+    protected final String _func;
     protected int _lastErrorType;
     protected String _lastErrorMsg;
     protected Object _userData;
@@ -128,8 +126,9 @@ public class YFunction
     /**
      * @param func : functionid
      */
-    protected YFunction(String func)
+    protected YFunction(YAPIContext yctx, String func)
     {
+        _yapi = yctx;
         _className = "Function";
         _func = func;
         _lastErrorType = YAPI.SUCCESS;
@@ -140,33 +139,51 @@ public class YFunction
         //--- (end of generated code: YFunction attributes initialization)
     }
 
+    public YFunction(String func)
+    {
+        _yapi = YAPI.GetYCtx();
+        _className = "Function";
+        _func = func;
+        _lastErrorType = YAPI.SUCCESS;
+        _lastErrorMsg = "";
+        _userData = null;
+        _dataStreams = new HashMap<String, YDataStream>();
+        //--- (generated code: YFunction attributes initialization)
+        //--- (end of generated code: YFunction attributes initialization)
+
+    }
+
     protected void _throw(int error, String message) throws YAPI_Exception
     {
         throw new YAPI_Exception(error, message);
     }
 
+    protected static YFunction _FindFromCacheInContext(YAPIContext yctx, String className, String func)
+    {
+        return yctx._yHash.getFunction(className, func);
+    }
+
     protected static YFunction _FindFromCache(String className, String func)
     {
-        return SafeYAPI()._yHash.getFunction(className, func);
+        YAPIContext ctx = YAPI.GetYCtx();
+        return ctx._yHash.getFunction(className, func);
     }
+
 
     protected static void _AddToCache(String className, String func, YFunction obj)
     {
-        SafeYAPI()._yHash.setFunction(className, func, obj);
+        obj._yapi._yHash.setFunction(className, func, obj);
     }
-
 
     protected static void _UpdateValueCallbackList(YFunction func, boolean add)
     {
-        SafeYAPI()._UpdateValueCallbackList(func, add);
+        func._yapi._UpdateValueCallbackList(func, add);
     }
-
 
     protected static void _UpdateTimedReportCallbackList(YFunction func, boolean add)
     {
-        SafeYAPI()._UpdateTimedReportCallbackList(func, add);
+        func._yapi._UpdateTimedReportCallbackList(func, add);
     }
-
 
     //--- (generated code: YFunction implementation)
     protected void  _parseAttr(JSONObject json_val) throws JSONException
@@ -188,7 +205,7 @@ public class YFunction
      */
     public String get_logicalName() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOGICALNAME_INVALID;
             }
@@ -256,7 +273,7 @@ public class YFunction
      */
     public String get_advertisedValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ADVERTISEDVALUE_INVALID;
             }
@@ -318,6 +335,41 @@ public class YFunction
         obj = (YFunction) YFunction._FindFromCache("Function", func);
         if (obj == null) {
             obj = new YFunction(func);
+            YFunction._AddToCache("Function", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a function for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the function is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YFunction.isOnline() to test if the function is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a function by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the function
+     *
+     * @return a YFunction object allowing you to drive the function.
+     */
+    public static YFunction FindFunctionInContext(YAPIContext yctx,String func)
+    {
+        YFunction obj;
+        obj = (YFunction) YFunction._FindFromCacheInContext(yctx, "Function", func);
+        if (obj == null) {
+            obj = new YFunction(yctx, func);
             YFunction._AddToCache("Function", func, obj);
         }
         return obj;
@@ -401,17 +453,17 @@ public class YFunction
     /**
      * comment from .yc definition
      */
-    public  YFunction nextFunction()
+    public YFunction nextFunction()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindFunction(next_hwid);
+        return FindFunctionInContext(_yapi, next_hwid);
     }
 
     /**
@@ -419,9 +471,20 @@ public class YFunction
      */
     public static YFunction FirstFunction()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Function");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Function");
         if (next_hwid == null)  return null;
-        return FindFunction(next_hwid);
+        return FindFunctionInContext(yctx, next_hwid);
+    }
+
+    /**
+     * comment from .yc definition
+     */
+    public static YFunction FirstFunctionInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Function");
+        if (next_hwid == null)  return null;
+        return FindFunctionInContext(yctx, next_hwid);
     }
 
     //--- (end of generated code: YFunction implementation)
@@ -445,7 +508,7 @@ public class YFunction
     public String describe()
     {
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
             return _className + "(" + _func + ")=" + hwid;
         } catch (YAPI_Exception ignored) {
         }
@@ -465,12 +528,12 @@ public class YFunction
      */
     public String get_hardwareId() throws YAPI_Exception
     {
-        return SafeYAPI()._yHash.resolveHwID(_className, _func);
+        return _yapi._yHash.resolveHwID(_className, _func);
     }
 
     public String getHardwareId() throws YAPI_Exception
     {
-        return SafeYAPI()._yHash.resolveHwID(_className, _func);
+        return _yapi._yHash.resolveHwID(_className, _func);
     }
 
 
@@ -484,12 +547,12 @@ public class YFunction
      */
     public String get_functionId() throws YAPI_Exception
     {
-        return SafeYAPI()._yHash.resolveFuncId(_className, _func);
+        return _yapi._yHash.resolveFuncId(_className, _func);
     }
 
     public String getFunctionId() throws YAPI_Exception
     {
-        return SafeYAPI()._yHash.resolveFuncId(_className, _func);
+        return _yapi._yHash.resolveFuncId(_className, _func);
     }
 
 
@@ -506,7 +569,7 @@ public class YFunction
      */
     public String get_friendlyName() throws YAPI_Exception
     {
-        SafeYAPI()._yHash.resolveHwID(_className, _func);
+        _yapi._yHash.resolveHwID(_className, _func);
 
         if (_className.equals("Module")) {
             if (_logicalName.equals(""))
@@ -514,8 +577,8 @@ public class YFunction
             else
                 return _logicalName + ".module";
         } else {
-            String moduleHwId = SafeYAPI()._yHash.resolveHwID("Module", _serial);
-            YModule module = YModule.FindModule(moduleHwId);
+            String moduleHwId = _yapi._yHash.resolveHwID("Module", _serial);
+            YModule module = YModule.FindModuleInContext(_yapi, moduleHwId);
             String modname = module.get_logicalName();
             if (modname.equals("")) {
                 modname = module.get_serialNumber();
@@ -553,7 +616,7 @@ public class YFunction
     protected String _escapeAttr(String newval) throws YAPI_Exception
     {
         try {
-            String escaped = URLEncoder.encode(newval, YAPI.DefaultEncoding);
+            String escaped = URLEncoder.encode(newval, _yapi._defaultEncoding);
             escaped = escaped.replace("%21", "!")
                     .replace("%23", "#").replace("%24", "$")
                     .replace("%27", "'").replace("%28", "(").replace("%29", ")")
@@ -575,7 +638,7 @@ public class YFunction
         }
         String attrname;
         try {
-            attrname = URLEncoder.encode(attr, YAPI.DefaultEncoding);
+            attrname = URLEncoder.encode(attr, _yapi._defaultEncoding);
         } catch (UnsupportedEncodingException ex) {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Unsupported Encoding");
         }
@@ -601,11 +664,7 @@ public class YFunction
 
     protected int _upload(String pathname, String content) throws YAPI_Exception
     {
-        try {
-            return this._upload(pathname, content.getBytes(YAPI.DefaultEncoding));
-        } catch (UnsupportedEncodingException e) {
-            throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, e.getLocalizedMessage());
-        }
+        return this._upload(pathname, content.getBytes(_yapi._deviceCharset));
     }
 
     protected byte[] _download(String url) throws YAPI_Exception
@@ -619,7 +678,7 @@ public class YFunction
     {
         JSONObject obj = null;
         try {
-            obj = new JSONObject(new String(json, YAPI.DeviceCharset));
+            obj = new JSONObject(new String(json, _yapi._deviceCharset));
         } catch (JSONException ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
@@ -636,7 +695,7 @@ public class YFunction
     {
         JSONArray array = null;
         try {
-            String s = new String(json, YAPI.DeviceCharset);
+            String s = new String(json, _yapi._deviceCharset);
             array = new JSONArray("[" + s + "]");
         } catch (JSONException ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
@@ -652,7 +711,7 @@ public class YFunction
     {
         JSONArray array = null;
         try {
-            array = new JSONArray(new String(json, DeviceCharset));
+            array = new JSONArray(new String(json, _yapi._deviceCharset));
         } catch (JSONException ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
@@ -706,8 +765,6 @@ public class YFunction
                         e.printStackTrace();
                         return "";
                     }
-                } else {
-                    System.out.println("instance of " + obj.toString());
                 }
             }
 
@@ -715,8 +772,6 @@ public class YFunction
                 return _get_json_path_array(jsonObject.optJSONArray(key), paths, ofs + 1);
             } else if (obj instanceof JSONObject) {
                 return _get_json_path_struct(jsonObject.optJSONObject(key), paths, ofs + 1);
-            } else {
-                System.out.println("instance of " + obj.toString());
             }
         }
         return "";
@@ -759,8 +814,6 @@ public class YFunction
                 return _get_json_path_array(jsonArray.optJSONArray(key), paths, ofs + 1);
             } else if (obj instanceof JSONObject) {
                 return _get_json_path_struct(jsonArray.optJSONObject(key), paths, ofs + 1);
-            } else {
-                System.out.println("instance of " + obj.toString());
             }
         }
         return "";
@@ -800,7 +853,7 @@ public class YFunction
     protected JSONObject _devRequest(String extra) throws YAPI_Exception
     {
         YDevice dev = getYDevice();
-        _hwId = SafeYAPI()._yHash.resolveHwID(_className, _func);
+        _hwId = _yapi._yHash.resolveHwID(_className, _func);
         String[] split = _hwId.split("\\.");
         _funId = split[1];
         _serial = split[0];
@@ -842,7 +895,7 @@ public class YFunction
 
     YDevice getYDevice() throws YAPI_Exception
     {
-        return SafeYAPI().funcGetDevice(_className, _func);
+        return _yapi.funcGetDevice(_className, _func);
     }
 
     // Method used to cache DataStream objects (new DataLogger)
@@ -853,7 +906,7 @@ public class YFunction
             return _dataStreams.get(key);
         }
 
-        YDataStream newDataStream = new YDataStream(this, dataset, YAPI._decodeWords(def));
+        YDataStream newDataStream = new YDataStream(this, dataset, YAPIContext._decodeWords(def));
         _dataStreams.put(key, newDataStream);
         return newDataStream;
     }
@@ -881,7 +934,7 @@ public class YFunction
         }
         try {
             // Check that the function is available without throwing exceptions
-            load(SafeYAPI().DefaultCacheValidity);
+            load(_yapi.DefaultCacheValidity);
         } catch (YAPI_Exception ex) {
             return false;
         }
@@ -996,25 +1049,25 @@ public class YFunction
     {
         // try to resolve the function name to a device id without query
         if (_serial != null && !_serial.equals("")) {
-            return YModule.FindModule(_serial + ".module");
+            return YModule.FindModuleInContext(_yapi, _serial + ".module");
         }
         if (_func.indexOf('.') == -1) {
             try {
-                String serial = SafeYAPI()._yHash.resolveSerial(_className, _func);
-                return YModule.FindModule(serial + ".module");
+                String serial = _yapi._yHash.resolveSerial(_className, _func);
+                return YModule.FindModuleInContext(_yapi, serial + ".module");
             } catch (YAPI_Exception ignored) {
             }
         }
         try {
             // device not resolved for now, force a communication for a last chance resolution
             if (load(YAPI.DefaultCacheValidity) == YAPI.SUCCESS) {
-                String serial = SafeYAPI()._yHash.resolveSerial(_className, _func);
-                return YModule.FindModule(serial + ".module");
+                String serial = _yapi._yHash.resolveSerial(_className, _func);
+                return YModule.FindModuleInContext(_yapi, serial + ".module");
             }
         } catch (YAPI_Exception ignored) {
         }
         // return a true yFindModule object even if it is not a module valid for communicating
-        return YModule.FindModule("module_of_" + _className + "_" + _func);
+        return YModule.FindModuleInContext(_yapi, "module_of_" + _className + "_" + _func);
     }
 
     public YModule getModule()
@@ -1040,7 +1093,7 @@ public class YFunction
     {
         // try to resolve the function name to a device id without query
         try {
-            return SafeYAPI()._yHash.resolveHwID(_className, _func);
+            return _yapi._yHash.resolveHwID(_className, _func);
         } catch (YAPI_Exception ignored) {
             return FUNCTIONDESCRIPTOR_INVALID;
         }

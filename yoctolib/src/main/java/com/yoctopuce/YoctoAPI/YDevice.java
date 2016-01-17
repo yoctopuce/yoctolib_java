@@ -1,40 +1,38 @@
 /*********************************************************************
- *
- * $Id: YDevice.java 22318 2015-12-11 09:10:27Z seb $
+ * $Id: YDevice.java 22743 2016-01-14 09:54:52Z seb $
  *
  * Internal YDevice class
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
- *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
- *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ * Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ * non-exclusive license to use, modify, copy and integrate this
+ * file into your software for the sole purpose of interfacing
+ * with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
- *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
- *  this notice in the distributed source file.
+ * You may reproduce and distribute copies of this file in
+ * source or object form, as long as the sole purpose of this
+ * code is to interface with Yoctopuce products. You must retain
+ * this notice in the distributed source file.
  *
- *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
- *  obligations.
+ * You should refer to Yoctopuce General Terms and Conditions
+ * for additional information regarding your rights and
+ * obligations.
  *
- *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *  WARRANTY, OR OTHERWISE.
- *
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ * EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ * COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ * SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
+ * LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ * WARRANTY, OR OTHERWISE.
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
@@ -44,7 +42,6 @@ import org.json.JSONObject;
 
 import java.util.*;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //
 // YDevice Class (used internally)
@@ -63,7 +60,7 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 public class YDevice
 {
     private YGenericHub _hub;
-    private WPEntry _wpRec;
+    WPEntry _wpRec;
     private long _cache_expiration;
     private String _cache_json;
     private final HashMap<Integer, YPEntry> _ypRecs;
@@ -183,7 +180,7 @@ public class YDevice
                     }
                     if (func.has("advertisedValue")) {
                         String pubval = func.getString("advertisedValue");
-                        SafeYAPI()._yHash.setFunctionValue(_wpRec.getSerialNumber(), pubval);
+                        _hub._yctx._yHash.setFunctionValue(_wpRec.getSerialNumber(), pubval);
                     }
                     for (int f = 0; f < _ypRecs.size(); f++) {
                         if (_ypRecs.get(f).getFuncId().equals(key)) {
@@ -201,7 +198,7 @@ public class YDevice
         }
 
         if (reindex) {
-            SafeYAPI()._yHash.reindexDevice(this);
+            _hub._yctx._yHash.reindexDevice(this);
         }
         return YAPI.SUCCESS;
     }
@@ -229,20 +226,29 @@ public class YDevice
     byte[] requestHTTPSync(String request, byte[] rest_of_request) throws YAPI_Exception
     {
         String shortRequest = formatRequest(request);
-        return _hub.devRequestSync(this, shortRequest, rest_of_request);
+        try {
+            return _hub.devRequestSync(this, shortRequest, rest_of_request);
+        } catch (InterruptedException e) {
+            throw new YAPI_Exception(YAPI.IO_ERROR,
+                    "Thread has been interrupted");
+        }
     }
 
     String requestHTTPSyncAsString(String request, byte[] rest_of_request) throws YAPI_Exception
     {
-        String shortRequest = formatRequest(request);
-        final byte[] bytes = _hub.devRequestSync(this, shortRequest, rest_of_request);
-        return new String(bytes, YAPI.DeviceCharset);
+        final byte[] bytes = requestHTTPSync(request, rest_of_request);
+        return new String(bytes, _hub._yctx._deviceCharset);
     }
 
     void requestHTTPAsync(String request, byte[] rest_of_request, YGenericHub.RequestAsyncResult asyncResult, Object context) throws YAPI_Exception
     {
         String shortRequest = formatRequest(request);
-        _hub.devRequestAsync(this, shortRequest, rest_of_request, asyncResult, context);
+        try {
+            _hub.devRequestAsync(this, shortRequest, rest_of_request, asyncResult, context);
+        } catch (InterruptedException e) {
+            throw new YAPI_Exception(YAPI.IO_ERROR,
+                    "Thread has been interrupted");
+        }
     }
 
     private String formatRequest(String request) throws YAPI_Exception
@@ -299,7 +305,7 @@ public class YDevice
             String logs = resultStr.substring(0, pos);
             String posStr = resultStr.substring(pos + 1);
             _logpos = Integer.valueOf(posStr);
-            YModule module = YModule.FindModule(getSerialNumber());
+            YModule module = YModule.FindModuleInContext(_hub._yctx, getSerialNumber());
             String[] lines = logs.split("\n");
             for (String line : lines) {
                 _logCallback.logCallback(module, line);
@@ -317,7 +323,7 @@ public class YDevice
         try {
             requestHTTPAsync(request, null, _logCallbackHandler, _logpos);
         } catch (YAPI_Exception ex) {
-            SafeYAPI()._Log("LOG error:" + ex.getLocalizedMessage());
+            _hub._yctx._Log("LOG error:" + ex.getLocalizedMessage());
         }
     }
 
@@ -337,7 +343,7 @@ public class YDevice
         // find a valid boundary
         do {
             boundary = String.format("Zz%06xzZ", randomGenerator.nextInt(0x1000000));
-        } while(mp_header.contains(boundary) && YAPI._find_in_bytes(content,boundary.getBytes())>=0);
+        } while (mp_header.contains(boundary) && YAPIContext._find_in_bytes(content, boundary.getBytes()) >= 0);
         //construct header parts
         String header_start = "Content-Type: multipart/form-data; boundary=" + boundary + "\r\n\r\n--" + boundary + "\r\n" + mp_header;
         String header_stop = "\r\n--" + boundary + "--\r\n";

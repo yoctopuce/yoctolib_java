@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPower.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YPower.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindPower(), the high-level API for Power functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YPower return codes)
 //--- (end of YPower return codes)
@@ -108,12 +107,21 @@ public class YPower extends YSensor
      *
      * @param func : functionid
      */
-    protected YPower(String func)
+    protected YPower(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Power";
         //--- (YPower attributes initialization)
         //--- (end of YPower attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YPower(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YPower implementation)
@@ -143,7 +151,7 @@ public class YPower extends YSensor
      */
     public double get_cosPhi() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COSPHI_INVALID;
             }
@@ -189,7 +197,7 @@ public class YPower extends YSensor
      */
     public double get_meter() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return METER_INVALID;
             }
@@ -220,7 +228,7 @@ public class YPower extends YSensor
      */
     public int get_meterTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return METERTIMER_INVALID;
             }
@@ -269,6 +277,41 @@ public class YPower extends YSensor
         obj = (YPower) YFunction._FindFromCache("Power", func);
         if (obj == null) {
             obj = new YPower(func);
+            YFunction._AddToCache("Power", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a electrical power sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the electrical power sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YPower.isOnline() to test if the electrical power sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a electrical power sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the electrical power sensor
+     *
+     * @return a YPower object allowing you to drive the electrical power sensor.
+     */
+    public static YPower FindPowerInContext(YAPIContext yctx,String func)
+    {
+        YPower obj;
+        obj = (YPower) YFunction._FindFromCacheInContext(yctx, "Power", func);
+        if (obj == null) {
+            obj = new YPower(yctx, func);
             YFunction._AddToCache("Power", func, obj);
         }
         return obj;
@@ -328,10 +371,12 @@ public class YPower extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackPower = callback;
         return 0;
@@ -367,17 +412,17 @@ public class YPower extends YSensor
      *         a electrical power sensor currently online, or a null pointer
      *         if there are no more electrical power sensors to enumerate.
      */
-    public  YPower nextPower()
+    public YPower nextPower()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindPower(next_hwid);
+        return FindPowerInContext(_yapi, next_hwid);
     }
 
     /**
@@ -391,9 +436,28 @@ public class YPower extends YSensor
      */
     public static YPower FirstPower()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Power");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Power");
         if (next_hwid == null)  return null;
-        return FindPower(next_hwid);
+        return FindPowerInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of electrical power sensors currently accessible.
+     * Use the method YPower.nextPower() to iterate on
+     * next electrical power sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YPower object, corresponding to
+     *         the first electrical power sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YPower FirstPowerInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Power");
+        if (next_hwid == null)  return null;
+        return FindPowerInContext(yctx, next_hwid);
     }
 
     //--- (end of YPower implementation)

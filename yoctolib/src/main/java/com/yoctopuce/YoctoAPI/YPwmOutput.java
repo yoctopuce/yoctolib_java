@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmOutput.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YPwmOutput.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YPwmOutput return codes)
 //--- (end of YPwmOutput return codes)
@@ -133,12 +132,21 @@ public class YPwmOutput extends YFunction
      *
      * @param func : functionid
      */
-    protected YPwmOutput(String func)
+    protected YPwmOutput(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "PwmOutput";
         //--- (YPwmOutput attributes initialization)
         //--- (end of YPwmOutput attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YPwmOutput(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YPwmOutput implementation)
@@ -181,7 +189,7 @@ public class YPwmOutput extends YFunction
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLED_INVALID;
             }
@@ -274,7 +282,7 @@ public class YPwmOutput extends YFunction
      */
     public double get_frequency() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREQUENCY_INVALID;
             }
@@ -334,7 +342,7 @@ public class YPwmOutput extends YFunction
      */
     public double get_period() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PERIOD_INVALID;
             }
@@ -394,7 +402,7 @@ public class YPwmOutput extends YFunction
      */
     public double get_dutyCycle() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DUTYCYCLE_INVALID;
             }
@@ -457,7 +465,7 @@ public class YPwmOutput extends YFunction
      */
     public double get_pulseDuration() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSEDURATION_INVALID;
             }
@@ -483,7 +491,7 @@ public class YPwmOutput extends YFunction
      */
     public String get_pwmTransition() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PWMTRANSITION_INVALID;
             }
@@ -522,7 +530,7 @@ public class YPwmOutput extends YFunction
      */
     public int get_enabledAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLEDATPOWERON_INVALID;
             }
@@ -621,7 +629,7 @@ public class YPwmOutput extends YFunction
      */
     public double get_dutyCycleAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DUTYCYCLEATPOWERON_INVALID;
             }
@@ -671,6 +679,41 @@ public class YPwmOutput extends YFunction
         obj = (YPwmOutput) YFunction._FindFromCache("PwmOutput", func);
         if (obj == null) {
             obj = new YPwmOutput(func);
+            YFunction._AddToCache("PwmOutput", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a PWM for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the PWM is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YPwmOutput.isOnline() to test if the PWM is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a PWM by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the PWM
+     *
+     * @return a YPwmOutput object allowing you to drive the PWM.
+     */
+    public static YPwmOutput FindPwmOutputInContext(YAPIContext yctx,String func)
+    {
+        YPwmOutput obj;
+        obj = (YPwmOutput) YFunction._FindFromCacheInContext(yctx, "PwmOutput", func);
+        if (obj == null) {
+            obj = new YPwmOutput(yctx, func);
             YFunction._AddToCache("PwmOutput", func, obj);
         }
         return obj;
@@ -770,17 +813,17 @@ public class YPwmOutput extends YFunction
      *         a PWM currently online, or a null pointer
      *         if there are no more PWMs to enumerate.
      */
-    public  YPwmOutput nextPwmOutput()
+    public YPwmOutput nextPwmOutput()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindPwmOutput(next_hwid);
+        return FindPwmOutputInContext(_yapi, next_hwid);
     }
 
     /**
@@ -794,9 +837,28 @@ public class YPwmOutput extends YFunction
      */
     public static YPwmOutput FirstPwmOutput()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("PwmOutput");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("PwmOutput");
         if (next_hwid == null)  return null;
-        return FindPwmOutput(next_hwid);
+        return FindPwmOutputInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of PWMs currently accessible.
+     * Use the method YPwmOutput.nextPwmOutput() to iterate on
+     * next PWMs.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YPwmOutput object, corresponding to
+     *         the first PWM currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YPwmOutput FirstPwmOutputInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("PwmOutput");
+        if (next_hwid == null)  return null;
+        return FindPwmOutputInContext(yctx, next_hwid);
     }
 
     //--- (end of YPwmOutput implementation)

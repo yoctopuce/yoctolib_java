@@ -2,6 +2,7 @@ package com.yoctopuce.YoctoAPI;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -153,7 +154,7 @@ public class YFirmwareFile {
                         throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid checksum");
                     }
                 } catch (NoSuchAlgorithmException ignore) {
-                    YAPI.SafeYAPI()._Log("Unable to verfiy MD5 of firmware " + path);
+                    throw new YAPI_Exception(YAPI.IO_ERROR, "Unable to verfiy MD5 of firmware " + path);
                 }
                 prog_buf = new byte[YAPI.YOCTO_FIRMWARE_LEN];
                 buffer.get(prog_buf);
@@ -182,7 +183,7 @@ public class YFirmwareFile {
         for (i = 0; i < serial_buf.length && serial_buf[i] != 0; ) {
             i++;
         }
-        return new String(serial_buf, 0, i, YAPI.DeviceCharset);
+        return new String(serial_buf, 0, i, StandardCharsets.ISO_8859_1);
     }
 
     private static String checkProgField(byte[] prog_buf) throws YAPI_Exception

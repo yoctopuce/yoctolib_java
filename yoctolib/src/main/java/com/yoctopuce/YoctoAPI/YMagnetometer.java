@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMagnetometer.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YMagnetometer.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YMagnetometer return codes)
 //--- (end of YMagnetometer return codes)
@@ -113,12 +112,21 @@ public class YMagnetometer extends YSensor
      *
      * @param func : functionid
      */
-    protected YMagnetometer(String func)
+    protected YMagnetometer(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Magnetometer";
         //--- (YMagnetometer attributes initialization)
         //--- (end of YMagnetometer attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YMagnetometer(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YMagnetometer implementation)
@@ -147,7 +155,7 @@ public class YMagnetometer extends YSensor
      */
     public double get_xValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return XVALUE_INVALID;
             }
@@ -178,7 +186,7 @@ public class YMagnetometer extends YSensor
      */
     public double get_yValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YVALUE_INVALID;
             }
@@ -209,7 +217,7 @@ public class YMagnetometer extends YSensor
      */
     public double get_zValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ZVALUE_INVALID;
             }
@@ -259,6 +267,41 @@ public class YMagnetometer extends YSensor
         obj = (YMagnetometer) YFunction._FindFromCache("Magnetometer", func);
         if (obj == null) {
             obj = new YMagnetometer(func);
+            YFunction._AddToCache("Magnetometer", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a magnetometer for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the magnetometer is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YMagnetometer.isOnline() to test if the magnetometer is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a magnetometer by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the magnetometer
+     *
+     * @return a YMagnetometer object allowing you to drive the magnetometer.
+     */
+    public static YMagnetometer FindMagnetometerInContext(YAPIContext yctx,String func)
+    {
+        YMagnetometer obj;
+        obj = (YMagnetometer) YFunction._FindFromCacheInContext(yctx, "Magnetometer", func);
+        if (obj == null) {
+            obj = new YMagnetometer(yctx, func);
             YFunction._AddToCache("Magnetometer", func, obj);
         }
         return obj;
@@ -318,10 +361,12 @@ public class YMagnetometer extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackMagnetometer = callback;
         return 0;
@@ -345,17 +390,17 @@ public class YMagnetometer extends YSensor
      *         a magnetometer currently online, or a null pointer
      *         if there are no more magnetometers to enumerate.
      */
-    public  YMagnetometer nextMagnetometer()
+    public YMagnetometer nextMagnetometer()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindMagnetometer(next_hwid);
+        return FindMagnetometerInContext(_yapi, next_hwid);
     }
 
     /**
@@ -369,9 +414,28 @@ public class YMagnetometer extends YSensor
      */
     public static YMagnetometer FirstMagnetometer()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Magnetometer");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Magnetometer");
         if (next_hwid == null)  return null;
-        return FindMagnetometer(next_hwid);
+        return FindMagnetometerInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of magnetometers currently accessible.
+     * Use the method YMagnetometer.nextMagnetometer() to iterate on
+     * next magnetometers.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YMagnetometer object, corresponding to
+     *         the first magnetometer currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YMagnetometer FirstMagnetometerInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Magnetometer");
+        if (next_hwid == null)  return null;
+        return FindMagnetometerInContext(yctx, next_hwid);
     }
 
     //--- (end of YMagnetometer implementation)

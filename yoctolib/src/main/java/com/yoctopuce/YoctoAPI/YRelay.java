@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRelay.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YRelay.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindRelay(), the high-level API for Relay functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YRelay return codes)
 //--- (end of YRelay return codes)
@@ -147,12 +146,21 @@ public class YRelay extends YFunction
      *
      * @param func : functionid
      */
-    protected YRelay(String func)
+    protected YRelay(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Relay";
         //--- (YRelay attributes initialization)
         //--- (end of YRelay attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YRelay(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YRelay implementation)
@@ -208,7 +216,7 @@ public class YRelay extends YFunction
      */
     public int get_state() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STATE_INVALID;
             }
@@ -274,7 +282,7 @@ public class YRelay extends YFunction
      */
     public int get_stateAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STATEATPOWERON_INVALID;
             }
@@ -343,7 +351,7 @@ public class YRelay extends YFunction
      */
     public long get_maxTimeOnStateA() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAXTIMEONSTATEA_INVALID;
             }
@@ -407,7 +415,7 @@ public class YRelay extends YFunction
      */
     public long get_maxTimeOnStateB() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAXTIMEONSTATEB_INVALID;
             }
@@ -471,7 +479,7 @@ public class YRelay extends YFunction
      */
     public int get_output() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OUTPUT_INVALID;
             }
@@ -537,7 +545,7 @@ public class YRelay extends YFunction
      */
     public long get_pulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSETIMER_INVALID;
             }
@@ -596,7 +604,7 @@ public class YRelay extends YFunction
      */
     public YDelayedPulse get_delayedPulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DELAYEDPULSETIMER_INVALID;
             }
@@ -654,7 +662,7 @@ public class YRelay extends YFunction
      */
     public long get_countdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COUNTDOWN_INVALID;
             }
@@ -711,6 +719,41 @@ public class YRelay extends YFunction
     }
 
     /**
+     * Retrieves a relay for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the relay is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YRelay.isOnline() to test if the relay is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a relay by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the relay
+     *
+     * @return a YRelay object allowing you to drive the relay.
+     */
+    public static YRelay FindRelayInContext(YAPIContext yctx,String func)
+    {
+        YRelay obj;
+        obj = (YRelay) YFunction._FindFromCacheInContext(yctx, "Relay", func);
+        if (obj == null) {
+            obj = new YRelay(yctx, func);
+            YFunction._AddToCache("Relay", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -758,17 +801,17 @@ public class YRelay extends YFunction
      *         a relay currently online, or a null pointer
      *         if there are no more relays to enumerate.
      */
-    public  YRelay nextRelay()
+    public YRelay nextRelay()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindRelay(next_hwid);
+        return FindRelayInContext(_yapi, next_hwid);
     }
 
     /**
@@ -782,9 +825,28 @@ public class YRelay extends YFunction
      */
     public static YRelay FirstRelay()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Relay");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Relay");
         if (next_hwid == null)  return null;
-        return FindRelay(next_hwid);
+        return FindRelayInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of relays currently accessible.
+     * Use the method YRelay.nextRelay() to iterate on
+     * next relays.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YRelay object, corresponding to
+     *         the first relay currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YRelay FirstRelayInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Relay");
+        if (next_hwid == null)  return null;
+        return FindRelayInContext(yctx, next_hwid);
     }
 
     //--- (end of YRelay implementation)

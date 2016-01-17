@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 22318 2015-12-11 09:10:27Z seb $
+ * $Id: YGenericHub.java 22749 2016-01-14 15:52:29Z seb $
  *
  * Internal YGenericHub object
  *
@@ -37,7 +37,6 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import com.yoctopuce.YoctoAPI.YAPI.PlugEvent.Event;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -45,15 +44,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 abstract class YGenericHub
 {
 
-    protected static final int NOTIFY_V2_LEGACY = 0;       // unused (reserved for compatibility with legacy notifications)
-    protected static final int NOTIFY_V2_6RAWBYTES = 1;       // largest type: data is always 6 bytes
-    protected static final int NOTIFY_V2_TYPEDDATA = 2;       // other types: first data byte holds the decoding format
-    protected static final int NOTIFY_V2_FLUSHGROUP = 3;       // no data associated
+    static final int NOTIFY_V2_LEGACY = 0;       // unused (reserved for compatibility with legacy notifications)
+    static final int NOTIFY_V2_6RAWBYTES = 1;       // largest type: data is always 6 bytes
+    static final int NOTIFY_V2_TYPEDDATA = 2;       // other types: first data byte holds the decoding format
+    static final int NOTIFY_V2_FLUSHGROUP = 3;       // no data associated
+
+    // stream type
+    static final int YSTREAM_EMPTY = 0;
+    static final int YSTREAM_TCP = 1;
+    static final int YSTREAM_TCP_CLOSE = 2;
+    static final int YSTREAM_NOTICE = 3;
+    static final int YSTREAM_REPORT = 4;
+    static final int YSTREAM_META = 5;
+    static final int YSTREAM_REPORT_V2 = 6;
+    static final int YSTREAM_NOTICE_V2 = 7;
+    static final int YSTREAM_TCP_NOTIF = 8;
 
     private static final int PUBVAL_LEGACY = 0;   // 0-6 ASCII characters (normally sent as YSTREAM_NOTICE)
     private static final int PUBVAL_1RAWBYTE = 1;   // 1 raw byte  (=2 characters)
@@ -67,19 +76,25 @@ abstract class YGenericHub
     private static final int PUBVAL_YOCTO_FLOAT_E3 = 9;   // 32-bit Yocto fixed-point format (e-3)
     private static final int PUBVAL_YOCTO_FLOAT_E6 = 10;   // 32-bit Yocto fixed-point format (e-6)
 
+    public static final long YPROG_BOOTLOADER_TIMEOUT = 10000;
+    protected final YAPIContext _yctx;
+    final HTTPParams _http_params;
     protected int _hubidx;
     protected long _notifyTrigger = 0;
     protected Object _notifyHandle = null;
     protected volatile long _devListValidity = 500;
     protected long _devListExpires = 0;
-    protected final ConcurrentHashMap<Integer, String> _serialByYdx = new ConcurrentHashMap <Integer, String>();
+    protected final ConcurrentHashMap<Integer, String> _serialByYdx = new ConcurrentHashMap<Integer, String>();
     protected HashMap<String, YDevice> _devices = new HashMap<String, YDevice>();
     protected final boolean _reportConnnectionLost;
+    private String _hubSerialNumber = null;
 
-    public YGenericHub(int idx, boolean reportConnnectionLost)
+    public YGenericHub(YAPIContext yctx, HTTPParams httpParams, int idx, boolean reportConnnectionLost)
     {
+        _yctx = yctx;
         _hubidx = idx;
         _reportConnnectionLost = reportConnnectionLost;
+        _http_params = httpParams;
     }
 
     abstract void release();
@@ -180,7 +195,6 @@ abstract class YGenericHub
         // by default consider all known device as unplugged
         ArrayList<YDevice> toRemove = new ArrayList<YDevice>(_devices.values());
 
-        YAPI yapi = SafeYAPI();
         for (WPEntry wp : whitePages) {
             String serial = wp.getSerialNumber();
             if (_devices.containsKey(serial)) {
@@ -189,39 +203,79 @@ abstract class YGenericHub
                 if (!currdev.getLogicalName().equals(wp.getLogicalName())) {
                     // Reindex device from its own data
                     currdev.refresh();
-                    yapi.pushPlugEvent(Event.CHANGE, serial);
+                    _yctx._pushPlugEvent(YAPIContext.PlugEvent.Event.CHANGE, serial);
                 } else if (currdev.getBeacon() > 0 != wp.getBeacon() > 0) {
                     currdev.refresh();
                 }
                 toRemove.remove(currdev);
             } else {
                 YDevice dev = new YDevice(this, wp, yellowPages);
-                yapi._yHash.reindexDevice(dev);
+                _yctx._yHash.reindexDevice(dev);
                 _devices.put(serial, dev);
-                yapi.pushPlugEvent(Event.PLUG, serial);
-                yapi._Log("HUB: device " + serial + " has been plugged\n");
+                _yctx._pushPlugEvent(YAPIContext.PlugEvent.Event.PLUG, serial);
+                _yctx._Log("HUB: device " + serial + " has been plugged\n");
             }
         }
 
         for (YDevice dev : toRemove) {
             String serial = dev.getSerialNumber();
-            yapi.pushPlugEvent(Event.UNPLUG, serial);
-            yapi._Log("HUB: device " + serial + " has been unplugged\n");
+            _yctx._pushPlugEvent(YAPIContext.PlugEvent.Event.UNPLUG, serial);
+            _yctx._Log("HUB: device " + serial + " has been unplugged\n");
             _devices.remove(serial);
         }
 
-        yapi._yHash.reindexYellowPages(yellowPages);
+        if (_hubSerialNumber == null) {
+            for (WPEntry wp : whitePages) {
+                if (wp.getNetworkUrl().equals("")) {
+                    _hubSerialNumber = wp.getSerialNumber();
+                }
+            }
+        }
+        _yctx._yHash.reindexYellowPages(yellowPages);
 
+    }
+
+    String getSerialNumber()
+    {
+        return _hubSerialNumber;
+    }
+
+    public String get_urlOf(String serialNumber)
+    {
+        for (YDevice dev : _devices.values()) {
+            String devSerialNumber = dev.getSerialNumber();
+            if (devSerialNumber.equals(serialNumber)) {
+                return _http_params.getUrl(true, false) + dev._wpRec.getNetworkUrl();
+            }
+        }
+        return _http_params.getUrl(true, false);
+    }
+
+    public ArrayList<String> get_subDeviceOf(String serialNumber)
+    {
+        ArrayList<String> res = new ArrayList<>();
+        for (YDevice dev : _devices.values()) {
+            String devSerialNumber = dev.getSerialNumber();
+            if (devSerialNumber.equals(serialNumber)) {
+                if (!dev._wpRec.getNetworkUrl().equals("")) {
+                    //
+                    res.clear();
+                    return res;
+                }
+            }
+            res.add(devSerialNumber);
+        }
+        return res;
     }
 
     protected void handleValueNotification(String serial, String funcid, String value)
     {
         String hwid = serial + "." + funcid;
-        SafeYAPI()._yHash.setFunctionValue(hwid, value);
-        YAPI yapi = SafeYAPI();
-        YFunction conn_fn = yapi._GetValueCallback(hwid);
+
+        _yctx._yHash.setFunctionValue(hwid, value);
+        YFunction conn_fn = _yctx._GetValueCallback(hwid);
         if (conn_fn != null) {
-            yapi._PushDataEvent(new YAPI.DataEvent(conn_fn, value));
+            _yctx._PushDataEvent(new YAPIContext.DataEvent(conn_fn, value));
         }
 
     }
@@ -234,22 +288,22 @@ abstract class YGenericHub
             int i = b & 0xff;
             arrayList.add(i);
         }
-        handleTimedNotification(serial,funcid,deviceTime,arrayList);
+        handleTimedNotification(serial, funcid, deviceTime, arrayList);
     }
 
 
     protected void handleTimedNotification(String serial, String funcid, double deviceTime, ArrayList<Integer> report)
     {
         String hwid = serial + "." + funcid;
-        YFunction func = SafeYAPI()._GetTimedReportCallback(hwid);
+        YFunction func = _yctx._GetTimedReportCallback(hwid);
         if (func != null) {
-            SafeYAPI()._PushDataEvent(new YAPI.DataEvent(func, deviceTime, report));
+            _yctx._PushDataEvent(new YAPIContext.DataEvent(func, deviceTime, report));
         }
     }
 
-    abstract void updateDeviceList(boolean forceupdate) throws YAPI_Exception;
+    abstract void updateDeviceList(boolean forceupdate) throws YAPI_Exception, InterruptedException;
 
-    public abstract ArrayList<String> getBootloaders() throws YAPI_Exception;
+    public abstract ArrayList<String> getBootloaders() throws YAPI_Exception, InterruptedException;
 
     abstract int ping(int mstimeout) throws YAPI_Exception;
 
@@ -271,9 +325,9 @@ abstract class YGenericHub
         void RequestAsyncDone(Object context, byte[] result, int error, String errmsg);
     }
 
-    abstract void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception;
+    abstract void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception, InterruptedException;
 
-    abstract byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body) throws YAPI_Exception;
+    abstract byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body) throws YAPI_Exception, InterruptedException;
 
 
     protected static class HTTPParams
@@ -283,12 +337,22 @@ abstract class YGenericHub
         private final int _port;
         private final String _user;
         private final String _pass;
+        private final String _proto;
 
         public HTTPParams(String url)
         {
             int pos = 0;
-            if (url.startsWith("http://")) {
-                pos = 7;
+            if (url.startsWith("ws://")) {
+                pos = 5;
+                _proto = "ws";
+            } else if (url.startsWith("usb://")) {
+                pos = 6;
+                _proto = "usb";
+            } else {
+                _proto = "http";
+                if (url.startsWith("http://")) {
+                    pos = 7;
+                }
             }
             int end_auth = url.indexOf('@', pos);
             int end_user = url.indexOf(':', pos);
@@ -334,10 +398,19 @@ abstract class YGenericHub
             return _user;
         }
 
-        public String getUrl()
+        String getUrl()
+        {
+            return getUrl(false, true);
+        }
+
+
+        String getUrl(boolean withProto, boolean withUserPass)
         {
             StringBuilder url = new StringBuilder();
-            if (!_user.equals("")) {
+            if (withProto) {
+                url.append(_proto).append("://");
+            }
+            if (withUserPass && !_user.equals("")) {
                 url.append(_user);
                 if (!_pass.equals("")) {
                     url.append(":");
@@ -347,8 +420,13 @@ abstract class YGenericHub
             }
             url.append(_host);
             url.append(":");
-            url.append(_pass);
+            url.append(_port);
             return url.toString();
+        }
+
+        public boolean isWebSocket()
+        {
+            return _proto.equals("ws");
         }
     }
 }

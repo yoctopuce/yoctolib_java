@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataSet.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YDataSet.java 22359 2015-12-15 13:30:10Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -126,10 +126,10 @@ public class YDataSet
             _functionId = json.getString("id");
             _unit = json.getString("unit");
             if (json.has("calib")) {
-                _calib = YAPI._decodeFloats(json.getString("calib"));
+                _calib = YAPIContext._decodeFloats(json.getString("calib"));
                 _calib.set(0, _calib.get(0) / 1000);
             } else {
-                _calib = YAPI._decodeWords(json.getString("cal"));
+                _calib = YAPIContext._decodeWords(json.getString("cal"));
             }
             _streams = new ArrayList<YDataStream>();
             _preview = new ArrayList<YMeasure>();

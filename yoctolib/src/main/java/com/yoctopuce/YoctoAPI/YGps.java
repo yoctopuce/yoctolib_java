@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGps.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YGps.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindGps(), the high-level API for Gps functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YGps return codes)
 //--- (end of YGps return codes)
@@ -163,12 +162,21 @@ public class YGps extends YFunction
      *
      * @param func : functionid
      */
-    protected YGps(String func)
+    protected YGps(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Gps";
         //--- (YGps attributes initialization)
         //--- (end of YGps attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YGps(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YGps implementation)
@@ -227,7 +235,7 @@ public class YGps extends YFunction
      */
     public int get_isFixed() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ISFIXED_INVALID;
             }
@@ -257,7 +265,7 @@ public class YGps extends YFunction
      */
     public long get_satCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SATCOUNT_INVALID;
             }
@@ -287,7 +295,7 @@ public class YGps extends YFunction
      */
     public int get_coordSystem() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COORDSYSTEM_INVALID;
             }
@@ -350,7 +358,7 @@ public class YGps extends YFunction
      */
     public String get_latitude() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LATITUDE_INVALID;
             }
@@ -379,7 +387,7 @@ public class YGps extends YFunction
      */
     public String get_longitude() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LONGITUDE_INVALID;
             }
@@ -410,7 +418,7 @@ public class YGps extends YFunction
      */
     public double get_dilution() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DILUTION_INVALID;
             }
@@ -442,7 +450,7 @@ public class YGps extends YFunction
      */
     public double get_altitude() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ALTITUDE_INVALID;
             }
@@ -472,7 +480,7 @@ public class YGps extends YFunction
      */
     public double get_groundSpeed() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return GROUNDSPEED_INVALID;
             }
@@ -503,7 +511,7 @@ public class YGps extends YFunction
      */
     public double get_direction() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DIRECTION_INVALID;
             }
@@ -536,7 +544,7 @@ public class YGps extends YFunction
      */
     public long get_unixTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UNIXTIME_INVALID;
             }
@@ -567,7 +575,7 @@ public class YGps extends YFunction
      */
     public String get_dateTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DATETIME_INVALID;
             }
@@ -596,7 +604,7 @@ public class YGps extends YFunction
      */
     public int get_utcOffset() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UTCOFFSET_INVALID;
             }
@@ -656,7 +664,7 @@ public class YGps extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -720,6 +728,41 @@ public class YGps extends YFunction
     }
 
     /**
+     * Retrieves a GPS for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the GPS is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YGps.isOnline() to test if the GPS is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a GPS by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the GPS
+     *
+     * @return a YGps object allowing you to drive the GPS.
+     */
+    public static YGps FindGpsInContext(YAPIContext yctx,String func)
+    {
+        YGps obj;
+        obj = (YGps) YFunction._FindFromCacheInContext(yctx, "Gps", func);
+        if (obj == null) {
+            obj = new YGps(yctx, func);
+            YFunction._AddToCache("Gps", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -767,17 +810,17 @@ public class YGps extends YFunction
      *         a GPS currently online, or a null pointer
      *         if there are no more GPS to enumerate.
      */
-    public  YGps nextGps()
+    public YGps nextGps()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindGps(next_hwid);
+        return FindGpsInContext(_yapi, next_hwid);
     }
 
     /**
@@ -791,9 +834,28 @@ public class YGps extends YFunction
      */
     public static YGps FirstGps()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Gps");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Gps");
         if (next_hwid == null)  return null;
-        return FindGps(next_hwid);
+        return FindGpsInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of GPS currently accessible.
+     * Use the method YGps.nextGps() to iterate on
+     * next GPS.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YGps object, corresponding to
+     *         the first GPS currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YGps FirstGpsInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Gps");
+        if (next_hwid == null)  return null;
+        return FindGpsInContext(yctx, next_hwid);
     }
 
     //--- (end of YGps implementation)

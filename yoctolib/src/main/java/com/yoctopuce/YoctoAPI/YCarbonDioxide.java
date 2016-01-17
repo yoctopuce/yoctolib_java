@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCarbonDioxide.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YCarbonDioxide.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YCarbonDioxide return codes)
 //--- (end of YCarbonDioxide return codes)
@@ -103,12 +102,21 @@ public class YCarbonDioxide extends YSensor
      *
      * @param func : functionid
      */
-    protected YCarbonDioxide(String func)
+    protected YCarbonDioxide(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "CarbonDioxide";
         //--- (YCarbonDioxide attributes initialization)
         //--- (end of YCarbonDioxide attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YCarbonDioxide(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YCarbonDioxide implementation)
@@ -134,7 +142,7 @@ public class YCarbonDioxide extends YSensor
      */
     public int get_abcPeriod() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ABCPERIOD_INVALID;
             }
@@ -199,7 +207,7 @@ public class YCarbonDioxide extends YSensor
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -263,6 +271,41 @@ public class YCarbonDioxide extends YSensor
     }
 
     /**
+     * Retrieves a CO2 sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the CO2 sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YCarbonDioxide.isOnline() to test if the CO2 sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a CO2 sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the CO2 sensor
+     *
+     * @return a YCarbonDioxide object allowing you to drive the CO2 sensor.
+     */
+    public static YCarbonDioxide FindCarbonDioxideInContext(YAPIContext yctx,String func)
+    {
+        YCarbonDioxide obj;
+        obj = (YCarbonDioxide) YFunction._FindFromCacheInContext(yctx, "CarbonDioxide", func);
+        if (obj == null) {
+            obj = new YCarbonDioxide(yctx, func);
+            YFunction._AddToCache("CarbonDioxide", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -316,10 +359,12 @@ public class YCarbonDioxide extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackCarbonDioxide = callback;
         return 0;
@@ -383,17 +428,17 @@ public class YCarbonDioxide extends YSensor
      *         a CO2 sensor currently online, or a null pointer
      *         if there are no more CO2 sensors to enumerate.
      */
-    public  YCarbonDioxide nextCarbonDioxide()
+    public YCarbonDioxide nextCarbonDioxide()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindCarbonDioxide(next_hwid);
+        return FindCarbonDioxideInContext(_yapi, next_hwid);
     }
 
     /**
@@ -407,9 +452,28 @@ public class YCarbonDioxide extends YSensor
      */
     public static YCarbonDioxide FirstCarbonDioxide()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("CarbonDioxide");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("CarbonDioxide");
         if (next_hwid == null)  return null;
-        return FindCarbonDioxide(next_hwid);
+        return FindCarbonDioxideInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of CO2 sensors currently accessible.
+     * Use the method YCarbonDioxide.nextCarbonDioxide() to iterate on
+     * next CO2 sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YCarbonDioxide object, corresponding to
+     *         the first CO2 sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YCarbonDioxide FirstCarbonDioxideInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("CarbonDioxide");
+        if (next_hwid == null)  return null;
+        return FindCarbonDioxideInContext(yctx, next_hwid);
     }
 
     //--- (end of YCarbonDioxide implementation)

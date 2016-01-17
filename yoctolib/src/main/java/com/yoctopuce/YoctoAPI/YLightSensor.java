@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YLightSensor.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YLightSensor return codes)
 //--- (end of YLightSensor return codes)
@@ -106,12 +105,21 @@ public class YLightSensor extends YSensor
      *
      * @param func : functionid
      */
-    protected YLightSensor(String func)
+    protected YLightSensor(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "LightSensor";
         //--- (YLightSensor attributes initialization)
         //--- (end of YLightSensor attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YLightSensor(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YLightSensor implementation)
@@ -169,7 +177,7 @@ public class YLightSensor extends YSensor
      */
     public int get_measureType() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MEASURETYPE_INVALID;
             }
@@ -267,6 +275,41 @@ public class YLightSensor extends YSensor
     }
 
     /**
+     * Retrieves a light sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the light sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YLightSensor.isOnline() to test if the light sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a light sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the light sensor
+     *
+     * @return a YLightSensor object allowing you to drive the light sensor.
+     */
+    public static YLightSensor FindLightSensorInContext(YAPIContext yctx,String func)
+    {
+        YLightSensor obj;
+        obj = (YLightSensor) YFunction._FindFromCacheInContext(yctx, "LightSensor", func);
+        if (obj == null) {
+            obj = new YLightSensor(yctx, func);
+            YFunction._AddToCache("LightSensor", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -320,10 +363,12 @@ public class YLightSensor extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackLightSensor = callback;
         return 0;
@@ -347,17 +392,17 @@ public class YLightSensor extends YSensor
      *         a light sensor currently online, or a null pointer
      *         if there are no more light sensors to enumerate.
      */
-    public  YLightSensor nextLightSensor()
+    public YLightSensor nextLightSensor()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindLightSensor(next_hwid);
+        return FindLightSensorInContext(_yapi, next_hwid);
     }
 
     /**
@@ -371,9 +416,28 @@ public class YLightSensor extends YSensor
      */
     public static YLightSensor FirstLightSensor()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("LightSensor");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("LightSensor");
         if (next_hwid == null)  return null;
-        return FindLightSensor(next_hwid);
+        return FindLightSensorInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of light sensors currently accessible.
+     * Use the method YLightSensor.nextLightSensor() to iterate on
+     * next light sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YLightSensor object, corresponding to
+     *         the first light sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YLightSensor FirstLightSensorInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("LightSensor");
+        if (next_hwid == null)  return null;
+        return FindLightSensorInContext(yctx, next_hwid);
     }
 
     //--- (end of YLightSensor implementation)

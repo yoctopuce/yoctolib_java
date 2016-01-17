@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YWireless.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -43,8 +43,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YWireless class start)
 /**
@@ -127,13 +125,19 @@ public class YWireless extends YFunction
     /**
      * @param func : functionid
      */
-    protected YWireless(String func)
+    protected YWireless(YAPIContext yctx, String func)
     {
-        super(func);
+        super(yctx, func);
         _className = "Wireless";
         //--- (generated code: YWireless attributes initialization)
         //--- (end of generated code: YWireless attributes initialization)
     }
+
+    protected YWireless(String func)
+    {
+        this(YAPI.GetYCtx(), func);
+    }
+
 
     //--- (generated code: YWireless implementation)
     @Override
@@ -169,7 +173,7 @@ public class YWireless extends YFunction
      */
     public int get_linkQuality() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LINKQUALITY_INVALID;
             }
@@ -198,7 +202,7 @@ public class YWireless extends YFunction
      */
     public String get_ssid() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SSID_INVALID;
             }
@@ -228,7 +232,7 @@ public class YWireless extends YFunction
      */
     public int get_channel() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CHANNEL_INVALID;
             }
@@ -260,7 +264,7 @@ public class YWireless extends YFunction
      */
     public int get_security() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SECURITY_INVALID;
             }
@@ -290,7 +294,7 @@ public class YWireless extends YFunction
      */
     public String get_message() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MESSAGE_INVALID;
             }
@@ -315,7 +319,7 @@ public class YWireless extends YFunction
      */
     public String get_wlanConfig() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WLANCONFIG_INVALID;
             }
@@ -373,6 +377,41 @@ public class YWireless extends YFunction
         obj = (YWireless) YFunction._FindFromCache("Wireless", func);
         if (obj == null) {
             obj = new YWireless(func);
+            YFunction._AddToCache("Wireless", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a wireless lan interface for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the wireless lan interface is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YWireless.isOnline() to test if the wireless lan interface is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a wireless lan interface by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the wireless lan interface
+     *
+     * @return a YWireless object allowing you to drive the wireless lan interface.
+     */
+    public static YWireless FindWirelessInContext(YAPIContext yctx,String func)
+    {
+        YWireless obj;
+        obj = (YWireless) YFunction._FindFromCacheInContext(yctx, "Wireless", func);
+        if (obj == null) {
+            obj = new YWireless(yctx, func);
             YFunction._AddToCache("Wireless", func, obj);
         }
         return obj;
@@ -517,17 +556,17 @@ public class YWireless extends YFunction
      *         a wireless lan interface currently online, or a null pointer
      *         if there are no more wireless lan interfaces to enumerate.
      */
-    public  YWireless nextWireless()
+    public YWireless nextWireless()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindWireless(next_hwid);
+        return FindWirelessInContext(_yapi, next_hwid);
     }
 
     /**
@@ -541,9 +580,28 @@ public class YWireless extends YFunction
      */
     public static YWireless FirstWireless()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Wireless");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Wireless");
         if (next_hwid == null)  return null;
-        return FindWireless(next_hwid);
+        return FindWirelessInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of wireless lan interfaces currently accessible.
+     * Use the method YWireless.nextWireless() to iterate on
+     * next wireless lan interfaces.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YWireless object, corresponding to
+     *         the first wireless lan interface currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YWireless FirstWirelessInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Wireless");
+        if (next_hwid == null)  return null;
+        return FindWirelessInContext(yctx, next_hwid);
     }
 
     //--- (end of generated code: YWireless implementation)

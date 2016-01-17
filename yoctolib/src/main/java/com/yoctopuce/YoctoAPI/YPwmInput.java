@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmInput.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YPwmInput.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YPwmInput return codes)
 //--- (end of YPwmInput return codes)
@@ -133,12 +132,21 @@ public class YPwmInput extends YSensor
      *
      * @param func : functionid
      */
-    protected YPwmInput(String func)
+    protected YPwmInput(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "PwmInput";
         //--- (YPwmInput attributes initialization)
         //--- (end of YPwmInput attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YPwmInput(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YPwmInput implementation)
@@ -178,7 +186,7 @@ public class YPwmInput extends YSensor
      */
     public double get_dutyCycle() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DUTYCYCLE_INVALID;
             }
@@ -208,7 +216,7 @@ public class YPwmInput extends YSensor
      */
     public double get_pulseDuration() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSEDURATION_INVALID;
             }
@@ -238,7 +246,7 @@ public class YPwmInput extends YSensor
      */
     public double get_frequency() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREQUENCY_INVALID;
             }
@@ -267,7 +275,7 @@ public class YPwmInput extends YSensor
      */
     public double get_period() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PERIOD_INVALID;
             }
@@ -298,7 +306,7 @@ public class YPwmInput extends YSensor
      */
     public long get_pulseCounter() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSECOUNTER_INVALID;
             }
@@ -342,7 +350,7 @@ public class YPwmInput extends YSensor
      */
     public long get_pulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSETIMER_INVALID;
             }
@@ -375,7 +383,7 @@ public class YPwmInput extends YSensor
      */
     public int get_pwmReportMode() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PWMREPORTMODE_INVALID;
             }
@@ -473,6 +481,41 @@ public class YPwmInput extends YSensor
     }
 
     /**
+     * Retrieves a PWM input for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the PWM input is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YPwmInput.isOnline() to test if the PWM input is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a PWM input by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the PWM input
+     *
+     * @return a YPwmInput object allowing you to drive the PWM input.
+     */
+    public static YPwmInput FindPwmInputInContext(YAPIContext yctx,String func)
+    {
+        YPwmInput obj;
+        obj = (YPwmInput) YFunction._FindFromCacheInContext(yctx, "PwmInput", func);
+        if (obj == null) {
+            obj = new YPwmInput(yctx, func);
+            YFunction._AddToCache("PwmInput", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -526,10 +569,12 @@ public class YPwmInput extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackPwmInput = callback;
         return 0;
@@ -565,17 +610,17 @@ public class YPwmInput extends YSensor
      *         a PWM input currently online, or a null pointer
      *         if there are no more PWM inputs to enumerate.
      */
-    public  YPwmInput nextPwmInput()
+    public YPwmInput nextPwmInput()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindPwmInput(next_hwid);
+        return FindPwmInputInContext(_yapi, next_hwid);
     }
 
     /**
@@ -589,9 +634,28 @@ public class YPwmInput extends YSensor
      */
     public static YPwmInput FirstPwmInput()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("PwmInput");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("PwmInput");
         if (next_hwid == null)  return null;
-        return FindPwmInput(next_hwid);
+        return FindPwmInputInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of PWM inputs currently accessible.
+     * Use the method YPwmInput.nextPwmInput() to iterate on
+     * next PWM inputs.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YPwmInput object, corresponding to
+     *         the first PWM input currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YPwmInput FirstPwmInputInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("PwmInput");
+        if (next_hwid == null)  return null;
+        return FindPwmInputInContext(yctx, next_hwid);
     }
 
     //--- (end of YPwmInput implementation)

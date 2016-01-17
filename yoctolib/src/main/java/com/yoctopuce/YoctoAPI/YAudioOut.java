@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAudioOut.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YAudioOut.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindAudioOut(), the high-level API for AudioOut functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YAudioOut return codes)
 //--- (end of YAudioOut return codes)
@@ -116,12 +115,21 @@ public class YAudioOut extends YFunction
      *
      * @param func : functionid
      */
-    protected YAudioOut(String func)
+    protected YAudioOut(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "AudioOut";
         //--- (YAudioOut attributes initialization)
         //--- (end of YAudioOut attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YAudioOut(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YAudioOut implementation)
@@ -155,7 +163,7 @@ public class YAudioOut extends YFunction
      */
     public int get_volume() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLUME_INVALID;
             }
@@ -215,7 +223,7 @@ public class YAudioOut extends YFunction
      */
     public int get_mute() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MUTE_INVALID;
             }
@@ -280,7 +288,7 @@ public class YAudioOut extends YFunction
      */
     public String get_volumeRange() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLUMERANGE_INVALID;
             }
@@ -312,7 +320,7 @@ public class YAudioOut extends YFunction
      */
     public int get_signal() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SIGNAL_INVALID;
             }
@@ -341,7 +349,7 @@ public class YAudioOut extends YFunction
      */
     public int get_noSignalFor() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return NOSIGNALFOR_INVALID;
             }
@@ -396,6 +404,41 @@ public class YAudioOut extends YFunction
     }
 
     /**
+     * Retrieves an audio output for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the audio output is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YAudioOut.isOnline() to test if the audio output is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * an audio output by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the audio output
+     *
+     * @return a YAudioOut object allowing you to drive the audio output.
+     */
+    public static YAudioOut FindAudioOutInContext(YAPIContext yctx,String func)
+    {
+        YAudioOut obj;
+        obj = (YAudioOut) YFunction._FindFromCacheInContext(yctx, "AudioOut", func);
+        if (obj == null) {
+            obj = new YAudioOut(yctx, func);
+            YFunction._AddToCache("AudioOut", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -443,17 +486,17 @@ public class YAudioOut extends YFunction
      *         an audio output currently online, or a null pointer
      *         if there are no more audio outputs to enumerate.
      */
-    public  YAudioOut nextAudioOut()
+    public YAudioOut nextAudioOut()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindAudioOut(next_hwid);
+        return FindAudioOutInContext(_yapi, next_hwid);
     }
 
     /**
@@ -467,9 +510,28 @@ public class YAudioOut extends YFunction
      */
     public static YAudioOut FirstAudioOut()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("AudioOut");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("AudioOut");
         if (next_hwid == null)  return null;
-        return FindAudioOut(next_hwid);
+        return FindAudioOutInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of audio outputs currently accessible.
+     * Use the method YAudioOut.nextAudioOut() to iterate on
+     * next audio outputs.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YAudioOut object, corresponding to
+     *         the first audio output currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YAudioOut FirstAudioOutInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("AudioOut");
+        if (next_hwid == null)  return null;
+        return FindAudioOutInContext(yctx, next_hwid);
     }
 
     //--- (end of YAudioOut implementation)

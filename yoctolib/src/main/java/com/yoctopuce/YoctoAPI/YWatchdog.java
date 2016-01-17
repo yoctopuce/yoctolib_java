@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YWatchdog.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YWatchdog return codes)
 //--- (end of YWatchdog return codes)
@@ -170,12 +169,21 @@ public class YWatchdog extends YFunction
      *
      * @param func : functionid
      */
-    protected YWatchdog(String func)
+    protected YWatchdog(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Watchdog";
         //--- (YWatchdog attributes initialization)
         //--- (end of YWatchdog attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YWatchdog(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YWatchdog implementation)
@@ -243,7 +251,7 @@ public class YWatchdog extends YFunction
      */
     public int get_state() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STATE_INVALID;
             }
@@ -309,7 +317,7 @@ public class YWatchdog extends YFunction
      */
     public int get_stateAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STATEATPOWERON_INVALID;
             }
@@ -378,7 +386,7 @@ public class YWatchdog extends YFunction
      */
     public long get_maxTimeOnStateA() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAXTIMEONSTATEA_INVALID;
             }
@@ -442,7 +450,7 @@ public class YWatchdog extends YFunction
      */
     public long get_maxTimeOnStateB() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAXTIMEONSTATEB_INVALID;
             }
@@ -506,7 +514,7 @@ public class YWatchdog extends YFunction
      */
     public int get_output() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OUTPUT_INVALID;
             }
@@ -572,7 +580,7 @@ public class YWatchdog extends YFunction
      */
     public long get_pulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSETIMER_INVALID;
             }
@@ -631,7 +639,7 @@ public class YWatchdog extends YFunction
      */
     public YDelayedPulse get_delayedPulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DELAYEDPULSETIMER_INVALID;
             }
@@ -689,7 +697,7 @@ public class YWatchdog extends YFunction
      */
     public long get_countdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COUNTDOWN_INVALID;
             }
@@ -721,7 +729,7 @@ public class YWatchdog extends YFunction
      */
     public int get_autoStart() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AUTOSTART_INVALID;
             }
@@ -785,7 +793,7 @@ public class YWatchdog extends YFunction
      */
     public int get_running() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RUNNING_INVALID;
             }
@@ -864,7 +872,7 @@ public class YWatchdog extends YFunction
      */
     public long get_triggerDelay() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TRIGGERDELAY_INVALID;
             }
@@ -927,7 +935,7 @@ public class YWatchdog extends YFunction
      */
     public long get_triggerDuration() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TRIGGERDURATION_INVALID;
             }
@@ -1013,6 +1021,41 @@ public class YWatchdog extends YFunction
     }
 
     /**
+     * Retrieves a watchdog for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the watchdog is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YWatchdog.isOnline() to test if the watchdog is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a watchdog by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the watchdog
+     *
+     * @return a YWatchdog object allowing you to drive the watchdog.
+     */
+    public static YWatchdog FindWatchdogInContext(YAPIContext yctx,String func)
+    {
+        YWatchdog obj;
+        obj = (YWatchdog) YFunction._FindFromCacheInContext(yctx, "Watchdog", func);
+        if (obj == null) {
+            obj = new YWatchdog(yctx, func);
+            YFunction._AddToCache("Watchdog", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -1060,17 +1103,17 @@ public class YWatchdog extends YFunction
      *         a watchdog currently online, or a null pointer
      *         if there are no more watchdog to enumerate.
      */
-    public  YWatchdog nextWatchdog()
+    public YWatchdog nextWatchdog()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindWatchdog(next_hwid);
+        return FindWatchdogInContext(_yapi, next_hwid);
     }
 
     /**
@@ -1084,9 +1127,28 @@ public class YWatchdog extends YFunction
      */
     public static YWatchdog FirstWatchdog()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Watchdog");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Watchdog");
         if (next_hwid == null)  return null;
-        return FindWatchdog(next_hwid);
+        return FindWatchdogInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of watchdog currently accessible.
+     * Use the method YWatchdog.nextWatchdog() to iterate on
+     * next watchdog.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YWatchdog object, corresponding to
+     *         the first watchdog currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YWatchdog FirstWatchdogInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Watchdog");
+        if (next_hwid == null)  return null;
+        return FindWatchdogInContext(yctx, next_hwid);
     }
 
     //--- (end of YWatchdog implementation)

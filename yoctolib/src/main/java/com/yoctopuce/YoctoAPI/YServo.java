@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YServo.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YServo.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindServo(), the high-level API for Servo functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YServo return codes)
 //--- (end of YServo return codes)
@@ -136,12 +135,21 @@ public class YServo extends YFunction
      *
      * @param func : functionid
      */
-    protected YServo(String func)
+    protected YServo(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Servo";
         //--- (YServo attributes initialization)
         //--- (end of YServo attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YServo(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YServo implementation)
@@ -193,7 +201,7 @@ public class YServo extends YFunction
      */
     public int get_position() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POSITION_INVALID;
             }
@@ -253,7 +261,7 @@ public class YServo extends YFunction
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLED_INVALID;
             }
@@ -313,7 +321,7 @@ public class YServo extends YFunction
      */
     public int get_range() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RANGE_INVALID;
             }
@@ -385,7 +393,7 @@ public class YServo extends YFunction
      */
     public int get_neutral() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return NEUTRAL_INVALID;
             }
@@ -453,7 +461,7 @@ public class YServo extends YFunction
      */
     public YMove get_move() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MOVE_INVALID;
             }
@@ -509,7 +517,7 @@ public class YServo extends YFunction
      */
     public int get_positionAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POSITIONATPOWERON_INVALID;
             }
@@ -572,7 +580,7 @@ public class YServo extends YFunction
      */
     public int get_enabledAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLEDATPOWERON_INVALID;
             }
@@ -661,6 +669,41 @@ public class YServo extends YFunction
     }
 
     /**
+     * Retrieves a servo for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the servo is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YServo.isOnline() to test if the servo is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a servo by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the servo
+     *
+     * @return a YServo object allowing you to drive the servo.
+     */
+    public static YServo FindServoInContext(YAPIContext yctx,String func)
+    {
+        YServo obj;
+        obj = (YServo) YFunction._FindFromCacheInContext(yctx, "Servo", func);
+        if (obj == null) {
+            obj = new YServo(yctx, func);
+            YFunction._AddToCache("Servo", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -708,17 +751,17 @@ public class YServo extends YFunction
      *         a servo currently online, or a null pointer
      *         if there are no more servos to enumerate.
      */
-    public  YServo nextServo()
+    public YServo nextServo()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindServo(next_hwid);
+        return FindServoInContext(_yapi, next_hwid);
     }
 
     /**
@@ -732,9 +775,28 @@ public class YServo extends YFunction
      */
     public static YServo FirstServo()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Servo");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Servo");
         if (next_hwid == null)  return null;
-        return FindServo(next_hwid);
+        return FindServoInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of servos currently accessible.
+     * Use the method YServo.nextServo() to iterate on
+     * next servos.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YServo object, corresponding to
+     *         the first servo currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YServo FirstServoInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Servo");
+        if (next_hwid == null)  return null;
+        return FindServoInContext(yctx, next_hwid);
     }
 
     //--- (end of YServo implementation)

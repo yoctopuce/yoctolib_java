@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBluetoothLink.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YBluetoothLink.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YBluetoothLink return codes)
 //--- (end of YBluetoothLink return codes)
@@ -148,12 +147,21 @@ public class YBluetoothLink extends YFunction
      *
      * @param func : functionid
      */
-    protected YBluetoothLink(String func)
+    protected YBluetoothLink(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "BluetoothLink";
         //--- (YBluetoothLink attributes initialization)
         //--- (end of YBluetoothLink attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YBluetoothLink(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YBluetoothLink implementation)
@@ -203,7 +211,7 @@ public class YBluetoothLink extends YFunction
      */
     public String get_ownAddress() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OWNADDRESS_INVALID;
             }
@@ -237,7 +245,7 @@ public class YBluetoothLink extends YFunction
      */
     public String get_pairingPin() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PAIRINGPIN_INVALID;
             }
@@ -305,7 +313,7 @@ public class YBluetoothLink extends YFunction
      */
     public String get_remoteAddress() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return REMOTEADDRESS_INVALID;
             }
@@ -365,7 +373,7 @@ public class YBluetoothLink extends YFunction
      */
     public String get_remoteName() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return REMOTENAME_INVALID;
             }
@@ -395,7 +403,7 @@ public class YBluetoothLink extends YFunction
      */
     public int get_mute() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MUTE_INVALID;
             }
@@ -458,7 +466,7 @@ public class YBluetoothLink extends YFunction
      */
     public int get_preAmplifier() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PREAMPLIFIER_INVALID;
             }
@@ -518,7 +526,7 @@ public class YBluetoothLink extends YFunction
      */
     public int get_volume() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLUME_INVALID;
             }
@@ -580,7 +588,7 @@ public class YBluetoothLink extends YFunction
      */
     public int get_linkState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LINKSTATE_INVALID;
             }
@@ -611,7 +619,7 @@ public class YBluetoothLink extends YFunction
      */
     public int get_linkQuality() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LINKQUALITY_INVALID;
             }
@@ -637,7 +645,7 @@ public class YBluetoothLink extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -695,6 +703,41 @@ public class YBluetoothLink extends YFunction
         obj = (YBluetoothLink) YFunction._FindFromCache("BluetoothLink", func);
         if (obj == null) {
             obj = new YBluetoothLink(func);
+            YFunction._AddToCache("BluetoothLink", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a cellular interface for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the cellular interface is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YBluetoothLink.isOnline() to test if the cellular interface is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a cellular interface by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the cellular interface
+     *
+     * @return a YBluetoothLink object allowing you to drive the cellular interface.
+     */
+    public static YBluetoothLink FindBluetoothLinkInContext(YAPIContext yctx,String func)
+    {
+        YBluetoothLink obj;
+        obj = (YBluetoothLink) YFunction._FindFromCacheInContext(yctx, "BluetoothLink", func);
+        if (obj == null) {
+            obj = new YBluetoothLink(yctx, func);
             YFunction._AddToCache("BluetoothLink", func, obj);
         }
         return obj;
@@ -772,17 +815,17 @@ public class YBluetoothLink extends YFunction
      *         a cellular interface currently online, or a null pointer
      *         if there are no more cellular interfaces to enumerate.
      */
-    public  YBluetoothLink nextBluetoothLink()
+    public YBluetoothLink nextBluetoothLink()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindBluetoothLink(next_hwid);
+        return FindBluetoothLinkInContext(_yapi, next_hwid);
     }
 
     /**
@@ -796,9 +839,28 @@ public class YBluetoothLink extends YFunction
      */
     public static YBluetoothLink FirstBluetoothLink()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("BluetoothLink");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("BluetoothLink");
         if (next_hwid == null)  return null;
-        return FindBluetoothLink(next_hwid);
+        return FindBluetoothLinkInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of cellular interfaces currently accessible.
+     * Use the method YBluetoothLink.nextBluetoothLink() to iterate on
+     * next cellular interfaces.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YBluetoothLink object, corresponding to
+     *         the first cellular interface currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YBluetoothLink FirstBluetoothLinkInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("BluetoothLink");
+        if (next_hwid == null)  return null;
+        return FindBluetoothLinkInContext(yctx, next_hwid);
     }
 
     //--- (end of YBluetoothLink implementation)

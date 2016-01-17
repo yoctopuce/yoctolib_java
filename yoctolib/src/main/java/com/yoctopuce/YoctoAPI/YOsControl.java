@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOsControl.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YOsControl.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YOsControl return codes)
 //--- (end of YOsControl return codes)
@@ -96,12 +95,21 @@ public class YOsControl extends YFunction
      *
      * @param func : functionid
      */
-    protected YOsControl(String func)
+    protected YOsControl(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "OsControl";
         //--- (YOsControl attributes initialization)
         //--- (end of YOsControl attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YOsControl(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YOsControl implementation)
@@ -125,7 +133,7 @@ public class YOsControl extends YFunction
      */
     public int get_shutdownCountdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SHUTDOWNCOUNTDOWN_INVALID;
             }
@@ -195,6 +203,41 @@ public class YOsControl extends YFunction
     }
 
     /**
+     * Retrieves OS control for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the OS control is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YOsControl.isOnline() to test if the OS control is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * OS control by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the OS control
+     *
+     * @return a YOsControl object allowing you to drive the OS control.
+     */
+    public static YOsControl FindOsControlInContext(YAPIContext yctx,String func)
+    {
+        YOsControl obj;
+        obj = (YOsControl) YFunction._FindFromCacheInContext(yctx, "OsControl", func);
+        if (obj == null) {
+            obj = new YOsControl(yctx, func);
+            YFunction._AddToCache("OsControl", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -256,17 +299,17 @@ public class YOsControl extends YFunction
      *         OS control currently online, or a null pointer
      *         if there are no more OS control to enumerate.
      */
-    public  YOsControl nextOsControl()
+    public YOsControl nextOsControl()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindOsControl(next_hwid);
+        return FindOsControlInContext(_yapi, next_hwid);
     }
 
     /**
@@ -280,9 +323,28 @@ public class YOsControl extends YFunction
      */
     public static YOsControl FirstOsControl()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("OsControl");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("OsControl");
         if (next_hwid == null)  return null;
-        return FindOsControl(next_hwid);
+        return FindOsControlInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of OS control currently accessible.
+     * Use the method YOsControl.nextOsControl() to iterate on
+     * next OS control.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YOsControl object, corresponding to
+     *         the first OS control currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YOsControl FirstOsControlInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("OsControl");
+        if (next_hwid == null)  return null;
+        return FindOsControlInContext(yctx, next_hwid);
     }
 
     //--- (end of YOsControl implementation)

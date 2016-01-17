@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoc.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YVoc.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindVoc(), the high-level API for Voc functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YVoc return codes)
 //--- (end of YVoc return codes)
@@ -92,12 +91,21 @@ public class YVoc extends YSensor
      *
      * @param func : functionid
      */
-    protected YVoc(String func)
+    protected YVoc(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Voc";
         //--- (YVoc attributes initialization)
         //--- (end of YVoc attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YVoc(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YVoc implementation)
@@ -136,6 +144,41 @@ public class YVoc extends YSensor
         obj = (YVoc) YFunction._FindFromCache("Voc", func);
         if (obj == null) {
             obj = new YVoc(func);
+            YFunction._AddToCache("Voc", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a Volatile Organic Compound sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the Volatile Organic Compound sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YVoc.isOnline() to test if the Volatile Organic Compound sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a Volatile Organic Compound sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the Volatile Organic Compound sensor
+     *
+     * @return a YVoc object allowing you to drive the Volatile Organic Compound sensor.
+     */
+    public static YVoc FindVocInContext(YAPIContext yctx,String func)
+    {
+        YVoc obj;
+        obj = (YVoc) YFunction._FindFromCacheInContext(yctx, "Voc", func);
+        if (obj == null) {
+            obj = new YVoc(yctx, func);
             YFunction._AddToCache("Voc", func, obj);
         }
         return obj;
@@ -195,10 +238,12 @@ public class YVoc extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackVoc = callback;
         return 0;
@@ -222,17 +267,17 @@ public class YVoc extends YSensor
      *         a Volatile Organic Compound sensor currently online, or a null pointer
      *         if there are no more Volatile Organic Compound sensors to enumerate.
      */
-    public  YVoc nextVoc()
+    public YVoc nextVoc()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindVoc(next_hwid);
+        return FindVocInContext(_yapi, next_hwid);
     }
 
     /**
@@ -246,9 +291,28 @@ public class YVoc extends YSensor
      */
     public static YVoc FirstVoc()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Voc");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Voc");
         if (next_hwid == null)  return null;
-        return FindVoc(next_hwid);
+        return FindVocInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of Volatile Organic Compound sensors currently accessible.
+     * Use the method YVoc.nextVoc() to iterate on
+     * next Volatile Organic Compound sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YVoc object, corresponding to
+     *         the first Volatile Organic Compound sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YVoc FirstVocInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Voc");
+        if (next_hwid == null)  return null;
+        return FindVocInContext(yctx, next_hwid);
     }
 
     //--- (end of YVoc implementation)

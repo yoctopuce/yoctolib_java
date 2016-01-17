@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLed.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YLed.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindLed(), the high-level API for Led functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YLed return codes)
 //--- (end of YLed return codes)
@@ -114,12 +113,21 @@ public class YLed extends YFunction
      *
      * @param func : functionid
      */
-    protected YLed(String func)
+    protected YLed(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Led";
         //--- (YLed attributes initialization)
         //--- (end of YLed attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YLed(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YLed implementation)
@@ -147,7 +155,7 @@ public class YLed extends YFunction
      */
     public int get_power() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return POWER_INVALID;
             }
@@ -207,7 +215,7 @@ public class YLed extends YFunction
      */
     public int get_luminosity() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LUMINOSITY_INVALID;
             }
@@ -268,7 +276,7 @@ public class YLed extends YFunction
      */
     public int get_blinking() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BLINKING_INVALID;
             }
@@ -357,6 +365,41 @@ public class YLed extends YFunction
     }
 
     /**
+     * Retrieves a led for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the led is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YLed.isOnline() to test if the led is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a led by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the led
+     *
+     * @return a YLed object allowing you to drive the led.
+     */
+    public static YLed FindLedInContext(YAPIContext yctx,String func)
+    {
+        YLed obj;
+        obj = (YLed) YFunction._FindFromCacheInContext(yctx, "Led", func);
+        if (obj == null) {
+            obj = new YLed(yctx, func);
+            YFunction._AddToCache("Led", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -404,17 +447,17 @@ public class YLed extends YFunction
      *         a led currently online, or a null pointer
      *         if there are no more leds to enumerate.
      */
-    public  YLed nextLed()
+    public YLed nextLed()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindLed(next_hwid);
+        return FindLedInContext(_yapi, next_hwid);
     }
 
     /**
@@ -428,9 +471,28 @@ public class YLed extends YFunction
      */
     public static YLed FirstLed()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Led");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Led");
         if (next_hwid == null)  return null;
-        return FindLed(next_hwid);
+        return FindLedInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of leds currently accessible.
+     * Use the method YLed.nextLed() to iterate on
+     * next leds.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YLed object, corresponding to
+     *         the first led currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YLed FirstLedInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Led");
+        if (next_hwid == null)  return null;
+        return FindLedInContext(yctx, next_hwid);
     }
 
     //--- (end of YLed implementation)

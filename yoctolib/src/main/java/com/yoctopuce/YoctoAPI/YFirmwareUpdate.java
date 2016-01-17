@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 22318 2015-12-11 09:10:27Z seb $
+ * $Id: YFirmwareUpdate.java 22749 2016-01-14 15:52:29Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -51,9 +51,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 //--- (generated code: YFirmwareUpdate return codes)
 //--- (end of generated code: YFirmwareUpdate return codes)
 //--- (generated code: YFirmwareUpdate class start)
@@ -78,6 +78,7 @@ public class YFirmwareUpdate
     protected int _restore_step = 0;
 
     //--- (end of generated code: YFirmwareUpdate definitions)
+    private final YAPIContext _yctx;
     private Thread _thread = null;
 
     static byte[] _downloadfile(String url) throws YAPI_Exception
@@ -188,15 +189,22 @@ public class YFirmwareUpdate
     }
 
 
-    public YFirmwareUpdate(String serial, String path, byte[] settings)
+
+    public YFirmwareUpdate(YAPIContext yctx, String serial, String path, byte[] settings)
     {
         _serial = serial;
         _firmwarepath = path;
         _settings = settings;
+        _yctx = yctx;
         //--- (generated code: YFirmwareUpdate attributes initialization)
         //--- (end of generated code: YFirmwareUpdate attributes initialization)
     }
 
+
+    public YFirmwareUpdate(String serial, String path, byte[] settings)
+    {
+        this(YAPI.GetYCtx(), serial, path, settings);
+    }
 
     private void _progress(int progress, String msg)
     {
@@ -230,13 +238,13 @@ public class YFirmwareUpdate
                                 //5% -> 10%
                                 _progress(5, "check if module is already in bootloader");
                                 YGenericHub hub = null;
-                                YModule module = YModule.FindModule(_serial + ".module");
+                                YModule module = YModule.FindModuleInContext(_yctx, _serial + ".module");
                                 if (module.isOnline()) {
                                     YDevice yDevice = module.getYDevice();
                                     hub = yDevice.getHub();
                                 } else {
                                     // test if already in bootloader
-                                    for (YGenericHub h : SafeYAPI()._hubs) {
+                                    for (YGenericHub h : _yctx._hubs) {
                                         ArrayList<String> bootloaders = h.getBootloaders();
                                         if (bootloaders.contains(_serial)) {
                                             hub = h;
@@ -294,11 +302,11 @@ public class YFirmwareUpdate
      * In this case this method return the path of the most recent appropriate byn file. This method will
      * ignore firmware that are older than mintrelase.
      *
-     * @param serial  : the serial number of the module to update
-     * @param path    : the path of a byn file or a directory that contain byn files
-     * @param minrelease : an positif integer
+     * @param serial : the serial number of the module to update
+     * @param path : the path of a byn file or a directory that contains byn files
+     * @param minrelease : a positive integer
      *
-     * @return : the path of the byn file to use or a empty string if no byn files match the requirement
+     * @return : the path of the byn file to use or an empty string if no byn files match the requirement
      *
      * On failure, returns a string that start with "error:".
      */
@@ -313,7 +321,7 @@ public class YFirmwareUpdate
             byte[] json = YFirmwareUpdate._downloadfile("http://www.yoctopuce.com//FR/common/getLastFirmwareLink.php?serial=" + serial);
             JSONObject obj = null;
             try {
-                obj = new JSONObject(new String(json, YAPI.DeviceCharset));
+                obj = new JSONObject(new String(json, Charset.forName("ISO_8859_1")));
             } catch (JSONException ex) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
             }
@@ -348,20 +356,31 @@ public class YFirmwareUpdate
      *
      * @return an array of strings containing the serial list of module in "update" mode.
      */
-    public static ArrayList<String> GetAllBootLoaders()
+    public static ArrayList<String> GetAllBootLoaders(YAPIContext yctx)
     {
         ArrayList<String> res = new ArrayList<String>();
-        for (YGenericHub h : YAPI.SafeYAPI()._hubs) {
+        for (YGenericHub h : yctx._hubs) {
             try {
-                ArrayList<String> bootloaders = h.getBootloaders();
+                ArrayList<String> bootloaders = null;
+                try {
+                    bootloaders = h.getBootloaders();
+                } catch (InterruptedException e) {
+                    throw new YAPI_Exception(YAPI.IO_ERROR,
+                            "Thread has been interrupted");
+                }
                 if (bootloaders != null) {
                     res.addAll(bootloaders);
                 }
             } catch (YAPI_Exception e) {
-                YAPI.SafeYAPI()._Log(e.getLocalizedMessage());
+                yctx._Log(e.getLocalizedMessage());
             }
         }
         return res;
+    }
+
+    public static ArrayList<String> GetAllBootLoaders()
+    {
+        return GetAllBootLoaders(YAPI.GetYCtx());
     }
 
 
@@ -372,6 +391,9 @@ public class YFirmwareUpdate
 
     //cannot be generated for Java:
     //public static ArrayList<String> GetAllBootLoaders()
+
+    //cannot be generated for Java:
+    //public static ArrayList<String> GetAllBootLoadersInContext(YAPIContext yctx)
 
     //cannot be generated for Java:
     //public static String CheckFirmware(String serial,String path,int minrelease)

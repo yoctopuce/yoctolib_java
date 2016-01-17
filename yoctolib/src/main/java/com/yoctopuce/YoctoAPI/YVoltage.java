@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoltage.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YVoltage.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindVoltage(), the high-level API for Voltage functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YVoltage return codes)
 //--- (end of YVoltage return codes)
@@ -92,12 +91,21 @@ public class YVoltage extends YSensor
      *
      * @param func : functionid
      */
-    protected YVoltage(String func)
+    protected YVoltage(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Voltage";
         //--- (YVoltage attributes initialization)
         //--- (end of YVoltage attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YVoltage(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YVoltage implementation)
@@ -136,6 +144,41 @@ public class YVoltage extends YSensor
         obj = (YVoltage) YFunction._FindFromCache("Voltage", func);
         if (obj == null) {
             obj = new YVoltage(func);
+            YFunction._AddToCache("Voltage", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a voltage sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the voltage sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YVoltage.isOnline() to test if the voltage sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a voltage sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the voltage sensor
+     *
+     * @return a YVoltage object allowing you to drive the voltage sensor.
+     */
+    public static YVoltage FindVoltageInContext(YAPIContext yctx,String func)
+    {
+        YVoltage obj;
+        obj = (YVoltage) YFunction._FindFromCacheInContext(yctx, "Voltage", func);
+        if (obj == null) {
+            obj = new YVoltage(yctx, func);
             YFunction._AddToCache("Voltage", func, obj);
         }
         return obj;
@@ -195,10 +238,12 @@ public class YVoltage extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackVoltage = callback;
         return 0;
@@ -222,17 +267,17 @@ public class YVoltage extends YSensor
      *         a voltage sensor currently online, or a null pointer
      *         if there are no more voltage sensors to enumerate.
      */
-    public  YVoltage nextVoltage()
+    public YVoltage nextVoltage()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindVoltage(next_hwid);
+        return FindVoltageInContext(_yapi, next_hwid);
     }
 
     /**
@@ -246,9 +291,28 @@ public class YVoltage extends YSensor
      */
     public static YVoltage FirstVoltage()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Voltage");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Voltage");
         if (next_hwid == null)  return null;
-        return FindVoltage(next_hwid);
+        return FindVoltageInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of voltage sensors currently accessible.
+     * Use the method YVoltage.nextVoltage() to iterate on
+     * next voltage sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YVoltage object, corresponding to
+     *         the first voltage sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YVoltage FirstVoltageInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Voltage");
+        if (next_hwid == null)  return null;
+        return FindVoltageInContext(yctx, next_hwid);
     }
 
     //--- (end of YVoltage implementation)

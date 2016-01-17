@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 21763 2015-10-15 12:16:50Z seb $
+ * $Id: YDisplay.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -41,8 +41,6 @@ package com.yoctopuce.YoctoAPI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YDisplay class start)
 /**
@@ -156,12 +154,17 @@ public class YDisplay extends YFunction
     /**
      * @param func : functionid
      */
-    protected YDisplay(String func)
+    protected YDisplay(YAPIContext yctx, String func)
     {
-        super(func);
+        super(yctx, func);
         _className = "Display";
         //--- (generated code: YDisplay attributes initialization)
         //--- (end of generated code: YDisplay attributes initialization)
+    }
+
+    protected YDisplay(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (generated code: YDisplay implementation)
@@ -214,7 +217,7 @@ public class YDisplay extends YFunction
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLED_INVALID;
             }
@@ -275,7 +278,7 @@ public class YDisplay extends YFunction
      */
     public String get_startupSeq() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STARTUPSEQ_INVALID;
             }
@@ -339,7 +342,7 @@ public class YDisplay extends YFunction
      */
     public int get_brightness() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BRIGHTNESS_INVALID;
             }
@@ -405,7 +408,7 @@ public class YDisplay extends YFunction
      */
     public int get_orientation() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ORIENTATION_INVALID;
             }
@@ -470,7 +473,7 @@ public class YDisplay extends YFunction
      */
     public int get_displayWidth() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYWIDTH_INVALID;
             }
@@ -499,7 +502,7 @@ public class YDisplay extends YFunction
      */
     public int get_displayHeight() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DISPLAYHEIGHT_INVALID;
             }
@@ -642,7 +645,7 @@ public class YDisplay extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -700,6 +703,41 @@ public class YDisplay extends YFunction
         obj = (YDisplay) YFunction._FindFromCache("Display", func);
         if (obj == null) {
             obj = new YDisplay(func);
+            YFunction._AddToCache("Display", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a display for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the display is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YDisplay.isOnline() to test if the display is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a display by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the display
+     *
+     * @return a YDisplay object allowing you to drive the display.
+     */
+    public static YDisplay FindDisplayInContext(YAPIContext yctx,String func)
+    {
+        YDisplay obj;
+        obj = (YDisplay) YFunction._FindFromCacheInContext(yctx, "Display", func);
+        if (obj == null) {
+            obj = new YDisplay(yctx, func);
             YFunction._AddToCache("Display", func, obj);
         }
         return obj;
@@ -932,17 +970,17 @@ public class YDisplay extends YFunction
      *         a display currently online, or a null pointer
      *         if there are no more displays to enumerate.
      */
-    public  YDisplay nextDisplay()
+    public YDisplay nextDisplay()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindDisplay(next_hwid);
+        return FindDisplayInContext(_yapi, next_hwid);
     }
 
     /**
@@ -956,9 +994,28 @@ public class YDisplay extends YFunction
      */
     public static YDisplay FirstDisplay()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Display");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Display");
         if (next_hwid == null)  return null;
-        return FindDisplay(next_hwid);
+        return FindDisplayInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of displays currently accessible.
+     * Use the method YDisplay.nextDisplay() to iterate on
+     * next displays.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YDisplay object, corresponding to
+     *         the first display currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YDisplay FirstDisplayInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Display");
+        if (next_hwid == null)  return null;
+        return FindDisplayInContext(yctx, next_hwid);
     }
 
     //--- (end of generated code: YDisplay implementation)

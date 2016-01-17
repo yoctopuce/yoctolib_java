@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YColorLed.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YColorLed return codes)
 //--- (end of YColorLed return codes)
@@ -141,12 +140,21 @@ public class YColorLed extends YFunction
      *
      * @param func : functionid
      */
-    protected YColorLed(String func)
+    protected YColorLed(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "ColorLed";
         //--- (YColorLed attributes initialization)
         //--- (end of YColorLed attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YColorLed(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YColorLed implementation)
@@ -216,7 +224,7 @@ public class YColorLed extends YFunction
      */
     public int get_rgbColor() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RGBCOLOR_INVALID;
             }
@@ -276,7 +284,7 @@ public class YColorLed extends YFunction
      */
     public int get_hslColor() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return HSLCOLOR_INVALID;
             }
@@ -332,7 +340,7 @@ public class YColorLed extends YFunction
      */
     public YMove get_rgbMove() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RGBMOVE_INVALID;
             }
@@ -384,7 +392,7 @@ public class YColorLed extends YFunction
      */
     public YMove get_hslMove() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return HSLMOVE_INVALID;
             }
@@ -440,7 +448,7 @@ public class YColorLed extends YFunction
      */
     public int get_rgbColorAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RGBCOLORATPOWERON_INVALID;
             }
@@ -502,7 +510,7 @@ public class YColorLed extends YFunction
      */
     public int get_blinkSeqSize() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BLINKSEQSIZE_INVALID;
             }
@@ -563,7 +571,7 @@ public class YColorLed extends YFunction
      */
     public int get_blinkSeqSignature() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BLINKSEQSIGNATURE_INVALID;
             }
@@ -591,7 +599,7 @@ public class YColorLed extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -649,6 +657,41 @@ public class YColorLed extends YFunction
         obj = (YColorLed) YFunction._FindFromCache("ColorLed", func);
         if (obj == null) {
             obj = new YColorLed(func);
+            YFunction._AddToCache("ColorLed", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves an RGB led for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the RGB led is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YColorLed.isOnline() to test if the RGB led is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * an RGB led by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the RGB led
+     *
+     * @return a YColorLed object allowing you to drive the RGB led.
+     */
+    public static YColorLed FindColorLedInContext(YAPIContext yctx,String func)
+    {
+        YColorLed obj;
+        obj = (YColorLed) YFunction._FindFromCacheInContext(yctx, "ColorLed", func);
+        if (obj == null) {
+            obj = new YColorLed(yctx, func);
             YFunction._AddToCache("ColorLed", func, obj);
         }
         return obj;
@@ -772,17 +815,17 @@ public class YColorLed extends YFunction
      *         an RGB led currently online, or a null pointer
      *         if there are no more RGB leds to enumerate.
      */
-    public  YColorLed nextColorLed()
+    public YColorLed nextColorLed()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindColorLed(next_hwid);
+        return FindColorLedInContext(_yapi, next_hwid);
     }
 
     /**
@@ -796,9 +839,28 @@ public class YColorLed extends YFunction
      */
     public static YColorLed FirstColorLed()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("ColorLed");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("ColorLed");
         if (next_hwid == null)  return null;
-        return FindColorLed(next_hwid);
+        return FindColorLedInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of RGB leds currently accessible.
+     * Use the method YColorLed.nextColorLed() to iterate on
+     * next RGB leds.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YColorLed object, corresponding to
+     *         the first RGB led currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YColorLed FirstColorLedInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("ColorLed");
+        if (next_hwid == null)  return null;
+        return FindColorLedInContext(yctx, next_hwid);
     }
 
     //--- (end of YColorLed implementation)

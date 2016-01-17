@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 21747 2015-10-13 14:03:18Z seb $
+ * $Id: YUSBHub.java 22743 2016-01-14 09:54:52Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -67,9 +67,27 @@ public class YUSBHub extends YGenericHub
         }
     }
 
-    public YUSBHub(int idx, boolean requestPermission) throws YAPI_Exception
+    @Override
+    String getSerialNumber()
     {
-        super(idx, true);
+        return "";
+    }
+
+    @Override
+    public String get_urlOf(String serialNumber)
+    {
+        return "usb";
+    }
+
+    @Override
+    public ArrayList<String> get_subDeviceOf(String serialNumber)
+    {
+        return new ArrayList<>();
+    }
+
+    public YUSBHub(YAPIContext yctx, int idx, boolean requestPermission) throws YAPI_Exception
+    {
+        super(yctx, new HTTPParams("usb://"), idx, true);
         YJniWrapper.reserveUSBAccess();
     }
 
@@ -170,7 +188,7 @@ public class YUSBHub extends YGenericHub
     {
         byte[] currentRequest = prepareRequest(req_first_line, req_head_and_body);
         byte[] result = YJniWrapper.devRequestSync(device.getSerialNumber(), currentRequest);
-        int hpos = YAPI._find_in_bytes(result, "\r\n\r\n".getBytes());
+        int hpos = YAPIContext._find_in_bytes(result, "\r\n\r\n".getBytes());
         if (hpos >= 0) {
             return Arrays.copyOfRange(result, hpos + 4, result.length);
         }

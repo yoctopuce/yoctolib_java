@@ -9,13 +9,16 @@ public class YHash
     private final HashMap<String, YDevice> _devs = new HashMap<String, YDevice>(); // hash table of devices, by serial number
     private final HashMap<String, String> _snByName = new HashMap<String, String>(); // serial number for each device, by name
     private final HashMap<String, YFunctionType> _fnByType = new HashMap<String, YFunctionType>(2); // functions by type
+    private final YAPIContext _yctx;
 
-
-    public YHash()
+    public YHash(YAPIContext yctx)
     {
-        //whatfor
-        _fnByType.put("Module", new YFunctionType("Module"));
+        _yctx = yctx;
+    }
 
+    void reset()
+    {
+        _fnByType.put("Module", new YFunctionType("Module", _yctx));
     }
 
     // Reindex a device in YAPI after a name change detected by device refresh
@@ -29,14 +32,16 @@ public class YHash
             _snByName.put(lname, serial);
         }
 
-        _fnByType.get("Module").reindexFunction(dev.getModuleYPEntry());
+        YFunctionType module = _fnByType.get("Module");
+        YPEntry moduleYPEntry = dev.getModuleYPEntry();
+        module.reindexFunction(moduleYPEntry);
         int count = dev.functionCount();
         for (int i = 0; i < count; i++) {
             YPEntry yp = dev.getYPEntry(i);
             String classname = yp.getClassname();
             YFunctionType functionType = _fnByType.get(classname);
             if (functionType == null) {
-                functionType = new YFunctionType(classname);
+                functionType = new YFunctionType(classname, _yctx);
                 _fnByType.put(classname, functionType);
             }
             functionType.reindexFunction(yp);
@@ -90,7 +95,7 @@ public class YHash
     synchronized private YFunctionType getFnByType(String className)
     {
         if (!_fnByType.containsKey(className)) {
-            _fnByType.put(className, new YFunctionType(className));
+            _fnByType.put(className, new YFunctionType(className, _yctx));
         }
         return _fnByType.get(className);
     }
@@ -153,7 +158,7 @@ public class YHash
     // Set a function advertised value by hardware id
     synchronized void setFunctionValue(String hwid, String pubval)
     {
-        String classname = YAPI.functionClass(hwid);
+        String classname = YAPIContext.functionClass(hwid);
         synchronized (this) {
             YFunctionType fnByType = getFnByType(classname);
             fnByType.setFunctionValue(hwid, pubval);
@@ -196,7 +201,7 @@ public class YHash
         } else {
             // enumeration of an abstract class
             YPEntry.BaseClass baseType = YAPI._BaseType.get(className);
-            String prevclass = YAPI.functionClass(hwid);
+            String prevclass = YAPIContext.functionClass(hwid);
             YPEntry res = getFnByType(prevclass).getNextYPEntry(hwid);
             if (res != null)
                 return res.getHardwareId();

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBuzzer.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YBuzzer.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YBuzzer return codes)
 //--- (end of YBuzzer return codes)
@@ -121,12 +120,21 @@ public class YBuzzer extends YFunction
      *
      * @param func : functionid
      */
-    protected YBuzzer(String func)
+    protected YBuzzer(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Buzzer";
         //--- (YBuzzer attributes initialization)
         //--- (end of YBuzzer attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YBuzzer(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YBuzzer implementation)
@@ -194,7 +202,7 @@ public class YBuzzer extends YFunction
      */
     public double get_frequency() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREQUENCY_INVALID;
             }
@@ -223,7 +231,7 @@ public class YBuzzer extends YFunction
      */
     public int get_volume() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLUME_INVALID;
             }
@@ -283,7 +291,7 @@ public class YBuzzer extends YFunction
      */
     public int get_playSeqSize() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PLAYSEQSIZE_INVALID;
             }
@@ -344,7 +352,7 @@ public class YBuzzer extends YFunction
      */
     public int get_playSeqSignature() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PLAYSEQSIGNATURE_INVALID;
             }
@@ -372,7 +380,7 @@ public class YBuzzer extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -430,6 +438,41 @@ public class YBuzzer extends YFunction
         obj = (YBuzzer) YFunction._FindFromCache("Buzzer", func);
         if (obj == null) {
             obj = new YBuzzer(func);
+            YFunction._AddToCache("Buzzer", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a buzzer for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the buzzer is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YBuzzer.isOnline() to test if the buzzer is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a buzzer by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the buzzer
+     *
+     * @return a YBuzzer object allowing you to drive the buzzer.
+     */
+    public static YBuzzer FindBuzzerInContext(YAPIContext yctx,String func)
+    {
+        YBuzzer obj;
+        obj = (YBuzzer) YFunction._FindFromCacheInContext(yctx, "Buzzer", func);
+        if (obj == null) {
+            obj = new YBuzzer(yctx, func);
             YFunction._AddToCache("Buzzer", func, obj);
         }
         return obj;
@@ -611,17 +654,17 @@ public class YBuzzer extends YFunction
      *         a buzzer currently online, or a null pointer
      *         if there are no more buzzers to enumerate.
      */
-    public  YBuzzer nextBuzzer()
+    public YBuzzer nextBuzzer()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindBuzzer(next_hwid);
+        return FindBuzzerInContext(_yapi, next_hwid);
     }
 
     /**
@@ -635,9 +678,28 @@ public class YBuzzer extends YFunction
      */
     public static YBuzzer FirstBuzzer()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Buzzer");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Buzzer");
         if (next_hwid == null)  return null;
-        return FindBuzzer(next_hwid);
+        return FindBuzzerInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of buzzers currently accessible.
+     * Use the method YBuzzer.nextBuzzer() to iterate on
+     * next buzzers.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YBuzzer object, corresponding to
+     *         the first buzzer currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YBuzzer FirstBuzzerInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Buzzer");
+        if (next_hwid == null)  return null;
+        return FindBuzzerInContext(yctx, next_hwid);
     }
 
     //--- (end of YBuzzer implementation)

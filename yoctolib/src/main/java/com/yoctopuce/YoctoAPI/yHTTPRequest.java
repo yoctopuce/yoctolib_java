@@ -1,40 +1,38 @@
 /*********************************************************************
- *
- * $Id: yHTTPRequest.java 22318 2015-12-11 09:10:27Z seb $
+ * $Id: yHTTPRequest.java 22680 2016-01-12 17:09:03Z seb $
  *
  * internal yHTTPRequest object
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
- *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
- *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ * Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ * non-exclusive license to use, modify, copy and integrate this
+ * file into your software for the sole purpose of interfacing
+ * with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
- *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
- *  this notice in the distributed source file.
+ * You may reproduce and distribute copies of this file in
+ * source or object form, as long as the sole purpose of this
+ * code is to interface with Yoctopuce products. You must retain
+ * this notice in the distributed source file.
  *
- *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
- *  obligations.
+ * You should refer to Yoctopuce General Terms and Conditions
+ * for additional information regarding your rights and
+ * obligations.
  *
- *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *  WARRANTY, OR OTHERWISE.
- *
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ * EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ * COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ * SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
+ * LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ * WARRANTY, OR OTHERWISE.
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
@@ -43,33 +41,27 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
+import java.net.*;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
-class yHTTPRequest implements Runnable {
+class yHTTPRequest implements Runnable
+{
     public static final int YIO_DEFAULT_TCP_TIMEOUT = 20000;
+    public static final int MAX_REQUEST_MS = 5000;
     private static final int YIO_IDLE_TCP_TIMEOUT = 5000;
 
     private Object _context;
+
     private YGenericHub.RequestAsyncResult _resultCallback;
 
     public void kill()
     {
         _requestStop();
     }
-
-    private enum State {
+    private enum State
+    {
         AVAIL, IN_REQUEST, STOPPED;
     }
-
-    public static final int MAX_REQUEST_MS = 5000;
 
     private final YHTTPHub _hub;
 
@@ -278,7 +270,7 @@ class yHTTPRequest implements Runnable {
                 if (duration > _requestTimeout) {
                     throw new YAPI_Exception(YAPI.TIMEOUT, String.format("TCP request on %s took too long (%dms)", _hub.getHost(), duration));
                 } else if (duration > (_requestTimeout - _requestTimeout / 4)) {
-                    YAPI.SafeYAPI()._Log(String.format("Slow TCP request on %s (%dms)\n", _hub.getHost(), duration));
+                    _hub._yctx._Log(String.format("Slow TCP request on %s (%dms)\n", _hub.getHost(), duration));
                 }
                 throw new YAPI_Exception(YAPI.TIMEOUT, String.format("Hub did not send data during %dms", nowTime - _lastReceiveTime));
             } catch (IOException e) {
@@ -292,13 +284,13 @@ class yHTTPRequest implements Runnable {
                 _lastReceiveTime = System.currentTimeMillis();
                 synchronized (_result) {
                     if (!_header_found) {
-                        String partial_head = new String(buffer, 0, read, YAPI.DeviceCharset);
+                        String partial_head = new String(buffer, 0, read, _hub._yctx._deviceCharset);
                         _header.append(partial_head);
                         int pos = _header.indexOf("\r\n\r\n");
                         if (pos > 0) {
                             pos += 4;
                             try {
-                                _result.write(_header.substring(pos).getBytes(YAPI.DeviceCharset));
+                                _result.write(_header.substring(pos).getBytes(_hub._yctx._deviceCharset));
                             } catch (IOException ex) {
                                 throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
                             }
@@ -404,7 +396,7 @@ class yHTTPRequest implements Runnable {
         } catch (YAPI_Exception ex) {
             errorType = ex.errorType;
             errmsg = ex.getMessage();
-            YAPI.SafeYAPI()._Log("ASYNC request " + _firstLine + "failed:" + errmsg + "\n");
+            _hub._yctx._Log("ASYNC request " + _firstLine + "failed:" + errmsg + "\n");
         }
         _requestStop();
         if (_resultCallback != null) {
@@ -429,20 +421,15 @@ class yHTTPRequest implements Runnable {
     }
 
 
-    synchronized void WaitRequestEnd()
+    synchronized void WaitRequestEnd(long mstimeout) throws InterruptedException
     {
-        long timeout = YAPI.GetTickCount() + MAX_REQUEST_MS;
+        long timeout = YAPI.GetTickCount() + mstimeout;
         while (timeout > YAPI.GetTickCount() && _state == State.IN_REQUEST) {
             long toWait = timeout - YAPI.GetTickCount();
-            try {
-                wait(toWait);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                break;
-            }
+            wait(toWait);
         }
         if (_state == State.IN_REQUEST)
-            SafeYAPI()._Log("WARNING: Last Http request did not finished");
+            _hub._yctx._Log("WARNING: Last Http request did not finished");
         // ensure that we close all socket
         _reuse_socket = false;
         _requestStop();

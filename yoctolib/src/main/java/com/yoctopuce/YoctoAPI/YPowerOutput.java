@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPowerOutput.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YPowerOutput.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YPowerOutput return codes)
 //--- (end of YPowerOutput return codes)
@@ -98,12 +97,21 @@ public class YPowerOutput extends YFunction
      *
      * @param func : functionid
      */
-    protected YPowerOutput(String func)
+    protected YPowerOutput(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "PowerOutput";
         //--- (YPowerOutput attributes initialization)
         //--- (end of YPowerOutput attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YPowerOutput(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YPowerOutput implementation)
@@ -128,7 +136,7 @@ public class YPowerOutput extends YFunction
      */
     public int get_voltage() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLTAGE_INVALID;
             }
@@ -225,6 +233,41 @@ public class YPowerOutput extends YFunction
     }
 
     /**
+     * Retrieves a dual power  ouput control for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the power ouput control is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YPowerOutput.isOnline() to test if the power ouput control is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a dual power  ouput control by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the power ouput control
+     *
+     * @return a YPowerOutput object allowing you to drive the power ouput control.
+     */
+    public static YPowerOutput FindPowerOutputInContext(YAPIContext yctx,String func)
+    {
+        YPowerOutput obj;
+        obj = (YPowerOutput) YFunction._FindFromCacheInContext(yctx, "PowerOutput", func);
+        if (obj == null) {
+            obj = new YPowerOutput(yctx, func);
+            YFunction._AddToCache("PowerOutput", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -272,17 +315,17 @@ public class YPowerOutput extends YFunction
      *         a dual power  ouput control currently online, or a null pointer
      *         if there are no more dual power ouput controls to enumerate.
      */
-    public  YPowerOutput nextPowerOutput()
+    public YPowerOutput nextPowerOutput()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindPowerOutput(next_hwid);
+        return FindPowerOutputInContext(_yapi, next_hwid);
     }
 
     /**
@@ -296,9 +339,28 @@ public class YPowerOutput extends YFunction
      */
     public static YPowerOutput FirstPowerOutput()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("PowerOutput");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("PowerOutput");
         if (next_hwid == null)  return null;
-        return FindPowerOutput(next_hwid);
+        return FindPowerOutputInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of dual power ouput controls currently accessible.
+     * Use the method YPowerOutput.nextPowerOutput() to iterate on
+     * next dual power ouput controls.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YPowerOutput object, corresponding to
+     *         the first dual power ouput control currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YPowerOutput FirstPowerOutputInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("PowerOutput");
+        if (next_hwid == null)  return null;
+        return FindPowerOutputInContext(yctx, next_hwid);
     }
 
     //--- (end of YPowerOutput implementation)

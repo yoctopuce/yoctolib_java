@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.*;
 import java.util.*;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 /**
  * YSSDP Class: network discovery using ssdp
@@ -13,8 +12,6 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
  */
 public class YSSDP {
 
-
-    private ArrayList<NetworkInterface> _netInterfaces;
 
     interface YSSDPReportInterface {
         /**
@@ -39,20 +36,30 @@ public class YSSDP {
     private static final String SSDP_HTTP = "HTTP/1.1 200 OK";
 
 
-    private HashMap<String, YSSDPCacheEntry> _cache = new HashMap<String, YSSDPCacheEntry>();
+    private final YAPIContext _yctx;
+    private final ArrayList<NetworkInterface> _netInterfaces = new ArrayList<>(1);
+    private final HashMap<String, YSSDPCacheEntry> _cache = new HashMap<String, YSSDPCacheEntry>();
     private InetAddress mMcastAddr;
     private boolean _Listening;
     private YSSDPReportInterface _callbacks;
     private Thread[] _listenMSearchThread;
     private Thread[] _listenBcastThread;
 
-    YSSDP()
+    YSSDP(YAPIContext yctx)
     {
-
-        _Listening = false;
-        _netInterfaces = new ArrayList<NetworkInterface>(1);
+        _yctx = yctx;
     }
 
+    void reset()
+    {
+        _netInterfaces.clear();
+        _cache.clear();
+        mMcastAddr = null;
+        _Listening = false;
+        _callbacks = null;
+        _listenMSearchThread = null;
+        _listenBcastThread = null;
+    }
 
     synchronized void addCallback(YSSDPReportInterface callback) throws YAPI_Exception
     {
@@ -152,7 +159,7 @@ public class YSSDP {
                             parseIncomingMessage(ssdpMessage);
                         } catch (SocketTimeoutException ignored) {
                         } catch (IOException e) {
-                            SafeYAPI()._Log("SSDP:" + e.getLocalizedMessage());
+                            _yctx._Log("SSDP:" + e.getLocalizedMessage());
                         }
                         checkCacheExpiration();
                     }
@@ -177,7 +184,7 @@ public class YSSDP {
                         msearchSocket.send(outPkt);
                     } catch (IOException ex) {
                         //todo: more user friendy error report
-                        YAPI.SafeYAPI()._Log("Unable to Send SSDP mSearch:" + ex.getLocalizedMessage());
+                        _yctx._Log("Unable to Send SSDP mSearch:" + ex.getLocalizedMessage());
                         return;
                     }
 
@@ -191,7 +198,7 @@ public class YSSDP {
                             parseIncomingMessage(ssdpMessage);
                         } catch (IOException ex) {
                             //todo: more user friendy error report
-                            YAPI.SafeYAPI()._Log("SSDP error:" + ex.getLocalizedMessage());
+                            _yctx._Log("SSDP error:" + ex.getLocalizedMessage());
                             return;
                         }
                     }
@@ -214,6 +221,7 @@ public class YSSDP {
                 _listenBcastThread[i].interrupt();
             _listenBcastThread[i] = null;
         }
+        _cache.clear();
     }
 
 

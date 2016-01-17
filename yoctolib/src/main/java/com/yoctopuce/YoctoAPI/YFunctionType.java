@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunctionType.java 21749 2015-10-13 15:14:03Z seb $
+ * $Id: YFunctionType.java 22359 2015-12-15 13:30:10Z seb $
  *
  * Internal YFunctionType object
  *
@@ -39,8 +39,6 @@ package com.yoctopuce.YoctoAPI;
 
 import java.util.HashMap;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
-
 
 // YFunctionType Class (used internally)
 //
@@ -56,6 +54,7 @@ class YFunctionType
 
     // private attributes, to be used within yocto_api only
     private String _className;
+    private final YAPIContext _yctx;
     private final HashMap<String, YPEntry> _ypEntries = new HashMap<String, YPEntry>();               // Yellow page by Hardware Id
     private final HashMap<String, YFunction> _connectedFns = new HashMap<String, YFunction>();           // functions requested and available, by Hardware Id
     private final HashMap<String, YFunction> _requestedFns = new HashMap<String, YFunction>();           // functions requested but not yet known, by any type of name
@@ -102,9 +101,10 @@ class YFunctionType
 
     }
 
-    public YFunctionType(String classname)
+    public YFunctionType(String classname, YAPIContext yctx)
     {
         _className = classname;
+        _yctx = yctx;
     }
 
 
@@ -173,7 +173,7 @@ class YFunctionType
         if (hwid.module.length() > 0) {
 
             // either the device id is a logical name, or the function is unknown
-            YDevice dev = SafeYAPI()._yHash.getDevice(hwid.module);
+            YDevice dev = _yctx._yHash.getDevice(hwid.module);
             if (dev == null) {
                 throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "Device [" + hwid.module + "] not online");
             }

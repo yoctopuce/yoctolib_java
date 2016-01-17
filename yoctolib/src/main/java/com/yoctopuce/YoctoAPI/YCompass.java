@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCompass.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YCompass.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindCompass(), the high-level API for Compass functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YCompass return codes)
 //--- (end of YCompass return codes)
@@ -111,12 +110,21 @@ public class YCompass extends YSensor
      *
      * @param func : functionid
      */
-    protected YCompass(String func)
+    protected YCompass(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Compass";
         //--- (YCompass attributes initialization)
         //--- (end of YCompass attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YCompass(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YCompass implementation)
@@ -137,7 +145,7 @@ public class YCompass extends YSensor
      */
     public int get_axis() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return AXIS_INVALID;
             }
@@ -162,7 +170,7 @@ public class YCompass extends YSensor
      */
     public double get_magneticHeading() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MAGNETICHEADING_INVALID;
             }
@@ -211,6 +219,41 @@ public class YCompass extends YSensor
         obj = (YCompass) YFunction._FindFromCache("Compass", func);
         if (obj == null) {
             obj = new YCompass(func);
+            YFunction._AddToCache("Compass", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a compass for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the compass is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YCompass.isOnline() to test if the compass is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a compass by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the compass
+     *
+     * @return a YCompass object allowing you to drive the compass.
+     */
+    public static YCompass FindCompassInContext(YAPIContext yctx,String func)
+    {
+        YCompass obj;
+        obj = (YCompass) YFunction._FindFromCacheInContext(yctx, "Compass", func);
+        if (obj == null) {
+            obj = new YCompass(yctx, func);
             YFunction._AddToCache("Compass", func, obj);
         }
         return obj;
@@ -270,10 +313,12 @@ public class YCompass extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackCompass = callback;
         return 0;
@@ -297,17 +342,17 @@ public class YCompass extends YSensor
      *         a compass currently online, or a null pointer
      *         if there are no more compasses to enumerate.
      */
-    public  YCompass nextCompass()
+    public YCompass nextCompass()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindCompass(next_hwid);
+        return FindCompassInContext(_yapi, next_hwid);
     }
 
     /**
@@ -321,9 +366,28 @@ public class YCompass extends YSensor
      */
     public static YCompass FirstCompass()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Compass");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Compass");
         if (next_hwid == null)  return null;
-        return FindCompass(next_hwid);
+        return FindCompassInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of compasses currently accessible.
+     * Use the method YCompass.nextCompass() to iterate on
+     * next compasses.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YCompass object, corresponding to
+     *         the first compass currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YCompass FirstCompassInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Compass");
+        if (next_hwid == null)  return null;
+        return FindCompassInContext(yctx, next_hwid);
     }
 
     //--- (end of YCompass implementation)

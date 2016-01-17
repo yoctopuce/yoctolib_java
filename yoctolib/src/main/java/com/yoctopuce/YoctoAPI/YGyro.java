@@ -1,48 +1,44 @@
 /*********************************************************************
- *
- * $Id: YGyro.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YGyro.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
- *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
- *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing 
- *  with Yoctopuce products. 
+ * Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ * non-exclusive license to use, modify, copy and integrate this
+ * file into your software for the sole purpose of interfacing
+ * with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in 
- *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain 
- *  this notice in the distributed source file.
+ * You may reproduce and distribute copies of this file in
+ * source or object form, as long as the sole purpose of this
+ * code is to interface with Yoctopuce products. You must retain
+ * this notice in the distributed source file.
  *
- *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and 
- *  obligations.
+ * You should refer to Yoctopuce General Terms and Conditions
+ * for additional information regarding your rights and
+ * obligations.
  *
- *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS 
- *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, 
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR 
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT 
- *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *  WARRANTY, OR OTHERWISE.
- *
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ * EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ * COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ * SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
+ * LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ * WARRANTY, OR OTHERWISE.
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YGyro return codes)
 //--- (end of generated code: YGyro return codes)
@@ -64,15 +60,18 @@ import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 public class YGyro extends YSensor
 {
 //--- (end of generated code: YGyro class start)
-    public interface YQuatCallback {
+    public interface YQuatCallback
+    {
         void yQuaternionCallback(YGyro yGyro, double w, double x, double y, double z);
     }
 
-    public interface YAnglesCallback {
+    public interface YAnglesCallback
+    {
         void yAnglesCallback(YGyro yGyro, double roll, double pitch, double head);
     }
 
-    static private YQt.UpdateCallback yInternalGyroCallback = new YQt.UpdateCallback() {
+    static private YQt.UpdateCallback yInternalGyroCallback = new YQt.UpdateCallback()
+    {
         @Override
         public void yNewValue(YQt obj, String value)
         {
@@ -153,13 +152,19 @@ public class YGyro extends YSensor
     /**
      * @param func : functionid
      */
-    protected YGyro(String func)
+    protected YGyro(YAPIContext yctx, String func)
     {
-        super(func);
+        super(yctx, func);
         _className = "Gyro";
         //--- (generated code: YGyro attributes initialization)
         //--- (end of generated code: YGyro attributes initialization)
     }
+
+    protected YGyro(String func)
+    {
+        this(YAPI.GetYCtx(), func);
+    }
+
 
     //--- (generated code: YGyro implementation)
     @Override
@@ -187,7 +192,7 @@ public class YGyro extends YSensor
      */
     public double get_xValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return XVALUE_INVALID;
             }
@@ -218,7 +223,7 @@ public class YGyro extends YSensor
      */
     public double get_yValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return YVALUE_INVALID;
             }
@@ -249,7 +254,7 @@ public class YGyro extends YSensor
      */
     public double get_zValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ZVALUE_INVALID;
             }
@@ -299,6 +304,41 @@ public class YGyro extends YSensor
         obj = (YGyro) YFunction._FindFromCache("Gyro", func);
         if (obj == null) {
             obj = new YGyro(func);
+            YFunction._AddToCache("Gyro", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a gyroscope for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the gyroscope is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YGyro.isOnline() to test if the gyroscope is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a gyroscope by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the gyroscope
+     *
+     * @return a YGyro object allowing you to drive the gyroscope.
+     */
+    public static YGyro FindGyroInContext(YAPIContext yctx,String func)
+    {
+        YGyro obj;
+        obj = (YGyro) YFunction._FindFromCacheInContext(yctx, "Gyro", func);
+        if (obj == null) {
+            obj = new YGyro(yctx, func);
             YFunction._AddToCache("Gyro", func, obj);
         }
         return obj;
@@ -358,10 +398,12 @@ public class YGyro extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackGyro = callback;
         return 0;
@@ -382,18 +424,17 @@ public class YGyro extends YSensor
     {
         int now_stamp;
         int age_ms;
-        
-        now_stamp = (int) ((YAPI.GetTickCount()) & (0x7FFFFFFF));
+        now_stamp = (int) ((YAPIContext.GetTickCount()) & (0x7FFFFFFF));
         age_ms = (((now_stamp - _qt_stamp)) & (0x7FFFFFFF));
         if ((age_ms >= 10) || (_qt_stamp == 0)) {
             if (load(10) != YAPI.SUCCESS) {
                 return YAPI.DEVICE_NOT_FOUND;
             }
             if (_qt_stamp == 0) {
-                _qt_w = YQt.FindQt(String.format("%s.qt1",_serial));
-                _qt_x = YQt.FindQt(String.format("%s.qt2",_serial));
-                _qt_y = YQt.FindQt(String.format("%s.qt3",_serial));
-                _qt_z = YQt.FindQt(String.format("%s.qt4",_serial));
+                _qt_w = YQt.FindQtInContext(_yapi, String.format("%s.qt1",_serial));
+                _qt_x = YQt.FindQtInContext(_yapi, String.format("%s.qt2",_serial));
+                _qt_y = YQt.FindQtInContext(_yapi, String.format("%s.qt3",_serial));
+                _qt_z = YQt.FindQtInContext(_yapi, String.format("%s.qt4",_serial));
             }
             if (_qt_w.load(9) != YAPI.SUCCESS) {
                 return YAPI.DEVICE_NOT_FOUND;
@@ -668,7 +709,7 @@ public class YGyro extends YSensor
         if (qtIndex < 4) {
             return 0;
         }
-        _qt_stamp = (int) ((YAPI.GetTickCount()) & (0x7FFFFFFF));
+        _qt_stamp = (int) ((YAPIContext.GetTickCount()) & (0x7FFFFFFF));
         if (_quatCallback != null) {
             _quatCallback.yQuaternionCallback(this, _w, _x, _y, _z);
         }
@@ -686,17 +727,17 @@ public class YGyro extends YSensor
      *         a gyroscope currently online, or a null pointer
      *         if there are no more gyroscopes to enumerate.
      */
-    public  YGyro nextGyro()
+    public YGyro nextGyro()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindGyro(next_hwid);
+        return FindGyroInContext(_yapi, next_hwid);
     }
 
     /**
@@ -710,9 +751,28 @@ public class YGyro extends YSensor
      */
     public static YGyro FirstGyro()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Gyro");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Gyro");
         if (next_hwid == null)  return null;
-        return FindGyro(next_hwid);
+        return FindGyroInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of gyroscopes currently accessible.
+     * Use the method YGyro.nextGyro() to iterate on
+     * next gyroscopes.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YGyro object, corresponding to
+     *         the first gyro currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YGyro FirstGyroInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Gyro");
+        if (next_hwid == null)  return null;
+        return FindGyroInContext(yctx, next_hwid);
     }
 
     //--- (end of generated code: YGyro implementation)

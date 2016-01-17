@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YSerialPort.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 import java.util.ArrayList;
 
 //--- (YSerialPort return codes)
@@ -162,12 +161,21 @@ public class YSerialPort extends YFunction
      *
      * @param func : functionid
      */
-    protected YSerialPort(String func)
+    protected YSerialPort(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "SerialPort";
         //--- (YSerialPort attributes initialization)
         //--- (end of YSerialPort attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YSerialPort(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YSerialPort implementation)
@@ -228,7 +236,7 @@ public class YSerialPort extends YFunction
      */
     public String get_serialMode() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SERIALMODE_INVALID;
             }
@@ -312,7 +320,7 @@ public class YSerialPort extends YFunction
      */
     public String get_protocol() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PROTOCOL_INVALID;
             }
@@ -397,7 +405,7 @@ public class YSerialPort extends YFunction
      */
     public int get_voltageLevel() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return VOLTAGELEVEL_INVALID;
             }
@@ -472,7 +480,7 @@ public class YSerialPort extends YFunction
      */
     public int get_rxCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RXCOUNT_INVALID;
             }
@@ -501,7 +509,7 @@ public class YSerialPort extends YFunction
      */
     public int get_txCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TXCOUNT_INVALID;
             }
@@ -530,7 +538,7 @@ public class YSerialPort extends YFunction
      */
     public int get_errCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ERRCOUNT_INVALID;
             }
@@ -559,7 +567,7 @@ public class YSerialPort extends YFunction
      */
     public int get_rxMsgCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RXMSGCOUNT_INVALID;
             }
@@ -588,7 +596,7 @@ public class YSerialPort extends YFunction
      */
     public int get_txMsgCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TXMSGCOUNT_INVALID;
             }
@@ -617,7 +625,7 @@ public class YSerialPort extends YFunction
      */
     public String get_lastMsg() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LASTMSG_INVALID;
             }
@@ -646,7 +654,7 @@ public class YSerialPort extends YFunction
      */
     public String get_currentJob() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTJOB_INVALID;
             }
@@ -710,7 +718,7 @@ public class YSerialPort extends YFunction
      */
     public String get_startupJob() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STARTUPJOB_INVALID;
             }
@@ -770,7 +778,7 @@ public class YSerialPort extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -828,6 +836,41 @@ public class YSerialPort extends YFunction
         obj = (YSerialPort) YFunction._FindFromCache("SerialPort", func);
         if (obj == null) {
             obj = new YSerialPort(func);
+            YFunction._AddToCache("SerialPort", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a serial port for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the serial port is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YSerialPort.isOnline() to test if the serial port is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a serial port by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the serial port
+     *
+     * @return a YSerialPort object allowing you to drive the serial port.
+     */
+    public static YSerialPort FindSerialPortInContext(YAPIContext yctx,String func)
+    {
+        YSerialPort obj;
+        obj = (YSerialPort) YFunction._FindFromCacheInContext(yctx, "SerialPort", func);
+        if (obj == null) {
+            obj = new YSerialPort(yctx, func);
             YFunction._AddToCache("SerialPort", func, obj);
         }
         return obj;
@@ -1337,7 +1380,7 @@ public class YSerialPort extends YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        _rxptr = YAPI._atoi(msgarr.get(msglen));
+        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
         if (msglen == 0) {
             return "";
         }
@@ -1384,7 +1427,7 @@ public class YSerialPort extends YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        _rxptr = YAPI._atoi(msgarr.get(msglen));
+        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
         idx = 0;
         while (idx < msglen) {
             res.add(_json_get_string(msgarr.get(idx).getBytes()));
@@ -1435,7 +1478,7 @@ public class YSerialPort extends YFunction
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
             bufflen = bufflen - 1;
         }
-        res = YAPI._atoi((new String(buff)).substring( 0,  0 + bufflen));
+        res = YAPIContext._atoi((new String(buff)).substring( 0,  0 + bufflen));
         return res;
     }
 
@@ -1468,7 +1511,7 @@ public class YSerialPort extends YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        _rxptr = YAPI._atoi(msgarr.get(msglen));
+        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
         if (msglen == 0) {
             return "";
         }
@@ -2034,17 +2077,17 @@ public class YSerialPort extends YFunction
      *         a serial port currently online, or a null pointer
      *         if there are no more serial ports to enumerate.
      */
-    public  YSerialPort nextSerialPort()
+    public YSerialPort nextSerialPort()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindSerialPort(next_hwid);
+        return FindSerialPortInContext(_yapi, next_hwid);
     }
 
     /**
@@ -2058,9 +2101,28 @@ public class YSerialPort extends YFunction
      */
     public static YSerialPort FirstSerialPort()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("SerialPort");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("SerialPort");
         if (next_hwid == null)  return null;
-        return FindSerialPort(next_hwid);
+        return FindSerialPortInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of serial ports currently accessible.
+     * Use the method YSerialPort.nextSerialPort() to iterate on
+     * next serial ports.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YSerialPort object, corresponding to
+     *         the first serial port currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YSerialPort FirstSerialPortInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("SerialPort");
+        if (next_hwid == null)  return null;
+        return FindSerialPortInContext(yctx, next_hwid);
     }
 
     //--- (end of YSerialPort implementation)

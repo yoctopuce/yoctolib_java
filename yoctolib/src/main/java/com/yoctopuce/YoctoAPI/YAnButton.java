@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAnButton.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YAnButton.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindAnButton(), the high-level API for AnButton functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YAnButton return codes)
 //--- (end of YAnButton return codes)
@@ -153,12 +152,21 @@ public class YAnButton extends YFunction
      *
      * @param func : functionid
      */
-    protected YAnButton(String func)
+    protected YAnButton(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "AnButton";
         //--- (YAnButton attributes initialization)
         //--- (end of YAnButton attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YAnButton(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YAnButton implementation)
@@ -210,7 +218,7 @@ public class YAnButton extends YFunction
      */
     public int get_calibratedValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATEDVALUE_INVALID;
             }
@@ -239,7 +247,7 @@ public class YAnButton extends YFunction
      */
     public int get_rawValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RAWVALUE_INVALID;
             }
@@ -268,7 +276,7 @@ public class YAnButton extends YFunction
      */
     public int get_analogCalibration() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ANALOGCALIBRATION_INVALID;
             }
@@ -331,7 +339,7 @@ public class YAnButton extends YFunction
      */
     public int get_calibrationMax() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATIONMAX_INVALID;
             }
@@ -401,7 +409,7 @@ public class YAnButton extends YFunction
      */
     public int get_calibrationMin() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATIONMIN_INVALID;
             }
@@ -471,7 +479,7 @@ public class YAnButton extends YFunction
      */
     public int get_sensitivity() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SENSITIVITY_INVALID;
             }
@@ -545,7 +553,7 @@ public class YAnButton extends YFunction
      */
     public int get_isPressed() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ISPRESSED_INVALID;
             }
@@ -578,7 +586,7 @@ public class YAnButton extends YFunction
      */
     public long get_lastTimePressed() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LASTTIMEPRESSED_INVALID;
             }
@@ -613,7 +621,7 @@ public class YAnButton extends YFunction
      */
     public long get_lastTimeReleased() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LASTTIMERELEASED_INVALID;
             }
@@ -645,7 +653,7 @@ public class YAnButton extends YFunction
      */
     public long get_pulseCounter() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSECOUNTER_INVALID;
             }
@@ -687,7 +695,7 @@ public class YAnButton extends YFunction
      */
     public long get_pulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PULSETIMER_INVALID;
             }
@@ -736,6 +744,41 @@ public class YAnButton extends YFunction
         obj = (YAnButton) YFunction._FindFromCache("AnButton", func);
         if (obj == null) {
             obj = new YAnButton(func);
+            YFunction._AddToCache("AnButton", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves an analog input for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the analog input is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YAnButton.isOnline() to test if the analog input is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * an analog input by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the analog input
+     *
+     * @return a YAnButton object allowing you to drive the analog input.
+     */
+    public static YAnButton FindAnButtonInContext(YAPIContext yctx,String func)
+    {
+        YAnButton obj;
+        obj = (YAnButton) YFunction._FindFromCacheInContext(yctx, "AnButton", func);
+        if (obj == null) {
+            obj = new YAnButton(yctx, func);
             YFunction._AddToCache("AnButton", func, obj);
         }
         return obj;
@@ -801,17 +844,17 @@ public class YAnButton extends YFunction
      *         an analog input currently online, or a null pointer
      *         if there are no more analog inputs to enumerate.
      */
-    public  YAnButton nextAnButton()
+    public YAnButton nextAnButton()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindAnButton(next_hwid);
+        return FindAnButtonInContext(_yapi, next_hwid);
     }
 
     /**
@@ -825,9 +868,28 @@ public class YAnButton extends YFunction
      */
     public static YAnButton FirstAnButton()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("AnButton");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("AnButton");
         if (next_hwid == null)  return null;
-        return FindAnButton(next_hwid);
+        return FindAnButtonInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of analog inputs currently accessible.
+     * Use the method YAnButton.nextAnButton() to iterate on
+     * next analog inputs.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YAnButton object, corresponding to
+     *         the first analog input currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YAnButton FirstAnButtonInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("AnButton");
+        if (next_hwid == null)  return null;
+        return FindAnButtonInContext(yctx, next_hwid);
     }
 
     //--- (end of YAnButton implementation)

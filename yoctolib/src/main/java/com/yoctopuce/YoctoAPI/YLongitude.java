@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLongitude.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YLongitude.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindLongitude(), the high-level API for Longitude functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YLongitude return codes)
 //--- (end of YLongitude return codes)
@@ -93,12 +92,21 @@ public class YLongitude extends YSensor
      *
      * @param func : functionid
      */
-    protected YLongitude(String func)
+    protected YLongitude(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Longitude";
         //--- (YLongitude attributes initialization)
         //--- (end of YLongitude attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YLongitude(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YLongitude implementation)
@@ -137,6 +145,41 @@ public class YLongitude extends YSensor
         obj = (YLongitude) YFunction._FindFromCache("Longitude", func);
         if (obj == null) {
             obj = new YLongitude(func);
+            YFunction._AddToCache("Longitude", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a longitude sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the longitude sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YLongitude.isOnline() to test if the longitude sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a longitude sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the longitude sensor
+     *
+     * @return a YLongitude object allowing you to drive the longitude sensor.
+     */
+    public static YLongitude FindLongitudeInContext(YAPIContext yctx,String func)
+    {
+        YLongitude obj;
+        obj = (YLongitude) YFunction._FindFromCacheInContext(yctx, "Longitude", func);
+        if (obj == null) {
+            obj = new YLongitude(yctx, func);
             YFunction._AddToCache("Longitude", func, obj);
         }
         return obj;
@@ -196,10 +239,12 @@ public class YLongitude extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackLongitude = callback;
         return 0;
@@ -223,17 +268,17 @@ public class YLongitude extends YSensor
      *         a longitude sensor currently online, or a null pointer
      *         if there are no more longitude sensors to enumerate.
      */
-    public  YLongitude nextLongitude()
+    public YLongitude nextLongitude()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindLongitude(next_hwid);
+        return FindLongitudeInContext(_yapi, next_hwid);
     }
 
     /**
@@ -247,9 +292,28 @@ public class YLongitude extends YSensor
      */
     public static YLongitude FirstLongitude()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Longitude");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Longitude");
         if (next_hwid == null)  return null;
-        return FindLongitude(next_hwid);
+        return FindLongitudeInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of longitude sensors currently accessible.
+     * Use the method YLongitude.nextLongitude() to iterate on
+     * next longitude sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YLongitude object, corresponding to
+     *         the first longitude sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YLongitude FirstLongitudeInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Longitude");
+        if (next_hwid == null)  return null;
+        return FindLongitudeInContext(yctx, next_hwid);
     }
 
     //--- (end of YLongitude implementation)

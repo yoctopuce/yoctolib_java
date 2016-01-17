@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YFiles.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -43,8 +43,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YFiles class start)
 /**
@@ -103,12 +101,17 @@ public class YFiles extends YFunction
     /**
      * @param func : functionid
      */
-    protected YFiles(String func)
+    protected YFiles(YAPIContext yctx, String func)
     {
-        super(func);
+        super(yctx, func);
         _className = "Files";
         //--- (generated code: YFiles attributes initialization)
         //--- (end of generated code: YFiles attributes initialization)
+    }
+
+    protected YFiles(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
 
@@ -134,7 +137,7 @@ public class YFiles extends YFunction
      */
     public int get_filesCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FILESCOUNT_INVALID;
             }
@@ -163,7 +166,7 @@ public class YFiles extends YFunction
      */
     public int get_freeSpace() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREESPACE_INVALID;
             }
@@ -212,6 +215,41 @@ public class YFiles extends YFunction
         obj = (YFiles) YFunction._FindFromCache("Files", func);
         if (obj == null) {
             obj = new YFiles(func);
+            YFunction._AddToCache("Files", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a filesystem for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the filesystem is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YFiles.isOnline() to test if the filesystem is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a filesystem by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the filesystem
+     *
+     * @return a YFiles object allowing you to drive the filesystem.
+     */
+    public static YFiles FindFilesInContext(YAPIContext yctx,String func)
+    {
+        YFiles obj;
+        obj = (YFiles) YFunction._FindFromCacheInContext(yctx, "Files", func);
+        if (obj == null) {
+            obj = new YFiles(yctx, func);
             YFunction._AddToCache("Files", func, obj);
         }
         return obj;
@@ -312,6 +350,30 @@ public class YFiles extends YFunction
     }
 
     /**
+     * Test if a file exist on the filesystem of the module.
+     *
+     * @param filename : the file name to test.
+     *
+     * @return a true if the file existe, false ortherwise.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public boolean fileExist(String filename) throws YAPI_Exception
+    {
+        byte[] json;
+        ArrayList<String> filelist = new ArrayList<String>();
+        if ((filename).length() == 0) {
+            return false;
+        }
+        json = sendCommand(String.format("dir&f=%s",filename));
+        filelist = _json_get_array(json);
+        if (filelist.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Downloads the requested file and returns a binary buffer with its content.
      *
      * @param pathname : path and name of the file to download
@@ -372,17 +434,17 @@ public class YFiles extends YFunction
      *         a filesystem currently online, or a null pointer
      *         if there are no more filesystems to enumerate.
      */
-    public  YFiles nextFiles()
+    public YFiles nextFiles()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindFiles(next_hwid);
+        return FindFilesInContext(_yapi, next_hwid);
     }
 
     /**
@@ -396,9 +458,28 @@ public class YFiles extends YFunction
      */
     public static YFiles FirstFiles()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Files");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Files");
         if (next_hwid == null)  return null;
-        return FindFiles(next_hwid);
+        return FindFilesInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of filesystems currently accessible.
+     * Use the method YFiles.nextFiles() to iterate on
+     * next filesystems.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YFiles object, corresponding to
+     *         the first filesystem currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YFiles FirstFilesInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Files");
+        if (next_hwid == null)  return null;
+        return FindFilesInContext(yctx, next_hwid);
     }
 
     //--- (end of generated code: YFiles implementation)

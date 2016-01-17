@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YPEntry.java 21937 2015-11-06 10:57:10Z seb $
+ * $Id: YPEntry.java 22359 2015-12-15 13:30:10Z seb $
  *
  * Yellow page implementation
  *
@@ -39,8 +39,6 @@ package com.yoctopuce.YoctoAPI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 
 class YPEntry
@@ -87,7 +85,7 @@ class YPEntry
         int pos = hardwareId.indexOf('.');
         _serial = hardwareId.substring(0, pos);
         _funcId = hardwareId.substring(pos + 1);
-        _classname = YAPI.functionClass(_funcId);
+        _classname = YAPIContext.functionClass(_funcId);
         _logicalName = json.getString("logicalName");
         _advertisedValue = json.getString("advertisedValue");
         try {
@@ -108,7 +106,7 @@ class YPEntry
         _serial = serial;
         _funcId = functionID;
         _baseclass = baseclass;
-        _classname = YAPI.functionClass(_funcId);
+        _classname = YAPIContext.functionClass(_funcId);
     }
 
     //called from Jni

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLatitude.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YLatitude.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindLatitude(), the high-level API for Latitude functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YLatitude return codes)
 //--- (end of YLatitude return codes)
@@ -93,12 +92,21 @@ public class YLatitude extends YSensor
      *
      * @param func : functionid
      */
-    protected YLatitude(String func)
+    protected YLatitude(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Latitude";
         //--- (YLatitude attributes initialization)
         //--- (end of YLatitude attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YLatitude(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YLatitude implementation)
@@ -137,6 +145,41 @@ public class YLatitude extends YSensor
         obj = (YLatitude) YFunction._FindFromCache("Latitude", func);
         if (obj == null) {
             obj = new YLatitude(func);
+            YFunction._AddToCache("Latitude", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a latitude sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the latitude sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YLatitude.isOnline() to test if the latitude sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a latitude sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the latitude sensor
+     *
+     * @return a YLatitude object allowing you to drive the latitude sensor.
+     */
+    public static YLatitude FindLatitudeInContext(YAPIContext yctx,String func)
+    {
+        YLatitude obj;
+        obj = (YLatitude) YFunction._FindFromCacheInContext(yctx, "Latitude", func);
+        if (obj == null) {
+            obj = new YLatitude(yctx, func);
             YFunction._AddToCache("Latitude", func, obj);
         }
         return obj;
@@ -196,10 +239,12 @@ public class YLatitude extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackLatitude = callback;
         return 0;
@@ -223,17 +268,17 @@ public class YLatitude extends YSensor
      *         a latitude sensor currently online, or a null pointer
      *         if there are no more latitude sensors to enumerate.
      */
-    public  YLatitude nextLatitude()
+    public YLatitude nextLatitude()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindLatitude(next_hwid);
+        return FindLatitudeInContext(_yapi, next_hwid);
     }
 
     /**
@@ -247,9 +292,28 @@ public class YLatitude extends YSensor
      */
     public static YLatitude FirstLatitude()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Latitude");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Latitude");
         if (next_hwid == null)  return null;
-        return FindLatitude(next_hwid);
+        return FindLatitudeInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of latitude sensors currently accessible.
+     * Use the method YLatitude.nextLatitude() to iterate on
+     * next latitude sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YLatitude object, corresponding to
+     *         the first latitude sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YLatitude FirstLatitudeInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Latitude");
+        if (next_hwid == null)  return null;
+        return FindLatitudeInContext(yctx, next_hwid);
     }
 
     //--- (end of YLatitude implementation)

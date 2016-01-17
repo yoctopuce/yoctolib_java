@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDigitalIO.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YDigitalIO.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YDigitalIO return codes)
 //--- (end of YDigitalIO return codes)
@@ -130,12 +129,21 @@ public class YDigitalIO extends YFunction
      *
      * @param func : functionid
      */
-    protected YDigitalIO(String func)
+    protected YDigitalIO(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "DigitalIO";
         //--- (YDigitalIO attributes initialization)
         //--- (end of YDigitalIO attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YDigitalIO(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YDigitalIO implementation)
@@ -175,7 +183,7 @@ public class YDigitalIO extends YFunction
      */
     public int get_portState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTSTATE_INVALID;
             }
@@ -238,7 +246,7 @@ public class YDigitalIO extends YFunction
      */
     public int get_portDirection() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTDIRECTION_INVALID;
             }
@@ -305,7 +313,7 @@ public class YDigitalIO extends YFunction
      */
     public int get_portOpenDrain() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTOPENDRAIN_INVALID;
             }
@@ -372,7 +380,7 @@ public class YDigitalIO extends YFunction
      */
     public int get_portPolarity() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTPOLARITY_INVALID;
             }
@@ -437,7 +445,7 @@ public class YDigitalIO extends YFunction
      */
     public int get_portSize() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PORTSIZE_INVALID;
             }
@@ -467,7 +475,7 @@ public class YDigitalIO extends YFunction
      */
     public int get_outputVoltage() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OUTPUTVOLTAGE_INVALID;
             }
@@ -528,7 +536,7 @@ public class YDigitalIO extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -586,6 +594,41 @@ public class YDigitalIO extends YFunction
         obj = (YDigitalIO) YFunction._FindFromCache("DigitalIO", func);
         if (obj == null) {
             obj = new YDigitalIO(func);
+            YFunction._AddToCache("DigitalIO", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a digital IO port for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the digital IO port is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YDigitalIO.isOnline() to test if the digital IO port is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a digital IO port by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the digital IO port
+     *
+     * @return a YDigitalIO object allowing you to drive the digital IO port.
+     */
+    public static YDigitalIO FindDigitalIOInContext(YAPIContext yctx,String func)
+    {
+        YDigitalIO obj;
+        obj = (YDigitalIO) YFunction._FindFromCacheInContext(yctx, "DigitalIO", func);
+        if (obj == null) {
+            obj = new YDigitalIO(yctx, func);
             YFunction._AddToCache("DigitalIO", func, obj);
         }
         return obj;
@@ -828,17 +871,17 @@ public class YDigitalIO extends YFunction
      *         a digital IO port currently online, or a null pointer
      *         if there are no more digital IO ports to enumerate.
      */
-    public  YDigitalIO nextDigitalIO()
+    public YDigitalIO nextDigitalIO()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindDigitalIO(next_hwid);
+        return FindDigitalIOInContext(_yapi, next_hwid);
     }
 
     /**
@@ -852,9 +895,28 @@ public class YDigitalIO extends YFunction
      */
     public static YDigitalIO FirstDigitalIO()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("DigitalIO");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("DigitalIO");
         if (next_hwid == null)  return null;
-        return FindDigitalIO(next_hwid);
+        return FindDigitalIOInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of digital IO ports currently accessible.
+     * Use the method YDigitalIO.nextDigitalIO() to iterate on
+     * next digital IO ports.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YDigitalIO object, corresponding to
+     *         the first digital IO port currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YDigitalIO FirstDigitalIOInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("DigitalIO");
+        if (next_hwid == null)  return null;
+        return FindDigitalIOInContext(yctx, next_hwid);
     }
 
     //--- (end of YDigitalIO implementation)

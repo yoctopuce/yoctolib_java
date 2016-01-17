@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHumidity.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YHumidity.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindHumidity(), the high-level API for Humidity functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YHumidity return codes)
 //--- (end of YHumidity return codes)
@@ -102,12 +101,21 @@ public class YHumidity extends YSensor
      *
      * @param func : functionid
      */
-    protected YHumidity(String func)
+    protected YHumidity(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Humidity";
         //--- (YHumidity attributes initialization)
         //--- (end of YHumidity attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YHumidity(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YHumidity implementation)
@@ -175,7 +183,7 @@ public class YHumidity extends YSensor
      */
     public double get_relHum() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RELHUM_INVALID;
             }
@@ -204,7 +212,7 @@ public class YHumidity extends YSensor
      */
     public double get_absHum() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ABSHUM_INVALID;
             }
@@ -253,6 +261,41 @@ public class YHumidity extends YSensor
         obj = (YHumidity) YFunction._FindFromCache("Humidity", func);
         if (obj == null) {
             obj = new YHumidity(func);
+            YFunction._AddToCache("Humidity", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a humidity sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the humidity sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YHumidity.isOnline() to test if the humidity sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a humidity sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the humidity sensor
+     *
+     * @return a YHumidity object allowing you to drive the humidity sensor.
+     */
+    public static YHumidity FindHumidityInContext(YAPIContext yctx,String func)
+    {
+        YHumidity obj;
+        obj = (YHumidity) YFunction._FindFromCacheInContext(yctx, "Humidity", func);
+        if (obj == null) {
+            obj = new YHumidity(yctx, func);
             YFunction._AddToCache("Humidity", func, obj);
         }
         return obj;
@@ -312,10 +355,12 @@ public class YHumidity extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackHumidity = callback;
         return 0;
@@ -339,17 +384,17 @@ public class YHumidity extends YSensor
      *         a humidity sensor currently online, or a null pointer
      *         if there are no more humidity sensors to enumerate.
      */
-    public  YHumidity nextHumidity()
+    public YHumidity nextHumidity()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindHumidity(next_hwid);
+        return FindHumidityInContext(_yapi, next_hwid);
     }
 
     /**
@@ -363,9 +408,28 @@ public class YHumidity extends YSensor
      */
     public static YHumidity FirstHumidity()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Humidity");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Humidity");
         if (next_hwid == null)  return null;
-        return FindHumidity(next_hwid);
+        return FindHumidityInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of humidity sensors currently accessible.
+     * Use the method YHumidity.nextHumidity() to iterate on
+     * next humidity sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YHumidity object, corresponding to
+     *         the first humidity sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YHumidity FirstHumidityInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Humidity");
+        if (next_hwid == null)  return null;
+        return FindHumidityInContext(yctx, next_hwid);
     }
 
     //--- (end of YHumidity implementation)

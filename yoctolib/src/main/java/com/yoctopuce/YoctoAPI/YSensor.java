@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YSensor.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -43,8 +43,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YSensor class start)
 /**
@@ -178,7 +176,7 @@ public class YSensor extends YFunction
             _throw(YAPI.NOT_SUPPORTED, "Device does not support new calibration parameters. Please upgrade your firmware");
             return "0";
         }
-        ArrayList<Integer> iCalib = YAPI._decodeWords(actualCparams);
+        ArrayList<Integer> iCalib = YAPIContext._decodeWords(actualCparams);
         int calibrationOffset = iCalib.get(0);
         int divisor = iCalib.get(1);
         if (divisor > 0) {
@@ -201,8 +199,8 @@ public class YSensor extends YFunction
         } else {
             // 16-bit floating-point decimal encoding
             for (int i = 0; i < npt; i++) {
-                rawVal = (int) YAPI._doubleToDecimal(rawValues.get(i));
-                refVal = (int) YAPI._doubleToDecimal(refValues.get(i));
+                rawVal = (int) YAPIContext._doubleToDecimal(rawValues.get(i));
+                refVal = (int) YAPIContext._doubleToDecimal(refValues.get(i));
                 res += String.format(",%d,%d", rawVal, refVal);
             }
         }
@@ -228,7 +226,7 @@ public class YSensor extends YFunction
             return -1;
         }
         // new format
-        ArrayList<Integer> iCalib = YAPI._decodeWords(calibParams);
+        ArrayList<Integer> iCalib = YAPIContext._decodeWords(calibParams);
         if (iCalib.size() < 2) {
             // bad format
             return -1;
@@ -251,7 +249,7 @@ public class YSensor extends YFunction
             if (calibType <= 10) {
                 fval = (ival + calibrationOffset) / divisor;
             } else {
-                fval = YAPI._decimalToDouble(ival);
+                fval = YAPIContext._decimalToDouble(ival);
             }
             intPt.add(ival);
             if ((intPt.size() & 1) == 1) {
@@ -270,12 +268,16 @@ public class YSensor extends YFunction
     /**
      * @param func : functionid
      */
-    protected YSensor(String func)
+    protected YSensor(YAPIContext yctx, String func)
     {
-        super(func);
+        super(yctx, func);
         _className = "Sensor";
         //--- (generated code: YSensor attributes initialization)
         //--- (end of generated code: YSensor attributes initialization)
+    }
+    protected YSensor(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
 
@@ -325,7 +327,7 @@ public class YSensor extends YFunction
      */
     public String get_unit() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UNIT_INVALID;
             }
@@ -356,7 +358,7 @@ public class YSensor extends YFunction
     public double get_currentValue() throws YAPI_Exception
     {
         double res;
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTVALUE_INVALID;
             }
@@ -424,7 +426,7 @@ public class YSensor extends YFunction
     public double get_lowestValue() throws YAPI_Exception
     {
         double res;
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOWESTVALUE_INVALID;
             }
@@ -488,7 +490,7 @@ public class YSensor extends YFunction
     public double get_highestValue() throws YAPI_Exception
     {
         double res;
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return HIGHESTVALUE_INVALID;
             }
@@ -521,7 +523,7 @@ public class YSensor extends YFunction
      */
     public double get_currentRawValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CURRENTRAWVALUE_INVALID;
             }
@@ -554,7 +556,7 @@ public class YSensor extends YFunction
      */
     public String get_logFrequency() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOGFREQUENCY_INVALID;
             }
@@ -626,7 +628,7 @@ public class YSensor extends YFunction
      */
     public String get_reportFrequency() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return REPORTFREQUENCY_INVALID;
             }
@@ -692,7 +694,7 @@ public class YSensor extends YFunction
      */
     public String get_calibrationParam() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATIONPARAM_INVALID;
             }
@@ -764,7 +766,7 @@ public class YSensor extends YFunction
      */
     public double get_resolution() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return RESOLUTION_INVALID;
             }
@@ -797,7 +799,7 @@ public class YSensor extends YFunction
      */
     public int get_sensorState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SENSORSTATE_INVALID;
             }
@@ -849,6 +851,41 @@ public class YSensor extends YFunction
         obj = (YSensor) YFunction._FindFromCache("Sensor", func);
         if (obj == null) {
             obj = new YSensor(func);
+            YFunction._AddToCache("Sensor", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YSensor.isOnline() to test if the sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the sensor
+     *
+     * @return a YSensor object allowing you to drive the sensor.
+     */
+    public static YSensor FindSensorInContext(YAPIContext yctx,String func)
+    {
+        YSensor obj;
+        obj = (YSensor) YFunction._FindFromCacheInContext(yctx, "Sensor", func);
+        if (obj == null) {
+            obj = new YSensor(yctx, func);
             YFunction._AddToCache("Sensor", func, obj);
         }
         return obj;
@@ -924,14 +961,14 @@ public class YSensor extends YFunction
             return 0;
         }
         if ((_calibrationParam).indexOf(",") >= 0) {
-            iCalib = SafeYAPI()._decodeFloats(_calibrationParam);
+            iCalib = YAPIContext._decodeFloats(_calibrationParam);
             _caltyp = ((iCalib.get(0).intValue()) / (1000));
             if (_caltyp > 0) {
                 if (_caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
                     _caltyp = -1;
                     return 0;
                 }
-                _calhdl = SafeYAPI()._getCalibrationHandler(_caltyp);
+                _calhdl = _yapi._getCalibrationHandler(_caltyp);
                 if (!(_calhdl != null)) {
                     _caltyp = -1;
                     return 0;
@@ -961,7 +998,7 @@ public class YSensor extends YFunction
                 position = position + 2;
             }
         } else {
-            iCalib = SafeYAPI()._decodeWords(_calibrationParam);
+            iCalib = YAPIContext._decodeWords(_calibrationParam);
             if (iCalib.size() < 2) {
                 _caltyp = -1;
                 return 0;
@@ -989,7 +1026,7 @@ public class YSensor extends YFunction
                 return 0;
             }
             _caltyp = iCalib.get(2).intValue();
-            _calhdl = SafeYAPI()._getCalibrationHandler(_caltyp);
+            _calhdl = _yapi._getCalibrationHandler(_caltyp);
             if (_caltyp <= 10) {
                 maxpos = _caltyp;
             } else {
@@ -1020,8 +1057,8 @@ public class YSensor extends YFunction
                     _calraw.add(fRaw);
                     _calref.add(fRef);
                 } else {
-                    _calraw.add(SafeYAPI()._decimalToDouble(iRaw));
-                    _calref.add(SafeYAPI()._decimalToDouble(iRef));
+                    _calraw.add(YAPIContext._decimalToDouble(iRaw));
+                    _calref.add(YAPIContext._decimalToDouble(iRef));
                 }
                 position = position + 2;
             }
@@ -1127,10 +1164,12 @@ public class YSensor extends YFunction
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackSensor = callback;
         return 0;
@@ -1260,8 +1299,8 @@ public class YSensor extends YFunction
                 res = String.format("%d",10 + npt);
                 idx = 0;
                 while (idx < npt) {
-                    iRaw = (int) SafeYAPI()._doubleToDecimal(rawValues.get(idx).doubleValue());
-                    iRef = (int) SafeYAPI()._doubleToDecimal(refValues.get(idx).doubleValue());
+                    iRaw = (int) YAPIContext._doubleToDecimal(rawValues.get(idx).doubleValue());
+                    iRef = (int) YAPIContext._doubleToDecimal(refValues.get(idx).doubleValue());
                     res = String.format("%s,%d,%d", res, iRaw,iRef);
                     idx = idx + 1;
                 }
@@ -1427,7 +1466,7 @@ public class YSensor extends YFunction
         if (_isScal) {
             val = (val - _offset) / _scale;
         } else {
-            val = SafeYAPI()._decimalToDouble(w);
+            val = YAPIContext._decimalToDouble(w);
         }
         if (_caltyp != 0) {
             if (_calhdl != null) {
@@ -1461,17 +1500,17 @@ public class YSensor extends YFunction
      *         a sensor currently online, or a null pointer
      *         if there are no more sensors to enumerate.
      */
-    public  YSensor nextSensor()
+    public YSensor nextSensor()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindSensor(next_hwid);
+        return FindSensorInContext(_yapi, next_hwid);
     }
 
     /**
@@ -1485,9 +1524,28 @@ public class YSensor extends YFunction
      */
     public static YSensor FirstSensor()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Sensor");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Sensor");
         if (next_hwid == null)  return null;
-        return FindSensor(next_hwid);
+        return FindSensorInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of sensors currently accessible.
+     * Use the method YSensor.nextSensor() to iterate on
+     * next sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YSensor object, corresponding to
+     *         the first sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YSensor FirstSensorInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Sensor");
+        if (next_hwid == null)  return null;
+        return FindSensorInContext(yctx, next_hwid);
     }
 
     //--- (end of generated code: YSensor implementation)

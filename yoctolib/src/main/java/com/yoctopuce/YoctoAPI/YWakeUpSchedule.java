@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpSchedule.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YWakeUpSchedule.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YWakeUpSchedule return codes)
 //--- (end of YWakeUpSchedule return codes)
@@ -126,12 +125,21 @@ public class YWakeUpSchedule extends YFunction
      *
      * @param func : functionid
      */
-    protected YWakeUpSchedule(String func)
+    protected YWakeUpSchedule(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "WakeUpSchedule";
         //--- (YWakeUpSchedule attributes initialization)
         //--- (end of YWakeUpSchedule attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YWakeUpSchedule(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YWakeUpSchedule implementation)
@@ -171,7 +179,7 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_minutesA() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MINUTESA_INVALID;
             }
@@ -231,7 +239,7 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_minutesB() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MINUTESB_INVALID;
             }
@@ -291,7 +299,7 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_hours() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return HOURS_INVALID;
             }
@@ -351,7 +359,7 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_weekDays() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return WEEKDAYS_INVALID;
             }
@@ -411,7 +419,7 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_monthDays() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MONTHDAYS_INVALID;
             }
@@ -471,7 +479,7 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_months() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MONTHS_INVALID;
             }
@@ -531,7 +539,7 @@ public class YWakeUpSchedule extends YFunction
      */
     public long get_nextOccurence() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return NEXTOCCURENCE_INVALID;
             }
@@ -580,6 +588,41 @@ public class YWakeUpSchedule extends YFunction
         obj = (YWakeUpSchedule) YFunction._FindFromCache("WakeUpSchedule", func);
         if (obj == null) {
             obj = new YWakeUpSchedule(func);
+            YFunction._AddToCache("WakeUpSchedule", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a wake up schedule for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the wake up schedule is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YWakeUpSchedule.isOnline() to test if the wake up schedule is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a wake up schedule by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the wake up schedule
+     *
+     * @return a YWakeUpSchedule object allowing you to drive the wake up schedule.
+     */
+    public static YWakeUpSchedule FindWakeUpScheduleInContext(YAPIContext yctx,String func)
+    {
+        YWakeUpSchedule obj;
+        obj = (YWakeUpSchedule) YFunction._FindFromCacheInContext(yctx, "WakeUpSchedule", func);
+        if (obj == null) {
+            obj = new YWakeUpSchedule(yctx, func);
             YFunction._AddToCache("WakeUpSchedule", func, obj);
         }
         return obj;
@@ -662,17 +705,17 @@ public class YWakeUpSchedule extends YFunction
      *         a wake up schedule currently online, or a null pointer
      *         if there are no more wake up schedules to enumerate.
      */
-    public  YWakeUpSchedule nextWakeUpSchedule()
+    public YWakeUpSchedule nextWakeUpSchedule()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindWakeUpSchedule(next_hwid);
+        return FindWakeUpScheduleInContext(_yapi, next_hwid);
     }
 
     /**
@@ -686,9 +729,28 @@ public class YWakeUpSchedule extends YFunction
      */
     public static YWakeUpSchedule FirstWakeUpSchedule()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("WakeUpSchedule");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("WakeUpSchedule");
         if (next_hwid == null)  return null;
-        return FindWakeUpSchedule(next_hwid);
+        return FindWakeUpScheduleInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of wake up schedules currently accessible.
+     * Use the method YWakeUpSchedule.nextWakeUpSchedule() to iterate on
+     * next wake up schedules.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YWakeUpSchedule object, corresponding to
+     *         the first wake up schedule currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YWakeUpSchedule FirstWakeUpScheduleInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("WakeUpSchedule");
+        if (next_hwid == null)  return null;
+        return FindWakeUpScheduleInContext(yctx, next_hwid);
     }
 
     //--- (end of YWakeUpSchedule implementation)

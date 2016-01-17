@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 21650 2015-09-30 15:35:28Z seb $
+ * $Id: YCallbackHub.java 22743 2016-01-14 09:54:52Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -51,17 +51,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
-
 public class YCallbackHub extends YGenericHub
 {
     private final HTTPParams _http_params;
     private final OutputStream _out;
     private JSONObject _callbackCache;
 
-    YCallbackHub(int idx, HTTPParams httpParams, InputStream request, OutputStream response) throws YAPI_Exception
+    YCallbackHub(YAPIContext yctx, int idx, HTTPParams httpParams, InputStream request, OutputStream response) throws YAPI_Exception
     {
-        super(idx, true);
+        super(yctx, httpParams, idx, true);
         _http_params = httpParams;
         _out = response;
         if (request == null || _out == null) {
@@ -108,7 +106,7 @@ public class YCallbackHub extends YGenericHub
 
     private void _output(String msg) throws IOException
     {
-        _out.write(msg.getBytes(YAPI.DeviceCharset));
+        _out.write(msg.getBytes(_yctx._deviceCharset));
     }
 
     private void loadCallbackCache(InputStream in) throws YAPI_Exception, IOException
@@ -122,7 +120,7 @@ public class YCallbackHub extends YGenericHub
             buffer.write(data, 0, nRead);
         }
         buffer.flush();
-        String data_str = buffer.toString(YAPI.DefaultEncoding);
+        String data_str = buffer.toString(_yctx._defaultEncoding);
 
         if (data_str.length() == 0) {
             String errmsg = "RegisterHub(callback) used without posting YoctoAPI data";
@@ -160,16 +158,16 @@ public class YCallbackHub extends YGenericHub
                     salt = pass.toLowerCase();
                 } else {
                     mdigest.reset();
-                    mdigest.update(pass.getBytes(YAPI.DeviceCharset));
+                    mdigest.update(pass.getBytes(_yctx._deviceCharset));
                     byte[] md5pass = mdigest.digest();
-                    salt = YAPI._bytesToHexStr(md5pass, 0, md5pass.length);
+                    salt = YAPIContext._bytesToHexStr(md5pass, 0, md5pass.length);
                 }
 
                 data_str = data_str.replace(sign, salt);
                 mdigest.reset();
-                mdigest.update(data_str.getBytes(YAPI.DefaultEncoding));
+                mdigest.update(data_str.getBytes(_yctx._deviceCharset));
                 byte[] md5 = mdigest.digest();
-                String check = YAPI._bytesToHexStr(md5, 0, md5.length);
+                String check = YAPIContext._bytesToHexStr(md5, 0, md5.length);
                 if (!check.equals(sign)) {
                     String errmsg = "invalid signature from incoming YoctoHub (invalid callback password)";
                     _output("\n!YoctoAPI:" + errmsg + "\n");
@@ -190,7 +188,7 @@ public class YCallbackHub extends YGenericHub
 
         if (query.startsWith("POST ")) {
             String boundary = "???";
-            int body_start = YAPI._find_in_bytes(header_and_body, "\r\n\r\n".getBytes(YAPI.DefaultEncoding)) + 4;
+            int body_start = YAPIContext._find_in_bytes(header_and_body, "\r\n\r\n".getBytes(_yctx._deviceCharset)) + 4;
             int endb;
             for (endb = body_start; endb < header_and_body.length; endb++) {
                 if (header_and_body[endb] == 13) break;
@@ -202,7 +200,7 @@ public class YCallbackHub extends YGenericHub
             int bodylen = header_and_body.length - body_start;
             _output("\n@YoctoAPI:" + query + " " + Integer.toString(bodylen) + ":" + boundary + "\n");
             _out.write(header_and_body, body_start, bodylen);
-            return "".getBytes(YAPI.DefaultEncoding);
+            return "".getBytes(_yctx._deviceCharset);
         }
         if (!query.startsWith("GET "))
             return null;
@@ -234,14 +232,14 @@ public class YCallbackHub extends YGenericHub
                 if (getmodule) {
                     jsonres = jsonres.getJSONObject("module");
                 }
-                return (jsonres.toString()).getBytes(YAPI.DefaultEncoding);
+                return (jsonres.toString()).getBytes(_yctx._deviceCharset);
             } catch (JSONException ex) {
                 return "".getBytes();
             }
         } else {
             // change request, print to output stream
             _output("\n@YoctoAPI:" + query + "\n");
-            return "".getBytes(YAPI.DeviceCharset);
+            return "".getBytes(_yctx._deviceCharset);
         }
     }
 

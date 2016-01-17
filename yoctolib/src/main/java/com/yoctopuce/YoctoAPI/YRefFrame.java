@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YRefFrame.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 import java.util.ArrayList;
 
 //--- (YRefFrame return codes)
@@ -187,12 +186,21 @@ public class YRefFrame extends YFunction
      *
      * @param func : functionid
      */
-    protected YRefFrame(String func)
+    protected YRefFrame(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "RefFrame";
         //--- (YRefFrame attributes initialization)
         //--- (end of YRefFrame attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YRefFrame(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YRefFrame implementation)
@@ -216,7 +224,7 @@ public class YRefFrame extends YFunction
      */
     public int get_mountPos() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MOUNTPOS_INVALID;
             }
@@ -313,7 +321,7 @@ public class YRefFrame extends YFunction
      */
     public double get_bearing() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BEARING_INVALID;
             }
@@ -340,7 +348,7 @@ public class YRefFrame extends YFunction
      */
     public String get_calibrationParam() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CALIBRATIONPARAM_INVALID;
             }
@@ -398,6 +406,41 @@ public class YRefFrame extends YFunction
         obj = (YRefFrame) YFunction._FindFromCache("RefFrame", func);
         if (obj == null) {
             obj = new YRefFrame(func);
+            YFunction._AddToCache("RefFrame", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a reference frame for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the reference frame is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YRefFrame.isOnline() to test if the reference frame is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a reference frame by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the reference frame
+     *
+     * @return a YRefFrame object allowing you to drive the reference frame.
+     */
+    public static YRefFrame FindRefFrameInContext(YAPIContext yctx,String func)
+    {
+        YRefFrame obj;
+        obj = (YRefFrame) YFunction._FindFromCacheInContext(yctx, "RefFrame", func);
+        if (obj == null) {
+            obj = new YRefFrame(yctx, func);
             YFunction._AddToCache("RefFrame", func, obj);
         }
         return obj;
@@ -526,7 +569,6 @@ public class YRefFrame extends YFunction
         double b;
         double xa;
         double xb;
-        
         // bubble sort is good since we will re-sort again after offset adjustment
         changed = 1;
         while (changed > 0) {
@@ -592,7 +634,7 @@ public class YRefFrame extends YFunction
         _calibStageProgress = 0;
         _calibProgress = 1;
         _calibInternalPos = 0;
-        _calibPrevTick = (int) ((YAPI.GetTickCount()) & (0x7FFFFFFF));
+        _calibPrevTick = (int) ((YAPIContext.GetTickCount()) & (0x7FFFFFFF));
         _calibOrient.clear();
         _calibDataAccX.clear();
         _calibDataAccY.clear();
@@ -633,9 +675,8 @@ public class YRefFrame extends YFunction
         if (_calibProgress == 100) {
             return YAPI.SUCCESS;
         }
-        
         // make sure we leave at least 160ms between samples
-        currTick =  (int) ((YAPI.GetTickCount()) & (0x7FFFFFFF));
+        currTick =  (int) ((YAPIContext.GetTickCount()) & (0x7FFFFFFF));
         if (((currTick - _calibPrevTick) & (0x7FFFFFFF)) < 160) {
             return YAPI.SUCCESS;
         }
@@ -644,9 +685,9 @@ public class YRefFrame extends YFunction
         _calibStageHint = "Set down the device on a steady horizontal surface";
         _calibPrevTick = ((currTick + 500) & (0x7FFFFFFF));
         jsonData = _download("api/accelerometer.json");
-        xVal = YAPI._atoi(_json_get_key(jsonData, "xValue")) / 65536.0;
-        yVal = YAPI._atoi(_json_get_key(jsonData, "yValue")) / 65536.0;
-        zVal = YAPI._atoi(_json_get_key(jsonData, "zValue")) / 65536.0;
+        xVal = YAPIContext._atoi(_json_get_key(jsonData, "xValue")) / 65536.0;
+        yVal = YAPIContext._atoi(_json_get_key(jsonData, "yValue")) / 65536.0;
+        zVal = YAPIContext._atoi(_json_get_key(jsonData, "zValue")) / 65536.0;
         xSq = xVal * xVal;
         if (xSq >= 0.04 && xSq < 0.64) {
             return YAPI.SUCCESS;
@@ -673,7 +714,6 @@ public class YRefFrame extends YFunction
             return YAPI.SUCCESS;
         }
         _calibPrevTick = currTick;
-        
         // Determine the device orientation index
         orient = 0;
         if (zSq > 0.5) {
@@ -697,7 +737,6 @@ public class YRefFrame extends YFunction
                 orient = 5;
             }
         }
-        
         // Discard measures that are not in the proper orientation
         if (_calibStageProgress == 0) {
             idx = 0;
@@ -719,7 +758,6 @@ public class YRefFrame extends YFunction
                 return YAPI.SUCCESS;
             }
         }
-        
         // Save measure
         _calibStageHint = "calibrating..";
         _calibDataAccX.add(xVal);
@@ -732,7 +770,6 @@ public class YRefFrame extends YFunction
             _calibStageProgress = 1 + ((99 * _calibInternalPos) / (_calibCount));
             return YAPI.SUCCESS;
         }
-        
         // Stage done, compute preliminary result
         intpos = (_calibStage - 1) * _calibCount;
         _calibSort(intpos, intpos + _calibCount);
@@ -740,7 +777,6 @@ public class YRefFrame extends YFunction
         _calibLogMsg = String.format("Stage %d: median is %d,%d,%d", _calibStage,
         (int) (double)Math.round(1000*_calibDataAccX.get(intpos).doubleValue()),
         (int) (double)Math.round(1000*_calibDataAccY.get(intpos).doubleValue()),(int) (double)Math.round(1000*_calibDataAccZ.get(intpos).doubleValue()));
-        
         // move to next stage
         _calibStage = _calibStage + 1;
         if (_calibStage < 7) {
@@ -772,7 +808,6 @@ public class YRefFrame extends YFunction
         _calibAccXOfs = xVal / 2.0;
         _calibAccYOfs = yVal / 2.0;
         _calibAccZOfs = zVal / 2.0;
-        
         // Recompute all norms, taking into account the computed shift, and re-sort
         intpos = 0;
         while (intpos < _calibDataAcc.size()) {
@@ -789,7 +824,6 @@ public class YRefFrame extends YFunction
             _calibSort(intpos, intpos + _calibCount);
             idx = idx + 1;
         }
-        
         // Compute the scaling factor for each axis
         xVal = 0;
         yVal = 0;
@@ -812,7 +846,6 @@ public class YRefFrame extends YFunction
         _calibAccXScale = xVal / 2.0;
         _calibAccYScale = yVal / 2.0;
         _calibAccZScale = zVal / 2.0;
-        
         // Report completion
         _calibProgress = 100;
         _calibStageHint = "Calibration data ready for saving";
@@ -899,7 +932,6 @@ public class YRefFrame extends YFunction
         if (_calibProgress != 100) {
             return YAPI.INVALID_ARGUMENT;
         }
-        
         // Compute integer values (correction unit is 732ug/count)
         shiftX = -(int) (double)Math.round(_calibAccXOfs / 0.000732);
         if (shiftX < 0) {
@@ -945,7 +977,6 @@ public class YRefFrame extends YFunction
         }
         scaleLo = ((((scaleY) & (15))) << (12)) + ((scaleX) << (2)) + scaleExp;
         scaleHi = ((scaleZ) << (6)) + ((scaleY) >> (4));
-        
         // Save calibration parameters
         newcalib = String.format("5,%d,%d,%d,%d,%d", shiftX, shiftY, shiftZ, scaleLo,scaleHi);
         _calibStage = 0;
@@ -974,17 +1005,17 @@ public class YRefFrame extends YFunction
      *         a reference frame currently online, or a null pointer
      *         if there are no more reference frames to enumerate.
      */
-    public  YRefFrame nextRefFrame()
+    public YRefFrame nextRefFrame()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindRefFrame(next_hwid);
+        return FindRefFrameInContext(_yapi, next_hwid);
     }
 
     /**
@@ -998,9 +1029,28 @@ public class YRefFrame extends YFunction
      */
     public static YRefFrame FirstRefFrame()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("RefFrame");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("RefFrame");
         if (next_hwid == null)  return null;
-        return FindRefFrame(next_hwid);
+        return FindRefFrameInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of reference frames currently accessible.
+     * Use the method YRefFrame.nextRefFrame() to iterate on
+     * next reference frames.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YRefFrame object, corresponding to
+     *         the first reference frame currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YRefFrame FirstRefFrameInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("RefFrame");
+        if (next_hwid == null)  return null;
+        return FindRefFrameInContext(yctx, next_hwid);
     }
 
     //--- (end of YRefFrame implementation)

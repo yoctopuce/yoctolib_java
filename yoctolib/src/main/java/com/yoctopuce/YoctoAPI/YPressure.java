@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPressure.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YPressure.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindPressure(), the high-level API for Pressure functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YPressure return codes)
 //--- (end of YPressure return codes)
@@ -92,12 +91,21 @@ public class YPressure extends YSensor
      *
      * @param func : functionid
      */
-    protected YPressure(String func)
+    protected YPressure(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Pressure";
         //--- (YPressure attributes initialization)
         //--- (end of YPressure attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YPressure(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YPressure implementation)
@@ -136,6 +144,41 @@ public class YPressure extends YSensor
         obj = (YPressure) YFunction._FindFromCache("Pressure", func);
         if (obj == null) {
             obj = new YPressure(func);
+            YFunction._AddToCache("Pressure", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a pressure sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the pressure sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YPressure.isOnline() to test if the pressure sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a pressure sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the pressure sensor
+     *
+     * @return a YPressure object allowing you to drive the pressure sensor.
+     */
+    public static YPressure FindPressureInContext(YAPIContext yctx,String func)
+    {
+        YPressure obj;
+        obj = (YPressure) YFunction._FindFromCacheInContext(yctx, "Pressure", func);
+        if (obj == null) {
+            obj = new YPressure(yctx, func);
             YFunction._AddToCache("Pressure", func, obj);
         }
         return obj;
@@ -195,10 +238,12 @@ public class YPressure extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackPressure = callback;
         return 0;
@@ -222,17 +267,17 @@ public class YPressure extends YSensor
      *         a pressure sensor currently online, or a null pointer
      *         if there are no more pressure sensors to enumerate.
      */
-    public  YPressure nextPressure()
+    public YPressure nextPressure()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindPressure(next_hwid);
+        return FindPressureInContext(_yapi, next_hwid);
     }
 
     /**
@@ -246,9 +291,28 @@ public class YPressure extends YSensor
      */
     public static YPressure FirstPressure()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Pressure");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Pressure");
         if (next_hwid == null)  return null;
-        return FindPressure(next_hwid);
+        return FindPressureInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of pressure sensors currently accessible.
+     * Use the method YPressure.nextPressure() to iterate on
+     * next pressure sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YPressure object, corresponding to
+     *         the first pressure sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YPressure FirstPressureInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Pressure");
+        if (next_hwid == null)  return null;
+        return FindPressureInContext(yctx, next_hwid);
     }
 
     //--- (end of YPressure implementation)

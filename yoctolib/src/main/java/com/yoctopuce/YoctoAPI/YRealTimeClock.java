@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YRealTimeClock.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YRealTimeClock return codes)
 //--- (end of YRealTimeClock return codes)
@@ -114,12 +113,21 @@ public class YRealTimeClock extends YFunction
      *
      * @param func : functionid
      */
-    protected YRealTimeClock(String func)
+    protected YRealTimeClock(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "RealTimeClock";
         //--- (YRealTimeClock attributes initialization)
         //--- (end of YRealTimeClock attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YRealTimeClock(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YRealTimeClock implementation)
@@ -151,7 +159,7 @@ public class YRealTimeClock extends YFunction
      */
     public long get_unixTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UNIXTIME_INVALID;
             }
@@ -212,7 +220,7 @@ public class YRealTimeClock extends YFunction
      */
     public String get_dateTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DATETIME_INVALID;
             }
@@ -241,7 +249,7 @@ public class YRealTimeClock extends YFunction
      */
     public int get_utcOffset() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return UTCOFFSET_INVALID;
             }
@@ -304,7 +312,7 @@ public class YRealTimeClock extends YFunction
      */
     public int get_timeSet() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TIMESET_INVALID;
             }
@@ -360,6 +368,41 @@ public class YRealTimeClock extends YFunction
     }
 
     /**
+     * Retrieves a clock for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the clock is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YRealTimeClock.isOnline() to test if the clock is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a clock by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the clock
+     *
+     * @return a YRealTimeClock object allowing you to drive the clock.
+     */
+    public static YRealTimeClock FindRealTimeClockInContext(YAPIContext yctx,String func)
+    {
+        YRealTimeClock obj;
+        obj = (YRealTimeClock) YFunction._FindFromCacheInContext(yctx, "RealTimeClock", func);
+        if (obj == null) {
+            obj = new YRealTimeClock(yctx, func);
+            YFunction._AddToCache("RealTimeClock", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -407,17 +450,17 @@ public class YRealTimeClock extends YFunction
      *         a clock currently online, or a null pointer
      *         if there are no more clocks to enumerate.
      */
-    public  YRealTimeClock nextRealTimeClock()
+    public YRealTimeClock nextRealTimeClock()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindRealTimeClock(next_hwid);
+        return FindRealTimeClockInContext(_yapi, next_hwid);
     }
 
     /**
@@ -431,9 +474,28 @@ public class YRealTimeClock extends YFunction
      */
     public static YRealTimeClock FirstRealTimeClock()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("RealTimeClock");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("RealTimeClock");
         if (next_hwid == null)  return null;
-        return FindRealTimeClock(next_hwid);
+        return FindRealTimeClockInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of clocks currently accessible.
+     * Use the method YRealTimeClock.nextRealTimeClock() to iterate on
+     * next clocks.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YRealTimeClock object, corresponding to
+     *         the first clock currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YRealTimeClock FirstRealTimeClockInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("RealTimeClock");
+        if (next_hwid == null)  return null;
+        return FindRealTimeClockInContext(yctx, next_hwid);
     }
 
     //--- (end of YRealTimeClock implementation)

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMotor.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YMotor.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindMotor(), the high-level API for Motor functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YMotor return codes)
 //--- (end of YMotor return codes)
@@ -146,12 +145,21 @@ public class YMotor extends YFunction
      *
      * @param func : functionid
      */
-    protected YMotor(String func)
+    protected YMotor(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Motor";
         //--- (YMotor attributes initialization)
         //--- (end of YMotor attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YMotor(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YMotor implementation)
@@ -210,7 +218,7 @@ public class YMotor extends YFunction
      */
     public int get_motorStatus() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MOTORSTATUS_INVALID;
             }
@@ -304,7 +312,7 @@ public class YMotor extends YFunction
      */
     public double get_drivingForce() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return DRIVINGFORCE_INVALID;
             }
@@ -372,7 +380,7 @@ public class YMotor extends YFunction
      */
     public double get_brakingForce() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return BRAKINGFORCE_INVALID;
             }
@@ -449,7 +457,7 @@ public class YMotor extends YFunction
      */
     public double get_cutOffVoltage() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CUTOFFVOLTAGE_INVALID;
             }
@@ -484,7 +492,7 @@ public class YMotor extends YFunction
      */
     public int get_overCurrentLimit() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return OVERCURRENTLIMIT_INVALID;
             }
@@ -593,7 +601,7 @@ public class YMotor extends YFunction
      */
     public double get_frequency() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FREQUENCY_INVALID;
             }
@@ -625,7 +633,7 @@ public class YMotor extends YFunction
      */
     public int get_starterTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return STARTERTIME_INVALID;
             }
@@ -699,7 +707,7 @@ public class YMotor extends YFunction
      */
     public int get_failSafeTimeout() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return FAILSAFETIMEOUT_INVALID;
             }
@@ -770,7 +778,7 @@ public class YMotor extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -828,6 +836,41 @@ public class YMotor extends YFunction
         obj = (YMotor) YFunction._FindFromCache("Motor", func);
         if (obj == null) {
             obj = new YMotor(func);
+            YFunction._AddToCache("Motor", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a motor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the motor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YMotor.isOnline() to test if the motor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a motor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the motor
+     *
+     * @return a YMotor object allowing you to drive the motor.
+     */
+    public static YMotor FindMotorInContext(YAPIContext yctx,String func)
+    {
+        YMotor obj;
+        obj = (YMotor) YFunction._FindFromCacheInContext(yctx, "Motor", func);
+        if (obj == null) {
+            obj = new YMotor(yctx, func);
             YFunction._AddToCache("Motor", func, obj);
         }
         return obj;
@@ -931,17 +974,17 @@ public class YMotor extends YFunction
      *         a motor currently online, or a null pointer
      *         if there are no more motors to enumerate.
      */
-    public  YMotor nextMotor()
+    public YMotor nextMotor()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindMotor(next_hwid);
+        return FindMotorInContext(_yapi, next_hwid);
     }
 
     /**
@@ -955,9 +998,28 @@ public class YMotor extends YFunction
      */
     public static YMotor FirstMotor()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Motor");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Motor");
         if (next_hwid == null)  return null;
-        return FindMotor(next_hwid);
+        return FindMotorInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of motors currently accessible.
+     * Use the method YMotor.nextMotor() to iterate on
+     * next motors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YMotor object, corresponding to
+     *         the first motor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YMotor FirstMotorInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Motor");
+        if (next_hwid == null)  return null;
+        return FindMotorInContext(yctx, next_hwid);
     }
 
     //--- (end of YMotor implementation)

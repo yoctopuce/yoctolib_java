@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAltitude.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YAltitude.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YAltitude return codes)
 //--- (end of YAltitude return codes)
@@ -104,12 +103,21 @@ public class YAltitude extends YSensor
      *
      * @param func : functionid
      */
-    protected YAltitude(String func)
+    protected YAltitude(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Altitude";
         //--- (YAltitude attributes initialization)
         //--- (end of YAltitude attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YAltitude(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YAltitude implementation)
@@ -208,7 +216,7 @@ public class YAltitude extends YSensor
      */
     public double get_qnh() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return QNH_INVALID;
             }
@@ -241,7 +249,7 @@ public class YAltitude extends YSensor
      */
     public String get_technology() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return TECHNOLOGY_INVALID;
             }
@@ -292,6 +300,41 @@ public class YAltitude extends YSensor
         obj = (YAltitude) YFunction._FindFromCache("Altitude", func);
         if (obj == null) {
             obj = new YAltitude(func);
+            YFunction._AddToCache("Altitude", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves an altimeter for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the altimeter is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YAltitude.isOnline() to test if the altimeter is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * an altimeter by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the altimeter
+     *
+     * @return a YAltitude object allowing you to drive the altimeter.
+     */
+    public static YAltitude FindAltitudeInContext(YAPIContext yctx,String func)
+    {
+        YAltitude obj;
+        obj = (YAltitude) YFunction._FindFromCacheInContext(yctx, "Altitude", func);
+        if (obj == null) {
+            obj = new YAltitude(yctx, func);
             YFunction._AddToCache("Altitude", func, obj);
         }
         return obj;
@@ -351,10 +394,12 @@ public class YAltitude extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackAltitude = callback;
         return 0;
@@ -378,17 +423,17 @@ public class YAltitude extends YSensor
      *         an altimeter currently online, or a null pointer
      *         if there are no more altimeters to enumerate.
      */
-    public  YAltitude nextAltitude()
+    public YAltitude nextAltitude()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindAltitude(next_hwid);
+        return FindAltitudeInContext(_yapi, next_hwid);
     }
 
     /**
@@ -402,9 +447,28 @@ public class YAltitude extends YSensor
      */
     public static YAltitude FirstAltitude()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Altitude");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Altitude");
         if (next_hwid == null)  return null;
-        return FindAltitude(next_hwid);
+        return FindAltitudeInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of altimeters currently accessible.
+     * Use the method YAltitude.nextAltitude() to iterate on
+     * next altimeters.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YAltitude object, corresponding to
+     *         the first altimeter currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YAltitude FirstAltitudeInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Altitude");
+        if (next_hwid == null)  return null;
+        return FindAltitudeInContext(yctx, next_hwid);
     }
 
     //--- (end of YAltitude implementation)

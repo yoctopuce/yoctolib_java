@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrent.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YCurrent.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindCurrent(), the high-level API for Current functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (YCurrent return codes)
 //--- (end of YCurrent return codes)
@@ -92,12 +91,21 @@ public class YCurrent extends YSensor
      *
      * @param func : functionid
      */
-    protected YCurrent(String func)
+    protected YCurrent(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Current";
         //--- (YCurrent attributes initialization)
         //--- (end of YCurrent attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YCurrent(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YCurrent implementation)
@@ -136,6 +144,41 @@ public class YCurrent extends YSensor
         obj = (YCurrent) YFunction._FindFromCache("Current", func);
         if (obj == null) {
             obj = new YCurrent(func);
+            YFunction._AddToCache("Current", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a current sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the current sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YCurrent.isOnline() to test if the current sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a current sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the current sensor
+     *
+     * @return a YCurrent object allowing you to drive the current sensor.
+     */
+    public static YCurrent FindCurrentInContext(YAPIContext yctx,String func)
+    {
+        YCurrent obj;
+        obj = (YCurrent) YFunction._FindFromCacheInContext(yctx, "Current", func);
+        if (obj == null) {
+            obj = new YCurrent(yctx, func);
             YFunction._AddToCache("Current", func, obj);
         }
         return obj;
@@ -195,10 +238,12 @@ public class YCurrent extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackCurrent = callback;
         return 0;
@@ -222,17 +267,17 @@ public class YCurrent extends YSensor
      *         a current sensor currently online, or a null pointer
      *         if there are no more current sensors to enumerate.
      */
-    public  YCurrent nextCurrent()
+    public YCurrent nextCurrent()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindCurrent(next_hwid);
+        return FindCurrentInContext(_yapi, next_hwid);
     }
 
     /**
@@ -246,9 +291,28 @@ public class YCurrent extends YSensor
      */
     public static YCurrent FirstCurrent()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Current");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Current");
         if (next_hwid == null)  return null;
-        return FindCurrent(next_hwid);
+        return FindCurrentInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of current sensors currently accessible.
+     * Use the method YCurrent.nextCurrent() to iterate on
+     * next current sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YCurrent object, corresponding to
+     *         the first current sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YCurrent FirstCurrentInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Current");
+        if (next_hwid == null)  return null;
+        return FindCurrentInContext(yctx, next_hwid);
     }
 
     //--- (end of YCurrent implementation)

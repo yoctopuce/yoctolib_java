@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 22191 2015-12-02 06:49:31Z mvuilleu $
+ * $Id: YTemperature.java 22696 2016-01-12 23:14:15Z seb $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -40,7 +40,6 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 import java.util.ArrayList;
 
 //--- (YTemperature return codes)
@@ -119,12 +118,21 @@ public class YTemperature extends YSensor
      *
      * @param func : functionid
      */
-    protected YTemperature(String func)
+    protected YTemperature(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Temperature";
         //--- (YTemperature attributes initialization)
         //--- (end of YTemperature attributes initialization)
+    }
+
+    /**
+     *
+     * @param func : functionid
+     */
+    protected YTemperature(String func)
+    {
+        this(YAPI.GetYCtx(), func);
     }
 
     //--- (YTemperature implementation)
@@ -202,7 +210,7 @@ public class YTemperature extends YSensor
      */
     public int get_sensorType() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return SENSORTYPE_INVALID;
             }
@@ -278,7 +286,7 @@ public class YTemperature extends YSensor
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -342,6 +350,41 @@ public class YTemperature extends YSensor
     }
 
     /**
+     * Retrieves a temperature sensor for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the temperature sensor is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YTemperature.isOnline() to test if the temperature sensor is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a temperature sensor by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the temperature sensor
+     *
+     * @return a YTemperature object allowing you to drive the temperature sensor.
+     */
+    public static YTemperature FindTemperatureInContext(YAPIContext yctx,String func)
+    {
+        YTemperature obj;
+        obj = (YTemperature) YFunction._FindFromCacheInContext(yctx, "Temperature", func);
+        if (obj == null) {
+            obj = new YTemperature(yctx, func);
+            YFunction._AddToCache("Temperature", func, obj);
+        }
+        return obj;
+    }
+
+    /**
      * Registers the callback function that is invoked on every change of advertised value.
      * The callback is invoked only during the execution of ySleep or yHandleEvents.
      * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
@@ -395,10 +438,12 @@ public class YTemperature extends YSensor
      */
     public int registerTimedReportCallback(TimedReportCallback callback)
     {
+        YSensor sensor;
+        sensor = this;
         if (callback != null) {
-            YFunction._UpdateTimedReportCallbackList(this, true);
+            YFunction._UpdateTimedReportCallbackList(sensor, true);
         } else {
-            YFunction._UpdateTimedReportCallbackList(this, false);
+            YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
         _timedReportCallbackTemperature = callback;
         return 0;
@@ -585,17 +630,17 @@ public class YTemperature extends YSensor
      *         a temperature sensor currently online, or a null pointer
      *         if there are no more temperature sensors to enumerate.
      */
-    public  YTemperature nextTemperature()
+    public YTemperature nextTemperature()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindTemperature(next_hwid);
+        return FindTemperatureInContext(_yapi, next_hwid);
     }
 
     /**
@@ -609,9 +654,28 @@ public class YTemperature extends YSensor
      */
     public static YTemperature FirstTemperature()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Temperature");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Temperature");
         if (next_hwid == null)  return null;
-        return FindTemperature(next_hwid);
+        return FindTemperatureInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of temperature sensors currently accessible.
+     * Use the method YTemperature.nextTemperature() to iterate on
+     * next temperature sensors.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YTemperature object, corresponding to
+     *         the first temperature sensor currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YTemperature FirstTemperatureInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Temperature");
+        if (next_hwid == null)  return null;
+        return FindTemperatureInContext(yctx, next_hwid);
     }
 
     //--- (end of YTemperature implementation)

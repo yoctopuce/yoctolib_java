@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOldDataStream.java 20376 2015-05-19 14:18:47Z seb $
+ * $Id: YOldDataStream.java 22359 2015-12-15 13:30:10Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -177,7 +177,7 @@ public class YOldDataStream extends YDataStream
             ArrayList<Integer> udata = null;
             try {
                 String data = jsonObj.getString("data");
-                udata = YAPI._decodeWords(data);
+                udata = YAPIContext._decodeWords(data);
             } catch (JSONException ignore) {
             }
 
@@ -201,7 +201,7 @@ public class YOldDataStream extends YDataStream
                 if (coltyp[c] < 2) {
                     val_d = (val_i + colofs[c]) * colscl[c];
                 } else {
-                    val_d = YAPI._decimalToDouble(val_i - 32767);
+                    val_d = YAPIContext._decimalToDouble(val_i - 32767);
                 }
                 dat.add(val_d);
                 c++;

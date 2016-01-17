@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 21748 2015-10-13 14:05:38Z seb $
+ * $Id: YCellular.java 22543 2015-12-24 12:16:21Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -44,8 +44,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import static com.yoctopuce.YoctoAPI.YAPI.SafeYAPI;
 
 //--- (generated code: YCellular return codes)
 //--- (end of generated code: YCellular return codes)
@@ -153,13 +151,19 @@ public class YCellular extends YFunction
      *
      * @param func : functionid
      */
-    protected YCellular(String func)
+    protected YCellular(YAPIContext ctx, String func)
     {
-        super(func);
+        super(ctx, func);
         _className = "Cellular";
         //--- (generated code: YCellular attributes initialization)
         //--- (end of generated code: YCellular attributes initialization)
     }
+
+    protected YCellular(String func)
+    {
+        this(YAPI.GetYCtx(), func);
+    }
+
 
     //--- (generated code: YCellular implementation)
     @Override
@@ -210,7 +214,7 @@ public class YCellular extends YFunction
      */
     public int get_linkQuality() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LINKQUALITY_INVALID;
             }
@@ -239,7 +243,7 @@ public class YCellular extends YFunction
      */
     public String get_cellOperator() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CELLOPERATOR_INVALID;
             }
@@ -269,7 +273,7 @@ public class YCellular extends YFunction
      */
     public String get_cellIdentifier() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return CELLIDENTIFIER_INVALID;
             }
@@ -303,7 +307,7 @@ public class YCellular extends YFunction
      */
     public String get_imsi() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return IMSI_INVALID;
             }
@@ -336,7 +340,7 @@ public class YCellular extends YFunction
      */
     public String get_message() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return MESSAGE_INVALID;
             }
@@ -369,7 +373,7 @@ public class YCellular extends YFunction
      */
     public String get_pin() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return PIN_INVALID;
             }
@@ -457,7 +461,7 @@ public class YCellular extends YFunction
      */
     public String get_lockedOperator() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return LOCKEDOPERATOR_INVALID;
             }
@@ -527,7 +531,7 @@ public class YCellular extends YFunction
      */
     public int get_enableData() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return ENABLEDATA_INVALID;
             }
@@ -602,7 +606,7 @@ public class YCellular extends YFunction
      */
     public String get_apn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return APN_INVALID;
             }
@@ -668,7 +672,7 @@ public class YCellular extends YFunction
      */
     public String get_apnSecret() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return APNSECRET_INVALID;
             }
@@ -709,7 +713,7 @@ public class YCellular extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPI.GetTickCount()) {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                 return COMMAND_INVALID;
             }
@@ -767,6 +771,41 @@ public class YCellular extends YFunction
         obj = (YCellular) YFunction._FindFromCache("Cellular", func);
         if (obj == null) {
             obj = new YCellular(func);
+            YFunction._AddToCache("Cellular", func, obj);
+        }
+        return obj;
+    }
+
+    /**
+     * Retrieves a cellular interface for a given identifier in a YAPI context.
+     * The identifier can be specified using several formats:
+     * <ul>
+     * <li>FunctionLogicalName</li>
+     * <li>ModuleSerialNumber.FunctionIdentifier</li>
+     * <li>ModuleSerialNumber.FunctionLogicalName</li>
+     * <li>ModuleLogicalName.FunctionIdentifier</li>
+     * <li>ModuleLogicalName.FunctionLogicalName</li>
+     * </ul>
+     *
+     * This function does not require that the cellular interface is online at the time
+     * it is invoked. The returned object is nevertheless valid.
+     * Use the method YCellular.isOnline() to test if the cellular interface is
+     * indeed online at a given time. In case of ambiguity when looking for
+     * a cellular interface by logical name, no error is notified: the first instance
+     * found is returned. The search is performed first by hardware name,
+     * then by logical name.
+     *
+     * @param yctx : a YAPI context
+     * @param func : a string that uniquely characterizes the cellular interface
+     *
+     * @return a YCellular object allowing you to drive the cellular interface.
+     */
+    public static YCellular FindCellularInContext(YAPIContext yctx,String func)
+    {
+        YCellular obj;
+        obj = (YCellular) YFunction._FindFromCacheInContext(yctx, "Cellular", func);
+        if (obj == null) {
+            obj = new YCellular(yctx, func);
             YFunction._AddToCache("Cellular", func, obj);
         }
         return obj;
@@ -994,7 +1033,7 @@ public class YCellular extends YFunction
         if ((mccs).substring(0, 0 + 1).equals("0")) {
             mccs = (mccs).substring(1, 1 + 1);
         }
-        mcc = YAPI._atoi(mccs);
+        mcc = YAPIContext._atoi(mccs);
         mncs = (moni).substring(11, 11 + 3);
         if ((mncs).substring(2, 2 + 1).equals(",")) {
             mncs = (mncs).substring(0, 0 + 2);
@@ -1002,7 +1041,7 @@ public class YCellular extends YFunction
         if ((mncs).substring(0, 0 + 1).equals("0")) {
             mncs = (mncs).substring(1, 1 + (mncs).length()-1);
         }
-        mnc = YAPI._atoi(mncs);
+        mnc = YAPIContext._atoi(mncs);
         recs = new ArrayList<String>(Arrays.asList(moni.split("#")));
         // process each line in turn
         res.clear();
@@ -1016,13 +1055,13 @@ public class YCellular extends YFunction
                     if ((dbms).substring(0, 0 + 1).equals(" ")) {
                         dbms = (dbms).substring(1, 1 + 3);
                     }
-                    dbm = YAPI._atoi(dbms);
+                    dbm = YAPIContext._atoi(dbms);
                     if (llen > 66) {
                         tads = (ii).substring(54, 54 + 2);
                         if ((tads).substring(0, 0 + 1).equals(" ")) {
                             tads = (tads).substring(1, 1 + 3);
                         }
-                        tad = YAPI._atoi(tads);
+                        tad = YAPIContext._atoi(tads);
                         oper = (ii).substring(66, 66 + llen-66);
                     } else {
                         tad = -1;
@@ -1044,17 +1083,17 @@ public class YCellular extends YFunction
      *         a cellular interface currently online, or a null pointer
      *         if there are no more cellular interfaces to enumerate.
      */
-    public  YCellular nextCellular()
+    public YCellular nextCellular()
     {
         String next_hwid;
         try {
-            String hwid = SafeYAPI()._yHash.resolveHwID(_className, _func);
-            next_hwid = SafeYAPI()._yHash.getNextHardwareId(_className, hwid);
+            String hwid = _yapi._yHash.resolveHwID(_className, _func);
+            next_hwid = _yapi._yHash.getNextHardwareId(_className, hwid);
         } catch (YAPI_Exception ignored) {
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindCellular(next_hwid);
+        return FindCellularInContext(_yapi, next_hwid);
     }
 
     /**
@@ -1068,9 +1107,28 @@ public class YCellular extends YFunction
      */
     public static YCellular FirstCellular()
     {
-        String next_hwid = SafeYAPI()._yHash.getFirstHardwareId("Cellular");
+        YAPIContext yctx = YAPI.GetYCtx();
+        String next_hwid = yctx._yHash.getFirstHardwareId("Cellular");
         if (next_hwid == null)  return null;
-        return FindCellular(next_hwid);
+        return FindCellularInContext(yctx, next_hwid);
+    }
+
+    /**
+     * Starts the enumeration of cellular interfaces currently accessible.
+     * Use the method YCellular.nextCellular() to iterate on
+     * next cellular interfaces.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YCellular object, corresponding to
+     *         the first cellular interface currently online, or a null pointer
+     *         if there are none.
+     */
+    public static YCellular FirstCellularInContext(YAPIContext yctx)
+    {
+        String next_hwid = yctx._yHash.getFirstHardwareId("Cellular");
+        if (next_hwid == null)  return null;
+        return FindCellularInContext(yctx, next_hwid);
     }
 
     //--- (end of generated code: YCellular implementation)
