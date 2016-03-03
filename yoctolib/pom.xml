@@ -7,9 +7,10 @@
     <artifactId>yoctolib</artifactId>
     <packaging>jar</packaging>
     <name>Yoctopuce Java API</name>
-    <version>1.10.22835-SNAPSHOT</version>
-    <description>Official Yoctopuce Library for Java</description>
+    <version>1.10.23400-SNAPSHOT</version>
+    <description>Official Yoctopuce Library for Java SE</description>
     <url>http://www.yoctopuce.com</url>
+
     <licenses>
         <license>
             <name>Yoctopuce License</name>
@@ -44,13 +45,7 @@
             <artifactId>json</artifactId>
             <version>20140107</version>
         </dependency>
-        <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
-            <version>1.0</version>
-        </dependency>
     </dependencies>
-
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -72,8 +67,8 @@
                     <source>1.7</source>
                     <target>1.7</target>
                 </configuration>
-            </plugin>            
-      </plugins>
+            </plugin>
+        </plugins>
     </build>
 
 </project>

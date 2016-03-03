@@ -1,13 +1,11 @@
 package com.yoctopuce.YoctoAPI;
 
-/**
- * Created by seb on 12.01.2016.
- */
 public class WSNotificationHandler extends NotificationHandler
 {
-    public WSNotificationHandler(YHTTPHub hub, Object callbackSession)
+    public WSNotificationHandler(YHTTPHub hub, Object callbackSession) throws YAPI_Exception
     {
         super(hub);
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "This yoctolib does not support WebSocket. Use yoctolib-jEE");
     }
 
     @Override
@@ -36,6 +34,12 @@ public class WSNotificationHandler extends NotificationHandler
 
     @Override
     public boolean isConnected()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean hasRwAccess()
     {
         return false;
     }

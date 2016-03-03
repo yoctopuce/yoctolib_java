@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.yoctopuce.java</groupId>
         <artifactId>javabundle</artifactId>
-        <version>1.10.1234-SNAPSHOT</version>
+        <version>1.10.23400-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>prog-httpcallback-websocket</artifactId>
     <packaging>war</packaging>
     <name>Prog-HTTPCallback</name>
-    <version>1.10.1234-SNAPSHOT</version>
+    <version>1.10.23400-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>
         <developer>
@@ -28,7 +28,7 @@
     <dependencies>
         <dependency>
             <groupId>com.yoctopuce.java</groupId>
-            <artifactId>yoctolib</artifactId>
+            <artifactId>yoctolib-jee</artifactId>
             <version>1.10.1234-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -43,7 +43,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.5</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
