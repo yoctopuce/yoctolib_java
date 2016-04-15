@@ -15,7 +15,8 @@ public class WSNotificationHandler extends NotificationHandler
     }
 
     @Override
-    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, int mstimeout) throws YAPI_Exception, InterruptedException
+    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, int mstimeout, YGenericHub.RequestProgress progress, Object context) throws
+            YAPI_Exception, InterruptedException
     {
         return new byte[0];
     }

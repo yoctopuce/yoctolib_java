@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 22743 2016-01-14 09:54:52Z seb $
+ * $Id: YDevice.java 23679 2016-03-31 12:07:23Z seb $
  *
  * Internal YDevice class
  *
@@ -227,7 +227,7 @@ public class YDevice
     {
         String shortRequest = formatRequest(request);
         try {
-            return _hub.devRequestSync(this, shortRequest, rest_of_request);
+            return _hub.devRequestSync(this, shortRequest, rest_of_request, null, null);
         } catch (InterruptedException e) {
             throw new YAPI_Exception(YAPI.IO_ERROR,
                     "Thread has been interrupted");

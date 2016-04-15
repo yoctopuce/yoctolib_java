@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLed.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YLed.java 23578 2016-03-22 23:00:41Z mvuilleu $
  *
  * Implements FindLed(), the high-level API for Led functions
  *
@@ -48,7 +48,7 @@ import org.json.JSONObject;
  * YLed Class: Led function interface
  *
  * Yoctopuce application programming interface
- * allows you not only to drive the intensity of the led, but also to
+ * allows you not only to drive the intensity of the LED, but also to
  * have it blink at various preset frequencies.
  */
  @SuppressWarnings("UnusedDeclaration")
@@ -147,9 +147,9 @@ public class YLed extends YFunction
     }
 
     /**
-     * Returns the current led state.
+     * Returns the current LED state.
      *
-     * @return either YLed.POWER_OFF or YLed.POWER_ON, according to the current led state
+     * @return either YLed.POWER_OFF or YLed.POWER_ON, according to the current LED state
      *
      * @throws YAPI_Exception on error
      */
@@ -164,9 +164,9 @@ public class YLed extends YFunction
     }
 
     /**
-     * Returns the current led state.
+     * Returns the current LED state.
      *
-     * @return either Y_POWER_OFF or Y_POWER_ON, according to the current led state
+     * @return either Y_POWER_OFF or Y_POWER_ON, according to the current LED state
      *
      * @throws YAPI_Exception on error
      */
@@ -176,9 +176,9 @@ public class YLed extends YFunction
     }
 
     /**
-     * Changes the state of the led.
+     * Changes the state of the LED.
      *
-     * @param newval : either YLed.POWER_OFF or YLed.POWER_ON, according to the state of the led
+     * @param newval : either YLed.POWER_OFF or YLed.POWER_ON, according to the state of the LED
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -193,9 +193,9 @@ public class YLed extends YFunction
     }
 
     /**
-     * Changes the state of the led.
+     * Changes the state of the LED.
      *
-     * @param newval : either Y_POWER_OFF or Y_POWER_ON, according to the state of the led
+     * @param newval : either Y_POWER_OFF or Y_POWER_ON, according to the state of the LED
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -207,9 +207,9 @@ public class YLed extends YFunction
     }
 
     /**
-     * Returns the current led intensity (in per cent).
+     * Returns the current LED intensity (in per cent).
      *
-     * @return an integer corresponding to the current led intensity (in per cent)
+     * @return an integer corresponding to the current LED intensity (in per cent)
      *
      * @throws YAPI_Exception on error
      */
@@ -224,9 +224,9 @@ public class YLed extends YFunction
     }
 
     /**
-     * Returns the current led intensity (in per cent).
+     * Returns the current LED intensity (in per cent).
      *
-     * @return an integer corresponding to the current led intensity (in per cent)
+     * @return an integer corresponding to the current LED intensity (in per cent)
      *
      * @throws YAPI_Exception on error
      */
@@ -236,9 +236,9 @@ public class YLed extends YFunction
     }
 
     /**
-     * Changes the current led intensity (in per cent).
+     * Changes the current LED intensity (in per cent).
      *
-     * @param newval : an integer corresponding to the current led intensity (in per cent)
+     * @param newval : an integer corresponding to the current LED intensity (in per cent)
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -253,9 +253,9 @@ public class YLed extends YFunction
     }
 
     /**
-     * Changes the current led intensity (in per cent).
+     * Changes the current LED intensity (in per cent).
      *
-     * @param newval : an integer corresponding to the current led intensity (in per cent)
+     * @param newval : an integer corresponding to the current LED intensity (in per cent)
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -267,10 +267,10 @@ public class YLed extends YFunction
     }
 
     /**
-     * Returns the current led signaling mode.
+     * Returns the current LED signaling mode.
      *
      *  @return a value among YLed.BLINKING_STILL, YLed.BLINKING_RELAX, YLed.BLINKING_AWARE,
-     * YLed.BLINKING_RUN, YLed.BLINKING_CALL and YLed.BLINKING_PANIC corresponding to the current led signaling mode
+     * YLed.BLINKING_RUN, YLed.BLINKING_CALL and YLed.BLINKING_PANIC corresponding to the current LED signaling mode
      *
      * @throws YAPI_Exception on error
      */
@@ -285,10 +285,10 @@ public class YLed extends YFunction
     }
 
     /**
-     * Returns the current led signaling mode.
+     * Returns the current LED signaling mode.
      *
      *  @return a value among Y_BLINKING_STILL, Y_BLINKING_RELAX, Y_BLINKING_AWARE, Y_BLINKING_RUN,
-     * Y_BLINKING_CALL and Y_BLINKING_PANIC corresponding to the current led signaling mode
+     * Y_BLINKING_CALL and Y_BLINKING_PANIC corresponding to the current LED signaling mode
      *
      * @throws YAPI_Exception on error
      */
@@ -298,10 +298,10 @@ public class YLed extends YFunction
     }
 
     /**
-     * Changes the current led signaling mode.
+     * Changes the current LED signaling mode.
      *
      *  @param newval : a value among YLed.BLINKING_STILL, YLed.BLINKING_RELAX, YLed.BLINKING_AWARE,
-     * YLed.BLINKING_RUN, YLed.BLINKING_CALL and YLed.BLINKING_PANIC corresponding to the current led signaling mode
+     * YLed.BLINKING_RUN, YLed.BLINKING_CALL and YLed.BLINKING_PANIC corresponding to the current LED signaling mode
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -316,10 +316,10 @@ public class YLed extends YFunction
     }
 
     /**
-     * Changes the current led signaling mode.
+     * Changes the current LED signaling mode.
      *
      *  @param newval : a value among Y_BLINKING_STILL, Y_BLINKING_RELAX, Y_BLINKING_AWARE, Y_BLINKING_RUN,
-     * Y_BLINKING_CALL and Y_BLINKING_PANIC corresponding to the current led signaling mode
+     * Y_BLINKING_CALL and Y_BLINKING_PANIC corresponding to the current LED signaling mode
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -331,7 +331,7 @@ public class YLed extends YFunction
     }
 
     /**
-     * Retrieves a led for a given identifier.
+     * Retrieves a LED for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -341,17 +341,17 @@ public class YLed extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the led is online at the time
+     * This function does not require that the LED is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YLed.isOnline() to test if the led is
+     * Use the method YLed.isOnline() to test if the LED is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a led by logical name, no error is notified: the first instance
+     * a LED by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
-     * @param func : a string that uniquely characterizes the led
+     * @param func : a string that uniquely characterizes the LED
      *
-     * @return a YLed object allowing you to drive the led.
+     * @return a YLed object allowing you to drive the LED.
      */
     public static YLed FindLed(String func)
     {
@@ -365,7 +365,7 @@ public class YLed extends YFunction
     }
 
     /**
-     * Retrieves a led for a given identifier in a YAPI context.
+     * Retrieves a LED for a given identifier in a YAPI context.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -375,18 +375,18 @@ public class YLed extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the led is online at the time
+     * This function does not require that the LED is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YLed.isOnline() to test if the led is
+     * Use the method YLed.isOnline() to test if the LED is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a led by logical name, no error is notified: the first instance
+     * a LED by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the led
+     * @param func : a string that uniquely characterizes the LED
      *
-     * @return a YLed object allowing you to drive the led.
+     * @return a YLed object allowing you to drive the LED.
      */
     public static YLed FindLedInContext(YAPIContext yctx,String func)
     {
@@ -441,11 +441,11 @@ public class YLed extends YFunction
     }
 
     /**
-     * Continues the enumeration of leds started using yFirstLed().
+     * Continues the enumeration of LEDs started using yFirstLed().
      *
      * @return a pointer to a YLed object, corresponding to
-     *         a led currently online, or a null pointer
-     *         if there are no more leds to enumerate.
+     *         a LED currently online, or a null pointer
+     *         if there are no more LEDs to enumerate.
      */
     public YLed nextLed()
     {
@@ -461,12 +461,12 @@ public class YLed extends YFunction
     }
 
     /**
-     * Starts the enumeration of leds currently accessible.
+     * Starts the enumeration of LEDs currently accessible.
      * Use the method YLed.nextLed() to iterate on
-     * next leds.
+     * next LEDs.
      *
      * @return a pointer to a YLed object, corresponding to
-     *         the first led currently online, or a null pointer
+     *         the first LED currently online, or a null pointer
      *         if there are none.
      */
     public static YLed FirstLed()
@@ -478,14 +478,14 @@ public class YLed extends YFunction
     }
 
     /**
-     * Starts the enumeration of leds currently accessible.
+     * Starts the enumeration of LEDs currently accessible.
      * Use the method YLed.nextLed() to iterate on
-     * next leds.
+     * next LEDs.
      *
      * @param yctx : a YAPI context.
      *
      * @return a pointer to a YLed object, corresponding to
-     *         the first led currently online, or a null pointer
+     *         the first LED currently online, or a null pointer
      *         if there are none.
      */
     public static YLed FirstLedInContext(YAPIContext yctx)

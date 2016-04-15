@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 23383 2016-03-02 18:08:31Z seb $
+ * $Id: YCallbackHub.java 23679 2016-03-31 12:07:23Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -341,7 +341,7 @@ public class YCallbackHub extends YGenericHub
     }
 
     @Override
-    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body) throws YAPI_Exception
+    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestProgress progress, Object context) throws YAPI_Exception
     {
         try {
             return cachedRequest(req_first_line, req_head_and_body);

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YGenericSensor.java 23527 2016-03-18 21:49:19Z mvuilleu $
  *
  * Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -205,9 +205,10 @@ public class YGenericSensor extends YSensor
     }
 
     /**
-     * Returns the measured value of the electrical signal used by the sensor.
+     * Returns the current value of the electrical signal measured by the sensor.
      *
-     * @return a floating point number corresponding to the measured value of the electrical signal used by the sensor
+     *  @return a floating point number corresponding to the current value of the electrical signal
+     * measured by the sensor
      *
      * @throws YAPI_Exception on error
      */
@@ -222,9 +223,10 @@ public class YGenericSensor extends YSensor
     }
 
     /**
-     * Returns the measured value of the electrical signal used by the sensor.
+     * Returns the current value of the electrical signal measured by the sensor.
      *
-     * @return a floating point number corresponding to the measured value of the electrical signal used by the sensor
+     *  @return a floating point number corresponding to the current value of the electrical signal
+     * measured by the sensor
      *
      * @throws YAPI_Exception on error
      */

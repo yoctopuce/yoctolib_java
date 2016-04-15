@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 23383 2016-03-02 18:08:31Z seb $
+ * $Id: YHTTPHub.java 23865 2016-04-11 12:32:42Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -75,7 +75,7 @@ class YHTTPHub extends YGenericHub
     boolean needRetryWithAuth()
     {
         synchronized (_authLock) {
-            return !(_http_params.getUser().length() == 0 || _http_params.getPass().length() == 0) && _authRetryCount++ <= 3;
+            return _http_params.getUser().length() != 0 && _http_params.getPass().length() != 0 && _authRetryCount++ <= 3;
         }
     }
 
@@ -133,7 +133,7 @@ class YHTTPHub extends YGenericHub
             mdigest.reset();
             mdigest.update(plaintext.getBytes());
             byte[] digest = this.mdigest.digest();
-            _ha1 = YAPIContext._bytesToHexStr(digest, 0, digest.length);
+            _ha1 = YAPIContext._bytesToHexStr(digest, 0, digest.length).toLowerCase();
         }
     }
 
@@ -158,12 +158,13 @@ class YHTTPHub extends YGenericHub
             mdigest.reset();
             mdigest.update(plaintext.getBytes());
             byte[] digest = this.mdigest.digest();
-            String ha2 = YAPIContext._bytesToHexStr(digest, 0, digest.length);
+            String ha2 = YAPIContext._bytesToHexStr(digest, 0, digest.length).toLowerCase();
             plaintext = _ha1 + ":" + _nounce + ":" + nc + ":" + cnonce + ":auth:" + ha2;
             this.mdigest.reset();
             this.mdigest.update(plaintext.getBytes());
             digest = this.mdigest.digest();
-            String response = YAPIContext._bytesToHexStr(digest, 0, digest.length);
+            String response = YAPIContext._bytesToHexStr(digest, 0, digest.length).toLowerCase();
+            //System.out.print(String.format("Auth Resp ha1=%s nonce=%s nc=%s cnouce=%s ha2=%s -> %s\n", _ha1, _nounce, nc, cnonce, ha2, response));
             return String.format(
                     "Authorization: Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", qop=auth, nc=%s, cnonce=\"%s\", response=\"%s\", opaque=\"%s\"\r\n",
                     _http_params.getUser(), _http_realm, _nounce, uri, nc, cnonce, response, _opaque);
@@ -231,7 +232,8 @@ class YHTTPHub extends YGenericHub
     boolean isSameHub(String url, Object request, Object response, Object session)
     {
         HTTPParams params = new HTTPParams(url);
-        return  params.getUrl().equals(_http_params.getUrl()) && _callbackSession.equals(session);
+        boolean url_equals = params.getUrl(false,false).equals(_http_params.getUrl(false,false));
+        return url_equals && (_callbackSession == null || _callbackSession.equals(session));
     }
 
 
@@ -332,7 +334,9 @@ class YHTTPHub extends YGenericHub
         boolean need_reboot = true;
         // todo: update code to use WS
         yHTTPRequest req = new yHTTPRequest(this, "hubFUpdate" + serial);
-        if (serial.equals(_serial) && !_serial.startsWith("VIRTHUB")) {
+        if (_serial.startsWith("VIRTHUB")) {
+            use_self_flash = false;
+        } else if (serial.equals(_serial)) {
             use_self_flash = true;
         } else {
             // check if subdevice support self flashing
@@ -346,9 +350,6 @@ class YHTTPHub extends YGenericHub
         //5% -> 10%
         progress.firmware_progress(5, "Enter in bootloader");
         ArrayList<String> bootloaders = getBootloaders();
-        if (bootloaders.size() >= 4) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, "Too many devices in update mode");
-        }
         boolean is_shield = serial.startsWith("YHUBSHL1");
         for (String bl : bootloaders) {
             if (bl.equals(serial)) {
@@ -359,12 +360,11 @@ class YHTTPHub extends YGenericHub
                 }
             }
         }
-        if (!use_self_flash && need_reboot) {
-            // reboot subdevice
-            req.RequestSync("GET /bySerial/" + serial + "/api/module/rebootCountdown?rebootCountdown=-1", null, YIO_DEFAULT_TCP_TIMEOUT);
+        if (!use_self_flash && need_reboot && bootloaders.size() >= 4) {
+            throw new YAPI_Exception(YAPI.IO_ERROR, "Too many devices in update mode");
         }
         //10% -> 40%
-        progress.firmware_progress(10, "Send firmware to bootloader");
+        progress.firmware_progress(10, "Send firmware file");
         byte[] head_body = YDevice.formatHTTPUpload("firmware", firmware.getData());
         req.RequestSync("POST " + baseurl + "/upload.html", head_body, 0);
         //check firmware upload result
@@ -382,11 +382,22 @@ class YHTTPHub extends YGenericHub
             throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json response :" + ex.getLocalizedMessage());
         }
         if (use_self_flash) {
+            byte[] startupConf;
+            try {
+                String json = new String(settings);
+                JSONObject jsonObject = new JSONObject(json);
+                JSONObject settingsOnly = jsonObject.getJSONObject("api");
+                settingsOnly.remove("services");
+                String startupConfStr = settingsOnly.toString();
+                startupConf = startupConfStr.getBytes();
+            } catch (JSONException ex) {
+                startupConf = new byte[0];
+            }
             progress.firmware_progress(20, "Upload startupConf.json");
-            head_body = YDevice.formatHTTPUpload("startupConf.json", settings);
+            head_body = YDevice.formatHTTPUpload("startupConf.json", startupConf);
             req.RequestSync("POST " + baseurl + "/upload.html", head_body, YIO_10_MINUTES_TCP_TIMEOUT);
             progress.firmware_progress(20, "Upload firmwareConf");
-            head_body = YDevice.formatHTTPUpload("firmwareConf", settings);
+            head_body = YDevice.formatHTTPUpload("firmwareConf", startupConf);
             req.RequestSync("POST " + baseurl + "/upload.html", head_body, YIO_10_MINUTES_TCP_TIMEOUT);
         }
 
@@ -397,6 +408,11 @@ class YHTTPHub extends YGenericHub
             req.RequestSync("GET " + baseurl + "/api/module/rebootCountdown?rebootCountdown=-1003", null, YIO_DEFAULT_TCP_TIMEOUT);
             Thread.sleep(7000);
         } else {
+            // reboot device to bootloader if needed
+            if (need_reboot) {
+                // reboot subdevice
+                req.RequestSync("GET /bySerial/" + serial + "/api/module/rebootCountdown?rebootCountdown=-2", null, YIO_DEFAULT_TCP_TIMEOUT);
+            }
             // verify that the device is in bootloader
             long timeout = YAPI.GetTickCount() + YPROG_BOOTLOADER_TIMEOUT;
             byte[] res;
@@ -440,7 +456,7 @@ class YHTTPHub extends YGenericHub
         if (!_notificationHandler.isConnected()) {
             throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.getUrl() + " is not reachable");
         }
-        if (_writeProtected && _notificationHandler.hasRwAccess()) {
+        if (_writeProtected && !_notificationHandler.hasRwAccess()) {
             throw new YAPI_Exception(YAPI.UNAUTHORIZED, "Access denied: admin credentials required");
         }
 
@@ -448,7 +464,7 @@ class YHTTPHub extends YGenericHub
     }
 
     @Override
-    synchronized byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body) throws YAPI_Exception, InterruptedException
+    synchronized byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestProgress progress, Object context) throws YAPI_Exception, InterruptedException
     {
         if (!_notificationHandler.isConnected()) {
             throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.getUrl() + " is not reachable");
@@ -459,7 +475,7 @@ class YHTTPHub extends YGenericHub
         } else if (req_first_line.contains("/flash.json") || req_first_line.contains("/upload.html")) {
             tcpTimeout = YIO_10_MINUTES_TCP_TIMEOUT;
         }
-        return _notificationHandler.devRequestSync(device, req_first_line, req_head_and_body, tcpTimeout);
+        return _notificationHandler.devRequestSync(device, req_first_line, req_head_and_body, tcpTimeout, progress, context);
     }
 
     String getHost()

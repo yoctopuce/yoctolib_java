@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 23272 2016-02-24 10:02:21Z seb $
+ * $Id: YFirmwareUpdate.java 23698 2016-04-01 12:49:46Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -76,6 +76,7 @@ public class YFirmwareUpdate
     protected int _progress_c = 0;
     protected int _progress = 0;
     protected int _restore_step = 0;
+    protected boolean _force;
 
     //--- (end of generated code: YFirmwareUpdate definitions)
     private final YAPIContext _yctx;
@@ -190,20 +191,26 @@ public class YFirmwareUpdate
 
 
 
-    public YFirmwareUpdate(YAPIContext yctx, String serial, String path, byte[] settings)
+    public YFirmwareUpdate(YAPIContext yctx, String serial, String path, byte[] settings, boolean force)
     {
         _serial = serial;
         _firmwarepath = path;
         _settings = settings;
         _yctx = yctx;
+        _force = force;
         //--- (generated code: YFirmwareUpdate attributes initialization)
         //--- (end of generated code: YFirmwareUpdate attributes initialization)
     }
 
 
+    public YFirmwareUpdate(YAPIContext yctx, String serial, String path, byte[] settings)
+    {
+        this(yctx,serial,path,settings,false);
+    }
+
     public YFirmwareUpdate(String serial, String path, byte[] settings)
     {
-        this(YAPI.GetYCtx(), serial, path, settings);
+        this(YAPI.GetYCtx(), serial, path, settings, false);
     }
 
     private void _progress(int progress, String msg)
@@ -266,7 +273,7 @@ public class YFirmwareUpdate
                                 });
                                 //80%-> 98%
                                 _progress(80, "wait to the device restart");
-                                long timeout = YAPI.GetTickCount() + 30000;
+                                long timeout = YAPI.GetTickCount() + 60000;
                                 module.clearCache();
                                 while (!module.isOnline() && timeout > YAPI.GetTickCount()) {
                                     Thread.sleep(500);
@@ -352,11 +359,13 @@ public class YFirmwareUpdate
     }
 
     /**
-     * Retruns a list of all the modules in "update" mode. Only USB connected
-     * devices are listed. For modules connected to a YoctoHub, you must
-     * connect yourself to the YoctoHub web interface.
+     * Returns a list of all the modules in "firmware update" mode. Only devices
+     * connected over USB are listed. For devices connected to a YoctoHub, you
+     * must connect to the YoctoHub web interface.
      *
-     * @return an array of strings containing the serial list of module in "update" mode.
+     * @param yctx : a YAPI context.
+     *
+     * @return an array of strings containing the serial numbers of devices in "firmware update" mode.
      */
     public static ArrayList<String> GetAllBootLoadersInContext(YAPIContext yctx)
     {
@@ -381,11 +390,11 @@ public class YFirmwareUpdate
     }
 
     /**
-     * Retruns a list of all the modules in "update" mode. Only USB connected
-     * devices are listed. For modules connected to a YoctoHub, you must
-     * connect yourself to the YoctoHub web interface.
+     * Returns a list of all the modules in "firmware update" mode. Only devices
+     * connected over USB are listed. For devices connected to a YoctoHub, you
+     * must connect yourself to the YoctoHub web interface.
      *
-     * @return an array of strings containing the serial list of module in "update" mode.
+     * @return an array of strings containing the serial numbers of devices in "firmware update" mode.
      */
     public static ArrayList<String> GetAllBootLoaders()
     {

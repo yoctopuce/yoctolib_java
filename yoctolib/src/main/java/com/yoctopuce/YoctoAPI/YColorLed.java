@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YColorLed.java 23578 2016-03-22 23:00:41Z mvuilleu $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -48,9 +48,9 @@ import org.json.JSONObject;
  * YColorLed Class: ColorLed function interface
  *
  * The Yoctopuce application programming interface
- * allows you to drive a color led using RGB coordinates as well as HSL coordinates.
+ * allows you to drive a color LED using RGB coordinates as well as HSL coordinates.
  * The module performs all conversions form RGB to HSL automatically. It is then
- * self-evident to turn on a led with a given hue and to progressively vary its
+ * self-evident to turn on a LED with a given hue and to progressively vary its
  * saturation or lightness. If needed, you can find more information on the
  * difference between RGB and HSL in the section following this one.
  */
@@ -216,9 +216,9 @@ public class YColorLed extends YFunction
      * invalid hslMove
      */
     /**
-     * Returns the current RGB color of the led.
+     * Returns the current RGB color of the LED.
      *
-     * @return an integer corresponding to the current RGB color of the led
+     * @return an integer corresponding to the current RGB color of the LED
      *
      * @throws YAPI_Exception on error
      */
@@ -233,9 +233,9 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Returns the current RGB color of the led.
+     * Returns the current RGB color of the LED.
      *
-     * @return an integer corresponding to the current RGB color of the led
+     * @return an integer corresponding to the current RGB color of the LED
      *
      * @throws YAPI_Exception on error
      */
@@ -245,9 +245,9 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Changes the current color of the led, using a RGB color. Encoding is done as follows: 0xRRGGBB.
+     * Changes the current color of the LED, using a RGB color. Encoding is done as follows: 0xRRGGBB.
      *
-     * @param newval : an integer corresponding to the current color of the led, using a RGB color
+     * @param newval : an integer corresponding to the current color of the LED, using a RGB color
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -262,9 +262,9 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Changes the current color of the led, using a RGB color. Encoding is done as follows: 0xRRGGBB.
+     * Changes the current color of the LED, using a RGB color. Encoding is done as follows: 0xRRGGBB.
      *
-     * @param newval : an integer corresponding to the current color of the led, using a RGB color
+     * @param newval : an integer corresponding to the current color of the LED, using a RGB color
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -276,9 +276,9 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Returns the current HSL color of the led.
+     * Returns the current HSL color of the LED.
      *
-     * @return an integer corresponding to the current HSL color of the led
+     * @return an integer corresponding to the current HSL color of the LED
      *
      * @throws YAPI_Exception on error
      */
@@ -293,9 +293,9 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Returns the current HSL color of the led.
+     * Returns the current HSL color of the LED.
      *
-     * @return an integer corresponding to the current HSL color of the led
+     * @return an integer corresponding to the current HSL color of the LED
      *
      * @throws YAPI_Exception on error
      */
@@ -305,9 +305,9 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Changes the current color of the led, using a color HSL. Encoding is done as follows: 0xHHSSLL.
+     * Changes the current color of the LED, using a color HSL. Encoding is done as follows: 0xHHSSLL.
      *
-     * @param newval : an integer corresponding to the current color of the led, using a color HSL
+     * @param newval : an integer corresponding to the current color of the LED, using a color HSL
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -322,9 +322,9 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Changes the current color of the led, using a color HSL. Encoding is done as follows: 0xHHSSLL.
+     * Changes the current color of the LED, using a color HSL. Encoding is done as follows: 0xHHSSLL.
      *
-     * @param newval : an integer corresponding to the current color of the led, using a color HSL
+     * @param newval : an integer corresponding to the current color of the LED, using a color HSL
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -469,9 +469,9 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Changes the color that the led will display by default when the module is turned on.
+     * Changes the color that the LED will display by default when the module is turned on.
      *
-     *  @param newval : an integer corresponding to the color that the led will display by default when the
+     *  @param newval : an integer corresponding to the color that the LED will display by default when the
      * module is turned on
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -487,9 +487,9 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Changes the color that the led will display by default when the module is turned on.
+     * Changes the color that the LED will display by default when the module is turned on.
      *
-     *  @param newval : an integer corresponding to the color that the led will display by default when the
+     *  @param newval : an integer corresponding to the color that the LED will display by default when the
      * module is turned on
      *
      * @return YAPI_SUCCESS if the call succeeds.
@@ -629,7 +629,7 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Retrieves an RGB led for a given identifier.
+     * Retrieves an RGB LED for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -639,17 +639,17 @@ public class YColorLed extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the RGB led is online at the time
+     * This function does not require that the RGB LED is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YColorLed.isOnline() to test if the RGB led is
+     * Use the method YColorLed.isOnline() to test if the RGB LED is
      * indeed online at a given time. In case of ambiguity when looking for
-     * an RGB led by logical name, no error is notified: the first instance
+     * an RGB LED by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
-     * @param func : a string that uniquely characterizes the RGB led
+     * @param func : a string that uniquely characterizes the RGB LED
      *
-     * @return a YColorLed object allowing you to drive the RGB led.
+     * @return a YColorLed object allowing you to drive the RGB LED.
      */
     public static YColorLed FindColorLed(String func)
     {
@@ -663,7 +663,7 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Retrieves an RGB led for a given identifier in a YAPI context.
+     * Retrieves an RGB LED for a given identifier in a YAPI context.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -673,18 +673,18 @@ public class YColorLed extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the RGB led is online at the time
+     * This function does not require that the RGB LED is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YColorLed.isOnline() to test if the RGB led is
+     * Use the method YColorLed.isOnline() to test if the RGB LED is
      * indeed online at a given time. In case of ambiguity when looking for
-     * an RGB led by logical name, no error is notified: the first instance
+     * an RGB LED by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the RGB led
+     * @param func : a string that uniquely characterizes the RGB LED
      *
-     * @return a YColorLed object allowing you to drive the RGB led.
+     * @return a YColorLed object allowing you to drive the RGB LED.
      */
     public static YColorLed FindColorLedInContext(YAPIContext yctx,String func)
     {
@@ -809,11 +809,11 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Continues the enumeration of RGB leds started using yFirstColorLed().
+     * Continues the enumeration of RGB LEDs started using yFirstColorLed().
      *
      * @return a pointer to a YColorLed object, corresponding to
-     *         an RGB led currently online, or a null pointer
-     *         if there are no more RGB leds to enumerate.
+     *         an RGB LED currently online, or a null pointer
+     *         if there are no more RGB LEDs to enumerate.
      */
     public YColorLed nextColorLed()
     {
@@ -829,12 +829,12 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Starts the enumeration of RGB leds currently accessible.
+     * Starts the enumeration of RGB LEDs currently accessible.
      * Use the method YColorLed.nextColorLed() to iterate on
-     * next RGB leds.
+     * next RGB LEDs.
      *
      * @return a pointer to a YColorLed object, corresponding to
-     *         the first RGB led currently online, or a null pointer
+     *         the first RGB LED currently online, or a null pointer
      *         if there are none.
      */
     public static YColorLed FirstColorLed()
@@ -846,14 +846,14 @@ public class YColorLed extends YFunction
     }
 
     /**
-     * Starts the enumeration of RGB leds currently accessible.
+     * Starts the enumeration of RGB LEDs currently accessible.
      * Use the method YColorLed.nextColorLed() to iterate on
-     * next RGB leds.
+     * next RGB LEDs.
      *
      * @param yctx : a YAPI context.
      *
      * @return a pointer to a YColorLed object, corresponding to
-     *         the first RGB led currently online, or a null pointer
+     *         the first RGB LED currently online, or a null pointer
      *         if there are none.
      */
     public static YColorLed FirstColorLedInContext(YAPIContext yctx)

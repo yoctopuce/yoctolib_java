@@ -4,7 +4,6 @@ public class Demo {
 
     public static void main(String[] args)
     {
-
         try {
             // setup the API to use local VirtualHub
             YAPI.RegisterHub("127.0.0.1");

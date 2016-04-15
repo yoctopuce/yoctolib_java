@@ -1,4 +1,5 @@
-- Add Java EE version of the library with WebSocket support
-- Add Doc GettingStarted example for Yocto-Thermistor-C and Yocto-MaxiThermistor
-- Fix settings and files that were not saved after a firmware update
-- Fix potential null pointer in method get_friendlyName()
+- Add YModule.updateFirmwareEx method
+- Fix settings that where not restored correctly on YoctoHub-Wireless
+- Fix HTTP authentication with YoctoHub
+- Fix YModule.registerLogCallback() that was not working if it's used on a callback
+- small fixes

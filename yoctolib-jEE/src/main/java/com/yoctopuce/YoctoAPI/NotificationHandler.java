@@ -196,7 +196,7 @@ public abstract class NotificationHandler implements Runnable
      * @return return the raw response without the http header
      * @throws YAPI_Exception
      */
-    abstract byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, int mstimeout) throws YAPI_Exception, InterruptedException;
+    abstract byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, int mstimeout, YGenericHub.RequestProgress progress, Object context) throws YAPI_Exception, InterruptedException;
 
     /**
      * @param req_first_line    first line of request without space, HTTP1.1 or \r\n

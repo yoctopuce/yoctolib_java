@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 23334 2016-03-01 08:42:50Z seb $
+ * $Id: YCellular.java 23715 2016-04-01 15:48:53Z mvuilleu $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -98,6 +98,12 @@ public class YCellular extends YFunction
      */
     public static final String LOCKEDOPERATOR_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid airplaneMode value
+     */
+    public static final int AIRPLANEMODE_OFF = 0;
+    public static final int AIRPLANEMODE_ON = 1;
+    public static final int AIRPLANEMODE_INVALID = -1;
+    /**
      * invalid enableData value
      */
     public static final int ENABLEDATA_HOMENETWORK = 0;
@@ -124,6 +130,7 @@ public class YCellular extends YFunction
     protected String _message = MESSAGE_INVALID;
     protected String _pin = PIN_INVALID;
     protected String _lockedOperator = LOCKEDOPERATOR_INVALID;
+    protected int _airplaneMode = AIRPLANEMODE_INVALID;
     protected int _enableData = ENABLEDATA_INVALID;
     protected String _apn = APN_INVALID;
     protected String _apnSecret = APNSECRET_INVALID;
@@ -203,6 +210,9 @@ public class YCellular extends YFunction
         }
         if (json_val.has("lockedOperator")) {
             _lockedOperator = json_val.getString("lockedOperator");
+        }
+        if (json_val.has("airplaneMode")) {
+            _airplaneMode = json_val.getInt("airplaneMode") > 0 ? 1 : 0;
         }
         if (json_val.has("enableData")) {
             _enableData = json_val.getInt("enableData");
@@ -563,6 +573,70 @@ public class YCellular extends YFunction
     public int setLockedOperator(String newval)  throws YAPI_Exception
     {
         return set_lockedOperator(newval);
+    }
+
+    /**
+     * Returns true if the airplane mode is active (radio turned off).
+     *
+     *  @return either YCellular.AIRPLANEMODE_OFF or YCellular.AIRPLANEMODE_ON, according to true if the
+     * airplane mode is active (radio turned off)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_airplaneMode() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return AIRPLANEMODE_INVALID;
+            }
+        }
+        return _airplaneMode;
+    }
+
+    /**
+     * Returns true if the airplane mode is active (radio turned off).
+     *
+     *  @return either Y_AIRPLANEMODE_OFF or Y_AIRPLANEMODE_ON, according to true if the airplane mode is
+     * active (radio turned off)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getAirplaneMode() throws YAPI_Exception
+    {
+        return get_airplaneMode();
+    }
+
+    /**
+     * Changes the activation state of airplane mode (radio turned off).
+     *
+     *  @param newval : either YCellular.AIRPLANEMODE_OFF or YCellular.AIRPLANEMODE_ON, according to the
+     * activation state of airplane mode (radio turned off)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_airplaneMode(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        _setAttr("airplaneMode",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the activation state of airplane mode (radio turned off).
+     *
+     *  @param newval : either Y_AIRPLANEMODE_OFF or Y_AIRPLANEMODE_ON, according to the activation state
+     * of airplane mode (radio turned off)
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setAirplaneMode(int newval)  throws YAPI_Exception
+    {
+        return set_airplaneMode(newval);
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YNetwork.java 23931 2016-04-15 09:31:46Z seb $
  *
  * Implements FindNetwork(), the high-level API for Network functions
  *
@@ -145,11 +145,16 @@ public class YNetwork extends YFunction
     public static final int CALLBACKENCODING_EMONCMS = 6;
     public static final int CALLBACKENCODING_AZURE = 7;
     public static final int CALLBACKENCODING_INFLUXDB = 8;
+    public static final int CALLBACKENCODING_MQTT = 9;
     public static final int CALLBACKENCODING_INVALID = -1;
     /**
      * invalid callbackCredentials value
      */
     public static final String CALLBACKCREDENTIALS_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid callbackInitialDelay value
+     */
+    public static final int CALLBACKINITIALDELAY_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid callbackMinDelay value
      */
@@ -181,6 +186,7 @@ public class YNetwork extends YFunction
     protected int _callbackMethod = CALLBACKMETHOD_INVALID;
     protected int _callbackEncoding = CALLBACKENCODING_INVALID;
     protected String _callbackCredentials = CALLBACKCREDENTIALS_INVALID;
+    protected int _callbackInitialDelay = CALLBACKINITIALDELAY_INVALID;
     protected int _callbackMinDelay = CALLBACKMINDELAY_INVALID;
     protected int _callbackMaxDelay = CALLBACKMAXDELAY_INVALID;
     protected int _poeCurrent = POECURRENT_INVALID;
@@ -295,6 +301,9 @@ public class YNetwork extends YFunction
         }
         if (json_val.has("callbackCredentials")) {
             _callbackCredentials = json_val.getString("callbackCredentials");
+        }
+        if (json_val.has("callbackInitialDelay")) {
+            _callbackInitialDelay = json_val.getInt("callbackInitialDelay");
         }
         if (json_val.has("callbackMinDelay")) {
             _callbackMinDelay = json_val.getInt("callbackMinDelay");
@@ -1266,9 +1275,9 @@ public class YNetwork extends YFunction
      *  @return a value among YNetwork.CALLBACKENCODING_FORM, YNetwork.CALLBACKENCODING_JSON,
      *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV,
      *  YNetwork.CALLBACKENCODING_YOCTO_API, YNetwork.CALLBACKENCODING_JSON_NUM,
-     *  YNetwork.CALLBACKENCODING_EMONCMS, YNetwork.CALLBACKENCODING_AZURE and
-     *  YNetwork.CALLBACKENCODING_INFLUXDB corresponding to the encoding standard to use for representing
-     * notification values
+     *  YNetwork.CALLBACKENCODING_EMONCMS, YNetwork.CALLBACKENCODING_AZURE,
+     *  YNetwork.CALLBACKENCODING_INFLUXDB and YNetwork.CALLBACKENCODING_MQTT corresponding to the encoding
+     * standard to use for representing notification values
      *
      * @throws YAPI_Exception on error
      */
@@ -1287,8 +1296,9 @@ public class YNetwork extends YFunction
      *
      *  @return a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
      *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV, Y_CALLBACKENCODING_YOCTO_API,
-     *  Y_CALLBACKENCODING_JSON_NUM, Y_CALLBACKENCODING_EMONCMS, Y_CALLBACKENCODING_AZURE and
-     * Y_CALLBACKENCODING_INFLUXDB corresponding to the encoding standard to use for representing notification values
+     *  Y_CALLBACKENCODING_JSON_NUM, Y_CALLBACKENCODING_EMONCMS, Y_CALLBACKENCODING_AZURE,
+     *  Y_CALLBACKENCODING_INFLUXDB and Y_CALLBACKENCODING_MQTT corresponding to the encoding standard to
+     * use for representing notification values
      *
      * @throws YAPI_Exception on error
      */
@@ -1303,9 +1313,9 @@ public class YNetwork extends YFunction
      *  @param newval : a value among YNetwork.CALLBACKENCODING_FORM, YNetwork.CALLBACKENCODING_JSON,
      *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV,
      *  YNetwork.CALLBACKENCODING_YOCTO_API, YNetwork.CALLBACKENCODING_JSON_NUM,
-     *  YNetwork.CALLBACKENCODING_EMONCMS, YNetwork.CALLBACKENCODING_AZURE and
-     *  YNetwork.CALLBACKENCODING_INFLUXDB corresponding to the encoding standard to use for representing
-     * notification values
+     *  YNetwork.CALLBACKENCODING_EMONCMS, YNetwork.CALLBACKENCODING_AZURE,
+     *  YNetwork.CALLBACKENCODING_INFLUXDB and YNetwork.CALLBACKENCODING_MQTT corresponding to the encoding
+     * standard to use for representing notification values
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -1324,8 +1334,9 @@ public class YNetwork extends YFunction
      *
      *  @param newval : a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
      *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV, Y_CALLBACKENCODING_YOCTO_API,
-     *  Y_CALLBACKENCODING_JSON_NUM, Y_CALLBACKENCODING_EMONCMS, Y_CALLBACKENCODING_AZURE and
-     * Y_CALLBACKENCODING_INFLUXDB corresponding to the encoding standard to use for representing notification values
+     *  Y_CALLBACKENCODING_JSON_NUM, Y_CALLBACKENCODING_EMONCMS, Y_CALLBACKENCODING_AZURE,
+     *  Y_CALLBACKENCODING_INFLUXDB and Y_CALLBACKENCODING_MQTT corresponding to the encoding standard to
+     * use for representing notification values
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -1435,6 +1446,68 @@ public class YNetwork extends YFunction
         rest_val = String.format("%s:%s", username.toString(), password.toString());
         _setAttr("callbackCredentials",rest_val);
         return YAPI.SUCCESS;
+    }
+
+    /**
+     * Returns the initial waiting time before first callback notifications, in seconds.
+     *
+     * @return an integer corresponding to the initial waiting time before first callback notifications, in seconds
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_callbackInitialDelay() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return CALLBACKINITIALDELAY_INVALID;
+            }
+        }
+        return _callbackInitialDelay;
+    }
+
+    /**
+     * Returns the initial waiting time before first callback notifications, in seconds.
+     *
+     * @return an integer corresponding to the initial waiting time before first callback notifications, in seconds
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getCallbackInitialDelay() throws YAPI_Exception
+    {
+        return get_callbackInitialDelay();
+    }
+
+    /**
+     * Changes the initial waiting time before first callback notifications, in seconds.
+     *
+     *  @param newval : an integer corresponding to the initial waiting time before first callback
+     * notifications, in seconds
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_callbackInitialDelay(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("callbackInitialDelay",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the initial waiting time before first callback notifications, in seconds.
+     *
+     *  @param newval : an integer corresponding to the initial waiting time before first callback
+     * notifications, in seconds
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setCallbackInitialDelay(int newval)  throws YAPI_Exception
+    {
+        return set_callbackInitialDelay(newval);
     }
 
     /**
@@ -1744,8 +1817,8 @@ public class YNetwork extends YFunction
     }
 
     /**
-     * Pings str_host to test the network connectivity. Sends four ICMP ECHO_REQUEST requests from the
-     * module to the target str_host. This method returns a string with the result of the
+     * Pings host to test the network connectivity. Sends four ICMP ECHO_REQUEST requests from the
+     * module to the target host. This method returns a string with the result of the
      * 4 ICMP ECHO_REQUEST requests.
      *
      * @param host : the hostname or the IP address of the target
@@ -1758,6 +1831,21 @@ public class YNetwork extends YFunction
         // may throw an exception
         content = _download(String.format("ping.txt?host=%s",host));
         return new String(content);
+    }
+
+    /**
+     * Trigger an HTTP callback quickly. This function can even be called within
+     * an HTTP callback, in which case the next callback will be triggered 5 seconds
+     * after the end of the current callback, regardless if the minimum time between
+     * callbacks configured in the device.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int triggerCallback() throws YAPI_Exception
+    {
+        return set_callbackMethod(get_callbackMethod());
     }
 
     /**

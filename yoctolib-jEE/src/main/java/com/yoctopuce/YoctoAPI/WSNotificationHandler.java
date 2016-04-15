@@ -16,34 +16,15 @@ import java.util.concurrent.*;
 public class WSNotificationHandler extends NotificationHandler implements MessageHandler
 {
 
-    public static final int NB_TCP_CHANNEL = 8;
-    public static final int HUB_TCP_CHANNEL = 1;
-    public static final int DEVICE_TCP_CHANNEL = 0;
-    public static final int DEVICE_ASYNC_TCP_CHANNEL = 2;
-    public static final int WS_REQUEST_MAX_DURATION = 50000;
-
-    static final int USB_META_UTCTIME = 1;
-    static final int USB_META_DLFLUSH = 2;
-    static final int USB_META_ACK_D2H_PACKET = 3;
-    static final int USB_META_WS_ANNOUNCE = 4;
-    static final int USB_META_WS_AUTHENTICATION = 5;
-    static final int USB_META_WS_ERROR = 6;
-
-    static final int USB_META_UTCTIME_SIZE = 5;
-    static final int USB_META_DLFLUSH_SIZE = 1;
-    static final int USB_META_ACK_D2H_PACKET_SIZE = 2;
-    static final int USB_META_WS_ANNOUNCE_SIZE = 8 + YAPI.YOCTO_SERIAL_LEN;
-    static final int USB_META_WS_AUTHENTICATION_SIZE = 28;
-    static final int USB_META_WS_ERROR_SIZE = 6;
+    private static final int NB_TCP_CHANNEL = 4;
+    private static final int HUB_TCP_CHANNEL = 0;
+    private static final int DEVICE_TCP_CHANNEL = 0;
+    private static final int WS_REQUEST_MAX_DURATION = 50000;
 
 
-    private static final int USB_META_WS_PROTO_V1 = 1;
-    private static final int VERSION_SUPPORT_ASYNC_CLOSE = 1;
-
-
-    private static final int USB_META_WS_VALID_SHA1 = 1;
-    private static final int USB_META_WS_RW = 2;
-
+    // default transport layer parameters
+    private static final int DEFAULT_TCP_ROUND_TRIP_TIME = 30;
+    private static final int DEFAULT_TCP_MAX_WINDOW_SIZE = 4 * 65536;
 
     private final ExecutorService _executorService;
     private final boolean _isHttpCallback;
@@ -52,21 +33,30 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     private Session _session;
 
 
-    private final BlockingQueue<WSRequest> _outRequest = new LinkedBlockingQueue<>();
+    private final BlockingQueue<WSRequest> _pendingRequests = new LinkedBlockingQueue<>();
 
     private final ArrayList<Queue<WSRequest>> _workingRequests;
     private final Object _stateLock = new Object();
-    private ConnectionState _connectionState = ConnectionState.CONNECTING;
     private volatile boolean _firstNotif;
-    private String _serial;
+    private volatile boolean _muststop;
+    private long _connectionTime = 0;
+    private ConnectionState _connectionState = ConnectionState.CONNECTING;
+    private int _remoteVersion = 0;
+    private String _remoteSerial;
     private long _remoteNouce;
     private int _nounce;
-    private volatile boolean _muststop;
-    private volatile String _session_error;
     private volatile int _session_errno;
+    private volatile String _session_error;
     private boolean _rwAccess = false;
-    private int _remoteVersion = 0;
+    private long _tcpRoundTripTime = DEFAULT_TCP_ROUND_TRIP_TIME;
+    private int _tcpMaxWindowSize = DEFAULT_TCP_MAX_WINDOW_SIZE;
+    private final int[] _lastUploadAckBytes = new int[NB_TCP_CHANNEL];
+    private final long[] _lastUploadAckTime = new long[NB_TCP_CHANNEL];
+    private final int[] _lastUploadRateBytes = new int[NB_TCP_CHANNEL];
+    private final long[] _lastUploadRateTime = new long[NB_TCP_CHANNEL];
+    private int _uploadRate = 0;
     private byte _nextAsyncId = 48;
+    private long _next_transmit_tm = 0;
 
 
     private enum ConnectionState
@@ -74,7 +64,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         DEAD, DISCONNECTED, CONNECTING, AUTHENTICATING, CONNECTED
     }
 
-    public WSNotificationHandler(YHTTPHub hub, Object session)
+    WSNotificationHandler(YHTTPHub hub, Object session)
     {
         super(hub);
         _session = (Session) session;
@@ -83,7 +73,6 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
             // server mode
             Whole<ByteBuffer> messageHandler = new Whole<ByteBuffer>()
             {
-
                 @Override
                 public void onMessage(ByteBuffer byteBuffer)
                 {
@@ -168,7 +157,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     private void runOnSession()
     {
         if (!_session.isOpen()) {
-            _hub._yctx._Log("WebSocket is not open");
+            WSLOG("WebSocket is not open");
             return;
         }
 
@@ -179,7 +168,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                 while (_connectionState == ConnectionState.CONNECTING && !_muststop) {
                     _stateLock.wait(1000);
                     if (timeout < System.currentTimeMillis()) {
-                        _hub._yctx._Log("YoctoHub did not send any data for 10 secs\n");
+                        WSLOG("YoctoHub did not send any data for 10 secs\n");
                         _connectionState = ConnectionState.DISCONNECTED;
                         _stateLock.notifyAll();
                         return;
@@ -188,41 +177,25 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
             }
 
             while (!Thread.currentThread().isInterrupted() && !_muststop) {
-                WSRequest request = _outRequest.take();
-                if (request.getErrorCode() != YAPI.SUCCESS) {
-                    // fake request to unlock thread
-                    break;
+                long now = YAPI.GetTickCount();
+                long wait;
+                if (_next_transmit_tm >= now) {
+                    wait = _next_transmit_tm - now;
+                } else {
+                    wait = 1000;
                 }
-                int tcp_channel = request.getChannel();
-                if (request.getState() == WSRequest.State.OPEN) {
+                WSRequest request = _pendingRequests.poll(wait, TimeUnit.MILLISECONDS);
+                if (request != null) {
+                    if (request.getState().equals(WSRequest.State.ERROR)) {
+                        // fake request to unlock thread and quit
+                        break;
+                    }
                     synchronized (_workingRequests) {
-                        _workingRequests.get(tcp_channel).offer(request);
-                    }
-                    ByteBuffer requestBB = request.getRequestBytes();
-                    while (requestBB.hasRemaining()) {
-                        int size = requestBB.remaining();
-                        int type;
-                        WSStream stream;
-                        if (size > WSStream.MAX_DATA_LEN) {
-                            size = WSStream.MAX_DATA_LEN;
-                            stream = new WSStream(YGenericHub.YSTREAM_TCP, tcp_channel, size, requestBB);
-                            basicRemote.sendBinary(stream.getContent(), true);
-                        } else {
-                            if (request.isAsync() && _remoteVersion >= VERSION_SUPPORT_ASYNC_CLOSE) {
-                                if (size == WSStream.MAX_DATA_LEN) {
-                                    stream = new WSStream(YGenericHub.YSTREAM_TCP, tcp_channel, size, requestBB);
-                                    basicRemote.sendBinary(stream.getContent(), true);
-                                    size = 0;
-                                }
-                                type = YGenericHub.YSTREAM_TCP_ASYNCCLOSE;
-                                stream = new WSStream(type, tcp_channel, size, requestBB, request.getAsyncId());
-                            } else {
-                                stream = new WSStream(YGenericHub.YSTREAM_TCP, tcp_channel, size, requestBB);
-                            }
-                            basicRemote.sendBinary(stream.getContent(), true);
-                        }
+                        request.reportStartOfProcess();
+                        _workingRequests.get(request.getChannel()).offer(request);
                     }
                 }
+                processRequests(basicRemote);
             }
         } catch (IOException | InterruptedException ex) {
             // put all request in error
@@ -242,7 +215,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
 
     }
 
-    private WSRequest sendRequest(String req_first_line, byte[] req_head_and_body, int tcpchanel, boolean async) throws YAPI_Exception, InterruptedException
+    private WSRequest sendRequest(String req_first_line, byte[] req_head_and_body, int tcpchanel, boolean async, YGenericHub.RequestProgress progress, Object context) throws YAPI_Exception, InterruptedException
     {
         WSRequest request;
         byte[] full_request;
@@ -280,10 +253,10 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                     _nextAsyncId = 48;
                 }
             } else {
-                request = new WSRequest(tcpchanel, full_request);
+                request = new WSRequest(tcpchanel, full_request, progress, context);
             }
         }
-        _outRequest.put(request);
+        _pendingRequests.put(request);
         return request;
     }
 
@@ -320,16 +293,16 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     public byte[] hubRequestSync(String req_first_line, byte[] req_head_and_body, int mstimeout) throws
             YAPI_Exception, InterruptedException
     {
-        WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, HUB_TCP_CHANNEL, false);
+        WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, HUB_TCP_CHANNEL, false, null, null);
         return getRequestResponse(wsRequest, mstimeout);
     }
 
 
     @Override
-    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, int mstimeout) throws
+    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, int mstimeout, YGenericHub.RequestProgress progress, Object context) throws
             YAPI_Exception, InterruptedException
     {
-        WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, DEVICE_TCP_CHANNEL, false);
+        WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, DEVICE_TCP_CHANNEL, false, progress, context);
         return getRequestResponse(wsRequest, mstimeout);
     }
 
@@ -338,7 +311,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                          final YGenericHub.RequestAsyncResult asyncResult, final Object asyncContext) throws
             YAPI_Exception, InterruptedException
     {
-        final WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, DEVICE_TCP_CHANNEL, true);
+        final WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, DEVICE_TCP_CHANNEL, true, null, null);
         _executorService.execute(new Runnable()
         {
             @Override
@@ -370,7 +343,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         try {
             _session.close();
         } catch (IOException | IllegalStateException e) {
-            _hub._yctx._Log("error on ws close : " + e.getMessage());
+            WSLOG("error on ws close : " + e.getMessage());
             e.printStackTrace();
         }
         _executorService.shutdown();
@@ -485,16 +458,17 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                 int metatype = raw_data.get() & 0xff;
                 long nounce;
                 int version;
-                switch (metatype)
-
-                {
-                    case USB_META_WS_ANNOUNCE:
+                switch (metatype) {
+                    case YGenericHub.USB_META_WS_ANNOUNCE:
                         version = raw_data.get() & 0xff;
-                        if (version < USB_META_WS_PROTO_V1 || raw_data.limit() < USB_META_WS_ANNOUNCE_SIZE) {
+                        if (version < YGenericHub.USB_META_WS_PROTO_V1 || raw_data.limit() < YGenericHub.USB_META_WS_ANNOUNCE_SIZE) {
                             return;
                         }
                         _remoteVersion = version;
-                        raw_data.getShort(); // ignore reserved word
+                        int maxtcpws = raw_data.getShort(); // ignore reserved word
+                        if (maxtcpws > 0) {
+                            _tcpMaxWindowSize = maxtcpws;
+                        }
                         nounce = raw_data.getInt();
                         nounce &= 0xffffffff;
                         byte[] serial_char = new byte[raw_data.remaining()];
@@ -505,8 +479,9 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                                 break;
                             }
                         }
-                        _serial = new String(serial_char, 0, len, StandardCharsets.ISO_8859_1);
+                        _remoteSerial = new String(serial_char, 0, len, StandardCharsets.ISO_8859_1);
                         _remoteNouce = nounce;
+                        _connectionTime = YAPI.GetTickCount();
                         Random randomGenerator = new Random();
                         _nounce = randomGenerator.nextInt();
                         synchronized (_stateLock) {
@@ -515,23 +490,26 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         }
                         sendAuthenticationMeta();
                         break;
-                    case USB_META_WS_AUTHENTICATION:
+                    case YGenericHub.USB_META_WS_AUTHENTICATION:
                         synchronized (_stateLock) {
                             if (_connectionState != ConnectionState.AUTHENTICATING)
                                 return;
                         }
                         version = raw_data.get() & 0xff;
-                        if (version < USB_META_WS_PROTO_V1 || raw_data.limit() < USB_META_WS_AUTHENTICATION_SIZE) {
+                        if (version < YGenericHub.USB_META_WS_PROTO_V1 || raw_data.limit() < YGenericHub.USB_META_WS_AUTHENTICATION_SIZE) {
                             return;
                         }
+                        _tcpRoundTripTime = YAPI.GetTickCount() - _connectionTime + 1;
+                        long uploadRate = _tcpMaxWindowSize * 1000 / _tcpRoundTripTime;
+                        _hub._yctx._Log(String.format("WS:RTT=%dms, WS=%d, uploadRate=%f KB/s\n", _tcpRoundTripTime, _tcpMaxWindowSize, uploadRate / 1000.0));
                         int flags = raw_data.getShort() & 0xffff;
                         raw_data.getInt(); // drop nounce
-                        if ((flags & USB_META_WS_RW) != 0)
+                        if ((flags & YGenericHub.USB_META_WS_AUTH_FLAGS_RW) != 0)
                             _rwAccess = true;
-                        if ((flags & USB_META_WS_VALID_SHA1) != 0) {
+                        if ((flags & YGenericHub.USB_META_WS_VALID_SHA1) != 0) {
                             byte[] remote_sha1 = new byte[20];
                             raw_data.get(remote_sha1);
-                            byte[] sha1 = computeAUTH(_hub._http_params.getUser(), _hub._http_params.getPass(), _serial, _nounce);
+                            byte[] sha1 = computeAUTH(_hub._http_params.getUser(), _hub._http_params.getPass(), _remoteSerial, _nounce);
                             if (Arrays.equals(sha1, remote_sha1)) {
                                 synchronized (_stateLock) {
                                     _connectionState = ConnectionState.CONNECTED;
@@ -557,7 +535,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                             }
                         }
                         break;
-                    case USB_META_WS_ERROR:
+                    case YGenericHub.USB_META_WS_ERROR:
                         // drop reserved byte
                         raw_data.get();
                         int html_error = raw_data.getShort() & 0xffff;
@@ -566,6 +544,45 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         } else {
                             errorOnSession(YAPI.IO_ERROR, String.format("Remote hub closed connection with error %d", html_error));
                         }
+                        break;
+                    case YGenericHub.USB_META_ACK_UPLOAD:
+                        int tcpchan = raw_data.get();
+                        synchronized (_workingRequests) {
+                            workingRequest = _workingRequests.get(tcpchan).peek();
+                        }
+                        if (workingRequest != null) {
+                            int b0 = raw_data.get() & 0xff;
+                            int b1 = raw_data.get() & 0xff;
+                            int b2 = raw_data.get() & 0xff;
+                            int b3 = raw_data.get() & 0xff;
+                            int ackBytes = b0 + (b1 << 8) + (b2 << 16) + (b3 << 24);
+                            long ackTime = YAPI.GetTickCount();
+                            if (_lastUploadAckTime[tcpchan] != 0 && ackBytes > _lastUploadAckBytes[tcpchan]) {
+                                _lastUploadAckBytes[tcpchan] = ackBytes;
+                                _lastUploadAckTime[tcpchan] = ackTime;
+
+                                int deltaBytes = ackBytes - _lastUploadRateBytes[tcpchan];
+                                long deltaTime = ackTime - _lastUploadRateTime[tcpchan];
+                                if (deltaTime < 500) break; // wait more
+                                if (deltaTime < 1000 && deltaBytes < 65536) break; // wait more
+                                _lastUploadRateBytes[tcpchan] = ackBytes;
+                                _lastUploadRateTime[tcpchan] = ackTime;
+                                workingRequest.reportProgress(ackBytes);
+                                double newRate = deltaBytes * 1000.0 / deltaTime;
+                                _uploadRate = (int) (0.8 * _uploadRate + 0.3 * newRate);// +10% intentionally
+                                _hub._yctx._Log(String.format("Upload rate: %.2f KB/s (based on %.2f KB in %fs)\n", newRate / 1000.0, deltaBytes / 1000.0, deltaTime / 1000.0));
+                            } else {
+                                _hub._yctx._Log("First Ack received\n");
+                                _lastUploadAckBytes[tcpchan] = ackBytes;
+                                _lastUploadAckTime[tcpchan] = ackTime;
+                                _lastUploadRateBytes[tcpchan] = ackBytes;
+                                _lastUploadRateTime[tcpchan] = ackTime;
+                                workingRequest.reportProgress(ackBytes);
+                            }
+                        }
+                        break;
+                    default:
+                        WSLOG(String.format("unhandled Meta pkt %d\n", ystream));
                         break;
                 }
 
@@ -580,26 +597,137 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
 
     }
 
+
+    /*
+    *   look through all pending request if there is some data that we can send
+    *
+    */
+    private void processRequests(RemoteEndpoint.Basic remote) throws IOException
+    {
+        int tcpchan;
+
+        if (_next_transmit_tm != 0 && _next_transmit_tm > YAPI.GetTickCount()) {
+            return;
+        }
+        for (tcpchan = 0; tcpchan < NB_TCP_CHANNEL; tcpchan++) {
+            WSRequest req;
+            synchronized (_workingRequests) {
+                req = _workingRequests.get(tcpchan).peek();
+            }
+            while (req != null) {
+                ByteBuffer requestBytes = req.getRequestBytes();
+                int throttle_start = requestBytes.position();
+                int throttle_end = requestBytes.limit();
+                if (throttle_end > 2108 && _remoteVersion >= YGenericHub.USB_META_WS_PROTO_V2 && tcpchan == 0) {
+                    // Perform throttling on large uploads
+                    if (requestBytes.position() == 0) {
+                        // First chunk is always first multiple of full window (124 bytes) above 2KB
+                        throttle_end = 2108;
+                        // Prepare to compute effective transfer rate
+                        _lastUploadAckBytes[tcpchan] = 0;
+                        _lastUploadAckTime[tcpchan] = 0;
+                        // Start with initial RTT based estimate
+                        _uploadRate = (int) (_tcpMaxWindowSize * 1000 / _tcpRoundTripTime);
+                    } else if (_lastUploadAckTime[tcpchan] == 0) {
+                        // first block not yet acked, wait more
+                        throttle_end = 0;
+                    } else {
+                        // adapt window frame to available bandwidth
+                        int bytesOnTheAir = requestBytes.position() - _lastUploadAckBytes[tcpchan];
+                        long timeOnTheAir = YAPI.GetTickCount() - _lastUploadAckTime[tcpchan];
+                        int uploadRate = _uploadRate;
+                        int toBeSent = (int) (2 * uploadRate + 1024 - bytesOnTheAir + (uploadRate * timeOnTheAir / 1000));
+                        if (toBeSent + bytesOnTheAir > DEFAULT_TCP_MAX_WINDOW_SIZE) {
+                            toBeSent = DEFAULT_TCP_MAX_WINDOW_SIZE - bytesOnTheAir;
+                        }
+                        WSLOG(String.format("throttling: %d bytes/s (%d + %d = %d)\n", _uploadRate, toBeSent, bytesOnTheAir, bytesOnTheAir + toBeSent));
+                        if (toBeSent < 64) {
+                            long waitTime = 1000 * (128 - toBeSent) / _uploadRate;
+                            if (waitTime < 2) waitTime = 2;
+                            _next_transmit_tm = YAPI.GetTickCount() + waitTime;
+                            WSLOG(String.format("WS: %d sent %dms ago, waiting %dms...\n", bytesOnTheAir, timeOnTheAir, waitTime));
+                            throttle_end = 0;
+                        }
+                        if (throttle_end > requestBytes.position() + toBeSent) {
+                            // when sending partial content, round up to full frames
+                            if (toBeSent > 124) {
+                                toBeSent = (toBeSent / 124) * 124;
+                            }
+                            throttle_end = requestBytes.position() + toBeSent;
+                        }
+                    }
+                }
+                while (requestBytes.position() < throttle_end) {
+                    int datalen = throttle_end - requestBytes.position();
+                    if (datalen > WSStream.MAX_DATA_LEN) {
+                        datalen = WSStream.MAX_DATA_LEN;
+                    }
+                    WSStream wsstream;
+                    if (req.isAsync() && (requestBytes.position() + datalen == requestBytes.limit())) {
+                        if (datalen == WSStream.MAX_DATA_LEN) {
+                            // last frame is already full we must send the async close in another one
+                            wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, datalen, requestBytes);
+                            remote.sendBinary(wsstream.getContent(), true);
+                            req.reportDataSent();
+                            //WSLOG(String.format("ws_req:%s: send %d bytes on chan%d (%d/%d)\n", req, datalen, tcpchan, requestBytes.position(), requestBytes.limit()));
+                            datalen = 0;
+                        }
+                        wsstream = new WSStream(YGenericHub.YSTREAM_TCP_ASYNCCLOSE, tcpchan, datalen, requestBytes, req.getAsyncId());
+                        remote.sendBinary(wsstream.getContent(), true);
+                        req.reportDataSent();
+                        //WSLOG(String.format("req(%s:%s) sent async close %d\n", _hub.getHost(), req, req.getAsyncId()));
+                    } else {
+                        wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, datalen, requestBytes);
+                        remote.sendBinary(wsstream.getContent(), true);
+                        req.reportDataSent();
+                        //WSLOG("ws_req:%p: sent %d bytes on chan%d (%d/%d)\n", req, datalen, tcpchan, req->ws.requestpos, req->ws.requestsize);
+                    }
+                }
+                if (requestBytes.position() < requestBytes.limit()) {
+                    int sent = requestBytes.position() - throttle_start;
+                    // not completely sent, cannot do more for now
+                    if (_uploadRate > 0) {
+                        long waitTime = 1000 * sent / _uploadRate;
+                        if (waitTime < 2) waitTime = 2;
+                        _next_transmit_tm = YAPI.GetTickCount() + waitTime;
+                        WSLOG(String.format("Sent %dbytes, waiting %dms...\n", sent, waitTime));
+                    } else {
+                        _next_transmit_tm = YAPI.GetTickCount() + 100;
+                    }
+                }
+                synchronized (_workingRequests) {
+                    req = _workingRequests.get(tcpchan).peek();
+                }
+            }
+        }
+    }
+
+    private void WSLOG(String s)
+    {
+        System.out.print(s);
+        _hub._yctx._Log(s);
+    }
+
     private void sendAuthenticationMeta()
     {
-        ByteBuffer auth = ByteBuffer.allocate(USB_META_WS_AUTHENTICATION_SIZE);
+        ByteBuffer auth = ByteBuffer.allocate(YGenericHub.USB_META_WS_AUTHENTICATION_SIZE);
         auth.order(ByteOrder.LITTLE_ENDIAN);
-        auth.put((byte) USB_META_WS_AUTHENTICATION);
+        auth.put((byte) YGenericHub.USB_META_WS_AUTHENTICATION);
         if (_hub._http_params.hasAuthParam()) {
-            auth.put((byte) USB_META_WS_PROTO_V1);
-            auth.putShort((short) USB_META_WS_VALID_SHA1);
+            auth.put((byte) YGenericHub.USB_META_WS_PROTO_V1);
+            auth.putShort((short) YGenericHub.USB_META_WS_VALID_SHA1);
             auth.putInt(_nounce);
-            byte[] sha1 = computeAUTH(_hub._http_params.getUser(), _hub._http_params.getPass(), _serial, _remoteNouce);
+            byte[] sha1 = computeAUTH(_hub._http_params.getUser(), _hub._http_params.getPass(), _remoteSerial, _remoteNouce);
             auth.put(sha1);
         } else {
-            auth.put((byte) USB_META_WS_PROTO_V1);
+            auth.put((byte) YGenericHub.USB_META_WS_PROTO_V1);
             auth.putInt(0);
             for (int i = 0; i < 5; i++) {
                 auth.putInt(0);
             }
         }
         auth.rewind();
-        WSStream stream = new WSStream(YGenericHub.YSTREAM_META, 0, USB_META_WS_AUTHENTICATION_SIZE, auth);
+        WSStream stream = new WSStream(YGenericHub.YSTREAM_META, 0, YGenericHub.USB_META_WS_AUTHENTICATION_SIZE, auth);
         RemoteEndpoint.Basic remote = _session.getBasicRemote();
         try {
             remote.sendBinary(stream.getContent(), true);
@@ -672,11 +800,9 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         } catch (IOException e) {
             e.printStackTrace();
         }
-        WSRequest fakeRequest = new WSRequest(0, null);
-        fakeRequest.setState(WSRequest.State.ERROR);
-        fakeRequest.setError(YAPI.IO_ERROR, closeReason, null);
+        WSRequest fakeRequest = new WSRequest(YAPI.IO_ERROR, closeReason);
         try {
-            _outRequest.put(fakeRequest);
+            _pendingRequests.put(fakeRequest);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

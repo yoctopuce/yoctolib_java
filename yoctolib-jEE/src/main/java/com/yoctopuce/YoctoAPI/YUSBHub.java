@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 23383 2016-03-02 18:08:31Z seb $
+ * $Id: YUSBHub.java 23679 2016-03-31 12:07:23Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -184,7 +184,7 @@ public class YUSBHub extends YGenericHub
     }
 
     @Override
-    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body) throws YAPI_Exception
+    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestProgress progress, Object context) throws YAPI_Exception
     {
         byte[] currentRequest = prepareRequest(req_first_line, req_head_and_body);
         byte[] result = YJniWrapper.devRequestSync(device.getSerialNumber(), currentRequest);

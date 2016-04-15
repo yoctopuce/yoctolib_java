@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YTemperature.java 23527 2016-03-18 21:49:19Z mvuilleu $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -78,10 +78,20 @@ public class YTemperature extends YSensor
     public static final int SENSORTYPE_RES_LINEAR = 13;
     public static final int SENSORTYPE_INVALID = -1;
     /**
+     * invalid signalValue value
+     */
+    public static final double SIGNALVALUE_INVALID = YAPI.INVALID_DOUBLE;
+    /**
+     * invalid signalUnit value
+     */
+    public static final String SIGNALUNIT_INVALID = YAPI.INVALID_STRING;
+    /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _sensorType = SENSORTYPE_INVALID;
+    protected double _signalValue = SIGNALVALUE_INVALID;
+    protected String _signalUnit = SIGNALUNIT_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackTemperature = null;
     protected TimedReportCallback _timedReportCallbackTemperature = null;
@@ -141,6 +151,12 @@ public class YTemperature extends YSensor
     {
         if (json_val.has("sensorType")) {
             _sensorType = json_val.getInt("sensorType");
+        }
+        if (json_val.has("signalValue")) {
+            _signalValue = Math.round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
+        }
+        if (json_val.has("signalUnit")) {
+            _signalUnit = json_val.getString("signalUnit");
         }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
@@ -279,6 +295,66 @@ public class YTemperature extends YSensor
     public int setSensorType(int newval)  throws YAPI_Exception
     {
         return set_sensorType(newval);
+    }
+
+    /**
+     * Returns the current value of the electrical signal measured by the sensor.
+     *
+     *  @return a floating point number corresponding to the current value of the electrical signal
+     * measured by the sensor
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_signalValue() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SIGNALVALUE_INVALID;
+            }
+        }
+        return (double)Math.round(_signalValue * 1000) / 1000;
+    }
+
+    /**
+     * Returns the current value of the electrical signal measured by the sensor.
+     *
+     *  @return a floating point number corresponding to the current value of the electrical signal
+     * measured by the sensor
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getSignalValue() throws YAPI_Exception
+    {
+        return get_signalValue();
+    }
+
+    /**
+     * Returns the measuring unit of the electrical signal used by the sensor.
+     *
+     * @return a string corresponding to the measuring unit of the electrical signal used by the sensor
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_signalUnit() throws YAPI_Exception
+    {
+        if (_cacheExpiration == 0) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SIGNALUNIT_INVALID;
+            }
+        }
+        return _signalUnit;
+    }
+
+    /**
+     * Returns the measuring unit of the electrical signal used by the sensor.
+     *
+     * @return a string corresponding to the measuring unit of the electrical signal used by the sensor
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getSignalUnit() throws YAPI_Exception
+    {
+        return get_signalUnit();
     }
 
     /**

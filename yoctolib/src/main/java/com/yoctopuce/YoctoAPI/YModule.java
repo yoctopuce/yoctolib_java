@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 23250 2016-02-23 16:20:08Z seb $
+ * $Id: YModule.java 23882 2016-04-12 08:38:50Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -300,7 +300,7 @@ public class YModule extends YFunction
     public void registerLogCallback(LogCallback callback)
     {
         _logCallback = callback;
-        YDevice ydev = _yapi._yHash.getDevice(_serial);
+        YDevice ydev = _yapi._yHash.getDevice(_serialNumber);
         if (ydev != null) {
             ydev.registerLogCallback(callback);
         }
@@ -350,10 +350,9 @@ public class YModule extends YFunction
 
 
     /**
-     * Returns a list of all the modules that are plugged into the current module. This
-     * method is only useful on a YoctoHub/VirtualHub. This method return the serial number of all
-     * module connected to a YoctoHub. Calling this method on a standard device is not an
-     * error, and an empty array will be returned.
+     * Returns a list of all the modules that are plugged into the current module.
+     * This method only makes sense when called for a YoctoHub/VirtualHub.
+     * Otherwise, an empty array will be returned.
      *
      * @return an array of strings containing the sub modules.
      */
@@ -367,7 +366,7 @@ public class YModule extends YFunction
 
     /**
      * Returns the serial number of the YoctoHub on which this module is connected.
-     * If the module is connected by USB or if the module is the root YoctoHub an
+     * If the module is connected by USB, or if the module is the root YoctoHub, an
      * empty string is returned.
      *
      * @return a string with the serial number of the YoctoHub or an empty string
@@ -384,7 +383,7 @@ public class YModule extends YFunction
 
 
     /**
-     * Returns the URL used to access the module. If the module is connected by USB the
+     * Returns the URL used to access the module. If the module is connected by USB, the
      * string 'usb' is returned.
      *
      * @return a string with the URL of the module.
@@ -1087,14 +1086,13 @@ public class YModule extends YFunction
      * needs to be updated.
      *  It is possible to pass a directory as argument instead of a file. In this case, this method returns
      * the path of the most recent
-     *  appropriate byn file. If the parameter onlynew is true, the function discards firmware that are
-     * older or equal to
-     * the installed firmware.
+     * appropriate .byn file. If the parameter onlynew is true, the function discards firmwares that are older or
+     * equal to the installed firmware.
      *
      * @param path : the path of a byn file or a directory that contains byn files
      * @param onlynew : returns only files that are strictly newer
      *
-     * @return : the path of the byn file to use or a empty string if no byn files matches the requirement
+     * @return the path of the byn file to use or a empty string if no byn files matches the requirement
      *
      * @throws YAPI_Exception on error
      */
@@ -1121,11 +1119,12 @@ public class YModule extends YFunction
      * Prepares a firmware update of the module. This method returns a YFirmwareUpdate object which
      * handles the firmware update process.
      *
-     * @param path : the path of the byn file to use.
+     * @param path : the path of the .byn file to use.
+     * @param force : true to force the firmware update even if some prerequisites appear not to be met
      *
-     * @return : A YFirmwareUpdate object or NULL on error.
+     * @return a YFirmwareUpdate object or NULL on error.
      */
-    public YFirmwareUpdate updateFirmware(String path) throws YAPI_Exception
+    public YFirmwareUpdate updateFirmwareEx(String path,boolean force) throws YAPI_Exception
     {
         String serial;
         byte[] settings;
@@ -1136,13 +1135,25 @@ public class YModule extends YFunction
             _throw(YAPI.IO_ERROR, "Unable to get device settings");
             settings = ("error:Unable to get device settings").getBytes();
         }
-        return new YFirmwareUpdate(_yapi, serial, path, settings);
+        return new YFirmwareUpdate(_yapi, serial, path, settings, force);
     }
 
     /**
-     *  Returns all the settings and uploaded files of the module. Useful to backup all the logical names,
-     * calibrations parameters,
-     * and uploaded files of a connected module.
+     * Prepares a firmware update of the module. This method returns a YFirmwareUpdate object which
+     * handles the firmware update process.
+     *
+     * @param path : the path of the .byn file to use.
+     *
+     * @return a YFirmwareUpdate object or NULL on error.
+     */
+    public YFirmwareUpdate updateFirmware(String path) throws YAPI_Exception
+    {
+        return updateFirmwareEx(path, false);
+    }
+
+    /**
+     * Returns all the settings and uploaded files of the module. Useful to backup all the
+     * logical names, calibrations parameters, and uploaded files of a device.
      *
      * @return a binary buffer with all the settings.
      *
@@ -1199,7 +1210,7 @@ public class YModule extends YFunction
             sep = "";
             for (String ii: filelist) {
                 name = _json_get_key((ii).getBytes(), "name");
-                if ((name).length() > 0 && !(name.equals("startupConf.json"))) {
+                if (((name).length() > 0) && !(name.equals("startupConf.json"))) {
                     file_data_bin = _download(_escapeAttr(name));
                     file_data = YAPIContext._bytesToHexStr(file_data_bin, 0, file_data_bin.length);
                     item = String.format("%s{\"name\":\"%s\", \"data\":\"%s\"}\n", sep, name,file_data);
@@ -1255,9 +1266,10 @@ public class YModule extends YFunction
     }
 
     /**
-     *  Restores all the settings and uploaded files of the module. Useful to restore all the logical names
-     * and calibrations parameters, uploaded
-     * files etc.. of a module from a backup.Remember to call the saveToFlash() method of the module if the
+     * Restores all the settings and uploaded files to the module.
+     * This method is useful to restore all the logical names and calibrations parameters,
+     * uploaded files etc. of a device from a backup.
+     * Remember to call the saveToFlash() method of the module if the
      * modifications must be kept.
      *
      * @param settings : a binary buffer with all the settings.
@@ -1306,12 +1318,12 @@ public class YModule extends YFunction
     }
 
     /**
-     * Test if the device has a specific function. This method took an function identifier
-     * and return a boolean.
+     * Tests if the device includes a specific function. This method takes a function identifier
+     * and returns a boolean.
      *
      * @param funcId : the requested function identifier
      *
-     * @return : true if the device has the function identifier
+     * @return true if the device has the function identifier
      */
     public boolean hasFunction(String funcId) throws YAPI_Exception
     {
@@ -1336,7 +1348,7 @@ public class YModule extends YFunction
      *
      * @param funType : The type of function (Relay, LightSensor, Voltage,...)
      *
-     * @return : A array of string.
+     * @return an array of strings.
      */
     public ArrayList<String> get_functionIds(String funType) throws YAPI_Exception
     {
@@ -1576,7 +1588,7 @@ public class YModule extends YFunction
     }
 
     /**
-     * Restores all the settings of the module. Useful to restore all the logical names and calibrations parameters
+     * Restores all the settings of the device. Useful to restore all the logical names and calibrations parameters
      * of a module from a backup.Remember to call the saveToFlash() method of the module if the
      * modifications must be kept.
      *
@@ -1896,6 +1908,22 @@ public class YModule extends YFunction
         // may throw an exception
         content = _download("logs.txt");
         return new String(content);
+    }
+
+    /**
+     * Adds a text message to the device logs. This function is useful in
+     * particular to trace the execution of HTTP callbacks. If a newline
+     * is desired after the message, it must be included in the string.
+     *
+     * @param text : the string to append to the logs.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int log(String text) throws YAPI_Exception
+    {
+        return _upload("logs.txt", (text).getBytes());
     }
 
     //cannot be generated for Java:

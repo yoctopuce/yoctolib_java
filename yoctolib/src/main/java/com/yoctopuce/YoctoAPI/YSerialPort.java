@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 23250 2016-02-23 16:20:08Z seb $
+ * $Id: YSerialPort.java 23780 2016-04-06 10:27:21Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -60,25 +60,6 @@ public class YSerialPort extends YFunction
 //--- (end of YSerialPort class start)
 //--- (YSerialPort definitions)
     /**
-     * invalid serialMode value
-     */
-    public static final String SERIALMODE_INVALID = YAPI.INVALID_STRING;
-    /**
-     * invalid protocol value
-     */
-    public static final String PROTOCOL_INVALID = YAPI.INVALID_STRING;
-    /**
-     * invalid voltageLevel value
-     */
-    public static final int VOLTAGELEVEL_OFF = 0;
-    public static final int VOLTAGELEVEL_TTL3V = 1;
-    public static final int VOLTAGELEVEL_TTL3VR = 2;
-    public static final int VOLTAGELEVEL_TTL5V = 3;
-    public static final int VOLTAGELEVEL_TTL5VR = 4;
-    public static final int VOLTAGELEVEL_RS232 = 5;
-    public static final int VOLTAGELEVEL_RS485 = 6;
-    public static final int VOLTAGELEVEL_INVALID = -1;
-    /**
      * invalid rxCount value
      */
     public static final int RXCOUNT_INVALID = YAPI.INVALID_UINT;
@@ -114,9 +95,25 @@ public class YSerialPort extends YFunction
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
-    protected String _serialMode = SERIALMODE_INVALID;
-    protected String _protocol = PROTOCOL_INVALID;
-    protected int _voltageLevel = VOLTAGELEVEL_INVALID;
+    /**
+     * invalid voltageLevel value
+     */
+    public static final int VOLTAGELEVEL_OFF = 0;
+    public static final int VOLTAGELEVEL_TTL3V = 1;
+    public static final int VOLTAGELEVEL_TTL3VR = 2;
+    public static final int VOLTAGELEVEL_TTL5V = 3;
+    public static final int VOLTAGELEVEL_TTL5VR = 4;
+    public static final int VOLTAGELEVEL_RS232 = 5;
+    public static final int VOLTAGELEVEL_RS485 = 6;
+    public static final int VOLTAGELEVEL_INVALID = -1;
+    /**
+     * invalid protocol value
+     */
+    public static final String PROTOCOL_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid serialMode value
+     */
+    public static final String SERIALMODE_INVALID = YAPI.INVALID_STRING;
     protected int _rxCount = RXCOUNT_INVALID;
     protected int _txCount = TXCOUNT_INVALID;
     protected int _errCount = ERRCOUNT_INVALID;
@@ -126,6 +123,9 @@ public class YSerialPort extends YFunction
     protected String _currentJob = CURRENTJOB_INVALID;
     protected String _startupJob = STARTUPJOB_INVALID;
     protected String _command = COMMAND_INVALID;
+    protected int _voltageLevel = VOLTAGELEVEL_INVALID;
+    protected String _protocol = PROTOCOL_INVALID;
+    protected String _serialMode = SERIALMODE_INVALID;
     protected UpdateCallback _valueCallbackSerialPort = null;
     protected int _rxptr = 0;
 
@@ -182,15 +182,6 @@ public class YSerialPort extends YFunction
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
-        if (json_val.has("serialMode")) {
-            _serialMode = json_val.getString("serialMode");
-        }
-        if (json_val.has("protocol")) {
-            _protocol = json_val.getString("protocol");
-        }
-        if (json_val.has("voltageLevel")) {
-            _voltageLevel = json_val.getInt("voltageLevel");
-        }
         if (json_val.has("rxCount")) {
             _rxCount = json_val.getInt("rxCount");
         }
@@ -218,257 +209,16 @@ public class YSerialPort extends YFunction
         if (json_val.has("command")) {
             _command = json_val.getString("command");
         }
+        if (json_val.has("voltageLevel")) {
+            _voltageLevel = json_val.getInt("voltageLevel");
+        }
+        if (json_val.has("protocol")) {
+            _protocol = json_val.getString("protocol");
+        }
+        if (json_val.has("serialMode")) {
+            _serialMode = json_val.getString("serialMode");
+        }
         super._parseAttr(json_val);
-    }
-
-    /**
-     * Returns the serial port communication parameters, as a string such as
-     * "9600,8N1". The string includes the baud rate, the number of data bits,
-     * the parity, and the number of stop bits. An optional suffix is included
-     * if flow control is active: "CtsRts" for hardware handshake, "XOnXOff"
-     * for logical flow control and "Simplex" for acquiring a shared bus using
-     * the RTS line (as used by some RS485 adapters for instance).
-     *
-     * @return a string corresponding to the serial port communication parameters, as a string such as
-     *         "9600,8N1"
-     *
-     * @throws YAPI_Exception on error
-     */
-    public String get_serialMode() throws YAPI_Exception
-    {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SERIALMODE_INVALID;
-            }
-        }
-        return _serialMode;
-    }
-
-    /**
-     * Returns the serial port communication parameters, as a string such as
-     * "9600,8N1". The string includes the baud rate, the number of data bits,
-     * the parity, and the number of stop bits. An optional suffix is included
-     * if flow control is active: "CtsRts" for hardware handshake, "XOnXOff"
-     * for logical flow control and "Simplex" for acquiring a shared bus using
-     * the RTS line (as used by some RS485 adapters for instance).
-     *
-     * @return a string corresponding to the serial port communication parameters, as a string such as
-     *         "9600,8N1"
-     *
-     * @throws YAPI_Exception on error
-     */
-    public String getSerialMode() throws YAPI_Exception
-    {
-        return get_serialMode();
-    }
-
-    /**
-     * Changes the serial port communication parameters, with a string such as
-     * "9600,8N1". The string includes the baud rate, the number of data bits,
-     * the parity, and the number of stop bits. An optional suffix can be added
-     * to enable flow control: "CtsRts" for hardware handshake, "XOnXOff"
-     * for logical flow control and "Simplex" for acquiring a shared bus using
-     * the RTS line (as used by some RS485 adapters for instance).
-     *
-     * @param newval : a string corresponding to the serial port communication parameters, with a string such as
-     *         "9600,8N1"
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_serialMode(String  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = newval;
-        _setAttr("serialMode",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the serial port communication parameters, with a string such as
-     * "9600,8N1". The string includes the baud rate, the number of data bits,
-     * the parity, and the number of stop bits. An optional suffix can be added
-     * to enable flow control: "CtsRts" for hardware handshake, "XOnXOff"
-     * for logical flow control and "Simplex" for acquiring a shared bus using
-     * the RTS line (as used by some RS485 adapters for instance).
-     *
-     * @param newval : a string corresponding to the serial port communication parameters, with a string such as
-     *         "9600,8N1"
-     *
-     * @return YAPI_SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int setSerialMode(String newval)  throws YAPI_Exception
-    {
-        return set_serialMode(newval);
-    }
-
-    /**
-     * Returns the type of protocol used over the serial line, as a string.
-     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
-     * "Frame:[timeout]ms" for binary messages separated by a delay time,
-     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
-     * "Modbus-RTU" for MODBUS messages in RTU mode,
-     * "Char" for a continuous ASCII stream or
-     * "Byte" for a continuous binary stream.
-     *
-     * @return a string corresponding to the type of protocol used over the serial line, as a string
-     *
-     * @throws YAPI_Exception on error
-     */
-    public String get_protocol() throws YAPI_Exception
-    {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PROTOCOL_INVALID;
-            }
-        }
-        return _protocol;
-    }
-
-    /**
-     * Returns the type of protocol used over the serial line, as a string.
-     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
-     * "Frame:[timeout]ms" for binary messages separated by a delay time,
-     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
-     * "Modbus-RTU" for MODBUS messages in RTU mode,
-     * "Char" for a continuous ASCII stream or
-     * "Byte" for a continuous binary stream.
-     *
-     * @return a string corresponding to the type of protocol used over the serial line, as a string
-     *
-     * @throws YAPI_Exception on error
-     */
-    public String getProtocol() throws YAPI_Exception
-    {
-        return get_protocol();
-    }
-
-    /**
-     * Changes the type of protocol used over the serial line.
-     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
-     * "Frame:[timeout]ms" for binary messages separated by a delay time,
-     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
-     * "Modbus-RTU" for MODBUS messages in RTU mode,
-     * "Char" for a continuous ASCII stream or
-     * "Byte" for a continuous binary stream.
-     * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
-     * is always at lest the specified number of milliseconds between each bytes sent.
-     *
-     * @param newval : a string corresponding to the type of protocol used over the serial line
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_protocol(String  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = newval;
-        _setAttr("protocol",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the type of protocol used over the serial line.
-     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
-     * "Frame:[timeout]ms" for binary messages separated by a delay time,
-     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
-     * "Modbus-RTU" for MODBUS messages in RTU mode,
-     * "Char" for a continuous ASCII stream or
-     * "Byte" for a continuous binary stream.
-     * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
-     * is always at lest the specified number of milliseconds between each bytes sent.
-     *
-     * @param newval : a string corresponding to the type of protocol used over the serial line
-     *
-     * @return YAPI_SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int setProtocol(String newval)  throws YAPI_Exception
-    {
-        return set_protocol(newval);
-    }
-
-    /**
-     * Returns the voltage level used on the serial line.
-     *
-     *  @return a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
-     *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
-     *  YSerialPort.VOLTAGELEVEL_RS232 and YSerialPort.VOLTAGELEVEL_RS485 corresponding to the voltage
-     * level used on the serial line
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int get_voltageLevel() throws YAPI_Exception
-    {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLTAGELEVEL_INVALID;
-            }
-        }
-        return _voltageLevel;
-    }
-
-    /**
-     * Returns the voltage level used on the serial line.
-     *
-     *  @return a value among Y_VOLTAGELEVEL_OFF, Y_VOLTAGELEVEL_TTL3V, Y_VOLTAGELEVEL_TTL3VR,
-     *  Y_VOLTAGELEVEL_TTL5V, Y_VOLTAGELEVEL_TTL5VR, Y_VOLTAGELEVEL_RS232 and Y_VOLTAGELEVEL_RS485
-     * corresponding to the voltage level used on the serial line
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int getVoltageLevel() throws YAPI_Exception
-    {
-        return get_voltageLevel();
-    }
-
-    /**
-     * Changes the voltage type used on the serial line. Valid
-     * values  will depend on the Yoctopuce device model featuring
-     * the serial port feature.  Check your device documentation
-     * to find out which values are valid for that specific model.
-     * Trying to set an invalid value will have no effect.
-     *
-     *  @param newval : a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
-     *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
-     *  YSerialPort.VOLTAGELEVEL_RS232 and YSerialPort.VOLTAGELEVEL_RS485 corresponding to the voltage type
-     * used on the serial line
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_voltageLevel(int  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("voltageLevel",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the voltage type used on the serial line. Valid
-     * values  will depend on the Yoctopuce device model featuring
-     * the serial port feature.  Check your device documentation
-     * to find out which values are valid for that specific model.
-     * Trying to set an invalid value will have no effect.
-     *
-     *  @param newval : a value among Y_VOLTAGELEVEL_OFF, Y_VOLTAGELEVEL_TTL3V, Y_VOLTAGELEVEL_TTL3VR,
-     *  Y_VOLTAGELEVEL_TTL5V, Y_VOLTAGELEVEL_TTL5VR, Y_VOLTAGELEVEL_RS232 and Y_VOLTAGELEVEL_RS485
-     * corresponding to the voltage type used on the serial line
-     *
-     * @return YAPI_SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int setVoltageLevel(int newval)  throws YAPI_Exception
-    {
-        return set_voltageLevel(newval);
     }
 
     /**
@@ -808,6 +558,256 @@ public class YSerialPort extends YFunction
     }
 
     /**
+     * Returns the voltage level used on the serial line.
+     *
+     *  @return a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
+     *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
+     *  YSerialPort.VOLTAGELEVEL_RS232 and YSerialPort.VOLTAGELEVEL_RS485 corresponding to the voltage
+     * level used on the serial line
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_voltageLevel() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return VOLTAGELEVEL_INVALID;
+            }
+        }
+        return _voltageLevel;
+    }
+
+    /**
+     * Returns the voltage level used on the serial line.
+     *
+     *  @return a value among Y_VOLTAGELEVEL_OFF, Y_VOLTAGELEVEL_TTL3V, Y_VOLTAGELEVEL_TTL3VR,
+     *  Y_VOLTAGELEVEL_TTL5V, Y_VOLTAGELEVEL_TTL5VR, Y_VOLTAGELEVEL_RS232 and Y_VOLTAGELEVEL_RS485
+     * corresponding to the voltage level used on the serial line
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getVoltageLevel() throws YAPI_Exception
+    {
+        return get_voltageLevel();
+    }
+
+    /**
+     * Changes the voltage type used on the serial line. Valid
+     * values  will depend on the Yoctopuce device model featuring
+     * the serial port feature.  Check your device documentation
+     * to find out which values are valid for that specific model.
+     * Trying to set an invalid value will have no effect.
+     *
+     *  @param newval : a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
+     *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
+     *  YSerialPort.VOLTAGELEVEL_RS232 and YSerialPort.VOLTAGELEVEL_RS485 corresponding to the voltage type
+     * used on the serial line
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_voltageLevel(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("voltageLevel",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the voltage type used on the serial line. Valid
+     * values  will depend on the Yoctopuce device model featuring
+     * the serial port feature.  Check your device documentation
+     * to find out which values are valid for that specific model.
+     * Trying to set an invalid value will have no effect.
+     *
+     *  @param newval : a value among Y_VOLTAGELEVEL_OFF, Y_VOLTAGELEVEL_TTL3V, Y_VOLTAGELEVEL_TTL3VR,
+     *  Y_VOLTAGELEVEL_TTL5V, Y_VOLTAGELEVEL_TTL5VR, Y_VOLTAGELEVEL_RS232 and Y_VOLTAGELEVEL_RS485
+     * corresponding to the voltage type used on the serial line
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setVoltageLevel(int newval)  throws YAPI_Exception
+    {
+        return set_voltageLevel(newval);
+    }
+
+    /**
+     * Returns the type of protocol used over the serial line, as a string.
+     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "Frame:[timeout]ms" for binary messages separated by a delay time,
+     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
+     * "Modbus-RTU" for MODBUS messages in RTU mode,
+     * "Char" for a continuous ASCII stream or
+     * "Byte" for a continuous binary stream.
+     *
+     * @return a string corresponding to the type of protocol used over the serial line, as a string
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_protocol() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PROTOCOL_INVALID;
+            }
+        }
+        return _protocol;
+    }
+
+    /**
+     * Returns the type of protocol used over the serial line, as a string.
+     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "Frame:[timeout]ms" for binary messages separated by a delay time,
+     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
+     * "Modbus-RTU" for MODBUS messages in RTU mode,
+     * "Char" for a continuous ASCII stream or
+     * "Byte" for a continuous binary stream.
+     *
+     * @return a string corresponding to the type of protocol used over the serial line, as a string
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getProtocol() throws YAPI_Exception
+    {
+        return get_protocol();
+    }
+
+    /**
+     * Changes the type of protocol used over the serial line.
+     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "Frame:[timeout]ms" for binary messages separated by a delay time,
+     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
+     * "Modbus-RTU" for MODBUS messages in RTU mode,
+     * "Char" for a continuous ASCII stream or
+     * "Byte" for a continuous binary stream.
+     * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
+     * is always at lest the specified number of milliseconds between each bytes sent.
+     *
+     * @param newval : a string corresponding to the type of protocol used over the serial line
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_protocol(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = newval;
+        _setAttr("protocol",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the type of protocol used over the serial line.
+     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "Frame:[timeout]ms" for binary messages separated by a delay time,
+     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
+     * "Modbus-RTU" for MODBUS messages in RTU mode,
+     * "Char" for a continuous ASCII stream or
+     * "Byte" for a continuous binary stream.
+     * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
+     * is always at lest the specified number of milliseconds between each bytes sent.
+     *
+     * @param newval : a string corresponding to the type of protocol used over the serial line
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setProtocol(String newval)  throws YAPI_Exception
+    {
+        return set_protocol(newval);
+    }
+
+    /**
+     * Returns the serial port communication parameters, as a string such as
+     * "9600,8N1". The string includes the baud rate, the number of data bits,
+     * the parity, and the number of stop bits. An optional suffix is included
+     * if flow control is active: "CtsRts" for hardware handshake, "XOnXOff"
+     * for logical flow control and "Simplex" for acquiring a shared bus using
+     * the RTS line (as used by some RS485 adapters for instance).
+     *
+     * @return a string corresponding to the serial port communication parameters, as a string such as
+     *         "9600,8N1"
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_serialMode() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SERIALMODE_INVALID;
+            }
+        }
+        return _serialMode;
+    }
+
+    /**
+     * Returns the serial port communication parameters, as a string such as
+     * "9600,8N1". The string includes the baud rate, the number of data bits,
+     * the parity, and the number of stop bits. An optional suffix is included
+     * if flow control is active: "CtsRts" for hardware handshake, "XOnXOff"
+     * for logical flow control and "Simplex" for acquiring a shared bus using
+     * the RTS line (as used by some RS485 adapters for instance).
+     *
+     * @return a string corresponding to the serial port communication parameters, as a string such as
+     *         "9600,8N1"
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getSerialMode() throws YAPI_Exception
+    {
+        return get_serialMode();
+    }
+
+    /**
+     * Changes the serial port communication parameters, with a string such as
+     * "9600,8N1". The string includes the baud rate, the number of data bits,
+     * the parity, and the number of stop bits. An optional suffix can be added
+     * to enable flow control: "CtsRts" for hardware handshake, "XOnXOff"
+     * for logical flow control and "Simplex" for acquiring a shared bus using
+     * the RTS line (as used by some RS485 adapters for instance).
+     *
+     * @param newval : a string corresponding to the serial port communication parameters, with a string such as
+     *         "9600,8N1"
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_serialMode(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = newval;
+        _setAttr("serialMode",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the serial port communication parameters, with a string such as
+     * "9600,8N1". The string includes the baud rate, the number of data bits,
+     * the parity, and the number of stop bits. An optional suffix can be added
+     * to enable flow control: "CtsRts" for hardware handshake, "XOnXOff"
+     * for logical flow control and "Simplex" for acquiring a shared bus using
+     * the RTS line (as used by some RS485 adapters for instance).
+     *
+     * @param newval : a string corresponding to the serial port communication parameters, with a string such as
+     *         "9600,8N1"
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setSerialMode(String newval)  throws YAPI_Exception
+    {
+        return set_serialMode(newval);
+    }
+
+    /**
      * Retrieves a serial port for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
@@ -934,40 +934,6 @@ public class YSerialPort extends YFunction
         _rxptr = 0;
         // may throw an exception
         return sendCommand("Z");
-    }
-
-    /**
-     * Manually sets the state of the RTS line. This function has no effect when
-     * hardware handshake is enabled, as the RTS line is driven automatically.
-     *
-     * @param val : 1 to turn RTS on, 0 to turn RTS off
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_RTS(int val) throws YAPI_Exception
-    {
-        return sendCommand(String.format("R%d",val));
-    }
-
-    /**
-     * Reads the level of the CTS line. The CTS line is usually driven by
-     * the RTS signal of the connected serial device.
-     *
-     * @return 1 if the CTS line is high, 0 if the CTS line is low.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int get_CTS() throws YAPI_Exception
-    {
-        byte[] buff;
-        int res;
-        // may throw an exception
-        buff = _download("cts.txt");
-        if (!((buff).length == 1)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "invalid CTS reply");}
-        res = buff[0] - 48;
-        return res;
     }
 
     /**
@@ -1130,22 +1096,6 @@ public class YSerialPort extends YFunction
         }
         // send string using file upload
         return _upload("txdata", buff);
-    }
-
-    /**
-     * Sends a MODBUS message (provided as a hexadecimal string) to the serial port.
-     * The message must start with the slave address. The MODBUS CRC/LRC is
-     * automatically added by the function. This function does not wait for a reply.
-     *
-     * @param hexString : a hexadecimal message string, including device address but no CRC/LRC
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int writeMODBUS(String hexString) throws YAPI_Exception
-    {
-        return sendCommand(String.format(":%s",hexString));
     }
 
     /**
@@ -1353,7 +1303,7 @@ public class YSerialPort extends YFunction
     /**
      * Reads a single line (or message) from the receive buffer, starting at current stream position.
      * This function is intended to be used when the serial port is configured for a message protocol,
-     * such as 'Line' mode or MODBUS protocols.
+     * such as 'Line' mode or frame protocols.
      *
      * If data at current stream position is not available anymore in the receive buffer,
      * the function returns the oldest available line and moves the stream position just after.
@@ -1438,7 +1388,7 @@ public class YSerialPort extends YFunction
 
     /**
      * Changes the current internal stream position to the specified value. This function
-     * does not affect the device, it only changes the value stored in the YSerialPort object
+     * does not affect the device, it only changes the value stored in the API object
      * for the next read operations.
      *
      * @param absPos : the absolute position index for next read operations.
@@ -1452,7 +1402,7 @@ public class YSerialPort extends YFunction
     }
 
     /**
-     * Returns the current absolute stream position pointer of the YSerialPort object.
+     * Returns the current absolute stream position pointer of the API object.
      *
      * @return the absolute position index for next read operations.
      */
@@ -1463,7 +1413,7 @@ public class YSerialPort extends YFunction
 
     /**
      * Returns the number of bytes available to read in the input buffer starting from the
-     * current absolute stream position pointer of the YSerialPort object.
+     * current absolute stream position pointer of the API object.
      *
      * @return the number of bytes available to read
      */
@@ -1517,6 +1467,89 @@ public class YSerialPort extends YFunction
         }
         res = _json_get_string((msgarr.get(0)).getBytes());
         return res;
+    }
+
+    /**
+     * Saves the job definition string (JSON data) into a job file.
+     * The job file can be later enabled using selectJob().
+     *
+     * @param jobfile : name of the job file to save on the device filesystem
+     * @param jsonDef : a string containing a JSON definition of the job
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int uploadJob(String jobfile,String jsonDef) throws YAPI_Exception
+    {
+        _upload(jobfile, (jsonDef).getBytes());
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Load and start processing the specified job file. The file must have
+     * been previously created using the user interface or uploaded on the
+     * device filesystem using the uploadJob() function.
+     *
+     * @param jobfile : name of the job file (on the device filesystem)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int selectJob(String jobfile) throws YAPI_Exception
+    {
+        return set_currentJob(jobfile);
+    }
+
+    /**
+     * Manually sets the state of the RTS line. This function has no effect when
+     * hardware handshake is enabled, as the RTS line is driven automatically.
+     *
+     * @param val : 1 to turn RTS on, 0 to turn RTS off
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_RTS(int val) throws YAPI_Exception
+    {
+        return sendCommand(String.format("R%d",val));
+    }
+
+    /**
+     * Reads the level of the CTS line. The CTS line is usually driven by
+     * the RTS signal of the connected serial device.
+     *
+     * @return 1 if the CTS line is high, 0 if the CTS line is low.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_CTS() throws YAPI_Exception
+    {
+        byte[] buff;
+        int res;
+        // may throw an exception
+        buff = _download("cts.txt");
+        if (!((buff).length == 1)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "invalid CTS reply");}
+        res = buff[0] - 48;
+        return res;
+    }
+
+    /**
+     * Sends a MODBUS message (provided as a hexadecimal string) to the serial port.
+     * The message must start with the slave address. The MODBUS CRC/LRC is
+     * automatically added by the function. This function does not wait for a reply.
+     *
+     * @param hexString : a hexadecimal message string, including device address but no CRC/LRC
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int writeMODBUS(String hexString) throws YAPI_Exception
+    {
+        return sendCommand(String.format(":%s",hexString));
     }
 
     /**
@@ -2035,39 +2068,6 @@ public class YSerialPort extends YFunction
             regpos = regpos + 1;
         }
         return res;
-    }
-
-    /**
-     * Saves the job definition string (JSON data) into a job file.
-     * The job file can be later enabled using selectJob().
-     *
-     * @param jobfile : name of the job file to save on the device filesystem
-     * @param jsonDef : a string containing a JSON definition of the job
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int uploadJob(String jobfile,String jsonDef) throws YAPI_Exception
-    {
-        _upload(jobfile, (jsonDef).getBytes());
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Load and start processing the specified job file. The file must have
-     * been previously created using the user interface or uploaded on the
-     * device filesystem using the uploadJob() function.
-     *
-     * @param jobfile : name of the job file (on the device filesystem)
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int selectJob(String jobfile) throws YAPI_Exception
-    {
-        return set_currentJob(jobfile);
     }
 
     /**

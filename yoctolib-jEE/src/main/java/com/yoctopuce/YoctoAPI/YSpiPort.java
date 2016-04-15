@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 23780 2016-04-06 10:27:21Z seb $
+ * $Id: pic24config.php 23551 2016-03-21 15:37:41Z mvuilleu $
  *
- * Implements FindSerialPort(), the high-level API for SerialPort functions
+ * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
  * - - - - - - - - - License information: - - - - - - - - - 
  *
@@ -42,11 +42,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
-//--- (YSerialPort return codes)
-//--- (end of YSerialPort return codes)
-//--- (YSerialPort class start)
+//--- (YSpiPort return codes)
+//--- (end of YSpiPort return codes)
+//--- (YSpiPort class start)
 /**
- * YSerialPort Class: SerialPort function interface
+ * YSpiPort Class: SerialPort function interface
  *
  * The SerialPort function interface allows you to fully drive a Yoctopuce
  * serial port, to send and receive data, and to configure communication
@@ -55,10 +55,10 @@ import java.util.ArrayList;
  * They are meant to be used in the same way as all Yoctopuce devices.
  */
  @SuppressWarnings("UnusedDeclaration")
-public class YSerialPort extends YFunction
+public class YSpiPort extends YFunction
 {
-//--- (end of YSerialPort class start)
-//--- (YSerialPort definitions)
+//--- (end of YSpiPort class start)
+//--- (YSpiPort definitions)
     /**
      * invalid rxCount value
      */
@@ -111,9 +111,21 @@ public class YSerialPort extends YFunction
      */
     public static final String PROTOCOL_INVALID = YAPI.INVALID_STRING;
     /**
-     * invalid serialMode value
+     * invalid spiMode value
      */
-    public static final String SERIALMODE_INVALID = YAPI.INVALID_STRING;
+    public static final String SPIMODE_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid ssPolarity value
+     */
+    public static final int SSPOLARITY_ACTIVE_LOW = 0;
+    public static final int SSPOLARITY_ACTIVE_HIGH = 1;
+    public static final int SSPOLARITY_INVALID = -1;
+    /**
+     * invalid shitftSampling value
+     */
+    public static final int SHITFTSAMPLING_OFF = 0;
+    public static final int SHITFTSAMPLING_ON = 1;
+    public static final int SHITFTSAMPLING_INVALID = -1;
     protected int _rxCount = RXCOUNT_INVALID;
     protected int _txCount = TXCOUNT_INVALID;
     protected int _errCount = ERRCOUNT_INVALID;
@@ -125,12 +137,14 @@ public class YSerialPort extends YFunction
     protected String _command = COMMAND_INVALID;
     protected int _voltageLevel = VOLTAGELEVEL_INVALID;
     protected String _protocol = PROTOCOL_INVALID;
-    protected String _serialMode = SERIALMODE_INVALID;
-    protected UpdateCallback _valueCallbackSerialPort = null;
+    protected String _spiMode = SPIMODE_INVALID;
+    protected int _ssPolarity = SSPOLARITY_INVALID;
+    protected int _shitftSampling = SHITFTSAMPLING_INVALID;
+    protected UpdateCallback _valueCallbackSpiPort = null;
     protected int _rxptr = 0;
 
     /**
-     * Deprecated UpdateCallback for SerialPort
+     * Deprecated UpdateCallback for SpiPort
      */
     public interface UpdateCallback
     {
@@ -139,11 +153,11 @@ public class YSerialPort extends YFunction
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
-        void yNewValue(YSerialPort function, String functionValue);
+        void yNewValue(YSpiPort function, String functionValue);
     }
 
     /**
-     * TimedReportCallback for SerialPort
+     * TimedReportCallback for SpiPort
      */
     public interface TimedReportCallback
     {
@@ -152,33 +166,33 @@ public class YSerialPort extends YFunction
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
-        void timedReportCallback(YSerialPort  function, YMeasure measure);
+        void timedReportCallback(YSpiPort  function, YMeasure measure);
     }
-    //--- (end of YSerialPort definitions)
+    //--- (end of YSpiPort definitions)
 
 
     /**
      *
      * @param func : functionid
      */
-    protected YSerialPort(YAPIContext ctx, String func)
+    protected YSpiPort(YAPIContext ctx, String func)
     {
         super(ctx, func);
-        _className = "SerialPort";
-        //--- (YSerialPort attributes initialization)
-        //--- (end of YSerialPort attributes initialization)
+        _className = "SpiPort";
+        //--- (YSpiPort attributes initialization)
+        //--- (end of YSpiPort attributes initialization)
     }
 
     /**
      *
      * @param func : functionid
      */
-    protected YSerialPort(String func)
+    protected YSpiPort(String func)
     {
         this(YAPI.GetYCtx(), func);
     }
 
-    //--- (YSerialPort implementation)
+    //--- (YSpiPort implementation)
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -215,8 +229,14 @@ public class YSerialPort extends YFunction
         if (json_val.has("protocol")) {
             _protocol = json_val.getString("protocol");
         }
-        if (json_val.has("serialMode")) {
-            _serialMode = json_val.getString("serialMode");
+        if (json_val.has("spiMode")) {
+            _spiMode = json_val.getString("spiMode");
+        }
+        if (json_val.has("ssPolarity")) {
+            _ssPolarity = json_val.getInt("ssPolarity") > 0 ? 1 : 0;
+        }
+        if (json_val.has("shitftSampling")) {
+            _shitftSampling = json_val.getInt("shitftSampling") > 0 ? 1 : 0;
         }
         super._parseAttr(json_val);
     }
@@ -367,9 +387,9 @@ public class YSerialPort extends YFunction
     }
 
     /**
-     * Returns the latest message fully received (for Line, Frame and Modbus protocols).
+     * Returns the latest message fully received (for Line and Frame protocols).
      *
-     * @return a string corresponding to the latest message fully received (for Line, Frame and Modbus protocols)
+     * @return a string corresponding to the latest message fully received (for Line and Frame protocols)
      *
      * @throws YAPI_Exception on error
      */
@@ -384,9 +404,9 @@ public class YSerialPort extends YFunction
     }
 
     /**
-     * Returns the latest message fully received (for Line, Frame and Modbus protocols).
+     * Returns the latest message fully received (for Line and Frame protocols).
      *
-     * @return a string corresponding to the latest message fully received (for Line, Frame and Modbus protocols)
+     * @return a string corresponding to the latest message fully received (for Line and Frame protocols)
      *
      * @throws YAPI_Exception on error
      */
@@ -560,10 +580,10 @@ public class YSerialPort extends YFunction
     /**
      * Returns the voltage level used on the serial line.
      *
-     *  @return a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
-     *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
-     *  YSerialPort.VOLTAGELEVEL_RS232 and YSerialPort.VOLTAGELEVEL_RS485 corresponding to the voltage
-     * level used on the serial line
+     *  @return a value among YSpiPort.VOLTAGELEVEL_OFF, YSpiPort.VOLTAGELEVEL_TTL3V,
+     *  YSpiPort.VOLTAGELEVEL_TTL3VR, YSpiPort.VOLTAGELEVEL_TTL5V, YSpiPort.VOLTAGELEVEL_TTL5VR,
+     *  YSpiPort.VOLTAGELEVEL_RS232 and YSpiPort.VOLTAGELEVEL_RS485 corresponding to the voltage level used
+     * on the serial line
      *
      * @throws YAPI_Exception on error
      */
@@ -598,10 +618,10 @@ public class YSerialPort extends YFunction
      * to find out which values are valid for that specific model.
      * Trying to set an invalid value will have no effect.
      *
-     *  @param newval : a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
-     *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
-     *  YSerialPort.VOLTAGELEVEL_RS232 and YSerialPort.VOLTAGELEVEL_RS485 corresponding to the voltage type
-     * used on the serial line
+     *  @param newval : a value among YSpiPort.VOLTAGELEVEL_OFF, YSpiPort.VOLTAGELEVEL_TTL3V,
+     *  YSpiPort.VOLTAGELEVEL_TTL3VR, YSpiPort.VOLTAGELEVEL_TTL5V, YSpiPort.VOLTAGELEVEL_TTL5VR,
+     *  YSpiPort.VOLTAGELEVEL_RS232 and YSpiPort.VOLTAGELEVEL_RS485 corresponding to the voltage type used
+     * on the serial line
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -639,8 +659,6 @@ public class YSerialPort extends YFunction
      * Returns the type of protocol used over the serial line, as a string.
      * Possible values are "Line" for ASCII messages separated by CR and/or LF,
      * "Frame:[timeout]ms" for binary messages separated by a delay time,
-     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
-     * "Modbus-RTU" for MODBUS messages in RTU mode,
      * "Char" for a continuous ASCII stream or
      * "Byte" for a continuous binary stream.
      *
@@ -662,8 +680,6 @@ public class YSerialPort extends YFunction
      * Returns the type of protocol used over the serial line, as a string.
      * Possible values are "Line" for ASCII messages separated by CR and/or LF,
      * "Frame:[timeout]ms" for binary messages separated by a delay time,
-     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
-     * "Modbus-RTU" for MODBUS messages in RTU mode,
      * "Char" for a continuous ASCII stream or
      * "Byte" for a continuous binary stream.
      *
@@ -680,8 +696,6 @@ public class YSerialPort extends YFunction
      * Changes the type of protocol used over the serial line.
      * Possible values are "Line" for ASCII messages separated by CR and/or LF,
      * "Frame:[timeout]ms" for binary messages separated by a delay time,
-     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
-     * "Modbus-RTU" for MODBUS messages in RTU mode,
      * "Char" for a continuous ASCII stream or
      * "Byte" for a continuous binary stream.
      * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
@@ -705,8 +719,6 @@ public class YSerialPort extends YFunction
      * Changes the type of protocol used over the serial line.
      * Possible values are "Line" for ASCII messages separated by CR and/or LF,
      * "Frame:[timeout]ms" for binary messages separated by a delay time,
-     * "Modbus-ASCII" for MODBUS messages in ASCII mode,
-     * "Modbus-RTU" for MODBUS messages in RTU mode,
      * "Char" for a continuous ASCII stream or
      * "Byte" for a continuous binary stream.
      * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
@@ -725,90 +737,207 @@ public class YSerialPort extends YFunction
 
     /**
      * Returns the serial port communication parameters, as a string such as
-     * "9600,8N1". The string includes the baud rate, the number of data bits,
-     * the parity, and the number of stop bits. An optional suffix is included
-     * if flow control is active: "CtsRts" for hardware handshake, "XOnXOff"
-     * for logical flow control and "Simplex" for acquiring a shared bus using
-     * the RTS line (as used by some RS485 adapters for instance).
+     * "125000,1,msb". The string includes the baud rate, the SPI mode (between
+     * 1 and 4) and the bit order.
      *
      * @return a string corresponding to the serial port communication parameters, as a string such as
-     *         "9600,8N1"
+     *         "125000,1,msb"
      *
      * @throws YAPI_Exception on error
      */
-    public String get_serialMode() throws YAPI_Exception
+    public String get_spiMode() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
             if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SERIALMODE_INVALID;
+                return SPIMODE_INVALID;
             }
         }
-        return _serialMode;
+        return _spiMode;
     }
 
     /**
      * Returns the serial port communication parameters, as a string such as
-     * "9600,8N1". The string includes the baud rate, the number of data bits,
-     * the parity, and the number of stop bits. An optional suffix is included
-     * if flow control is active: "CtsRts" for hardware handshake, "XOnXOff"
-     * for logical flow control and "Simplex" for acquiring a shared bus using
-     * the RTS line (as used by some RS485 adapters for instance).
+     * "125000,1,msb". The string includes the baud rate, the SPI mode (between
+     * 1 and 4) and the bit order.
      *
      * @return a string corresponding to the serial port communication parameters, as a string such as
-     *         "9600,8N1"
+     *         "125000,1,msb"
      *
      * @throws YAPI_Exception on error
      */
-    public String getSerialMode() throws YAPI_Exception
+    public String getSpiMode() throws YAPI_Exception
     {
-        return get_serialMode();
+        return get_spiMode();
     }
 
     /**
      * Changes the serial port communication parameters, with a string such as
-     * "9600,8N1". The string includes the baud rate, the number of data bits,
-     * the parity, and the number of stop bits. An optional suffix can be added
-     * to enable flow control: "CtsRts" for hardware handshake, "XOnXOff"
-     * for logical flow control and "Simplex" for acquiring a shared bus using
-     * the RTS line (as used by some RS485 adapters for instance).
+     * "125000,1,msb". The string includes the baud rate, the SPI mode (between
+     * 1 and 4) and the bit order.
      *
      * @param newval : a string corresponding to the serial port communication parameters, with a string such as
-     *         "9600,8N1"
+     *         "125000,1,msb"
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int set_serialMode(String  newval)  throws YAPI_Exception
+    public int set_spiMode(String  newval)  throws YAPI_Exception
     {
         String rest_val;
         rest_val = newval;
-        _setAttr("serialMode",rest_val);
+        _setAttr("spiMode",rest_val);
         return YAPI.SUCCESS;
     }
 
     /**
      * Changes the serial port communication parameters, with a string such as
-     * "9600,8N1". The string includes the baud rate, the number of data bits,
-     * the parity, and the number of stop bits. An optional suffix can be added
-     * to enable flow control: "CtsRts" for hardware handshake, "XOnXOff"
-     * for logical flow control and "Simplex" for acquiring a shared bus using
-     * the RTS line (as used by some RS485 adapters for instance).
+     * "125000,1,msb". The string includes the baud rate, the SPI mode (between
+     * 1 and 4) and the bit order.
      *
      * @param newval : a string corresponding to the serial port communication parameters, with a string such as
-     *         "9600,8N1"
+     *         "125000,1,msb"
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int setSerialMode(String newval)  throws YAPI_Exception
+    public int setSpiMode(String newval)  throws YAPI_Exception
     {
-        return set_serialMode(newval);
+        return set_spiMode(newval);
     }
 
     /**
-     * Retrieves a serial port for a given identifier.
+     * Returns the SS line polarity.
+     *
+     *  @return either YSpiPort.SSPOLARITY_ACTIVE_LOW or YSpiPort.SSPOLARITY_ACTIVE_HIGH, according to the
+     * SS line polarity
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_ssPolarity() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SSPOLARITY_INVALID;
+            }
+        }
+        return _ssPolarity;
+    }
+
+    /**
+     * Returns the SS line polarity.
+     *
+     * @return either Y_SSPOLARITY_ACTIVE_LOW or Y_SSPOLARITY_ACTIVE_HIGH, according to the SS line polarity
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getSsPolarity() throws YAPI_Exception
+    {
+        return get_ssPolarity();
+    }
+
+    /**
+     * Changes the SS line polarity.
+     *
+     *  @param newval : either YSpiPort.SSPOLARITY_ACTIVE_LOW or YSpiPort.SSPOLARITY_ACTIVE_HIGH, according
+     * to the SS line polarity
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_ssPolarity(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        _setAttr("ssPolarity",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the SS line polarity.
+     *
+     * @param newval : either Y_SSPOLARITY_ACTIVE_LOW or Y_SSPOLARITY_ACTIVE_HIGH, according to the SS line polarity
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setSsPolarity(int newval)  throws YAPI_Exception
+    {
+        return set_ssPolarity(newval);
+    }
+
+    /**
+     * Returns true when SDI line phase is shifted with regards to SDO line.
+     *
+     *  @return either YSpiPort.SHITFTSAMPLING_OFF or YSpiPort.SHITFTSAMPLING_ON, according to true when
+     * SDI line phase is shifted with regards to SDO line
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_shitftSampling() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return SHITFTSAMPLING_INVALID;
+            }
+        }
+        return _shitftSampling;
+    }
+
+    /**
+     * Returns true when SDI line phase is shifted with regards to SDO line.
+     *
+     *  @return either Y_SHITFTSAMPLING_OFF or Y_SHITFTSAMPLING_ON, according to true when SDI line phase
+     * is shifted with regards to SDO line
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getShitftSampling() throws YAPI_Exception
+    {
+        return get_shitftSampling();
+    }
+
+    /**
+     * Changes the SDI line sampling shift. When disabled, SDI line is
+     * sampled in the middle of data output time. When enabled, SDI line is
+     * samples at the end of data output time.
+     *
+     *  @param newval : either YSpiPort.SHITFTSAMPLING_OFF or YSpiPort.SHITFTSAMPLING_ON, according to the
+     * SDI line sampling shift
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_shitftSampling(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        _setAttr("shitftSampling",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the SDI line sampling shift. When disabled, SDI line is
+     * sampled in the middle of data output time. When enabled, SDI line is
+     * samples at the end of data output time.
+     *
+     * @param newval : either Y_SHITFTSAMPLING_OFF or Y_SHITFTSAMPLING_ON, according to the SDI line sampling shift
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setShitftSampling(int newval)  throws YAPI_Exception
+    {
+        return set_shitftSampling(newval);
+    }
+
+    /**
+     * Retrieves a SPI port for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -818,31 +947,31 @@ public class YSerialPort extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the serial port is online at the time
+     * This function does not require that the SPI port is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YSerialPort.isOnline() to test if the serial port is
+     * Use the method YSpiPort.isOnline() to test if the SPI port is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a serial port by logical name, no error is notified: the first instance
+     * a SPI port by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
-     * @param func : a string that uniquely characterizes the serial port
+     * @param func : a string that uniquely characterizes the SPI port
      *
-     * @return a YSerialPort object allowing you to drive the serial port.
+     * @return a YSpiPort object allowing you to drive the SPI port.
      */
-    public static YSerialPort FindSerialPort(String func)
+    public static YSpiPort FindSpiPort(String func)
     {
-        YSerialPort obj;
-        obj = (YSerialPort) YFunction._FindFromCache("SerialPort", func);
+        YSpiPort obj;
+        obj = (YSpiPort) YFunction._FindFromCache("SpiPort", func);
         if (obj == null) {
-            obj = new YSerialPort(func);
-            YFunction._AddToCache("SerialPort", func, obj);
+            obj = new YSpiPort(func);
+            YFunction._AddToCache("SpiPort", func, obj);
         }
         return obj;
     }
 
     /**
-     * Retrieves a serial port for a given identifier in a YAPI context.
+     * Retrieves a SPI port for a given identifier in a YAPI context.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -852,26 +981,26 @@ public class YSerialPort extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the serial port is online at the time
+     * This function does not require that the SPI port is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YSerialPort.isOnline() to test if the serial port is
+     * Use the method YSpiPort.isOnline() to test if the SPI port is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a serial port by logical name, no error is notified: the first instance
+     * a SPI port by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the serial port
+     * @param func : a string that uniquely characterizes the SPI port
      *
-     * @return a YSerialPort object allowing you to drive the serial port.
+     * @return a YSpiPort object allowing you to drive the SPI port.
      */
-    public static YSerialPort FindSerialPortInContext(YAPIContext yctx,String func)
+    public static YSpiPort FindSpiPortInContext(YAPIContext yctx,String func)
     {
-        YSerialPort obj;
-        obj = (YSerialPort) YFunction._FindFromCacheInContext(yctx, "SerialPort", func);
+        YSpiPort obj;
+        obj = (YSpiPort) YFunction._FindFromCacheInContext(yctx, "SpiPort", func);
         if (obj == null) {
-            obj = new YSerialPort(yctx, func);
-            YFunction._AddToCache("SerialPort", func, obj);
+            obj = new YSpiPort(yctx, func);
+            YFunction._AddToCache("SpiPort", func, obj);
         }
         return obj;
     }
@@ -895,7 +1024,7 @@ public class YSerialPort extends YFunction
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
-        _valueCallbackSerialPort = callback;
+        _valueCallbackSpiPort = callback;
         // Immediately invoke value callback with current value
         if (callback != null && isOnline()) {
             val = _advertisedValue;
@@ -909,8 +1038,8 @@ public class YSerialPort extends YFunction
     @Override
     public int _invokeValueCallback(String value)
     {
-        if (_valueCallbackSerialPort != null) {
-            _valueCallbackSerialPort.yNewValue(this, value);
+        if (_valueCallbackSpiPort != null) {
+            _valueCallbackSpiPort.yNewValue(this, value);
         } else {
             super._invokeValueCallback(value);
         }
@@ -1503,581 +1632,28 @@ public class YSerialPort extends YFunction
     }
 
     /**
-     * Manually sets the state of the RTS line. This function has no effect when
-     * hardware handshake is enabled, as the RTS line is driven automatically.
+     * Manually sets the state of the SS line. This function has no effect when
+     * the SS line is handled automatically.
      *
-     * @param val : 1 to turn RTS on, 0 to turn RTS off
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_RTS(int val) throws YAPI_Exception
-    {
-        return sendCommand(String.format("R%d",val));
-    }
-
-    /**
-     * Reads the level of the CTS line. The CTS line is usually driven by
-     * the RTS signal of the connected serial device.
-     *
-     * @return 1 if the CTS line is high, 0 if the CTS line is low.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int get_CTS() throws YAPI_Exception
-    {
-        byte[] buff;
-        int res;
-        // may throw an exception
-        buff = _download("cts.txt");
-        if (!((buff).length == 1)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "invalid CTS reply");}
-        res = buff[0] - 48;
-        return res;
-    }
-
-    /**
-     * Sends a MODBUS message (provided as a hexadecimal string) to the serial port.
-     * The message must start with the slave address. The MODBUS CRC/LRC is
-     * automatically added by the function. This function does not wait for a reply.
-     *
-     * @param hexString : a hexadecimal message string, including device address but no CRC/LRC
+     * @param val : 1 to turn SS active, 0 to release SS.
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int writeMODBUS(String hexString) throws YAPI_Exception
+    public int set_SS(int val) throws YAPI_Exception
     {
-        return sendCommand(String.format(":%s",hexString));
+        return sendCommand(String.format("S%d",val));
     }
 
     /**
-     * Sends a message to a specified MODBUS slave connected to the serial port, and reads the
-     * reply, if any. The message is the PDU, provided as a vector of bytes.
+     * Continues the enumeration of SPI ports started using yFirstSpiPort().
      *
-     * @param slaveNo : the address of the slave MODBUS device to query
-     * @param pduBytes : the message to send (PDU), as a vector of bytes. The first byte of the
-     *         PDU is the MODBUS function code.
-     *
-     * @return the received reply, as a vector of bytes.
-     *
-     * @throws YAPI_Exception on error
+     * @return a pointer to a YSpiPort object, corresponding to
+     *         a SPI port currently online, or a null pointer
+     *         if there are no more SPI ports to enumerate.
      */
-    public ArrayList<Integer> queryMODBUS(int slaveNo,ArrayList<Integer> pduBytes) throws YAPI_Exception
-    {
-        int funCode;
-        int nib;
-        int i;
-        String cmd;
-        String url;
-        String pat;
-        byte[] msgs;
-        ArrayList<String> reps = new ArrayList<String>();
-        String rep;
-        ArrayList<Integer> res = new ArrayList<Integer>();
-        int replen;
-        int hexb;
-        funCode = pduBytes.get(0).intValue();
-        nib = ((funCode) >> (4));
-        pat = String.format("%02x[%x%x]%x.*", slaveNo, nib, (nib+8),((funCode) & (15)));
-        cmd = String.format("%02x%02x", slaveNo,funCode);
-        i = 1;
-        while (i < pduBytes.size()) {
-            cmd = String.format("%s%02x", cmd,((pduBytes.get(i).intValue()) & (0xff)));
-            i = i + 1;
-        }
-        // may throw an exception
-        url = String.format("rxmsg.json?cmd=:%s&pat=:%s", cmd,pat);
-        msgs = _download(url);
-        reps = _json_get_array(msgs);
-        if (!(reps.size() > 1)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "no reply from slave");}
-        if (reps.size() > 1) {
-            rep = _json_get_string((reps.get(0)).getBytes());
-            replen = (((rep).length() - 3) >> (1));
-            i = 0;
-            while (i < replen) {
-                hexb = Integer.valueOf((rep).substring(2 * i + 3, 2 * i + 3 + 2),16);
-                res.add(hexb);
-                i = i + 1;
-            }
-            if (res.get(0).intValue() != funCode) {
-                i = res.get(1).intValue();
-                if (!(i > 1)) { throw new YAPI_Exception( YAPI.NOT_SUPPORTED,  "MODBUS error: unsupported function code");}
-                if (!(i > 2)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "MODBUS error: illegal data address");}
-                if (!(i > 3)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "MODBUS error: illegal data value");}
-                if (!(i > 4)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "MODBUS error: failed to execute function");}
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Reads one or more contiguous internal bits (or coil status) from a MODBUS serial device.
-     * This method uses the MODBUS function code 0x01 (Read Coils).
-     *
-     * @param slaveNo : the address of the slave MODBUS device to query
-     * @param pduAddr : the relative address of the first bit/coil to read (zero-based)
-     * @param nBits : the number of bits/coils to read
-     *
-     * @return a vector of integers, each corresponding to one bit.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public ArrayList<Integer> modbusReadBits(int slaveNo,int pduAddr,int nBits) throws YAPI_Exception
-    {
-        ArrayList<Integer> pdu = new ArrayList<Integer>();
-        ArrayList<Integer> reply = new ArrayList<Integer>();
-        ArrayList<Integer> res = new ArrayList<Integer>();
-        int bitpos;
-        int idx;
-        int val;
-        int mask;
-        pdu.add(0x01);
-        pdu.add(((pduAddr) >> (8)));
-        pdu.add(((pduAddr) & (0xff)));
-        pdu.add(((nBits) >> (8)));
-        pdu.add(((nBits) & (0xff)));
-        // may throw an exception
-        reply = queryMODBUS(slaveNo, pdu);
-        if (reply.size() == 0) {
-            return res;
-        }
-        if (reply.get(0).intValue() != pdu.get(0).intValue()) {
-            return res;
-        }
-        bitpos = 0;
-        idx = 2;
-        val = reply.get(idx).intValue();
-        mask = 1;
-        while (bitpos < nBits) {
-            if (((val) & (mask)) == 0) {
-                res.add(0);
-            } else {
-                res.add(1);
-            }
-            bitpos = bitpos + 1;
-            if (mask == 0x80) {
-                idx = idx + 1;
-                val = reply.get(idx).intValue();
-                mask = 1;
-            } else {
-                mask = ((mask) << (1));
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Reads one or more contiguous input bits (or discrete inputs) from a MODBUS serial device.
-     * This method uses the MODBUS function code 0x02 (Read Discrete Inputs).
-     *
-     * @param slaveNo : the address of the slave MODBUS device to query
-     * @param pduAddr : the relative address of the first bit/input to read (zero-based)
-     * @param nBits : the number of bits/inputs to read
-     *
-     * @return a vector of integers, each corresponding to one bit.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public ArrayList<Integer> modbusReadInputBits(int slaveNo,int pduAddr,int nBits) throws YAPI_Exception
-    {
-        ArrayList<Integer> pdu = new ArrayList<Integer>();
-        ArrayList<Integer> reply = new ArrayList<Integer>();
-        ArrayList<Integer> res = new ArrayList<Integer>();
-        int bitpos;
-        int idx;
-        int val;
-        int mask;
-        pdu.add(0x02);
-        pdu.add(((pduAddr) >> (8)));
-        pdu.add(((pduAddr) & (0xff)));
-        pdu.add(((nBits) >> (8)));
-        pdu.add(((nBits) & (0xff)));
-        // may throw an exception
-        reply = queryMODBUS(slaveNo, pdu);
-        if (reply.size() == 0) {
-            return res;
-        }
-        if (reply.get(0).intValue() != pdu.get(0).intValue()) {
-            return res;
-        }
-        bitpos = 0;
-        idx = 2;
-        val = reply.get(idx).intValue();
-        mask = 1;
-        while (bitpos < nBits) {
-            if (((val) & (mask)) == 0) {
-                res.add(0);
-            } else {
-                res.add(1);
-            }
-            bitpos = bitpos + 1;
-            if (mask == 0x80) {
-                idx = idx + 1;
-                val = reply.get(idx).intValue();
-                mask = 1;
-            } else {
-                mask = ((mask) << (1));
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Reads one or more contiguous internal registers (holding registers) from a MODBUS serial device.
-     * This method uses the MODBUS function code 0x03 (Read Holding Registers).
-     *
-     * @param slaveNo : the address of the slave MODBUS device to query
-     * @param pduAddr : the relative address of the first holding register to read (zero-based)
-     * @param nWords : the number of holding registers to read
-     *
-     * @return a vector of integers, each corresponding to one 16-bit register value.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public ArrayList<Integer> modbusReadRegisters(int slaveNo,int pduAddr,int nWords) throws YAPI_Exception
-    {
-        ArrayList<Integer> pdu = new ArrayList<Integer>();
-        ArrayList<Integer> reply = new ArrayList<Integer>();
-        ArrayList<Integer> res = new ArrayList<Integer>();
-        int regpos;
-        int idx;
-        int val;
-        pdu.add(0x03);
-        pdu.add(((pduAddr) >> (8)));
-        pdu.add(((pduAddr) & (0xff)));
-        pdu.add(((nWords) >> (8)));
-        pdu.add(((nWords) & (0xff)));
-        // may throw an exception
-        reply = queryMODBUS(slaveNo, pdu);
-        if (reply.size() == 0) {
-            return res;
-        }
-        if (reply.get(0).intValue() != pdu.get(0).intValue()) {
-            return res;
-        }
-        regpos = 0;
-        idx = 2;
-        while (regpos < nWords) {
-            val = ((reply.get(idx).intValue()) << (8));
-            idx = idx + 1;
-            val = val + reply.get(idx).intValue();
-            idx = idx + 1;
-            res.add(val);
-            regpos = regpos + 1;
-        }
-        return res;
-    }
-
-    /**
-     * Reads one or more contiguous input registers (read-only registers) from a MODBUS serial device.
-     * This method uses the MODBUS function code 0x04 (Read Input Registers).
-     *
-     * @param slaveNo : the address of the slave MODBUS device to query
-     * @param pduAddr : the relative address of the first input register to read (zero-based)
-     * @param nWords : the number of input registers to read
-     *
-     * @return a vector of integers, each corresponding to one 16-bit input value.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public ArrayList<Integer> modbusReadInputRegisters(int slaveNo,int pduAddr,int nWords) throws YAPI_Exception
-    {
-        ArrayList<Integer> pdu = new ArrayList<Integer>();
-        ArrayList<Integer> reply = new ArrayList<Integer>();
-        ArrayList<Integer> res = new ArrayList<Integer>();
-        int regpos;
-        int idx;
-        int val;
-        pdu.add(0x04);
-        pdu.add(((pduAddr) >> (8)));
-        pdu.add(((pduAddr) & (0xff)));
-        pdu.add(((nWords) >> (8)));
-        pdu.add(((nWords) & (0xff)));
-        // may throw an exception
-        reply = queryMODBUS(slaveNo, pdu);
-        if (reply.size() == 0) {
-            return res;
-        }
-        if (reply.get(0).intValue() != pdu.get(0).intValue()) {
-            return res;
-        }
-        regpos = 0;
-        idx = 2;
-        while (regpos < nWords) {
-            val = ((reply.get(idx).intValue()) << (8));
-            idx = idx + 1;
-            val = val + reply.get(idx).intValue();
-            idx = idx + 1;
-            res.add(val);
-            regpos = regpos + 1;
-        }
-        return res;
-    }
-
-    /**
-     * Sets a single internal bit (or coil) on a MODBUS serial device.
-     * This method uses the MODBUS function code 0x05 (Write Single Coil).
-     *
-     * @param slaveNo : the address of the slave MODBUS device to drive
-     * @param pduAddr : the relative address of the bit/coil to set (zero-based)
-     * @param value : the value to set (0 for OFF state, non-zero for ON state)
-     *
-     * @return the number of bits/coils affected on the device (1)
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int modbusWriteBit(int slaveNo,int pduAddr,int value) throws YAPI_Exception
-    {
-        ArrayList<Integer> pdu = new ArrayList<Integer>();
-        ArrayList<Integer> reply = new ArrayList<Integer>();
-        int res;
-        res = 0;
-        if (value != 0) {
-            value = 0xff;
-        }
-        pdu.add(0x05);
-        pdu.add(((pduAddr) >> (8)));
-        pdu.add(((pduAddr) & (0xff)));
-        pdu.add(value);
-        pdu.add(0x00);
-        // may throw an exception
-        reply = queryMODBUS(slaveNo, pdu);
-        if (reply.size() == 0) {
-            return res;
-        }
-        if (reply.get(0).intValue() != pdu.get(0).intValue()) {
-            return res;
-        }
-        res = 1;
-        return res;
-    }
-
-    /**
-     * Sets several contiguous internal bits (or coils) on a MODBUS serial device.
-     * This method uses the MODBUS function code 0x0f (Write Multiple Coils).
-     *
-     * @param slaveNo : the address of the slave MODBUS device to drive
-     * @param pduAddr : the relative address of the first bit/coil to set (zero-based)
-     * @param bits : the vector of bits to be set (one integer per bit)
-     *
-     * @return the number of bits/coils affected on the device
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int modbusWriteBits(int slaveNo,int pduAddr,ArrayList<Integer> bits) throws YAPI_Exception
-    {
-        int nBits;
-        int nBytes;
-        int bitpos;
-        int val;
-        int mask;
-        ArrayList<Integer> pdu = new ArrayList<Integer>();
-        ArrayList<Integer> reply = new ArrayList<Integer>();
-        int res;
-        res = 0;
-        nBits = bits.size();
-        nBytes = (((nBits + 7)) >> (3));
-        pdu.add(0x0f);
-        pdu.add(((pduAddr) >> (8)));
-        pdu.add(((pduAddr) & (0xff)));
-        pdu.add(((nBits) >> (8)));
-        pdu.add(((nBits) & (0xff)));
-        pdu.add(nBytes);
-        bitpos = 0;
-        val = 0;
-        mask = 1;
-        while (bitpos < nBits) {
-            if (bits.get(bitpos).intValue() != 0) {
-                val = ((val) | (mask));
-            }
-            bitpos = bitpos + 1;
-            if (mask == 0x80) {
-                pdu.add(val);
-                val = 0;
-                mask = 1;
-            } else {
-                mask = ((mask) << (1));
-            }
-        }
-        if (mask != 1) {
-            pdu.add(val);
-        }
-        // may throw an exception
-        reply = queryMODBUS(slaveNo, pdu);
-        if (reply.size() == 0) {
-            return res;
-        }
-        if (reply.get(0).intValue() != pdu.get(0).intValue()) {
-            return res;
-        }
-        res = ((reply.get(3).intValue()) << (8));
-        res = res + reply.get(4).intValue();
-        return res;
-    }
-
-    /**
-     * Sets a single internal register (or holding register) on a MODBUS serial device.
-     * This method uses the MODBUS function code 0x06 (Write Single Register).
-     *
-     * @param slaveNo : the address of the slave MODBUS device to drive
-     * @param pduAddr : the relative address of the register to set (zero-based)
-     * @param value : the 16 bit value to set
-     *
-     * @return the number of registers affected on the device (1)
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int modbusWriteRegister(int slaveNo,int pduAddr,int value) throws YAPI_Exception
-    {
-        ArrayList<Integer> pdu = new ArrayList<Integer>();
-        ArrayList<Integer> reply = new ArrayList<Integer>();
-        int res;
-        res = 0;
-        if (value != 0) {
-            value = 0xff;
-        }
-        pdu.add(0x06);
-        pdu.add(((pduAddr) >> (8)));
-        pdu.add(((pduAddr) & (0xff)));
-        pdu.add(((value) >> (8)));
-        pdu.add(((value) & (0xff)));
-        // may throw an exception
-        reply = queryMODBUS(slaveNo, pdu);
-        if (reply.size() == 0) {
-            return res;
-        }
-        if (reply.get(0).intValue() != pdu.get(0).intValue()) {
-            return res;
-        }
-        res = 1;
-        return res;
-    }
-
-    /**
-     * Sets several contiguous internal registers (or holding registers) on a MODBUS serial device.
-     * This method uses the MODBUS function code 0x10 (Write Multiple Registers).
-     *
-     * @param slaveNo : the address of the slave MODBUS device to drive
-     * @param pduAddr : the relative address of the first internal register to set (zero-based)
-     * @param values : the vector of 16 bit values to set
-     *
-     * @return the number of registers affected on the device
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int modbusWriteRegisters(int slaveNo,int pduAddr,ArrayList<Integer> values) throws YAPI_Exception
-    {
-        int nWords;
-        int nBytes;
-        int regpos;
-        int val;
-        ArrayList<Integer> pdu = new ArrayList<Integer>();
-        ArrayList<Integer> reply = new ArrayList<Integer>();
-        int res;
-        res = 0;
-        nWords = values.size();
-        nBytes = 2 * nWords;
-        pdu.add(0x10);
-        pdu.add(((pduAddr) >> (8)));
-        pdu.add(((pduAddr) & (0xff)));
-        pdu.add(((nWords) >> (8)));
-        pdu.add(((nWords) & (0xff)));
-        pdu.add(nBytes);
-        regpos = 0;
-        while (regpos < nWords) {
-            val = values.get(regpos).intValue();
-            pdu.add(((val) >> (8)));
-            pdu.add(((val) & (0xff)));
-            regpos = regpos + 1;
-        }
-        // may throw an exception
-        reply = queryMODBUS(slaveNo, pdu);
-        if (reply.size() == 0) {
-            return res;
-        }
-        if (reply.get(0).intValue() != pdu.get(0).intValue()) {
-            return res;
-        }
-        res = ((reply.get(3).intValue()) << (8));
-        res = res + reply.get(4).intValue();
-        return res;
-    }
-
-    /**
-     * Sets several contiguous internal registers (holding registers) on a MODBUS serial device,
-     * then performs a contiguous read of a set of (possibly different) internal registers.
-     * This method uses the MODBUS function code 0x17 (Read/Write Multiple Registers).
-     *
-     * @param slaveNo : the address of the slave MODBUS device to drive
-     * @param pduWriteAddr : the relative address of the first internal register to set (zero-based)
-     * @param values : the vector of 16 bit values to set
-     * @param pduReadAddr : the relative address of the first internal register to read (zero-based)
-     * @param nReadWords : the number of 16 bit values to read
-     *
-     * @return a vector of integers, each corresponding to one 16-bit register value read.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public ArrayList<Integer> modbusWriteAndReadRegisters(int slaveNo,int pduWriteAddr,ArrayList<Integer> values,int pduReadAddr,int nReadWords) throws YAPI_Exception
-    {
-        int nWriteWords;
-        int nBytes;
-        int regpos;
-        int val;
-        int idx;
-        ArrayList<Integer> pdu = new ArrayList<Integer>();
-        ArrayList<Integer> reply = new ArrayList<Integer>();
-        ArrayList<Integer> res = new ArrayList<Integer>();
-        nWriteWords = values.size();
-        nBytes = 2 * nWriteWords;
-        pdu.add(0x17);
-        pdu.add(((pduReadAddr) >> (8)));
-        pdu.add(((pduReadAddr) & (0xff)));
-        pdu.add(((nReadWords) >> (8)));
-        pdu.add(((nReadWords) & (0xff)));
-        pdu.add(((pduWriteAddr) >> (8)));
-        pdu.add(((pduWriteAddr) & (0xff)));
-        pdu.add(((nWriteWords) >> (8)));
-        pdu.add(((nWriteWords) & (0xff)));
-        pdu.add(nBytes);
-        regpos = 0;
-        while (regpos < nWriteWords) {
-            val = values.get(regpos).intValue();
-            pdu.add(((val) >> (8)));
-            pdu.add(((val) & (0xff)));
-            regpos = regpos + 1;
-        }
-        // may throw an exception
-        reply = queryMODBUS(slaveNo, pdu);
-        if (reply.size() == 0) {
-            return res;
-        }
-        if (reply.get(0).intValue() != pdu.get(0).intValue()) {
-            return res;
-        }
-        regpos = 0;
-        idx = 2;
-        while (regpos < nReadWords) {
-            val = ((reply.get(idx).intValue()) << (8));
-            idx = idx + 1;
-            val = val + reply.get(idx).intValue();
-            idx = idx + 1;
-            res.add(val);
-            regpos = regpos + 1;
-        }
-        return res;
-    }
-
-    /**
-     * Continues the enumeration of serial ports started using yFirstSerialPort().
-     *
-     * @return a pointer to a YSerialPort object, corresponding to
-     *         a serial port currently online, or a null pointer
-     *         if there are no more serial ports to enumerate.
-     */
-    public YSerialPort nextSerialPort()
+    public YSpiPort nextSpiPort()
     {
         String next_hwid;
         try {
@@ -2087,44 +1663,44 @@ public class YSerialPort extends YFunction
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindSerialPortInContext(_yapi, next_hwid);
+        return FindSpiPortInContext(_yapi, next_hwid);
     }
 
     /**
-     * Starts the enumeration of serial ports currently accessible.
-     * Use the method YSerialPort.nextSerialPort() to iterate on
-     * next serial ports.
+     * Starts the enumeration of SPI ports currently accessible.
+     * Use the method YSpiPort.nextSpiPort() to iterate on
+     * next SPI ports.
      *
-     * @return a pointer to a YSerialPort object, corresponding to
-     *         the first serial port currently online, or a null pointer
+     * @return a pointer to a YSpiPort object, corresponding to
+     *         the first SPI port currently online, or a null pointer
      *         if there are none.
      */
-    public static YSerialPort FirstSerialPort()
+    public static YSpiPort FirstSpiPort()
     {
         YAPIContext yctx = YAPI.GetYCtx();
-        String next_hwid = yctx._yHash.getFirstHardwareId("SerialPort");
+        String next_hwid = yctx._yHash.getFirstHardwareId("SpiPort");
         if (next_hwid == null)  return null;
-        return FindSerialPortInContext(yctx, next_hwid);
+        return FindSpiPortInContext(yctx, next_hwid);
     }
 
     /**
-     * Starts the enumeration of serial ports currently accessible.
-     * Use the method YSerialPort.nextSerialPort() to iterate on
-     * next serial ports.
+     * Starts the enumeration of SPI ports currently accessible.
+     * Use the method YSpiPort.nextSpiPort() to iterate on
+     * next SPI ports.
      *
      * @param yctx : a YAPI context.
      *
-     * @return a pointer to a YSerialPort object, corresponding to
-     *         the first serial port currently online, or a null pointer
+     * @return a pointer to a YSpiPort object, corresponding to
+     *         the first SPI port currently online, or a null pointer
      *         if there are none.
      */
-    public static YSerialPort FirstSerialPortInContext(YAPIContext yctx)
+    public static YSpiPort FirstSpiPortInContext(YAPIContext yctx)
     {
-        String next_hwid = yctx._yHash.getFirstHardwareId("SerialPort");
+        String next_hwid = yctx._yHash.getFirstHardwareId("SpiPort");
         if (next_hwid == null)  return null;
-        return FindSerialPortInContext(yctx, next_hwid);
+        return FindSpiPortInContext(yctx, next_hwid);
     }
 
-    //--- (end of YSerialPort implementation)
+    //--- (end of YSpiPort implementation)
 }
 

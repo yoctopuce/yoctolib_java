@@ -88,7 +88,7 @@ public class TCPNotificationHandler extends NotificationHandler
     }
 
     @Override
-    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, int mstimeout) throws YAPI_Exception
+    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, int mstimeout, YGenericHub.RequestProgress progress, Object context) throws YAPI_Exception
     {
         if (!_httpReqByDev.containsKey(device)) {
             _httpReqByDev.put(device, new yHTTPRequest(_hub, "Device " + device.getSerialNumber()));
@@ -124,6 +124,6 @@ public class TCPNotificationHandler extends NotificationHandler
     @Override
     public boolean hasRwAccess()
     {
-        return !_hub._http_params.getUser().equals("admin");
+        return _hub._http_params.getUser().equals("admin");
     }
 }
