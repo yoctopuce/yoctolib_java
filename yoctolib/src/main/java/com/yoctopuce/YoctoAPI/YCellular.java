@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 23715 2016-04-01 15:48:53Z mvuilleu $
+ * $Id: YCellular.java 23960 2016-04-15 21:30:18Z mvuilleu $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -119,6 +119,10 @@ public class YCellular extends YFunction
      */
     public static final String APNSECRET_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid pingInterval value
+     */
+    public static final int PINGINTERVAL_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
@@ -134,6 +138,7 @@ public class YCellular extends YFunction
     protected int _enableData = ENABLEDATA_INVALID;
     protected String _apn = APN_INVALID;
     protected String _apnSecret = APNSECRET_INVALID;
+    protected int _pingInterval = PINGINTERVAL_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackCellular = null;
 
@@ -222,6 +227,9 @@ public class YCellular extends YFunction
         }
         if (json_val.has("apnSecret")) {
             _apnSecret = json_val.getString("apnSecret");
+        }
+        if (json_val.has("pingInterval")) {
+            _pingInterval = json_val.getInt("pingInterval");
         }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
@@ -825,6 +833,66 @@ public class YCellular extends YFunction
     public int setApnSecret(String newval)  throws YAPI_Exception
     {
         return set_apnSecret(newval);
+    }
+
+    /**
+     * Returns the automated connectivity check interval, in seconds.
+     *
+     * @return an integer corresponding to the automated connectivity check interval, in seconds
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_pingInterval() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return PINGINTERVAL_INVALID;
+            }
+        }
+        return _pingInterval;
+    }
+
+    /**
+     * Returns the automated connectivity check interval, in seconds.
+     *
+     * @return an integer corresponding to the automated connectivity check interval, in seconds
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getPingInterval() throws YAPI_Exception
+    {
+        return get_pingInterval();
+    }
+
+    /**
+     * Changes the automated connectivity check interval, in seconds.
+     *
+     * @param newval : an integer corresponding to the automated connectivity check interval, in seconds
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_pingInterval(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("pingInterval",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the automated connectivity check interval, in seconds.
+     *
+     * @param newval : an integer corresponding to the automated connectivity check interval, in seconds
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setPingInterval(int newval)  throws YAPI_Exception
+    {
+        return set_pingInterval(newval);
     }
 
     /**

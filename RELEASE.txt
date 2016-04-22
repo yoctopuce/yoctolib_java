@@ -1,5 +1,1 @@
-- Add YModule.updateFirmwareEx method
-- Fix settings that where not restored correctly on YoctoHub-Wireless
-- Fix HTTP authentication with YoctoHub
-- Fix YModule.registerLogCallback() that was not working if it's used on a callback
-- small fixes
+- Fix set_xxx() method  that where not finished correctly if they are executed just before YAPI.UnregisterHub()

@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.yoctopuce.java</groupId>
         <artifactId>javabundle</artifactId>
-        <version>1.10.23948-SNAPSHOT</version>
+        <version>1.10.24182-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>doc-gettingstarted-yocto-powerrelay</artifactId>
     <packaging>jar</packaging>
     <name>Doc-GettingStarted-Yocto-PowerRelay</name>
-    <version>1.10.23948-SNAPSHOT</version>
+    <version>1.10.24182-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>
         <developer>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.yoctopuce.java</groupId>
             <artifactId>yoctolib</artifactId>
-            <version>1.10.23948-SNAPSHOT</version>
+            <version>1.10.24182-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

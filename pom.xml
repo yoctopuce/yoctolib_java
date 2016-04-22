@@ -7,7 +7,7 @@
     <groupId>com.yoctopuce.java</groupId>
     <artifactId>javabundle</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.23948-SNAPSHOT</version>
+    <version>1.10.24182-SNAPSHOT</version>
     <name>Yoctopuce Java API (with examples)</name>
     <description>Official Yoctopuce Library for Java with examples</description>
     <url>http://www.yoctopuce.com</url>
@@ -49,6 +49,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-RS485</module>
         <module>Examples/Doc-GettingStarted-Yocto-Serial</module>
         <module>Examples/Doc-GettingStarted-Yocto-Servo</module>
+        <module>Examples/Doc-GettingStarted-Yocto-SPI</module>
         <module>Examples/Doc-GettingStarted-Yocto-Temperature</module>
         <module>Examples/Doc-GettingStarted-Yocto-Thermocouple</module>
         <module>Examples/Doc-GettingStarted-Yocto-VOC</module>

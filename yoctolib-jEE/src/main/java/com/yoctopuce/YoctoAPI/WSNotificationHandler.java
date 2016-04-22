@@ -339,6 +339,8 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     @Override
     boolean waitAndFreeAsyncTasks(long timeout) throws InterruptedException
     {
+        _executorService.shutdown();
+        boolean allTerminated = _executorService.awaitTermination(timeout, TimeUnit.MILLISECONDS);
         _muststop = true;
         try {
             _session.close();
@@ -346,8 +348,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
             WSLOG("error on ws close : " + e.getMessage());
             e.printStackTrace();
         }
-        _executorService.shutdown();
-        return !_executorService.awaitTermination(timeout, TimeUnit.MILLISECONDS);
+        return !allTerminated;
     }
 
     @Override
@@ -704,8 +705,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
 
     private void WSLOG(String s)
     {
-        System.out.print(s);
-        _hub._yctx._Log(s);
+        _hub._yctx._Log(s+"\n");
     }
 
     private void sendAuthenticationMeta()

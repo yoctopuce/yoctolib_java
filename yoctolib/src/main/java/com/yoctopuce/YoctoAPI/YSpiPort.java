@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 23551 2016-03-21 15:37:41Z mvuilleu $
+ * $Id: YSpiPort.java 24086 2016-04-21 15:43:42Z seb $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -737,11 +737,11 @@ public class YSpiPort extends YFunction
 
     /**
      * Returns the serial port communication parameters, as a string such as
-     * "125000,1,msb". The string includes the baud rate, the SPI mode (between
-     * 1 and 4) and the bit order.
+     * "125000,0,msb". The string includes the baud rate, the SPI mode (between
+     * 0 and 3) and the bit order.
      *
      * @return a string corresponding to the serial port communication parameters, as a string such as
-     *         "125000,1,msb"
+     *         "125000,0,msb"
      *
      * @throws YAPI_Exception on error
      */
@@ -757,11 +757,11 @@ public class YSpiPort extends YFunction
 
     /**
      * Returns the serial port communication parameters, as a string such as
-     * "125000,1,msb". The string includes the baud rate, the SPI mode (between
-     * 1 and 4) and the bit order.
+     * "125000,0,msb". The string includes the baud rate, the SPI mode (between
+     * 0 and 3) and the bit order.
      *
      * @return a string corresponding to the serial port communication parameters, as a string such as
-     *         "125000,1,msb"
+     *         "125000,0,msb"
      *
      * @throws YAPI_Exception on error
      */
@@ -772,11 +772,11 @@ public class YSpiPort extends YFunction
 
     /**
      * Changes the serial port communication parameters, with a string such as
-     * "125000,1,msb". The string includes the baud rate, the SPI mode (between
-     * 1 and 4) and the bit order.
+     * "125000,0,msb". The string includes the baud rate, the SPI mode (between
+     * 0 and 3) and the bit order.
      *
      * @param newval : a string corresponding to the serial port communication parameters, with a string such as
-     *         "125000,1,msb"
+     *         "125000,0,msb"
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -792,11 +792,11 @@ public class YSpiPort extends YFunction
 
     /**
      * Changes the serial port communication parameters, with a string such as
-     * "125000,1,msb". The string includes the baud rate, the SPI mode (between
-     * 1 and 4) and the bit order.
+     * "125000,0,msb". The string includes the baud rate, the SPI mode (between
+     * 0 and 3) and the bit order.
      *
      * @param newval : a string corresponding to the serial port communication parameters, with a string such as
-     *         "125000,1,msb"
+     *         "125000,0,msb"
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

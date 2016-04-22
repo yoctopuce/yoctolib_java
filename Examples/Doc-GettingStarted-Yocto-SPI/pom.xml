@@ -9,9 +9,9 @@
         <version>1.10.24182-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>prog-devicestree</artifactId>
+    <artifactId>doc-gettingstarted-yocto-spi</artifactId>
     <packaging>jar</packaging>
-    <name>Prog-DevicesTree</name>
+    <name>Doc-GettingStarted-Yocto-SPI</name>
     <version>1.10.24182-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>
