@@ -168,7 +168,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                 while (_connectionState == ConnectionState.CONNECTING && !_muststop) {
                     _stateLock.wait(1000);
                     if (timeout < System.currentTimeMillis()) {
-                        WSLOG("YoctoHub did not send any data for 10 secs\n");
+                        WSLOG("YoctoHub did not send any data for 10 secs");
                         _connectionState = ConnectionState.DISCONNECTED;
                         _stateLock.notifyAll();
                         return;
@@ -293,6 +293,10 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     public byte[] hubRequestSync(String req_first_line, byte[] req_head_and_body, int mstimeout) throws
             YAPI_Exception, InterruptedException
     {
+        if (mstimeout == 0) {
+            // simulate a wait indefinitely
+            mstimeout = 86400000; //24h
+        }
         WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, HUB_TCP_CHANNEL, false, null, null);
         return getRequestResponse(wsRequest, mstimeout);
     }
@@ -302,6 +306,10 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, int mstimeout, YGenericHub.RequestProgress progress, Object context) throws
             YAPI_Exception, InterruptedException
     {
+        if (mstimeout == 0) {
+            // simulate a wait indefinitely
+            mstimeout = 86400000; //24h
+        }
         WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, DEVICE_TCP_CHANNEL, false, progress, context);
         return getRequestResponse(wsRequest, mstimeout);
     }
@@ -583,7 +591,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         }
                         break;
                     default:
-                        WSLOG(String.format("unhandled Meta pkt %d\n", ystream));
+                        WSLOG(String.format("unhandled Meta pkt %d", ystream));
                         break;
                 }
 
@@ -593,7 +601,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
             case YGenericHub.YSTREAM_REPORT_V2:
             case YGenericHub.YSTREAM_NOTICE_V2:
             default:
-                _hub._yctx._Log(String.format("Invalid WS stream type (%d)", ystream));
+                _hub._yctx._Log(String.format("Invalid WS stream type (%d)\n", ystream));
         }
 
     }
@@ -641,12 +649,12 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         if (toBeSent + bytesOnTheAir > DEFAULT_TCP_MAX_WINDOW_SIZE) {
                             toBeSent = DEFAULT_TCP_MAX_WINDOW_SIZE - bytesOnTheAir;
                         }
-                        WSLOG(String.format("throttling: %d bytes/s (%d + %d = %d)\n", _uploadRate, toBeSent, bytesOnTheAir, bytesOnTheAir + toBeSent));
+                        WSLOG(String.format("throttling: %d bytes/s (%d + %d = %d)", _uploadRate, toBeSent, bytesOnTheAir, bytesOnTheAir + toBeSent));
                         if (toBeSent < 64) {
                             long waitTime = 1000 * (128 - toBeSent) / _uploadRate;
                             if (waitTime < 2) waitTime = 2;
                             _next_transmit_tm = YAPI.GetTickCount() + waitTime;
-                            WSLOG(String.format("WS: %d sent %dms ago, waiting %dms...\n", bytesOnTheAir, timeOnTheAir, waitTime));
+                            WSLOG(String.format("WS: %d sent %dms ago, waiting %dms...", bytesOnTheAir, timeOnTheAir, waitTime));
                             throttle_end = 0;
                         }
                         if (throttle_end > requestBytes.position() + toBeSent) {
@@ -687,11 +695,11 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                 if (requestBytes.position() < requestBytes.limit()) {
                     int sent = requestBytes.position() - throttle_start;
                     // not completely sent, cannot do more for now
-                    if (_uploadRate > 0) {
+                    if (sent > 0  && _uploadRate > 0) {
                         long waitTime = 1000 * sent / _uploadRate;
                         if (waitTime < 2) waitTime = 2;
                         _next_transmit_tm = YAPI.GetTickCount() + waitTime;
-                        WSLOG(String.format("Sent %dbytes, waiting %dms...\n", sent, waitTime));
+                        WSLOG(String.format("Sent %dbytes, waiting %dms...", sent, waitTime));
                     } else {
                         _next_transmit_tm = YAPI.GetTickCount() + 100;
                     }
@@ -705,7 +713,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
 
     private void WSLOG(String s)
     {
-        _hub._yctx._Log(s+"\n");
+        _hub._yctx._Log(s + "\n");
     }
 
     private void sendAuthenticationMeta()
@@ -714,13 +722,13 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         auth.order(ByteOrder.LITTLE_ENDIAN);
         auth.put((byte) YGenericHub.USB_META_WS_AUTHENTICATION);
         if (_hub._http_params.hasAuthParam()) {
-            auth.put((byte) YGenericHub.USB_META_WS_PROTO_V1);
+            auth.put((byte) YGenericHub.USB_META_WS_PROTO_V2);
             auth.putShort((short) YGenericHub.USB_META_WS_VALID_SHA1);
             auth.putInt(_nounce);
             byte[] sha1 = computeAUTH(_hub._http_params.getUser(), _hub._http_params.getPass(), _remoteSerial, _remoteNouce);
             auth.put(sha1);
         } else {
-            auth.put((byte) YGenericHub.USB_META_WS_PROTO_V1);
+            auth.put((byte) YGenericHub.USB_META_WS_PROTO_V2);
             auth.putInt(0);
             for (int i = 0; i < 5; i++) {
                 auth.putInt(0);

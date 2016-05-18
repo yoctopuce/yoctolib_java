@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 23865 2016-04-11 12:32:42Z seb $
+ * $Id: YHTTPHub.java 24281 2016-04-29 09:40:53Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -53,7 +53,6 @@ class YHTTPHub extends YGenericHub
     public static final int YIO_DEFAULT_TCP_TIMEOUT = 20000;
     public static final int YIO_1_MINUTE_TCP_TIMEOUT = 60000;
     public static final int YIO_10_MINUTES_TCP_TIMEOUT = 600000;
-    public static final int YIO_IDLE_TCP_TIMEOUT = 5000;
 
     private final Object _callbackSession;
     private NotificationHandler _notificationHandler;
@@ -232,7 +231,7 @@ class YHTTPHub extends YGenericHub
     boolean isSameHub(String url, Object request, Object response, Object session)
     {
         HTTPParams params = new HTTPParams(url);
-        boolean url_equals = params.getUrl(false,false).equals(_http_params.getUrl(false,false));
+        boolean url_equals = params.getUrl(false, false).equals(_http_params.getUrl(false, false));
         return url_equals && (_callbackSession == null || _callbackSession.equals(session));
     }
 
@@ -332,8 +331,6 @@ class YHTTPHub extends YGenericHub
         boolean use_self_flash = false;
         String baseurl = "";
         boolean need_reboot = true;
-        // todo: update code to use WS
-        yHTTPRequest req = new yHTTPRequest(this, "hubFUpdate" + serial);
         if (_serial.startsWith("VIRTHUB")) {
             use_self_flash = false;
         } else if (serial.equals(_serial)) {
@@ -341,7 +338,7 @@ class YHTTPHub extends YGenericHub
         } else {
             // check if subdevice support self flashing
             try {
-                req.RequestSync("GET /bySerial/" + serial + "/flash.json?a=state", null, YIO_DEFAULT_TCP_TIMEOUT);
+                _notificationHandler.hubRequestSync("GET /bySerial/" + serial + "/flash.json?a=state", null, YIO_DEFAULT_TCP_TIMEOUT);
                 baseurl = "/bySerial/" + serial;
                 use_self_flash = true;
             } catch (YAPI_Exception ignored) {
@@ -363,12 +360,25 @@ class YHTTPHub extends YGenericHub
         if (!use_self_flash && need_reboot && bootloaders.size() >= 4) {
             throw new YAPI_Exception(YAPI.IO_ERROR, "Too many devices in update mode");
         }
+        // ensure flash engine is not busy
+        byte[] bytes = _notificationHandler.hubRequestSync("GET" + baseurl + "/flash.json?a=state", null, YIO_DEFAULT_TCP_TIMEOUT);
+        String uploadstate = new String(bytes);
+        try {
+            JSONObject uploadres = new JSONObject(uploadstate);
+            String state = uploadres.getString("state");
+            if (state.equals("uploading") || state.equals("flashing")) {
+                throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot start firmware update: busy (" + state + ")");
+            }
+        } catch (JSONException ex) {
+            throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json response :" + ex.getLocalizedMessage());
+        }
+        // start firmware upload
         //10% -> 40%
         progress.firmware_progress(10, "Send firmware file");
         byte[] head_body = YDevice.formatHTTPUpload("firmware", firmware.getData());
-        req.RequestSync("POST " + baseurl + "/upload.html", head_body, 0);
+        _notificationHandler.hubRequestSync("POST " + baseurl + "/upload.html", head_body, 0);
         //check firmware upload result
-        byte[] bytes = req.RequestSync("GET " + baseurl + "/flash.json?a=state", null, YIO_10_MINUTES_TCP_TIMEOUT);
+        bytes = _notificationHandler.hubRequestSync("GET " + baseurl + "/flash.json?a=state", null, YIO_10_MINUTES_TCP_TIMEOUT);
         String uploadresstr = new String(bytes);
         try {
             JSONObject uploadres = new JSONObject(uploadresstr);
@@ -395,23 +405,23 @@ class YHTTPHub extends YGenericHub
             }
             progress.firmware_progress(20, "Upload startupConf.json");
             head_body = YDevice.formatHTTPUpload("startupConf.json", startupConf);
-            req.RequestSync("POST " + baseurl + "/upload.html", head_body, YIO_10_MINUTES_TCP_TIMEOUT);
+            _notificationHandler.hubRequestSync("POST " + baseurl + "/upload.html", head_body, YIO_10_MINUTES_TCP_TIMEOUT);
             progress.firmware_progress(20, "Upload firmwareConf");
             head_body = YDevice.formatHTTPUpload("firmwareConf", startupConf);
-            req.RequestSync("POST " + baseurl + "/upload.html", head_body, YIO_10_MINUTES_TCP_TIMEOUT);
+            _notificationHandler.hubRequestSync("POST " + baseurl + "/upload.html", head_body, YIO_10_MINUTES_TCP_TIMEOUT);
         }
 
         //40%-> 80%
         if (use_self_flash) {
             progress.firmware_progress(40, "Flash firmware");
             // the hub itself -> reboot in autoflash mode
-            req.RequestSync("GET " + baseurl + "/api/module/rebootCountdown?rebootCountdown=-1003", null, YIO_DEFAULT_TCP_TIMEOUT);
+            _notificationHandler.hubRequestSync("GET " + baseurl + "/api/module/rebootCountdown?rebootCountdown=-1003", null, YIO_DEFAULT_TCP_TIMEOUT);
             Thread.sleep(7000);
         } else {
             // reboot device to bootloader if needed
             if (need_reboot) {
                 // reboot subdevice
-                req.RequestSync("GET /bySerial/" + serial + "/api/module/rebootCountdown?rebootCountdown=-2", null, YIO_DEFAULT_TCP_TIMEOUT);
+                _notificationHandler.hubRequestSync("GET /bySerial/" + serial + "/api/module/rebootCountdown?rebootCountdown=-2", null, YIO_DEFAULT_TCP_TIMEOUT);
             }
             // verify that the device is in bootloader
             long timeout = YAPI.GetTickCount() + YPROG_BOOTLOADER_TIMEOUT;
@@ -432,7 +442,7 @@ class YHTTPHub extends YGenericHub
             } while (!found && YAPI.GetTickCount() < timeout);
             //start flash
             progress.firmware_progress(45, "Flash firmware");
-            res = req.RequestSync("GET /flash.json?a=flash&s=" + serial, null, YIO_10_MINUTES_TCP_TIMEOUT);
+            res = _notificationHandler.hubRequestSync("GET /flash.json?a=flash&s=" + serial, null, YIO_10_MINUTES_TCP_TIMEOUT);
             try {
                 String jsonstr = new String(res);
                 JSONObject flashres = new JSONObject(jsonstr);
@@ -469,10 +479,12 @@ class YHTTPHub extends YGenericHub
         if (!_notificationHandler.isConnected()) {
             throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.getUrl() + " is not reachable");
         }
+        // Setup timeout counter
         int tcpTimeout = YIO_DEFAULT_TCP_TIMEOUT;
-        if (req_first_line.contains("/testcb.txt") || req_first_line.contains("/rxmsg.json")) {
+        if (req_first_line.contains("/testcb.txt") || req_first_line.contains("/rxmsg.json")
+                || req_first_line.contains("/files.json") || req_first_line.contains("/upload.html")) {
             tcpTimeout = YIO_1_MINUTE_TCP_TIMEOUT;
-        } else if (req_first_line.contains("/flash.json") || req_first_line.contains("/upload.html")) {
+        } else if (req_first_line.contains("/flash.json")) {
             tcpTimeout = YIO_10_MINUTES_TCP_TIMEOUT;
         }
         return _notificationHandler.devRequestSync(device, req_first_line, req_head_and_body, tcpTimeout, progress, context);

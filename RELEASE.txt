@@ -1,1 +1,3 @@
-- Fix set_xxx() method  that where not finished correctly if they are executed just before YAPI.UnregisterHub()
+- Add missing methods in YColorledCluster
+- Fix firmware update if YocotHub is using WebSocket
+- Fix YCellular.sendPUK() method

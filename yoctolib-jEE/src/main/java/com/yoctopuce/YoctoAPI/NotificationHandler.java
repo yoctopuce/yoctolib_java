@@ -187,6 +187,14 @@ public abstract class NotificationHandler implements Runnable
     }
 
 
+    /**
+     * @param req_first_line    first line of request without space, HTTP1.1 or \r\n
+     * @param req_head_and_body http headers with double \r\n followed by potential body
+     * @param mstimeout         number of milisecond allowed to the request to finish
+     * @return return the raw response without the http header
+     * @throws YAPI_Exception
+     * @throws InterruptedException
+     */
     abstract byte[] hubRequestSync(String req_first_line, byte[] req_head_and_body, int mstimeout) throws YAPI_Exception, InterruptedException;
 
     /**
