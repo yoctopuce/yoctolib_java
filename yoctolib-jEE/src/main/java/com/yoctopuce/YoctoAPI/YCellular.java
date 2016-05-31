@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 24465 2016-05-12 07:30:46Z mvuilleu $
+ * $Id: YCellular.java 24622 2016-05-27 12:51:52Z mvuilleu $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -123,6 +123,14 @@ public class YCellular extends YFunction
      */
     public static final int PINGINTERVAL_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid dataSent value
+     */
+    public static final int DATASENT_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid dataReceived value
+     */
+    public static final int DATARECEIVED_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
@@ -139,6 +147,8 @@ public class YCellular extends YFunction
     protected String _apn = APN_INVALID;
     protected String _apnSecret = APNSECRET_INVALID;
     protected int _pingInterval = PINGINTERVAL_INVALID;
+    protected int _dataSent = DATASENT_INVALID;
+    protected int _dataReceived = DATARECEIVED_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackCellular = null;
 
@@ -230,6 +240,12 @@ public class YCellular extends YFunction
         }
         if (json_val.has("pingInterval")) {
             _pingInterval = json_val.getInt("pingInterval");
+        }
+        if (json_val.has("dataSent")) {
+            _dataSent = json_val.getInt("dataSent");
+        }
+        if (json_val.has("dataReceived")) {
+            _dataReceived = json_val.getInt("dataReceived");
         }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
@@ -896,6 +912,126 @@ public class YCellular extends YFunction
     }
 
     /**
+     * Returns the number of bytes sent so far.
+     *
+     * @return an integer corresponding to the number of bytes sent so far
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_dataSent() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return DATASENT_INVALID;
+            }
+        }
+        return _dataSent;
+    }
+
+    /**
+     * Returns the number of bytes sent so far.
+     *
+     * @return an integer corresponding to the number of bytes sent so far
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getDataSent() throws YAPI_Exception
+    {
+        return get_dataSent();
+    }
+
+    /**
+     * Changes the value of the outgoing data counter.
+     *
+     * @param newval : an integer corresponding to the value of the outgoing data counter
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_dataSent(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("dataSent",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the value of the outgoing data counter.
+     *
+     * @param newval : an integer corresponding to the value of the outgoing data counter
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setDataSent(int newval)  throws YAPI_Exception
+    {
+        return set_dataSent(newval);
+    }
+
+    /**
+     * Returns the number of bytes received so far.
+     *
+     * @return an integer corresponding to the number of bytes received so far
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_dataReceived() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return DATARECEIVED_INVALID;
+            }
+        }
+        return _dataReceived;
+    }
+
+    /**
+     * Returns the number of bytes received so far.
+     *
+     * @return an integer corresponding to the number of bytes received so far
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getDataReceived() throws YAPI_Exception
+    {
+        return get_dataReceived();
+    }
+
+    /**
+     * Changes the value of the incoming data counter.
+     *
+     * @param newval : an integer corresponding to the value of the incoming data counter
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_dataReceived(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("dataReceived",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the value of the incoming data counter.
+     *
+     * @param newval : an integer corresponding to the value of the incoming data counter
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setDataReceived(int newval)  throws YAPI_Exception
+    {
+        return set_dataReceived(newval);
+    }
+
+    /**
      * @throws YAPI_Exception on error
      */
     public String get_command() throws YAPI_Exception
@@ -1057,7 +1193,7 @@ public class YCellular extends YFunction
     {
         String gsmMsg;
         gsmMsg = get_message();
-        if (!((gsmMsg).substring(0, 13).equals("Enter SIM PUK"))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,  "PUK not expected at this time");}
+        if (!(!((gsmMsg).substring(0, 13).equals("Enter SIM PUK")))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,  "PUK not expected at this time");}
         if (newPin.equals("")) {
             return set_command(String.format("AT+CPIN=%s,0000;+CLCK=SC,0,0000",puk));
         }
@@ -1078,6 +1214,25 @@ public class YCellular extends YFunction
     public int set_apnAuth(String username,String password) throws YAPI_Exception
     {
         return set_apnSecret(String.format("%s,%s",username,password));
+    }
+
+    /**
+     * Clear the transmitted data counters.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int clearDataCounters() throws YAPI_Exception
+    {
+        int retcode;
+        // may throw an exception
+        retcode = set_dataReceived(0);
+        if (retcode != YAPI.SUCCESS) {
+            return retcode;
+        }
+        retcode = set_dataSent(0);
+        return retcode;
     }
 
     /**

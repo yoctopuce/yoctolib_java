@@ -1,3 +1,1 @@
-- Add missing methods in YColorledCluster
-- Fix firmware update if YocotHub is using WebSocket
-- Fix YCellular.sendPUK() method
+- Add support for sending and receiving SMS

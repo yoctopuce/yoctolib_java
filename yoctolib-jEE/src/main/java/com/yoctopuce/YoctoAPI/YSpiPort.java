@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 24076 2016-04-21 11:57:21Z mvuilleu $
+ * $Id: pic24config.php 24565 2016-05-25 08:35:48Z mvuilleu $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 24076 2016-04-21 11:57:21Z mvuilleu $
+ * $Id: pic24config.php 24565 2016-05-25 08:35:48Z mvuilleu $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -49,7 +49,9 @@ import java.util.ArrayList;
  * YColorLedCluster Class: ColorLedCluster function interface
  *
  * The Yoctopuce application programming interface
- * allows you to drive a color LED cluster  using RGB coordinates as well as HSL coordinates.
+ * allows you to drive a color LED cluster. Unlike the ColorLed class, the ColorLedCluster
+ *  allows to handle several LEDs at one. Color changes can be done   using RGB coordinates as well as
+ * HSL coordinates.
  * The module performs all conversions form RGB to HSL automatically. It is then
  * self-evident to turn on a LED with a given hue and to progressively vary its
  * saturation or lightness. If needed, you can find more information on the
