@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 24576 2016-05-26 08:22:20Z seb $
+ * $Id: YColorLedCluster.java 24717 2016-06-03 16:09:53Z seb $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -250,7 +250,7 @@ public class YColorLedCluster extends YFunction
     }
 
     /**
-     * Returns the maximum number of sequences that the device can handle
+     * Returns the maximum number of sequences that the device can handle.
      *
      * @return an integer corresponding to the maximum number of sequences that the device can handle
      *
@@ -267,7 +267,7 @@ public class YColorLedCluster extends YFunction
     }
 
     /**
-     * Returns the maximum number of sequences that the device can handle
+     * Returns the maximum number of sequences that the device can handle.
      *
      * @return an integer corresponding to the maximum number of sequences that the device can handle
      *
@@ -457,12 +457,15 @@ public class YColorLedCluster extends YFunction
     }
 
     /**
-     *  Changes the current color of consecutve LEDs in the cluster , using a RGB color. Encoding is done
-     * as follows: 0xRRGGBB.
+     *  Changes the current color of consecutve LEDs in the cluster, using a RGB color. Encoding is done as
+     * follows: 0xRRGGBB.
      *
      * @param ledIndex :  index of the first affected LED.
      * @param count    :  affected LED count.
      * @param rgbValue :  new color.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int set_rgbColor(int ledIndex,int count,int rgbValue) throws YAPI_Exception
@@ -471,12 +474,17 @@ public class YColorLedCluster extends YFunction
     }
 
     /**
-     *  Changes the  color at device startup of consecutve LEDs in the cluster , using a RGB color.
-     * Encoding is done as follows: 0xRRGGBB.
+     *  Changes the  color at device startup of consecutve LEDs in the cluster, using a RGB color. Encoding
+     * is done as follows: 0xRRGGBB.
+     *  Don't forget to call saveLedsConfigAtPowerOn() to make sure the modification is saved in the device
+     * flash memory.
      *
      * @param ledIndex :  index of the first affected LED.
      * @param count    :  affected LED count.
      * @param rgbValue :  new color.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int set_rgbColorAtPowerOn(int ledIndex,int count,int rgbValue) throws YAPI_Exception
@@ -491,6 +499,9 @@ public class YColorLedCluster extends YFunction
      * @param ledIndex :  index of the first affected LED.
      * @param count    :  affected LED count.
      * @param hslValue :  new color.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int set_hslColor(int ledIndex,int count,int hslValue) throws YAPI_Exception
@@ -506,6 +517,9 @@ public class YColorLedCluster extends YFunction
      * @param count    :  affected LED count.
      * @param rgbValue :  new color (0xRRGGBB).
      * @param delay    :  transition duration in ms
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int rgb_move(int ledIndex,int count,int rgbValue,int delay) throws YAPI_Exception
@@ -525,6 +539,9 @@ public class YColorLedCluster extends YFunction
      * @param count    :  affected LED count.
      * @param hslValue :  new color (0xHHSSLL).
      * @param delay    :  transition duration in ms
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int hsl_move(int ledIndex,int count,int hslValue,int delay) throws YAPI_Exception
@@ -535,11 +552,14 @@ public class YColorLedCluster extends YFunction
     /**
      * Adds an RGB transition to a sequence. A sequence is a transition list, which can
      * be executed in loop by a group of LEDs.  Sequences are persistent and are saved
-     * in the device flash memory as soon as the module saveToFlash() method is called.
+     * in the device flash memory as soon as the saveBlinkSeq() method is called.
      *
      * @param seqIndex :  sequence index.
      * @param rgbValue :  target color (0xRRGGBB)
      * @param delay    :  transition duration in ms
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int addRgbMoveToBlinkSeq(int seqIndex,int rgbValue,int delay) throws YAPI_Exception
@@ -550,11 +570,14 @@ public class YColorLedCluster extends YFunction
     /**
      * Adds an HSL transition to a sequence. A sequence is a transition list, which can
      * be executed in loop by an group of LEDs.  Sequences are persistant and are saved
-     * in the device flash memory as soon as the module saveToFlash() method is called.
+     * in the device flash memory as soon as the saveBlinkSeq() method is called.
      *
      * @param seqIndex : sequence index.
      * @param hslValue : target color (0xHHSSLL)
      * @param delay    : transition duration in ms
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int addHslMoveToBlinkSeq(int seqIndex,int hslValue,int delay) throws YAPI_Exception
@@ -570,6 +593,9 @@ public class YColorLedCluster extends YFunction
      * the initial direction.
      *
      * @param seqIndex : sequence index.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int addMirrorToBlinkSeq(int seqIndex) throws YAPI_Exception
@@ -587,6 +613,9 @@ public class YColorLedCluster extends YFunction
      * @param count    :  affected LED count.
      * @param seqIndex :  sequence index.
      * @param offset   :  execution offset in ms.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int linkLedToBlinkSeq(int ledIndex,int count,int seqIndex,int offset) throws YAPI_Exception
@@ -596,7 +625,7 @@ public class YColorLedCluster extends YFunction
 
     /**
      * Links adjacent LEDs to a specific sequence at device poweron. Don't forget to configure
-     * the sequence auto start flag as well and call saveLedsState. It is possible to add an offset
+     * the sequence auto start flag as well and call saveLedsConfigAtPowerOn(). It is possible to add an offset
      * in the execution: that way we  can have several groups of LEDs executing the same
      * sequence, with a  temporal offset. A LED cannot be linked to more than one sequence.
      *
@@ -604,6 +633,9 @@ public class YColorLedCluster extends YFunction
      * @param count    :  affected LED count.
      * @param seqIndex :  sequence index.
      * @param offset   :  execution offset in ms.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int linkLedToBlinkSeqAtPowerOn(int ledIndex,int count,int seqIndex,int offset) throws YAPI_Exception
@@ -621,6 +653,9 @@ public class YColorLedCluster extends YFunction
      * @param count    :  affected LED count.
      * @param seqIndex :  sequence index.
      * @param periods  :  number of periods to show on LEDs.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int linkLedToPeriodicBlinkSeq(int ledIndex,int count,int seqIndex,int periods) throws YAPI_Exception
@@ -633,6 +668,9 @@ public class YColorLedCluster extends YFunction
      *
      * @param ledIndex  :  index of the first affected LED.
      * @param count     :  affected LED count.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int unlinkLedFromBlinkSeq(int ledIndex,int count) throws YAPI_Exception
@@ -645,6 +683,9 @@ public class YColorLedCluster extends YFunction
      * run it in a loop.
      *
      * @param seqIndex :  index of the sequence to start.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int startBlinkSeq(int seqIndex) throws YAPI_Exception
@@ -657,6 +698,9 @@ public class YColorLedCluster extends YFunction
      * restarts from the beginning.
      *
      * @param seqIndex :  index of the sequence to stop.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int stopBlinkSeq(int seqIndex) throws YAPI_Exception
@@ -669,6 +713,9 @@ public class YColorLedCluster extends YFunction
      * sequence are not automatically updated anymore.
      *
      * @param seqIndex :  index of the sequence to reset
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int resetBlinkSeq(int seqIndex) throws YAPI_Exception
@@ -678,16 +725,19 @@ public class YColorLedCluster extends YFunction
 
     /**
      * Configures a sequence to make it start automatically at device
-     * startup. Don't forget to call  saveLedsState() to make sure the
+     * startup. Don't forget to call saveBlinkSeq() to make sure the
      * modification is saved in the device flash memory.
      *
-     * @param seqIndex :  index of the sequence to reset
-     * @param autostart :  boolean telling if the sequence must start automatically or not.
+     * @param seqIndex :  index of the sequence to reset.
+     * @param autostart : 0 to keep the sequence turned off and 1 to start it automatically.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
-    public int set_blinkSeqAutoStart(int seqIndex,boolean autostart) throws YAPI_Exception
+    public int set_blinkSeqStateAtPowerOn(int seqIndex,int autostart) throws YAPI_Exception
     {
-        return sendCommand(String.format("AS%d,%d",seqIndex,(autostart ? 1 : 0)));
+        return sendCommand(String.format("AS%d,%d",seqIndex,autostart));
     }
 
     /**
@@ -697,6 +747,9 @@ public class YColorLedCluster extends YFunction
      *
      * @param seqIndex :  index of the sequence to start.
      * @param speed :     sequence running speed (-1000...1000).
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int set_blinkSeqSpeed(int seqIndex,int speed) throws YAPI_Exception
@@ -705,41 +758,65 @@ public class YColorLedCluster extends YFunction
     }
 
     /**
-     * Saves the cluster power-on configuration, this includes
-     * LED start-up colors, sequence steps and sequence auto-start flags.
+     * Saves the LEDs power-on configuration. This includes the start-up color or
+     * sequence binding for all LEDs. Warning: if some LEDs are linked to a sequence, the
+     * method saveBlinkSeq() must also be called to save the sequence definition.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
-    public int saveLedsState() throws YAPI_Exception
+    public int saveLedsConfigAtPowerOn() throws YAPI_Exception
     {
-        return sendCommand("SL");
+        return sendCommand("WL");
+    }
+
+    /**
+     * Saves the definition of a sequence. Warning: only sequence steps and flags are saved.
+     * to save the LEDs startup bindings, the method saveLedsConfigAtPowerOn()
+     * must be called.
+     *
+     * @param seqIndex :  index of the sequence to start.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int saveBlinkSeq(int seqIndex) throws YAPI_Exception
+    {
+        return sendCommand(String.format("WS%d",seqIndex));
     }
 
     /**
      * Sends a binary buffer to the LED RGB buffer, as is.
-     * First three bytes are RGB components for first LED, the
-     * next three bytes for the second LED, etc.
+     * First three bytes are RGB components for LED specified as parameter, the
+     * next three bytes for the next LED, etc.
      *
+     * @param ledIndex : index of the first LED which should be updated
      * @param buff : the binary buffer to send
      *
      * @return YAPI.SUCCESS if the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
-    public int set_rgbBuffer(byte[] buff) throws YAPI_Exception
+    public int set_rgbColorBuffer(int ledIndex,byte[] buff) throws YAPI_Exception
     {
-        return _upload("rgb:0", buff);
+        return _upload(String.format("rgb:0:%d",ledIndex), buff);
     }
 
     /**
      * Sends 24bit RGB colors (provided as a list of integers) to the LED RGB buffer, as is.
-     * The first number represents the RGB value of the first LED, the second number represents
-     * the RGB value of the second LED, etc.
+     * The first number represents the RGB value of the LED specified as parameter, the second
+     * number represents the RGB value of the next LED, etc.
      *
+     * @param ledIndex : index of the first LED which should be updated
      * @param rgbList : a list of 24bit RGB codes, in the form 0xRRGGBB
      *
      * @return YAPI.SUCCESS if the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
-    public int set_rgbArray(ArrayList<Integer> rgbList) throws YAPI_Exception
+    public int set_rgbColorArray(int ledIndex,ArrayList<Integer> rgbList) throws YAPI_Exception
     {
         int listlen;
         byte[] buff;
@@ -757,19 +834,20 @@ public class YColorLedCluster extends YFunction
             idx = idx + 1;
         }
         // may throw an exception
-        res = _upload("rgb:0", buff);
+        res = _upload(String.format("rgb:0:%d",ledIndex), buff);
         return res;
     }
 
     /**
      * Sets up a smooth RGB color transition to the specified pixel-by-pixel list of RGB
      * color codes. The first color code represents the target RGB value of the first LED,
-     * the second color code represents the target value of the second LED, etc.
+     * the next color code represents the target value of the next LED, etc.
      *
      * @param rgbList : a list of target 24bit RGB codes, in the form 0xRRGGBB
      * @param delay   : transition duration in ms
      *
      * @return YAPI.SUCCESS if the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int rgbArray_move(ArrayList<Integer> rgbList,int delay) throws YAPI_Exception
@@ -796,30 +874,34 @@ public class YColorLedCluster extends YFunction
 
     /**
      * Sends a binary buffer to the LED HSL buffer, as is.
-     * First three bytes are HSL components for first LED, the
+     * First three bytes are HSL components for the LED specified as parameter, the
      * next three bytes for the second LED, etc.
      *
+     * @param ledIndex : index of the first LED which should be updated
      * @param buff : the binary buffer to send
      *
      * @return YAPI.SUCCESS if the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
-    public int set_hslBuffer(byte[] buff) throws YAPI_Exception
+    public int set_hslColorBuffer(int ledIndex,byte[] buff) throws YAPI_Exception
     {
-        return _upload("hsl:0", buff);
+        return _upload(String.format("hsl:0:%d",ledIndex), buff);
     }
 
     /**
      * Sends 24bit HSL colors (provided as a list of integers) to the LED HSL buffer, as is.
-     * The first number represents the HSL value of the first LED, the second number represents
+     * The first number represents the HSL value of the LED specified as parameter, the second number represents
      * the HSL value of the second LED, etc.
      *
+     * @param ledIndex : index of the first LED which should be updated
      * @param hslList : a list of 24bit HSL codes, in the form 0xHHSSLL
      *
      * @return YAPI.SUCCESS if the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
-    public int set_hslArray(ArrayList<Integer> hslList) throws YAPI_Exception
+    public int set_hslColorArray(int ledIndex,ArrayList<Integer> hslList) throws YAPI_Exception
     {
         int listlen;
         byte[] buff;
@@ -837,7 +919,7 @@ public class YColorLedCluster extends YFunction
             idx = idx + 1;
         }
         // may throw an exception
-        res = _upload("hsl:0", buff);
+        res = _upload(String.format("hsl:0:%d",ledIndex), buff);
         return res;
     }
 
@@ -850,6 +932,7 @@ public class YColorLedCluster extends YFunction
      * @param delay   : transition duration in ms
      *
      * @return YAPI.SUCCESS if the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
     public int hslArray_move(ArrayList<Integer> hslList,int delay) throws YAPI_Exception
@@ -883,6 +966,7 @@ public class YColorLedCluster extends YFunction
      * @param count    : number of LEDs which should be returned
      *
      * @return a binary buffer with RGB components of selected LEDs.
+     *
      * @throws YAPI_Exception on error
      */
     public byte[] get_rgbColorBuffer(int ledIndex,int count) throws YAPI_Exception
@@ -899,6 +983,7 @@ public class YColorLedCluster extends YFunction
      * @param count    : number of LEDs which should be returned
      *
      * @return a list of 24bit color codes with RGB components of selected LEDs, as 0xRRGGBB.
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<Integer> get_rgbColorArray(int ledIndex,int count) throws YAPI_Exception
@@ -932,6 +1017,7 @@ public class YColorLedCluster extends YFunction
      * @param count    : number of LEDs which should be returned
      *
      * @return a list of 24bit color codes with RGB components of selected LEDs, as 0xRRGGBB.
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<Integer> get_rgbColorArrayAtPowerOn(int ledIndex,int count) throws YAPI_Exception
@@ -965,6 +1051,7 @@ public class YColorLedCluster extends YFunction
      * @param count    : number of LEDs which should be returned
      *
      * @return a list of integers with sequence index
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<Integer> get_linkedSeqArray(int ledIndex,int count) throws YAPI_Exception
@@ -994,6 +1081,7 @@ public class YColorLedCluster extends YFunction
      * @param count    : number of blinking sequences which should be returned
      *
      * @return a list of 32 bit integer signatures
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<Integer> get_blinkSeqSignatures(int seqIndex,int count) throws YAPI_Exception
@@ -1027,6 +1115,7 @@ public class YColorLedCluster extends YFunction
      * @param count    : number of sequence speeds which should be returned
      *
      * @return a list of integers, 0 for sequences turned off and 1 for sequences running
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<Integer> get_blinkSeqStateSpeed(int seqIndex,int count) throws YAPI_Exception
@@ -1056,6 +1145,7 @@ public class YColorLedCluster extends YFunction
      * @param count    : number of blinking sequences which should be returned
      *
      * @return a list of integers, 0 for sequences turned off and 1 for sequences running
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<Integer> get_blinkSeqStateAtPowerOn(int seqIndex,int count) throws YAPI_Exception
@@ -1083,6 +1173,7 @@ public class YColorLedCluster extends YFunction
      * @param count    : number of blinking sequences which should be returned
      *
      * @return a list of integers, 0 for sequences turned off and 1 for sequences running
+     *
      * @throws YAPI_Exception on error
      */
     public ArrayList<Integer> get_blinkSeqState(int seqIndex,int count) throws YAPI_Exception

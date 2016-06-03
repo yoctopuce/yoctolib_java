@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 24565 2016-05-25 08:35:48Z mvuilleu $
+ * $Id: YSpiPort.java 24714 2016-06-03 15:35:50Z seb $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
