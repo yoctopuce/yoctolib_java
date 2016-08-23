@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 23383 2016-03-02 18:08:31Z seb $
+ * $Id: YAPI.java 24889 2016-06-23 14:55:59Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -61,7 +61,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "24718";
+    public static final String YOCTO_API_BUILD_STR = "25250";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -181,29 +181,20 @@ public class YAPI
     }
 
 
-    static synchronized YAPIContext GetYCtx()
+    static synchronized YAPIContext GetYCtx(boolean instanciateNew)
     {
         if (_MultipleYAPI != null) {
             YAPIContext context = _MultipleYAPI.get(Thread.currentThread().getId());
-            if (context == null) {
+            if (context == null && instanciateNew) {
                 context = new YAPIContext();
                 _MultipleYAPI.put(Thread.currentThread().getId(), context);
             }
             return context;
         } else {
-            if (_SingleYAPI == null) {
+            if (_SingleYAPI == null && instanciateNew) {
                 _SingleYAPI = new YAPIContext();
             }
             return _SingleYAPI;
-        }
-    }
-
-    static synchronized void AddYCtx(YAPIContext yapi)
-    {
-        if (_MultipleYAPI != null) {
-            _MultipleYAPI.put(Thread.currentThread().getId(), yapi);
-        } else {
-            _SingleYAPI = yapi;
         }
     }
 
@@ -228,7 +219,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".24718" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".25250" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -252,7 +243,7 @@ public class YAPI
      */
     public static int InitAPI(int mode) throws YAPI_Exception
     {
-        YAPIContext yctx = GetYCtx();
+        YAPIContext yctx = GetYCtx(true);
         return yctx.InitAPI(mode);
     }
 
@@ -329,13 +320,13 @@ public class YAPI
      */
     public static int RegisterHub(String url) throws YAPI_Exception
     {
-        return GetYCtx().RegisterHub(url);
+        return GetYCtx(true).RegisterHub(url);
     }
 
 
     public static int RegisterHub(String url, InputStream request, OutputStream response) throws YAPI_Exception
     {
-        return GetYCtx().RegisterHub(url, request, response);
+        return GetYCtx(true).RegisterHub(url, request, response);
     }
 
     /**
@@ -343,7 +334,7 @@ public class YAPI
      */
     public static int PreregisterHubWebSocketCallback(Object session) throws YAPI_Exception
     {
-        return GetYCtx().PreregisterHubWebSocketCallback(session, null, null);
+        return GetYCtx(true).PreregisterHubWebSocketCallback(session, null, null);
     }
 
     /**
@@ -351,7 +342,7 @@ public class YAPI
      */
     public static int PreregisterHubWebSocketCallback(Object session, String user, String pass) throws YAPI_Exception
     {
-        return GetYCtx().PreregisterHubWebSocketCallback(session, user, pass);
+        return GetYCtx(true).PreregisterHubWebSocketCallback(session, user, pass);
     }
 
     /**
@@ -359,7 +350,11 @@ public class YAPI
      */
     public static void UnregisterHubWebSocketCallback(Object session)
     {
-        GetYCtx().UnregisterHubWebSocketCallback(session);
+        YAPIContext yCtx = GetYCtx(false);
+        if (yCtx == null) {
+            return;
+        }
+        yCtx.UnregisterHubWebSocketCallback(session);
     }
 
     /**
@@ -374,7 +369,7 @@ public class YAPI
      */
     public static void EnableUSBHost(Object osContext) throws YAPI_Exception
     {
-        GetYCtx().EnableUSBHost(osContext);
+        GetYCtx(true).EnableUSBHost(osContext);
     }
 
     /**
@@ -393,7 +388,7 @@ public class YAPI
      */
     public static int PreregisterHub(String url) throws YAPI_Exception
     {
-        return GetYCtx().PreregisterHub(url);
+        return GetYCtx(true).PreregisterHub(url);
     }
 
     /**
@@ -405,7 +400,11 @@ public class YAPI
      */
     public static void UnregisterHub(String url)
     {
-        GetYCtx().UnregisterHub(url);
+        YAPIContext yCtx = GetYCtx(false);
+        if (yCtx == null) {
+            return;
+        }
+        yCtx.UnregisterHub(url);
     }
 
 
@@ -425,7 +424,7 @@ public class YAPI
      */
     public static int TestHub(String url, int mstimeout) throws YAPI_Exception
     {
-        return GetYCtx().TestHub(url, mstimeout);
+        return GetYCtx(true).TestHub(url, mstimeout);
     }
 
 
@@ -444,7 +443,12 @@ public class YAPI
      */
     public static int UpdateDeviceList() throws YAPI_Exception
     {
-        return GetYCtx().UpdateDeviceList();
+
+        YAPIContext yCtx = GetYCtx(false);
+        if (yCtx == null) {
+            throw new YAPI_Exception(NOT_INITIALIZED, "API not initialized");
+        }
+        return yCtx.UpdateDeviceList();
     }
 
     /**
@@ -464,7 +468,11 @@ public class YAPI
      */
     public static int HandleEvents() throws YAPI_Exception
     {
-        return GetYCtx().HandleEvents();
+        YAPIContext yCtx = GetYCtx(false);
+        if (yCtx == null) {
+            throw new YAPI_Exception(NOT_INITIALIZED, "API not initialized");
+        }
+        return yCtx.HandleEvents();
     }
 
     /**
@@ -487,7 +495,11 @@ public class YAPI
      */
     public static int Sleep(long ms_duration) throws YAPI_Exception
     {
-        return GetYCtx().Sleep(ms_duration);
+        YAPIContext yCtx = GetYCtx(false);
+        if (yCtx == null) {
+            throw new YAPI_Exception(NOT_INITIALIZED, "API not initialized");
+        }
+        return yCtx.Sleep(ms_duration);
     }
 
     /**
@@ -499,7 +511,11 @@ public class YAPI
      */
     public static int TriggerHubDiscovery() throws YAPI_Exception
     {
-        return GetYCtx().TriggerHubDiscovery();
+        YAPIContext yCtx = GetYCtx(false);
+        if (yCtx == null) {
+            throw new YAPI_Exception(NOT_INITIALIZED, "API not initialized");
+        }
+        return yCtx.TriggerHubDiscovery();
     }
 
     /**
@@ -540,12 +556,12 @@ public class YAPI
      */
     public static void RegisterDeviceArrivalCallback(YAPI.DeviceArrivalCallback arrivalCallback)
     {
-        GetYCtx().RegisterDeviceArrivalCallback(arrivalCallback);
+        GetYCtx(true).RegisterDeviceArrivalCallback(arrivalCallback);
     }
 
     public static void RegisterDeviceChangeCallback(YAPI.DeviceChangeCallback changeCallback)
     {
-        GetYCtx().RegisterDeviceChangeCallback(changeCallback);
+        GetYCtx(true).RegisterDeviceChangeCallback(changeCallback);
     }
 
     /**
@@ -558,7 +574,7 @@ public class YAPI
      */
     public static void RegisterDeviceRemovalCallback(YAPI.DeviceRemovalCallback removalCallback)
     {
-        GetYCtx().RegisterDeviceRemovalCallback(removalCallback);
+        GetYCtx(true).RegisterDeviceRemovalCallback(removalCallback);
     }
 
     /**
@@ -573,7 +589,11 @@ public class YAPI
      */
     public static void RegisterHubDiscoveryCallback(YAPI.HubDiscoveryCallback hubDiscoveryCallback)
     {
-        GetYCtx().RegisterHubDiscoveryCallback(hubDiscoveryCallback);
+        YAPIContext yCtx = GetYCtx(false);
+        if (yCtx == null) {
+            return;
+        }
+        yCtx.RegisterHubDiscoveryCallback(hubDiscoveryCallback);
     }
 
     /**
@@ -585,7 +605,7 @@ public class YAPI
      */
     public static void RegisterLogFunction(YAPI.LogCallback logfun)
     {
-        GetYCtx().RegisterLogFunction(logfun);
+        GetYCtx(true).RegisterLogFunction(logfun);
     }
 
 }

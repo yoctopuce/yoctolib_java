@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YRealTimeClock.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -127,7 +127,7 @@ public class YRealTimeClock extends YFunction
      */
     protected YRealTimeClock(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YRealTimeClock implementation)
@@ -474,7 +474,8 @@ public class YRealTimeClock extends YFunction
      */
     public static YRealTimeClock FirstRealTimeClock()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("RealTimeClock");
         if (next_hwid == null)  return null;
         return FindRealTimeClockInContext(yctx, next_hwid);

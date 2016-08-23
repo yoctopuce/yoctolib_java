@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 23716 2016-04-01 15:51:25Z seb $
+ * $Id: YFirmwareUpdate.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -210,7 +210,7 @@ public class YFirmwareUpdate
 
     public YFirmwareUpdate(String serial, String path, byte[] settings)
     {
-        this(YAPI.GetYCtx(), serial, path, settings, false);
+        this(YAPI.GetYCtx(false), serial, path, settings, false);
     }
 
     private void _progress(int progress, String msg)
@@ -398,7 +398,7 @@ public class YFirmwareUpdate
      */
     public static ArrayList<String> GetAllBootLoaders()
     {
-        return GetAllBootLoadersInContext(YAPI.GetYCtx());
+        return GetAllBootLoadersInContext(YAPI.GetYCtx(false));
     }
 
 

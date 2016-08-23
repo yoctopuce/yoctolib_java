@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YServo.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YServo.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindServo(), the high-level API for Servo functions
  *
@@ -149,7 +149,7 @@ public class YServo extends YFunction
      */
     protected YServo(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YServo implementation)
@@ -775,7 +775,8 @@ public class YServo extends YFunction
      */
     public static YServo FirstServo()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Servo");
         if (next_hwid == null)  return null;
         return FindServoInContext(yctx, next_hwid);

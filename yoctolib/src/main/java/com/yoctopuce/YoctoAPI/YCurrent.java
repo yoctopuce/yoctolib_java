@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrent.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YCurrent.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindCurrent(), the high-level API for Current functions
  *
@@ -105,7 +105,7 @@ public class YCurrent extends YSensor
      */
     protected YCurrent(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YCurrent implementation)
@@ -291,7 +291,8 @@ public class YCurrent extends YSensor
      */
     public static YCurrent FirstCurrent()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Current");
         if (next_hwid == null)  return null;
         return FindCurrentInContext(yctx, next_hwid);

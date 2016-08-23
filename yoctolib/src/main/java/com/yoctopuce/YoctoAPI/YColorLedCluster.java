@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 24717 2016-06-03 16:09:53Z seb $
+ * $Id: YColorLedCluster.java 24939 2016-07-01 08:45:11Z seb $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -135,7 +135,7 @@ public class YColorLedCluster extends YFunction
      */
     protected YColorLedCluster(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YColorLedCluster implementation)
@@ -771,6 +771,11 @@ public class YColorLedCluster extends YFunction
         return sendCommand("WL");
     }
 
+    public int saveLedsState() throws YAPI_Exception
+    {
+        return sendCommand("WL");
+    }
+
     /**
      * Saves the definition of a sequence. Warning: only sequence steps and flags are saved.
      * to save the LEDs startup bindings, the method saveLedsConfigAtPowerOn()
@@ -1225,7 +1230,8 @@ public class YColorLedCluster extends YFunction
      */
     public static YColorLedCluster FirstColorLedCluster()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("ColorLedCluster");
         if (next_hwid == null)  return null;
         return FindColorLedClusterInContext(yctx, next_hwid);

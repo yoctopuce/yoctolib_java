@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLed.java 24475 2016-05-12 14:03:35Z mvuilleu $
+ * $Id: YLed.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindLed(), the high-level API for Led functions
  *
@@ -127,7 +127,7 @@ public class YLed extends YFunction
      */
     protected YLed(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YLed implementation)
@@ -471,7 +471,8 @@ public class YLed extends YFunction
      */
     public static YLed FirstLed()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Led");
         if (next_hwid == null)  return null;
         return FindLedInContext(yctx, next_hwid);

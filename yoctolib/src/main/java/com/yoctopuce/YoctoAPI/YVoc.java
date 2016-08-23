@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoc.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YVoc.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindVoc(), the high-level API for Voc functions
  *
@@ -105,7 +105,7 @@ public class YVoc extends YSensor
      */
     protected YVoc(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YVoc implementation)
@@ -291,7 +291,8 @@ public class YVoc extends YSensor
      */
     public static YVoc FirstVoc()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Voc");
         if (next_hwid == null)  return null;
         return FindVocInContext(yctx, next_hwid);

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YRefFrame.java 24943 2016-07-01 14:02:25Z seb $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -133,6 +133,7 @@ public class YRefFrame extends YFunction
     protected double _bearing = BEARING_INVALID;
     protected String _calibrationParam = CALIBRATIONPARAM_INVALID;
     protected UpdateCallback _valueCallbackRefFrame = null;
+    protected boolean _calibV2;
     protected int _calibStage = 0;
     protected String _calibStageHint;
     protected int _calibStageProgress = 0;
@@ -200,7 +201,7 @@ public class YRefFrame extends YFunction
      */
     protected YRefFrame(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YRefFrame implementation)
@@ -561,6 +562,67 @@ public class YRefFrame extends YFunction
         return set_mountPos(mixedPos);
     }
 
+    /**
+     * Returns the 3D sensor calibration state (Yocto-3D-V2 only). This function returns
+     * an integer representing the calibration state of the 3 inertial sensors of
+     * the BNO055 chip, found in the Yocto-3D-V2. Hundredths show the calibration state
+     * of the accelerometer, tenths show the calibration state of the magnetometer while
+     * units show the calibration state of the gyroscope. For each sensor, the value 0
+     * means no calibration and the value 3 means full calibration.
+     *
+     * @return an integer representing the calibration state of Yocto-3D-V2:
+     *         333 when fully calibrated, 0 when not calibrated at all.
+     *
+     * @throws YAPI_Exception on error
+     * For the Yocto-3D (V1), this function always return -3 (unsupported function).
+     */
+    public int get_calibrationState() throws YAPI_Exception
+    {
+        String calibParam;
+        ArrayList<Integer> iCalib = new ArrayList<Integer>();
+        int caltyp;
+        int res;
+        // may throw an exception
+        calibParam = get_calibrationParam();
+        iCalib = YAPIContext._decodeFloats(calibParam);
+        caltyp = ((iCalib.get(0).intValue()) / (1000));
+        if (caltyp != 33) {
+            return YAPI.NOT_SUPPORTED;
+        }
+        res = ((iCalib.get(1).intValue()) / (1000));
+        return res;
+    }
+
+    /**
+     * Returns estimated quality of the orientation (Yocto-3D-V2 only). This function returns
+     * an integer between 0 and 3 representing the degree of confidence of the position
+     * estimate. When the value is 3, the estimation is reliable. Below 3, one should
+     * expect sudden corrections, in particular for heading (compass function).
+     * The most frequent causes for values below 3 are magnetic interferences, and
+     * accelerations or rotations beyond the sensor range.
+     *
+     * @return an integer between 0 and 3 (3 when the measure is reliable)
+     *
+     * @throws YAPI_Exception on error
+     * For the Yocto-3D (V1), this function always return -3 (unsupported function).
+     */
+    public int get_measureQuality() throws YAPI_Exception
+    {
+        String calibParam;
+        ArrayList<Integer> iCalib = new ArrayList<Integer>();
+        int caltyp;
+        int res;
+        // may throw an exception
+        calibParam = get_calibrationParam();
+        iCalib = YAPIContext._decodeFloats(calibParam);
+        caltyp = ((iCalib.get(0).intValue()) / (1000));
+        if (caltyp != 33) {
+            return YAPI.NOT_SUPPORTED;
+        }
+        res = ((iCalib.get(2).intValue()) / (1000));
+        return res;
+    }
+
     public int _calibSort(int start,int stopidx)
     {
         int idx;
@@ -627,6 +689,7 @@ public class YRefFrame extends YFunction
             cancel3DCalibration();
         }
         _calibSavedParams = get_calibrationParam();
+        _calibV2 = (YAPIContext._atoi(_calibSavedParams) == 33);
         set_calibrationParam("0");
         _calibCount = 50;
         _calibStage = 1;
@@ -654,6 +717,14 @@ public class YRefFrame extends YFunction
      * @throws YAPI_Exception on error
      */
     public int more3DCalibration() throws YAPI_Exception
+    {
+        if (_calibV2) {
+            return more3DCalibrationV2();
+        }
+        return more3DCalibrationV1();
+    }
+
+    public int more3DCalibrationV1() throws YAPI_Exception
     {
         int currTick;
         byte[] jsonData;
@@ -852,6 +923,65 @@ public class YRefFrame extends YFunction
         return YAPI.SUCCESS;
     }
 
+    public int more3DCalibrationV2() throws YAPI_Exception
+    {
+        int currTick;
+        byte[] calibParam;
+        ArrayList<Integer> iCalib = new ArrayList<Integer>();
+        int cal3;
+        int calAcc;
+        int calMag;
+        int calGyr;
+        // make sure calibration has been started
+        if (_calibStage == 0) {
+            return YAPI.INVALID_ARGUMENT;
+        }
+        if (_calibProgress == 100) {
+            return YAPI.SUCCESS;
+        }
+        // make sure we don't start before previous calibration is cleared
+        if (_calibStage == 1) {
+            currTick = (int) ((YAPIContext.GetTickCount()) & (0x7FFFFFFF));
+            currTick = ((currTick - _calibPrevTick) & (0x7FFFFFFF));
+            if (currTick < 1600) {
+                _calibStageHint = "Set down the device on a steady horizontal surface";
+                _calibStageProgress = ((currTick) / (40));
+                _calibProgress = 1;
+                return YAPI.SUCCESS;
+            }
+        }
+        // may throw an exception
+        calibParam = _download("api/refFrame/calibrationParam.txt");
+        iCalib = YAPIContext._decodeFloats(new String(calibParam));
+        cal3 = ((iCalib.get(1).intValue()) / (1000));
+        calAcc = ((cal3) / (100));
+        calMag = ((cal3) / (10)) - 10*calAcc;
+        calGyr = ((cal3) % (10));
+        if (calGyr < 3) {
+            _calibStageHint = "Set down the device on a steady horizontal surface";
+            _calibStageProgress = 40 + calGyr*20;
+            _calibProgress = 4 + calGyr*2;
+        } else {
+            _calibStage = 2;
+            if (calMag < 3) {
+                _calibStageHint = "Slowly draw '8' shapes along the 3 axis";
+                _calibStageProgress = 1 + calMag*33;
+                _calibProgress = 10 + calMag*5;
+            } else {
+                _calibStage = 3;
+                if (calAcc < 3) {
+                    _calibStageHint = "Slowly turn the device, stopping at each 90 degrees";
+                    _calibStageProgress = 1 + calAcc*33;
+                    _calibProgress = 25 + calAcc*25;
+                } else {
+                    _calibStageProgress = 99;
+                    _calibProgress = 100;
+                }
+            }
+        }
+        return YAPI.SUCCESS;
+    }
+
     /**
      * Returns instructions to proceed to the tridimensional calibration initiated with
      * method start3DCalibration.
@@ -919,6 +1049,14 @@ public class YRefFrame extends YFunction
      */
     public int save3DCalibration() throws YAPI_Exception
     {
+        if (_calibV2) {
+            return save3DCalibrationV2();
+        }
+        return save3DCalibrationV1();
+    }
+
+    public int save3DCalibrationV1() throws YAPI_Exception
+    {
         int shiftX;
         int shiftY;
         int shiftZ;
@@ -983,6 +1121,11 @@ public class YRefFrame extends YFunction
         return set_calibrationParam(newcalib);
     }
 
+    public int save3DCalibrationV2() throws YAPI_Exception
+    {
+        return set_calibrationParam("5,5,5,5,5,5");
+    }
+
     /**
      * Aborts the sensors tridimensional calibration process et restores normal settings.
      *
@@ -1029,7 +1172,8 @@ public class YRefFrame extends YFunction
      */
     public static YRefFrame FirstRefFrame()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("RefFrame");
         if (next_hwid == null)  return null;
         return FindRefFrameInContext(yctx, next_hwid);

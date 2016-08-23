@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAudioIn.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YAudioIn.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindAudioIn(), the high-level API for AudioIn functions
  *
@@ -129,7 +129,7 @@ public class YAudioIn extends YFunction
      */
     protected YAudioIn(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YAudioIn implementation)
@@ -510,7 +510,8 @@ public class YAudioIn extends YFunction
      */
     public static YAudioIn FirstAudioIn()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("AudioIn");
         if (next_hwid == null)  return null;
         return FindAudioInInContext(yctx, next_hwid);

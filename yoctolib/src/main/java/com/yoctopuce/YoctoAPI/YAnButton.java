@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAnButton.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YAnButton.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindAnButton(), the high-level API for AnButton functions
  *
@@ -166,7 +166,7 @@ public class YAnButton extends YFunction
      */
     protected YAnButton(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YAnButton implementation)
@@ -645,7 +645,9 @@ public class YAnButton extends YFunction
     }
 
     /**
-     * Returns the pulse counter value.
+     * Returns the pulse counter value. The value is a 32 bit integer. In case
+     * of overflow (>=2^32), the counter will wrap. To reset the counter, just
+     * call the resetCounter() method.
      *
      * @return an integer corresponding to the pulse counter value
      *
@@ -662,7 +664,9 @@ public class YAnButton extends YFunction
     }
 
     /**
-     * Returns the pulse counter value.
+     * Returns the pulse counter value. The value is a 32 bit integer. In case
+     * of overflow (>=2^32), the counter will wrap. To reset the counter, just
+     * call the resetCounter() method.
      *
      * @return an integer corresponding to the pulse counter value
      *
@@ -868,7 +872,8 @@ public class YAnButton extends YFunction
      */
     public static YAnButton FirstAnButton()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("AnButton");
         if (next_hwid == null)  return null;
         return FindAnButtonInContext(yctx, next_hwid);

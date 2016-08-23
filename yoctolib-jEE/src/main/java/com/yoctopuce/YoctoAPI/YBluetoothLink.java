@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBluetoothLink.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YBluetoothLink.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -161,7 +161,7 @@ public class YBluetoothLink extends YFunction
      */
     protected YBluetoothLink(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YBluetoothLink implementation)
@@ -839,7 +839,8 @@ public class YBluetoothLink extends YFunction
      */
     public static YBluetoothLink FirstBluetoothLink()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("BluetoothLink");
         if (next_hwid == null)  return null;
         return FindBluetoothLinkInContext(yctx, next_hwid);

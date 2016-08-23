@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 23392 2016-03-03 15:52:29Z seb $
+ * $Id: YFunction.java 24889 2016-06-23 14:55:59Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -141,7 +141,7 @@ public class YFunction
 
     public YFunction(String func)
     {
-        _yapi = YAPI.GetYCtx();
+        _yapi = YAPI.GetYCtx(false);
         _className = "Function";
         _func = func;
         _lastErrorType = YAPI.SUCCESS;
@@ -165,7 +165,7 @@ public class YFunction
 
     protected static YFunction _FindFromCache(String className, String func)
     {
-        YAPIContext ctx = YAPI.GetYCtx();
+        YAPIContext ctx = YAPI.GetYCtx(true);
         return ctx._yHash.getFunction(className, func);
     }
 
@@ -471,7 +471,8 @@ public class YFunction
      */
     public static YFunction FirstFunction()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Function");
         if (next_hwid == null)  return null;
         return FindFunctionInContext(yctx, next_hwid);

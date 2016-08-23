@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.java 23527 2016-03-18 21:49:19Z mvuilleu $
+ * $Id: YGenericSensor.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -141,7 +141,7 @@ public class YGenericSensor extends YSensor
      */
     protected YGenericSensor(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YGenericSensor implementation)
@@ -735,7 +735,8 @@ public class YGenericSensor extends YSensor
      */
     public static YGenericSensor FirstGenericSensor()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("GenericSensor");
         if (next_hwid == null)  return null;
         return FindGenericSensorInContext(yctx, next_hwid);

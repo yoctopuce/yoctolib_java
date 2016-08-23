@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 24475 2016-05-12 14:03:35Z mvuilleu $
+ * $Id: YColorLed.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -154,7 +154,7 @@ public class YColorLed extends YFunction
      */
     protected YColorLed(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YColorLed implementation)
@@ -839,7 +839,8 @@ public class YColorLed extends YFunction
      */
     public static YColorLed FirstColorLed()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("ColorLed");
         if (next_hwid == null)  return null;
         return FindColorLedInContext(yctx, next_hwid);

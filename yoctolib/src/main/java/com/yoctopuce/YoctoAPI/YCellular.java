@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 24622 2016-05-27 12:51:52Z mvuilleu $
+ * $Id: YCellular.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -109,6 +109,7 @@ public class YCellular extends YFunction
     public static final int ENABLEDATA_HOMENETWORK = 0;
     public static final int ENABLEDATA_ROAMING = 1;
     public static final int ENABLEDATA_NEVER = 2;
+    public static final int ENABLEDATA_NEUTRALITY = 3;
     public static final int ENABLEDATA_INVALID = -1;
     /**
      * invalid apn value
@@ -194,7 +195,7 @@ public class YCellular extends YFunction
 
     protected YCellular(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
 
@@ -667,8 +668,9 @@ public class YCellular extends YFunction
      * Returns the condition for enabling IP data services (GPRS).
      * When data services are disabled, SMS are the only mean of communication.
      *
-     *  @return a value among YCellular.ENABLEDATA_HOMENETWORK, YCellular.ENABLEDATA_ROAMING and
-     * YCellular.ENABLEDATA_NEVER corresponding to the condition for enabling IP data services (GPRS)
+     *  @return a value among YCellular.ENABLEDATA_HOMENETWORK, YCellular.ENABLEDATA_ROAMING,
+     *  YCellular.ENABLEDATA_NEVER and YCellular.ENABLEDATA_NEUTRALITY corresponding to the condition for
+     * enabling IP data services (GPRS)
      *
      * @throws YAPI_Exception on error
      */
@@ -686,8 +688,8 @@ public class YCellular extends YFunction
      * Returns the condition for enabling IP data services (GPRS).
      * When data services are disabled, SMS are the only mean of communication.
      *
-     *  @return a value among Y_ENABLEDATA_HOMENETWORK, Y_ENABLEDATA_ROAMING and Y_ENABLEDATA_NEVER
-     * corresponding to the condition for enabling IP data services (GPRS)
+     *  @return a value among Y_ENABLEDATA_HOMENETWORK, Y_ENABLEDATA_ROAMING, Y_ENABLEDATA_NEVER and
+     * Y_ENABLEDATA_NEUTRALITY corresponding to the condition for enabling IP data services (GPRS)
      *
      * @throws YAPI_Exception on error
      */
@@ -704,8 +706,9 @@ public class YCellular extends YFunction
      *
      * When data services are disabled, SMS are the only mean of communication.
      *
-     *  @param newval : a value among YCellular.ENABLEDATA_HOMENETWORK, YCellular.ENABLEDATA_ROAMING and
-     * YCellular.ENABLEDATA_NEVER corresponding to the condition for enabling IP data services (GPRS)
+     *  @param newval : a value among YCellular.ENABLEDATA_HOMENETWORK, YCellular.ENABLEDATA_ROAMING,
+     *  YCellular.ENABLEDATA_NEVER and YCellular.ENABLEDATA_NEUTRALITY corresponding to the condition for
+     * enabling IP data services (GPRS)
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -727,8 +730,8 @@ public class YCellular extends YFunction
      *
      * When data services are disabled, SMS are the only mean of communication.
      *
-     *  @param newval : a value among Y_ENABLEDATA_HOMENETWORK, Y_ENABLEDATA_ROAMING and Y_ENABLEDATA_NEVER
-     * corresponding to the condition for enabling IP data services (GPRS)
+     *  @param newval : a value among Y_ENABLEDATA_HOMENETWORK, Y_ENABLEDATA_ROAMING, Y_ENABLEDATA_NEVER
+     * and Y_ENABLEDATA_NEUTRALITY corresponding to the condition for enabling IP data services (GPRS)
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -1449,7 +1452,8 @@ public class YCellular extends YFunction
      */
     public static YCellular FirstCellular()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Cellular");
         if (next_hwid == null)  return null;
         return FindCellularInContext(yctx, next_hwid);

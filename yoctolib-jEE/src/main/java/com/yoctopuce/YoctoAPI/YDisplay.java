@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 23250 2016-02-23 16:20:08Z seb $
+ * $Id: YDisplay.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -164,7 +164,7 @@ public class YDisplay extends YFunction
 
     protected YDisplay(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (generated code: YDisplay implementation)
@@ -994,7 +994,8 @@ public class YDisplay extends YFunction
      */
     public static YDisplay FirstDisplay()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Display");
         if (next_hwid == null)  return null;
         return FindDisplayInContext(yctx, next_hwid);

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLongitude.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YLongitude.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindLongitude(), the high-level API for Longitude functions
  *
@@ -106,7 +106,7 @@ public class YLongitude extends YSensor
      */
     protected YLongitude(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YLongitude implementation)
@@ -292,7 +292,8 @@ public class YLongitude extends YSensor
      */
     public static YLongitude FirstLongitude()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Longitude");
         if (next_hwid == null)  return null;
         return FindLongitudeInContext(yctx, next_hwid);

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YWatchdog.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -183,7 +183,7 @@ public class YWatchdog extends YFunction
      */
     protected YWatchdog(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YWatchdog implementation)
@@ -1127,7 +1127,8 @@ public class YWatchdog extends YFunction
      */
     public static YWatchdog FirstWatchdog()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Watchdog");
         if (next_hwid == null)  return null;
         return FindWatchdogInContext(yctx, next_hwid);

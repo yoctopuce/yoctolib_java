@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 24648 2016-05-31 09:34:32Z mvuilleu $
+ * $Id: YMessageBox.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -141,7 +141,7 @@ public class YMessageBox extends YFunction
      */
     protected YMessageBox(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (generated code: YMessageBox implementation)
@@ -1149,7 +1149,8 @@ public class YMessageBox extends YFunction
      */
     public static YMessageBox FirstMessageBox()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("MessageBox");
         if (next_hwid == null)  return null;
         return FindMessageBoxInContext(yctx, next_hwid);

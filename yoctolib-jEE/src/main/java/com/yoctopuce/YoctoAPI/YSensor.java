@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 22696 2016-01-12 23:14:15Z seb $
+ * $Id: YSensor.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -277,7 +277,7 @@ public class YSensor extends YFunction
     }
     protected YSensor(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(false), func);
     }
 
 
@@ -1524,7 +1524,8 @@ public class YSensor extends YFunction
      */
     public static YSensor FirstSensor()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Sensor");
         if (next_hwid == null)  return null;
         return FindSensorInContext(yctx, next_hwid);

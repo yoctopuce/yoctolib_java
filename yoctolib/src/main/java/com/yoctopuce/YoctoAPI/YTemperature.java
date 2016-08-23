@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 23527 2016-03-18 21:49:19Z mvuilleu $
+ * $Id: YTemperature.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -142,7 +142,7 @@ public class YTemperature extends YSensor
      */
     protected YTemperature(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YTemperature implementation)
@@ -730,7 +730,8 @@ public class YTemperature extends YSensor
      */
     public static YTemperature FirstTemperature()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Temperature");
         if (next_hwid == null)  return null;
         return FindTemperatureInContext(yctx, next_hwid);

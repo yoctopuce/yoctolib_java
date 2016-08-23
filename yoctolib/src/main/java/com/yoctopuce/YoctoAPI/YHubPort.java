@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHubPort.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YHubPort.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindHubPort(), the high-level API for HubPort functions
  *
@@ -127,7 +127,7 @@ public class YHubPort extends YFunction
      */
     protected YHubPort(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YHubPort implementation)
@@ -416,7 +416,8 @@ public class YHubPort extends YFunction
      */
     public static YHubPort FirstHubPort()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("HubPort");
         if (next_hwid == null)  return null;
         return FindHubPortInContext(yctx, next_hwid);

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCarbonDioxide.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YCarbonDioxide.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -116,7 +116,7 @@ public class YCarbonDioxide extends YSensor
      */
     protected YCarbonDioxide(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YCarbonDioxide implementation)
@@ -452,7 +452,8 @@ public class YCarbonDioxide extends YSensor
      */
     public static YCarbonDioxide FirstCarbonDioxide()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("CarbonDioxide");
         if (next_hwid == null)  return null;
         return FindCarbonDioxideInContext(yctx, next_hwid);

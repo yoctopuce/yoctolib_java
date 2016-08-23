@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmPowerSource.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YPwmPowerSource.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -112,7 +112,7 @@ public class YPwmPowerSource extends YFunction
      */
     protected YPwmPowerSource(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YPwmPowerSource implementation)
@@ -343,7 +343,8 @@ public class YPwmPowerSource extends YFunction
      */
     public static YPwmPowerSource FirstPwmPowerSource()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("PwmPowerSource");
         if (next_hwid == null)  return null;
         return FindPwmPowerSourceInContext(yctx, next_hwid);

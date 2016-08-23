@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTilt.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YTilt.java 24934 2016-06-30 22:32:01Z mvuilleu $
  *
  * Implements FindTilt(), the high-level API for Tilt functions
  *
@@ -63,12 +63,17 @@ public class YTilt extends YSensor
 //--- (end of YTilt class start)
 //--- (YTilt definitions)
     /**
+     * invalid bandwidth value
+     */
+    public static final int BANDWIDTH_INVALID = YAPI.INVALID_INT;
+    /**
      * invalid axis value
      */
     public static final int AXIS_X = 0;
     public static final int AXIS_Y = 1;
     public static final int AXIS_Z = 2;
     public static final int AXIS_INVALID = -1;
+    protected int _bandwidth = BANDWIDTH_INVALID;
     protected int _axis = AXIS_INVALID;
     protected UpdateCallback _valueCallbackTilt = null;
     protected TimedReportCallback _timedReportCallbackTilt = null;
@@ -119,17 +124,82 @@ public class YTilt extends YSensor
      */
     protected YTilt(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YTilt implementation)
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
+        if (json_val.has("bandwidth")) {
+            _bandwidth = json_val.getInt("bandwidth");
+        }
         if (json_val.has("axis")) {
             _axis = json_val.getInt("axis");
         }
         super._parseAttr(json_val);
+    }
+
+    /**
+     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     *
+     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_bandwidth() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BANDWIDTH_INVALID;
+            }
+        }
+        return _bandwidth;
+    }
+
+    /**
+     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     *
+     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getBandwidth() throws YAPI_Exception
+    {
+        return get_bandwidth();
+    }
+
+    /**
+     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * frequency is lower, the device performs averaging.
+     *
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_bandwidth(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("bandwidth",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * frequency is lower, the device performs averaging.
+     *
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setBandwidth(int newval)  throws YAPI_Exception
+    {
+        return set_bandwidth(newval);
     }
 
     /**
@@ -329,7 +399,8 @@ public class YTilt extends YSensor
      */
     public static YTilt FirstTilt()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Tilt");
         if (next_hwid == null)  return null;
         return FindTiltInContext(yctx, next_hwid);

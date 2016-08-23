@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java 22696 2016-01-12 23:14:15Z seb $
+ * $Id: YGyro.java 24948 2016-07-01 20:57:28Z mvuilleu $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -89,6 +89,10 @@ public class YGyro extends YSensor
 
 //--- (generated code: YGyro definitions)
     /**
+     * invalid bandwidth value
+     */
+    public static final int BANDWIDTH_INVALID = YAPI.INVALID_INT;
+    /**
      * invalid xValue value
      */
     public static final double XVALUE_INVALID = YAPI.INVALID_DOUBLE;
@@ -100,6 +104,7 @@ public class YGyro extends YSensor
      * invalid zValue value
      */
     public static final double ZVALUE_INVALID = YAPI.INVALID_DOUBLE;
+    protected int _bandwidth = BANDWIDTH_INVALID;
     protected double _xValue = XVALUE_INVALID;
     protected double _yValue = YVALUE_INVALID;
     protected double _zValue = ZVALUE_INVALID;
@@ -162,7 +167,7 @@ public class YGyro extends YSensor
 
     protected YGyro(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
 
@@ -170,6 +175,9 @@ public class YGyro extends YSensor
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
+        if (json_val.has("bandwidth")) {
+            _bandwidth = json_val.getInt("bandwidth");
+        }
         if (json_val.has("xValue")) {
             _xValue = Math.round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
         }
@@ -180,6 +188,68 @@ public class YGyro extends YSensor
             _zValue = Math.round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
+    }
+
+    /**
+     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     *
+     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_bandwidth() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BANDWIDTH_INVALID;
+            }
+        }
+        return _bandwidth;
+    }
+
+    /**
+     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     *
+     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getBandwidth() throws YAPI_Exception
+    {
+        return get_bandwidth();
+    }
+
+    /**
+     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * frequency is lower, the device performs averaging.
+     *
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_bandwidth(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("bandwidth",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * frequency is lower, the device performs averaging.
+     *
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setBandwidth(int newval)  throws YAPI_Exception
+    {
+        return set_bandwidth(newval);
     }
 
     /**
@@ -478,11 +548,11 @@ public class YGyro extends YSensor
             delta = _y * _w - _x * _z;
             if (delta > 0.499 * norm) {
                 _pitch = 90.0;
-                _head  = (double)Math.round(2.0 * 1800.0/java.lang.Math.PI * java.lang.Math.atan2(_x,_w)) / 10.0;
+                _head  = (double)Math.round(2.0 * 1800.0/java.lang.Math.PI * java.lang.Math.atan2(_x,-_w)) / 10.0;
             } else {
                 if (delta < -0.499 * norm) {
                     _pitch = -90.0;
-                    _head  = (double)Math.round(-2.0 * 1800.0/java.lang.Math.PI * java.lang.Math.atan2(_x,_w)) / 10.0;
+                    _head  = (double)Math.round(-2.0 * 1800.0/java.lang.Math.PI * java.lang.Math.atan2(_x,-_w)) / 10.0;
                 } else {
                     _roll  = (double)Math.round(1800.0/java.lang.Math.PI * java.lang.Math.atan2(2.0 * (_w * _x + _y * _z),sqw - sqx - sqy + sqz)) / 10.0;
                     _pitch = (double)Math.round(1800.0/java.lang.Math.PI * java.lang.Math.asin(2.0 * delta / norm)) / 10.0;
@@ -751,7 +821,8 @@ public class YGyro extends YSensor
      */
     public static YGyro FirstGyro()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Gyro");
         if (next_hwid == null)  return null;
         return FindGyroInContext(yctx, next_hwid);

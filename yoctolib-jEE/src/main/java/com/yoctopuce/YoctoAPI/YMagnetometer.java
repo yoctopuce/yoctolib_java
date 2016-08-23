@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMagnetometer.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YMagnetometer.java 24934 2016-06-30 22:32:01Z mvuilleu $
  *
  * Implements FindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -63,6 +63,10 @@ public class YMagnetometer extends YSensor
 //--- (end of YMagnetometer class start)
 //--- (YMagnetometer definitions)
     /**
+     * invalid bandwidth value
+     */
+    public static final int BANDWIDTH_INVALID = YAPI.INVALID_INT;
+    /**
      * invalid xValue value
      */
     public static final double XVALUE_INVALID = YAPI.INVALID_DOUBLE;
@@ -74,6 +78,7 @@ public class YMagnetometer extends YSensor
      * invalid zValue value
      */
     public static final double ZVALUE_INVALID = YAPI.INVALID_DOUBLE;
+    protected int _bandwidth = BANDWIDTH_INVALID;
     protected double _xValue = XVALUE_INVALID;
     protected double _yValue = YVALUE_INVALID;
     protected double _zValue = ZVALUE_INVALID;
@@ -126,13 +131,16 @@ public class YMagnetometer extends YSensor
      */
     protected YMagnetometer(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YMagnetometer implementation)
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
+        if (json_val.has("bandwidth")) {
+            _bandwidth = json_val.getInt("bandwidth");
+        }
         if (json_val.has("xValue")) {
             _xValue = Math.round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
         }
@@ -143,6 +151,68 @@ public class YMagnetometer extends YSensor
             _zValue = Math.round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
+    }
+
+    /**
+     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     *
+     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_bandwidth() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BANDWIDTH_INVALID;
+            }
+        }
+        return _bandwidth;
+    }
+
+    /**
+     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     *
+     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getBandwidth() throws YAPI_Exception
+    {
+        return get_bandwidth();
+    }
+
+    /**
+     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * frequency is lower, the device performs averaging.
+     *
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_bandwidth(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("bandwidth",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * frequency is lower, the device performs averaging.
+     *
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setBandwidth(int newval)  throws YAPI_Exception
+    {
+        return set_bandwidth(newval);
     }
 
     /**
@@ -414,7 +484,8 @@ public class YMagnetometer extends YSensor
      */
     public static YMagnetometer FirstMagnetometer()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Magnetometer");
         if (next_hwid == null)  return null;
         return FindMagnetometerInContext(yctx, next_hwid);

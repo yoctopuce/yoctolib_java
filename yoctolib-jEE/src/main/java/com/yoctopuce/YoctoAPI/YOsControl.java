@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOsControl.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YOsControl.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -109,7 +109,7 @@ public class YOsControl extends YFunction
      */
     protected YOsControl(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YOsControl implementation)
@@ -323,7 +323,8 @@ public class YOsControl extends YFunction
      */
     public static YOsControl FirstOsControl()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("OsControl");
         if (next_hwid == null)  return null;
         return FindOsControlInContext(yctx, next_hwid);

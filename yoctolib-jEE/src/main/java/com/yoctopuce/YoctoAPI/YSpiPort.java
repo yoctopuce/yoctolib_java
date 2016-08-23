@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSpiPort.java 24714 2016-06-03 15:35:50Z seb $
+ * $Id: YSpiPort.java 25085 2016-07-26 16:38:36Z mvuilleu $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -142,6 +142,8 @@ public class YSpiPort extends YFunction
     protected int _shitftSampling = SHITFTSAMPLING_INVALID;
     protected UpdateCallback _valueCallbackSpiPort = null;
     protected int _rxptr = 0;
+    protected byte[] _rxbuff;
+    protected int _rxbuffptr = 0;
 
     /**
      * Deprecated UpdateCallback for SpiPort
@@ -189,7 +191,7 @@ public class YSpiPort extends YFunction
      */
     protected YSpiPort(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YSpiPort implementation)
@@ -1061,6 +1063,8 @@ public class YSpiPort extends YFunction
     public int reset() throws YAPI_Exception
     {
         _rxptr = 0;
+        _rxbuffptr = 0;
+        _rxbuff = new byte[0];
         // may throw an exception
         return sendCommand("Z");
     }
@@ -1238,11 +1242,49 @@ public class YSpiPort extends YFunction
      */
     public int readByte() throws YAPI_Exception
     {
+        int currpos;
+        int reqlen;
         byte[] buff;
         int bufflen;
         int mult;
         int endpos;
         int res;
+        
+        // first check if we have the requested character in the look-ahead buffer
+        bufflen = (_rxbuff).length;
+        if ((_rxptr >= _rxbuffptr) && (_rxptr < _rxbuffptr+bufflen)) {
+            res = _rxbuff[_rxptr-_rxbuffptr];
+            _rxptr = _rxptr + 1;
+            return res;
+        }
+        
+        // try to preload more than one byte to speed-up byte-per-byte access
+        currpos = _rxptr;
+        reqlen = 1024;
+        buff = readBin(reqlen);
+        bufflen = (buff).length;
+        if (_rxptr == currpos+bufflen) {
+            res = buff[0];
+            _rxptr = currpos+1;
+            _rxbuffptr = currpos;
+            _rxbuff = buff;
+            return res;
+        }
+        // mixed bidirectional data, retry with a smaller block
+        _rxptr = currpos;
+        reqlen = 16;
+        buff = readBin(reqlen);
+        bufflen = (buff).length;
+        if (_rxptr == currpos+bufflen) {
+            res = buff[0];
+            _rxptr = currpos+1;
+            _rxbuffptr = currpos;
+            _rxbuff = buff;
+            return res;
+        }
+        // still mixed, need to process character by character
+        _rxptr = currpos;
+        
         // may throw an exception
         buff = _download(String.format("rxdata.bin?pos=%d&len=1",_rxptr));
         bufflen = (buff).length - 1;
@@ -1677,7 +1719,8 @@ public class YSpiPort extends YFunction
      */
     public static YSpiPort FirstSpiPort()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("SpiPort");
         if (next_hwid == null)  return null;
         return FindSpiPortInContext(yctx, next_hwid);

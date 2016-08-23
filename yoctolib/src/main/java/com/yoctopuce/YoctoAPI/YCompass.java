@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCompass.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YCompass.java 24934 2016-06-30 22:32:01Z mvuilleu $
  *
  * Implements FindCompass(), the high-level API for Compass functions
  *
@@ -63,6 +63,10 @@ public class YCompass extends YSensor
 //--- (end of YCompass class start)
 //--- (YCompass definitions)
     /**
+     * invalid bandwidth value
+     */
+    public static final int BANDWIDTH_INVALID = YAPI.INVALID_INT;
+    /**
      * invalid axis value
      */
     public static final int AXIS_X = 0;
@@ -73,6 +77,7 @@ public class YCompass extends YSensor
      * invalid magneticHeading value
      */
     public static final double MAGNETICHEADING_INVALID = YAPI.INVALID_DOUBLE;
+    protected int _bandwidth = BANDWIDTH_INVALID;
     protected int _axis = AXIS_INVALID;
     protected double _magneticHeading = MAGNETICHEADING_INVALID;
     protected UpdateCallback _valueCallbackCompass = null;
@@ -124,13 +129,16 @@ public class YCompass extends YSensor
      */
     protected YCompass(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YCompass implementation)
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
+        if (json_val.has("bandwidth")) {
+            _bandwidth = json_val.getInt("bandwidth");
+        }
         if (json_val.has("axis")) {
             _axis = json_val.getInt("axis");
         }
@@ -138,6 +146,68 @@ public class YCompass extends YSensor
             _magneticHeading = Math.round(json_val.getDouble("magneticHeading") * 1000.0 / 65536.0) / 1000.0;
         }
         super._parseAttr(json_val);
+    }
+
+    /**
+     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     *
+     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_bandwidth() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return BANDWIDTH_INVALID;
+            }
+        }
+        return _bandwidth;
+    }
+
+    /**
+     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     *
+     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getBandwidth() throws YAPI_Exception
+    {
+        return get_bandwidth();
+    }
+
+    /**
+     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * frequency is lower, the device performs averaging.
+     *
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_bandwidth(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("bandwidth",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * frequency is lower, the device performs averaging.
+     *
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setBandwidth(int newval)  throws YAPI_Exception
+    {
+        return set_bandwidth(newval);
     }
 
     /**
@@ -366,7 +436,8 @@ public class YCompass extends YSensor
      */
     public static YCompass FirstCompass()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Compass");
         if (next_hwid == null)  return null;
         return FindCompassInContext(yctx, next_hwid);

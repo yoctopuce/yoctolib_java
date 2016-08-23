@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDualPower.java 23235 2016-02-23 13:51:07Z seb $
+ * $Id: YDualPower.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements FindDualPower(), the high-level API for DualPower functions
  *
@@ -128,7 +128,7 @@ public class YDualPower extends YFunction
      */
     protected YDualPower(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
     //--- (YDualPower implementation)
@@ -416,7 +416,8 @@ public class YDualPower extends YFunction
      */
     public static YDualPower FirstDualPower()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("DualPower");
         if (next_hwid == null)  return null;
         return FindDualPowerInContext(yctx, next_hwid);

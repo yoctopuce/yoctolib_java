@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 23882 2016-04-12 08:38:50Z seb $
+ * $Id: YModule.java 24889 2016-06-23 14:55:59Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -192,7 +192,7 @@ public class YModule extends YFunction
 
     protected YModule(String func)
     {
-        this(YAPI.GetYCtx(),func);
+        this(YAPI.GetYCtx(false),func);
     }
 
 
@@ -1966,7 +1966,8 @@ public class YModule extends YFunction
      */
     public static YModule FirstModule()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Module");
         if (next_hwid == null)  return null;
         return FindModuleInContext(yctx, next_hwid);

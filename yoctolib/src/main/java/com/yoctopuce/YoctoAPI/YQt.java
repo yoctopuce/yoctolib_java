@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 22696 2016-01-12 23:14:15Z seb $
+ * $Id: YQt.java 24889 2016-06-23 14:55:59Z seb $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -99,7 +99,7 @@ public class YQt extends YSensor
     }
     protected YQt(String func)
     {
-        this(YAPI.GetYCtx(), func);
+        this(YAPI.GetYCtx(true), func);
     }
 
 
@@ -287,7 +287,8 @@ public class YQt extends YSensor
      */
     public static YQt FirstQt()
     {
-        YAPIContext yctx = YAPI.GetYCtx();
+        YAPIContext yctx = YAPI.GetYCtx(false);
+        if (yctx == null)  return null;
         String next_hwid = yctx._yHash.getFirstHardwareId("Qt");
         if (next_hwid == null)  return null;
         return FindQtInContext(yctx, next_hwid);
