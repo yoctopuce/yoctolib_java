@@ -1,5 +1,2 @@
-- Add roaming neutrality support for YoctoHub-GSM
-- Add Yocto-3D-V2 support (new calibration instructions)
-- Add read-ahead buffer for readByte function
-- Fix potential duplicate YAPIContext allocation
-- Fix MODBUS write register command
+- Fix MD5 signature of HTTP Callback
+- Improve global library performances

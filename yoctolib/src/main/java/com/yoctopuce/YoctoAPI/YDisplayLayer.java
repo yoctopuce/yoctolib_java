@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YDisplayLayer.java 25275 2016-08-24 13:42:24Z mvuilleu $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *
@@ -381,14 +381,14 @@ public class YDisplayLayer
      * @param x : the distance from left of layer to the text anchor point, in pixels
      * @param y : the distance from top of layer to the text anchor point, in pixels
      * @param anchor : the text anchor point, chosen among the YDisplayLayer.ALIGN enumeration:
-     *          YDisplayLayer.ALIGN_TOP_LEFT,    YDisplayLayer.ALIGN_CENTER_LEFT,
-     *         YDisplayLayer.ALIGN_BASELINE_LEFT,    YDisplayLayer.ALIGN_BOTTOM_LEFT,
-     *          YDisplayLayer.ALIGN_TOP_CENTER,  YDisplayLayer.ALIGN_CENTER,
-     *         YDisplayLayer.ALIGN_BASELINE_CENTER,  YDisplayLayer.ALIGN_BOTTOM_CENTER,
-     *          YDisplayLayer.ALIGN_TOP_DECIMAL, YDisplayLayer.ALIGN_CENTER_DECIMAL,
-     *         YDisplayLayer.ALIGN_BASELINE_DECIMAL, YDisplayLayer.ALIGN_BOTTOM_DECIMAL,
-     *          YDisplayLayer.ALIGN_TOP_RIGHT,   YDisplayLayer.ALIGN_CENTER_RIGHT,
-     *         YDisplayLayer.ALIGN_BASELINE_RIGHT,   YDisplayLayer.ALIGN_BOTTOM_RIGHT.
+     *          YDisplayLayer.ALIGN.TOP_LEFT,    YDisplayLayer.ALIGN.CENTER_LEFT,
+     *         YDisplayLayer.ALIGN.BASELINE_LEFT,    YDisplayLayer.ALIGN.BOTTOM_LEFT,
+     *          YDisplayLayer.ALIGN.TOP_CENTER,  YDisplayLayer.ALIGN.CENTER,
+     *         YDisplayLayer.ALIGN.BASELINE_CENTER,  YDisplayLayer.ALIGN.BOTTOM_CENTER,
+     *          YDisplayLayer.ALIGN.TOP_DECIMAL, YDisplayLayer.ALIGN.CENTER_DECIMAL,
+     *         YDisplayLayer.ALIGN.BASELINE_DECIMAL, YDisplayLayer.ALIGN.BOTTOM_DECIMAL,
+     *          YDisplayLayer.ALIGN.TOP_RIGHT,   YDisplayLayer.ALIGN.CENTER_RIGHT,
+     *         YDisplayLayer.ALIGN.BASELINE_RIGHT,   YDisplayLayer.ALIGN.BOTTOM_RIGHT.
      * @param text : the text string to draw
      *
      * @return YAPI.SUCCESS if the call succeeds.

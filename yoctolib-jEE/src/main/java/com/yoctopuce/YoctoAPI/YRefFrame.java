@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 24943 2016-07-01 14:02:25Z seb $
+ * $Id: YRefFrame.java 25275 2016-08-24 13:42:24Z mvuilleu $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -77,7 +77,8 @@ public class YRefFrame extends YFunction
         FRONT(2),
         REAR(3),
         RIGHT(4),
-        LEFT(5);
+        LEFT(5),
+        INVALID(6);
         public final int value;
         private MOUNTPOSITION(int val)
         {
@@ -98,6 +99,8 @@ public class YRefFrame extends YFunction
                 return RIGHT;
             case 5:
                 return LEFT;
+            case 6:
+                return INVALID;
             }
             return null;
         }
@@ -107,7 +110,8 @@ public class YRefFrame extends YFunction
         TWELVE(0),
         THREE(1),
         SIX(2),
-        NINE(3);
+        NINE(3),
+        INVALID(4);
         public final int value;
         private MOUNTORIENTATION(int val)
         {
@@ -124,6 +128,8 @@ public class YRefFrame extends YFunction
                 return SIX;
             case 3:
                 return NINE;
+            case 4:
+                return INVALID;
             }
             return null;
         }
@@ -494,9 +500,9 @@ public class YRefFrame extends YFunction
      * pitch/roll tilt sensors.
      *
      * @return a value among the YRefFrame.MOUNTPOSITION enumeration
-     *         (YRefFrame.MOUNTPOSITION_BOTTOM,   YRefFrame.MOUNTPOSITION_TOP,
-     *         YRefFrame.MOUNTPOSITION_FRONT,    YRefFrame.MOUNTPOSITION_RIGHT,
-     *         YRefFrame.MOUNTPOSITION_REAR,     YRefFrame.MOUNTPOSITION_LEFT),
+     *         (YRefFrame.MOUNTPOSITION.BOTTOM,   YRefFrame.MOUNTPOSITION.TOP,
+     *         YRefFrame.MOUNTPOSITION.FRONT,    YRefFrame.MOUNTPOSITION.RIGHT,
+     *         YRefFrame.MOUNTPOSITION.REAR,     YRefFrame.MOUNTPOSITION.LEFT),
      *         corresponding to the installation in a box, on one of the six faces.
      *
      * @throws YAPI_Exception on error
@@ -505,6 +511,9 @@ public class YRefFrame extends YFunction
     {
         int position;
         position = get_mountPos();
+        if (position < 0) {
+            return MOUNTPOSITION.INVALID;
+        }
         return MOUNTPOSITION.fromInt(((position) >> (2)));
     }
 
@@ -514,8 +523,8 @@ public class YRefFrame extends YFunction
      * pitch/roll tilt sensors.
      *
      * @return a value among the enumeration YRefFrame.MOUNTORIENTATION
-     *         (YRefFrame.MOUNTORIENTATION_TWELVE, YRefFrame.MOUNTORIENTATION_THREE,
-     *         YRefFrame.MOUNTORIENTATION_SIX,     YRefFrame.MOUNTORIENTATION_NINE)
+     *         (YRefFrame.MOUNTORIENTATION.TWELVE, YRefFrame.MOUNTORIENTATION.THREE,
+     *         YRefFrame.MOUNTORIENTATION.SIX,     YRefFrame.MOUNTORIENTATION.NINE)
      *         corresponding to the orientation of the "X" arrow on the device,
      *         as on a clock dial seen from an observer in the center of the box.
      *         On the bottom face, the 12H orientation points to the front, while
@@ -527,6 +536,9 @@ public class YRefFrame extends YFunction
     {
         int position;
         position = get_mountPos();
+        if (position < 0) {
+            return MOUNTORIENTATION.INVALID;
+        }
         return MOUNTORIENTATION.fromInt(((position) & (3)));
     }
 
@@ -538,13 +550,13 @@ public class YRefFrame extends YFunction
      * the earth surface) so that the measures are made relative to this position.
      *
      * @param position : a value among the YRefFrame.MOUNTPOSITION enumeration
-     *         (YRefFrame.MOUNTPOSITION_BOTTOM,   YRefFrame.MOUNTPOSITION_TOP,
-     *         YRefFrame.MOUNTPOSITION_FRONT,    YRefFrame.MOUNTPOSITION_RIGHT,
-     *         YRefFrame.MOUNTPOSITION_REAR,     YRefFrame.MOUNTPOSITION_LEFT),
+     *         (YRefFrame.MOUNTPOSITION.BOTTOM,   YRefFrame.MOUNTPOSITION.TOP,
+     *         YRefFrame.MOUNTPOSITION.FRONT,    YRefFrame.MOUNTPOSITION.RIGHT,
+     *         YRefFrame.MOUNTPOSITION.REAR,     YRefFrame.MOUNTPOSITION.LEFT),
      *         corresponding to the installation in a box, on one of the six faces.
      * @param orientation : a value among the enumeration YRefFrame.MOUNTORIENTATION
-     *         (YRefFrame.MOUNTORIENTATION_TWELVE, YRefFrame.MOUNTORIENTATION_THREE,
-     *         YRefFrame.MOUNTORIENTATION_SIX,     YRefFrame.MOUNTORIENTATION_NINE)
+     *         (YRefFrame.MOUNTORIENTATION.TWELVE, YRefFrame.MOUNTORIENTATION.THREE,
+     *         YRefFrame.MOUNTORIENTATION.SIX,     YRefFrame.MOUNTORIENTATION.NINE)
      *         corresponding to the orientation of the "X" arrow on the device,
      *         as on a clock dial seen from an observer in the center of the box.
      *         On the bottom face, the 12H orientation points to the front, while

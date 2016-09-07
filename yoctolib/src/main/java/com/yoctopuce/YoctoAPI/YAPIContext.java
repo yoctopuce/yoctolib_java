@@ -280,7 +280,7 @@ public class YAPIContext
         char[] hexChars = new char[len * 2];
         for (int j = 0; j < len; j++) {
             int v = bytes[offset + j] & 0xFF;
-            hexChars[j * 2] = _hexArray[v >> 4];
+            hexChars[j * 2] = _hexArray[v >>> 4];
             hexChars[j * 2 + 1] = _hexArray[v & 0x0F];
         }
         return new String(hexChars);

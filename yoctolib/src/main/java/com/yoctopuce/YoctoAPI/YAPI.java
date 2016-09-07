@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YAPI.java 25310 2016-09-07 09:06:02Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -61,7 +61,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "25250";
+    public static final String YOCTO_API_BUILD_STR = "25310";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -104,14 +104,12 @@ public class YAPI
     static final int YOCTO_REALM_LEN = 20;
 
     // yInitAPI argument
-    // fixme copy to YAPIContex
-
     public static final int DETECT_NONE = 0;
     public static final int DETECT_USB = 1;
     public static final int DETECT_NET = 2;
     public static final int RESEND_MISSING_PKT = 4;
     public static final int DETECT_ALL = DETECT_USB | DETECT_NET;
-    public static final int DEFAULT_PKT_RESEND_DELAY = 50;
+    public static int DEFAULT_PKT_RESEND_DELAY = 0;
     static int pktAckDelay = DEFAULT_PKT_RESEND_DELAY;
 
 
@@ -219,7 +217,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".25250" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".25310" + YUSBHub.getAPIVersion();
     }
 
     /**

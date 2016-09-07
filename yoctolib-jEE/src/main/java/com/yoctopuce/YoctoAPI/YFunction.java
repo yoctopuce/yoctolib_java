@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YFunction.java 25310 2016-09-07 09:06:02Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -589,7 +589,6 @@ public class YFunction
 
     protected void _parse(JSONObject json, long msValidity) throws YAPI_Exception
     {
-        _cacheExpiration = YAPI.GetTickCount() + msValidity;
         try {
             _parseAttr(json);
         } catch (JSONException e) {
@@ -846,9 +845,8 @@ public class YFunction
         if (extra.equals("")) {
             // use a cached API string, without reloading unless module is
             // requested
-            String yreq = dev.requestAPI();
+            JSONObject jsonval = dev.requestAPI();
             try {
-                JSONObject jsonval = new JSONObject(yreq);
                 loadval = jsonval.getJSONObject(_funId);
             } catch (JSONException ex) {
                 throw new YAPI_Exception(YAPI.IO_ERROR,
@@ -1020,6 +1018,7 @@ public class YFunction
     {
         JSONObject json_obj = _devRequest("");
         _parse(json_obj, msValidity);
+        _cacheExpiration = YAPI.GetTickCount() + msValidity;
         return YAPI.SUCCESS;
     }
 

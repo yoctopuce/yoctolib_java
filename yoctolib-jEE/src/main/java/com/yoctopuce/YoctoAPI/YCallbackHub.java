@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 23679 2016-03-31 12:07:23Z seb $
+ * $Id: YCallbackHub.java 25308 2016-09-07 09:02:02Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -161,14 +161,14 @@ public class YCallbackHub extends YGenericHub
                     mdigest.reset();
                     mdigest.update(pass.getBytes(_yctx._deviceCharset));
                     byte[] md5pass = mdigest.digest();
-                    salt = YAPIContext._bytesToHexStr(md5pass, 0, md5pass.length);
+                    salt = YAPIContext._bytesToHexStr(md5pass, 0, md5pass.length).toLowerCase();
                 }
 
                 data_str = data_str.replace(sign, salt);
                 mdigest.reset();
                 mdigest.update(data_str.getBytes(_yctx._deviceCharset));
                 byte[] md5 = mdigest.digest();
-                String check = YAPIContext._bytesToHexStr(md5, 0, md5.length);
+                String check = YAPIContext._bytesToHexStr(md5, 0, md5.length).toLowerCase();
                 if (!check.equals(sign)) {
                     String errmsg = "invalid signature from incoming YoctoHub (invalid callback password)";
                     _output("\n!YoctoAPI:" + errmsg + "\n");
