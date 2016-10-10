@@ -75,7 +75,7 @@ class WSRequest
     void reportProgress(int ackBytes)
     {
         if (_progressCb != null && _requestData.limit() > 0) {
-            _progressCb.RequestProgress(_progressCb, ackBytes, _requestData.limit());
+            _progressCb.requestProgressUpdate(_progressCb, ackBytes, _requestData.limit());
         }
     }
 

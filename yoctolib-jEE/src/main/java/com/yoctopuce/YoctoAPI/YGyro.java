@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java 24948 2016-07-01 20:57:28Z mvuilleu $
+ * $Id: YGyro.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -40,6 +40,8 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Locale;
+
 //--- (generated code: YGyro return codes)
 //--- (end of generated code: YGyro return codes)
 //--- (generated code: YGyro class start)
@@ -56,7 +58,7 @@ import org.json.JSONObject;
  * Note: The YAnButton class is the only analog input which does not inherit
  * from YSensor.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YGyro extends YSensor
 {
 //--- (end of generated code: YGyro class start)
@@ -172,6 +174,7 @@ public class YGyro extends YSensor
 
 
     //--- (generated code: YGyro implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -501,10 +504,10 @@ public class YGyro extends YSensor
                 return YAPI.DEVICE_NOT_FOUND;
             }
             if (_qt_stamp == 0) {
-                _qt_w = YQt.FindQtInContext(_yapi, String.format("%s.qt1",_serial));
-                _qt_x = YQt.FindQtInContext(_yapi, String.format("%s.qt2",_serial));
-                _qt_y = YQt.FindQtInContext(_yapi, String.format("%s.qt3",_serial));
-                _qt_z = YQt.FindQtInContext(_yapi, String.format("%s.qt4",_serial));
+                _qt_w = YQt.FindQtInContext(_yapi, String.format(Locale.US, "%s.qt1",_serial));
+                _qt_x = YQt.FindQtInContext(_yapi, String.format(Locale.US, "%s.qt2",_serial));
+                _qt_y = YQt.FindQtInContext(_yapi, String.format(Locale.US, "%s.qt3",_serial));
+                _qt_z = YQt.FindQtInContext(_yapi, String.format(Locale.US, "%s.qt4",_serial));
             }
             if (_qt_w.load(9) != YAPI.SUCCESS) {
                 return YAPI.DEVICE_NOT_FOUND;

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 23679 2016-03-31 12:07:23Z seb $
+ * $Id: YUSBHub.java 25362 2016-09-16 08:23:48Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class YUSBHub extends YGenericHub
+class YUSBHub extends YGenericHub
 {
 
     private Thread _thread;
@@ -85,7 +85,7 @@ public class YUSBHub extends YGenericHub
         return new ArrayList<>();
     }
 
-    public YUSBHub(YAPIContext yctx, int idx, boolean requestPermission) throws YAPI_Exception
+    YUSBHub(YAPIContext yctx, int idx, boolean requestPermission, int pktAckDelay) throws YAPI_Exception
     {
         super(yctx, new HTTPParams("usb://"), idx, true);
         YJniWrapper.reserveUSBAccess();
@@ -219,7 +219,7 @@ public class YUSBHub extends YGenericHub
     }
 
     @Override
-    public boolean isSameHub(String url, Object request, Object response, Object session)
+    boolean isSameHub(String url, Object request, Object response, Object session)
     {
         return url.equals("usb");
     }

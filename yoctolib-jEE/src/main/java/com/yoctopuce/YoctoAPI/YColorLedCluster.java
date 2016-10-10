@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 24939 2016-07-01 08:45:11Z seb $
+ * $Id: YColorLedCluster.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Locale;
 import java.util.ArrayList;
 
 //--- (YColorLedCluster return codes)
@@ -57,7 +58,7 @@ import java.util.ArrayList;
  * saturation or lightness. If needed, you can find more information on the
  * difference between RGB and HSL in the section following this one.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YColorLedCluster extends YFunction
 {
 //--- (end of YColorLedCluster class start)
@@ -139,6 +140,7 @@ public class YColorLedCluster extends YFunction
     }
 
     //--- (YColorLedCluster implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -470,7 +472,7 @@ public class YColorLedCluster extends YFunction
      */
     public int set_rgbColor(int ledIndex,int count,int rgbValue) throws YAPI_Exception
     {
-        return sendCommand(String.format("SR%d,%d,%x",ledIndex,count,rgbValue));
+        return sendCommand(String.format(Locale.US, "SR%d,%d,%x",ledIndex,count,rgbValue));
     }
 
     /**
@@ -489,7 +491,7 @@ public class YColorLedCluster extends YFunction
      */
     public int set_rgbColorAtPowerOn(int ledIndex,int count,int rgbValue) throws YAPI_Exception
     {
-        return sendCommand(String.format("SC%d,%d,%x",ledIndex,count,rgbValue));
+        return sendCommand(String.format(Locale.US, "SC%d,%d,%x",ledIndex,count,rgbValue));
     }
 
     /**
@@ -506,7 +508,7 @@ public class YColorLedCluster extends YFunction
      */
     public int set_hslColor(int ledIndex,int count,int hslValue) throws YAPI_Exception
     {
-        return sendCommand(String.format("SH%d,%d,%x",ledIndex,count,hslValue));
+        return sendCommand(String.format(Locale.US, "SH%d,%d,%x",ledIndex,count,hslValue));
     }
 
     /**
@@ -524,7 +526,7 @@ public class YColorLedCluster extends YFunction
      */
     public int rgb_move(int ledIndex,int count,int rgbValue,int delay) throws YAPI_Exception
     {
-        return sendCommand(String.format("MR%d,%d,%x,%d",ledIndex,count,rgbValue,delay));
+        return sendCommand(String.format(Locale.US, "MR%d,%d,%x,%d",ledIndex,count,rgbValue,delay));
     }
 
     /**
@@ -546,7 +548,7 @@ public class YColorLedCluster extends YFunction
      */
     public int hsl_move(int ledIndex,int count,int hslValue,int delay) throws YAPI_Exception
     {
-        return sendCommand(String.format("MH%d,%d,%x,%d",ledIndex,count,hslValue,delay));
+        return sendCommand(String.format(Locale.US, "MH%d,%d,%x,%d",ledIndex,count,hslValue,delay));
     }
 
     /**
@@ -564,7 +566,7 @@ public class YColorLedCluster extends YFunction
      */
     public int addRgbMoveToBlinkSeq(int seqIndex,int rgbValue,int delay) throws YAPI_Exception
     {
-        return sendCommand(String.format("AR%d,%x,%d",seqIndex,rgbValue,delay));
+        return sendCommand(String.format(Locale.US, "AR%d,%x,%d",seqIndex,rgbValue,delay));
     }
 
     /**
@@ -582,7 +584,7 @@ public class YColorLedCluster extends YFunction
      */
     public int addHslMoveToBlinkSeq(int seqIndex,int hslValue,int delay) throws YAPI_Exception
     {
-        return sendCommand(String.format("AH%d,%x,%d",seqIndex,hslValue,delay));
+        return sendCommand(String.format(Locale.US, "AH%d,%x,%d",seqIndex,hslValue,delay));
     }
 
     /**
@@ -600,7 +602,7 @@ public class YColorLedCluster extends YFunction
      */
     public int addMirrorToBlinkSeq(int seqIndex) throws YAPI_Exception
     {
-        return sendCommand(String.format("AC%d,0,0",seqIndex));
+        return sendCommand(String.format(Locale.US, "AC%d,0,0",seqIndex));
     }
 
     /**
@@ -620,7 +622,7 @@ public class YColorLedCluster extends YFunction
      */
     public int linkLedToBlinkSeq(int ledIndex,int count,int seqIndex,int offset) throws YAPI_Exception
     {
-        return sendCommand(String.format("LS%d,%d,%d,%d",ledIndex,count,seqIndex,offset));
+        return sendCommand(String.format(Locale.US, "LS%d,%d,%d,%d",ledIndex,count,seqIndex,offset));
     }
 
     /**
@@ -640,7 +642,7 @@ public class YColorLedCluster extends YFunction
      */
     public int linkLedToBlinkSeqAtPowerOn(int ledIndex,int count,int seqIndex,int offset) throws YAPI_Exception
     {
-        return sendCommand(String.format("LO%d,%d,%d,%d",ledIndex,count,seqIndex,offset));
+        return sendCommand(String.format(Locale.US, "LO%d,%d,%d,%d",ledIndex,count,seqIndex,offset));
     }
 
     /**
@@ -660,7 +662,7 @@ public class YColorLedCluster extends YFunction
      */
     public int linkLedToPeriodicBlinkSeq(int ledIndex,int count,int seqIndex,int periods) throws YAPI_Exception
     {
-        return sendCommand(String.format("LP%d,%d,%d,%d",ledIndex,count,seqIndex,periods));
+        return sendCommand(String.format(Locale.US, "LP%d,%d,%d,%d",ledIndex,count,seqIndex,periods));
     }
 
     /**
@@ -675,7 +677,7 @@ public class YColorLedCluster extends YFunction
      */
     public int unlinkLedFromBlinkSeq(int ledIndex,int count) throws YAPI_Exception
     {
-        return sendCommand(String.format("US%d,%d",ledIndex,count));
+        return sendCommand(String.format(Locale.US, "US%d,%d",ledIndex,count));
     }
 
     /**
@@ -690,7 +692,7 @@ public class YColorLedCluster extends YFunction
      */
     public int startBlinkSeq(int seqIndex) throws YAPI_Exception
     {
-        return sendCommand(String.format("SS%d",seqIndex));
+        return sendCommand(String.format(Locale.US, "SS%d",seqIndex));
     }
 
     /**
@@ -705,7 +707,7 @@ public class YColorLedCluster extends YFunction
      */
     public int stopBlinkSeq(int seqIndex) throws YAPI_Exception
     {
-        return sendCommand(String.format("XS%d",seqIndex));
+        return sendCommand(String.format(Locale.US, "XS%d",seqIndex));
     }
 
     /**
@@ -720,7 +722,7 @@ public class YColorLedCluster extends YFunction
      */
     public int resetBlinkSeq(int seqIndex) throws YAPI_Exception
     {
-        return sendCommand(String.format("ZS%d",seqIndex));
+        return sendCommand(String.format(Locale.US, "ZS%d",seqIndex));
     }
 
     /**
@@ -737,7 +739,7 @@ public class YColorLedCluster extends YFunction
      */
     public int set_blinkSeqStateAtPowerOn(int seqIndex,int autostart) throws YAPI_Exception
     {
-        return sendCommand(String.format("AS%d,%d",seqIndex,autostart));
+        return sendCommand(String.format(Locale.US, "AS%d,%d",seqIndex,autostart));
     }
 
     /**
@@ -754,7 +756,7 @@ public class YColorLedCluster extends YFunction
      */
     public int set_blinkSeqSpeed(int seqIndex,int speed) throws YAPI_Exception
     {
-        return sendCommand(String.format("CS%d,%d",seqIndex,speed));
+        return sendCommand(String.format(Locale.US, "CS%d,%d",seqIndex,speed));
     }
 
     /**
@@ -789,7 +791,7 @@ public class YColorLedCluster extends YFunction
      */
     public int saveBlinkSeq(int seqIndex) throws YAPI_Exception
     {
-        return sendCommand(String.format("WS%d",seqIndex));
+        return sendCommand(String.format(Locale.US, "WS%d",seqIndex));
     }
 
     /**
@@ -806,7 +808,7 @@ public class YColorLedCluster extends YFunction
      */
     public int set_rgbColorBuffer(int ledIndex,byte[] buff) throws YAPI_Exception
     {
-        return _upload(String.format("rgb:0:%d",ledIndex), buff);
+        return _upload(String.format(Locale.US, "rgb:0:%d",ledIndex), buff);
     }
 
     /**
@@ -839,7 +841,7 @@ public class YColorLedCluster extends YFunction
             idx = idx + 1;
         }
         // may throw an exception
-        res = _upload(String.format("rgb:0:%d",ledIndex), buff);
+        res = _upload(String.format(Locale.US, "rgb:0:%d",ledIndex), buff);
         return res;
     }
 
@@ -873,7 +875,7 @@ public class YColorLedCluster extends YFunction
             idx = idx + 1;
         }
         // may throw an exception
-        res = _upload(String.format("rgb:%d",delay), buff);
+        res = _upload(String.format(Locale.US, "rgb:%d",delay), buff);
         return res;
     }
 
@@ -891,7 +893,7 @@ public class YColorLedCluster extends YFunction
      */
     public int set_hslColorBuffer(int ledIndex,byte[] buff) throws YAPI_Exception
     {
-        return _upload(String.format("hsl:0:%d",ledIndex), buff);
+        return _upload(String.format(Locale.US, "hsl:0:%d",ledIndex), buff);
     }
 
     /**
@@ -924,7 +926,7 @@ public class YColorLedCluster extends YFunction
             idx = idx + 1;
         }
         // may throw an exception
-        res = _upload(String.format("hsl:0:%d",ledIndex), buff);
+        res = _upload(String.format(Locale.US, "hsl:0:%d",ledIndex), buff);
         return res;
     }
 
@@ -958,7 +960,7 @@ public class YColorLedCluster extends YFunction
             idx = idx + 1;
         }
         // may throw an exception
-        res = _upload(String.format("hsl:%d",delay), buff);
+        res = _upload(String.format(Locale.US, "hsl:%d",delay), buff);
         return res;
     }
 
@@ -976,7 +978,7 @@ public class YColorLedCluster extends YFunction
      */
     public byte[] get_rgbColorBuffer(int ledIndex,int count) throws YAPI_Exception
     {
-        return _download(String.format("rgb.bin?typ=0&pos=%d&len=%d",3*ledIndex,3*count));
+        return _download(String.format(Locale.US, "rgb.bin?typ=0&pos=%d&len=%d",3*ledIndex,3*count));
     }
 
     /**
@@ -994,13 +996,13 @@ public class YColorLedCluster extends YFunction
     public ArrayList<Integer> get_rgbColorArray(int ledIndex,int count) throws YAPI_Exception
     {
         byte[] buff;
-        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int r;
         int g;
         int b;
         // may throw an exception
-        buff = _download(String.format("rgb.bin?typ=0&pos=%d&len=%d",3*ledIndex,3*count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=0&pos=%d&len=%d",3*ledIndex,3*count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1028,13 +1030,13 @@ public class YColorLedCluster extends YFunction
     public ArrayList<Integer> get_rgbColorArrayAtPowerOn(int ledIndex,int count) throws YAPI_Exception
     {
         byte[] buff;
-        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int r;
         int g;
         int b;
         // may throw an exception
-        buff = _download(String.format("rgb.bin?typ=4&pos=%d&len=%d",3*ledIndex,3*count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=4&pos=%d&len=%d",3*ledIndex,3*count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1062,11 +1064,11 @@ public class YColorLedCluster extends YFunction
     public ArrayList<Integer> get_linkedSeqArray(int ledIndex,int count) throws YAPI_Exception
     {
         byte[] buff;
-        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int seq;
         // may throw an exception
-        buff = _download(String.format("rgb.bin?typ=1&pos=%d&len=%d",ledIndex,count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=1&pos=%d&len=%d",ledIndex,count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1092,14 +1094,14 @@ public class YColorLedCluster extends YFunction
     public ArrayList<Integer> get_blinkSeqSignatures(int seqIndex,int count) throws YAPI_Exception
     {
         byte[] buff;
-        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int hh;
         int hl;
         int lh;
         int ll;
         // may throw an exception
-        buff = _download(String.format("rgb.bin?typ=2&pos=%d&len=%d",4*seqIndex,4*count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=2&pos=%d&len=%d",4*seqIndex,4*count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1126,12 +1128,12 @@ public class YColorLedCluster extends YFunction
     public ArrayList<Integer> get_blinkSeqStateSpeed(int seqIndex,int count) throws YAPI_Exception
     {
         byte[] buff;
-        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int lh;
         int ll;
         // may throw an exception
-        buff = _download(String.format("rgb.bin?typ=6&pos=%d&len=%d",seqIndex,count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=6&pos=%d&len=%d",seqIndex,count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1156,11 +1158,11 @@ public class YColorLedCluster extends YFunction
     public ArrayList<Integer> get_blinkSeqStateAtPowerOn(int seqIndex,int count) throws YAPI_Exception
     {
         byte[] buff;
-        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int started;
         // may throw an exception
-        buff = _download(String.format("rgb.bin?typ=5&pos=%d&len=%d",seqIndex,count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=5&pos=%d&len=%d",seqIndex,count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1184,11 +1186,11 @@ public class YColorLedCluster extends YFunction
     public ArrayList<Integer> get_blinkSeqState(int seqIndex,int count) throws YAPI_Exception
     {
         byte[] buff;
-        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int started;
         // may throw an exception
-        buff = _download(String.format("rgb.bin?typ=3&pos=%d&len=%d",seqIndex,count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=3&pos=%d&len=%d",seqIndex,count));
         res.clear();
         idx = 0;
         while (idx < count) {

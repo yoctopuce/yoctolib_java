@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBuzzer.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YBuzzer.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Locale;
 
 //--- (YBuzzer return codes)
 //--- (end of YBuzzer return codes)
@@ -51,7 +52,7 @@ import org.json.JSONObject;
  * choose the frequency and volume at which the buzzer must sound.
  * You can also pre-program a play sequence.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YBuzzer extends YFunction
 {
 //--- (end of YBuzzer class start)
@@ -138,6 +139,7 @@ public class YBuzzer extends YFunction
     }
 
     //--- (YBuzzer implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -535,7 +537,7 @@ public class YBuzzer extends YFunction
      */
     public int addFreqMoveToPlaySeq(int freq,int msDelay) throws YAPI_Exception
     {
-        return sendCommand(String.format("A%d,%d",freq,msDelay));
+        return sendCommand(String.format(Locale.US, "A%d,%d",freq,msDelay));
     }
 
     /**
@@ -549,7 +551,7 @@ public class YBuzzer extends YFunction
      */
     public int addPulseToPlaySeq(int freq,int msDuration) throws YAPI_Exception
     {
-        return sendCommand(String.format("B%d,%d",freq,msDuration));
+        return sendCommand(String.format(Locale.US, "B%d,%d",freq,msDuration));
     }
 
     /**
@@ -564,7 +566,7 @@ public class YBuzzer extends YFunction
      */
     public int addVolMoveToPlaySeq(int volume,int msDuration) throws YAPI_Exception
     {
-        return sendCommand(String.format("C%d,%d",volume,msDuration));
+        return sendCommand(String.format(Locale.US, "C%d,%d",volume,msDuration));
     }
 
     /**
@@ -614,7 +616,7 @@ public class YBuzzer extends YFunction
      */
     public int pulse(int frequency,int duration) throws YAPI_Exception
     {
-        return set_command(String.format("P%d,%d",frequency,duration));
+        return set_command(String.format(Locale.US, "P%d,%d",frequency,duration));
     }
 
     /**
@@ -629,7 +631,7 @@ public class YBuzzer extends YFunction
      */
     public int freqMove(int frequency,int duration) throws YAPI_Exception
     {
-        return set_command(String.format("F%d,%d",frequency,duration));
+        return set_command(String.format(Locale.US, "F%d,%d",frequency,duration));
     }
 
     /**
@@ -644,7 +646,7 @@ public class YBuzzer extends YFunction
      */
     public int volumeMove(int volume,int duration) throws YAPI_Exception
     {
-        return set_command(String.format("V%d,%d",volume,duration));
+        return set_command(String.format(Locale.US, "V%d,%d",volume,duration));
     }
 
     /**

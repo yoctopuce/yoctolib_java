@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunctionType.java 22359 2015-12-15 13:30:10Z seb $
+ * $Id: YFunctionType.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Internal YFunctionType object
  *
@@ -55,10 +55,10 @@ class YFunctionType
     // private attributes, to be used within yocto_api only
     private String _className;
     private final YAPIContext _yctx;
-    private final HashMap<String, YPEntry> _ypEntries = new HashMap<String, YPEntry>();               // Yellow page by Hardware Id
-    private final HashMap<String, YFunction> _connectedFns = new HashMap<String, YFunction>();           // functions requested and available, by Hardware Id
-    private final HashMap<String, YFunction> _requestedFns = new HashMap<String, YFunction>();           // functions requested but not yet known, by any type of name
-    private final HashMap<String, String> _hwIdByName = new HashMap<String, String>();                // hash table of function Hardware Id by logical name
+    private final HashMap<String, YPEntry> _ypEntries = new HashMap<>();               // Yellow page by Hardware Id
+    private final HashMap<String, YFunction> _connectedFns = new HashMap<>();           // functions requested and available, by Hardware Id
+    private final HashMap<String, YFunction> _requestedFns = new HashMap<>();           // functions requested but not yet known, by any type of name
+    private final HashMap<String, String> _hwIdByName = new HashMap<>();                // hash table of function Hardware Id by logical name
 
 
     // class used to store module.function (can be serial or logical name)
@@ -147,7 +147,7 @@ class YFunctionType
     // This function will not cause any network access
 
 
-    public HWID resolve(String func) throws YAPI_Exception
+    private HWID resolve(String func) throws YAPI_Exception
     {
         // Try to resolve str_func to a known Function instance, if possible, without any device access
         int dotpos = func.indexOf('.');
@@ -265,6 +265,7 @@ class YFunctionType
     // Find the the hardwareId of the first instance of a given function class
     public YPEntry getFirstYPEntry()
     {
+        //noinspection LoopStatementThatDoesntLoop
         for (String key : _ypEntries.keySet()) {
             return _ypEntries.get(key);
         }

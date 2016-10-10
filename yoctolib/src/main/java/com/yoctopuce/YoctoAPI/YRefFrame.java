@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 25275 2016-08-24 13:42:24Z mvuilleu $
+ * $Id: YRefFrame.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -41,6 +41,7 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.Locale;
 
 //--- (YRefFrame return codes)
 //--- (end of YRefFrame return codes)
@@ -54,7 +55,7 @@ import java.util.ArrayList;
  * sensor calibration process, which can compensate for local variations
  * of standard gravity and improve the precision of the tilt sensors.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YRefFrame extends YFunction
 {
 //--- (end of YRefFrame class start)
@@ -80,7 +81,7 @@ public class YRefFrame extends YFunction
         LEFT(5),
         INVALID(6);
         public final int value;
-        private MOUNTPOSITION(int val)
+        MOUNTPOSITION(int val)
         {
             this.value = val;
         }
@@ -113,7 +114,7 @@ public class YRefFrame extends YFunction
         NINE(3),
         INVALID(4);
         public final int value;
-        private MOUNTORIENTATION(int val)
+        MOUNTORIENTATION(int val)
         {
             this.value = val;
         }
@@ -149,11 +150,11 @@ public class YRefFrame extends YFunction
     protected int _calibCount = 0;
     protected int _calibInternalPos = 0;
     protected int _calibPrevTick = 0;
-    protected ArrayList<Integer> _calibOrient = new ArrayList<Integer>();
-    protected ArrayList<Double> _calibDataAccX = new ArrayList<Double>();
-    protected ArrayList<Double> _calibDataAccY = new ArrayList<Double>();
-    protected ArrayList<Double> _calibDataAccZ = new ArrayList<Double>();
-    protected ArrayList<Double> _calibDataAcc = new ArrayList<Double>();
+    protected ArrayList<Integer> _calibOrient = new ArrayList<>();
+    protected ArrayList<Double> _calibDataAccX = new ArrayList<>();
+    protected ArrayList<Double> _calibDataAccY = new ArrayList<>();
+    protected ArrayList<Double> _calibDataAccZ = new ArrayList<>();
+    protected ArrayList<Double> _calibDataAcc = new ArrayList<>();
     protected double _calibAccXOfs = 0;
     protected double _calibAccYOfs = 0;
     protected double _calibAccZOfs = 0;
@@ -211,6 +212,7 @@ public class YRefFrame extends YFunction
     }
 
     //--- (YRefFrame implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -591,7 +593,7 @@ public class YRefFrame extends YFunction
     public int get_calibrationState() throws YAPI_Exception
     {
         String calibParam;
-        ArrayList<Integer> iCalib = new ArrayList<Integer>();
+        ArrayList<Integer> iCalib = new ArrayList<>();
         int caltyp;
         int res;
         // may throw an exception
@@ -621,7 +623,7 @@ public class YRefFrame extends YFunction
     public int get_measureQuality() throws YAPI_Exception
     {
         String calibParam;
-        ArrayList<Integer> iCalib = new ArrayList<Integer>();
+        ArrayList<Integer> iCalib = new ArrayList<>();
         int caltyp;
         int res;
         // may throw an exception
@@ -857,7 +859,7 @@ public class YRefFrame extends YFunction
         intpos = (_calibStage - 1) * _calibCount;
         _calibSort(intpos, intpos + _calibCount);
         intpos = intpos + ((_calibCount) / (2));
-        _calibLogMsg = String.format("Stage %d: median is %d,%d,%d", _calibStage,
+        _calibLogMsg = String.format(Locale.US, "Stage %d: median is %d,%d,%d", _calibStage,
         (int) (double)Math.round(1000*_calibDataAccX.get(intpos).doubleValue()),
         (int) (double)Math.round(1000*_calibDataAccY.get(intpos).doubleValue()),(int) (double)Math.round(1000*_calibDataAccZ.get(intpos).doubleValue()));
         // move to next stage
@@ -939,7 +941,7 @@ public class YRefFrame extends YFunction
     {
         int currTick;
         byte[] calibParam;
-        ArrayList<Integer> iCalib = new ArrayList<Integer>();
+        ArrayList<Integer> iCalib = new ArrayList<>();
         int cal3;
         int calAcc;
         int calMag;
@@ -1128,7 +1130,7 @@ public class YRefFrame extends YFunction
         scaleLo = ((((scaleY) & (15))) << (12)) + ((scaleX) << (2)) + scaleExp;
         scaleHi = ((scaleZ) << (6)) + ((scaleY) >> (4));
         // Save calibration parameters
-        newcalib = String.format("5,%d,%d,%d,%d,%d", shiftX, shiftY, shiftZ, scaleLo,scaleHi);
+        newcalib = String.format(Locale.US, "5,%d,%d,%d,%d,%d", shiftX, shiftY, shiftZ, scaleLo,scaleHi);
         _calibStage = 0;
         return set_calibrationParam(newcalib);
     }

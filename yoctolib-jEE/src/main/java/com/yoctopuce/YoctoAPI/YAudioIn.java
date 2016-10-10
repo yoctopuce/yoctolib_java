@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAudioIn.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YAudioIn.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindAudioIn(), the high-level API for AudioIn functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce application programming interface allows you to configure the volume of the input channel.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YAudioIn extends YFunction
 {
 //--- (end of YAudioIn class start)
@@ -133,6 +133,7 @@ public class YAudioIn extends YFunction
     }
 
     //--- (YAudioIn implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

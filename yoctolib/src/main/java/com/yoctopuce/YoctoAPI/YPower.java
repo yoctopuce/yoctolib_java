@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPower.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YPower.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindPower(), the high-level API for Power functions
  *
@@ -52,7 +52,7 @@ import org.json.JSONObject;
  * register callback functions, access to the autonomous datalogger.
  * This class adds the ability to access the energy counter and the power factor.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPower extends YSensor
 {
 //--- (end of YPower class start)
@@ -125,6 +125,7 @@ public class YPower extends YSensor
     }
 
     //--- (YPower implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

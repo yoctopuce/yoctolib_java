@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCarbonDioxide.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YCarbonDioxide.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -52,7 +52,7 @@ import org.json.JSONObject;
  * register callback functions, access to the autonomous datalogger.
  * This class adds the ability to perform manual calibration if reuired.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YCarbonDioxide extends YSensor
 {
 //--- (end of YCarbonDioxide class start)
@@ -120,6 +120,7 @@ public class YCarbonDioxide extends YSensor
     }
 
     //--- (YCarbonDioxide implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

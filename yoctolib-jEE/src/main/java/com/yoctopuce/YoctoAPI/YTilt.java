@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTilt.java 24934 2016-06-30 22:32:01Z mvuilleu $
+ * $Id: YTilt.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindTilt(), the high-level API for Tilt functions
  *
@@ -57,7 +57,7 @@ import org.json.JSONObject;
  * Note: The YAnButton class is the only analog input which does not inherit
  * from YSensor.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YTilt extends YSensor
 {
 //--- (end of YTilt class start)
@@ -128,6 +128,7 @@ public class YTilt extends YSensor
     }
 
     //--- (YTilt implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

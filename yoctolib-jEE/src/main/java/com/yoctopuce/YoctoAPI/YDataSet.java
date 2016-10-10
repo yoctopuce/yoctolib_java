@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataSet.java 22359 2015-12-15 13:30:10Z seb $
+ * $Id: YDataSet.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -42,6 +42,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 //--- (generated code: YDataSet class start)
 /**
@@ -63,7 +64,7 @@ import java.util.ArrayList;
  * This class can only be used on devices that use a recent firmware,
  * as YDataSet objects are not supported by firmwares older than version 13000.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YDataSet
 {
 //--- (end of generated code: YDataSet class start)
@@ -76,11 +77,11 @@ public class YDataSet
     protected long _startTime = 0;
     protected long _endTime = 0;
     protected int _progress = 0;
-    protected ArrayList<Integer> _calib = new ArrayList<Integer>();
-    protected ArrayList<YDataStream> _streams = new ArrayList<YDataStream>();
+    protected ArrayList<Integer> _calib = new ArrayList<>();
+    protected ArrayList<YDataStream> _streams = new ArrayList<>();
     protected YMeasure _summary;
-    protected ArrayList<YMeasure> _preview = new ArrayList<YMeasure>();
-    protected ArrayList<YMeasure> _measures = new ArrayList<YMeasure>();
+    protected ArrayList<YMeasure> _preview = new ArrayList<>();
+    protected ArrayList<YMeasure> _measures = new ArrayList<>();
 
     //--- (end of generated code: YDataSet definitions)
 
@@ -98,7 +99,7 @@ public class YDataSet
     }
 
     // YDataSet constructor for the new datalogger
-    public YDataSet(YFunction parent) throws YAPI_Exception
+    public YDataSet(YFunction parent)
     {
         _parent = parent;
         _startTime = 0;
@@ -131,9 +132,9 @@ public class YDataSet
             } else {
                 _calib = YAPIContext._decodeWords(json.getString("cal"));
             }
-            _streams = new ArrayList<YDataStream>();
-            _preview = new ArrayList<YMeasure>();
-            _measures = new ArrayList<YMeasure>();
+            _streams = new ArrayList<>();
+            _preview = new ArrayList<>();
+            _measures = new ArrayList<>();
             jstreams = json.getJSONArray("streams");
             for (int i = 0; i < jstreams.length(); i++) {
                 YDataStream stream = _parent._findDataStream(this, jstreams.getString(i));
@@ -197,7 +198,7 @@ public class YDataSet
     public int processMore(int progress,byte[] data) throws YAPI_Exception
     {
         YDataStream stream;
-        ArrayList<ArrayList<Double>> dataRows = new ArrayList<ArrayList<Double>>();
+        ArrayList<ArrayList<Double>> dataRows = new ArrayList<>();
         String strdata;
         double tim;
         double itv;
@@ -274,7 +275,7 @@ public class YDataSet
             return _hardwareId;
         }
         mo = _parent.get_module();
-        _hardwareId = String.format("%s.%s", mo.get_serialNumber(),get_functionId());
+        _hardwareId = String.format(Locale.US, "%s.%s", mo.get_serialNumber(),get_functionId());
         return _hardwareId;
     }
 
@@ -369,7 +370,7 @@ public class YDataSet
         String url;
         YDataStream stream;
         if (_progress < 0) {
-            url = String.format("logger.json?id=%s",_functionId);
+            url = String.format(Locale.US, "logger.json?id=%s",_functionId);
         } else {
             if (_progress >= _streams.size()) {
                 return 100;
@@ -440,8 +441,8 @@ public class YDataSet
     {
         long startUtc;
         YDataStream stream;
-        ArrayList<ArrayList<Double>> dataRows = new ArrayList<ArrayList<Double>>();
-        ArrayList<YMeasure> measures = new ArrayList<YMeasure>();
+        ArrayList<ArrayList<Double>> dataRows = new ArrayList<>();
+        ArrayList<YMeasure> measures = new ArrayList<>();
         double tim;
         double itv;
         int nCols;

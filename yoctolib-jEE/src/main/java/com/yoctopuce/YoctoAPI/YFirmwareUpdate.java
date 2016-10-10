@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YFirmwareUpdate.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -64,7 +64,7 @@ import java.util.ArrayList;
  * module. This class should not be instantiate directly, instead the method
  * updateFirmware should be called to get an instance of YFirmwareUpdate.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YFirmwareUpdate
 {
 //--- (end of generated code: YFirmwareUpdate class start)

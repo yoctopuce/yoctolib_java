@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 25308 2016-09-07 09:02:02Z seb $
+ * $Id: YCallbackHub.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -87,7 +87,7 @@ public class YCallbackHub extends YGenericHub
     synchronized boolean isSameHub(String url, Object request, Object response, Object session)
     {
         HTTPParams params = new HTTPParams(url);
-        OutputStream tmp = (OutputStream)response;
+        OutputStream tmp = (OutputStream) response;
         return params.getUrl().equals(_http_params.getUrl()) && tmp == _out;
     }
 
@@ -179,6 +179,7 @@ public class YCallbackHub extends YGenericHub
         }
     }
 
+    @SuppressWarnings("RedundantThrows")
     private byte[] cachedRequest(String query, byte[] header_and_body) throws YAPI_Exception, IOException
     {
         // apply POST remotely
@@ -258,12 +259,16 @@ public class YCallbackHub extends YGenericHub
         }
         String yreq;
         try {
-            yreq = new String(cachedRequest("GET /api.json\r\n", null));
+            byte[] data = cachedRequest("GET /api.json\r\n", null);
+            if (data == null) {
+                throw new YAPI_Exception(YAPI.IO_ERROR, "no cached request for GET /api.json");
+            }
+            yreq = new String(data);
         } catch (IOException ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
-        HashMap<String, ArrayList<YPEntry>> yellowPages = new HashMap<String, ArrayList<YPEntry>>();
-        ArrayList<WPEntry> whitePages = new ArrayList<WPEntry>();
+        HashMap<String, ArrayList<YPEntry>> yellowPages = new HashMap<>();
+        ArrayList<WPEntry> whitePages = new ArrayList<>();
         JSONObject loadval;
         try {
             loadval = new JSONObject(yreq);
@@ -281,7 +286,7 @@ public class YCallbackHub extends YGenericHub
             while (keys.hasNext()) {
                 String classname = keys.next().toString();
                 JSONArray yprecs_json = yellowPages_json.getJSONArray(classname);
-                ArrayList<YPEntry> yprecs_arr = new ArrayList<YPEntry>(
+                ArrayList<YPEntry> yprecs_arr = new ArrayList<>(
                         yprecs_json.length());
                 for (int i = 0; i < yprecs_json.length(); i++) {
                     YPEntry yprec = new YPEntry(yprecs_json.getJSONObject(i));

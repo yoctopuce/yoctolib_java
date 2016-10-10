@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmPowerSource.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YPwmPowerSource.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -50,7 +50,7 @@ import org.json.JSONObject;
  * The Yoctopuce application programming interface allows you to configure
  * the voltage source used by all PWM on the same device.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPwmPowerSource extends YFunction
 {
 //--- (end of YPwmPowerSource class start)
@@ -116,6 +116,7 @@ public class YPwmPowerSource extends YFunction
     }
 
     //--- (YPwmPowerSource implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

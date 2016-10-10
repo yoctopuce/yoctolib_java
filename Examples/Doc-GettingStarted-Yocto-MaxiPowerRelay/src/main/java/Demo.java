@@ -1,8 +1,10 @@
 import com.yoctopuce.YoctoAPI.*;
 
-public class Demo {
+public class Demo
+{
 
-    public static void main(String[] args)   {
+    public static void main(String[] args)
+    {
         try {
             // setup the API to use local VirtualHub
             YAPI.RegisterHub("127.0.0.1");
@@ -29,19 +31,18 @@ public class Demo {
             }
         }
 
-        System.out.println("We will use");
 
         try {
 
             System.out.println("Switch on all output");
-            for (int channel = 1; channel < 9; channel++) {
+            for (int channel = 1; channel < 6; channel++) {
                 YRelay relay = YRelay.FindRelay(serial + ".relay" + channel);
                 relay.set_output(YRelay.OUTPUT_ON);
                 YAPI.Sleep(100);
             }
             YAPI.Sleep(500);
             System.out.println("Switch off all output");
-            for (int channel = 1; channel < 9; channel++) {
+            for (int channel = 1; channel < 6; channel++) {
                 YRelay relay = YRelay.FindRelay(serial + ".relay" + channel);
                 relay.set_output(YRelay.OUTPUT_OFF);
                 YAPI.Sleep(100);

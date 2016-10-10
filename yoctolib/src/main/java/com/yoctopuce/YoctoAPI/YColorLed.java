@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YColorLed.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Locale;
 
 //--- (YColorLed return codes)
 //--- (end of YColorLed return codes)
@@ -54,7 +55,7 @@ import org.json.JSONObject;
  * saturation or lightness. If needed, you can find more information on the
  * difference between RGB and HSL in the section following this one.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YColorLed extends YFunction
 {
 //--- (end of YColorLed class start)
@@ -158,6 +159,7 @@ public class YColorLed extends YFunction
     }
 
     //--- (YColorLed implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -256,7 +258,7 @@ public class YColorLed extends YFunction
     public int set_rgbColor(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("0x%06x",newval);
+        rest_val = String.format(Locale.US, "0x%06x",newval);
         _setAttr("rgbColor",rest_val);
         return YAPI.SUCCESS;
     }
@@ -316,7 +318,7 @@ public class YColorLed extends YFunction
     public int set_hslColor(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("0x%06x",newval);
+        rest_val = String.format(Locale.US, "0x%06x",newval);
         _setAttr("hslColor",rest_val);
         return YAPI.SUCCESS;
     }
@@ -359,7 +361,7 @@ public class YColorLed extends YFunction
     public int set_rgbMove(YMove  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("%d:%d",newval.target,newval.ms);
+        rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
         _setAttr("rgbMove",rest_val);
         return YAPI.SUCCESS;
     }
@@ -382,7 +384,7 @@ public class YColorLed extends YFunction
     public int rgbMove(int rgb_target,int ms_duration)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("%d:%d",rgb_target,ms_duration);
+        rest_val = String.format(Locale.US, "%d:%d",rgb_target,ms_duration);
         _setAttr("rgbMove",rest_val);
         return YAPI.SUCCESS;
     }
@@ -411,7 +413,7 @@ public class YColorLed extends YFunction
     public int set_hslMove(YMove  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("%d:%d",newval.target,newval.ms);
+        rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
         _setAttr("hslMove",rest_val);
         return YAPI.SUCCESS;
     }
@@ -434,7 +436,7 @@ public class YColorLed extends YFunction
     public int hslMove(int hsl_target,int ms_duration)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("%d:%d",hsl_target,ms_duration);
+        rest_val = String.format(Locale.US, "%d:%d",hsl_target,ms_duration);
         _setAttr("hslMove",rest_val);
         return YAPI.SUCCESS;
     }
@@ -481,7 +483,7 @@ public class YColorLed extends YFunction
     public int set_rgbColorAtPowerOn(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("0x%06x",newval);
+        rest_val = String.format(Locale.US, "0x%06x",newval);
         _setAttr("rgbColorAtPowerOn",rest_val);
         return YAPI.SUCCESS;
     }
@@ -755,7 +757,7 @@ public class YColorLed extends YFunction
      */
     public int addHslMoveToBlinkSeq(int HSLcolor,int msDelay) throws YAPI_Exception
     {
-        return sendCommand(String.format("H%d,%d",HSLcolor,msDelay));
+        return sendCommand(String.format(Locale.US, "H%d,%d",HSLcolor,msDelay));
     }
 
     /**
@@ -770,7 +772,7 @@ public class YColorLed extends YFunction
      */
     public int addRgbMoveToBlinkSeq(int RGBcolor,int msDelay) throws YAPI_Exception
     {
-        return sendCommand(String.format("R%d,%d",RGBcolor,msDelay));
+        return sendCommand(String.format(Locale.US, "R%d,%d",RGBcolor,msDelay));
     }
 
     /**

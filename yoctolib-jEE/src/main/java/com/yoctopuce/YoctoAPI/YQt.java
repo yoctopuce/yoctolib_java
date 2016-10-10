@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YQt.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -51,7 +51,7 @@ import org.json.JSONObject;
  * using a quaternion. It is usually not needed to use the YQt class directly, as the
  * YGyro class provides a more convenient higher-level interface.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YQt extends YSensor
 {
 //--- (end of generated code: YQt class start)
@@ -105,6 +105,7 @@ public class YQt extends YSensor
 
 
     //--- (generated code: YQt implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

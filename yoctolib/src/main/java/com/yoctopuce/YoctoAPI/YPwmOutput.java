@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmOutput.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YPwmOutput.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Locale;
 
 //--- (YPwmOutput return codes)
 //--- (end of YPwmOutput return codes)
@@ -49,7 +50,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce application programming interface allows you to configure, start, and stop the PWM.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPwmOutput extends YFunction
 {
 //--- (end of YPwmOutput class start)
@@ -150,6 +151,7 @@ public class YPwmOutput extends YFunction
     }
 
     //--- (YPwmOutput implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -778,7 +780,7 @@ public class YPwmOutput extends YFunction
         if (ms_target < 0.0) {
             ms_target = 0.0;
         }
-        newval = String.format("%dms:%d", (int) (double)Math.round(ms_target*65536),ms_duration);
+        newval = String.format(Locale.US, "%dms:%d", (int) (double)Math.round(ms_target*65536),ms_duration);
         return set_pwmTransition(newval);
     }
 
@@ -802,7 +804,7 @@ public class YPwmOutput extends YFunction
         if (target > 100.0) {
             target = 100.0;
         }
-        newval = String.format("%d:%d", (int) (double)Math.round(target*65536),ms_duration);
+        newval = String.format(Locale.US, "%d:%d", (int) (double)Math.round(target*65536),ms_duration);
         return set_pwmTransition(newval);
     }
 

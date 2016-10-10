@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 25310 2016-09-07 09:06:02Z seb $
+ * $Id: YDevice.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Internal YDevice class
  *
@@ -40,7 +40,11 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
 
 
 //
@@ -71,7 +75,7 @@ public class YDevice
     private boolean _logIsPulling = false;
 
     // Device constructor. Automatically call the YAPI functin to reindex device
-    YDevice(YGenericHub hub, WPEntry wpRec, HashMap<String, ArrayList<YPEntry>> ypRecs) throws YAPI_Exception
+    YDevice(YGenericHub hub, WPEntry wpRec, HashMap<String, ArrayList<YPEntry>> ypRecs)
     {
         // private attributes
         _hub = hub;
@@ -80,7 +84,7 @@ public class YDevice
         _cache_json = null;
         _moduleYPEntry = new YPEntry(wpRec.getSerialNumber(), "module", YPEntry.BaseClass.Function);
         _moduleYPEntry.setLogicalName(wpRec.getLogicalName());
-        _ypRecs = new HashMap<Integer, YPEntry>();
+        _ypRecs = new HashMap<>();
         Set<String> keySet = ypRecs.keySet();
         for (String categ : keySet) {
             for (YPEntry rec : ypRecs.get(categ)) {
@@ -107,23 +111,6 @@ public class YDevice
     public String getLogicalName()
     {
         return _wpRec.getLogicalName();
-    }
-
-    // Return the product name of the device, as found during discovery
-    public String getProductName()
-    {
-        return _wpRec.getProductName();
-    }
-
-    // Return the product Id of the device, as found during discovery
-    public int getProductId()
-    {
-        return _wpRec.getProductId();
-    }
-
-    String getRelativePath()
-    {
-        return _wpRec.getNetworkUrl();
     }
 
     // Return the beacon state of the device, as found during discovery
@@ -181,7 +168,7 @@ public class YDevice
                     }
                     if (func.has("advertisedValue")) {
                         String pubval = func.getString("advertisedValue");
-                        _hub._yctx._yHash.setFunctionValue(_wpRec.getSerialNumber()+"."+key, pubval);
+                        _hub._yctx._yHash.setFunctionValue(_wpRec.getSerialNumber() + "." + key, pubval);
                     }
                     for (int f = 0; f < _ypRecs.size(); f++) {
                         if (_ypRecs.get(f).getFuncId().equals(key)) {
@@ -211,7 +198,7 @@ public class YDevice
     }
 
     // Retrieve the number of functions (beside "module") in the device
-    protected int functionCount()
+    int functionCount()
     {
         return _ypRecs.size();
     }
@@ -334,7 +321,7 @@ public class YDevice
         triggerLogPull();
     }
 
-    static byte[] formatHTTPUpload(String path, byte[] content) throws YAPI_Exception
+    static byte[] formatHTTPUpload(String path, byte[] content)
     {
         Random randomGenerator = new Random();
         String boundary;
@@ -344,7 +331,8 @@ public class YDevice
         // find a valid boundary
         do {
             boundary = String.format("Zz%06xzZ", randomGenerator.nextInt(0x1000000));
-        } while (mp_header.contains(boundary) && YAPIContext._find_in_bytes(content, boundary.getBytes()) >= 0);
+        }
+        while (mp_header.contains(boundary) && YAPIContext._find_in_bytes(content, boundary.getBytes()) >= 0);
         //construct header parts
         String header_start = "Content-Type: multipart/form-data; boundary=" + boundary + "\r\n\r\n--" + boundary + "\r\n" + mp_header;
         String header_stop = "\r\n--" + boundary + "--\r\n";

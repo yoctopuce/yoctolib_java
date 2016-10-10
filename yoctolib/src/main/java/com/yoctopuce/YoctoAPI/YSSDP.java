@@ -10,7 +10,7 @@ import java.util.*;
  * <p/>
  * this class is used to detect all YoctoHub using SSDP
  */
-public class YSSDP {
+class YSSDP {
 
 
     interface YSSDPReportInterface {
@@ -38,7 +38,7 @@ public class YSSDP {
 
     private final YAPIContext _yctx;
     private final ArrayList<NetworkInterface> _netInterfaces = new ArrayList<>(1);
-    private final HashMap<String, YSSDPCacheEntry> _cache = new HashMap<String, YSSDPCacheEntry>();
+    private final HashMap<String, YSSDPCacheEntry> _cache = new HashMap<>();
     private InetAddress mMcastAddr;
     private boolean _Listening;
     private YSSDPReportInterface _callbacks;
@@ -101,7 +101,7 @@ public class YSSDP {
 
     private synchronized void checkCacheExpiration()
     {
-        ArrayList<String> to_remove = new ArrayList<String>();
+        ArrayList<String> to_remove = new ArrayList<>();
         for (YSSDPCacheEntry entry : _cache.values()) {
             if (entry.hasExpired()) {
                 _callbacks.HubDiscoveryCallback(entry.getSerial(), null, entry.getURL());

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPressure.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YPressure.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindPressure(), the high-level API for Pressure functions
  *
@@ -51,7 +51,7 @@ import org.json.JSONObject;
  * sensors. It inherits from YSensor class the core functions to read measurements,
  * register callback functions, access to the autonomous datalogger.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPressure extends YSensor
 {
 //--- (end of YPressure class start)
@@ -109,6 +109,7 @@ public class YPressure extends YSensor
     }
 
     //--- (YPressure implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

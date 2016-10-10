@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 22359 2015-12-15 13:30:10Z seb $
+ * $Id: YDataStream.java 25362 2016-09-16 08:23:48Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 //--- (generated code: YDataStream class start)
 /**
@@ -55,7 +56,7 @@ import java.util.ArrayList;
  * get_dataSets() method from the data logger) provide
  * a more convenient interface.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YDataStream
 {
 //--- (end of generated code: YDataStream class start)
@@ -68,7 +69,7 @@ public class YDataStream
     protected int _nCols = 0;
     protected int _nRows = 0;
     protected int _duration = 0;
-    protected ArrayList<String> _columnNames = new ArrayList<String>();
+    protected ArrayList<String> _columnNames = new ArrayList<>();
     protected String _functionId;
     protected boolean _isClosed;
     protected boolean _isAvg;
@@ -83,10 +84,10 @@ public class YDataStream
     protected double _maxVal = 0;
     protected double _decexp = 0;
     protected int _caltyp = 0;
-    protected ArrayList<Integer> _calpar = new ArrayList<Integer>();
-    protected ArrayList<Double> _calraw = new ArrayList<Double>();
-    protected ArrayList<Double> _calref = new ArrayList<Double>();
-    protected ArrayList<ArrayList<Double>> _values = new ArrayList<ArrayList<Double>>();
+    protected ArrayList<Integer> _calpar = new ArrayList<>();
+    protected ArrayList<Double> _calraw = new ArrayList<>();
+    protected ArrayList<Double> _calref = new ArrayList<>();
+    protected ArrayList<ArrayList<Double>> _values = new ArrayList<>();
 
     //--- (end of generated code: YDataStream definitions)
     protected YAPI.CalibrationHandlerCallback _calhdl = null;
@@ -96,7 +97,7 @@ public class YDataStream
         _parent = parent;
     }
 
-    YDataStream(YFunction parent, YDataSet dataset, ArrayList<Integer> encoded) throws YAPI_Exception
+    YDataStream(YFunction parent, YDataSet dataset, ArrayList<Integer> encoded)
     {
         _parent = parent;
         _initFromDataSet(dataset, encoded);
@@ -114,7 +115,7 @@ public class YDataStream
         double fRaw;
         double fRef;
         double duration_float;
-        ArrayList<Integer> iCalib = new ArrayList<Integer>();
+        ArrayList<Integer> iCalib = new ArrayList<>();
         // decode sequence header to extract data
         _runNo = encoded.get(0).intValue() + (((encoded.get(1).intValue()) << (16)));
         _utcStamp = encoded.get(2).intValue() + (((encoded.get(3).intValue()) << (16)));
@@ -204,9 +205,9 @@ public class YDataStream
         _functionId = dataset.get_functionId();
         if (_isAvg) {
             _columnNames.clear();
-            _columnNames.add(String.format("%s_min",_functionId));
-            _columnNames.add(String.format("%s_avg",_functionId));
-            _columnNames.add(String.format("%s_max",_functionId));
+            _columnNames.add(String.format(Locale.US, "%s_min",_functionId));
+            _columnNames.add(String.format(Locale.US, "%s_avg",_functionId));
+            _columnNames.add(String.format(Locale.US, "%s_max",_functionId));
             _nCols = 3;
         } else {
             _columnNames.clear();
@@ -231,8 +232,8 @@ public class YDataStream
     public int _parseStream(byte[] sdata) throws YAPI_Exception
     {
         int idx;
-        ArrayList<Integer> udat = new ArrayList<Integer>();
-        ArrayList<Double> dat = new ArrayList<Double>();
+        ArrayList<Integer> udat = new ArrayList<>();
+        ArrayList<Double> dat = new ArrayList<>();
         if ((sdata).length == 0) {
             _nRows = 0;
             return YAPI.SUCCESS;
@@ -282,7 +283,7 @@ public class YDataStream
     public String _get_url()
     {
         String url;
-        url = String.format("logger.json?id=%s&run=%d&utc=%d",
+        url = String.format(Locale.US, "logger.json?id=%s&run=%d&utc=%d",
         _functionId,_runNo,_utcStamp);
         return url;
     }

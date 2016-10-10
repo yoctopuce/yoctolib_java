@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmInput.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YPwmInput.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -53,7 +53,7 @@ import org.json.JSONObject;
  * This class adds the ability to configure the signal parameter used to transmit
  * information: the duty cycle, the frequency or the pulse width.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPwmInput extends YSensor
 {
 //--- (end of YPwmInput class start)
@@ -150,6 +150,7 @@ public class YPwmInput extends YSensor
     }
 
     //--- (YPwmInput implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

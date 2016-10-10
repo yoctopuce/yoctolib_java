@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YSms.java 24649 2016-05-31 11:20:13Z mvuilleu $
+ * $Id: YSms.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindSms(), the high-level API for Sms functions
  *
@@ -37,6 +37,7 @@
 
 package com.yoctopuce.YoctoAPI;
 import java.util.ArrayList;
+import java.util.Locale;
 
 //--- (generated code: YSms return codes)
 //--- (end of generated code: YSms return codes)
@@ -46,7 +47,7 @@ import java.util.ArrayList;
  *
  *
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YSms
 {
 //--- (end of generated code: YSms class start)
@@ -66,7 +67,7 @@ public class YSms
     protected byte[] _udata;
     protected int _npdu = 0;
     protected byte[] _pdu;
-    protected ArrayList<YSms> _parts = new ArrayList<YSms>();
+    protected ArrayList<YSms> _parts = new ArrayList<>();
     protected String _aggSig;
     protected int _aggIdx = 0;
     protected int _aggCnt = 0;
@@ -181,7 +182,7 @@ public class YSms
 
     public ArrayList<Integer> get_unicodeData()
     {
-        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Integer> res = new ArrayList<>();
         int unisize;
         int unival;
         int i;
@@ -355,7 +356,7 @@ public class YSms
 
     public int convertToUnicode()
     {
-        ArrayList<Integer> ucs2 = new ArrayList<Integer>();
+        ArrayList<Integer> ucs2 = new ArrayList<>();
         int udatalen;
         int i;
         int uni;
@@ -499,7 +500,7 @@ public class YSms
 
     public int set_parts(ArrayList<YSms> parts)
     {
-        ArrayList<YSms> sorted = new ArrayList<YSms>();
+        ArrayList<YSms> sorted = new ArrayList<>();
         int partno;
         int initpartno;
         int i;
@@ -587,7 +588,7 @@ public class YSms
         }
         if (numlen == 0) {
             res = new byte[1];
-            res[0] = (byte)(0 & 0xff);
+            res[0] = 0;
             return res;
         }
         res = new byte[2+((numlen+1) >> (1))];
@@ -664,7 +665,7 @@ public class YSms
             i = 0;
             while (i < siz) {
                 byt = addr[ofs+i+1];
-                res = String.format("%s%x%x", res, ((byt) & (15)),((byt) >> (4)));
+                res = String.format(Locale.US, "%s%x%x", res, ((byt) & (15)),((byt) >> (4)));
                 i = i + 1;
             }
             if (((addr[ofs+siz]) >> (4)) == 15) {
@@ -733,7 +734,7 @@ public class YSms
             i = i + 1;
         }
         while (n < 7) {
-            res[n] = (byte)(0 & 0xff);
+            res[n] = 0;
             n = n + 1;
         }
         if (i+2 < explen) {
@@ -783,22 +784,22 @@ public class YSms
                     }
                 }
             }
-            return String.format("+%d",n);
+            return String.format(Locale.US, "+%d",n);
         }
         res = "20";
         i = 0;
         while ((i < siz) && (i < 6)) {
             byt = exp[ofs+i];
-            res = String.format("%s%x%x", res, ((byt) & (15)),((byt) >> (4)));
+            res = String.format(Locale.US, "%s%x%x", res, ((byt) & (15)),((byt) >> (4)));
             if (i < 3) {
                 if (i < 2) {
-                    res = String.format("%s-",res);
+                    res = String.format(Locale.US, "%s-",res);
                 } else {
-                    res = String.format("%s ",res);
+                    res = String.format(Locale.US, "%s ",res);
                 }
             } else {
                 if (i < 5) {
-                    res = String.format("%s:",res);
+                    res = String.format(Locale.US, "%s:",res);
                 }
             }
             i = i + 1;
@@ -811,15 +812,15 @@ public class YSms
                 sign = "-";
             }
             byt = (10*(((byt) & (15)))) + (((byt) >> (4)));
-            hh = String.format("%d",((byt) >> (2)));
-            ss = String.format("%d",15*(((byt) & (3))));
+            hh = String.format(Locale.US, "%d",((byt) >> (2)));
+            ss = String.format(Locale.US, "%d",15*(((byt) & (3))));
             if ((hh).length()<2) {
-                hh = String.format("0%s",hh);
+                hh = String.format(Locale.US, "0%s",hh);
             }
             if ((ss).length()<2) {
-                ss = String.format("0%s",ss);
+                ss = String.format(Locale.US, "0%s",ss);
             }
-            res = String.format("%s%s%s:%s", res, sign, hh,ss);
+            res = String.format(Locale.US, "%s%s%s:%s", res, sign, hh,ss);
         }
         return res;
     }
@@ -940,7 +941,7 @@ public class YSms
         while (wpos < udlen) {
             partno = partno + 1;
             newudh = new byte[5+udhsize];
-            newudh[0] = (byte)(0 & 0xff);
+            newudh[0] = 0;
             newudh[1] = (byte)(3 & 0xff);
             newudh[2] = (byte)(_mref & 0xff);
             newudh[3] = (byte)(_npdu & 0xff);
@@ -1081,14 +1082,14 @@ public class YSms
             i = i + 2;
             if (i + ielen <= udhlen) {
                 if ((iei == 0) && (ielen == 3)) {
-                    sig = String.format("%s-%s-%02x-%02x", _orig, _dest,
+                    sig = String.format(Locale.US, "%s-%s-%02x-%02x", _orig, _dest,
                     _mref,_udh[i]);
                     _aggSig = sig;
                     _aggCnt = _udh[i+1];
                     _aggIdx = _udh[i+2];
                 }
                 if ((iei == 8) && (ielen == 4)) {
-                    sig = String.format("%s-%s-%02x-%02x%02x", _orig, _dest,
+                    sig = String.format(Locale.US, "%s-%s-%02x-%02x%02x", _orig, _dest,
                     _mref, _udh[i],_udh[i+1]);
                     _aggSig = sig;
                     _aggCnt = _udh[i+2];

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YNetwork.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindNetwork(), the high-level API for Network functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Locale;
 
 //--- (YNetwork return codes)
 //--- (end of YNetwork return codes)
@@ -50,7 +51,7 @@ import org.json.JSONObject;
  * YNetwork objects provide access to TCP/IP parameters of Yoctopuce
  * modules that include a built-in network interface.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YNetwork extends YFunction
 {
 //--- (end of YNetwork class start)
@@ -242,6 +243,7 @@ public class YNetwork extends YFunction
     }
 
     //--- (YNetwork implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -1443,7 +1445,7 @@ public class YNetwork extends YFunction
     public int callbackLogin(String username,String password)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("%s:%s", username.toString(), password.toString());
+        rest_val = String.format(Locale.US, "%s:%s", username, password);
         _setAttr("callbackCredentials",rest_val);
         return YAPI.SUCCESS;
     }
@@ -1796,7 +1798,7 @@ public class YNetwork extends YFunction
      */
     public int useDHCP(String fallbackIpAddr,int fallbackSubnetMaskLen,String fallbackRouter) throws YAPI_Exception
     {
-        return set_ipConfig(String.format("DHCP:%s/%d/%s", fallbackIpAddr, fallbackSubnetMaskLen,fallbackRouter));
+        return set_ipConfig(String.format(Locale.US, "DHCP:%s/%d/%s", fallbackIpAddr, fallbackSubnetMaskLen,fallbackRouter));
     }
 
     /**
@@ -1813,7 +1815,7 @@ public class YNetwork extends YFunction
      */
     public int useStaticIP(String ipAddress,int subnetMaskLen,String router) throws YAPI_Exception
     {
-        return set_ipConfig(String.format("STATIC:%s/%d/%s", ipAddress, subnetMaskLen,router));
+        return set_ipConfig(String.format(Locale.US, "STATIC:%s/%d/%s", ipAddress, subnetMaskLen,router));
     }
 
     /**
@@ -1829,7 +1831,7 @@ public class YNetwork extends YFunction
     {
         byte[] content;
         // may throw an exception
-        content = _download(String.format("ping.txt?host=%s",host));
+        content = _download(String.format(Locale.US, "ping.txt?host=%s",host));
         return new String(content);
     }
 

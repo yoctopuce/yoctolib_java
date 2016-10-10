@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAnButton.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YAnButton.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindAnButton(), the high-level API for AnButton functions
  *
@@ -54,7 +54,7 @@ import org.json.JSONObject;
  * in order to compute a calibrated value that varies proportionally with the
  * potentiometer position, regardless of its total resistance.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YAnButton extends YFunction
 {
 //--- (end of YAnButton class start)
@@ -170,6 +170,7 @@ public class YAnButton extends YFunction
     }
 
     //--- (YAnButton implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrentLoopOutput.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YCurrentLoopOutput.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Locale;
 
 //--- (YCurrentLoopOutput return codes)
 //--- (end of YCurrentLoopOutput return codes)
@@ -50,7 +51,7 @@ import org.json.JSONObject;
  * The Yoctopuce application programming interface allows you to change the value of the 4-20mA
  * output as well as to know the current loop state.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YCurrentLoopOutput extends YFunction
 {
 //--- (end of YCurrentLoopOutput class start)
@@ -130,6 +131,7 @@ public class YCurrentLoopOutput extends YFunction
     }
 
     //--- (YCurrentLoopOutput implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -472,7 +474,7 @@ public class YCurrentLoopOutput extends YFunction
         if (mA_target > 21.0) {
             mA_target = 21.0;
         }
-        newval = String.format("%d:%d", (int) (double)Math.round(mA_target*1000),ms_duration);
+        newval = String.format(Locale.US, "%d:%d", (int) (double)Math.round(mA_target*1000),ms_duration);
         // may throw an exception
         return set_currentTransition(newval);
     }

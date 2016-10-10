@@ -3,12 +3,12 @@ package com.yoctopuce.YoctoAPI;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class YHash
+class YHash
 {
 
-    private final HashMap<String, YDevice> _devs = new HashMap<String, YDevice>(); // hash table of devices, by serial number
-    private final HashMap<String, String> _snByName = new HashMap<String, String>(); // serial number for each device, by name
-    private final HashMap<String, YFunctionType> _fnByType = new HashMap<String, YFunctionType>(2); // functions by type
+    private final HashMap<String, YDevice> _devs = new HashMap<>(); // hash table of devices, by serial number
+    private final HashMap<String, String> _snByName = new HashMap<>(); // serial number for each device, by name
+    private final HashMap<String, YFunctionType> _fnByType = new HashMap<>(2); // functions by type
     private final YAPIContext _yctx;
 
     public YHash(YAPIContext yctx)
@@ -112,7 +112,7 @@ public class YHash
             for (YFunctionType subClassType : _fnByType.values()) {
                 try {
                     YPEntry yp = subClassType.getYPEntry(func);
-                    if (yp.getBaseClass().equals(baseType)) {
+                    if (yp.matchBaseType(baseType)) {
                         return yp;
                     }
                 } catch (YAPI_Exception ignore) {
@@ -181,7 +181,7 @@ public class YHash
             YPEntry.BaseClass baseType = YAPI._BaseType.get(className);
             for (YFunctionType subClassType : _fnByType.values()) {
                 YPEntry yp = subClassType.getFirstYPEntry();
-                if (yp != null && yp.getBaseClass().equals(baseType)) {
+                if (yp != null && yp.matchBaseType(baseType)) {
                     return yp.getHardwareId();
                 }
             }
@@ -214,7 +214,7 @@ public class YHash
                 }
                 YFunctionType functionType = _fnByType.get(altClassName);
                 res = functionType.getFirstYPEntry();
-                if (res != null && res.getBaseClass().equals(baseType)) {
+                if (res != null && res.matchBaseType(baseType)) {
                     return res.getHardwareId();
                 }
             }

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YModule.java 25362 2016-09-16 08:23:48Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -44,6 +44,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Locale;
 
 
 //--- (generated code: YModule class start)
@@ -54,7 +55,7 @@ import java.util.Iterator;
  * It can be used to control the module global parameters, and
  * to enumerate the functions provided by each module.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YModule extends YFunction
 {
 //--- (end of generated code: YModule class start)
@@ -397,6 +398,7 @@ public class YModule extends YFunction
 
 
     // --- (generated code: YModule implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -1174,8 +1176,8 @@ public class YModule extends YFunction
         byte[] file_data_bin;
         byte[] temp_data_bin;
         String ext_settings;
-        ArrayList<String> filelist = new ArrayList<String>();
-        ArrayList<String> templist = new ArrayList<String>();
+        ArrayList<String> filelist = new ArrayList<>();
+        ArrayList<String> templist = new ArrayList<>();
         // may throw an exception
         settings = _download("api.json");
         if ((settings).length == 0) {
@@ -1186,15 +1188,15 @@ public class YModule extends YFunction
         sep = "";
         for (String ii: templist) {
             if (YAPIContext._atoi(get_firmwareRelease()) > 9000) {
-                url = String.format("api/%s/sensorType",ii);
+                url = String.format(Locale.US, "api/%s/sensorType",ii);
                 t_type = new String(_download(url));
                 if (t_type.equals("RES_NTC")) {
                     id = (ii).substring( 11,  11 + (ii).length() - 11);
-                    temp_data_bin = _download(String.format("extra.json?page=%s",id));
+                    temp_data_bin = _download(String.format(Locale.US, "extra.json?page=%s",id));
                     if ((temp_data_bin).length == 0) {
                         return temp_data_bin;
                     }
-                    item = String.format("%s{\"fid\":\"%s\", \"json\":%s}\n", sep, ii,new String(temp_data_bin));
+                    item = String.format(Locale.US, "%s{\"fid\":\"%s\", \"json\":%s}\n", sep, ii,new String(temp_data_bin));
                     ext_settings = ext_settings + item;
                     sep = ",";
                 }
@@ -1213,7 +1215,7 @@ public class YModule extends YFunction
                 if (((name).length() > 0) && !(name.equals("startupConf.json"))) {
                     file_data_bin = _download(_escapeAttr(name));
                     file_data = YAPIContext._bytesToHexStr(file_data_bin, 0, file_data_bin.length);
-                    item = String.format("%s{\"name\":\"%s\", \"data\":\"%s\"}\n", sep, name,file_data);
+                    item = String.format(Locale.US, "%s{\"name\":\"%s\", \"data\":\"%s\"}\n", sep, name,file_data);
                     ext_settings = ext_settings + item;
                     sep = ",";
                 }
@@ -1225,7 +1227,7 @@ public class YModule extends YFunction
 
     public int loadThermistorExtra(String funcId,String jsonExtra) throws YAPI_Exception
     {
-        ArrayList<String> values = new ArrayList<String>();
+        ArrayList<String> values = new ArrayList<>();
         String url;
         String curr;
         String currTemp;
@@ -1241,7 +1243,7 @@ public class YModule extends YFunction
         while (ofs + 1 < size) {
             curr = values.get(ofs);
             currTemp = values.get(ofs + 1);
-            url = String.format("api/%s/.json?command=m%s:%s",  funcId, curr,currTemp);
+            url = String.format(Locale.US, "api/%s/.json?command=m%s:%s",  funcId, curr,currTemp);
             _download(url);
             ofs = ofs + 2;
         }
@@ -1250,7 +1252,7 @@ public class YModule extends YFunction
 
     public int set_extraSettings(String jsonExtra) throws YAPI_Exception
     {
-        ArrayList<String> extras = new ArrayList<String>();
+        ArrayList<String> extras = new ArrayList<>();
         String functionId;
         String data;
         extras = _json_get_array((jsonExtra).getBytes());
@@ -1296,13 +1298,14 @@ public class YModule extends YFunction
         }
         set_allSettings((json_api).getBytes());
         if (hasFunction("files")) {
-            ArrayList<String> files = new ArrayList<String>();
+            ArrayList<String> files = new ArrayList<>();
             String res;
             String name;
             String data;
             down = _download("files.json?a=format");
             res = _get_json_path(new String(down), "res");
             res = _decode_json_string(res);
+            //noinspection DoubleNegation
             if (!(res.equals("ok"))) { throw new YAPI_Exception( YAPI.IO_ERROR,  "format failed");}
             json_files = _get_json_path(json, "files");
             files = _json_get_array((json_files).getBytes());
@@ -1355,7 +1358,7 @@ public class YModule extends YFunction
         int count;
         int i;
         String ftype;
-        ArrayList<String> res = new ArrayList<String>();
+        ArrayList<String> res = new ArrayList<>();
         // may throw an exception
         count = functionCount();
         i = 0;
@@ -1436,10 +1439,10 @@ public class YModule extends YFunction
         int funOffset;
         int paramScale;
         int paramOffset;
-        ArrayList<Integer> words = new ArrayList<Integer>();
-        ArrayList<String> words_str = new ArrayList<String>();
-        ArrayList<Double> calibData = new ArrayList<Double>();
-        ArrayList<Integer> iCalib = new ArrayList<Integer>();
+        ArrayList<Integer> words = new ArrayList<>();
+        ArrayList<String> words_str = new ArrayList<>();
+        ArrayList<Double> calibData = new ArrayList<>();
+        ArrayList<Integer> iCalib = new ArrayList<>();
         int calibType;
         int i;
         int maxSize;
@@ -1496,7 +1499,7 @@ public class YModule extends YFunction
                 }
             } else {
                 if (paramVer == 1) {
-                    words_str = new ArrayList<String>(Arrays.asList(param.split(",")));
+                    words_str = new ArrayList<>(Arrays.asList(param.split(",")));
                     for (String ii:words_str) {
                         words.add(YAPIContext._atoi(ii));
                     }
@@ -1600,17 +1603,17 @@ public class YModule extends YFunction
      */
     public int set_allSettings(byte[] settings) throws YAPI_Exception
     {
-        ArrayList<String> restoreLast = new ArrayList<String>();
+        ArrayList<String> restoreLast = new ArrayList<>();
         byte[] old_json_flat;
-        ArrayList<String> old_dslist = new ArrayList<String>();
-        ArrayList<String> old_jpath = new ArrayList<String>();
-        ArrayList<Integer> old_jpath_len = new ArrayList<Integer>();
-        ArrayList<String> old_val_arr = new ArrayList<String>();
+        ArrayList<String> old_dslist = new ArrayList<>();
+        ArrayList<String> old_jpath = new ArrayList<>();
+        ArrayList<Integer> old_jpath_len = new ArrayList<>();
+        ArrayList<String> old_val_arr = new ArrayList<>();
         byte[] actualSettings;
-        ArrayList<String> new_dslist = new ArrayList<String>();
-        ArrayList<String> new_jpath = new ArrayList<String>();
-        ArrayList<Integer> new_jpath_len = new ArrayList<Integer>();
-        ArrayList<String> new_val_arr = new ArrayList<String>();
+        ArrayList<String> new_dslist = new ArrayList<>();
+        ArrayList<String> new_jpath = new ArrayList<>();
+        ArrayList<Integer> new_jpath_len = new ArrayList<>();
+        ArrayList<String> new_val_arr = new ArrayList<>();
         int cpos;
         int eqpos;
         int leng;
@@ -1804,7 +1807,7 @@ public class YModule extends YFunction
                 j = 0;
                 found = false;
                 while ((j < old_jpath.size()) && !(found)) {
-                    if ((new_jpath_len.get(i) == old_jpath_len.get(j)) && (new_jpath.get(i).equals(old_jpath.get(j)))) {
+                    if ((new_jpath_len.get(i).intValue() == old_jpath_len.get(j).intValue()) && (new_jpath.get(i).equals(old_jpath.get(j)))) {
                         found = true;
                         oldval = old_val_arr.get(j);
                         if (!(newval.equals(oldval))) {
@@ -1823,7 +1826,7 @@ public class YModule extends YFunction
                     j = 0;
                     found = false;
                     while ((j < old_jpath.size()) && !(found)) {
-                        if ((new_jpath_len.get(i) == old_jpath_len.get(j)) && (new_jpath.get(i).equals(old_jpath.get(j)))) {
+                        if ((new_jpath_len.get(i).intValue() == old_jpath_len.get(j).intValue()) && (new_jpath.get(i).equals(old_jpath.get(j)))) {
                             found = true;
                             old_calib = old_val_arr.get(j);
                         }

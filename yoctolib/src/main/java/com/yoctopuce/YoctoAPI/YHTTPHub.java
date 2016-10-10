@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 24281 2016-04-29 09:40:53Z seb $
+ * $Id: YHTTPHub.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -51,8 +51,8 @@ import java.util.Random;
 class YHTTPHub extends YGenericHub
 {
     public static final int YIO_DEFAULT_TCP_TIMEOUT = 20000;
-    public static final int YIO_1_MINUTE_TCP_TIMEOUT = 60000;
-    public static final int YIO_10_MINUTES_TCP_TIMEOUT = 600000;
+    private static final int YIO_1_MINUTE_TCP_TIMEOUT = 60000;
+    private static final int YIO_10_MINUTES_TCP_TIMEOUT = 600000;
 
     private final Object _callbackSession;
     private NotificationHandler _notificationHandler;
@@ -66,7 +66,7 @@ class YHTTPHub extends YGenericHub
     private Random _randGen = new Random();
     private MessageDigest mdigest;
     private int _authRetryCount = 0;
-    boolean _writeProtected = false;
+    private boolean _writeProtected = false;
 
     private final Object _authLock = new Object();
 
@@ -138,7 +138,7 @@ class YHTTPHub extends YGenericHub
 
 
     // Return an Authorization header for a given request
-    String getAuthorization(String request) throws YAPI_Exception
+    String getAuthorization(String request)
     {
         synchronized (_authLock) {
             if (_http_params.getUser().length() == 0 || _http_realm.length() == 0)

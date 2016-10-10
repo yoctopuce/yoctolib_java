@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YDisplay.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -42,6 +42,8 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Locale;
+
 //--- (generated code: YDisplay class start)
 /**
  * YDisplay Class: Display function interface
@@ -52,7 +54,7 @@ import org.json.JSONObject;
  * and freely moved on the display. It can also replay recorded
  * sequences (animations).
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YDisplay extends YFunction
 {
 //--- (end of generated code: YDisplay class start)
@@ -168,6 +170,7 @@ public class YDisplay extends YFunction
     }
 
     //--- (generated code: YDisplay implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -814,7 +817,7 @@ public class YDisplay extends YFunction
     public int fade(int brightness,int duration) throws YAPI_Exception
     {
         flushLayers();
-        return sendCommand(String.format("+%d,%d",brightness,duration));
+        return sendCommand(String.format(Locale.US, "+%d,%d",brightness,duration));
     }
 
     /**
@@ -851,7 +854,7 @@ public class YDisplay extends YFunction
         _recording = false;
         _upload(sequenceName, (_sequence).getBytes());
         //We need to use YPRINTF("") for Objective-C
-        _sequence = String.format("");
+        _sequence = "";
         return YAPI.SUCCESS;
     }
 
@@ -868,7 +871,7 @@ public class YDisplay extends YFunction
     public int playSequence(String sequenceName) throws YAPI_Exception
     {
         flushLayers();
-        return sendCommand(String.format("S%s",sequenceName));
+        return sendCommand(String.format(Locale.US, "S%s",sequenceName));
     }
 
     /**
@@ -888,7 +891,7 @@ public class YDisplay extends YFunction
     public int pauseSequence(int delay_ms) throws YAPI_Exception
     {
         flushLayers();
-        return sendCommand(String.format("W%d",delay_ms));
+        return sendCommand(String.format(Locale.US, "W%d",delay_ms));
     }
 
     /**
@@ -939,7 +942,7 @@ public class YDisplay extends YFunction
     public int copyLayerContent(int srcLayerId,int dstLayerId) throws YAPI_Exception
     {
         flushLayers();
-        return sendCommand(String.format("o%d,%d",srcLayerId,dstLayerId));
+        return sendCommand(String.format(Locale.US, "o%d,%d",srcLayerId,dstLayerId));
     }
 
     /**
@@ -960,7 +963,7 @@ public class YDisplay extends YFunction
     public int swapLayerContent(int layerIdA,int layerIdB) throws YAPI_Exception
     {
         flushLayers();
-        return sendCommand(String.format("E%d,%d",layerIdA,layerIdB));
+        return sendCommand(String.format(Locale.US, "E%d,%d",layerIdA,layerIdB));
     }
 
     /**
@@ -1053,18 +1056,18 @@ public class YDisplay extends YFunction
     public synchronized int flushLayers() throws YAPI_Exception
     {
         if (_allDisplayLayers != null) {
-            for (int i = 0; i < _allDisplayLayers.length; i++) {
-                _allDisplayLayers[i].flush_now();
+            for (YDisplayLayer _allDisplayLayer : _allDisplayLayers) {
+                _allDisplayLayer.flush_now();
             }
         }
         return YAPI.SUCCESS;
     }
 
-    public synchronized void resetHiddenLayerFlags() throws YAPI_Exception
+    public synchronized void resetHiddenLayerFlags()
     {
         if (_allDisplayLayers != null) {
-            for (int i = 0; i < _allDisplayLayers.length; i++) {
-                _allDisplayLayers[i].resetHiddenFlag();
+            for (YDisplayLayer _allDisplayLayer : _allDisplayLayers) {
+                _allDisplayLayer.resetHiddenFlag();
             }
         }
     }

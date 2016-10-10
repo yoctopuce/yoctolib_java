@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 24273 2016-04-26 18:56:42Z seb $
+ * $Id: yHTTPRequest.java 25362 2016-09-16 08:23:48Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
+import java.util.Locale;
 
 
 class yHTTPRequest implements Runnable
@@ -59,7 +60,7 @@ class yHTTPRequest implements Runnable
     }
     private enum State
     {
-        AVAIL, IN_REQUEST, STOPPED;
+        AVAIL, IN_REQUEST, STOPPED
     }
 
     private final YHTTPHub _hub;
@@ -157,9 +158,6 @@ class yHTTPRequest implements Runnable
             } catch (UnknownHostException e) {
                 _requestStop();
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Unknown host(" + _hub.getHost() + ")");
-            } catch (SocketException e) {
-                _requestStop();
-                throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
             } catch (IOException e) {
                 _requestStop();
                 throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
@@ -225,7 +223,7 @@ class yHTTPRequest implements Runnable
         }
     }
 
-    void _requestReset() throws YAPI_Exception
+    private void _requestReset() throws YAPI_Exception
     {
         _requestStop();
         _requestStart(_firstLine, _rest_of_request, _requestTimeout, _context, _resultCallback);
@@ -248,7 +246,7 @@ class yHTTPRequest implements Runnable
                 if (_requestTimeout > 0) {
                     long read_timeout = _startRequestTime + _requestTimeout - System.currentTimeMillis();
                     if (read_timeout < 0) {
-                        throw new YAPI_Exception(YAPI.TIMEOUT, String.format("Hub did not send data during %dms", System.currentTimeMillis() - _lastReceiveTime));
+                        throw new YAPI_Exception(YAPI.TIMEOUT, String.format(Locale.US, "Hub did not send data during %dms", System.currentTimeMillis() - _lastReceiveTime));
                     }
                     if (read_timeout > YIO_IDLE_TCP_TIMEOUT) {
                         read_timeout = YIO_IDLE_TCP_TIMEOUT;
@@ -267,9 +265,9 @@ class yHTTPRequest implements Runnable
                 long duration = nowTime - _startRequestTime;
                 // global request timeout
                 if (duration > _requestTimeout) {
-                    throw new YAPI_Exception(YAPI.TIMEOUT, String.format("TCP request on %s took too long (%dms)", _hub.getHost(), duration));
+                    throw new YAPI_Exception(YAPI.TIMEOUT, String.format(Locale.US, "TCP request on %s took too long (%dms)", _hub.getHost(), duration));
                 } else if (duration > (_requestTimeout - _requestTimeout / 4)) {
-                    _hub._yctx._Log(String.format("Slow TCP request on %s (%dms)\n", _hub.getHost(), duration));
+                    _hub._yctx._Log(String.format(Locale.US, "Slow TCP request on %s (%dms)\n", _hub.getHost(), duration));
                 }
                 retry = true;
                 continue;

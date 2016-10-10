@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YSensor.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -43,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 //--- (generated code: YSensor class start)
 /**
@@ -58,7 +59,7 @@ import java.util.ArrayList;
  * Note: The YAnButton class is the only analog input which does not inherit
  * from YSensor.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YSensor extends YFunction
 {
 //--- (end of generated code: YSensor class start)
@@ -124,9 +125,9 @@ public class YSensor extends YFunction
     protected boolean _isScal;
     protected boolean _isScal32;
     protected int _caltyp = 0;
-    protected ArrayList<Integer> _calpar = new ArrayList<Integer>();
-    protected ArrayList<Double> _calraw = new ArrayList<Double>();
-    protected ArrayList<Double> _calref = new ArrayList<Double>();
+    protected ArrayList<Integer> _calpar = new ArrayList<>();
+    protected ArrayList<Double> _calraw = new ArrayList<>();
+    protected ArrayList<Double> _calref = new ArrayList<>();
     protected YAPI.CalibrationHandlerCallback _calhdl;
 
     /**
@@ -191,7 +192,7 @@ public class YSensor extends YFunction
                 if (rawVal >= minRaw && rawVal < 65536) {
                     refVal = (int) (refValues.get(i) * divisor - calibrationOffset + .5);
                     if (refVal >= 0 && refVal < 65536) {
-                        res += String.format(",%d,%d", rawVal, refVal);
+                        res += String.format(Locale.US, ",%d,%d", rawVal, refVal);
                         minRaw = rawVal + 1;
                     }
                 }
@@ -201,7 +202,7 @@ public class YSensor extends YFunction
             for (int i = 0; i < npt; i++) {
                 rawVal = (int) YAPIContext._doubleToDecimal(rawValues.get(i));
                 refVal = (int) YAPIContext._doubleToDecimal(refValues.get(i));
-                res += String.format(",%d,%d", rawVal, refVal);
+                res += String.format(Locale.US, ",%d,%d", rawVal, refVal);
             }
         }
         return res;
@@ -211,7 +212,7 @@ public class YSensor extends YFunction
     /*
      * Method used to decode calibration points from fixed-point 16-bit integers
      */
-    static int _decodeCalibrationPoints(String calibParams, ArrayList<Integer> intPt, ArrayList<Double> rawPt, ArrayList<Double> calPt) throws YAPI_Exception
+    static int _decodeCalibrationPoints(String calibParams, ArrayList<Integer> intPt, ArrayList<Double> rawPt, ArrayList<Double> calPt)
     {
 
         intPt.clear();
@@ -282,6 +283,7 @@ public class YSensor extends YFunction
 
 
     //--- (generated code: YSensor implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -937,7 +939,7 @@ public class YSensor extends YFunction
     {
         int position;
         int maxpos;
-        ArrayList<Integer> iCalib = new ArrayList<Integer>();
+        ArrayList<Integer> iCalib = new ArrayList<>();
         int iRaw;
         int iRef;
         double fRaw;
@@ -1097,6 +1099,7 @@ public class YSensor extends YFunction
         byte[] res;
         // may throw an exception
         res = _download("api/dataLogger/recording?recording=1");
+        //noinspection DoubleNegation
         if (!((res).length>0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to start datalogger");}
         return YAPI.SUCCESS;
     }
@@ -1111,6 +1114,7 @@ public class YSensor extends YFunction
         byte[] res;
         // may throw an exception
         res = _download("api/dataLogger/recording?recording=0");
+        //noinspection DoubleNegation
         if (!((res).length>0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to stop datalogger");}
         return YAPI.SUCCESS;
     }
@@ -1279,29 +1283,29 @@ public class YSensor extends YFunction
             return "0";
         }
         if (_isScal32) {
-            res = String.format("%d",YAPI.YOCTO_CALIB_TYPE_OFS);
+            res = String.format(Locale.US, "%d",YAPI.YOCTO_CALIB_TYPE_OFS);
             idx = 0;
             while (idx < npt) {
-                res = String.format("%s,%f,%f", res, rawValues.get(idx).doubleValue(),refValues.get(idx).doubleValue());
+                res = String.format(Locale.US, "%s,%f,%f", res, rawValues.get(idx).doubleValue(),refValues.get(idx).doubleValue());
                 idx = idx + 1;
             }
         } else {
             if (_isScal) {
-                res = String.format("%d",npt);
+                res = String.format(Locale.US, "%d",npt);
                 idx = 0;
                 while (idx < npt) {
                     iRaw = (int) (double)Math.round(rawValues.get(idx).doubleValue() * _scale + _offset);
                     iRef = (int) (double)Math.round(refValues.get(idx).doubleValue() * _scale + _offset);
-                    res = String.format("%s,%d,%d", res, iRaw,iRef);
+                    res = String.format(Locale.US, "%s,%d,%d", res, iRaw,iRef);
                     idx = idx + 1;
                 }
             } else {
-                res = String.format("%d",10 + npt);
+                res = String.format(Locale.US, "%d",10 + npt);
                 idx = 0;
                 while (idx < npt) {
                     iRaw = (int) YAPIContext._doubleToDecimal(rawValues.get(idx).doubleValue());
                     iRef = (int) YAPIContext._doubleToDecimal(refValues.get(idx).doubleValue());
-                    res = String.format("%s,%d,%d", res, iRaw,iRef);
+                    res = String.format(Locale.US, "%s,%d,%d", res, iRaw,iRef);
                     idx = idx + 1;
                 }
             }

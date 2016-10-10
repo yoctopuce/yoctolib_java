@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHubPort.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YHubPort.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindHubPort(), the high-level API for HubPort functions
  *
@@ -52,7 +52,7 @@ import org.json.JSONObject;
  * The logical name of a YHubPort is always automatically set to the
  * unique serial number of the Yoctopuce device connected to it.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YHubPort extends YFunction
 {
 //--- (end of YHubPort class start)
@@ -131,6 +131,7 @@ public class YHubPort extends YFunction
     }
 
     //--- (YHubPort implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

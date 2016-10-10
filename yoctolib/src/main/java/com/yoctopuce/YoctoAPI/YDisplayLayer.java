@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 25275 2016-08-24 13:42:24Z mvuilleu $
+ * $Id: YDisplayLayer.java 25362 2016-09-16 08:23:48Z seb $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *
@@ -39,6 +39,8 @@
 
 package com.yoctopuce.YoctoAPI;
 
+import java.util.Locale;
+
 //--- (generated code: YDisplayLayer class start)
 /**
  * YDisplayLayer Class: DisplayLayer object interface
@@ -48,7 +50,7 @@ package com.yoctopuce.YoctoAPI;
  * the layer is active on the screen (and not masked by other
  * overlapping layers).
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YDisplayLayer
 {
 //--- (end of generated code: YDisplayLayer class start)
@@ -71,7 +73,7 @@ public class YDisplayLayer
         BASELINE_RIGHT(14),
         BOTTOM_RIGHT(15);
         public final int value;
-        private ALIGN(int val)
+        ALIGN(int val)
         {
             this.value = val;
         }
@@ -216,7 +218,7 @@ public class YDisplayLayer
      */
     public int selectColorPen(int color) throws YAPI_Exception
     {
-        return command_push(String.format("c%06x",color));
+        return command_push(String.format(Locale.US, "c%06x",color));
     }
 
     /**
@@ -235,7 +237,7 @@ public class YDisplayLayer
      */
     public int selectGrayPen(int graylevel) throws YAPI_Exception
     {
-        return command_push(String.format("g%d",graylevel));
+        return command_push(String.format(Locale.US, "g%d",graylevel));
     }
 
     /**
@@ -271,7 +273,7 @@ public class YDisplayLayer
      */
     public int setAntialiasingMode(boolean mode) throws YAPI_Exception
     {
-        return command_push(String.format("a%d",(mode ? 1 : 0)));
+        return command_push(String.format(Locale.US, "a%d",(mode ? 1 : 0)));
     }
 
     /**
@@ -286,7 +288,7 @@ public class YDisplayLayer
      */
     public int drawPixel(int x,int y) throws YAPI_Exception
     {
-        return command_flush(String.format("P%d,%d",x,y));
+        return command_flush(String.format(Locale.US, "P%d,%d",x,y));
     }
 
     /**
@@ -303,7 +305,7 @@ public class YDisplayLayer
      */
     public int drawRect(int x1,int y1,int x2,int y2) throws YAPI_Exception
     {
-        return command_flush(String.format("R%d,%d,%d,%d",x1,y1,x2,y2));
+        return command_flush(String.format(Locale.US, "R%d,%d,%d,%d",x1,y1,x2,y2));
     }
 
     /**
@@ -320,7 +322,7 @@ public class YDisplayLayer
      */
     public int drawBar(int x1,int y1,int x2,int y2) throws YAPI_Exception
     {
-        return command_flush(String.format("B%d,%d,%d,%d",x1,y1,x2,y2));
+        return command_flush(String.format(Locale.US, "B%d,%d,%d,%d",x1,y1,x2,y2));
     }
 
     /**
@@ -336,7 +338,7 @@ public class YDisplayLayer
      */
     public int drawCircle(int x,int y,int r) throws YAPI_Exception
     {
-        return command_flush(String.format("C%d,%d,%d",x,y,r));
+        return command_flush(String.format(Locale.US, "C%d,%d,%d",x,y,r));
     }
 
     /**
@@ -352,7 +354,7 @@ public class YDisplayLayer
      */
     public int drawDisc(int x,int y,int r) throws YAPI_Exception
     {
-        return command_flush(String.format("D%d,%d,%d",x,y,r));
+        return command_flush(String.format(Locale.US, "D%d,%d,%d",x,y,r));
     }
 
     /**
@@ -370,7 +372,7 @@ public class YDisplayLayer
      */
     public int selectFont(String fontname) throws YAPI_Exception
     {
-        return command_push(String.format("&%s%c",fontname,27));
+        return command_push(String.format(Locale.US, "&%s%c",fontname,27));
     }
 
     /**
@@ -397,7 +399,7 @@ public class YDisplayLayer
      */
     public int drawText(int x,int y,ALIGN anchor,String text) throws YAPI_Exception
     {
-        return command_flush(String.format("T%d,%d,%d,%s%c",x,y,anchor.value,text,27));
+        return command_flush(String.format(Locale.US, "T%d,%d,%d,%s%c",x,y,anchor.value,text,27));
     }
 
     /**
@@ -416,7 +418,7 @@ public class YDisplayLayer
      */
     public int drawImage(int x,int y,String imagename) throws YAPI_Exception
     {
-        return command_flush(String.format("*%d,%d,%s%c",x,y,imagename,27));
+        return command_flush(String.format(Locale.US, "*%d,%d,%s%c",x,y,imagename,27));
     }
 
     /**
@@ -442,7 +444,7 @@ public class YDisplayLayer
     public int drawBitmap(int x,int y,int w,byte[] bitmap,int bgcol) throws YAPI_Exception
     {
         String destname;
-        destname = String.format("layer%d:%d,%d@%d,%d",_id,w,bgcol,x,y);
+        destname = String.format(Locale.US, "layer%d:%d,%d@%d,%d",_id,w,bgcol,x,y);
         return _display.upload(destname,bitmap);
     }
 
@@ -458,7 +460,7 @@ public class YDisplayLayer
      */
     public int moveTo(int x,int y) throws YAPI_Exception
     {
-        return command_push(String.format("@%d,%d",x,y));
+        return command_push(String.format(Locale.US, "@%d,%d",x,y));
     }
 
     /**
@@ -475,7 +477,7 @@ public class YDisplayLayer
      */
     public int lineTo(int x,int y) throws YAPI_Exception
     {
-        return command_flush(String.format("-%d,%d",x,y));
+        return command_flush(String.format(Locale.US, "-%d,%d",x,y));
     }
 
     /**
@@ -493,7 +495,7 @@ public class YDisplayLayer
      */
     public int consoleOut(String text) throws YAPI_Exception
     {
-        return command_flush(String.format("!%s%c",text,27));
+        return command_flush(String.format(Locale.US, "!%s%c",text,27));
     }
 
     /**
@@ -510,7 +512,7 @@ public class YDisplayLayer
      */
     public int setConsoleMargins(int x1,int y1,int x2,int y2) throws YAPI_Exception
     {
-        return command_push(String.format("m%d,%d,%d,%d",x1,y1,x2,y2));
+        return command_push(String.format(Locale.US, "m%d,%d,%d,%d",x1,y1,x2,y2));
     }
 
     /**
@@ -526,7 +528,7 @@ public class YDisplayLayer
      */
     public int setConsoleBackground(int bgcol) throws YAPI_Exception
     {
-        return command_push(String.format("b%d",bgcol));
+        return command_push(String.format(Locale.US, "b%d",bgcol));
     }
 
     /**
@@ -541,7 +543,7 @@ public class YDisplayLayer
      */
     public int setConsoleWordWrap(boolean wordwrap) throws YAPI_Exception
     {
-        return command_push(String.format("w%d",(wordwrap ? 1 : 0)));
+        return command_push(String.format(Locale.US, "w%d",(wordwrap ? 1 : 0)));
     }
 
     /**
@@ -573,7 +575,7 @@ public class YDisplayLayer
      */
     public int setLayerPosition(int x,int y,int scrollTime) throws YAPI_Exception
     {
-        return command_flush(String.format("#%d,%d,%d",x,y,scrollTime));
+        return command_flush(String.format(Locale.US, "#%d,%d,%d",x,y,scrollTime));
     }
 
     /**

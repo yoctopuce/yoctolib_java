@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YWireless.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -43,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 //--- (generated code: YWireless class start)
 /**
@@ -51,7 +52,7 @@ import java.util.ArrayList;
  * YWireless functions provides control over wireless network parameters
  * and status for devices that are wireless-enabled.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YWireless extends YFunction
 {
 //--- (end of generated code: YWireless class start)
@@ -140,6 +141,7 @@ public class YWireless extends YFunction
 
 
     //--- (generated code: YWireless implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -472,7 +474,7 @@ public class YWireless extends YFunction
      */
     public int joinNetwork(String ssid,String securityKey) throws YAPI_Exception
     {
-        return set_wlanConfig(String.format("INFRA:%s\\%s", ssid,securityKey));
+        return set_wlanConfig(String.format(Locale.US, "INFRA:%s\\%s", ssid,securityKey));
     }
 
     /**
@@ -497,7 +499,7 @@ public class YWireless extends YFunction
      */
     public int adhocNetwork(String ssid,String securityKey) throws YAPI_Exception
     {
-        return set_wlanConfig(String.format("ADHOC:%s\\%s", ssid,securityKey));
+        return set_wlanConfig(String.format(Locale.US, "ADHOC:%s\\%s", ssid,securityKey));
     }
 
     /**
@@ -520,7 +522,7 @@ public class YWireless extends YFunction
      */
     public int softAPNetwork(String ssid,String securityKey) throws YAPI_Exception
     {
-        return set_wlanConfig(String.format("SOFTAP:%s\\%s", ssid,securityKey));
+        return set_wlanConfig(String.format(Locale.US, "SOFTAP:%s\\%s", ssid,securityKey));
     }
 
     /**
@@ -537,8 +539,8 @@ public class YWireless extends YFunction
     public ArrayList<YWlanRecord> get_detectedWlans() throws YAPI_Exception
     {
         byte[] json;
-        ArrayList<String> wlanlist = new ArrayList<String>();
-        ArrayList<YWlanRecord> res = new ArrayList<YWlanRecord>();
+        ArrayList<String> wlanlist = new ArrayList<>();
+        ArrayList<YWlanRecord> res = new ArrayList<>();
         // may throw an exception
         json = _download("wlan.json?by=name");
         wlanlist = _json_get_array(json);

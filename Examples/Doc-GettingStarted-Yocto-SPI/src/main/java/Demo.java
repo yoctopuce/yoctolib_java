@@ -5,14 +5,6 @@ import java.util.ArrayList;
 public class Demo
 {
 
-    public static void usage()
-    {
-        System.out.println("Usage");
-        System.out.println("demo <serial_number> <value>");
-        System.out.println("demo <logical_name>  <value>");
-        System.out.println("demo any  <value>   (use any discovered device)");
-        System.exit(1);
-    }
 
     public static void main(String[] args)
     {
@@ -25,32 +17,28 @@ public class Demo
             System.exit(1);
         }
 
-        if (args.length < 2) usage();
-        String target = args[0].toUpperCase();
-        int value = Integer.valueOf(args[1]);
 
-        if (target.equals("ANY")) {
-            YSpiPort tmp = YSpiPort.FirstSpiPort();
-            if (tmp == null) {
-                System.out.println("No module connected (check USB cable)");
-                System.exit(1);
-            }
-            try {
-                target = tmp.module().get_serialNumber();
-            } catch (YAPI_Exception ex) {
-                System.out.println("No module connected (check USB cable)");
-                System.exit(1);
-            }
+        YSpiPort spiPort;
+        if (args.length > 0) {
+            spiPort = YSpiPort.FindSpiPort(args[0] + ".spiPort");
+        } else {
+            spiPort = YSpiPort.FirstSpiPort();
         }
+        if (spiPort == null || !spiPort.isOnline()) {
+            System.out.println("No module connected (check USB cable)");
+            System.exit(1);
+        }
+        int value = 22345678;
 
-        YSpiPort spiPort = YSpiPort.FindSpiPort(target + ".spiPort");
         try {
             // sample code driving MAX7219 7-segment display driver
             // such as SPI7SEGDISP8.56 from www.embedded-lab.com
-            spiPort.set_spiMode("250000,2,msb");
+            spiPort.set_spiMode("250000,3,msb");
             spiPort.set_ssPolarity(YSpiPort.SSPOLARITY_ACTIVE_LOW);
             spiPort.set_protocol("Frame:5ms");
             spiPort.reset();
+            // do not forget to configure the powerOutput of the Yocto-SPI
+            // ( for SPI7SEGDISP8.56 powerOutput need to be set at 5v )
             System.out.println("****************************");
             System.out.println("* make sure voltage levels *");
             System.out.println("* are properly configured  *");

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YGenericSensor.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -53,7 +53,7 @@ import org.json.JSONObject;
  * This class adds the ability to configure the automatic conversion between the
  * measured signal and the corresponding engineering unit.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YGenericSensor extends YSensor
 {
 //--- (end of YGenericSensor class start)
@@ -145,6 +145,7 @@ public class YGenericSensor extends YSensor
     }
 
     //--- (YGenericSensor implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

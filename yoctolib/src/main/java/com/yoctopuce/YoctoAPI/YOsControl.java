@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOsControl.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YOsControl.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -51,7 +51,7 @@ import org.json.JSONObject;
  * OsControl is available on the VirtualHub software only. This feature must be activated at the VirtualHub
  * start up with -o option.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YOsControl extends YFunction
 {
 //--- (end of YOsControl class start)
@@ -113,6 +113,7 @@ public class YOsControl extends YFunction
     }
 
     //--- (YOsControl implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

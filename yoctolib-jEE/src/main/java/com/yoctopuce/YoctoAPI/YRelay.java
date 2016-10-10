@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRelay.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YRelay.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindRelay(), the high-level API for Relay functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Locale;
 
 //--- (YRelay return codes)
 //--- (end of YRelay return codes)
@@ -55,7 +56,7 @@ import org.json.JSONObject;
  * with output A corresponding to the idle position (at power off) and the output B corresponding to the
  * active state. If you prefer the alternate default state, simply switch your cables on the board.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YRelay extends YFunction
 {
 //--- (end of YRelay class start)
@@ -164,6 +165,7 @@ public class YRelay extends YFunction
     }
 
     //--- (YRelay implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -623,7 +625,7 @@ public class YRelay extends YFunction
     public int set_delayedPulseTimer(YDelayedPulse  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("%d:%d",newval.target,newval.ms);
+        rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
         _setAttr("delayedPulseTimer",rest_val);
         return YAPI.SUCCESS;
     }
@@ -646,7 +648,7 @@ public class YRelay extends YFunction
     public int delayedPulse(int ms_delay,int ms_duration)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("%d:%d",ms_delay,ms_duration);
+        rest_val = String.format(Locale.US, "%d:%d",ms_delay,ms_duration);
         _setAttr("delayedPulseTimer",rest_val);
         return YAPI.SUCCESS;
     }

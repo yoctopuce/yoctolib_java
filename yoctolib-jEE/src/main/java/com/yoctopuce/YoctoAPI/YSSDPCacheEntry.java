@@ -76,6 +76,7 @@ class YSSDPCacheEntry {
 
     boolean hasExpired() {
         Date now = new Date();
+        //noinspection RedundantIfStatement
         if ((now.getTime() - mDetectedTime.getTime()) > mMaxAgeInMS)
             return true;
         return false;  //To change body of created methods use File | Settings | File Templates.

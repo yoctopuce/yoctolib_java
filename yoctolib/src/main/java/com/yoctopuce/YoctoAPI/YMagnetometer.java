@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMagnetometer.java 24934 2016-06-30 22:32:01Z mvuilleu $
+ * $Id: YMagnetometer.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -57,7 +57,7 @@ import org.json.JSONObject;
  * Note: The YAnButton class is the only analog input which does not inherit
  * from YSensor.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YMagnetometer extends YSensor
 {
 //--- (end of YMagnetometer class start)
@@ -135,6 +135,7 @@ public class YMagnetometer extends YSensor
     }
 
     //--- (YMagnetometer implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

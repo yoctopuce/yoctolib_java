@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 23716 2016-04-01 15:51:25Z seb $
+ * $Id: YGenericHub.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Internal YGenericHub object
  *
@@ -42,6 +42,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -103,20 +104,20 @@ abstract class YGenericHub
     private static final int PUBVAL_YOCTO_FLOAT_E3 = 9;   // 32-bit Yocto fixed-point format (e-3)
     private static final int PUBVAL_YOCTO_FLOAT_E6 = 10;   // 32-bit Yocto fixed-point format (e-6)
 
-    public static final long YPROG_BOOTLOADER_TIMEOUT = 10000;
-    protected final YAPIContext _yctx;
+    static final long YPROG_BOOTLOADER_TIMEOUT = 10000;
+    final YAPIContext _yctx;
     final HTTPParams _http_params;
-    protected int _hubidx;
+    int _hubidx;
     protected long _notifyTrigger = 0;
     protected Object _notifyHandle = null;
-    protected volatile long _devListValidity = 500;
-    protected long _devListExpires = 0;
-    protected final ConcurrentHashMap<Integer, String> _serialByYdx = new ConcurrentHashMap<Integer, String>();
-    protected HashMap<String, YDevice> _devices = new HashMap<String, YDevice>();
-    protected final boolean _reportConnnectionLost;
+    volatile long _devListValidity = 500;
+    long _devListExpires = 0;
+    final ConcurrentHashMap<Integer, String> _serialByYdx = new ConcurrentHashMap<>();
+    private HashMap<String, YDevice> _devices = new HashMap<>();
+    final boolean _reportConnnectionLost;
     private String _hubSerialNumber = null;
 
-    public YGenericHub(YAPIContext yctx, HTTPParams httpParams, int idx, boolean reportConnnectionLost)
+    YGenericHub(YAPIContext yctx, HTTPParams httpParams, int idx, boolean reportConnnectionLost)
     {
         _yctx = yctx;
         _hubidx = idx;
@@ -128,6 +129,7 @@ abstract class YGenericHub
 
     abstract String getRootUrl();
 
+    @SuppressWarnings("UnusedParameters")
     abstract boolean isSameHub(String url, Object request, Object response, Object session);
 
     abstract void startNotifications() throws YAPI_Exception;
@@ -174,9 +176,9 @@ abstract class YGenericHub
                     numVal += (int) (funcval[ofs++] & 0xff) << 16;
                     numVal += (int) (funcval[ofs++] & 0xff) << 24;
                     if (funcValType == PUBVAL_C_LONG) {
-                        return String.format("%d", numVal);
+                        return String.format(Locale.US, "%d", numVal);
                     } else {
-                        buffer = String.format("%.3f", numVal / 1000.0);
+                        buffer = String.format(Locale.US, "%.3f", numVal / 1000.0);
                         int endp = buffer.length();
                         while (endp > 0 && buffer.charAt(endp - 1) == '0') {
                             --endp;
@@ -190,7 +192,7 @@ abstract class YGenericHub
                 case PUBVAL_C_FLOAT:
                     // 32bit (short) float
                     float floatVal = ByteBuffer.wrap(funcval).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-                    buffer = String.format("%.6f", floatVal);
+                    buffer = String.format(Locale.US, "%.6f", floatVal);
                     int endp = buffer.length();
                     while (endp > 0 && buffer.charAt(endp - 1) == '0') {
                         --endp;
@@ -216,11 +218,11 @@ abstract class YGenericHub
     }
 
 
-    protected void updateFromWpAndYp(ArrayList<WPEntry> whitePages, HashMap<String, ArrayList<YPEntry>> yellowPages) throws YAPI_Exception
+    void updateFromWpAndYp(ArrayList<WPEntry> whitePages, HashMap<String, ArrayList<YPEntry>> yellowPages) throws YAPI_Exception
     {
 
         // by default consider all known device as unplugged
-        ArrayList<YDevice> toRemove = new ArrayList<YDevice>(_devices.values());
+        ArrayList<YDevice> toRemove = new ArrayList<>(_devices.values());
 
         for (WPEntry wp : whitePages) {
             String serial = wp.getSerialNumber();
@@ -295,7 +297,7 @@ abstract class YGenericHub
         return res;
     }
 
-    protected void handleValueNotification(String serial, String funcid, String value)
+    void handleValueNotification(String serial, String funcid, String value)
     {
         String hwid = serial + "." + funcid;
 
@@ -310,7 +312,7 @@ abstract class YGenericHub
     //called from Jni
     protected void handleTimedNotification(String serial, String funcid, double deviceTime, byte[] report)
     {
-        ArrayList<Integer> arrayList = new ArrayList<Integer>(report.length);
+        ArrayList<Integer> arrayList = new ArrayList<>(report.length);
         for (byte b : report) {
             int i = b & 0xff;
             arrayList.add(i);
@@ -319,7 +321,7 @@ abstract class YGenericHub
     }
 
 
-    protected void handleTimedNotification(String serial, String funcid, double deviceTime, ArrayList<Integer> report)
+    void handleTimedNotification(String serial, String funcid, double deviceTime, ArrayList<Integer> report)
     {
         String hwid = serial + "." + funcid;
         YFunction func = _yctx._GetTimedReportCallback(hwid);
@@ -341,19 +343,20 @@ abstract class YGenericHub
 
     interface UpdateProgress
     {
-        public void firmware_progress(int percent, String message);
+        void firmware_progress(int percent, String message);
     }
 
     abstract ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception, InterruptedException;
 
     interface RequestAsyncResult
     {
+        @SuppressWarnings("UnusedParameters")
         void RequestAsyncDone(Object context, byte[] result, int error, String errmsg);
     }
 
     interface RequestProgress
     {
-        void RequestProgress(Object context, int acked, int total);
+        void requestProgressUpdate(Object context, int acked, int total);
     }
 
     abstract void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception, InterruptedException;
@@ -361,7 +364,7 @@ abstract class YGenericHub
     abstract byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestProgress progress, Object context) throws YAPI_Exception, InterruptedException;
 
 
-    protected static class HTTPParams
+    static class HTTPParams
     {
 
         private final String _host;

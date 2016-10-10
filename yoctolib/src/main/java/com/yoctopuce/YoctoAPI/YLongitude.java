@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLongitude.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YLongitude.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindLongitude(), the high-level API for Longitude functions
  *
@@ -52,7 +52,7 @@ import org.json.JSONObject;
  * read measurements, register callback functions, access the autonomous
  * datalogger.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YLongitude extends YSensor
 {
 //--- (end of YLongitude class start)
@@ -110,6 +110,7 @@ public class YLongitude extends YSensor
     }
 
     //--- (YLongitude implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

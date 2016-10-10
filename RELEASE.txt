@@ -1,2 +1,3 @@
-- Fix MD5 signature of HTTP Callback
-- Improve global library performances
+- Improve library performances
+- Function.FirstFunction() method that was not returning all functions.
+- Fix some demo examples

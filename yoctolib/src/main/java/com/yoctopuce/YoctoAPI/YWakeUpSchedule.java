@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpSchedule.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YWakeUpSchedule.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -51,7 +51,7 @@ import org.json.JSONObject;
  * specified as a set of months and/or days and/or hours and/or minutes when the
  * wake up should happen.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YWakeUpSchedule extends YFunction
 {
 //--- (end of YWakeUpSchedule class start)
@@ -143,6 +143,7 @@ public class YWakeUpSchedule extends YFunction
     }
 
     //--- (YWakeUpSchedule implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

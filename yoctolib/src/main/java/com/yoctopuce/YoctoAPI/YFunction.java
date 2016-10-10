@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 25310 2016-09-07 09:06:02Z seb $
+ * $Id: YFunction.java 25362 2016-09-16 08:23:48Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -65,7 +65,7 @@ import java.util.HashMap;
  * The YFunction class implements a generic high-level cache for the attribute values of
  * the specified function, pre-parsed from the REST API string.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YFunction
 {
 //--- (end of generated code: YFunction class start)
@@ -134,7 +134,7 @@ public class YFunction
         _lastErrorType = YAPI.SUCCESS;
         _lastErrorMsg = "";
         _userData = null;
-        _dataStreams = new HashMap<String, YDataStream>();
+        _dataStreams = new HashMap<>();
         //--- (generated code: YFunction attributes initialization)
         //--- (end of generated code: YFunction attributes initialization)
     }
@@ -147,7 +147,7 @@ public class YFunction
         _lastErrorType = YAPI.SUCCESS;
         _lastErrorMsg = "";
         _userData = null;
-        _dataStreams = new HashMap<String, YDataStream>();
+        _dataStreams = new HashMap<>();
         //--- (generated code: YFunction attributes initialization)
         //--- (end of generated code: YFunction attributes initialization)
 
@@ -699,7 +699,7 @@ public class YFunction
         } catch (JSONException ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         int len = array.length();
         for (int i = 0; i < len; i++) {
             try {

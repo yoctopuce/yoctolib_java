@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YRealTimeClock.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -52,7 +52,7 @@ import org.json.JSONObject;
  * The current time may represent a local time as well as an UTC time, but no automatic time change
  * will occur to account for daylight saving time.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YRealTimeClock extends YFunction
 {
 //--- (end of YRealTimeClock class start)
@@ -131,6 +131,7 @@ public class YRealTimeClock extends YFunction
     }
 
     //--- (YRealTimeClock implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

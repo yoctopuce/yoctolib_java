@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCompass.java 24934 2016-06-30 22:32:01Z mvuilleu $
+ * $Id: YCompass.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindCompass(), the high-level API for Compass functions
  *
@@ -57,7 +57,7 @@ import org.json.JSONObject;
  * Note: The YAnButton class is the only analog input which does not inherit
  * from YSensor.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YCompass extends YSensor
 {
 //--- (end of YCompass class start)
@@ -133,6 +133,7 @@ public class YCompass extends YSensor
     }
 
     //--- (YCompass implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

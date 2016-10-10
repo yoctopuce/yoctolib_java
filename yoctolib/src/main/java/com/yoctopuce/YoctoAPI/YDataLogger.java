@@ -1,40 +1,38 @@
 /*********************************************************************
- *
- * $Id: YDataLogger.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YDataLogger.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
- *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
+ * Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
- *  Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
- *  non-exclusive license to use, modify, copy and integrate this
- *  file into your software for the sole purpose of interfacing
- *  with Yoctopuce products.
+ * Yoctopuce Sarl (hereafter Licensor) grants to you a perpetual
+ * non-exclusive license to use, modify, copy and integrate this
+ * file into your software for the sole purpose of interfacing
+ * with Yoctopuce products.
  *
- *  You may reproduce and distribute copies of this file in
- *  source or object form, as long as the sole purpose of this
- *  code is to interface with Yoctopuce products. You must retain
- *  this notice in the distributed source file.
+ * You may reproduce and distribute copies of this file in
+ * source or object form, as long as the sole purpose of this
+ * code is to interface with Yoctopuce products. You must retain
+ * this notice in the distributed source file.
  *
- *  You should refer to Yoctopuce General Terms and Conditions
- *  for additional information regarding your rights and
- *  obligations.
+ * You should refer to Yoctopuce General Terms and Conditions
+ * for additional information regarding your rights and
+ * obligations.
  *
- *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
- *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
- *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
- *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
- *  INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
- *  COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
- *  SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
- *  LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
- *  CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
- *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
- *  WARRANTY, OR OTHERWISE.
- *
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
+ * EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA,
+ * COST OF PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR
+ * SERVICES, ANY CLAIMS BY THIRD PARTIES (INCLUDING BUT NOT
+ * LIMITED TO ANY DEFENSE THEREOF), ANY CLAIMS FOR INDEMNITY OR
+ * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
+ * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
+ * WARRANTY, OR OTHERWISE.
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI; //test
@@ -45,6 +43,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 
 //--- (generated code: YDataLogger class start)
@@ -56,7 +55,7 @@ import java.util.ArrayList;
  * The DataLogger function controls the global parameters of the internal data
  * logger.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YDataLogger extends YFunction
 {
 //--- (end of generated code: YDataLogger class start)
@@ -145,7 +144,7 @@ public class YDataLogger extends YFunction
 
         String httpreq = "GET " + _dataLoggerURL;
         if (timeIdx != null) {
-            httpreq += String.format("?run=%d&time=%d", runIdx, timeIdx);
+            httpreq += String.format(Locale.US, "?run=%d&time=%d", runIdx, timeIdx);
         }
         String result;
         YDevice dev = _yapi._yHash.getDevice(devid);
@@ -158,8 +157,7 @@ public class YDataLogger extends YFunction
             }
             throw ex;
         }
-        JSONTokener loadval = new JSONTokener(result);
-        return loadval;
+        return new JSONTokener(result);
     }
 
 
@@ -237,6 +235,7 @@ public class YDataLogger extends YFunction
     }
 
     //--- (generated code: YDataLogger implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -729,9 +728,9 @@ public class YDataLogger extends YFunction
 
     public ArrayList<YDataSet> parse_dataSets(byte[] json) throws YAPI_Exception
     {
-        ArrayList<String> dslist = new ArrayList<String>();
+        ArrayList<String> dslist = new ArrayList<>();
         YDataSet dataset;
-        ArrayList<YDataSet> res = new ArrayList<YDataSet>();
+        ArrayList<YDataSet> res = new ArrayList<>();
         // may throw an exception
         dslist = _json_get_array(json);
         res.clear();

@@ -3,35 +3,36 @@ package com.yoctopuce.YoctoAPI;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public abstract class NotificationHandler implements Runnable
+@SuppressWarnings("unused")
+abstract class NotificationHandler implements Runnable
 {
-    protected final static char NOTIFY_NETPKT_NAME = '0';
-    protected final static char NOTIFY_NETPKT_CHILD = '2';
-    protected final static char NOTIFY_NETPKT_FUNCNAME = '4';
-    protected final static char NOTIFY_NETPKT_FUNCVAL = '5';
-    protected final static char NOTIFY_NETPKT_FUNCNAMEYDX = '8';
-    protected final static char NOTIFY_NETPKT_FLUSHV2YDX = 't';
-    protected final static char NOTIFY_NETPKT_FUNCV2YDX = 'u';
-    protected final static char NOTIFY_NETPKT_TIMEV2YDX = 'v';
-    protected final static char NOTIFY_NETPKT_DEVLOGYDX = 'w';
-    protected final static char NOTIFY_NETPKT_TIMEVALYDX = 'x';
-    protected final static char NOTIFY_NETPKT_FUNCVALYDX = 'y';
-    protected final static char NOTIFY_NETPKT_TIMEAVGYDX = 'z';
-    protected final static char NOTIFY_NETPKT_NOT_SYNC = '@';
+    private final static char NOTIFY_NETPKT_NAME = '0';
+    private final static char NOTIFY_NETPKT_CHILD = '2';
+    private final static char NOTIFY_NETPKT_FUNCNAME = '4';
+    private final static char NOTIFY_NETPKT_FUNCVAL = '5';
+    private final static char NOTIFY_NETPKT_FUNCNAMEYDX = '8';
+    private final static char NOTIFY_NETPKT_FLUSHV2YDX = 't';
+    private final static char NOTIFY_NETPKT_FUNCV2YDX = 'u';
+    private final static char NOTIFY_NETPKT_TIMEV2YDX = 'v';
+    private final static char NOTIFY_NETPKT_DEVLOGYDX = 'w';
+    private final static char NOTIFY_NETPKT_TIMEVALYDX = 'x';
+    private final static char NOTIFY_NETPKT_FUNCVALYDX = 'y';
+    private final static char NOTIFY_NETPKT_TIMEAVGYDX = 'z';
+    private final static char NOTIFY_NETPKT_NOT_SYNC = '@';
     private final static char NOTIFY_NETPKT_LOG = '7';
     private static final int NOTIFY_NETPKT_STOP = 10;
     private static final int NET_HUB_NOT_CONNECTION_TIMEOUT = 6000;
 
 
-    protected long _notifyPos = -1;
-    protected int _notifRetryCount = 0;
-    protected int _error_delay = 0;
+    long _notifyPos = -1;
+    int _notifRetryCount = 0;
+    int _error_delay = 0;
 
 
-    protected final YHTTPHub _hub;
+    final YHTTPHub _hub;
 
 
-    public NotificationHandler(YHTTPHub hub)
+    NotificationHandler(YHTTPHub hub)
     {
         _hub = hub;
     }
@@ -44,7 +45,7 @@ public abstract class NotificationHandler implements Runnable
     //
     // return null on error
     //
-    protected byte[] decodeNetFuncValV2(byte[] p)
+    private byte[] decodeNetFuncValV2(byte[] p)
     {
         int p_ofs = 0;
         int ch = p[p_ofs] & 0xff;
@@ -78,7 +79,7 @@ public abstract class NotificationHandler implements Runnable
         return funcVal;
     }
 
-    protected void handleNetNotification(String notification_line)
+    void handleNetNotification(String notification_line)
     {
         String ev = notification_line.trim();
 
@@ -127,7 +128,7 @@ public abstract class NotificationHandler implements Runnable
                                 funcid = ydev.getYPEntry(funydx).getFuncId();
                                 if (!funcid.equals("")) {
                                     // timed value report
-                                    ArrayList<Integer> report = new ArrayList<Integer>(1 + value.length() / 2);
+                                    ArrayList<Integer> report = new ArrayList<>(1 + value.length() / 2);
                                     report.add((ev.charAt(0) == NOTIFY_NETPKT_TIMEVALYDX ? 0 :
                                             (ev.charAt(0) == NOTIFY_NETPKT_TIMEAVGYDX ? 1 : 2)));
                                     for (int pos = 0; pos < value.length(); pos += 2) {
@@ -187,6 +188,14 @@ public abstract class NotificationHandler implements Runnable
     }
 
 
+    /**
+     * @param req_first_line    first line of request without space, HTTP1.1 or \r\n
+     * @param req_head_and_body http headers with double \r\n followed by potential body
+     * @param mstimeout         number of milisecond allowed to the request to finish
+     * @return return the raw response without the http header
+     * @throws YAPI_Exception
+     * @throws InterruptedException
+     */
     abstract byte[] hubRequestSync(String req_first_line, byte[] req_head_and_body, int mstimeout) throws YAPI_Exception, InterruptedException;
 
     /**
@@ -196,6 +205,7 @@ public abstract class NotificationHandler implements Runnable
      * @return return the raw response without the http header
      * @throws YAPI_Exception
      */
+    @SuppressWarnings("UnusedParameters")
     abstract byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, int mstimeout, YGenericHub.RequestProgress progress, Object context) throws YAPI_Exception, InterruptedException;
 
     /**

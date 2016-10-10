@@ -27,7 +27,7 @@ public class Demo {
 
         int slave, reg, val;
         String cmd;
-        
+
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);
         BufferedReader console = new BufferedReader(inputStreamReader);
         try {
@@ -38,19 +38,19 @@ public class Demo {
             } while(slave < 1 || slave > 255);
             do {
                 System.out.println("Please select a Coil No (>=1), Input Bit No (>=10001+),");
-                System.out.println("       Register No (>=30001) or Input Register No (>=40001)");
+                System.out.println("       Input Register No (>=30001) or Register No (>=40001)");
                 System.out.print("No: ");
                 reg = Integer.parseInt(console.readLine());
             } while(reg < 1 || reg >= 50000 || (reg % 10000) == 0);
-            while(true) {                
+            while(true) {
                 if(reg >= 40001) {
-                    val = serialPort.modbusReadInputRegisters(slave, reg-40001, 1).get(0);                
+                    val = serialPort.modbusReadRegisters(slave, reg-40001, 1).get(0);
                 } else if(reg >= 30001) {
-                    val = serialPort.modbusReadRegisters(slave, reg-30001, 1).get(0);
+                    val = serialPort.modbusReadInputRegisters(slave, reg-30001, 1).get(0);
                 } else if(reg >= 10001) {
                     val = serialPort.modbusReadInputBits(slave, reg-10001, 1).get(0);
                 } else {
-                    val = serialPort.modbusReadBits(slave, reg-1, 1).get(0);                
+                    val = serialPort.modbusReadBits(slave, reg-1, 1).get(0);
                 }
                 System.out.println("Current value: "+Integer.toString(val));
                 System.out.print("Press ENTER to read again, Q to quit");
@@ -70,7 +70,7 @@ public class Demo {
                 }
             }
         } catch(Exception ex) {
-            ex.printStackTrace();  
+            ex.printStackTrace();
         }
 
         YAPI.FreeAPI();

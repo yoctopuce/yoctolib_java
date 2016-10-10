@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YFiles.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -43,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 //--- (generated code: YFiles class start)
 /**
@@ -53,7 +54,7 @@ import java.util.ArrayList;
  * (for networked devices) or to add fonts (on display
  * devices).
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YFiles extends YFunction
 {
 //--- (end of generated code: YFiles class start)
@@ -116,6 +117,7 @@ public class YFiles extends YFunction
 
 
     //--- (generated code: YFiles implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -299,7 +301,7 @@ public class YFiles extends YFunction
     public byte[] sendCommand(String command) throws YAPI_Exception
     {
         String url;
-        url = String.format("files.json?a=%s",command);
+        url = String.format(Locale.US, "files.json?a=%s",command);
         // may throw an exception
         return _download(url);
     }
@@ -318,6 +320,7 @@ public class YFiles extends YFunction
         String res;
         json = sendCommand("format");
         res = _json_get_key(json, "res");
+        //noinspection DoubleNegation
         if (!(res.equals("ok"))) { throw new YAPI_Exception( YAPI.IO_ERROR,  "format failed");}
         return YAPI.SUCCESS;
     }
@@ -338,9 +341,9 @@ public class YFiles extends YFunction
     public ArrayList<YFileRecord> get_list(String pattern) throws YAPI_Exception
     {
         byte[] json;
-        ArrayList<String> filelist = new ArrayList<String>();
-        ArrayList<YFileRecord> res = new ArrayList<YFileRecord>();
-        json = sendCommand(String.format("dir&f=%s",pattern));
+        ArrayList<String> filelist = new ArrayList<>();
+        ArrayList<YFileRecord> res = new ArrayList<>();
+        json = sendCommand(String.format(Locale.US, "dir&f=%s",pattern));
         filelist = _json_get_array(json);
         res.clear();
         for (String ii:filelist) {
@@ -361,11 +364,11 @@ public class YFiles extends YFunction
     public boolean fileExist(String filename) throws YAPI_Exception
     {
         byte[] json;
-        ArrayList<String> filelist = new ArrayList<String>();
+        ArrayList<String> filelist = new ArrayList<>();
         if ((filename).length() == 0) {
             return false;
         }
-        json = sendCommand(String.format("dir&f=%s",filename));
+        json = sendCommand(String.format(Locale.US, "dir&f=%s",filename));
         filelist = _json_get_array(json);
         if (filelist.size() > 0) {
             return true;
@@ -421,8 +424,9 @@ public class YFiles extends YFunction
     {
         byte[] json;
         String res;
-        json = sendCommand(String.format("del&f=%s",pathname));
+        json = sendCommand(String.format(Locale.US, "del&f=%s",pathname));
         res  = _json_get_key(json, "res");
+        //noinspection DoubleNegation
         if (!(res.equals("ok"))) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to remove file");}
         return YAPI.SUCCESS;
     }

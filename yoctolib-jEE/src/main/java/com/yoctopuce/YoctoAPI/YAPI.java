@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 25310 2016-09-07 09:06:02Z seb $
+ * $Id: YAPI.java 25362 2016-09-16 08:23:48Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -45,6 +45,7 @@ import java.util.HashMap;
 /**
  *
  */
+@SuppressWarnings("unused")
 public class YAPI
 {
     // Default cache validity (in [ms]) before reloading data from device. This
@@ -61,7 +62,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "25310";
+    public static final String YOCTO_API_BUILD_STR = "25534";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -143,6 +144,7 @@ public class YAPI
     public interface CalibrationHandlerCallback
     {
 
+        @SuppressWarnings("UnusedParameters")
         double yCalibrationHandler(double rawValue, int calibType,
                                    ArrayList<Integer> params, ArrayList<Double> rawValues, ArrayList<Double> refValues);
     }
@@ -150,7 +152,7 @@ public class YAPI
     static final HashMap<String, YPEntry.BaseClass> _BaseType;
 
     static {
-        _BaseType = new HashMap<String, YPEntry.BaseClass>();
+        _BaseType = new HashMap<>();
         _BaseType.put("Function", YPEntry.BaseClass.Function);
         _BaseType.put("Sensor", YPEntry.BaseClass.Sensor);
     }
@@ -175,7 +177,7 @@ public class YAPI
     {
         if (_SingleYAPI != null)
             throw new YAPI_Exception(INVALID_ARGUMENT, "SetSingleThreadMode must be called before start using the Yoctopuce API");
-        _MultipleYAPI = new HashMap<Long, YAPIContext>();
+        _MultipleYAPI = new HashMap<>();
     }
 
 
@@ -217,7 +219,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".25310" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".25534" + YUSBHub.getAPIVersion();
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOldDataStream.java 22359 2015-12-15 13:30:10Z seb $
+ * $Id: YOldDataStream.java 25362 2016-09-16 08:23:48Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -59,9 +59,9 @@ import java.util.ArrayList;
  */
 public class YOldDataStream extends YDataStream
 {
-    YDataLogger _dataLogger;
-    int _timeStamp;
-    int _interval;
+    private YDataLogger _dataLogger;
+    private int _timeStamp;
+    private int _interval;
 
     public YOldDataStream(YDataLogger parent, int run, int stamp, long utc, int itv)
     {
@@ -110,7 +110,7 @@ public class YOldDataStream extends YDataStream
                     _nCols = 0;
                     throw new YAPI_Exception(YAPI.IO_ERROR, "DataStream corrupted");
                 }
-                _columnNames = new ArrayList<String>(_nCols);
+                _columnNames = new ArrayList<>(_nCols);
                 for (int i = 0; i < jsonKeys.length(); i++) {
                     _columnNames.add(jsonKeys.getString(i));
                 }
@@ -155,13 +155,16 @@ public class YOldDataStream extends YDataStream
                 for (int i = 0; i < json_colscl.length(); i++) {
                     double dval = json_colscl.getDouble(i);
                     colscl[i] = dval / 65536.0;
+                    assert coltyp != null;
                     colofs[i] = (coltyp[i] != 0 ? -32767 : 0);
                 }
             } else {
+                assert coldiv != null;
                 colscl = new double[coldiv.length()];
                 colofs = new int[coldiv.length()];
                 for (int i = 0; i < coldiv.length(); i++) {
                     colscl[i] = 1.0 / coldiv.getDouble(i);
+                    assert coltyp != null;
                     colofs[i] = (coltyp[i] != 0 ? -32767 : 0);
                 }
 
@@ -170,6 +173,7 @@ public class YOldDataStream extends YDataStream
             throw new YAPI_Exception(YAPI.IO_ERROR, "json parse error");
         }
 
+        //noinspection ConstantConditions
         if (jsonObj != null && jsonObj.has("data")) {
             if (_nCols == 0 || coldiv == null || coltyp == null) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, "DataStream corrupted");
@@ -184,7 +188,7 @@ public class YOldDataStream extends YDataStream
             if (udata == null) {
                 try {
                     JSONArray jsonData = jsonObj.getJSONArray("data");
-                    udata = new ArrayList<Integer>();
+                    udata = new ArrayList<>();
                     for (int i = 0; i < jsonData.length(); i++) {
                         udata.add(jsonData.getInt(i));
                     }
@@ -193,8 +197,8 @@ public class YOldDataStream extends YDataStream
                 }
 
             }
-            _values = new ArrayList<ArrayList<Double>>();
-            ArrayList<Double> dat = new ArrayList<Double>();
+            _values = new ArrayList<>();
+            ArrayList<Double> dat = new ArrayList<>();
             int c = 0;
             for (int val_i : udata) {
                 double val_d;
@@ -207,7 +211,7 @@ public class YOldDataStream extends YDataStream
                 c++;
                 if (c == _nCols) {
                     _values.add(dat);
-                    dat = new ArrayList<Double>();
+                    dat = new ArrayList<>();
                     c = 0;
                 }
             }

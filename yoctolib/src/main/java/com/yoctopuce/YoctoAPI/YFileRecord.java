@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFileRecord.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YFileRecord.java 25362 2016-09-16 08:23:48Z seb $
  *
  * YFileRecord Class: Description of a file on the device filesystem
  *
@@ -48,7 +48,7 @@ import org.json.JSONObject;
  *
  *
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YFileRecord
 {
 //--- (end of generated code: YFileRecord class start)

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLatitude.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YLatitude.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindLatitude(), the high-level API for Latitude functions
  *
@@ -52,7 +52,7 @@ import org.json.JSONObject;
  * read measurements, register callback functions, access the autonomous
  * datalogger.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YLatitude extends YSensor
 {
 //--- (end of YLatitude class start)
@@ -110,6 +110,7 @@ public class YLatitude extends YSensor
     }
 
     //--- (YLatitude implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWlanRecord.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YWlanRecord.java 25362 2016-09-16 08:23:48Z seb $
  *
  * YWlanRecord Class: Description of a wireless network detected
  *
@@ -48,7 +48,7 @@ import org.json.JSONObject;
  *
  *
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YWlanRecord
 {
 //--- (end of generated code: YWlanRecord class start)

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAltitude.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YAltitude.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -53,7 +53,7 @@ import org.json.JSONObject;
  * This class adds the ability to configure the barometric pressure adjusted to
  * sea level (QNH) for barometric sensors.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YAltitude extends YSensor
 {
 //--- (end of YAltitude class start)
@@ -121,6 +121,7 @@ public class YAltitude extends YSensor
     }
 
     //--- (YAltitude implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

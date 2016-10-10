@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMeasure.java 19328 2015-02-17 17:30:45Z seb $
+ * $Id: YMeasure.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements yFindMeasure(), the high-level API for Measure functions
  *
@@ -50,7 +50,7 @@ import java.util.Date;
  * a value measured at a specified time. These objects are
  * used in particular in conjunction with the YDataSet class.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YMeasure
 {
 //--- (end of generated code: YMeasure class start)

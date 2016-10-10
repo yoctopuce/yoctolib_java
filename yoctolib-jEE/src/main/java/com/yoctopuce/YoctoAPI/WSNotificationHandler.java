@@ -713,6 +713,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
 
     private void WSLOG(String s)
     {
+        System.out.println(s);
         _hub._yctx._Log(s + "\n");
     }
 

@@ -7,7 +7,7 @@
     <groupId>com.yoctopuce.java</groupId>
     <artifactId>javabundle</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.25310-SNAPSHOT</version>
+    <version>1.10.25534-SNAPSHOT</version>
     <name>Yoctopuce Java API (with examples)</name>
     <description>Official Yoctopuce Library for Java with examples</description>
     <url>http://www.yoctopuce.com</url>
@@ -34,6 +34,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-MaxiCoupler</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiDisplay</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiPowerRelay</module>
+        <module>Examples/Doc-GettingStarted-Yocto-MaxiThermistor</module>
         <module>Examples/Doc-GettingStarted-Yocto-Meteo</module>
         <module>Examples/Doc-GettingStarted-Yocto-milliVolt-Rx</module>
         <module>Examples/Doc-GettingStarted-Yocto-milliVolt-Rx-BNC</module>
@@ -50,6 +51,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-Serial</module>
         <module>Examples/Doc-GettingStarted-Yocto-Servo</module>
         <module>Examples/Doc-GettingStarted-Yocto-SPI</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Thermistor-C</module>
         <module>Examples/Doc-GettingStarted-Yocto-Temperature</module>
         <module>Examples/Doc-GettingStarted-Yocto-Thermocouple</module>
         <module>Examples/Doc-GettingStarted-Yocto-VOC</module>

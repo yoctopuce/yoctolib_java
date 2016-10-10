@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMotor.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YMotor.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindMotor(), the high-level API for Motor functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Locale;
 
 //--- (YMotor return codes)
 //--- (end of YMotor return codes)
@@ -53,7 +54,7 @@ import org.json.JSONObject;
  * have to monitor it. The API also allows to slow down the motor by shortening
  * its terminals: the motor will then act as an electromagnetic brake.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YMotor extends YFunction
 {
 //--- (end of YMotor class start)
@@ -163,6 +164,7 @@ public class YMotor extends YFunction
     }
 
     //--- (YMotor implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -949,7 +951,7 @@ public class YMotor extends YFunction
      */
     public int drivingForceMove(double targetPower,int delay) throws YAPI_Exception
     {
-        return set_command(String.format("P%d,%d",(int) (double)Math.round(targetPower*10),delay));
+        return set_command(String.format(Locale.US, "P%d,%d",(int) (double)Math.round(targetPower*10),delay));
     }
 
     /**
@@ -964,7 +966,7 @@ public class YMotor extends YFunction
      */
     public int brakingForceMove(double targetPower,int delay) throws YAPI_Exception
     {
-        return set_command(String.format("B%d,%d",(int) (double)Math.round(targetPower*10),delay));
+        return set_command(String.format(Locale.US, "B%d,%d",(int) (double)Math.round(targetPower*10),delay));
     }
 
     /**

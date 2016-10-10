@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YServo.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YServo.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindServo(), the high-level API for Servo functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Locale;
 
 //--- (YServo return codes)
 //--- (end of YServo return codes)
@@ -52,7 +53,7 @@ import org.json.JSONObject;
  * in which the move should be performed. This makes it possible to
  * synchronize two servos involved in a same move.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YServo extends YFunction
 {
 //--- (end of YServo class start)
@@ -153,6 +154,7 @@ public class YServo extends YFunction
     }
 
     //--- (YServo implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -480,7 +482,7 @@ public class YServo extends YFunction
     public int set_move(YMove  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("%d:%d",newval.target,newval.ms);
+        rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
         _setAttr("move",rest_val);
         return YAPI.SUCCESS;
     }
@@ -503,7 +505,7 @@ public class YServo extends YFunction
     public int move(int target,int ms_duration)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format("%d:%d",target,ms_duration);
+        rest_val = String.format(Locale.US, "%d:%d",target,ms_duration);
         _setAttr("move",rest_val);
         return YAPI.SUCCESS;
     }

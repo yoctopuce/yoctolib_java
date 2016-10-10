@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSpiPort.java 25085 2016-07-26 16:38:36Z mvuilleu $
+ * $Id: YSpiPort.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Locale;
 import java.util.ArrayList;
 
 //--- (YSpiPort return codes)
@@ -54,7 +55,7 @@ import java.util.ArrayList;
  * Note that Yoctopuce SPI ports are not exposed as virtual COM ports.
  * They are meant to be used in the same way as all Yoctopuce devices.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YSpiPort extends YFunction
 {
 //--- (end of YSpiPort class start)
@@ -195,6 +196,7 @@ public class YSpiPort extends YFunction
     }
 
     //--- (YSpiPort implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -1080,7 +1082,7 @@ public class YSpiPort extends YFunction
      */
     public int writeByte(int code) throws YAPI_Exception
     {
-        return sendCommand(String.format("$%02x",code));
+        return sendCommand(String.format(Locale.US, "$%02x",code));
     }
 
     /**
@@ -1112,7 +1114,7 @@ public class YSpiPort extends YFunction
                 }
             }
             if (idx >= bufflen) {
-                return sendCommand(String.format("+%s",text));
+                return sendCommand(String.format(Locale.US, "+%s",text));
             }
         }
         // send string using file upload
@@ -1180,7 +1182,7 @@ public class YSpiPort extends YFunction
         int res;
         bufflen = (hexString).length();
         if (bufflen < 100) {
-            return sendCommand(String.format("$%s",hexString));
+            return sendCommand(String.format(Locale.US, "$%s",hexString));
         }
         bufflen = ((bufflen) >> (1));
         buff = new byte[bufflen];
@@ -1210,7 +1212,7 @@ public class YSpiPort extends YFunction
         int bufflen;
         int idx;
         int ch;
-        buff = (String.format("%s\r\n",text)).getBytes();
+        buff = (String.format(Locale.US, "%s\r\n",text)).getBytes();
         bufflen = (buff).length-2;
         if (bufflen < 100) {
             ch = 0x20;
@@ -1224,7 +1226,7 @@ public class YSpiPort extends YFunction
                 }
             }
             if (idx >= bufflen) {
-                return sendCommand(String.format("!%s",text));
+                return sendCommand(String.format(Locale.US, "!%s",text));
             }
         }
         // send string using file upload
@@ -1286,7 +1288,7 @@ public class YSpiPort extends YFunction
         _rxptr = currpos;
         
         // may throw an exception
-        buff = _download(String.format("rxdata.bin?pos=%d&len=1",_rxptr));
+        buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=1",_rxptr));
         bufflen = (buff).length - 1;
         endpos = 0;
         mult = 1;
@@ -1325,7 +1327,7 @@ public class YSpiPort extends YFunction
             nChars = 65535;
         }
         // may throw an exception
-        buff = _download(String.format("rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
+        buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
         bufflen = (buff).length - 1;
         endpos = 0;
         mult = 1;
@@ -1362,7 +1364,7 @@ public class YSpiPort extends YFunction
             nChars = 65535;
         }
         // may throw an exception
-        buff = _download(String.format("rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
+        buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
         bufflen = (buff).length - 1;
         endpos = 0;
         mult = 1;
@@ -1400,12 +1402,12 @@ public class YSpiPort extends YFunction
         int endpos;
         int idx;
         int b;
-        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Integer> res = new ArrayList<>();
         if (nChars > 65535) {
             nChars = 65535;
         }
         // may throw an exception
-        buff = _download(String.format("rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
+        buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
         bufflen = (buff).length - 1;
         endpos = 0;
         mult = 1;
@@ -1448,7 +1450,7 @@ public class YSpiPort extends YFunction
             nBytes = 65535;
         }
         // may throw an exception
-        buff = _download(String.format("rxdata.bin?pos=%d&len=%d", _rxptr,nBytes));
+        buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nBytes));
         bufflen = (buff).length - 1;
         endpos = 0;
         mult = 1;
@@ -1461,11 +1463,11 @@ public class YSpiPort extends YFunction
         res = "";
         ofs = 0;
         while (ofs + 3 < bufflen) {
-            res = String.format("%s%02x%02x%02x%02x", res, buff[ofs], buff[ofs + 1], buff[ofs + 2],buff[ofs + 3]);
+            res = String.format(Locale.US, "%s%02x%02x%02x%02x", res, buff[ofs], buff[ofs + 1], buff[ofs + 2],buff[ofs + 3]);
             ofs = ofs + 4;
         }
         while (ofs < bufflen) {
-            res = String.format("%s%02x", res,buff[ofs]);
+            res = String.format(Locale.US, "%s%02x", res,buff[ofs]);
             ofs = ofs + 1;
         }
         return res;
@@ -1488,11 +1490,11 @@ public class YSpiPort extends YFunction
     {
         String url;
         byte[] msgbin;
-        ArrayList<String> msgarr = new ArrayList<String>();
+        ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
         // may throw an exception
-        url = String.format("rxmsg.json?pos=%d&len=1&maxw=1",_rxptr);
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&len=1&maxw=1",_rxptr);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
@@ -1534,12 +1536,12 @@ public class YSpiPort extends YFunction
     {
         String url;
         byte[] msgbin;
-        ArrayList<String> msgarr = new ArrayList<String>();
+        ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
-        ArrayList<String> res = new ArrayList<String>();
+        ArrayList<String> res = new ArrayList<>();
         int idx;
         // may throw an exception
-        url = String.format("rxmsg.json?pos=%d&maxw=%d&pat=%s", _rxptr, maxWait,pattern);
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&pat=%s", _rxptr, maxWait,pattern);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
@@ -1594,7 +1596,7 @@ public class YSpiPort extends YFunction
         int bufflen;
         int res;
         // may throw an exception
-        buff = _download(String.format("rxcnt.bin?pos=%d",_rxptr));
+        buff = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         bufflen = (buff).length - 1;
         while ((bufflen > 0) && (buff[bufflen] != 64)) {
             bufflen = bufflen - 1;
@@ -1619,11 +1621,11 @@ public class YSpiPort extends YFunction
     {
         String url;
         byte[] msgbin;
-        ArrayList<String> msgarr = new ArrayList<String>();
+        ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
         // may throw an exception
-        url = String.format("rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,query);
+        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,query);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
@@ -1685,7 +1687,7 @@ public class YSpiPort extends YFunction
      */
     public int set_SS(int val) throws YAPI_Exception
     {
-        return sendCommand(String.format("S%d",val));
+        return sendCommand(String.format(Locale.US, "S%d",val));
     }
 
     /**

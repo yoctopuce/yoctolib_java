@@ -1,10 +1,16 @@
 package com.yoctopuce.YoctoAPI;
 
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Queue;
 
+@SuppressWarnings("unused")
 public class YAPIContext
 {
 
@@ -50,7 +56,7 @@ public class YAPIContext
     static class PlugEvent
     {
 
-        public static enum Event
+        public enum Event
         {
 
             PLUG, UNPLUG, CHANGE
@@ -127,7 +133,7 @@ public class YAPIContext
     // Parse an array of u16 encoded in a base64-like string with memory-based compression
     static ArrayList<Integer> _decodeWords(String data)
     {
-        ArrayList<Integer> udata = new ArrayList<Integer>();
+        ArrayList<Integer> udata = new ArrayList<>();
         int datalen = data.length();
         int p = 0;
         while (p < datalen) {
@@ -167,7 +173,7 @@ public class YAPIContext
     // Parse an array of u16 encoded in a base64-like string with memory-based compression
     static ArrayList<Integer> _decodeFloats(String data)
     {
-        ArrayList<Integer> idata = new ArrayList<Integer>();
+        ArrayList<Integer> idata = new ArrayList<>();
         int datalen = data.length();
         int p = 0;
         while (p < datalen) {
@@ -331,19 +337,19 @@ public class YAPIContext
     private int _apiMode;
     final ArrayList<YGenericHub> _hubs = new ArrayList<>(1); // array of root urls
     private boolean _firstArrival;
-    private final Queue<PlugEvent> _pendingCallbacks = new LinkedList<PlugEvent>();
-    private final Queue<DataEvent> _data_events = new LinkedList<DataEvent>();
+    private final Queue<PlugEvent> _pendingCallbacks = new LinkedList<>();
+    private final Queue<DataEvent> _data_events = new LinkedList<>();
     private YAPI.DeviceArrivalCallback _arrivalCallback;
     private YAPI.DeviceChangeCallback _namechgCallback;
     private YAPI.DeviceRemovalCallback _removalCallback;
     private YAPI.LogCallback _logCallback;
     private final Object _newHubCallbackLock = new Object();
     private YAPI.HubDiscoveryCallback _HubDiscoveryCallback;
-    private final HashMap<Integer, YAPI.CalibrationHandlerCallback> _calibHandlers = new HashMap<Integer, YAPI.CalibrationHandlerCallback>();
+    private final HashMap<Integer, YAPI.CalibrationHandlerCallback> _calibHandlers = new HashMap<>();
     private final YSSDP _ssdp;
     final YHash _yHash;
-    private final ArrayList<YFunction> _ValueCallbackList = new ArrayList<YFunction>();
-    private final ArrayList<YFunction> _TimedReportCallbackList = new ArrayList<YFunction>();
+    private final ArrayList<YFunction> _ValueCallbackList = new ArrayList<>();
+    private final ArrayList<YFunction> _TimedReportCallbackList = new ArrayList<>();
 
     private final YSSDP.YSSDPReportInterface _ssdpCallback = new YSSDP.YSSDPReportInterface()
     {
@@ -578,12 +584,13 @@ public class YAPIContext
         // Add hub to known list
         if (url.equals("usb")) {
             YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(this, _hubs.size(), true);
+            newhub = new YUSBHub(this, _hubs.size(), true, YAPI.DEFAULT_PKT_RESEND_DELAY);
         } else if (url.equals("usb_silent")) {
             YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(this, _hubs.size(), false);
+            newhub = new YUSBHub(this, _hubs.size(), false, YAPI.DEFAULT_PKT_RESEND_DELAY);
         } else if (url.equals("net")) {
             if ((_apiMode & YAPI.DETECT_NET) == 0) {
+                //noinspection ConstantConditions
                 if (YUSBHub.RegisterLocalhost()) {
                     newhub = new YHTTPHub(this, _hubs.size(), new YGenericHub.HTTPParams("localhost"), false, null);
                     _hubs.add(newhub);
@@ -931,7 +938,7 @@ public class YAPIContext
         // Add hub to known list
         if (url.equals("usb")) {
             YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(this, 0, true);
+            newhub = new YUSBHub(this, 0, true, YAPI.DEFAULT_PKT_RESEND_DELAY);
         } else if (url.equals("net")) {
             return YAPI.SUCCESS;
         } else if (parsedurl.getHost().equals("callback")) {
@@ -976,6 +983,7 @@ public class YAPIContext
      * @return YAPI.SUCCESS when the call succeeds.
      * @throws YAPI_Exception on error
      */
+    @SuppressWarnings("RedundantThrows")
     public int HandleEvents() throws YAPI_Exception
     {
         // handle pending events

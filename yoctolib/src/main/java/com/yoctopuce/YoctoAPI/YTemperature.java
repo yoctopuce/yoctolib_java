@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YTemperature.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -41,6 +41,7 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.Locale;
 
 //--- (YTemperature return codes)
 //--- (end of YTemperature return codes)
@@ -54,7 +55,7 @@ import java.util.ArrayList;
  * This class adds the ability to configure some specific parameters for some
  * sensors (connection type, temperature mapping table).
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YTemperature extends YSensor
 {
 //--- (end of YTemperature class start)
@@ -146,6 +147,7 @@ public class YTemperature extends YSensor
     }
 
     //--- (YTemperature implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -554,8 +556,8 @@ public class YTemperature extends YSensor
         double t0;
         double t1;
         double res100;
-        ArrayList<Double> tempValues = new ArrayList<Double>();
-        ArrayList<Double> resValues = new ArrayList<Double>();
+        ArrayList<Double> tempValues = new ArrayList<>();
+        ArrayList<Double> resValues = new ArrayList<>();
         t0 = 25.0+275.15;
         t1 = 100.0+275.15;
         res100 = res25 * java.lang.Math.exp(beta*(1.0/t1 - 1.0/t0));
@@ -595,10 +597,13 @@ public class YTemperature extends YSensor
         double currTemp;
         double idxres;
         siz = tempValues.size();
+        //noinspection DoubleNegation
         if (!(siz >= 2)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "thermistor response table must have at least two points");}
+        //noinspection DoubleNegation
         if (!(siz == resValues.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "table sizes mismatch");}
         // may throw an exception
         res = set_command("Z");
+        //noinspection DoubleNegation
         if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermistor parameters");}
         // add records in growing resistance value
         found = 1;
@@ -618,7 +623,8 @@ public class YTemperature extends YSensor
                 idx = idx + 1;
             }
             if (found > 0) {
-                res = set_command(String.format("m%d:%d", (int) (double)Math.round(1000*curr),(int) (double)Math.round(1000*currTemp)));
+                res = set_command(String.format(Locale.US, "m%d:%d", (int) (double)Math.round(1000*curr),(int) (double)Math.round(1000*currTemp)));
+                //noinspection DoubleNegation
                 if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermistor parameters");}
                 prev = curr;
             }
@@ -646,8 +652,8 @@ public class YTemperature extends YSensor
     {
         String id;
         byte[] bin_json;
-        ArrayList<String> paramlist = new ArrayList<String>();
-        ArrayList<Double> templist = new ArrayList<Double>();
+        ArrayList<String> paramlist = new ArrayList<>();
+        ArrayList<Double> templist = new ArrayList<>();
         int siz;
         int idx;
         double temp;
@@ -660,7 +666,7 @@ public class YTemperature extends YSensor
         // may throw an exception
         id = get_functionId();
         id = (id).substring( 11,  11 + (id).length() - 11);
-        bin_json = _download(String.format("extra.json?page=%s",id));
+        bin_json = _download(String.format(Locale.US, "extra.json?page=%s",id));
         paramlist = _json_get_array(bin_json);
         // first convert all temperatures to float
         siz = ((paramlist.size()) >> (1));

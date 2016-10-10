@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YLightSensor.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -55,7 +55,7 @@ import org.json.JSONObject;
  * For some light sensors with several working modes, this class can select the
  * desired working mode.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YLightSensor extends YSensor
 {
 //--- (end of YLightSensor class start)
@@ -123,6 +123,7 @@ public class YLightSensor extends YSensor
     }
 
     //--- (YLightSensor implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YCellular.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -44,6 +44,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 //--- (generated code: YCellular return codes)
 //--- (end of generated code: YCellular return codes)
@@ -54,7 +55,7 @@ import java.util.Arrays;
  * YCellular functions provides control over cellular network parameters
  * and status for devices that are GSM-enabled.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YCellular extends YFunction
 {
 //--- (end of generated code: YCellular class start)
@@ -200,6 +201,7 @@ public class YCellular extends YFunction
 
 
     //--- (generated code: YCellular implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -1196,11 +1198,12 @@ public class YCellular extends YFunction
     {
         String gsmMsg;
         gsmMsg = get_message();
+        //noinspection DoubleNegation
         if (!(!((gsmMsg).substring(0, 13).equals("Enter SIM PUK")))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,  "PUK not expected at this time");}
         if (newPin.equals("")) {
-            return set_command(String.format("AT+CPIN=%s,0000;+CLCK=SC,0,0000",puk));
+            return set_command(String.format(Locale.US, "AT+CPIN=%s,0000;+CLCK=SC,0,0000",puk));
         }
-        return set_command(String.format("AT+CPIN=%s,%s",puk,newPin));
+        return set_command(String.format(Locale.US, "AT+CPIN=%s,%s",puk,newPin));
     }
 
     /**
@@ -1216,7 +1219,7 @@ public class YCellular extends YFunction
      */
     public int set_apnAuth(String username,String password) throws YAPI_Exception
     {
-        return set_apnSecret(String.format("%s,%s",username,password));
+        return set_apnSecret(String.format(Locale.US, "%s,%s",username,password));
     }
 
     /**
@@ -1265,24 +1268,24 @@ public class YCellular extends YFunction
         cmdLen = (cmd).length();
         chrPos = (cmd).indexOf("#");
         while (chrPos >= 0) {
-            cmd = String.format("%s%c23%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmd = String.format(Locale.US, "%s%c23%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
             cmdLen = cmdLen + 2;
             chrPos = (cmd).indexOf("#");
         }
         chrPos = (cmd).indexOf("+");
         while (chrPos >= 0) {
-            cmd = String.format("%s%c2B%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmd = String.format(Locale.US, "%s%c2B%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
             cmdLen = cmdLen + 2;
             chrPos = (cmd).indexOf("+");
         }
         chrPos = (cmd).indexOf("=");
         while (chrPos >= 0) {
-            cmd = String.format("%s%c3D%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmd = String.format(Locale.US, "%s%c3D%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
             cmdLen = cmdLen + 2;
             chrPos = (cmd).indexOf("=");
         }
-        cmd = String.format("at.txt?cmd=%s",cmd);
-        res = String.format("");
+        cmd = String.format(Locale.US, "at.txt?cmd=%s",cmd);
+        res = "";
         // max 2 minutes (each iteration may take up to 5 seconds if waiting)
         waitMore = 24;
         while (waitMore > 0) {
@@ -1296,13 +1299,13 @@ public class YCellular extends YFunction
             }
             if (buff[idx] == 64) {
                 suffixlen = bufflen - idx;
-                cmd = String.format("at.txt?cmd=%s",(buffstr).substring( buffstrlen - suffixlen,  buffstrlen - suffixlen + suffixlen));
+                cmd = String.format(Locale.US, "at.txt?cmd=%s",(buffstr).substring( buffstrlen - suffixlen,  buffstrlen - suffixlen + suffixlen));
                 buffstr = (buffstr).substring(0, buffstrlen - suffixlen);
                 waitMore = waitMore - 1;
             } else {
                 waitMore = 0;
             }
-            res = String.format("%s%s", res,buffstr);
+            res = String.format(Locale.US, "%s%s", res,buffstr);
         }
         return res;
     }
@@ -1321,7 +1324,7 @@ public class YCellular extends YFunction
         String cops;
         int idx;
         int slen;
-        ArrayList<String> res = new ArrayList<String>();
+        ArrayList<String> res = new ArrayList<>();
         // may throw an exception
         cops = _AT("+COPS=?");
         slen = (cops).length();
@@ -1355,7 +1358,7 @@ public class YCellular extends YFunction
     public ArrayList<YCellRecord> quickCellSurvey() throws YAPI_Exception
     {
         String moni;
-        ArrayList<String> recs = new ArrayList<String>();
+        ArrayList<String> recs = new ArrayList<>();
         int llen;
         String mccs;
         int mcc;
@@ -1368,7 +1371,7 @@ public class YCellular extends YFunction
         String tads;
         int tad;
         String oper;
-        ArrayList<YCellRecord> res = new ArrayList<YCellRecord>();
+        ArrayList<YCellRecord> res = new ArrayList<>();
         // may throw an exception
         moni = _AT("+CCED=0;#MONI=7;#MONI");
         mccs = (moni).substring(7, 7 + 3);
@@ -1387,7 +1390,7 @@ public class YCellular extends YFunction
             mncs = (mncs).substring(1, 1 + (mncs).length()-1);
         }
         mnc = YAPIContext._atoi(mncs);
-        recs = new ArrayList<String>(Arrays.asList(moni.split("#")));
+        recs = new ArrayList<>(Arrays.asList(moni.split("#")));
         // process each line in turn
         res.clear();
         for (String ii:recs) {

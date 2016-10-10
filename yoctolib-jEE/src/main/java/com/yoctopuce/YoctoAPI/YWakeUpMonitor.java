@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpMonitor.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YWakeUpMonitor.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -50,7 +50,7 @@ import org.json.JSONObject;
  * The WakeUpMonitor function handles globally all wake-up sources, as well
  * as automated sleep mode.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YWakeUpMonitor extends YFunction
 {
 //--- (end of YWakeUpMonitor class start)
@@ -146,6 +146,7 @@ public class YWakeUpMonitor extends YFunction
     }
 
     //--- (YWakeUpMonitor implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -582,6 +583,7 @@ public class YWakeUpMonitor extends YFunction
     {
         int currTime;
         currTime = (int)(get_rtcTime());
+        //noinspection DoubleNegation
         if (!(currTime != 0)) { throw new YAPI_Exception( YAPI.RTC_NOT_READY,  "RTC time not set");}
         set_nextWakeUp(_endOfTime);
         set_sleepCountdown(secBeforeSleep);
@@ -604,6 +606,7 @@ public class YWakeUpMonitor extends YFunction
     {
         int currTime;
         currTime = (int)(get_rtcTime());
+        //noinspection DoubleNegation
         if (!(currTime != 0)) { throw new YAPI_Exception( YAPI.RTC_NOT_READY,  "RTC time not set");}
         set_nextWakeUp(currTime+secUntilWakeUp);
         set_sleepCountdown(secBeforeSleep);
@@ -626,6 +629,7 @@ public class YWakeUpMonitor extends YFunction
     {
         int currTime;
         currTime = (int)(get_rtcTime());
+        //noinspection DoubleNegation
         if (!(currTime != 0)) { throw new YAPI_Exception( YAPI.RTC_NOT_READY,  "RTC time not set");}
         set_nextWakeUp(wakeUpTime);
         set_sleepCountdown(secBeforeSleep);

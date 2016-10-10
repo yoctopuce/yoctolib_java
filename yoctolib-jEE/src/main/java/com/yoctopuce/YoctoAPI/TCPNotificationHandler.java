@@ -1,11 +1,12 @@
 package com.yoctopuce.YoctoAPI;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 public class TCPNotificationHandler extends NotificationHandler
 {
-    protected volatile boolean _sendPingNotification = false;
-    protected volatile boolean _connected = false;
+    private volatile boolean _sendPingNotification = false;
+    private volatile boolean _connected = false;
     private HashMap<YDevice, yHTTPRequest> _httpReqByDev = new HashMap<>();
 
 
@@ -18,7 +19,7 @@ public class TCPNotificationHandler extends NotificationHandler
     @Override
     public void run()
     {
-        yHTTPRequest yreq = new yHTTPRequest((YHTTPHub) _hub, "Notification of " + _hub.getRootUrl());
+        yHTTPRequest yreq = new yHTTPRequest(_hub, "Notification of " + _hub.getRootUrl());
         while (!Thread.currentThread().isInterrupted()) {
             if (_error_delay > 0) {
                 try {
@@ -35,7 +36,7 @@ public class TCPNotificationHandler extends NotificationHandler
                 if (_notifyPos < 0) {
                     notUrl = "GET /not.byn";
                 } else {
-                    notUrl = String.format("GET /not.byn?abs=%d", _notifyPos);
+                    notUrl = String.format(Locale.US, "GET /not.byn?abs=%d", _notifyPos);
                 }
                 yreq._requestStart(notUrl, null, 0, null, null);
                 _connected = true;

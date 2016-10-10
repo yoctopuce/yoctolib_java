@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPowerOutput.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YPowerOutput.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -50,7 +50,7 @@ import org.json.JSONObject;
  * Yoctopuce application programming interface allows you to control
  * the power ouput featured on some devices such as the Yocto-Serial.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPowerOutput extends YFunction
 {
 //--- (end of YPowerOutput class start)
@@ -115,6 +115,7 @@ public class YPowerOutput extends YFunction
     }
 
     //--- (YPowerOutput implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {

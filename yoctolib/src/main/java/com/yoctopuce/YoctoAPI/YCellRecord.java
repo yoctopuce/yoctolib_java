@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellRecord.java 20376 2015-05-19 14:18:47Z seb $
+ * $Id: YCellRecord.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindCellRecord(), the high-level API for CellRecord functions
  *
@@ -46,7 +46,7 @@ package com.yoctopuce.YoctoAPI;
  *
  *
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YCellRecord
 {
 //--- (end of generated code: YCellRecord class start)

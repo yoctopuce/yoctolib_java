@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YMessageBox.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -39,6 +39,8 @@
 
 package com.yoctopuce.YoctoAPI;
 import java.util.ArrayList;
+import java.util.Locale;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,7 +53,7 @@ import org.json.JSONObject;
  * YMessageBox functions provides SMS sending and receiving capability to
  * GSM-enabled Yoctopuce devices.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YMessageBox extends YFunction
 {
 //--- (end of generated code: YMessageBox class start)
@@ -89,10 +91,10 @@ public class YMessageBox extends YFunction
     protected UpdateCallback _valueCallbackMessageBox = null;
     protected int _nextMsgRef = 0;
     protected String _prevBitmapStr;
-    protected ArrayList<YSms> _pdus = new ArrayList<YSms>();
-    protected ArrayList<YSms> _messages = new ArrayList<YSms>();
+    protected ArrayList<YSms> _pdus = new ArrayList<>();
+    protected ArrayList<YSms> _messages = new ArrayList<>();
     protected boolean _gsm2unicodeReady;
-    protected ArrayList<Integer> _gsm2unicode = new ArrayList<Integer>();
+    protected ArrayList<Integer> _gsm2unicode = new ArrayList<>();
     protected byte[] _iso2gsm;
 
     /**
@@ -145,6 +147,7 @@ public class YMessageBox extends YFunction
     }
 
     //--- (generated code: YMessageBox implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
@@ -521,18 +524,18 @@ public class YMessageBox extends YFunction
     public int clearSIMSlot(int slot) throws YAPI_Exception
     {
         _prevBitmapStr = "";
-        return set_command(String.format("DS%d",slot));
+        return set_command(String.format(Locale.US, "DS%d",slot));
     }
 
     public YSms fetchPdu(int slot) throws YAPI_Exception
     {
         byte[] binPdu;
-        ArrayList<String> arrPdu = new ArrayList<String>();
+        ArrayList<String> arrPdu = new ArrayList<>();
         String hexPdu;
         YSms sms;
         
         // may throw an exception
-        binPdu = _download(String.format("sms.json?pos=%d&len=1",slot));
+        binPdu = _download(String.format(Locale.US, "sms.json?pos=%d&len=1",slot));
         arrPdu = _json_get_array(binPdu);
         hexPdu = _decode_json_string(arrPdu.get(0));
         sms = new YSms(this);
@@ -631,7 +634,7 @@ public class YMessageBox extends YFunction
         int i;
         int gsmlen;
         int reslen;
-        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Integer> res = new ArrayList<>();
         int uni;
         
         if (!(_gsm2unicodeReady)) {
@@ -894,10 +897,10 @@ public class YMessageBox extends YFunction
         int nsig;
         int cnt;
         String sig;
-        ArrayList<YSms> newArr = new ArrayList<YSms>();
-        ArrayList<YSms> newMsg = new ArrayList<YSms>();
-        ArrayList<YSms> newAgg = new ArrayList<YSms>();
-        ArrayList<String> signatures = new ArrayList<String>();
+        ArrayList<YSms> newArr = new ArrayList<>();
+        ArrayList<YSms> newMsg = new ArrayList<>();
+        ArrayList<YSms> newAgg = new ArrayList<>();
+        ArrayList<String> signatures = new ArrayList<>();
         YSms sms;
         
         // may throw an exception

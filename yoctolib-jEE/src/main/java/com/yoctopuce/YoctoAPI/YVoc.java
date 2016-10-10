@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoc.java 24889 2016-06-23 14:55:59Z seb $
+ * $Id: YVoc.java 25362 2016-09-16 08:23:48Z seb $
  *
  * Implements FindVoc(), the high-level API for Voc functions
  *
@@ -51,7 +51,7 @@ import org.json.JSONObject;
  * Compound sensors. It inherits from YSensor class the core functions to read measurements,
  * register callback functions, access to the autonomous datalogger.
  */
- @SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YVoc extends YSensor
 {
 //--- (end of YVoc class start)
@@ -109,6 +109,7 @@ public class YVoc extends YSensor
     }
 
     //--- (YVoc implementation)
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
