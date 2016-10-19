@@ -1,3 +1,4 @@
-- Improve library performances
-- Function.FirstFunction() method that was not returning all functions.
-- Fix some demo examples
+- Fix race condition in WebSocket due to Tomcat 7 under UNIX
+- Fix heavy CPU usage with WebSocket Callback
+- Fix PIN reset using PUK
+- Fix possible timeout during firmware update of GSM hubs

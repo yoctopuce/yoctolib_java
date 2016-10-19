@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YCellular.java 25609 2016-10-19 12:37:17Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -1199,7 +1199,7 @@ public class YCellular extends YFunction
         String gsmMsg;
         gsmMsg = get_message();
         //noinspection DoubleNegation
-        if (!(!((gsmMsg).substring(0, 13).equals("Enter SIM PUK")))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,  "PUK not expected at this time");}
+        if (!((gsmMsg).substring(0, 13).equals("Enter SIM PUK"))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,  "PUK not expected at this time");}
         if (newPin.equals("")) {
             return set_command(String.format(Locale.US, "AT+CPIN=%s,0000;+CLCK=SC,0,0000",puk));
         }

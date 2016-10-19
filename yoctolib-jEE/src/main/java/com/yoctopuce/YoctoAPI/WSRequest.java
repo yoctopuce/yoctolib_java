@@ -21,6 +21,18 @@ class WSRequest
     private long _tmIn;
     private long _tmOut;
     private long _tmClose;
+    private final String _dbgLabel;
+
+
+    @Override
+    public String toString()
+    {
+        return "WSRequest{" +
+                "_async=" + _async +
+                ", _asyncId=" + _asyncId +
+                ", _dbgLabel='" + _dbgLabel + '\'' +
+                '}';
+    }
 
     void checkError() throws YAPI_Exception
     {
@@ -99,6 +111,7 @@ class WSRequest
         _errorCode = ioError;
         _errorMsg = reasonPhrase;
         _state = State.ERROR;
+        _dbgLabel = "error:" + reasonPhrase;
     }
 
 
@@ -113,6 +126,7 @@ class WSRequest
         _tmOpen = System.currentTimeMillis();
         _progressCb = null;
         _progressCtx = null;
+        _dbgLabel = "";//getReqDbgString(full_request);
     }
 
     WSRequest(int tcpchanel, byte[] full_request, YGenericHub.RequestProgress progress, Object context)
@@ -126,7 +140,20 @@ class WSRequest
         _tmOpen = System.currentTimeMillis();
         _progressCb = progress;
         _progressCtx = context;
+        _dbgLabel = "";//getReqDbgString(full_request);
     }
+
+
+    private String getReqDbgString(byte[] full_request)
+    {
+        String dbg_req = new String(full_request);
+        int pos = dbg_req.indexOf("\r");
+        if (pos > 0) {
+            dbg_req = dbg_req.substring(0, pos);
+        }
+        return dbg_req;
+    }
+
 
     ByteBuffer getRequestBytes()
     {
@@ -143,7 +170,7 @@ class WSRequest
         _state = state;
         if (state.equals(State.CLOSED)) {
             _tmClose = System.currentTimeMillis();
-            //<logProcess("success");
+            //logProcess("success");
         }
         this.notifyAll();
     }

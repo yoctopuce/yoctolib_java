@@ -35,7 +35,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
 
     private final BlockingQueue<WSRequest> _pendingRequests = new LinkedBlockingQueue<>();
 
-    private final ArrayList<Queue<WSRequest>> _workingRequests;
+    private final ArrayList<ArrayList<WSRequest>> _workingRequests;
     private final Object _stateLock = new Object();
     private volatile boolean _firstNotif;
     private volatile boolean _muststop;
@@ -58,6 +58,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     private byte _nextAsyncId = 48;
     private long _next_transmit_tm = 0;
 
+    private final Object _sendLock = new Object();
 
     private enum ConnectionState
     {
@@ -84,7 +85,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         _workingRequests = new ArrayList<>(NB_TCP_CHANNEL);
 
         for (int i = 0; i < NB_TCP_CHANNEL; i++) {
-            _workingRequests.add(i, new LinkedList<WSRequest>());
+            _workingRequests.add(i, new ArrayList<WSRequest>());
         }
         _executorService = Executors.newFixedThreadPool(1);
         _muststop = false;
@@ -192,7 +193,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                     }
                     synchronized (_workingRequests) {
                         request.reportStartOfProcess();
-                        _workingRequests.get(request.getChannel()).offer(request);
+                        _workingRequests.get(request.getChannel()).add(request);
                     }
                 }
                 processRequests(basicRemote);
@@ -403,6 +404,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         int tcpChanel = first_byte & 0x7;
         int ystream = (first_byte & 0xff) >> 3;
 
+        ArrayList<WSRequest> requestOfTCPChan = _workingRequests.get(tcpChanel);
         switch (ystream) {
             case YGenericHub.YSTREAM_TCP_NOTIF:
                 if (_firstNotif) {
@@ -425,7 +427,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                 return;
             case YGenericHub.YSTREAM_TCP_ASYNCCLOSE:
                 synchronized (_workingRequests) {
-                    workingRequest = _workingRequests.get(tcpChanel).peek();
+                    workingRequest = requestOfTCPChan.size() > 0 ? requestOfTCPChan.get(0) : null;
                 }
                 if (workingRequest != null && raw_data.remaining() >= 1) {
                     stream = new WSStream(ystream, tcpChanel, raw_data.remaining() - 1, raw_data);
@@ -437,14 +439,14 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                     workingRequest.addStream(stream);
                     workingRequest.setState(WSRequest.State.CLOSED);
                     synchronized (_workingRequests) {
-                        _workingRequests.get(tcpChanel).remove(workingRequest);
+                        requestOfTCPChan.remove(workingRequest);
                     }
                 }
                 break;
             case YGenericHub.YSTREAM_TCP:
             case YGenericHub.YSTREAM_TCP_CLOSE:
                 synchronized (_workingRequests) {
-                    workingRequest = _workingRequests.get(tcpChanel).peek();
+                    workingRequest = requestOfTCPChan.size() > 0 ? requestOfTCPChan.get(0) : null;
                 }
                 if (workingRequest != null) {
                     stream = new WSStream(ystream, tcpChanel, raw_data.remaining(), raw_data);
@@ -452,13 +454,16 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                     if (ystream == YGenericHub.YSTREAM_TCP_CLOSE) {
                         WSStream outstream = new WSStream(YGenericHub.YSTREAM_TCP_CLOSE, tcpChanel, 0, null);
                         try {
-                            _session.getBasicRemote().sendBinary(outstream.getContent(), true);
+                            RemoteEndpoint.Basic basicRemote = _session.getBasicRemote();
+                            synchronized (_sendLock) {
+                                basicRemote.sendBinary(outstream.getContent(), true);
+                            }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                         workingRequest.setState(WSRequest.State.CLOSED);
                         synchronized (_workingRequests) {
-                            _workingRequests.get(tcpChanel).remove(workingRequest);
+                            requestOfTCPChan.remove(workingRequest);
                         }
                     }
                 }
@@ -557,7 +562,8 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                     case YGenericHub.USB_META_ACK_UPLOAD:
                         int tcpchan = raw_data.get();
                         synchronized (_workingRequests) {
-                            workingRequest = _workingRequests.get(tcpchan).peek();
+                            ArrayList<WSRequest> uploadChandRequests = _workingRequests.get(tcpchan);
+                            workingRequest = uploadChandRequests.size() > 0 ? uploadChandRequests.get(0) : null;
                         }
                         if (workingRequest != null) {
                             int b0 = raw_data.get() & 0xff;
@@ -620,8 +626,11 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         }
         for (tcpchan = 0; tcpchan < NB_TCP_CHANNEL; tcpchan++) {
             WSRequest req;
+            ArrayList<WSRequest> requestOfTCPChan = _workingRequests.get(tcpchan);
+            long chan0 = System.currentTimeMillis();
+            int reqIndex = 0;
             synchronized (_workingRequests) {
-                req = _workingRequests.get(tcpchan).peek();
+                req = requestOfTCPChan.size() > reqIndex ? requestOfTCPChan.get(reqIndex) : null;
             }
             while (req != null) {
                 ByteBuffer requestBytes = req.getRequestBytes();
@@ -676,18 +685,24 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         if (datalen == WSStream.MAX_DATA_LEN) {
                             // last frame is already full we must send the async close in another one
                             wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, datalen, requestBytes);
-                            remote.sendBinary(wsstream.getContent(), true);
+                            synchronized (_sendLock) {
+                                remote.sendBinary(wsstream.getContent(), true);
+                            }
                             req.reportDataSent();
                             //WSLOG(String.format("ws_req:%s: send %d bytes on chan%d (%d/%d)\n", req, datalen, tcpchan, requestBytes.position(), requestBytes.limit()));
                             datalen = 0;
                         }
                         wsstream = new WSStream(YGenericHub.YSTREAM_TCP_ASYNCCLOSE, tcpchan, datalen, requestBytes, req.getAsyncId());
-                        remote.sendBinary(wsstream.getContent(), true);
+                        synchronized (_sendLock) {
+                            remote.sendBinary(wsstream.getContent(), true);
+                        }
                         req.reportDataSent();
                         //WSLOG(String.format("req(%s:%s) sent async close %d\n", _hub.getHost(), req, req.getAsyncId()));
                     } else {
                         wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, datalen, requestBytes);
-                        remote.sendBinary(wsstream.getContent(), true);
+                        synchronized (_sendLock) {
+                            remote.sendBinary(wsstream.getContent(), true);
+                        }
                         req.reportDataSent();
                         //WSLOG("ws_req:%p: sent %d bytes on chan%d (%d/%d)\n", req, datalen, tcpchan, req->ws.requestpos, req->ws.requestsize);
                     }
@@ -695,7 +710,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                 if (requestBytes.position() < requestBytes.limit()) {
                     int sent = requestBytes.position() - throttle_start;
                     // not completely sent, cannot do more for now
-                    if (sent > 0  && _uploadRate > 0) {
+                    if (sent > 0 && _uploadRate > 0) {
                         long waitTime = 1000 * sent / _uploadRate;
                         if (waitTime < 2) waitTime = 2;
                         _next_transmit_tm = YAPI.GetTickCount() + waitTime;
@@ -705,7 +720,8 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                     }
                 }
                 synchronized (_workingRequests) {
-                    req = _workingRequests.get(tcpchan).peek();
+                    reqIndex++;
+                    req = requestOfTCPChan.size() > reqIndex ? requestOfTCPChan.get(reqIndex) : null;
                 }
             }
         }
@@ -713,7 +729,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
 
     private void WSLOG(String s)
     {
-        System.out.println(s);
+        //System.out.println("WSLOG:"+s);
         _hub._yctx._Log(s + "\n");
     }
 
@@ -739,7 +755,9 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         WSStream stream = new WSStream(YGenericHub.YSTREAM_META, 0, YGenericHub.USB_META_WS_AUTHENTICATION_SIZE, auth);
         RemoteEndpoint.Basic remote = _session.getBasicRemote();
         try {
-            remote.sendBinary(stream.getContent(), true);
+            synchronized (_sendLock) {
+                remote.sendBinary(stream.getContent(), true);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
