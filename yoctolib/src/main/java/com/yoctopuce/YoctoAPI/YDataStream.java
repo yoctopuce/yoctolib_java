@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YDataStream.java 25651 2016-10-20 13:36:46Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -307,7 +307,9 @@ public class YDataStream
             }
         }
         if (_caltyp != 0) {
-            val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
+            if (_calhdl != null) {
+                val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
+            }
         }
         return val;
     }
@@ -326,7 +328,9 @@ public class YDataStream
             }
         }
         if (_caltyp != 0) {
-            val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
+            if (_calhdl != null) {
+                val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
+            }
         }
         return val;
     }

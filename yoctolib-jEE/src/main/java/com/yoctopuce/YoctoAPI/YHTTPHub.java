@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YHTTPHub.java 25642 2016-10-20 10:22:52Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -361,7 +361,7 @@ class YHTTPHub extends YGenericHub
             throw new YAPI_Exception(YAPI.IO_ERROR, "Too many devices in update mode");
         }
         // ensure flash engine is not busy
-        byte[] bytes = _notificationHandler.hubRequestSync("GET" + baseurl + "/flash.json?a=state", null, YIO_DEFAULT_TCP_TIMEOUT);
+        byte[] bytes = _notificationHandler.hubRequestSync("GET " + baseurl + "/flash.json?a=state", null, YIO_DEFAULT_TCP_TIMEOUT);
         String uploadstate = new String(bytes);
         try {
             JSONObject uploadres = new JSONObject(uploadstate);
