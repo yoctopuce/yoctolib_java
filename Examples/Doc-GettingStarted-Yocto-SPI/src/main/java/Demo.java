@@ -28,7 +28,7 @@ public class Demo
             System.out.println("No module connected (check USB cable)");
             System.exit(1);
         }
-        int value = 22345678;
+        int value = 12345678;
 
         try {
             // sample code driving MAX7219 7-segment display driver

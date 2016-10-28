@@ -1,6 +1,4 @@
 - Fix race condition in WebSocket due to Tomcat 7 under UNIX
-- Give more time for hubs to reach bootloader during firmware update (because of GSM hub)
+- Fix possible timeout during firmware update of GSM hub
 - Fix heavy CPU usage with WebSocket Callback
-- Fix firmware update
-- Fix handling of invalid calibration handler
-- Fix sendPUK(str_puk,str_newPin) method
+- Fix method sendPUK of class YCellular

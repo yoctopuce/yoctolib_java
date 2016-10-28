@@ -1,8 +1,10 @@
 import com.yoctopuce.YoctoAPI.*;
 
-public class Demo {
+public class Demo
+{
 
-    public static void main(String[] args)   {
+    public static void main(String[] args)
+    {
         try {
             // setup the API to use local VirtualHub
             YAPI.RegisterHub("127.0.0.1");
@@ -24,20 +26,19 @@ public class Demo {
         }
 
         try {
-
             System.out.println("Starting watching dog");
             watchdog.set_state(YWatchdog.RUNNING_ON);
             System.out.println("waiting");
-            for (int i=0; i < 12; i++) {
+            for (int i = 0; i < 12; i++) {
                 YAPI.Sleep(10000);
-                System.out.println("Reseting watching dog");
+                System.out.println("Resetting watching dog");
                 watchdog.resetWatchdog();
                 System.out.println("waiting");
             }
-            System.out.println("Stoping watching dog");
+            System.out.println("Stopping watching dog");
             watchdog.set_state(YWatchdog.RUNNING_OFF);
         } catch (YAPI_Exception ex) {
-            System.out.println("Module "+watchdog.describe()+" not connected (check identification and USB cable)");
+            System.out.println("Module " + watchdog.describe() + " not connected (check identification and USB cable)");
         }
         YAPI.FreeAPI();
     }

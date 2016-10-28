@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: yHTTPRequest.java 25742 2016-10-28 07:59:33Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -182,7 +182,6 @@ class yHTTPRequest implements Runnable
                 }
             } catch (SocketTimeoutException ignored) {
             } catch (IOException e) {
-                e.printStackTrace();
                 if (_reuse_socket) {
                     retry = true;
                 } else {
@@ -408,7 +407,7 @@ class yHTTPRequest implements Runnable
     {
         _requestReserve();
         try {
-            _requestStart(req_first_line, req_head_and_body, YHTTPHub.YIO_DEFAULT_TCP_TIMEOUT, context, callback);//fixme
+            _requestStart(req_first_line, req_head_and_body, YHTTPHub.YIO_DEFAULT_TCP_TIMEOUT, context, callback);
             Thread t = new Thread(this);
             t.setName(_dbglabel);
             t.start();
