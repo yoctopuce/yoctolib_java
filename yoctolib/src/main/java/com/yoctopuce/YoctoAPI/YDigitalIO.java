@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDigitalIO.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YDigitalIO.java 25871 2016-11-15 14:32:56Z seb $
  *
  * Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -404,11 +404,13 @@ public class YDigitalIO extends YFunction
     }
 
     /**
-     * Changes the polarity of all the bits of the port: 0 makes a bit an input, 1 makes it an output.
+     * Changes the polarity of all the bits of the port: For each bit set to 0, the matching I/O works the regular,
+     * intuitive way; for each bit set to 1, the I/O works in reverse mode.
      * Remember to call the saveToFlash() method  to make sure the setting will be kept after a reboot.
      *
-     *  @param newval : an integer corresponding to the polarity of all the bits of the port: 0 makes a bit
-     * an input, 1 makes it an output
+     *  @param newval : an integer corresponding to the polarity of all the bits of the port: For each bit
+     * set to 0, the matching I/O works the regular,
+     *         intuitive way; for each bit set to 1, the I/O works in reverse mode
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -423,11 +425,13 @@ public class YDigitalIO extends YFunction
     }
 
     /**
-     * Changes the polarity of all the bits of the port: 0 makes a bit an input, 1 makes it an output.
+     * Changes the polarity of all the bits of the port: For each bit set to 0, the matching I/O works the regular,
+     * intuitive way; for each bit set to 1, the I/O works in reverse mode.
      * Remember to call the saveToFlash() method  to make sure the setting will be kept after a reboot.
      *
-     *  @param newval : an integer corresponding to the polarity of all the bits of the port: 0 makes a bit
-     * an input, 1 makes it an output
+     *  @param newval : an integer corresponding to the polarity of all the bits of the port: For each bit
+     * set to 0, the matching I/O works the regular,
+     *         intuitive way; for each bit set to 1, the I/O works in reverse mode
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

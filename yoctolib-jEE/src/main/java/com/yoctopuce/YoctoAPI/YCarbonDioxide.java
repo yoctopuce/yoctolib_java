@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCarbonDioxide.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YCarbonDioxide.java 25833 2016-11-08 16:55:24Z seb $
  *
  * Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -396,9 +396,14 @@ public class YCarbonDioxide extends YSensor
      *
      * @throws YAPI_Exception on error
      */
-    public int triggetBaselineCalibration() throws YAPI_Exception
+    public int triggerBaselineCalibration() throws YAPI_Exception
     {
         return set_command("BC");
+    }
+
+    public int triggetBaselineCalibration() throws YAPI_Exception
+    {
+        return triggerBaselineCalibration();
     }
 
     /**
@@ -417,9 +422,14 @@ public class YCarbonDioxide extends YSensor
      *
      * @throws YAPI_Exception on error
      */
-    public int triggetZeroCalibration() throws YAPI_Exception
+    public int triggerZeroCalibration() throws YAPI_Exception
     {
         return set_command("ZC");
+    }
+
+    public int triggetZeroCalibration() throws YAPI_Exception
+    {
+        return triggerZeroCalibration();
     }
 
     /**

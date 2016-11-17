@@ -1,4 +1,4 @@
-- Fix race condition in WebSocket due to Tomcat 7 under UNIX
-- Fix possible timeout during firmware update of GSM hub
-- Fix heavy CPU usage with WebSocket Callback
-- Fix method sendPUK of class YCellular
+- Add README.md for Github
+- Fix native USB support on OSX
+- Fix typo in CO2 calibration function name
+- Fix comment of method set_portPolarity() of YDigitalIO class.

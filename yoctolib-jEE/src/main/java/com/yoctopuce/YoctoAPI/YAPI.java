@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YAPI.java 25853 2016-11-11 16:56:13Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -62,7 +62,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "25748";
+    public static final String YOCTO_API_BUILD_STR = "25913";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -110,8 +110,6 @@ public class YAPI
     public static final int DETECT_NET = 2;
     public static final int RESEND_MISSING_PKT = 4;
     public static final int DETECT_ALL = DETECT_USB | DETECT_NET;
-    public static int DEFAULT_PKT_RESEND_DELAY = 0;
-    static int pktAckDelay = DEFAULT_PKT_RESEND_DELAY;
 
 
     /**
@@ -201,6 +199,25 @@ public class YAPI
 
     //PUBLIC STATIC METHOD:
 
+
+    /**
+     * Enables the acknowledge of every USB packet received by the Yoctopuce library.
+     * This function allows the library to run on Android phones that tend to loose USB packets.
+     * By default, this feature is disabled because it doubles the number of packets sent and slows
+     * down the API considerably. Therefore, the acknowledge of incoming USB packets should only be
+     * enabled on phones or tablets that loose USB packets. A delay of 50 milliseconds is generally
+     * enough. In case of doubt, contact Yoctopuce support. To disable USB packets acknowledge,
+     * call this function with the value 0. Note: this feature is only available on Android.
+     *
+     * @param pktAckDelay : then number of milliseconds before the module resend the last USB packet.
+     */
+    public static void SetUSBPacketAckMs(int pktAckDelay)
+    {
+        YAPIContext yctx = GetYCtx(true);
+        yctx.SetUSBPacketAckMs(pktAckDelay);
+    }
+
+
     /**
      * Returns the version identifier for the Yoctopuce library in use.
      * The version is a string in the form "Major.Minor.Build",
@@ -219,7 +236,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".25748" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".25913" + YUSBHub.getAPIVersion();
     }
 
     /**
