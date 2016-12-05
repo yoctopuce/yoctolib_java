@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataSet.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YDataSet.java 26132 2016-12-01 17:02:38Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -248,8 +248,8 @@ public class YDataSet
                 _measures.add(new YMeasure(tim - itv, tim, ii.get(minCol).doubleValue(), ii.get(avgCol).doubleValue(), ii.get(maxCol).doubleValue()));
             }
             tim = tim + itv;
+            tim = (double)Math.round(tim * 1000) / 1000.0;
         }
-        
         return get_progress();
     }
 

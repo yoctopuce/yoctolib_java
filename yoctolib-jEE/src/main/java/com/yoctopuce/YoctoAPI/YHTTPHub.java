@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 25642 2016-10-20 10:22:52Z seb $
+ * $Id: YHTTPHub.java 26008 2016-11-23 13:47:41Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -247,7 +247,7 @@ class YHTTPHub extends YGenericHub
         if (_devListExpires > now) {
             return;
         }
-        if (!_notificationHandler.isConnected()) {
+        if (_notificationHandler == null || !_notificationHandler.isConnected()) {
             if (_reportConnnectionLost) {
                 throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.getUrl() + " is not reachable");
             } else {
@@ -463,7 +463,7 @@ class YHTTPHub extends YGenericHub
     @Override
     synchronized void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception, InterruptedException
     {
-        if (!_notificationHandler.isConnected()) {
+        if (_notificationHandler == null || !_notificationHandler.isConnected()) {
             throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.getUrl() + " is not reachable");
         }
         if (_writeProtected && !_notificationHandler.hasRwAccess()) {
@@ -476,7 +476,7 @@ class YHTTPHub extends YGenericHub
     @Override
     synchronized byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestProgress progress, Object context) throws YAPI_Exception, InterruptedException
     {
-        if (!_notificationHandler.isConnected()) {
+        if (_notificationHandler == null || !_notificationHandler.isConnected()) {
             throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.getUrl() + " is not reachable");
         }
         // Setup timeout counter

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 25853 2016-11-11 16:56:13Z seb $
+ * $Id: YAPI.java 26127 2016-12-01 13:30:34Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -62,7 +62,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "25913";
+    public static final String YOCTO_API_BUILD_STR = "26144";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -209,7 +209,8 @@ public class YAPI
      * enough. In case of doubt, contact Yoctopuce support. To disable USB packets acknowledge,
      * call this function with the value 0. Note: this feature is only available on Android.
      *
-     * @param pktAckDelay : then number of milliseconds before the module resend the last USB packet.
+     * @param pktAckDelay : then number of milliseconds before the module
+     *         resend the last USB packet.
      */
     public static void SetUSBPacketAckMs(int pktAckDelay)
     {
@@ -236,7 +237,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".25913" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".26144" + YUSBHub.getAPIVersion();
     }
 
     /**

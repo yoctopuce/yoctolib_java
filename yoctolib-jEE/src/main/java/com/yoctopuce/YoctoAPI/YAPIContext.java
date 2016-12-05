@@ -688,7 +688,8 @@ public class YAPIContext
      * enough. In case of doubt, contact Yoctopuce support. To disable USB packets acknowledge,
      * call this function with the value 0. Note: this feature is only available on Android.
      *
-     * @param pktAckDelay : then number of milliseconds before the module resend the last USB packet.
+     * @param pktAckDelay : then number of milliseconds before the module
+     *         resend the last USB packet.
      */
     public void SetUSBPacketAckMs(int pktAckDelay)
     {

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 25588 2016-10-18 14:39:24Z seb $
+ * $Id: YGenericHub.java 25921 2016-11-17 16:44:33Z seb $
  *
  * Internal YGenericHub object
  *
@@ -406,9 +406,14 @@ abstract class YGenericHub
                 end_url = url.length();
             }
             int portpos = url.indexOf(':', pos);
-            if (portpos > 0 && portpos < end_url) {
-                _host = url.substring(pos, portpos);
-                _port = Integer.parseInt(url.substring(portpos + 1, end_url));
+            if (portpos > 0) {
+                if (portpos + 1 < end_url) {
+                    _host = url.substring(pos, portpos);
+                    _port = Integer.parseInt(url.substring(portpos + 1, end_url));
+                } else {
+                    _host = url.substring(pos, portpos);
+                    _port = 4444;
+                }
             } else {
                 _host = url.substring(pos, end_url);
                 _port = 4444;
