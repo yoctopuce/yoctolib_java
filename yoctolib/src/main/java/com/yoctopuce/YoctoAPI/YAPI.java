@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 26127 2016-12-01 13:30:34Z seb $
+ * $Id: YAPI.java 26206 2016-12-22 17:14:36Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -62,7 +62,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "26144";
+    public static final String YOCTO_API_BUILD_STR = "26380";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -92,13 +92,13 @@ public class YAPI
     static final int YOCTO_CALIB_TYPE_OFS = 30;
 
     // Yoctopuce generic constant
-    static final int YOCTO_MANUFACTURER_LEN = 20;
-    static final int YOCTO_SERIAL_LEN = 20;
-    static final int YOCTO_BASE_SERIAL_LEN = 8;
-    static final int YOCTO_PRODUCTNAME_LEN = 28;
-    static final int YOCTO_FIRMWARE_LEN = 22;
-    static final int YOCTO_LOGICAL_LEN = 20;
-    static final int YOCTO_FUNCTION_LEN = 20;
+    public static final int YOCTO_MANUFACTURER_LEN = 20;
+    public static final int YOCTO_SERIAL_LEN = 20;
+    public static final int YOCTO_BASE_SERIAL_LEN = 8;
+    public static final int YOCTO_PRODUCTNAME_LEN = 28;
+    public static final int YOCTO_FIRMWARE_LEN = 22;
+    public static final int YOCTO_LOGICAL_LEN = 20;
+    public static final int YOCTO_FUNCTION_LEN = 20;
     static final int YOCTO_PUBVAL_SIZE = 6; // Size of the data (can be non null
     static final int YOCTO_PUBVAL_LEN = 16; // Temporary storage, >=
     static final int YOCTO_PASS_LEN = 20;
@@ -237,7 +237,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".26144" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".26380" + YUSBHub.getAPIVersion();
     }
 
     /**

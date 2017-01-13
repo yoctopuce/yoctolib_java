@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 25964 2016-11-21 15:30:59Z mvuilleu $
+ * $Id: pic24config.php 26169 2016-12-12 01:36:34Z mvuilleu $
  *
  * Implements FindProximity(), the high-level API for Proximity functions
  *
@@ -275,12 +275,12 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Returns the number of elapsed milliseconds between the module power on and the last time
-     * the input button was pressed (the input contact transitioned from absent to present).
+     * Returns the number of elapsed milliseconds between the module power on and the last observed
+     * detection (the input contact transitioned from absent to present).
      *
      *  @return an integer corresponding to the number of elapsed milliseconds between the module power on
-     * and the last time
-     *         the input button was pressed (the input contact transitioned from absent to present)
+     * and the last observed
+     *         detection (the input contact transitioned from absent to present)
      *
      * @throws YAPI_Exception on error
      */
@@ -295,12 +295,12 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Returns the number of elapsed milliseconds between the module power on and the last time
-     * the input button was pressed (the input contact transitioned from absent to present).
+     * Returns the number of elapsed milliseconds between the module power on and the last observed
+     * detection (the input contact transitioned from absent to present).
      *
      *  @return an integer corresponding to the number of elapsed milliseconds between the module power on
-     * and the last time
-     *         the input button was pressed (the input contact transitioned from absent to present)
+     * and the last observed
+     *         detection (the input contact transitioned from absent to present)
      *
      * @throws YAPI_Exception on error
      */
@@ -310,12 +310,12 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Returns the number of elapsed milliseconds between the module power on and the last time
-     * the input button was released (the input contact transitioned from present to absent).
+     * Returns the number of elapsed milliseconds between the module power on and the last observed
+     * detection (the input contact transitioned from present to absent).
      *
      *  @return an integer corresponding to the number of elapsed milliseconds between the module power on
-     * and the last time
-     *         the input button was released (the input contact transitioned from present to absent)
+     * and the last observed
+     *         detection (the input contact transitioned from present to absent)
      *
      * @throws YAPI_Exception on error
      */
@@ -330,12 +330,12 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Returns the number of elapsed milliseconds between the module power on and the last time
-     * the input button was released (the input contact transitioned from present to absent).
+     * Returns the number of elapsed milliseconds between the module power on and the last observed
+     * detection (the input contact transitioned from present to absent).
      *
      *  @return an integer corresponding to the number of elapsed milliseconds between the module power on
-     * and the last time
-     *         the input button was released (the input contact transitioned from present to absent)
+     * and the last observed
+     *         detection (the input contact transitioned from present to absent)
      *
      * @throws YAPI_Exception on error
      */

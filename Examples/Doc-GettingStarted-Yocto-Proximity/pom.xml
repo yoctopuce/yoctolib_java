@@ -9,9 +9,9 @@
         <version>1.10.26380-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>doc-gettingstarted-yocto-powercolor</artifactId>
+    <artifactId>doc-gettingstarted-yocto-proximity</artifactId>
     <packaging>jar</packaging>
-    <name>Doc-GettingStarted-Yocto-PowerColor</name>
+    <name>Doc-GettingStarted-Yocto-Proximity</name>
     <version>1.10.26380-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>

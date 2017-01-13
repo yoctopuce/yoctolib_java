@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 25964 2016-11-21 15:30:59Z mvuilleu $
+ * $Id: YStepperMotor.java 26277 2017-01-04 15:35:59Z seb $
  *
  * Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -99,10 +99,6 @@ public class YStepperMotor extends YFunction
     public static final int STEPPING_FULLSTEP = 4;
     public static final int STEPPING_INVALID = -1;
     /**
-     * invalid ustepMaxSpeed value
-     */
-    public static final double USTEPMAXSPEED_INVALID = YAPI.INVALID_DOUBLE;
-    /**
      * invalid overcurrent value
      */
     public static final int OVERCURRENT_INVALID = YAPI.INVALID_UINT;
@@ -119,6 +115,14 @@ public class YStepperMotor extends YFunction
      */
     public static final String ALERTMODE_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid auxMode value
+     */
+    public static final String AUXMODE_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid auxSignal value
+     */
+    public static final int AUXSIGNAL_INVALID = YAPI.INVALID_INT;
+    /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
@@ -130,11 +134,12 @@ public class YStepperMotor extends YFunction
     protected double _maxAccel = MAXACCEL_INVALID;
     protected double _maxSpeed = MAXSPEED_INVALID;
     protected int _stepping = STEPPING_INVALID;
-    protected double _ustepMaxSpeed = USTEPMAXSPEED_INVALID;
     protected int _overcurrent = OVERCURRENT_INVALID;
     protected int _tCurrStop = TCURRSTOP_INVALID;
     protected int _tCurrRun = TCURRRUN_INVALID;
     protected String _alertMode = ALERTMODE_INVALID;
+    protected String _auxMode = AUXMODE_INVALID;
+    protected int _auxSignal = AUXSIGNAL_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackStepperMotor = null;
 
@@ -216,9 +221,6 @@ public class YStepperMotor extends YFunction
         if (json_val.has("stepping")) {
             _stepping = json_val.getInt("stepping");
         }
-        if (json_val.has("ustepMaxSpeed")) {
-            _ustepMaxSpeed = Math.round(json_val.getDouble("ustepMaxSpeed") * 1000.0 / 65536.0) / 1000.0;
-        }
         if (json_val.has("overcurrent")) {
             _overcurrent = json_val.getInt("overcurrent");
         }
@@ -230,6 +232,12 @@ public class YStepperMotor extends YFunction
         }
         if (json_val.has("alertMode")) {
             _alertMode = json_val.getString("alertMode");
+        }
+        if (json_val.has("auxMode")) {
+            _auxMode = json_val.getString("auxMode");
+        }
+        if (json_val.has("auxSignal")) {
+            _auxSignal = json_val.getInt("auxSignal");
         }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
@@ -655,70 +663,6 @@ public class YStepperMotor extends YFunction
     }
 
     /**
-     * Changes the maximal motor speed for micro-stepping, measured in steps per second.
-     *
-     *  @param newval : a floating point number corresponding to the maximal motor speed for
-     * micro-stepping, measured in steps per second
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_ustepMaxSpeed(double  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("ustepMaxSpeed",rest_val);
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the maximal motor speed for micro-stepping, measured in steps per second.
-     *
-     *  @param newval : a floating point number corresponding to the maximal motor speed for
-     * micro-stepping, measured in steps per second
-     *
-     * @return YAPI_SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int setUstepMaxSpeed(double newval)  throws YAPI_Exception
-    {
-        return set_ustepMaxSpeed(newval);
-    }
-
-    /**
-     * Returns the maximal motor speed for micro-stepping, measured in steps per second.
-     *
-     *  @return a floating point number corresponding to the maximal motor speed for micro-stepping,
-     * measured in steps per second
-     *
-     * @throws YAPI_Exception on error
-     */
-    public double get_ustepMaxSpeed() throws YAPI_Exception
-    {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return USTEPMAXSPEED_INVALID;
-            }
-        }
-        return _ustepMaxSpeed;
-    }
-
-    /**
-     * Returns the maximal motor speed for micro-stepping, measured in steps per second.
-     *
-     *  @return a floating point number corresponding to the maximal motor speed for micro-stepping,
-     * measured in steps per second
-     *
-     * @throws YAPI_Exception on error
-     */
-    public double getUstepMaxSpeed() throws YAPI_Exception
-    {
-        return get_ustepMaxSpeed();
-    }
-
-    /**
      * Returns the overcurrent alert and emergency stop threshold, measured in mA.
      *
      * @return an integer corresponding to the overcurrent alert and emergency stop threshold, measured in mA
@@ -939,6 +883,102 @@ public class YStepperMotor extends YFunction
     /**
      * @throws YAPI_Exception on error
      */
+    public String get_auxMode() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return AUXMODE_INVALID;
+            }
+        }
+        return _auxMode;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public String getAuxMode() throws YAPI_Exception
+    {
+        return get_auxMode();
+    }
+
+    public int set_auxMode(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = newval;
+        _setAttr("auxMode",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    public int setAuxMode(String newval)  throws YAPI_Exception
+    {
+        return set_auxMode(newval);
+    }
+
+    /**
+     * Returns the current value of the signal generated on the auxiliary output.
+     *
+     * @return an integer corresponding to the current value of the signal generated on the auxiliary output
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_auxSignal() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return AUXSIGNAL_INVALID;
+            }
+        }
+        return _auxSignal;
+    }
+
+    /**
+     * Returns the current value of the signal generated on the auxiliary output.
+     *
+     * @return an integer corresponding to the current value of the signal generated on the auxiliary output
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getAuxSignal() throws YAPI_Exception
+    {
+        return get_auxSignal();
+    }
+
+    /**
+     * Changes the value of the signal generated on the auxiliary output.
+     * Acceptable values depend on the auxiliary output signal type configured.
+     *
+     * @param newval : an integer corresponding to the value of the signal generated on the auxiliary output
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_auxSignal(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = Integer.toString(newval);
+        _setAttr("auxSignal",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the value of the signal generated on the auxiliary output.
+     * Acceptable values depend on the auxiliary output signal type configured.
+     *
+     * @param newval : an integer corresponding to the value of the signal generated on the auxiliary output
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setAuxSignal(int newval)  throws YAPI_Exception
+    {
+        return set_auxSignal(newval);
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
     public String get_command() throws YAPI_Exception
     {
         if (_cacheExpiration <= YAPIContext.GetTickCount()) {
@@ -1088,7 +1128,7 @@ public class YStepperMotor extends YFunction
     /**
      * Reinitialize the controller and clear all alert flags.
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
      */
     public int reset() throws YAPI_Exception
@@ -1101,12 +1141,12 @@ public class YStepperMotor extends YFunction
      *
      * @param speed : desired speed, in steps per second.
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
      */
     public int findHomePosition(double speed) throws YAPI_Exception
     {
-        return sendCommand("H");
+        return sendCommand(String.format(Locale.US, "H%d",(int) (double)Math.round(1000*speed)));
     }
 
     /**
@@ -1116,12 +1156,12 @@ public class YStepperMotor extends YFunction
      * @param speed : desired speed, in steps per second. The minimal non-zero speed
      *         is 0.001 pulse per second.
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
      */
     public int changeSpeed(double speed) throws YAPI_Exception
     {
-        return sendCommand(String.format(Locale.US, "R%d",(double)Math.round(1000*speed)));
+        return sendCommand(String.format(Locale.US, "R%d",(int) (double)Math.round(1000*speed)));
     }
 
     /**
@@ -1131,34 +1171,46 @@ public class YStepperMotor extends YFunction
      *
      * @param absPos : absolute position, measured in steps from the origin.
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
      */
     public int moveTo(double absPos) throws YAPI_Exception
     {
-        return sendCommand(String.format(Locale.US, "M%d",(double)Math.round(16*absPos)));
+        return sendCommand(String.format(Locale.US, "M%d",(int) (double)Math.round(16*absPos)));
     }
 
     /**
-     * Starts the motor to reach a given absolute position. The time needed to reach the requested
+     * Starts the motor to reach a given relative position. The time needed to reach the requested
      * position will depend on the acceleration and max speed parameters configured for
      * the motor.
      *
      * @param relPos : relative position, measured in steps from the current position.
      *
-     * @return YAPI_SUCCESS if the call succeeds.
-     *
+     * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
      */
     public int moveRel(double relPos) throws YAPI_Exception
     {
-        return sendCommand(String.format(Locale.US, "m%d",(double)Math.round(16*relPos)));
+        return sendCommand(String.format(Locale.US, "m%d",(int) (double)Math.round(16*relPos)));
+    }
+
+    /**
+     * Keep the motor in the same state for the specified amount of time, before processing next command.
+     *
+     * @param waitMs : wait time, specified in milliseconds.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int pause(int waitMs) throws YAPI_Exception
+    {
+        return sendCommand(String.format(Locale.US, "_%d",waitMs));
     }
 
     /**
      * Stops the motor with an emergency alert, without taking any additional precaution.
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
      */
     public int emergencyStop() throws YAPI_Exception
@@ -1171,7 +1223,7 @@ public class YStepperMotor extends YFunction
      * The move occures even if the system is still in alert mode (end switch depressed). Caution.
      * use this function with great care as it may cause mechanical damages !
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
      */
     public int alertStepOut() throws YAPI_Exception
@@ -1182,7 +1234,7 @@ public class YStepperMotor extends YFunction
     /**
      * Stops the motor smoothly as soon as possible, without waiting for ongoing move completion.
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
      */
     public int abortAndBrake() throws YAPI_Exception
@@ -1193,7 +1245,7 @@ public class YStepperMotor extends YFunction
     /**
      * Turn the controller into Hi-Z mode immediately, without waiting for ongoing move completion.
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
      */
     public int abortAndHiZ() throws YAPI_Exception

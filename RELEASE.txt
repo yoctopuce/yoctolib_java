@@ -1,1 +1,2 @@
-- Fix timestamps of YMeasures that was not rounded to 1/1000s
+- Add loadAttribute method
+- Add Yocto-Proximity example

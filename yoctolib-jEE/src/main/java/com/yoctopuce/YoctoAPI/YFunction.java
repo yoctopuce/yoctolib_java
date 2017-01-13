@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YFunction.java 26329 2017-01-11 14:04:39Z mvuilleu $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -46,6 +46,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 
 //--- (generated code: YFunction class start)
@@ -443,6 +444,25 @@ public class YFunction
     public int unmuteValueCallbacks() throws YAPI_Exception
     {
         return set_advertisedValue("");
+    }
+
+    /**
+     * Returns the current value of a single function attribute, as a text string, as quickly as
+     * possible but without using the cached value.
+     *
+     * @param attrName : le nom de l'attribut désiré
+     *
+     * @return une chaîne de caractères représentant la valeur actuelle de l'attribut.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String loadAttribute(String attrName) throws YAPI_Exception
+    {
+        String url;
+        byte[] attrVal;
+        url = String.format(Locale.US, "api/%s/%s", get_functionId(),attrName);
+        attrVal = _download(url);
+        return new String(attrVal);
     }
 
     public int _parserHelper()

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrent.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YCurrent.java 26183 2016-12-15 00:14:02Z mvuilleu $
  *
  * Implements FindCurrent(), the high-level API for Current functions
  *
@@ -56,6 +56,13 @@ public class YCurrent extends YSensor
 {
 //--- (end of YCurrent class start)
 //--- (YCurrent definitions)
+    /**
+     * invalid enabled value
+     */
+    public static final int ENABLED_FALSE = 0;
+    public static final int ENABLED_TRUE = 1;
+    public static final int ENABLED_INVALID = -1;
+    protected int _enabled = ENABLED_INVALID;
     protected UpdateCallback _valueCallbackCurrent = null;
     protected TimedReportCallback _timedReportCallbackCurrent = null;
 
@@ -113,7 +120,44 @@ public class YCurrent extends YSensor
     @Override
     protected void  _parseAttr(JSONObject json_val) throws JSONException
     {
+        if (json_val.has("enabled")) {
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
+        }
         super._parseAttr(json_val);
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public int get_enabled() throws YAPI_Exception
+    {
+        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                return ENABLED_INVALID;
+            }
+        }
+        return _enabled;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public int getEnabled() throws YAPI_Exception
+    {
+        return get_enabled();
+    }
+
+    public int set_enabled(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        rest_val = (newval > 0 ? "1" : "0");
+        _setAttr("enabled",rest_val);
+        return YAPI.SUCCESS;
+    }
+
+    public int setEnabled(int newval)  throws YAPI_Exception
+    {
+        return set_enabled(newval);
     }
 
     /**
