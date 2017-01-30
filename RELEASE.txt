@@ -1,2 +1,1 @@
-- Add loadAttribute method
-- Add Yocto-Proximity example
+- Fix binary data decoding in some functions of YColorLedCluster and YSerialPort

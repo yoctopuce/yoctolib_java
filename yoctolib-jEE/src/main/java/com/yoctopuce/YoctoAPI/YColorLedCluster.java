@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YColorLedCluster.java 26468 2017-01-24 17:01:29Z seb $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -1006,9 +1006,9 @@ public class YColorLedCluster extends YFunction
         res.clear();
         idx = 0;
         while (idx < count) {
-            r = buff[3*idx];
-            g = buff[3*idx+1];
-            b = buff[3*idx+2];
+            r = (buff[3*idx] & 0xff);
+            g = (buff[3*idx+1] & 0xff);
+            b = (buff[3*idx+2] & 0xff);
             res.add(r*65536+g*256+b);
             idx = idx + 1;
         }
@@ -1040,9 +1040,9 @@ public class YColorLedCluster extends YFunction
         res.clear();
         idx = 0;
         while (idx < count) {
-            r = buff[3*idx];
-            g = buff[3*idx+1];
-            b = buff[3*idx+2];
+            r = (buff[3*idx] & 0xff);
+            g = (buff[3*idx+1] & 0xff);
+            b = (buff[3*idx+2] & 0xff);
             res.add(r*65536+g*256+b);
             idx = idx + 1;
         }
@@ -1072,7 +1072,7 @@ public class YColorLedCluster extends YFunction
         res.clear();
         idx = 0;
         while (idx < count) {
-            seq = buff[idx];
+            seq = (buff[idx] & 0xff);
             res.add(seq);
             idx = idx + 1;
         }
@@ -1105,10 +1105,10 @@ public class YColorLedCluster extends YFunction
         res.clear();
         idx = 0;
         while (idx < count) {
-            hh = buff[4*idx];
-            hl = buff[4*idx+1];
-            lh = buff[4*idx+2];
-            ll = buff[4*idx+3];
+            hh = (buff[4*idx] & 0xff);
+            hl = (buff[4*idx+1] & 0xff);
+            lh = (buff[4*idx+2] & 0xff);
+            ll = (buff[4*idx+3] & 0xff);
             res.add(((hh) << (24))+((hl) << (16))+((lh) << (8))+ll);
             idx = idx + 1;
         }
@@ -1137,8 +1137,8 @@ public class YColorLedCluster extends YFunction
         res.clear();
         idx = 0;
         while (idx < count) {
-            lh = buff[2*idx];
-            ll = buff[2*idx+1];
+            lh = (buff[2*idx] & 0xff);
+            ll = (buff[2*idx+1] & 0xff);
             res.add(((lh) << (8))+ll);
             idx = idx + 1;
         }
@@ -1166,7 +1166,7 @@ public class YColorLedCluster extends YFunction
         res.clear();
         idx = 0;
         while (idx < count) {
-            started = buff[idx];
+            started = (buff[idx] & 0xff);
             res.add(started);
             idx = idx + 1;
         }
@@ -1194,7 +1194,7 @@ public class YColorLedCluster extends YFunction
         res.clear();
         idx = 0;
         while (idx < count) {
-            started = buff[idx];
+            started = (buff[idx] & 0xff);
             res.add(started);
             idx = idx + 1;
         }

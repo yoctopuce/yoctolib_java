@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 25609 2016-10-19 12:37:17Z seb $
+ * $Id: YCellular.java 26468 2017-01-24 17:01:29Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -1294,10 +1294,10 @@ public class YCellular extends YFunction
             buffstr = new String(buff);
             buffstrlen = (buffstr).length();
             idx = bufflen - 1;
-            while ((idx > 0) && (buff[idx] != 64) && (buff[idx] != 10) && (buff[idx] != 13)) {
+            while ((idx > 0) && ((buff[idx] & 0xff) != 64) && ((buff[idx] & 0xff) != 10) && ((buff[idx] & 0xff) != 13)) {
                 idx = idx - 1;
             }
-            if (buff[idx] == 64) {
+            if ((buff[idx] & 0xff) == 64) {
                 suffixlen = bufflen - idx;
                 cmd = String.format(Locale.US, "at.txt?cmd=%s",(buffstr).substring( buffstrlen - suffixlen,  buffstrlen - suffixlen + suffixlen));
                 buffstr = (buffstr).substring(0, buffstrlen - suffixlen);

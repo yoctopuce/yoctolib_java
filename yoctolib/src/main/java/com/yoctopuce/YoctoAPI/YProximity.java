@@ -48,7 +48,7 @@ import org.json.JSONObject;
  * YProximity Class: Proximity function interface
  *
  * The Yoctopuce class YProximity allows you to use and configure Yoctopuce proximity
- * sensors. It inherits from YSensor class the core functions to read measurements,
+ * sensors. It inherits from the YSensor class the core functions to read measurements,
  * register callback functions, access to the autonomous datalogger.
  * This class adds the ability to easily perform a one-point linear calibration
  * to compensate the effect of a glass or filter placed in front of the sensor.
@@ -391,9 +391,9 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Returns the timer of the pulses counter (ms).
+     * Returns the timer of the pulse counter (ms).
      *
-     * @return an integer corresponding to the timer of the pulses counter (ms)
+     * @return an integer corresponding to the timer of the pulse counter (ms)
      *
      * @throws YAPI_Exception on error
      */
@@ -408,9 +408,9 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Returns the timer of the pulses counter (ms).
+     * Returns the timer of the pulse counter (ms).
      *
-     * @return an integer corresponding to the timer of the pulses counter (ms)
+     * @return an integer corresponding to the timer of the pulse counter (ms)
      *
      * @throws YAPI_Exception on error
      */
@@ -565,7 +565,7 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Returns the pulse counter value as well as its timer.
+     * Resets the pulse counter value as well as its timer.
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YMessageBox.java 26468 2017-01-24 17:01:29Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -644,7 +644,7 @@ public class YMessageBox extends YFunction
         reslen = gsmlen;
         i = 0;
         while (i < gsmlen) {
-            if (gsm[i] == 27) {
+            if ((gsm[i] & 0xff) == 27) {
                 reslen = reslen - 1;
             }
             i = i + 1;
@@ -652,10 +652,10 @@ public class YMessageBox extends YFunction
         res.clear();
         i = 0;
         while (i < gsmlen) {
-            uni = _gsm2unicode.get(gsm[i]).intValue();
+            uni = _gsm2unicode.get((gsm[i] & 0xff)).intValue();
             if ((uni == 27) && (i+1 < gsmlen)) {
                 i = i + 1;
-                uni = gsm[i];
+                uni = (gsm[i] & 0xff);
                 if (uni < 60) {
                     if (uni < 41) {
                         if (uni==20) {
@@ -730,7 +730,7 @@ public class YMessageBox extends YFunction
         reslen = gsmlen;
         i = 0;
         while (i < gsmlen) {
-            if (gsm[i] == 27) {
+            if ((gsm[i] & 0xff) == 27) {
                 reslen = reslen - 1;
             }
             i = i + 1;
@@ -739,10 +739,10 @@ public class YMessageBox extends YFunction
         i = 0;
         reslen = 0;
         while (i < gsmlen) {
-            uni = _gsm2unicode.get(gsm[i]).intValue();
+            uni = _gsm2unicode.get((gsm[i] & 0xff)).intValue();
             if ((uni == 27) && (i+1 < gsmlen)) {
                 i = i + 1;
-                uni = gsm[i];
+                uni = (gsm[i] & 0xff);
                 if (uni < 60) {
                     if (uni < 41) {
                         if (uni==20) {
@@ -825,8 +825,8 @@ public class YMessageBox extends YFunction
         extra = 0;
         i = 0;
         while (i < asclen) {
-            ch = asc[i];
-            gsm7 = _iso2gsm[ch];
+            ch = (asc[i] & 0xff);
+            gsm7 = (_iso2gsm[ch] & 0xff);
             if (gsm7 == 27) {
                 extra = extra + 1;
             }
@@ -840,8 +840,8 @@ public class YMessageBox extends YFunction
         wpos = 0;
         i = 0;
         while (i < asclen) {
-            ch = asc[i];
-            gsm7 = _iso2gsm[ch];
+            ch = (asc[i] & 0xff);
+            gsm7 = (_iso2gsm[ch] & 0xff);
             res[wpos] = (byte)(gsm7 & 0xff);
             wpos = wpos + 1;
             if (gsm7 == 27) {
@@ -924,7 +924,7 @@ public class YMessageBox extends YFunction
             idx = ((slot) >> (3));
             if (idx < (newBitmap).length) {
                 bitVal = ((1) << ((((slot) & (7)))));
-                if ((((newBitmap[idx]) & (bitVal))) != 0) {
+                if (((((newBitmap[idx] & 0xff)) & (bitVal))) != 0) {
                     newArr.add(sms);
                     if (sms.get_concatCount() == 0) {
                         newMsg.add(sms);
@@ -953,9 +953,9 @@ public class YMessageBox extends YFunction
             bitVal = ((1) << ((((slot) & (7)))));
             prevBit = 0;
             if (idx < (prevBitmap).length) {
-                prevBit = ((prevBitmap[idx]) & (bitVal));
+                prevBit = (((prevBitmap[idx] & 0xff)) & (bitVal));
             }
-            if ((((newBitmap[idx]) & (bitVal))) != 0) {
+            if (((((newBitmap[idx] & 0xff)) & (bitVal))) != 0) {
                 if (prevBit == 0) {
                     sms = fetchPdu(slot);
                     newArr.add(sms);

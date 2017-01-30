@@ -88,7 +88,7 @@ public class Demo
             upgradeSerialList(hubs);
             // ... then all shield..
             upgradeSerialList(shield);
-            // ... and finaly all devices
+            // ... and finally all devices
             upgradeSerialList(devices);
             System.out.println("All devices are now up to date");
         } catch (YAPI_Exception ex) {

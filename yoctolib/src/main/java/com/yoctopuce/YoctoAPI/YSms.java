@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YSms.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YSms.java 26468 2017-01-24 17:01:29Z seb $
  *
  * Implements FindSms(), the high-level API for Sms functions
  *
@@ -170,7 +170,7 @@ public class YSms
             isolatin = new byte[isosize];
             i = 0;
             while (i < isosize) {
-                isolatin[i] = (byte)(_udata[2*i+1] & 0xff);
+                isolatin[i] = (byte)((_udata[2*i+1] & 0xff) & 0xff);
                 i = i + 1;
             }
             return new String(isolatin);
@@ -195,7 +195,7 @@ public class YSms
             res.clear();
             i = 0;
             while (i < unisize) {
-                unival = 256*_udata[2*i]+_udata[2*i+1];
+                unival = 256*(_udata[2*i] & 0xff)+(_udata[2*i+1] & 0xff);
                 res.add(unival);
                 i = i + 1;
             }
@@ -204,7 +204,7 @@ public class YSms
             res.clear();
             i = 0;
             while (i < unisize) {
-                res.add(_udata[i]+0);
+                res.add((_udata[i] & 0xff)+0);
                 i = i + 1;
             }
         }
@@ -371,7 +371,7 @@ public class YSms
             ucs2.clear();
             i = 0;
             while (i < udatalen) {
-                uni = _udata[i];
+                uni = (_udata[i] & 0xff);
                 ucs2.add(uni);
                 i = i + 1;
             }
@@ -412,12 +412,12 @@ public class YSms
             udata = new byte[udatalen + 2*newdatalen];
             i = 0;
             while (i < udatalen) {
-                udata[i] = (byte)(_udata[i] & 0xff);
+                udata[i] = (byte)((_udata[i] & 0xff) & 0xff);
                 i = i + 1;
             }
             i = 0;
             while (i < newdatalen) {
-                udata[udatalen+1] = (byte)(newdata[i] & 0xff);
+                udata[udatalen+1] = (byte)((newdata[i] & 0xff) & 0xff);
                 udatalen = udatalen + 2;
                 i = i + 1;
             }
@@ -425,12 +425,12 @@ public class YSms
             udata = new byte[udatalen+newdatalen];
             i = 0;
             while (i < udatalen) {
-                udata[i] = (byte)(_udata[i] & 0xff);
+                udata[i] = (byte)((_udata[i] & 0xff) & 0xff);
                 i = i + 1;
             }
             i = 0;
             while (i < newdatalen) {
-                udata[udatalen] = (byte)(newdata[i] & 0xff);
+                udata[udatalen] = (byte)((newdata[i] & 0xff) & 0xff);
                 udatalen = udatalen + 1;
                 i = i + 1;
             }
@@ -468,7 +468,7 @@ public class YSms
         udata = new byte[udatalen+2*newdatalen];
         i = 0;
         while (i < udatalen) {
-            udata[i] = (byte)(_udata[i] & 0xff);
+            udata[i] = (byte)((_udata[i] & 0xff) & 0xff);
             i = i + 1;
         }
         i = 0;
@@ -556,7 +556,7 @@ public class YSms
             subdata = subsms.get_userData();
             i = 0;
             while (i < (subdata).length) {
-                res[totsize] = (byte)(subdata[i] & 0xff);
+                res[totsize] = (byte)((subdata[i] & 0xff) & 0xff);
                 totsize = totsize + 1;
                 i = i + 1;
             }
@@ -580,7 +580,7 @@ public class YSms
         numlen = 0;
         i = 0;
         while (i < srclen) {
-            val = bytes[i];
+            val = (bytes[i] & 0xff);
             if ((val >= 48) && (val < 58)) {
                 numlen = numlen + 1;
             }
@@ -593,7 +593,7 @@ public class YSms
         }
         res = new byte[2+((numlen+1) >> (1))];
         res[0] = (byte)(numlen & 0xff);
-        if (bytes[0] == 43) {
+        if ((bytes[0] & 0xff) == 43) {
             res[1] = (byte)(145 & 0xff);
         } else {
             res[1] = (byte)(129 & 0xff);
@@ -602,7 +602,7 @@ public class YSms
         digit = 0;
         i = 0;
         while (i < srclen) {
-            val = bytes[i];
+            val = (bytes[i] & 0xff);
             if ((val >= 48) && (val < 58)) {
                 if (((numlen) & (1)) == 0) {
                     digit = val - 48;
@@ -634,7 +634,7 @@ public class YSms
             return "";
         }
         res = "";
-        addrType = ((addr[ofs]) & (112));
+        addrType = (((addr[ofs] & 0xff)) & (112));
         if (addrType == 80) {
             siz = ((4*siz) / (7));
             gsm7 = new byte[siz];
@@ -648,7 +648,7 @@ public class YSms
                     carry = 0;
                     nbits = 0;
                 } else {
-                    byt = addr[ofs+rpos];
+                    byt = (addr[ofs+rpos] & 0xff);
                     rpos = rpos + 1;
                     gsm7[i] = (byte)(((carry) | ((((((byt) << (nbits)))) & (127)))) & 0xff);
                     carry = ((byt) >> ((7 - nbits)));
@@ -664,11 +664,11 @@ public class YSms
             siz = (((siz+1)) >> (1));
             i = 0;
             while (i < siz) {
-                byt = addr[ofs+i+1];
+                byt = (addr[ofs+i+1] & 0xff);
                 res = String.format(Locale.US, "%s%x%x", res, ((byt) & (15)),((byt) >> (4)));
                 i = i + 1;
             }
-            if (((addr[ofs+siz]) >> (4)) == 15) {
+            if ((((addr[ofs+siz] & 0xff)) >> (4)) == 15) {
                 res = (res).substring(0, (res).length()-1);
             }
             return res;
@@ -720,9 +720,9 @@ public class YSms
         n = 0;
         i = 0;
         while ((i+1 < explen) && (n < 7)) {
-            v1 = expasc[i];
+            v1 = (expasc[i] & 0xff);
             if ((v1 >= 48) && (v1 < 58)) {
-                v2 = expasc[i+1];
+                v2 = (expasc[i+1] & 0xff);
                 if ((v2 >= 48) && (v2 < 58)) {
                     v1 = v1 - 48;
                     v2 = v2 - 48;
@@ -738,16 +738,16 @@ public class YSms
             n = n + 1;
         }
         if (i+2 < explen) {
-            v1 = expasc[i-3];
-            v2 = expasc[i];
+            v1 = (expasc[i-3] & 0xff);
+            v2 = (expasc[i] & 0xff);
             if (((v1 == 43) || (v1 == 45)) && (v2 == 58)) {
-                v1 = expasc[i+1];
-                v2 = expasc[i+2];
+                v1 = (expasc[i+1] & 0xff);
+                v2 = (expasc[i+2] & 0xff);
                 if ((v1 >= 48) && (v1 < 58) && (v1 >= 48) && (v1 < 58)) {
                     v1 = (((10*(v1 - 48)+(v2 - 48))) / (15));
                     n = n - 1;
-                    v2 = 4 * res[n] + v1;
-                    if (expasc[i-3] == 45) {
+                    v2 = 4 * (res[n] & 0xff) + v1;
+                    if ((expasc[i-3] & 0xff) == 45) {
                         v2 += 128;
                     }
                     res[n] = (byte)(v2 & 0xff);
@@ -770,7 +770,7 @@ public class YSms
             return "";
         }
         if (siz == 1) {
-            n = exp[ofs];
+            n = (exp[ofs] & 0xff);
             if (n < 144) {
                 n = n * 300;
             } else {
@@ -789,7 +789,7 @@ public class YSms
         res = "20";
         i = 0;
         while ((i < siz) && (i < 6)) {
-            byt = exp[ofs+i];
+            byt = (exp[ofs+i] & 0xff);
             res = String.format(Locale.US, "%s%x%x", res, ((byt) & (15)),((byt) >> (4)));
             if (i < 3) {
                 if (i < 2) {
@@ -805,7 +805,7 @@ public class YSms
             i = i + 1;
         }
         if (siz == 7) {
-            byt = exp[ofs+i];
+            byt = (exp[ofs+i] & 0xff);
             sign = "+";
             if (((byt) & (8)) != 0) {
                 byt = byt - 8;
@@ -881,7 +881,7 @@ public class YSms
             wpos = wpos + 1;
             i = 0;
             while (i < udhsize) {
-                res[wpos] = (byte)(_udh[i] & 0xff);
+                res[wpos] = (byte)((_udh[i] & 0xff) & 0xff);
                 wpos = wpos + 1;
                 i = i + 1;
             }
@@ -891,10 +891,10 @@ public class YSms
             i = 0;
             while (i < udlen) {
                 if (nbits == 0) {
-                    carry = _udata[i];
+                    carry = (_udata[i] & 0xff);
                     nbits = 7;
                 } else {
-                    thisb = _udata[i];
+                    thisb = (_udata[i] & 0xff);
                     res[wpos] = (byte)(((carry) | ((((((thisb) << (nbits)))) & (255)))) & 0xff);
                     wpos = wpos + 1;
                     nbits = nbits - 1;
@@ -908,7 +908,7 @@ public class YSms
         } else {
             i = 0;
             while (i < udlen) {
-                res[wpos] = (byte)(_udata[i] & 0xff);
+                res[wpos] = (byte)((_udata[i] & 0xff) & 0xff);
                 wpos = wpos + 1;
                 i = i + 1;
             }
@@ -948,7 +948,7 @@ public class YSms
             newudh[4] = (byte)(partno & 0xff);
             i = 0;
             while (i < udhsize) {
-                newudh[5+i] = (byte)(_udh[i] & 0xff);
+                newudh[5+i] = (byte)((_udh[i] & 0xff) & 0xff);
                 i = i + 1;
             }
             if (wpos+mss < udlen) {
@@ -959,7 +959,7 @@ public class YSms
             newud = new byte[partlen];
             i = 0;
             while (i < partlen) {
-                newud[i] = (byte)(_udata[wpos] & 0xff);
+                newud[i] = (byte)((_udata[wpos] & 0xff) & 0xff);
                 wpos = wpos + 1;
                 i = i + 1;
             }
@@ -1027,19 +1027,19 @@ public class YSms
         pdulen = 0;
         i = 0;
         while (i < (sca).length) {
-            _pdu[pdulen] = (byte)(sca[i] & 0xff);
+            _pdu[pdulen] = (byte)((sca[i] & 0xff) & 0xff);
             pdulen = pdulen + 1;
             i = i + 1;
         }
         i = 0;
         while (i < (hdr).length) {
-            _pdu[pdulen] = (byte)(hdr[i] & 0xff);
+            _pdu[pdulen] = (byte)((hdr[i] & 0xff) & 0xff);
             pdulen = pdulen + 1;
             i = i + 1;
         }
         i = 0;
         while (i < (addr).length) {
-            _pdu[pdulen] = (byte)(addr[i] & 0xff);
+            _pdu[pdulen] = (byte)((addr[i] & 0xff) & 0xff);
             pdulen = pdulen + 1;
             i = i + 1;
         }
@@ -1049,13 +1049,13 @@ public class YSms
         pdulen = pdulen + 1;
         i = 0;
         while (i < (stamp).length) {
-            _pdu[pdulen] = (byte)(stamp[i] & 0xff);
+            _pdu[pdulen] = (byte)((stamp[i] & 0xff) & 0xff);
             pdulen = pdulen + 1;
             i = i + 1;
         }
         i = 0;
         while (i < (udata).length) {
-            _pdu[pdulen] = (byte)(udata[i] & 0xff);
+            _pdu[pdulen] = (byte)((udata[i] & 0xff) & 0xff);
             pdulen = pdulen + 1;
             i = i + 1;
         }
@@ -1077,23 +1077,23 @@ public class YSms
         udhlen = (_udh).length;
         i = 0;
         while (i+1 < udhlen) {
-            iei = _udh[i];
-            ielen = _udh[i+1];
+            iei = (_udh[i] & 0xff);
+            ielen = (_udh[i+1] & 0xff);
             i = i + 2;
             if (i + ielen <= udhlen) {
                 if ((iei == 0) && (ielen == 3)) {
                     sig = String.format(Locale.US, "%s-%s-%02x-%02x", _orig, _dest,
-                    _mref,_udh[i]);
+                    _mref,(_udh[i] & 0xff));
                     _aggSig = sig;
-                    _aggCnt = _udh[i+1];
-                    _aggIdx = _udh[i+2];
+                    _aggCnt = (_udh[i+1] & 0xff);
+                    _aggIdx = (_udh[i+2] & 0xff);
                 }
                 if ((iei == 8) && (ielen == 4)) {
                     sig = String.format(Locale.US, "%s-%s-%02x-%02x%02x", _orig, _dest,
-                    _mref, _udh[i],_udh[i+1]);
+                    _mref, (_udh[i] & 0xff),(_udh[i+1] & 0xff));
                     _aggSig = sig;
-                    _aggCnt = _udh[i+2];
-                    _aggIdx = _udh[i+3];
+                    _aggCnt = (_udh[i+2] & 0xff);
+                    _aggIdx = (_udh[i+3] & 0xff);
                 }
             }
             i = i + ielen;
@@ -1120,21 +1120,21 @@ public class YSms
         _npdu = 1;
         
         // parse meta-data
-        _smsc = decodeAddress(pdu, 1, 2*(pdu[0]-1));
-        rpos = 1+pdu[0];
-        pdutyp = pdu[rpos];
+        _smsc = decodeAddress(pdu, 1, 2*((pdu[0] & 0xff)-1));
+        rpos = 1+(pdu[0] & 0xff);
+        pdutyp = (pdu[rpos] & 0xff);
         rpos = rpos + 1;
         _deliv = (((pdutyp) & (3)) == 0);
         if (_deliv) {
-            addrlen = pdu[rpos];
+            addrlen = (pdu[rpos] & 0xff);
             rpos = rpos + 1;
             _orig = decodeAddress(pdu, rpos, addrlen);
             _dest = "";
             tslen = 7;
         } else {
-            _mref = pdu[rpos];
+            _mref = (pdu[rpos] & 0xff);
             rpos = rpos + 1;
-            addrlen = pdu[rpos];
+            addrlen = (pdu[rpos] & 0xff);
             rpos = rpos + 1;
             _dest = decodeAddress(pdu, rpos, addrlen);
             _orig = "";
@@ -1149,9 +1149,9 @@ public class YSms
             }
         }
         rpos = rpos + ((((addrlen+3)) >> (1)));
-        _pid = pdu[rpos];
+        _pid = (pdu[rpos] & 0xff);
         rpos = rpos + 1;
-        dcs = pdu[rpos];
+        dcs = (pdu[rpos] & 0xff);
         rpos = rpos + 1;
         _alphab = (((((dcs) >> (2)))) & (3));
         _mclass = ((dcs) & (16+3));
@@ -1161,15 +1161,15 @@ public class YSms
         // parse user data (including udh)
         nbits = 0;
         carry = 0;
-        udlen = pdu[rpos];
+        udlen = (pdu[rpos] & 0xff);
         rpos = rpos + 1;
         if (((pdutyp) & (64)) != 0) {
-            udhsize = pdu[rpos];
+            udhsize = (pdu[rpos] & 0xff);
             rpos = rpos + 1;
             _udh = new byte[udhsize];
             i = 0;
             while (i < udhsize) {
-                _udh[i] = (byte)(pdu[rpos] & 0xff);
+                _udh[i] = (byte)((pdu[rpos] & 0xff) & 0xff);
                 rpos = rpos + 1;
                 i = i + 1;
             }
@@ -1177,7 +1177,7 @@ public class YSms
                 udhlen = (((8 + 8*udhsize + 6)) / (7));
                 nbits = 7*udhlen - 8 - 8*udhsize;
                 if (nbits > 0) {
-                    thisb = pdu[rpos];
+                    thisb = (pdu[rpos] & 0xff);
                     rpos = rpos + 1;
                     carry = ((thisb) >> (nbits));
                     nbits = 8 - nbits;
@@ -1199,7 +1199,7 @@ public class YSms
                     carry = 0;
                     nbits = 0;
                 } else {
-                    thisb = pdu[rpos];
+                    thisb = (pdu[rpos] & 0xff);
                     rpos = rpos + 1;
                     _udata[i] = (byte)(((carry) | ((((((thisb) << (nbits)))) & (127)))) & 0xff);
                     carry = ((thisb) >> ((7 - nbits)));
@@ -1210,7 +1210,7 @@ public class YSms
         } else {
             i = 0;
             while (i < udlen) {
-                _udata[i] = (byte)(pdu[rpos] & 0xff);
+                _udata[i] = (byte)((pdu[rpos] & 0xff) & 0xff);
                 rpos = rpos + 1;
                 i = i + 1;
             }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSpiPort.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YSpiPort.java 26468 2017-01-24 17:01:29Z seb $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -1106,7 +1106,7 @@ public class YSpiPort extends YFunction
             ch = 0x20;
             idx = 0;
             while ((idx < bufflen) && (ch != 0)) {
-                ch = buff[idx];
+                ch = (buff[idx] & 0xff);
                 if ((ch >= 0x20) && (ch < 0x7f)) {
                     idx = idx + 1;
                 } else {
@@ -1218,7 +1218,7 @@ public class YSpiPort extends YFunction
             ch = 0x20;
             idx = 0;
             while ((idx < bufflen) && (ch != 0)) {
-                ch = buff[idx];
+                ch = (buff[idx] & 0xff);
                 if ((ch >= 0x20) && (ch < 0x7f)) {
                     idx = idx + 1;
                 } else {
@@ -1255,7 +1255,7 @@ public class YSpiPort extends YFunction
         // first check if we have the requested character in the look-ahead buffer
         bufflen = (_rxbuff).length;
         if ((_rxptr >= _rxbuffptr) && (_rxptr < _rxbuffptr+bufflen)) {
-            res = _rxbuff[_rxptr-_rxbuffptr];
+            res = (_rxbuff[_rxptr-_rxbuffptr] & 0xff);
             _rxptr = _rxptr + 1;
             return res;
         }
@@ -1266,7 +1266,7 @@ public class YSpiPort extends YFunction
         buff = readBin(reqlen);
         bufflen = (buff).length;
         if (_rxptr == currpos+bufflen) {
-            res = buff[0];
+            res = (buff[0] & 0xff);
             _rxptr = currpos+1;
             _rxbuffptr = currpos;
             _rxbuff = buff;
@@ -1278,7 +1278,7 @@ public class YSpiPort extends YFunction
         buff = readBin(reqlen);
         bufflen = (buff).length;
         if (_rxptr == currpos+bufflen) {
-            res = buff[0];
+            res = (buff[0] & 0xff);
             _rxptr = currpos+1;
             _rxbuffptr = currpos;
             _rxbuff = buff;
@@ -1292,8 +1292,8 @@ public class YSpiPort extends YFunction
         bufflen = (buff).length - 1;
         endpos = 0;
         mult = 1;
-        while ((bufflen > 0) && (buff[bufflen] != 64)) {
-            endpos = endpos + mult * (buff[bufflen] - 48);
+        while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
+            endpos = endpos + mult * ((buff[bufflen] & 0xff) - 48);
             mult = mult * 10;
             bufflen = bufflen - 1;
         }
@@ -1301,7 +1301,7 @@ public class YSpiPort extends YFunction
         if (bufflen == 0) {
             return YAPI.NO_MORE_DATA;
         }
-        res = buff[0];
+        res = (buff[0] & 0xff);
         return res;
     }
 
@@ -1331,8 +1331,8 @@ public class YSpiPort extends YFunction
         bufflen = (buff).length - 1;
         endpos = 0;
         mult = 1;
-        while ((bufflen > 0) && (buff[bufflen] != 64)) {
-            endpos = endpos + mult * (buff[bufflen] - 48);
+        while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
+            endpos = endpos + mult * ((buff[bufflen] & 0xff) - 48);
             mult = mult * 10;
             bufflen = bufflen - 1;
         }
@@ -1368,8 +1368,8 @@ public class YSpiPort extends YFunction
         bufflen = (buff).length - 1;
         endpos = 0;
         mult = 1;
-        while ((bufflen > 0) && (buff[bufflen] != 64)) {
-            endpos = endpos + mult * (buff[bufflen] - 48);
+        while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
+            endpos = endpos + mult * ((buff[bufflen] & 0xff) - 48);
             mult = mult * 10;
             bufflen = bufflen - 1;
         }
@@ -1377,7 +1377,7 @@ public class YSpiPort extends YFunction
         res = new byte[bufflen];
         idx = 0;
         while (idx < bufflen) {
-            res[idx] = (byte)(buff[idx] & 0xff);
+            res[idx] = (byte)((buff[idx] & 0xff) & 0xff);
             idx = idx + 1;
         }
         return res;
@@ -1411,8 +1411,8 @@ public class YSpiPort extends YFunction
         bufflen = (buff).length - 1;
         endpos = 0;
         mult = 1;
-        while ((bufflen > 0) && (buff[bufflen] != 64)) {
-            endpos = endpos + mult * (buff[bufflen] - 48);
+        while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
+            endpos = endpos + mult * ((buff[bufflen] & 0xff) - 48);
             mult = mult * 10;
             bufflen = bufflen - 1;
         }
@@ -1420,7 +1420,7 @@ public class YSpiPort extends YFunction
         res.clear();
         idx = 0;
         while (idx < bufflen) {
-            b = buff[idx];
+            b = (buff[idx] & 0xff);
             res.add(b);
             idx = idx + 1;
         }
@@ -1454,8 +1454,8 @@ public class YSpiPort extends YFunction
         bufflen = (buff).length - 1;
         endpos = 0;
         mult = 1;
-        while ((bufflen > 0) && (buff[bufflen] != 64)) {
-            endpos = endpos + mult * (buff[bufflen] - 48);
+        while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
+            endpos = endpos + mult * ((buff[bufflen] & 0xff) - 48);
             mult = mult * 10;
             bufflen = bufflen - 1;
         }
@@ -1463,11 +1463,11 @@ public class YSpiPort extends YFunction
         res = "";
         ofs = 0;
         while (ofs + 3 < bufflen) {
-            res = String.format(Locale.US, "%s%02x%02x%02x%02x", res, buff[ofs], buff[ofs + 1], buff[ofs + 2],buff[ofs + 3]);
+            res = String.format(Locale.US, "%s%02x%02x%02x%02x", res, (buff[ofs] & 0xff), (buff[ofs + 1] & 0xff), (buff[ofs + 2] & 0xff),(buff[ofs + 3] & 0xff));
             ofs = ofs + 4;
         }
         while (ofs < bufflen) {
-            res = String.format(Locale.US, "%s%02x", res,buff[ofs]);
+            res = String.format(Locale.US, "%s%02x", res,(buff[ofs] & 0xff));
             ofs = ofs + 1;
         }
         return res;
@@ -1598,7 +1598,7 @@ public class YSpiPort extends YFunction
         // may throw an exception
         buff = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         bufflen = (buff).length - 1;
-        while ((bufflen > 0) && (buff[bufflen] != 64)) {
+        while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
             bufflen = bufflen - 1;
         }
         res = YAPIContext._atoi((new String(buff)).substring(0, bufflen));
