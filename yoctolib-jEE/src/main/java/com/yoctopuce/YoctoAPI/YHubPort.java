@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHubPort.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YHubPort.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindHubPort(), the high-level API for HubPort functions
  *
@@ -157,12 +157,16 @@ public class YHubPort extends YFunction
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = _enabled;
         }
-        return _enabled;
+        return res;
     }
 
     /**
@@ -192,8 +196,10 @@ public class YHubPort extends YFunction
     public int set_enabled(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("enabled",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("enabled",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -222,12 +228,16 @@ public class YHubPort extends YFunction
      */
     public int get_portState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTSTATE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTSTATE_INVALID;
+                }
             }
+            res = _portState;
         }
-        return _portState;
+        return res;
     }
 
     /**
@@ -254,12 +264,16 @@ public class YHubPort extends YFunction
      */
     public int get_baudRate() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BAUDRATE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BAUDRATE_INVALID;
+                }
             }
+            res = _baudRate;
         }
-        return _baudRate;
+        return res;
     }
 
     /**
@@ -302,10 +316,12 @@ public class YHubPort extends YFunction
     public static YHubPort FindHubPort(String func)
     {
         YHubPort obj;
-        obj = (YHubPort) YFunction._FindFromCache("HubPort", func);
-        if (obj == null) {
-            obj = new YHubPort(func);
-            YFunction._AddToCache("HubPort", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YHubPort) YFunction._FindFromCache("HubPort", func);
+            if (obj == null) {
+                obj = new YHubPort(func);
+                YFunction._AddToCache("HubPort", func, obj);
+            }
         }
         return obj;
     }
@@ -337,10 +353,12 @@ public class YHubPort extends YFunction
     public static YHubPort FindHubPortInContext(YAPIContext yctx,String func)
     {
         YHubPort obj;
-        obj = (YHubPort) YFunction._FindFromCacheInContext(yctx, "HubPort", func);
-        if (obj == null) {
-            obj = new YHubPort(yctx, func);
-            YFunction._AddToCache("HubPort", func, obj);
+        synchronized (yctx) {
+            obj = (YHubPort) YFunction._FindFromCacheInContext(yctx, "HubPort", func);
+            if (obj == null) {
+                obj = new YHubPort(yctx, func);
+                YFunction._AddToCache("HubPort", func, obj);
+            }
         }
         return obj;
     }

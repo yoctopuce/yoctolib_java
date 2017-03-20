@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YNetwork.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindNetwork(), the high-level API for Network functions
  *
@@ -157,6 +157,10 @@ public class YNetwork extends YFunction
      */
     public static final int CALLBACKINITIALDELAY_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid callbackSchedule value
+     */
+    public static final String CALLBACKSCHEDULE_INVALID = YAPI.INVALID_STRING;
+    /**
      * invalid callbackMinDelay value
      */
     public static final int CALLBACKMINDELAY_INVALID = YAPI.INVALID_UINT;
@@ -188,6 +192,7 @@ public class YNetwork extends YFunction
     protected int _callbackEncoding = CALLBACKENCODING_INVALID;
     protected String _callbackCredentials = CALLBACKCREDENTIALS_INVALID;
     protected int _callbackInitialDelay = CALLBACKINITIALDELAY_INVALID;
+    protected String _callbackSchedule = CALLBACKSCHEDULE_INVALID;
     protected int _callbackMinDelay = CALLBACKMINDELAY_INVALID;
     protected int _callbackMaxDelay = CALLBACKMAXDELAY_INVALID;
     protected int _poeCurrent = POECURRENT_INVALID;
@@ -307,6 +312,9 @@ public class YNetwork extends YFunction
         if (json_val.has("callbackInitialDelay")) {
             _callbackInitialDelay = json_val.getInt("callbackInitialDelay");
         }
+        if (json_val.has("callbackSchedule")) {
+            _callbackSchedule = json_val.getString("callbackSchedule");
+        }
         if (json_val.has("callbackMinDelay")) {
             _callbackMinDelay = json_val.getInt("callbackMinDelay");
         }
@@ -343,12 +351,16 @@ public class YNetwork extends YFunction
      */
     public int get_readiness() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return READINESS_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return READINESS_INVALID;
+                }
             }
+            res = _readiness;
         }
-        return _readiness;
+        return res;
     }
 
     /**
@@ -387,12 +399,16 @@ public class YNetwork extends YFunction
      */
     public String get_macAddress() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MACADDRESS_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MACADDRESS_INVALID;
+                }
             }
+            res = _macAddress;
         }
-        return _macAddress;
+        return res;
     }
 
     /**
@@ -418,12 +434,16 @@ public class YNetwork extends YFunction
      */
     public String get_ipAddress() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return IPADDRESS_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return IPADDRESS_INVALID;
+                }
             }
+            res = _ipAddress;
         }
-        return _ipAddress;
+        return res;
     }
 
     /**
@@ -448,12 +468,16 @@ public class YNetwork extends YFunction
      */
     public String get_subnetMask() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SUBNETMASK_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SUBNETMASK_INVALID;
+                }
             }
+            res = _subnetMask;
         }
-        return _subnetMask;
+        return res;
     }
 
     /**
@@ -477,12 +501,16 @@ public class YNetwork extends YFunction
      */
     public String get_router() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ROUTER_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ROUTER_INVALID;
+                }
             }
+            res = _router;
         }
-        return _router;
+        return res;
     }
 
     /**
@@ -498,19 +526,55 @@ public class YNetwork extends YFunction
     }
 
     /**
+     * Returns the IP configuration of the network interface.
+     *
+     *  If the network interface is setup to use a static IP address, the string starts with "STATIC:" and
+     * is followed by three
+     *  parameters, separated by "/". The first is the device IP address, followed by the subnet mask
+     * length, and finally the
+     * router IP address (default gateway). For instance: "STATIC:192.168.1.14/16/192.168.1.1"
+     *
+     *  If the network interface is configured to receive its IP from a DHCP server, the string start with
+     * "DHCP:" and is followed by
+     *  three parameters separated by "/". The first is the fallback IP address, then the fallback subnet
+     * mask length and finally the
+     * fallback router IP address. These three parameters are used when no DHCP reply is received.
+     *
+     * @return a string corresponding to the IP configuration of the network interface
+     *
      * @throws YAPI_Exception on error
      */
     public String get_ipConfig() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return IPCONFIG_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return IPCONFIG_INVALID;
+                }
             }
+            res = _ipConfig;
         }
-        return _ipConfig;
+        return res;
     }
 
     /**
+     * Returns the IP configuration of the network interface.
+     *
+     *  If the network interface is setup to use a static IP address, the string starts with "STATIC:" and
+     * is followed by three
+     *  parameters, separated by "/". The first is the device IP address, followed by the subnet mask
+     * length, and finally the
+     * router IP address (default gateway). For instance: "STATIC:192.168.1.14/16/192.168.1.1"
+     *
+     *  If the network interface is configured to receive its IP from a DHCP server, the string start with
+     * "DHCP:" and is followed by
+     *  three parameters separated by "/". The first is the fallback IP address, then the fallback subnet
+     * mask length and finally the
+     * fallback router IP address. These three parameters are used when no DHCP reply is received.
+     *
+     * @return a string corresponding to the IP configuration of the network interface
+     *
      * @throws YAPI_Exception on error
      */
     public String getIpConfig() throws YAPI_Exception
@@ -521,8 +585,10 @@ public class YNetwork extends YFunction
     public int set_ipConfig(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("ipConfig",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("ipConfig",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -540,12 +606,16 @@ public class YNetwork extends YFunction
      */
     public String get_primaryDNS() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PRIMARYDNS_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PRIMARYDNS_INVALID;
+                }
             }
+            res = _primaryDNS;
         }
-        return _primaryDNS;
+        return res;
     }
 
     /**
@@ -574,8 +644,10 @@ public class YNetwork extends YFunction
     public int set_primaryDNS(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("primaryDNS",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("primaryDNS",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -604,12 +676,16 @@ public class YNetwork extends YFunction
      */
     public String get_secondaryDNS() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SECONDARYDNS_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SECONDARYDNS_INVALID;
+                }
             }
+            res = _secondaryDNS;
         }
-        return _secondaryDNS;
+        return res;
     }
 
     /**
@@ -638,8 +714,10 @@ public class YNetwork extends YFunction
     public int set_secondaryDNS(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("secondaryDNS",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("secondaryDNS",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -668,12 +746,16 @@ public class YNetwork extends YFunction
      */
     public String get_ntpServer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return NTPSERVER_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return NTPSERVER_INVALID;
+                }
             }
+            res = _ntpServer;
         }
-        return _ntpServer;
+        return res;
     }
 
     /**
@@ -701,8 +783,10 @@ public class YNetwork extends YFunction
     public int set_ntpServer(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("ntpServer",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("ntpServer",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -732,12 +816,16 @@ public class YNetwork extends YFunction
      */
     public String get_userPassword() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return USERPASSWORD_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return USERPASSWORD_INVALID;
+                }
             }
+            res = _userPassword;
         }
-        return _userPassword;
+        return res;
     }
 
     /**
@@ -770,8 +858,10 @@ public class YNetwork extends YFunction
     public int set_userPassword(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("userPassword",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("userPassword",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -804,12 +894,16 @@ public class YNetwork extends YFunction
      */
     public String get_adminPassword() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ADMINPASSWORD_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ADMINPASSWORD_INVALID;
+                }
             }
+            res = _adminPassword;
         }
-        return _adminPassword;
+        return res;
     }
 
     /**
@@ -842,8 +936,10 @@ public class YNetwork extends YFunction
     public int set_adminPassword(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("adminPassword",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("adminPassword",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -874,12 +970,16 @@ public class YNetwork extends YFunction
      */
     public int get_httpPort() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return HTTPPORT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return HTTPPORT_INVALID;
+                }
             }
+            res = _httpPort;
         }
-        return _httpPort;
+        return res;
     }
 
     /**
@@ -908,8 +1008,10 @@ public class YNetwork extends YFunction
     public int set_httpPort(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("httpPort",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("httpPort",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -938,12 +1040,16 @@ public class YNetwork extends YFunction
      */
     public String get_defaultPage() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DEFAULTPAGE_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DEFAULTPAGE_INVALID;
+                }
             }
+            res = _defaultPage;
         }
-        return _defaultPage;
+        return res;
     }
 
     /**
@@ -972,8 +1078,10 @@ public class YNetwork extends YFunction
     public int set_defaultPage(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("defaultPage",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("defaultPage",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1005,12 +1113,16 @@ public class YNetwork extends YFunction
      */
     public int get_discoverable() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISCOVERABLE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISCOVERABLE_INVALID;
+                }
             }
+            res = _discoverable;
         }
-        return _discoverable;
+        return res;
     }
 
     /**
@@ -1043,8 +1155,10 @@ public class YNetwork extends YFunction
     public int set_discoverable(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("discoverable",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("discoverable",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1078,12 +1192,16 @@ public class YNetwork extends YFunction
      */
     public int get_wwwWatchdogDelay() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return WWWWATCHDOGDELAY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return WWWWATCHDOGDELAY_INVALID;
+                }
             }
+            res = _wwwWatchdogDelay;
         }
-        return _wwwWatchdogDelay;
+        return res;
     }
 
     /**
@@ -1119,8 +1237,10 @@ public class YNetwork extends YFunction
     public int set_wwwWatchdogDelay(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("wwwWatchdogDelay",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("wwwWatchdogDelay",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1152,12 +1272,16 @@ public class YNetwork extends YFunction
      */
     public String get_callbackUrl() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKURL_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKURL_INVALID;
+                }
             }
+            res = _callbackUrl;
         }
-        return _callbackUrl;
+        return res;
     }
 
     /**
@@ -1185,8 +1309,10 @@ public class YNetwork extends YFunction
     public int set_callbackUrl(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("callbackUrl",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("callbackUrl",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1216,12 +1342,16 @@ public class YNetwork extends YFunction
      */
     public int get_callbackMethod() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKMETHOD_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKMETHOD_INVALID;
+                }
             }
+            res = _callbackMethod;
         }
-        return _callbackMethod;
+        return res;
     }
 
     /**
@@ -1251,8 +1381,10 @@ public class YNetwork extends YFunction
     public int set_callbackMethod(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("callbackMethod",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("callbackMethod",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1285,12 +1417,16 @@ public class YNetwork extends YFunction
      */
     public int get_callbackEncoding() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKENCODING_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKENCODING_INVALID;
+                }
             }
+            res = _callbackEncoding;
         }
-        return _callbackEncoding;
+        return res;
     }
 
     /**
@@ -1326,8 +1462,10 @@ public class YNetwork extends YFunction
     public int set_callbackEncoding(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("callbackEncoding",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("callbackEncoding",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1360,12 +1498,16 @@ public class YNetwork extends YFunction
      */
     public String get_callbackCredentials() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKCREDENTIALS_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKCREDENTIALS_INVALID;
+                }
             }
+            res = _callbackCredentials;
         }
-        return _callbackCredentials;
+        return res;
     }
 
     /**
@@ -1402,8 +1544,10 @@ public class YNetwork extends YFunction
     public int set_callbackCredentials(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("callbackCredentials",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("callbackCredentials",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1459,12 +1603,16 @@ public class YNetwork extends YFunction
      */
     public int get_callbackInitialDelay() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKINITIALDELAY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKINITIALDELAY_INVALID;
+                }
             }
+            res = _callbackInitialDelay;
         }
-        return _callbackInitialDelay;
+        return res;
     }
 
     /**
@@ -1492,8 +1640,10 @@ public class YNetwork extends YFunction
     public int set_callbackInitialDelay(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("callbackInitialDelay",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("callbackInitialDelay",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1513,26 +1663,96 @@ public class YNetwork extends YFunction
     }
 
     /**
-     * Returns the minimum waiting time between two callback notifications, in seconds.
+     * Returns the HTTP callback schedule strategy, as a text string.
      *
-     * @return an integer corresponding to the minimum waiting time between two callback notifications, in seconds
+     * @return a string corresponding to the HTTP callback schedule strategy, as a text string
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_callbackSchedule() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKSCHEDULE_INVALID;
+                }
+            }
+            res = _callbackSchedule;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the HTTP callback schedule strategy, as a text string.
+     *
+     * @return a string corresponding to the HTTP callback schedule strategy, as a text string
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getCallbackSchedule() throws YAPI_Exception
+    {
+        return get_callbackSchedule();
+    }
+
+    /**
+     * Changes the HTTP callback schedule strategy, as a text string.
+     *
+     * @param newval : a string corresponding to the HTTP callback schedule strategy, as a text string
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_callbackSchedule(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("callbackSchedule",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the HTTP callback schedule strategy, as a text string.
+     *
+     * @param newval : a string corresponding to the HTTP callback schedule strategy, as a text string
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setCallbackSchedule(String newval)  throws YAPI_Exception
+    {
+        return set_callbackSchedule(newval);
+    }
+
+    /**
+     * Returns the minimum waiting time between two HTTP callbacks, in seconds.
+     *
+     * @return an integer corresponding to the minimum waiting time between two HTTP callbacks, in seconds
      *
      * @throws YAPI_Exception on error
      */
     public int get_callbackMinDelay() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKMINDELAY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKMINDELAY_INVALID;
+                }
             }
+            res = _callbackMinDelay;
         }
-        return _callbackMinDelay;
+        return res;
     }
 
     /**
-     * Returns the minimum waiting time between two callback notifications, in seconds.
+     * Returns the minimum waiting time between two HTTP callbacks, in seconds.
      *
-     * @return an integer corresponding to the minimum waiting time between two callback notifications, in seconds
+     * @return an integer corresponding to the minimum waiting time between two HTTP callbacks, in seconds
      *
      * @throws YAPI_Exception on error
      */
@@ -1542,10 +1762,9 @@ public class YNetwork extends YFunction
     }
 
     /**
-     * Changes the minimum waiting time between two callback notifications, in seconds.
+     * Changes the minimum waiting time between two HTTP callbacks, in seconds.
      *
-     *  @param newval : an integer corresponding to the minimum waiting time between two callback
-     * notifications, in seconds
+     * @param newval : an integer corresponding to the minimum waiting time between two HTTP callbacks, in seconds
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -1554,16 +1773,17 @@ public class YNetwork extends YFunction
     public int set_callbackMinDelay(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("callbackMinDelay",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("callbackMinDelay",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes the minimum waiting time between two callback notifications, in seconds.
+     * Changes the minimum waiting time between two HTTP callbacks, in seconds.
      *
-     *  @param newval : an integer corresponding to the minimum waiting time between two callback
-     * notifications, in seconds
+     * @param newval : an integer corresponding to the minimum waiting time between two HTTP callbacks, in seconds
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -1575,26 +1795,30 @@ public class YNetwork extends YFunction
     }
 
     /**
-     * Returns the maximum waiting time between two callback notifications, in seconds.
+     * Returns the waiting time between two HTTP callbacks when there is nothing new.
      *
-     * @return an integer corresponding to the maximum waiting time between two callback notifications, in seconds
+     * @return an integer corresponding to the waiting time between two HTTP callbacks when there is nothing new
      *
      * @throws YAPI_Exception on error
      */
     public int get_callbackMaxDelay() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALLBACKMAXDELAY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKMAXDELAY_INVALID;
+                }
             }
+            res = _callbackMaxDelay;
         }
-        return _callbackMaxDelay;
+        return res;
     }
 
     /**
-     * Returns the maximum waiting time between two callback notifications, in seconds.
+     * Returns the waiting time between two HTTP callbacks when there is nothing new.
      *
-     * @return an integer corresponding to the maximum waiting time between two callback notifications, in seconds
+     * @return an integer corresponding to the waiting time between two HTTP callbacks when there is nothing new
      *
      * @throws YAPI_Exception on error
      */
@@ -1604,10 +1828,10 @@ public class YNetwork extends YFunction
     }
 
     /**
-     * Changes the maximum waiting time between two callback notifications, in seconds.
+     * Changes the waiting time between two HTTP callbacks when there is nothing new.
      *
-     *  @param newval : an integer corresponding to the maximum waiting time between two callback
-     * notifications, in seconds
+     *  @param newval : an integer corresponding to the waiting time between two HTTP callbacks when there
+     * is nothing new
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -1616,16 +1840,18 @@ public class YNetwork extends YFunction
     public int set_callbackMaxDelay(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("callbackMaxDelay",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("callbackMaxDelay",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes the maximum waiting time between two callback notifications, in seconds.
+     * Changes the waiting time between two HTTP callbacks when there is nothing new.
      *
-     *  @param newval : an integer corresponding to the maximum waiting time between two callback
-     * notifications, in seconds
+     *  @param newval : an integer corresponding to the waiting time between two HTTP callbacks when there
+     * is nothing new
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -1648,12 +1874,16 @@ public class YNetwork extends YFunction
      */
     public int get_poeCurrent() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POECURRENT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POECURRENT_INVALID;
+                }
             }
+            res = _poeCurrent;
         }
-        return _poeCurrent;
+        return res;
     }
 
     /**
@@ -1697,10 +1927,12 @@ public class YNetwork extends YFunction
     public static YNetwork FindNetwork(String func)
     {
         YNetwork obj;
-        obj = (YNetwork) YFunction._FindFromCache("Network", func);
-        if (obj == null) {
-            obj = new YNetwork(func);
-            YFunction._AddToCache("Network", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YNetwork) YFunction._FindFromCache("Network", func);
+            if (obj == null) {
+                obj = new YNetwork(func);
+                YFunction._AddToCache("Network", func, obj);
+            }
         }
         return obj;
     }
@@ -1732,10 +1964,12 @@ public class YNetwork extends YFunction
     public static YNetwork FindNetworkInContext(YAPIContext yctx,String func)
     {
         YNetwork obj;
-        obj = (YNetwork) YFunction._FindFromCacheInContext(yctx, "Network", func);
-        if (obj == null) {
-            obj = new YNetwork(yctx, func);
-            YFunction._AddToCache("Network", func, obj);
+        synchronized (yctx) {
+            obj = (YNetwork) YFunction._FindFromCacheInContext(yctx, "Network", func);
+            if (obj == null) {
+                obj = new YNetwork(yctx, func);
+                YFunction._AddToCache("Network", func, obj);
+            }
         }
         return obj;
     }

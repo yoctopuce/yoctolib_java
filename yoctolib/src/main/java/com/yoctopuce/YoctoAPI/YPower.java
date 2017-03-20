@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPower.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YPower.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindPower(), the high-level API for Power functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce class YPower allows you to read and configure Yoctopuce power
  * sensors. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * to register callback functions, to access the autonomous datalogger.
  * This class adds the ability to access the energy counter and the power factor.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -152,12 +152,16 @@ public class YPower extends YSensor
      */
     public double get_cosPhi() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COSPHI_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COSPHI_INVALID;
+                }
             }
+            res = _cosPhi;
         }
-        return _cosPhi;
+        return res;
     }
 
     /**
@@ -177,8 +181,10 @@ public class YPower extends YSensor
     public int set_meter(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("meter",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("meter",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -198,12 +204,16 @@ public class YPower extends YSensor
      */
     public double get_meter() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return METER_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return METER_INVALID;
+                }
             }
+            res = _meter;
         }
-        return _meter;
+        return res;
     }
 
     /**
@@ -229,12 +239,16 @@ public class YPower extends YSensor
      */
     public int get_meterTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return METERTIMER_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return METERTIMER_INVALID;
+                }
             }
+            res = _meterTimer;
         }
-        return _meterTimer;
+        return res;
     }
 
     /**
@@ -275,10 +289,12 @@ public class YPower extends YSensor
     public static YPower FindPower(String func)
     {
         YPower obj;
-        obj = (YPower) YFunction._FindFromCache("Power", func);
-        if (obj == null) {
-            obj = new YPower(func);
-            YFunction._AddToCache("Power", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YPower) YFunction._FindFromCache("Power", func);
+            if (obj == null) {
+                obj = new YPower(func);
+                YFunction._AddToCache("Power", func, obj);
+            }
         }
         return obj;
     }
@@ -310,10 +326,12 @@ public class YPower extends YSensor
     public static YPower FindPowerInContext(YAPIContext yctx,String func)
     {
         YPower obj;
-        obj = (YPower) YFunction._FindFromCacheInContext(yctx, "Power", func);
-        if (obj == null) {
-            obj = new YPower(yctx, func);
-            YFunction._AddToCache("Power", func, obj);
+        synchronized (yctx) {
+            obj = (YPower) YFunction._FindFromCacheInContext(yctx, "Power", func);
+            if (obj == null) {
+                obj = new YPower(yctx, func);
+                YFunction._AddToCache("Power", func, obj);
+            }
         }
         return obj;
     }

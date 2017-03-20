@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 26468 2017-01-24 17:01:29Z seb $
+ * $Id: YColorLedCluster.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -171,12 +171,16 @@ public class YColorLedCluster extends YFunction
      */
     public int get_activeLedCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ACTIVELEDCOUNT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ACTIVELEDCOUNT_INVALID;
+                }
             }
+            res = _activeLedCount;
         }
-        return _activeLedCount;
+        return res;
     }
 
     /**
@@ -203,8 +207,10 @@ public class YColorLedCluster extends YFunction
     public int set_activeLedCount(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("activeLedCount",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("activeLedCount",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -231,12 +237,16 @@ public class YColorLedCluster extends YFunction
      */
     public int get_maxLedCount() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MAXLEDCOUNT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MAXLEDCOUNT_INVALID;
+                }
             }
+            res = _maxLedCount;
         }
-        return _maxLedCount;
+        return res;
     }
 
     /**
@@ -260,12 +270,16 @@ public class YColorLedCluster extends YFunction
      */
     public int get_blinkSeqMaxCount() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKSEQMAXCOUNT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKSEQMAXCOUNT_INVALID;
+                }
             }
+            res = _blinkSeqMaxCount;
         }
-        return _blinkSeqMaxCount;
+        return res;
     }
 
     /**
@@ -289,12 +303,16 @@ public class YColorLedCluster extends YFunction
      */
     public int get_blinkSeqMaxSize() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKSEQMAXSIZE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKSEQMAXSIZE_INVALID;
+                }
             }
+            res = _blinkSeqMaxSize;
         }
-        return _blinkSeqMaxSize;
+        return res;
     }
 
     /**
@@ -314,12 +332,16 @@ public class YColorLedCluster extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -333,8 +355,10 @@ public class YColorLedCluster extends YFunction
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -369,10 +393,12 @@ public class YColorLedCluster extends YFunction
     public static YColorLedCluster FindColorLedCluster(String func)
     {
         YColorLedCluster obj;
-        obj = (YColorLedCluster) YFunction._FindFromCache("ColorLedCluster", func);
-        if (obj == null) {
-            obj = new YColorLedCluster(func);
-            YFunction._AddToCache("ColorLedCluster", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YColorLedCluster) YFunction._FindFromCache("ColorLedCluster", func);
+            if (obj == null) {
+                obj = new YColorLedCluster(func);
+                YFunction._AddToCache("ColorLedCluster", func, obj);
+            }
         }
         return obj;
     }
@@ -404,10 +430,12 @@ public class YColorLedCluster extends YFunction
     public static YColorLedCluster FindColorLedClusterInContext(YAPIContext yctx,String func)
     {
         YColorLedCluster obj;
-        obj = (YColorLedCluster) YFunction._FindFromCacheInContext(yctx, "ColorLedCluster", func);
-        if (obj == null) {
-            obj = new YColorLedCluster(yctx, func);
-            YFunction._AddToCache("ColorLedCluster", func, obj);
+        synchronized (yctx) {
+            obj = (YColorLedCluster) YFunction._FindFromCacheInContext(yctx, "ColorLedCluster", func);
+            if (obj == null) {
+                obj = new YColorLedCluster(yctx, func);
+                YFunction._AddToCache("ColorLedCluster", func, obj);
+            }
         }
         return obj;
     }

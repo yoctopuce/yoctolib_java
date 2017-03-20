@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAltitude.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YAltitude.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce class YAltitude allows you to read and configure Yoctopuce altitude
  * sensors. It inherits from the YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * to register callback functions, to access the autonomous datalogger.
  * This class adds the ability to configure the barometric pressure adjusted to
  * sea level (QNH) for barometric sensors.
  */
@@ -147,8 +147,10 @@ public class YAltitude extends YSensor
     public int set_currentValue(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("currentValue",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("currentValue",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -183,8 +185,10 @@ public class YAltitude extends YSensor
     public int set_qnh(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("qnh",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("qnh",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -217,12 +221,16 @@ public class YAltitude extends YSensor
      */
     public double get_qnh() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return QNH_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return QNH_INVALID;
+                }
             }
+            res = _qnh;
         }
-        return _qnh;
+        return res;
     }
 
     /**
@@ -250,12 +258,16 @@ public class YAltitude extends YSensor
      */
     public String get_technology() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TECHNOLOGY_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TECHNOLOGY_INVALID;
+                }
             }
+            res = _technology;
         }
-        return _technology;
+        return res;
     }
 
     /**
@@ -298,10 +310,12 @@ public class YAltitude extends YSensor
     public static YAltitude FindAltitude(String func)
     {
         YAltitude obj;
-        obj = (YAltitude) YFunction._FindFromCache("Altitude", func);
-        if (obj == null) {
-            obj = new YAltitude(func);
-            YFunction._AddToCache("Altitude", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YAltitude) YFunction._FindFromCache("Altitude", func);
+            if (obj == null) {
+                obj = new YAltitude(func);
+                YFunction._AddToCache("Altitude", func, obj);
+            }
         }
         return obj;
     }
@@ -333,10 +347,12 @@ public class YAltitude extends YSensor
     public static YAltitude FindAltitudeInContext(YAPIContext yctx,String func)
     {
         YAltitude obj;
-        obj = (YAltitude) YFunction._FindFromCacheInContext(yctx, "Altitude", func);
-        if (obj == null) {
-            obj = new YAltitude(yctx, func);
-            YFunction._AddToCache("Altitude", func, obj);
+        synchronized (yctx) {
+            obj = (YAltitude) YFunction._FindFromCacheInContext(yctx, "Altitude", func);
+            if (obj == null) {
+                obj = new YAltitude(yctx, func);
+                YFunction._AddToCache("Altitude", func, obj);
+            }
         }
         return obj;
     }

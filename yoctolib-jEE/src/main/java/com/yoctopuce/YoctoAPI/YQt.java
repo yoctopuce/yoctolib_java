@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YQt.java 26640 2017-02-21 18:17:26Z seb $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -138,10 +138,12 @@ public class YQt extends YSensor
     public static YQt FindQt(String func)
     {
         YQt obj;
-        obj = (YQt) YFunction._FindFromCache("Qt", func);
-        if (obj == null) {
-            obj = new YQt(func);
-            YFunction._AddToCache("Qt", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YQt) YFunction._FindFromCache("Qt", func);
+            if (obj == null) {
+                obj = new YQt(func);
+                YFunction._AddToCache("Qt", func, obj);
+            }
         }
         return obj;
     }
@@ -173,10 +175,12 @@ public class YQt extends YSensor
     public static YQt FindQtInContext(YAPIContext yctx,String func)
     {
         YQt obj;
-        obj = (YQt) YFunction._FindFromCacheInContext(yctx, "Qt", func);
-        if (obj == null) {
-            obj = new YQt(yctx, func);
-            YFunction._AddToCache("Qt", func, obj);
+        synchronized (yctx) {
+            obj = (YQt) YFunction._FindFromCacheInContext(yctx, "Qt", func);
+            if (obj == null) {
+                obj = new YQt(yctx, func);
+                YFunction._AddToCache("Qt", func, obj);
+            }
         }
         return obj;
     }

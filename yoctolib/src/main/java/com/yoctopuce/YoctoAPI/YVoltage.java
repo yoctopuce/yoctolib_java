@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoltage.java 26183 2016-12-15 00:14:02Z mvuilleu $
+ * $Id: YVoltage.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindVoltage(), the high-level API for Voltage functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce class YVoltage allows you to read and configure Yoctopuce voltage
  * sensors. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * to register callback functions, to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YVoltage extends YSensor
@@ -131,12 +131,16 @@ public class YVoltage extends YSensor
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = _enabled;
         }
-        return _enabled;
+        return res;
     }
 
     /**
@@ -150,8 +154,10 @@ public class YVoltage extends YSensor
     public int set_enabled(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("enabled",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("enabled",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -186,10 +192,12 @@ public class YVoltage extends YSensor
     public static YVoltage FindVoltage(String func)
     {
         YVoltage obj;
-        obj = (YVoltage) YFunction._FindFromCache("Voltage", func);
-        if (obj == null) {
-            obj = new YVoltage(func);
-            YFunction._AddToCache("Voltage", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YVoltage) YFunction._FindFromCache("Voltage", func);
+            if (obj == null) {
+                obj = new YVoltage(func);
+                YFunction._AddToCache("Voltage", func, obj);
+            }
         }
         return obj;
     }
@@ -221,10 +229,12 @@ public class YVoltage extends YSensor
     public static YVoltage FindVoltageInContext(YAPIContext yctx,String func)
     {
         YVoltage obj;
-        obj = (YVoltage) YFunction._FindFromCacheInContext(yctx, "Voltage", func);
-        if (obj == null) {
-            obj = new YVoltage(yctx, func);
-            YFunction._AddToCache("Voltage", func, obj);
+        synchronized (yctx) {
+            obj = (YVoltage) YFunction._FindFromCacheInContext(yctx, "Voltage", func);
+            if (obj == null) {
+                obj = new YVoltage(yctx, func);
+                YFunction._AddToCache("Voltage", func, obj);
+            }
         }
         return obj;
     }

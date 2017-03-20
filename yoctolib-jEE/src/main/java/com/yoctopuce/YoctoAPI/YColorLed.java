@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YColorLed.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -226,12 +226,16 @@ public class YColorLed extends YFunction
      */
     public int get_rgbColor() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RGBCOLOR_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RGBCOLOR_INVALID;
+                }
             }
+            res = _rgbColor;
         }
-        return _rgbColor;
+        return res;
     }
 
     /**
@@ -258,8 +262,10 @@ public class YColorLed extends YFunction
     public int set_rgbColor(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format(Locale.US, "0x%06x",newval);
-        _setAttr("rgbColor",rest_val);
+        synchronized (this) {
+            rest_val = String.format(Locale.US, "0x%06x",newval);
+            _setAttr("rgbColor",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -286,12 +292,16 @@ public class YColorLed extends YFunction
      */
     public int get_hslColor() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return HSLCOLOR_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return HSLCOLOR_INVALID;
+                }
             }
+            res = _hslColor;
         }
-        return _hslColor;
+        return res;
     }
 
     /**
@@ -318,8 +328,10 @@ public class YColorLed extends YFunction
     public int set_hslColor(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format(Locale.US, "0x%06x",newval);
-        _setAttr("hslColor",rest_val);
+        synchronized (this) {
+            rest_val = String.format(Locale.US, "0x%06x",newval);
+            _setAttr("hslColor",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -342,12 +354,16 @@ public class YColorLed extends YFunction
      */
     public YMove get_rgbMove() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RGBMOVE_INVALID;
+        YMove res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RGBMOVE_INVALID;
+                }
             }
+            res = _rgbMove;
         }
-        return _rgbMove;
+        return res;
     }
 
     /**
@@ -361,8 +377,10 @@ public class YColorLed extends YFunction
     public int set_rgbMove(YMove  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
-        _setAttr("rgbMove",rest_val);
+        synchronized (this) {
+            rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
+            _setAttr("rgbMove",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -394,12 +412,16 @@ public class YColorLed extends YFunction
      */
     public YMove get_hslMove() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return HSLMOVE_INVALID;
+        YMove res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return HSLMOVE_INVALID;
+                }
             }
+            res = _hslMove;
         }
-        return _hslMove;
+        return res;
     }
 
     /**
@@ -413,8 +435,10 @@ public class YColorLed extends YFunction
     public int set_hslMove(YMove  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
-        _setAttr("hslMove",rest_val);
+        synchronized (this) {
+            rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
+            _setAttr("hslMove",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -450,12 +474,16 @@ public class YColorLed extends YFunction
      */
     public int get_rgbColorAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RGBCOLORATPOWERON_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RGBCOLORATPOWERON_INVALID;
+                }
             }
+            res = _rgbColorAtPowerOn;
         }
-        return _rgbColorAtPowerOn;
+        return res;
     }
 
     /**
@@ -483,8 +511,10 @@ public class YColorLed extends YFunction
     public int set_rgbColorAtPowerOn(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format(Locale.US, "0x%06x",newval);
-        _setAttr("rgbColorAtPowerOn",rest_val);
+        synchronized (this) {
+            rest_val = String.format(Locale.US, "0x%06x",newval);
+            _setAttr("rgbColorAtPowerOn",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -512,12 +542,16 @@ public class YColorLed extends YFunction
      */
     public int get_blinkSeqSize() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKSEQSIZE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKSEQSIZE_INVALID;
+                }
             }
+            res = _blinkSeqSize;
         }
-        return _blinkSeqSize;
+        return res;
     }
 
     /**
@@ -541,12 +575,16 @@ public class YColorLed extends YFunction
      */
     public int get_blinkSeqMaxSize() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKSEQMAXSIZE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKSEQMAXSIZE_INVALID;
+                }
             }
+            res = _blinkSeqMaxSize;
         }
-        return _blinkSeqMaxSize;
+        return res;
     }
 
     /**
@@ -573,12 +611,16 @@ public class YColorLed extends YFunction
      */
     public int get_blinkSeqSignature() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKSEQSIGNATURE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKSEQSIGNATURE_INVALID;
+                }
             }
+            res = _blinkSeqSignature;
         }
-        return _blinkSeqSignature;
+        return res;
     }
 
     /**
@@ -601,12 +643,16 @@ public class YColorLed extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -620,8 +666,10 @@ public class YColorLed extends YFunction
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -656,10 +704,12 @@ public class YColorLed extends YFunction
     public static YColorLed FindColorLed(String func)
     {
         YColorLed obj;
-        obj = (YColorLed) YFunction._FindFromCache("ColorLed", func);
-        if (obj == null) {
-            obj = new YColorLed(func);
-            YFunction._AddToCache("ColorLed", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YColorLed) YFunction._FindFromCache("ColorLed", func);
+            if (obj == null) {
+                obj = new YColorLed(func);
+                YFunction._AddToCache("ColorLed", func, obj);
+            }
         }
         return obj;
     }
@@ -691,10 +741,12 @@ public class YColorLed extends YFunction
     public static YColorLed FindColorLedInContext(YAPIContext yctx,String func)
     {
         YColorLed obj;
-        obj = (YColorLed) YFunction._FindFromCacheInContext(yctx, "ColorLed", func);
-        if (obj == null) {
-            obj = new YColorLed(yctx, func);
-            YFunction._AddToCache("ColorLed", func, obj);
+        synchronized (yctx) {
+            obj = (YColorLed) YFunction._FindFromCacheInContext(yctx, "ColorLed", func);
+            if (obj == null) {
+                obj = new YColorLed(yctx, func);
+                YFunction._AddToCache("ColorLed", func, obj);
+            }
         }
         return obj;
     }

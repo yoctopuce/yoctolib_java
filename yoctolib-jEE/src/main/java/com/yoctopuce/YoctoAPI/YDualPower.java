@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDualPower.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YDualPower.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindDualPower(), the high-level API for DualPower functions
  *
@@ -159,12 +159,16 @@ public class YDualPower extends YFunction
      */
     public int get_powerState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POWERSTATE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POWERSTATE_INVALID;
+                }
             }
+            res = _powerState;
         }
-        return _powerState;
+        return res;
     }
 
     /**
@@ -191,12 +195,16 @@ public class YDualPower extends YFunction
      */
     public int get_powerControl() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POWERCONTROL_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POWERCONTROL_INVALID;
+                }
             }
+            res = _powerControl;
         }
-        return _powerControl;
+        return res;
     }
 
     /**
@@ -226,8 +234,10 @@ public class YDualPower extends YFunction
     public int set_powerControl(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("powerControl",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("powerControl",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -256,12 +266,16 @@ public class YDualPower extends YFunction
      */
     public int get_extVoltage() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return EXTVOLTAGE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return EXTVOLTAGE_INVALID;
+                }
             }
+            res = _extVoltage;
         }
-        return _extVoltage;
+        return res;
     }
 
     /**
@@ -302,10 +316,12 @@ public class YDualPower extends YFunction
     public static YDualPower FindDualPower(String func)
     {
         YDualPower obj;
-        obj = (YDualPower) YFunction._FindFromCache("DualPower", func);
-        if (obj == null) {
-            obj = new YDualPower(func);
-            YFunction._AddToCache("DualPower", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YDualPower) YFunction._FindFromCache("DualPower", func);
+            if (obj == null) {
+                obj = new YDualPower(func);
+                YFunction._AddToCache("DualPower", func, obj);
+            }
         }
         return obj;
     }
@@ -337,10 +353,12 @@ public class YDualPower extends YFunction
     public static YDualPower FindDualPowerInContext(YAPIContext yctx,String func)
     {
         YDualPower obj;
-        obj = (YDualPower) YFunction._FindFromCacheInContext(yctx, "DualPower", func);
-        if (obj == null) {
-            obj = new YDualPower(yctx, func);
-            YFunction._AddToCache("DualPower", func, obj);
+        synchronized (yctx) {
+            obj = (YDualPower) YFunction._FindFromCacheInContext(yctx, "DualPower", func);
+            if (obj == null) {
+                obj = new YDualPower(yctx, func);
+                YFunction._AddToCache("DualPower", func, obj);
+            }
         }
         return obj;
     }

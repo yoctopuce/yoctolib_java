@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YRealTimeClock.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -160,12 +160,16 @@ public class YRealTimeClock extends YFunction
      */
     public long get_unixTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return UNIXTIME_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return UNIXTIME_INVALID;
+                }
             }
+            res = _unixTime;
         }
-        return _unixTime;
+        return res;
     }
 
     /**
@@ -193,8 +197,10 @@ public class YRealTimeClock extends YFunction
     public int set_unixTime(long  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
-        _setAttr("unixTime",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(newval);
+            _setAttr("unixTime",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -221,12 +227,16 @@ public class YRealTimeClock extends YFunction
      */
     public String get_dateTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DATETIME_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DATETIME_INVALID;
+                }
             }
+            res = _dateTime;
         }
-        return _dateTime;
+        return res;
     }
 
     /**
@@ -250,12 +260,16 @@ public class YRealTimeClock extends YFunction
      */
     public int get_utcOffset() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return UTCOFFSET_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return UTCOFFSET_INVALID;
+                }
             }
+            res = _utcOffset;
         }
-        return _utcOffset;
+        return res;
     }
 
     /**
@@ -283,8 +297,10 @@ public class YRealTimeClock extends YFunction
     public int set_utcOffset(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("utcOffset",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("utcOffset",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -313,12 +329,16 @@ public class YRealTimeClock extends YFunction
      */
     public int get_timeSet() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TIMESET_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TIMESET_INVALID;
+                }
             }
+            res = _timeSet;
         }
-        return _timeSet;
+        return res;
     }
 
     /**
@@ -360,10 +380,12 @@ public class YRealTimeClock extends YFunction
     public static YRealTimeClock FindRealTimeClock(String func)
     {
         YRealTimeClock obj;
-        obj = (YRealTimeClock) YFunction._FindFromCache("RealTimeClock", func);
-        if (obj == null) {
-            obj = new YRealTimeClock(func);
-            YFunction._AddToCache("RealTimeClock", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YRealTimeClock) YFunction._FindFromCache("RealTimeClock", func);
+            if (obj == null) {
+                obj = new YRealTimeClock(func);
+                YFunction._AddToCache("RealTimeClock", func, obj);
+            }
         }
         return obj;
     }
@@ -395,10 +417,12 @@ public class YRealTimeClock extends YFunction
     public static YRealTimeClock FindRealTimeClockInContext(YAPIContext yctx,String func)
     {
         YRealTimeClock obj;
-        obj = (YRealTimeClock) YFunction._FindFromCacheInContext(yctx, "RealTimeClock", func);
-        if (obj == null) {
-            obj = new YRealTimeClock(yctx, func);
-            YFunction._AddToCache("RealTimeClock", func, obj);
+        synchronized (yctx) {
+            obj = (YRealTimeClock) YFunction._FindFromCacheInContext(yctx, "RealTimeClock", func);
+            if (obj == null) {
+                obj = new YRealTimeClock(yctx, func);
+                YFunction._AddToCache("RealTimeClock", func, obj);
+            }
         }
         return obj;
     }

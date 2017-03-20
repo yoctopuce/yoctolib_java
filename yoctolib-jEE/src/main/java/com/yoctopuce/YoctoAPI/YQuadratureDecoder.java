@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQuadratureDecoder.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YQuadratureDecoder.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The class YQuadratureDecoder allows you to decode a two-wire signal produced by a
  * quadrature encoder. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * to register callback functions, to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YQuadratureDecoder extends YSensor
@@ -147,8 +147,10 @@ public class YQuadratureDecoder extends YSensor
     public int set_currentValue(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("currentValue",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("currentValue",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -176,12 +178,16 @@ public class YQuadratureDecoder extends YSensor
      */
     public double get_speed() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SPEED_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SPEED_INVALID;
+                }
             }
+            res = _speed;
         }
-        return _speed;
+        return res;
     }
 
     /**
@@ -206,12 +212,16 @@ public class YQuadratureDecoder extends YSensor
      */
     public int get_decoding() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DECODING_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DECODING_INVALID;
+                }
             }
+            res = _decoding;
         }
-        return _decoding;
+        return res;
     }
 
     /**
@@ -240,8 +250,10 @@ public class YQuadratureDecoder extends YSensor
     public int set_decoding(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("decoding",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("decoding",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -286,10 +298,12 @@ public class YQuadratureDecoder extends YSensor
     public static YQuadratureDecoder FindQuadratureDecoder(String func)
     {
         YQuadratureDecoder obj;
-        obj = (YQuadratureDecoder) YFunction._FindFromCache("QuadratureDecoder", func);
-        if (obj == null) {
-            obj = new YQuadratureDecoder(func);
-            YFunction._AddToCache("QuadratureDecoder", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YQuadratureDecoder) YFunction._FindFromCache("QuadratureDecoder", func);
+            if (obj == null) {
+                obj = new YQuadratureDecoder(func);
+                YFunction._AddToCache("QuadratureDecoder", func, obj);
+            }
         }
         return obj;
     }
@@ -321,10 +335,12 @@ public class YQuadratureDecoder extends YSensor
     public static YQuadratureDecoder FindQuadratureDecoderInContext(YAPIContext yctx,String func)
     {
         YQuadratureDecoder obj;
-        obj = (YQuadratureDecoder) YFunction._FindFromCacheInContext(yctx, "QuadratureDecoder", func);
-        if (obj == null) {
-            obj = new YQuadratureDecoder(yctx, func);
-            YFunction._AddToCache("QuadratureDecoder", func, obj);
+        synchronized (yctx) {
+            obj = (YQuadratureDecoder) YFunction._FindFromCacheInContext(yctx, "QuadratureDecoder", func);
+            if (obj == null) {
+                obj = new YQuadratureDecoder(yctx, func);
+                YFunction._AddToCache("QuadratureDecoder", func, obj);
+            }
         }
         return obj;
     }

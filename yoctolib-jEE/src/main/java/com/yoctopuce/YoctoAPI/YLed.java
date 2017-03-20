@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLed.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YLed.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindLed(), the high-level API for Led functions
  *
@@ -156,12 +156,16 @@ public class YLed extends YFunction
      */
     public int get_power() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POWER_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POWER_INVALID;
+                }
             }
+            res = _power;
         }
-        return _power;
+        return res;
     }
 
     /**
@@ -188,8 +192,10 @@ public class YLed extends YFunction
     public int set_power(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("power",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("power",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -216,12 +222,16 @@ public class YLed extends YFunction
      */
     public int get_luminosity() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LUMINOSITY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LUMINOSITY_INVALID;
+                }
             }
+            res = _luminosity;
         }
-        return _luminosity;
+        return res;
     }
 
     /**
@@ -248,8 +258,10 @@ public class YLed extends YFunction
     public int set_luminosity(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("luminosity",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("luminosity",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -277,12 +289,16 @@ public class YLed extends YFunction
      */
     public int get_blinking() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BLINKING_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BLINKING_INVALID;
+                }
             }
+            res = _blinking;
         }
-        return _blinking;
+        return res;
     }
 
     /**
@@ -311,8 +327,10 @@ public class YLed extends YFunction
     public int set_blinking(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("blinking",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("blinking",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -357,10 +375,12 @@ public class YLed extends YFunction
     public static YLed FindLed(String func)
     {
         YLed obj;
-        obj = (YLed) YFunction._FindFromCache("Led", func);
-        if (obj == null) {
-            obj = new YLed(func);
-            YFunction._AddToCache("Led", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YLed) YFunction._FindFromCache("Led", func);
+            if (obj == null) {
+                obj = new YLed(func);
+                YFunction._AddToCache("Led", func, obj);
+            }
         }
         return obj;
     }
@@ -392,10 +412,12 @@ public class YLed extends YFunction
     public static YLed FindLedInContext(YAPIContext yctx,String func)
     {
         YLed obj;
-        obj = (YLed) YFunction._FindFromCacheInContext(yctx, "Led", func);
-        if (obj == null) {
-            obj = new YLed(yctx, func);
-            YFunction._AddToCache("Led", func, obj);
+        synchronized (yctx) {
+            obj = (YLed) YFunction._FindFromCacheInContext(yctx, "Led", func);
+            if (obj == null) {
+                obj = new YLed(yctx, func);
+                YFunction._AddToCache("Led", func, obj);
+            }
         }
         return obj;
     }

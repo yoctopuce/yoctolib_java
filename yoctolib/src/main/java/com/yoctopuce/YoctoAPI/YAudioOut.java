@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAudioOut.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YAudioOut.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindAudioOut(), the high-level API for AudioOut functions
  *
@@ -164,12 +164,16 @@ public class YAudioOut extends YFunction
      */
     public int get_volume() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLUME_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VOLUME_INVALID;
+                }
             }
+            res = _volume;
         }
-        return _volume;
+        return res;
     }
 
     /**
@@ -196,8 +200,10 @@ public class YAudioOut extends YFunction
     public int set_volume(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("volume",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("volume",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -224,12 +230,16 @@ public class YAudioOut extends YFunction
      */
     public int get_mute() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MUTE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MUTE_INVALID;
+                }
             }
+            res = _mute;
         }
-        return _mute;
+        return res;
     }
 
     /**
@@ -257,8 +267,10 @@ public class YAudioOut extends YFunction
     public int set_mute(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("mute",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("mute",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -289,12 +301,16 @@ public class YAudioOut extends YFunction
      */
     public String get_volumeRange() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLUMERANGE_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VOLUMERANGE_INVALID;
+                }
             }
+            res = _volumeRange;
         }
-        return _volumeRange;
+        return res;
     }
 
     /**
@@ -321,12 +337,16 @@ public class YAudioOut extends YFunction
      */
     public int get_signal() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNAL_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNAL_INVALID;
+                }
             }
+            res = _signal;
         }
-        return _signal;
+        return res;
     }
 
     /**
@@ -350,12 +370,16 @@ public class YAudioOut extends YFunction
      */
     public int get_noSignalFor() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return NOSIGNALFOR_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return NOSIGNALFOR_INVALID;
+                }
             }
+            res = _noSignalFor;
         }
-        return _noSignalFor;
+        return res;
     }
 
     /**
@@ -396,10 +420,12 @@ public class YAudioOut extends YFunction
     public static YAudioOut FindAudioOut(String func)
     {
         YAudioOut obj;
-        obj = (YAudioOut) YFunction._FindFromCache("AudioOut", func);
-        if (obj == null) {
-            obj = new YAudioOut(func);
-            YFunction._AddToCache("AudioOut", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YAudioOut) YFunction._FindFromCache("AudioOut", func);
+            if (obj == null) {
+                obj = new YAudioOut(func);
+                YFunction._AddToCache("AudioOut", func, obj);
+            }
         }
         return obj;
     }
@@ -431,10 +457,12 @@ public class YAudioOut extends YFunction
     public static YAudioOut FindAudioOutInContext(YAPIContext yctx,String func)
     {
         YAudioOut obj;
-        obj = (YAudioOut) YFunction._FindFromCacheInContext(yctx, "AudioOut", func);
-        if (obj == null) {
-            obj = new YAudioOut(yctx, func);
-            YFunction._AddToCache("AudioOut", func, obj);
+        synchronized (yctx) {
+            obj = (YAudioOut) YFunction._FindFromCacheInContext(yctx, "AudioOut", func);
+            if (obj == null) {
+                obj = new YAudioOut(yctx, func);
+                YFunction._AddToCache("AudioOut", func, obj);
+            }
         }
         return obj;
     }

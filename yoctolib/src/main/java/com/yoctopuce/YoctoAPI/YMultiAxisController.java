@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMultiAxisController.java 26303 2017-01-10 13:52:43Z mvuilleu $
+ * $Id: YMultiAxisController.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -154,12 +154,16 @@ public class YMultiAxisController extends YFunction
      */
     public int get_nAxis() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return NAXIS_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return NAXIS_INVALID;
+                }
             }
+            res = _nAxis;
         }
-        return _nAxis;
+        return res;
     }
 
     /**
@@ -186,8 +190,10 @@ public class YMultiAxisController extends YFunction
     public int set_nAxis(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("nAxis",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("nAxis",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -217,12 +223,16 @@ public class YMultiAxisController extends YFunction
      */
     public int get_globalState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return GLOBALSTATE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return GLOBALSTATE_INVALID;
+                }
             }
+            res = _globalState;
         }
-        return _globalState;
+        return res;
     }
 
     /**
@@ -244,12 +254,16 @@ public class YMultiAxisController extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -263,8 +277,10 @@ public class YMultiAxisController extends YFunction
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -299,10 +315,12 @@ public class YMultiAxisController extends YFunction
     public static YMultiAxisController FindMultiAxisController(String func)
     {
         YMultiAxisController obj;
-        obj = (YMultiAxisController) YFunction._FindFromCache("MultiAxisController", func);
-        if (obj == null) {
-            obj = new YMultiAxisController(func);
-            YFunction._AddToCache("MultiAxisController", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YMultiAxisController) YFunction._FindFromCache("MultiAxisController", func);
+            if (obj == null) {
+                obj = new YMultiAxisController(func);
+                YFunction._AddToCache("MultiAxisController", func, obj);
+            }
         }
         return obj;
     }
@@ -334,10 +352,12 @@ public class YMultiAxisController extends YFunction
     public static YMultiAxisController FindMultiAxisControllerInContext(YAPIContext yctx,String func)
     {
         YMultiAxisController obj;
-        obj = (YMultiAxisController) YFunction._FindFromCacheInContext(yctx, "MultiAxisController", func);
-        if (obj == null) {
-            obj = new YMultiAxisController(yctx, func);
-            YFunction._AddToCache("MultiAxisController", func, obj);
+        synchronized (yctx) {
+            obj = (YMultiAxisController) YFunction._FindFromCacheInContext(yctx, "MultiAxisController", func);
+            if (obj == null) {
+                obj = new YMultiAxisController(yctx, func);
+                YFunction._AddToCache("MultiAxisController", func, obj);
+            }
         }
         return obj;
     }

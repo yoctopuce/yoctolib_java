@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YServo.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YServo.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindServo(), the high-level API for Servo functions
  *
@@ -203,12 +203,16 @@ public class YServo extends YFunction
      */
     public int get_position() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POSITION_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POSITION_INVALID;
+                }
             }
+            res = _position;
         }
-        return _position;
+        return res;
     }
 
     /**
@@ -235,8 +239,10 @@ public class YServo extends YFunction
     public int set_position(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("position",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("position",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -263,12 +269,16 @@ public class YServo extends YFunction
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = _enabled;
         }
-        return _enabled;
+        return res;
     }
 
     /**
@@ -295,8 +305,10 @@ public class YServo extends YFunction
     public int set_enabled(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("enabled",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("enabled",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -323,12 +335,16 @@ public class YServo extends YFunction
      */
     public int get_range() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RANGE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RANGE_INVALID;
+                }
             }
+            res = _range;
         }
-        return _range;
+        return res;
     }
 
     /**
@@ -361,8 +377,10 @@ public class YServo extends YFunction
     public int set_range(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("range",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("range",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -395,12 +413,16 @@ public class YServo extends YFunction
      */
     public int get_neutral() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return NEUTRAL_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return NEUTRAL_INVALID;
+                }
             }
+            res = _neutral;
         }
-        return _neutral;
+        return res;
     }
 
     /**
@@ -433,8 +455,10 @@ public class YServo extends YFunction
     public int set_neutral(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("neutral",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("neutral",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -463,12 +487,16 @@ public class YServo extends YFunction
      */
     public YMove get_move() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MOVE_INVALID;
+        YMove res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MOVE_INVALID;
+                }
             }
+            res = _move;
         }
-        return _move;
+        return res;
     }
 
     /**
@@ -482,8 +510,10 @@ public class YServo extends YFunction
     public int set_move(YMove  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
-        _setAttr("move",rest_val);
+        synchronized (this) {
+            rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
+            _setAttr("move",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -519,12 +549,16 @@ public class YServo extends YFunction
      */
     public int get_positionAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POSITIONATPOWERON_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POSITIONATPOWERON_INVALID;
+                }
             }
+            res = _positionAtPowerOn;
         }
-        return _positionAtPowerOn;
+        return res;
     }
 
     /**
@@ -552,8 +586,10 @@ public class YServo extends YFunction
     public int set_positionAtPowerOn(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("positionAtPowerOn",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("positionAtPowerOn",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -582,12 +618,16 @@ public class YServo extends YFunction
      */
     public int get_enabledAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLEDATPOWERON_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLEDATPOWERON_INVALID;
+                }
             }
+            res = _enabledAtPowerOn;
         }
-        return _enabledAtPowerOn;
+        return res;
     }
 
     /**
@@ -616,8 +656,10 @@ public class YServo extends YFunction
     public int set_enabledAtPowerOn(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("enabledAtPowerOn",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("enabledAtPowerOn",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -662,10 +704,12 @@ public class YServo extends YFunction
     public static YServo FindServo(String func)
     {
         YServo obj;
-        obj = (YServo) YFunction._FindFromCache("Servo", func);
-        if (obj == null) {
-            obj = new YServo(func);
-            YFunction._AddToCache("Servo", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YServo) YFunction._FindFromCache("Servo", func);
+            if (obj == null) {
+                obj = new YServo(func);
+                YFunction._AddToCache("Servo", func, obj);
+            }
         }
         return obj;
     }
@@ -697,10 +741,12 @@ public class YServo extends YFunction
     public static YServo FindServoInContext(YAPIContext yctx,String func)
     {
         YServo obj;
-        obj = (YServo) YFunction._FindFromCacheInContext(yctx, "Servo", func);
-        if (obj == null) {
-            obj = new YServo(yctx, func);
-            YFunction._AddToCache("Servo", func, obj);
+        synchronized (yctx) {
+            obj = (YServo) YFunction._FindFromCacheInContext(yctx, "Servo", func);
+            if (obj == null) {
+                obj = new YServo(yctx, func);
+                YFunction._AddToCache("Servo", func, obj);
+            }
         }
         return obj;
     }

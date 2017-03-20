@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YDevice.java 26571 2017-02-07 17:16:17Z seb $
  *
  * Internal YDevice class
  *
@@ -40,11 +40,7 @@ package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 
 //
@@ -198,17 +194,16 @@ public class YDevice
     }
 
     // Retrieve the number of functions (beside "module") in the device
-    int functionCount()
+
+    Collection<YPEntry> getFunctions()
     {
-        return _ypRecs.size();
+        return _ypRecs.values();
     }
+
 
     YPEntry getYPEntry(int idx)
     {
-        if (idx < _ypRecs.size()) {
-            return _ypRecs.get(idx);
-        }
-        return null;
+        return _ypRecs.get(idx);
     }
 
     byte[] requestHTTPSync(String request, byte[] rest_of_request) throws YAPI_Exception

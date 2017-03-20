@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YDataLogger.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -271,12 +271,16 @@ public class YDataLogger extends YFunction
      */
     public int get_currentRunIndex() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CURRENTRUNINDEX_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CURRENTRUNINDEX_INVALID;
+                }
             }
+            res = _currentRunIndex;
         }
-        return _currentRunIndex;
+        return res;
     }
 
     /**
@@ -302,12 +306,16 @@ public class YDataLogger extends YFunction
      */
     public long get_timeUTC() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TIMEUTC_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TIMEUTC_INVALID;
+                }
             }
+            res = _timeUTC;
         }
-        return _timeUTC;
+        return res;
     }
 
     /**
@@ -334,8 +342,10 @@ public class YDataLogger extends YFunction
     public int set_timeUTC(long  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
-        _setAttr("timeUTC",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(newval);
+            _setAttr("timeUTC",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -363,12 +373,16 @@ public class YDataLogger extends YFunction
      */
     public int get_recording() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RECORDING_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RECORDING_INVALID;
+                }
             }
+            res = _recording;
         }
-        return _recording;
+        return res;
     }
 
     /**
@@ -398,8 +412,10 @@ public class YDataLogger extends YFunction
     public int set_recording(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("recording",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("recording",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -428,12 +444,16 @@ public class YDataLogger extends YFunction
      */
     public int get_autoStart() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return AUTOSTART_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return AUTOSTART_INVALID;
+                }
             }
+            res = _autoStart;
         }
-        return _autoStart;
+        return res;
     }
 
     /**
@@ -464,8 +484,10 @@ public class YDataLogger extends YFunction
     public int set_autoStart(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("autoStart",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("autoStart",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -487,26 +509,32 @@ public class YDataLogger extends YFunction
     }
 
     /**
-     * Return true if the data logger is synchronised with the localization beacon.
+     * Returns true if the data logger is synchronised with the localization beacon.
      *
-     * @return either YDataLogger.BEACONDRIVEN_OFF or YDataLogger.BEACONDRIVEN_ON
+     *  @return either YDataLogger.BEACONDRIVEN_OFF or YDataLogger.BEACONDRIVEN_ON, according to true if
+     * the data logger is synchronised with the localization beacon
      *
      * @throws YAPI_Exception on error
      */
     public int get_beaconDriven() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BEACONDRIVEN_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BEACONDRIVEN_INVALID;
+                }
             }
+            res = _beaconDriven;
         }
-        return _beaconDriven;
+        return res;
     }
 
     /**
-     * Return true if the data logger is synchronised with the localization beacon.
+     * Returns true if the data logger is synchronised with the localization beacon.
      *
-     * @return either Y_BEACONDRIVEN_OFF or Y_BEACONDRIVEN_ON
+     *  @return either Y_BEACONDRIVEN_OFF or Y_BEACONDRIVEN_ON, according to true if the data logger is
+     * synchronised with the localization beacon
      *
      * @throws YAPI_Exception on error
      */
@@ -530,8 +558,10 @@ public class YDataLogger extends YFunction
     public int set_beaconDriven(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("beaconDriven",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("beaconDriven",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -557,12 +587,16 @@ public class YDataLogger extends YFunction
      */
     public int get_clearHistory() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CLEARHISTORY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CLEARHISTORY_INVALID;
+                }
             }
+            res = _clearHistory;
         }
-        return _clearHistory;
+        return res;
     }
 
     /**
@@ -576,8 +610,10 @@ public class YDataLogger extends YFunction
     public int set_clearHistory(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("clearHistory",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("clearHistory",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -612,10 +648,12 @@ public class YDataLogger extends YFunction
     public static YDataLogger FindDataLogger(String func)
     {
         YDataLogger obj;
-        obj = (YDataLogger) YFunction._FindFromCache("DataLogger", func);
-        if (obj == null) {
-            obj = new YDataLogger(func);
-            YFunction._AddToCache("DataLogger", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YDataLogger) YFunction._FindFromCache("DataLogger", func);
+            if (obj == null) {
+                obj = new YDataLogger(func);
+                YFunction._AddToCache("DataLogger", func, obj);
+            }
         }
         return obj;
     }
@@ -647,10 +685,12 @@ public class YDataLogger extends YFunction
     public static YDataLogger FindDataLoggerInContext(YAPIContext yctx,String func)
     {
         YDataLogger obj;
-        obj = (YDataLogger) YFunction._FindFromCacheInContext(yctx, "DataLogger", func);
-        if (obj == null) {
-            obj = new YDataLogger(yctx, func);
-            YFunction._AddToCache("DataLogger", func, obj);
+        synchronized (yctx) {
+            obj = (YDataLogger) YFunction._FindFromCacheInContext(yctx, "DataLogger", func);
+            if (obj == null) {
+                obj = new YDataLogger(yctx, func);
+                YFunction._AddToCache("DataLogger", func, obj);
+            }
         }
         return obj;
     }

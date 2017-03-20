@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpSchedule.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YWakeUpSchedule.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -180,12 +180,16 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_minutesA() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MINUTESA_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MINUTESA_INVALID;
+                }
             }
+            res = _minutesA;
         }
-        return _minutesA;
+        return res;
     }
 
     /**
@@ -212,8 +216,10 @@ public class YWakeUpSchedule extends YFunction
     public int set_minutesA(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("minutesA",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("minutesA",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -240,12 +246,16 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_minutesB() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MINUTESB_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MINUTESB_INVALID;
+                }
             }
+            res = _minutesB;
         }
-        return _minutesB;
+        return res;
     }
 
     /**
@@ -272,8 +282,10 @@ public class YWakeUpSchedule extends YFunction
     public int set_minutesB(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("minutesB",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("minutesB",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -300,12 +312,16 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_hours() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return HOURS_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return HOURS_INVALID;
+                }
             }
+            res = _hours;
         }
-        return _hours;
+        return res;
     }
 
     /**
@@ -332,8 +348,10 @@ public class YWakeUpSchedule extends YFunction
     public int set_hours(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("hours",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("hours",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -360,12 +378,16 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_weekDays() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return WEEKDAYS_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return WEEKDAYS_INVALID;
+                }
             }
+            res = _weekDays;
         }
-        return _weekDays;
+        return res;
     }
 
     /**
@@ -392,8 +414,10 @@ public class YWakeUpSchedule extends YFunction
     public int set_weekDays(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("weekDays",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("weekDays",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -420,12 +444,16 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_monthDays() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MONTHDAYS_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MONTHDAYS_INVALID;
+                }
             }
+            res = _monthDays;
         }
-        return _monthDays;
+        return res;
     }
 
     /**
@@ -452,8 +480,10 @@ public class YWakeUpSchedule extends YFunction
     public int set_monthDays(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("monthDays",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("monthDays",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -480,12 +510,16 @@ public class YWakeUpSchedule extends YFunction
      */
     public int get_months() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MONTHS_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MONTHS_INVALID;
+                }
             }
+            res = _months;
         }
-        return _months;
+        return res;
     }
 
     /**
@@ -512,8 +546,10 @@ public class YWakeUpSchedule extends YFunction
     public int set_months(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("months",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("months",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -540,12 +576,16 @@ public class YWakeUpSchedule extends YFunction
      */
     public long get_nextOccurence() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return NEXTOCCURENCE_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return NEXTOCCURENCE_INVALID;
+                }
             }
+            res = _nextOccurence;
         }
-        return _nextOccurence;
+        return res;
     }
 
     /**
@@ -586,10 +626,12 @@ public class YWakeUpSchedule extends YFunction
     public static YWakeUpSchedule FindWakeUpSchedule(String func)
     {
         YWakeUpSchedule obj;
-        obj = (YWakeUpSchedule) YFunction._FindFromCache("WakeUpSchedule", func);
-        if (obj == null) {
-            obj = new YWakeUpSchedule(func);
-            YFunction._AddToCache("WakeUpSchedule", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YWakeUpSchedule) YFunction._FindFromCache("WakeUpSchedule", func);
+            if (obj == null) {
+                obj = new YWakeUpSchedule(func);
+                YFunction._AddToCache("WakeUpSchedule", func, obj);
+            }
         }
         return obj;
     }
@@ -621,10 +663,12 @@ public class YWakeUpSchedule extends YFunction
     public static YWakeUpSchedule FindWakeUpScheduleInContext(YAPIContext yctx,String func)
     {
         YWakeUpSchedule obj;
-        obj = (YWakeUpSchedule) YFunction._FindFromCacheInContext(yctx, "WakeUpSchedule", func);
-        if (obj == null) {
-            obj = new YWakeUpSchedule(yctx, func);
-            YFunction._AddToCache("WakeUpSchedule", func, obj);
+        synchronized (yctx) {
+            obj = (YWakeUpSchedule) YFunction._FindFromCacheInContext(yctx, "WakeUpSchedule", func);
+            if (obj == null) {
+                obj = new YWakeUpSchedule(yctx, func);
+                YFunction._AddToCache("WakeUpSchedule", func, obj);
+            }
         }
         return obj;
     }

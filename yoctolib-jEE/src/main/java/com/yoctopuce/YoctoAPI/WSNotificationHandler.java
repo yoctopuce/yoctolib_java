@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 @ClientEndpoint
-public class WSNotificationHandler extends NotificationHandler implements MessageHandler
+class WSNotificationHandler extends NotificationHandler implements MessageHandler
 {
 
     private static final int NB_TCP_CHANNEL = 4;

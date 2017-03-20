@@ -1,6 +1,7 @@
 package com.yoctopuce.YoctoAPI;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 class YHash
@@ -35,9 +36,8 @@ class YHash
         YFunctionType module = _fnByType.get("Module");
         YPEntry moduleYPEntry = dev.getModuleYPEntry();
         module.reindexFunction(moduleYPEntry);
-        int count = dev.functionCount();
-        for (int i = 0; i < count; i++) {
-            YPEntry yp = dev.getYPEntry(i);
+        Collection<YPEntry> functions = dev.getFunctions();
+        for (YPEntry yp : functions) {
             String classname = yp.getClassname();
             YFunctionType functionType = _fnByType.get(classname);
             if (functionType == null) {
@@ -82,9 +82,8 @@ class YHash
         }
         YFunctionType module = _fnByType.get("Module");
         module.forgetFunction(serial + ".module");
-        int count = dev.functionCount();
-        for (int i = 0; i < count; i++) {
-            YPEntry yp = dev.getYPEntry(i);
+        Collection<YPEntry> functions = dev.getFunctions();
+        for (YPEntry yp : functions) {
             YFunctionType functionType = _fnByType.get(yp.getClassname());
             if (functionType != null) {
                 functionType.forgetFunction(yp.getHardwareId());

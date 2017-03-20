@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHumidity.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YHumidity.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindHumidity(), the high-level API for Humidity functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce class YHumidity allows you to read and configure Yoctopuce humidity
  * sensors. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * to register callback functions, to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YHumidity extends YSensor
@@ -150,8 +150,10 @@ public class YHumidity extends YSensor
     public int set_unit(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("unit",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("unit",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -184,12 +186,16 @@ public class YHumidity extends YSensor
      */
     public double get_relHum() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RELHUM_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RELHUM_INVALID;
+                }
             }
+            res = _relHum;
         }
-        return _relHum;
+        return res;
     }
 
     /**
@@ -213,12 +219,16 @@ public class YHumidity extends YSensor
      */
     public double get_absHum() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ABSHUM_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ABSHUM_INVALID;
+                }
             }
+            res = _absHum;
         }
-        return _absHum;
+        return res;
     }
 
     /**
@@ -259,10 +269,12 @@ public class YHumidity extends YSensor
     public static YHumidity FindHumidity(String func)
     {
         YHumidity obj;
-        obj = (YHumidity) YFunction._FindFromCache("Humidity", func);
-        if (obj == null) {
-            obj = new YHumidity(func);
-            YFunction._AddToCache("Humidity", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YHumidity) YFunction._FindFromCache("Humidity", func);
+            if (obj == null) {
+                obj = new YHumidity(func);
+                YFunction._AddToCache("Humidity", func, obj);
+            }
         }
         return obj;
     }
@@ -294,10 +306,12 @@ public class YHumidity extends YSensor
     public static YHumidity FindHumidityInContext(YAPIContext yctx,String func)
     {
         YHumidity obj;
-        obj = (YHumidity) YFunction._FindFromCacheInContext(yctx, "Humidity", func);
-        if (obj == null) {
-            obj = new YHumidity(yctx, func);
-            YFunction._AddToCache("Humidity", func, obj);
+        synchronized (yctx) {
+            obj = (YHumidity) YFunction._FindFromCacheInContext(yctx, "Humidity", func);
+            if (obj == null) {
+                obj = new YHumidity(yctx, func);
+                YFunction._AddToCache("Humidity", func, obj);
+            }
         }
         return obj;
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMotor.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YMotor.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindMotor(), the high-level API for Motor functions
  *
@@ -220,12 +220,16 @@ public class YMotor extends YFunction
      */
     public int get_motorStatus() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MOTORSTATUS_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MOTORSTATUS_INVALID;
+                }
             }
+            res = _motorStatus;
         }
-        return _motorStatus;
+        return res;
     }
 
     /**
@@ -255,8 +259,10 @@ public class YMotor extends YFunction
     public int set_motorStatus(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("motorStatus",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("motorStatus",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -281,8 +287,10 @@ public class YMotor extends YFunction
     public int set_drivingForce(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("drivingForce",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("drivingForce",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -314,12 +322,16 @@ public class YMotor extends YFunction
      */
     public double get_drivingForce() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DRIVINGFORCE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DRIVINGFORCE_INVALID;
+                }
             }
+            res = _drivingForce;
         }
-        return _drivingForce;
+        return res;
     }
 
     /**
@@ -350,8 +362,10 @@ public class YMotor extends YFunction
     public int set_brakingForce(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("brakingForce",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("brakingForce",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -382,12 +396,16 @@ public class YMotor extends YFunction
      */
     public double get_brakingForce() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BRAKINGFORCE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BRAKINGFORCE_INVALID;
+                }
             }
+            res = _brakingForce;
         }
-        return _brakingForce;
+        return res;
     }
 
     /**
@@ -421,8 +439,10 @@ public class YMotor extends YFunction
     public int set_cutOffVoltage(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("cutOffVoltage",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("cutOffVoltage",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -459,12 +479,16 @@ public class YMotor extends YFunction
      */
     public double get_cutOffVoltage() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CUTOFFVOLTAGE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CUTOFFVOLTAGE_INVALID;
+                }
             }
+            res = _cutOffVoltage;
         }
-        return _cutOffVoltage;
+        return res;
     }
 
     /**
@@ -494,12 +518,16 @@ public class YMotor extends YFunction
      */
     public int get_overCurrentLimit() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return OVERCURRENTLIMIT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return OVERCURRENTLIMIT_INVALID;
+                }
             }
+            res = _overCurrentLimit;
         }
-        return _overCurrentLimit;
+        return res;
     }
 
     /**
@@ -533,8 +561,10 @@ public class YMotor extends YFunction
     public int set_overCurrentLimit(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("overCurrentLimit",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("overCurrentLimit",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -572,8 +602,10 @@ public class YMotor extends YFunction
     public int set_frequency(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("frequency",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("frequency",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -603,12 +635,16 @@ public class YMotor extends YFunction
      */
     public double get_frequency() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FREQUENCY_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FREQUENCY_INVALID;
+                }
             }
+            res = _frequency;
         }
-        return _frequency;
+        return res;
     }
 
     /**
@@ -635,12 +671,16 @@ public class YMotor extends YFunction
      */
     public int get_starterTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return STARTERTIME_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return STARTERTIME_INVALID;
+                }
             }
+            res = _starterTime;
         }
-        return _starterTime;
+        return res;
     }
 
     /**
@@ -673,8 +713,10 @@ public class YMotor extends YFunction
     public int set_starterTime(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("starterTime",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("starterTime",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -709,12 +751,16 @@ public class YMotor extends YFunction
      */
     public int get_failSafeTimeout() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FAILSAFETIMEOUT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FAILSAFETIMEOUT_INVALID;
+                }
             }
+            res = _failSafeTimeout;
         }
-        return _failSafeTimeout;
+        return res;
     }
 
     /**
@@ -751,8 +797,10 @@ public class YMotor extends YFunction
     public int set_failSafeTimeout(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("failSafeTimeout",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("failSafeTimeout",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -780,12 +828,16 @@ public class YMotor extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -799,8 +851,10 @@ public class YMotor extends YFunction
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -835,10 +889,12 @@ public class YMotor extends YFunction
     public static YMotor FindMotor(String func)
     {
         YMotor obj;
-        obj = (YMotor) YFunction._FindFromCache("Motor", func);
-        if (obj == null) {
-            obj = new YMotor(func);
-            YFunction._AddToCache("Motor", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YMotor) YFunction._FindFromCache("Motor", func);
+            if (obj == null) {
+                obj = new YMotor(func);
+                YFunction._AddToCache("Motor", func, obj);
+            }
         }
         return obj;
     }
@@ -870,10 +926,12 @@ public class YMotor extends YFunction
     public static YMotor FindMotorInContext(YAPIContext yctx,String func)
     {
         YMotor obj;
-        obj = (YMotor) YFunction._FindFromCacheInContext(yctx, "Motor", func);
-        if (obj == null) {
-            obj = new YMotor(yctx, func);
-            YFunction._AddToCache("Motor", func, obj);
+        synchronized (yctx) {
+            obj = (YMotor) YFunction._FindFromCacheInContext(yctx, "Motor", func);
+            if (obj == null) {
+                obj = new YMotor(yctx, func);
+                YFunction._AddToCache("Motor", func, obj);
+            }
         }
         return obj;
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBluetoothLink.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YBluetoothLink.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -212,12 +212,16 @@ public class YBluetoothLink extends YFunction
      */
     public String get_ownAddress() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return OWNADDRESS_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return OWNADDRESS_INVALID;
+                }
             }
+            res = _ownAddress;
         }
-        return _ownAddress;
+        return res;
     }
 
     /**
@@ -246,12 +250,16 @@ public class YBluetoothLink extends YFunction
      */
     public String get_pairingPin() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PAIRINGPIN_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PAIRINGPIN_INVALID;
+                }
             }
+            res = _pairingPin;
         }
-        return _pairingPin;
+        return res;
     }
 
     /**
@@ -284,8 +292,10 @@ public class YBluetoothLink extends YFunction
     public int set_pairingPin(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("pairingPin",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("pairingPin",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -314,12 +324,16 @@ public class YBluetoothLink extends YFunction
      */
     public String get_remoteAddress() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return REMOTEADDRESS_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return REMOTEADDRESS_INVALID;
+                }
             }
+            res = _remoteAddress;
         }
-        return _remoteAddress;
+        return res;
     }
 
     /**
@@ -346,8 +360,10 @@ public class YBluetoothLink extends YFunction
     public int set_remoteAddress(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("remoteAddress",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("remoteAddress",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -374,12 +390,16 @@ public class YBluetoothLink extends YFunction
      */
     public String get_remoteName() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return REMOTENAME_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return REMOTENAME_INVALID;
+                }
             }
+            res = _remoteName;
         }
-        return _remoteName;
+        return res;
     }
 
     /**
@@ -404,12 +424,16 @@ public class YBluetoothLink extends YFunction
      */
     public int get_mute() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MUTE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MUTE_INVALID;
+                }
             }
+            res = _mute;
         }
-        return _mute;
+        return res;
     }
 
     /**
@@ -438,8 +462,10 @@ public class YBluetoothLink extends YFunction
     public int set_mute(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("mute",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("mute",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -467,12 +493,16 @@ public class YBluetoothLink extends YFunction
      */
     public int get_preAmplifier() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PREAMPLIFIER_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PREAMPLIFIER_INVALID;
+                }
             }
+            res = _preAmplifier;
         }
-        return _preAmplifier;
+        return res;
     }
 
     /**
@@ -499,8 +529,10 @@ public class YBluetoothLink extends YFunction
     public int set_preAmplifier(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("preAmplifier",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("preAmplifier",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -527,12 +559,16 @@ public class YBluetoothLink extends YFunction
      */
     public int get_volume() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLUME_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VOLUME_INVALID;
+                }
             }
+            res = _volume;
         }
-        return _volume;
+        return res;
     }
 
     /**
@@ -559,8 +595,10 @@ public class YBluetoothLink extends YFunction
     public int set_volume(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("volume",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("volume",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -589,12 +627,16 @@ public class YBluetoothLink extends YFunction
      */
     public int get_linkState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LINKSTATE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LINKSTATE_INVALID;
+                }
             }
+            res = _linkState;
         }
-        return _linkState;
+        return res;
     }
 
     /**
@@ -620,12 +662,16 @@ public class YBluetoothLink extends YFunction
      */
     public int get_linkQuality() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LINKQUALITY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LINKQUALITY_INVALID;
+                }
             }
+            res = _linkQuality;
         }
-        return _linkQuality;
+        return res;
     }
 
     /**
@@ -646,12 +692,16 @@ public class YBluetoothLink extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -665,8 +715,10 @@ public class YBluetoothLink extends YFunction
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -701,10 +753,12 @@ public class YBluetoothLink extends YFunction
     public static YBluetoothLink FindBluetoothLink(String func)
     {
         YBluetoothLink obj;
-        obj = (YBluetoothLink) YFunction._FindFromCache("BluetoothLink", func);
-        if (obj == null) {
-            obj = new YBluetoothLink(func);
-            YFunction._AddToCache("BluetoothLink", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YBluetoothLink) YFunction._FindFromCache("BluetoothLink", func);
+            if (obj == null) {
+                obj = new YBluetoothLink(func);
+                YFunction._AddToCache("BluetoothLink", func, obj);
+            }
         }
         return obj;
     }
@@ -736,10 +790,12 @@ public class YBluetoothLink extends YFunction
     public static YBluetoothLink FindBluetoothLinkInContext(YAPIContext yctx,String func)
     {
         YBluetoothLink obj;
-        obj = (YBluetoothLink) YFunction._FindFromCacheInContext(yctx, "BluetoothLink", func);
-        if (obj == null) {
-            obj = new YBluetoothLink(yctx, func);
-            YFunction._AddToCache("BluetoothLink", func, obj);
+        synchronized (yctx) {
+            obj = (YBluetoothLink) YFunction._FindFromCacheInContext(yctx, "BluetoothLink", func);
+            if (obj == null) {
+                obj = new YBluetoothLink(yctx, func);
+                YFunction._AddToCache("BluetoothLink", func, obj);
+            }
         }
         return obj;
     }

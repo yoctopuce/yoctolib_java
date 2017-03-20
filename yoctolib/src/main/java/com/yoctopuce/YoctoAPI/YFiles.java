@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YFiles.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -139,12 +139,16 @@ public class YFiles extends YFunction
      */
     public int get_filesCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FILESCOUNT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FILESCOUNT_INVALID;
+                }
             }
+            res = _filesCount;
         }
-        return _filesCount;
+        return res;
     }
 
     /**
@@ -168,12 +172,16 @@ public class YFiles extends YFunction
      */
     public int get_freeSpace() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FREESPACE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FREESPACE_INVALID;
+                }
             }
+            res = _freeSpace;
         }
-        return _freeSpace;
+        return res;
     }
 
     /**
@@ -214,10 +222,12 @@ public class YFiles extends YFunction
     public static YFiles FindFiles(String func)
     {
         YFiles obj;
-        obj = (YFiles) YFunction._FindFromCache("Files", func);
-        if (obj == null) {
-            obj = new YFiles(func);
-            YFunction._AddToCache("Files", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YFiles) YFunction._FindFromCache("Files", func);
+            if (obj == null) {
+                obj = new YFiles(func);
+                YFunction._AddToCache("Files", func, obj);
+            }
         }
         return obj;
     }
@@ -249,10 +259,12 @@ public class YFiles extends YFunction
     public static YFiles FindFilesInContext(YAPIContext yctx,String func)
     {
         YFiles obj;
-        obj = (YFiles) YFunction._FindFromCacheInContext(yctx, "Files", func);
-        if (obj == null) {
-            obj = new YFiles(yctx, func);
-            YFunction._AddToCache("Files", func, obj);
+        synchronized (yctx) {
+            obj = (YFiles) YFunction._FindFromCacheInContext(yctx, "Files", func);
+            if (obj == null) {
+                obj = new YFiles(yctx, func);
+                YFunction._AddToCache("Files", func, obj);
+            }
         }
         return obj;
     }

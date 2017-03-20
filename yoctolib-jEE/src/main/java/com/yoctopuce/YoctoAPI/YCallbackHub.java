@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YCallbackHub.java 26644 2017-02-23 07:51:03Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -51,7 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class YCallbackHub extends YGenericHub
+class YCallbackHub extends YGenericHub
 {
     private final HTTPParams _http_params;
     private final OutputStream _out;

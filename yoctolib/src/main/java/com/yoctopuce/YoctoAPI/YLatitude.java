@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLatitude.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YLatitude.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindLatitude(), the high-level API for Latitude functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce class YLatitude allows you to read the latitude from Yoctopuce
  * geolocalization sensors. It inherits from the YSensor class the core functions to
- * read measurements, register callback functions, access the autonomous
+ * read measurements, to register callback functions, to access the autonomous
  * datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -143,10 +143,12 @@ public class YLatitude extends YSensor
     public static YLatitude FindLatitude(String func)
     {
         YLatitude obj;
-        obj = (YLatitude) YFunction._FindFromCache("Latitude", func);
-        if (obj == null) {
-            obj = new YLatitude(func);
-            YFunction._AddToCache("Latitude", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YLatitude) YFunction._FindFromCache("Latitude", func);
+            if (obj == null) {
+                obj = new YLatitude(func);
+                YFunction._AddToCache("Latitude", func, obj);
+            }
         }
         return obj;
     }
@@ -178,10 +180,12 @@ public class YLatitude extends YSensor
     public static YLatitude FindLatitudeInContext(YAPIContext yctx,String func)
     {
         YLatitude obj;
-        obj = (YLatitude) YFunction._FindFromCacheInContext(yctx, "Latitude", func);
-        if (obj == null) {
-            obj = new YLatitude(yctx, func);
-            YFunction._AddToCache("Latitude", func, obj);
+        synchronized (yctx) {
+            obj = (YLatitude) YFunction._FindFromCacheInContext(yctx, "Latitude", func);
+            if (obj == null) {
+                obj = new YLatitude(yctx, func);
+                YFunction._AddToCache("Latitude", func, obj);
+            }
         }
         return obj;
     }

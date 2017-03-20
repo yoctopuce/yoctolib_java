@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMagnetometer.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YMagnetometer.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -163,12 +163,16 @@ public class YMagnetometer extends YSensor
      */
     public int get_bandwidth() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BANDWIDTH_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BANDWIDTH_INVALID;
+                }
             }
+            res = _bandwidth;
         }
-        return _bandwidth;
+        return res;
     }
 
     /**
@@ -196,8 +200,10 @@ public class YMagnetometer extends YSensor
     public int set_bandwidth(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("bandwidth",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("bandwidth",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -226,12 +232,16 @@ public class YMagnetometer extends YSensor
      */
     public double get_xValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return XVALUE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return XVALUE_INVALID;
+                }
             }
+            res = _xValue;
         }
-        return _xValue;
+        return res;
     }
 
     /**
@@ -257,12 +267,16 @@ public class YMagnetometer extends YSensor
      */
     public double get_yValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return YVALUE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return YVALUE_INVALID;
+                }
             }
+            res = _yValue;
         }
-        return _yValue;
+        return res;
     }
 
     /**
@@ -288,12 +302,16 @@ public class YMagnetometer extends YSensor
      */
     public double get_zValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ZVALUE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ZVALUE_INVALID;
+                }
             }
+            res = _zValue;
         }
-        return _zValue;
+        return res;
     }
 
     /**
@@ -335,10 +353,12 @@ public class YMagnetometer extends YSensor
     public static YMagnetometer FindMagnetometer(String func)
     {
         YMagnetometer obj;
-        obj = (YMagnetometer) YFunction._FindFromCache("Magnetometer", func);
-        if (obj == null) {
-            obj = new YMagnetometer(func);
-            YFunction._AddToCache("Magnetometer", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YMagnetometer) YFunction._FindFromCache("Magnetometer", func);
+            if (obj == null) {
+                obj = new YMagnetometer(func);
+                YFunction._AddToCache("Magnetometer", func, obj);
+            }
         }
         return obj;
     }
@@ -370,10 +390,12 @@ public class YMagnetometer extends YSensor
     public static YMagnetometer FindMagnetometerInContext(YAPIContext yctx,String func)
     {
         YMagnetometer obj;
-        obj = (YMagnetometer) YFunction._FindFromCacheInContext(yctx, "Magnetometer", func);
-        if (obj == null) {
-            obj = new YMagnetometer(yctx, func);
-            YFunction._AddToCache("Magnetometer", func, obj);
+        synchronized (yctx) {
+            obj = (YMagnetometer) YFunction._FindFromCacheInContext(yctx, "Magnetometer", func);
+            if (obj == null) {
+                obj = new YMagnetometer(yctx, func);
+                YFunction._AddToCache("Magnetometer", func, obj);
+            }
         }
         return obj;
     }

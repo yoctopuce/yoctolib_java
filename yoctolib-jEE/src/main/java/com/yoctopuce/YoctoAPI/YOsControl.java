@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOsControl.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YOsControl.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -134,12 +134,16 @@ public class YOsControl extends YFunction
      */
     public int get_shutdownCountdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SHUTDOWNCOUNTDOWN_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SHUTDOWNCOUNTDOWN_INVALID;
+                }
             }
+            res = _shutdownCountdown;
         }
-        return _shutdownCountdown;
+        return res;
     }
 
     /**
@@ -159,8 +163,10 @@ public class YOsControl extends YFunction
     public int set_shutdownCountdown(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("shutdownCountdown",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("shutdownCountdown",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -195,10 +201,12 @@ public class YOsControl extends YFunction
     public static YOsControl FindOsControl(String func)
     {
         YOsControl obj;
-        obj = (YOsControl) YFunction._FindFromCache("OsControl", func);
-        if (obj == null) {
-            obj = new YOsControl(func);
-            YFunction._AddToCache("OsControl", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YOsControl) YFunction._FindFromCache("OsControl", func);
+            if (obj == null) {
+                obj = new YOsControl(func);
+                YFunction._AddToCache("OsControl", func, obj);
+            }
         }
         return obj;
     }
@@ -230,10 +238,12 @@ public class YOsControl extends YFunction
     public static YOsControl FindOsControlInContext(YAPIContext yctx,String func)
     {
         YOsControl obj;
-        obj = (YOsControl) YFunction._FindFromCacheInContext(yctx, "OsControl", func);
-        if (obj == null) {
-            obj = new YOsControl(yctx, func);
-            YFunction._AddToCache("OsControl", func, obj);
+        synchronized (yctx) {
+            obj = (YOsControl) YFunction._FindFromCacheInContext(yctx, "OsControl", func);
+            if (obj == null) {
+                obj = new YOsControl(yctx, func);
+                YFunction._AddToCache("OsControl", func, obj);
+            }
         }
         return obj;
     }

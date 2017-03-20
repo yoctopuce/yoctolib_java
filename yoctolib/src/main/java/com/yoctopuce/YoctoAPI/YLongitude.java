@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLongitude.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YLongitude.java 26640 2017-02-21 18:17:26Z seb $
  *
  * Implements FindLongitude(), the high-level API for Longitude functions
  *
@@ -143,10 +143,12 @@ public class YLongitude extends YSensor
     public static YLongitude FindLongitude(String func)
     {
         YLongitude obj;
-        obj = (YLongitude) YFunction._FindFromCache("Longitude", func);
-        if (obj == null) {
-            obj = new YLongitude(func);
-            YFunction._AddToCache("Longitude", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YLongitude) YFunction._FindFromCache("Longitude", func);
+            if (obj == null) {
+                obj = new YLongitude(func);
+                YFunction._AddToCache("Longitude", func, obj);
+            }
         }
         return obj;
     }
@@ -178,10 +180,12 @@ public class YLongitude extends YSensor
     public static YLongitude FindLongitudeInContext(YAPIContext yctx,String func)
     {
         YLongitude obj;
-        obj = (YLongitude) YFunction._FindFromCacheInContext(yctx, "Longitude", func);
-        if (obj == null) {
-            obj = new YLongitude(yctx, func);
-            YFunction._AddToCache("Longitude", func, obj);
+        synchronized (yctx) {
+            obj = (YLongitude) YFunction._FindFromCacheInContext(yctx, "Longitude", func);
+            if (obj == null) {
+                obj = new YLongitude(yctx, func);
+                YFunction._AddToCache("Longitude", func, obj);
+            }
         }
         return obj;
     }

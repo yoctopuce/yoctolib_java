@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 26468 2017-01-24 17:01:29Z seb $
+ * $Id: YCellular.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -265,12 +265,16 @@ public class YCellular extends YFunction
      */
     public int get_linkQuality() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LINKQUALITY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LINKQUALITY_INVALID;
+                }
             }
+            res = _linkQuality;
         }
-        return _linkQuality;
+        return res;
     }
 
     /**
@@ -294,12 +298,16 @@ public class YCellular extends YFunction
      */
     public String get_cellOperator() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CELLOPERATOR_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CELLOPERATOR_INVALID;
+                }
             }
+            res = _cellOperator;
         }
-        return _cellOperator;
+        return res;
     }
 
     /**
@@ -324,12 +332,16 @@ public class YCellular extends YFunction
      */
     public String get_cellIdentifier() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CELLIDENTIFIER_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CELLIDENTIFIER_INVALID;
+                }
             }
+            res = _cellIdentifier;
         }
-        return _cellIdentifier;
+        return res;
     }
 
     /**
@@ -355,12 +367,16 @@ public class YCellular extends YFunction
      */
     public int get_cellType() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CELLTYPE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CELLTYPE_INVALID;
+                }
             }
+            res = _cellType;
         }
-        return _cellType;
+        return res;
     }
 
     /**
@@ -389,12 +405,16 @@ public class YCellular extends YFunction
      */
     public String get_imsi() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return IMSI_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return IMSI_INVALID;
+                }
             }
+            res = _imsi;
         }
-        return _imsi;
+        return res;
     }
 
     /**
@@ -422,12 +442,16 @@ public class YCellular extends YFunction
      */
     public String get_message() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MESSAGE_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MESSAGE_INVALID;
+                }
             }
+            res = _message;
         }
-        return _message;
+        return res;
     }
 
     /**
@@ -455,12 +479,16 @@ public class YCellular extends YFunction
      */
     public String get_pin() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PIN_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PIN_INVALID;
+                }
             }
+            res = _pin;
         }
-        return _pin;
+        return res;
     }
 
     /**
@@ -501,8 +529,10 @@ public class YCellular extends YFunction
     public int set_pin(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("pin",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("pin",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -543,12 +573,16 @@ public class YCellular extends YFunction
      */
     public String get_lockedOperator() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LOCKEDOPERATOR_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LOCKEDOPERATOR_INVALID;
+                }
             }
+            res = _lockedOperator;
         }
-        return _lockedOperator;
+        return res;
     }
 
     /**
@@ -581,8 +615,10 @@ public class YCellular extends YFunction
     public int set_lockedOperator(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("lockedOperator",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("lockedOperator",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -612,12 +648,16 @@ public class YCellular extends YFunction
      */
     public int get_airplaneMode() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return AIRPLANEMODE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return AIRPLANEMODE_INVALID;
+                }
             }
+            res = _airplaneMode;
         }
-        return _airplaneMode;
+        return res;
     }
 
     /**
@@ -646,8 +686,10 @@ public class YCellular extends YFunction
     public int set_airplaneMode(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("airplaneMode",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("airplaneMode",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -678,12 +720,16 @@ public class YCellular extends YFunction
      */
     public int get_enableData() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLEDATA_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLEDATA_INVALID;
+                }
             }
+            res = _enableData;
         }
-        return _enableData;
+        return res;
     }
 
     /**
@@ -719,8 +765,10 @@ public class YCellular extends YFunction
     public int set_enableData(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("enableData",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("enableData",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -754,12 +802,16 @@ public class YCellular extends YFunction
      */
     public String get_apn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return APN_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return APN_INVALID;
+                }
             }
+            res = _apn;
         }
-        return _apn;
+        return res;
     }
 
     /**
@@ -788,8 +840,10 @@ public class YCellular extends YFunction
     public int set_apn(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("apn",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("apn",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -820,12 +874,16 @@ public class YCellular extends YFunction
      */
     public String get_apnSecret() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return APNSECRET_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return APNSECRET_INVALID;
+                }
             }
+            res = _apnSecret;
         }
-        return _apnSecret;
+        return res;
     }
 
     /**
@@ -846,8 +904,10 @@ public class YCellular extends YFunction
     public int set_apnSecret(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("apnSecret",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("apnSecret",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -865,12 +925,16 @@ public class YCellular extends YFunction
      */
     public int get_pingInterval() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PINGINTERVAL_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PINGINTERVAL_INVALID;
+                }
             }
+            res = _pingInterval;
         }
-        return _pingInterval;
+        return res;
     }
 
     /**
@@ -897,8 +961,10 @@ public class YCellular extends YFunction
     public int set_pingInterval(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("pingInterval",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("pingInterval",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -925,12 +991,16 @@ public class YCellular extends YFunction
      */
     public int get_dataSent() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DATASENT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DATASENT_INVALID;
+                }
             }
+            res = _dataSent;
         }
-        return _dataSent;
+        return res;
     }
 
     /**
@@ -957,8 +1027,10 @@ public class YCellular extends YFunction
     public int set_dataSent(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("dataSent",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("dataSent",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -985,12 +1057,16 @@ public class YCellular extends YFunction
      */
     public int get_dataReceived() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DATARECEIVED_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DATARECEIVED_INVALID;
+                }
             }
+            res = _dataReceived;
         }
-        return _dataReceived;
+        return res;
     }
 
     /**
@@ -1017,8 +1093,10 @@ public class YCellular extends YFunction
     public int set_dataReceived(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("dataReceived",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("dataReceived",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1041,12 +1119,16 @@ public class YCellular extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -1060,8 +1142,10 @@ public class YCellular extends YFunction
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1096,10 +1180,12 @@ public class YCellular extends YFunction
     public static YCellular FindCellular(String func)
     {
         YCellular obj;
-        obj = (YCellular) YFunction._FindFromCache("Cellular", func);
-        if (obj == null) {
-            obj = new YCellular(func);
-            YFunction._AddToCache("Cellular", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YCellular) YFunction._FindFromCache("Cellular", func);
+            if (obj == null) {
+                obj = new YCellular(func);
+                YFunction._AddToCache("Cellular", func, obj);
+            }
         }
         return obj;
     }
@@ -1131,10 +1217,12 @@ public class YCellular extends YFunction
     public static YCellular FindCellularInContext(YAPIContext yctx,String func)
     {
         YCellular obj;
-        obj = (YCellular) YFunction._FindFromCacheInContext(yctx, "Cellular", func);
-        if (obj == null) {
-            obj = new YCellular(yctx, func);
-            YFunction._AddToCache("Cellular", func, obj);
+        synchronized (yctx) {
+            obj = (YCellular) YFunction._FindFromCacheInContext(yctx, "Cellular", func);
+            if (obj == null) {
+                obj = new YCellular(yctx, func);
+                YFunction._AddToCache("Cellular", func, obj);
+            }
         }
         return obj;
     }

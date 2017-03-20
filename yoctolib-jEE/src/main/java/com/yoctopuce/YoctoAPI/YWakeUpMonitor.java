@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpMonitor.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YWakeUpMonitor.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -180,12 +180,16 @@ public class YWakeUpMonitor extends YFunction
      */
     public int get_powerDuration() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POWERDURATION_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POWERDURATION_INVALID;
+                }
             }
+            res = _powerDuration;
         }
-        return _powerDuration;
+        return res;
     }
 
     /**
@@ -213,8 +217,10 @@ public class YWakeUpMonitor extends YFunction
     public int set_powerDuration(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("powerDuration",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("powerDuration",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -242,12 +248,16 @@ public class YWakeUpMonitor extends YFunction
      */
     public int get_sleepCountdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SLEEPCOUNTDOWN_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SLEEPCOUNTDOWN_INVALID;
+                }
             }
+            res = _sleepCountdown;
         }
-        return _sleepCountdown;
+        return res;
     }
 
     /**
@@ -274,8 +284,10 @@ public class YWakeUpMonitor extends YFunction
     public int set_sleepCountdown(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("sleepCountdown",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("sleepCountdown",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -302,12 +314,16 @@ public class YWakeUpMonitor extends YFunction
      */
     public long get_nextWakeUp() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return NEXTWAKEUP_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return NEXTWAKEUP_INVALID;
+                }
             }
+            res = _nextWakeUp;
         }
-        return _nextWakeUp;
+        return res;
     }
 
     /**
@@ -334,8 +350,10 @@ public class YWakeUpMonitor extends YFunction
     public int set_nextWakeUp(long  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
-        _setAttr("nextWakeUp",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(newval);
+            _setAttr("nextWakeUp",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -365,12 +383,16 @@ public class YWakeUpMonitor extends YFunction
      */
     public int get_wakeUpReason() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return WAKEUPREASON_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return WAKEUPREASON_INVALID;
+                }
             }
+            res = _wakeUpReason;
         }
-        return _wakeUpReason;
+        return res;
     }
 
     /**
@@ -397,12 +419,16 @@ public class YWakeUpMonitor extends YFunction
      */
     public int get_wakeUpState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return WAKEUPSTATE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return WAKEUPSTATE_INVALID;
+                }
             }
+            res = _wakeUpState;
         }
-        return _wakeUpState;
+        return res;
     }
 
     /**
@@ -420,8 +446,10 @@ public class YWakeUpMonitor extends YFunction
     public int set_wakeUpState(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("wakeUpState",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("wakeUpState",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -435,12 +463,16 @@ public class YWakeUpMonitor extends YFunction
      */
     public long get_rtcTime() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RTCTIME_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RTCTIME_INVALID;
+                }
             }
+            res = _rtcTime;
         }
-        return _rtcTime;
+        return res;
     }
 
     /**
@@ -477,10 +509,12 @@ public class YWakeUpMonitor extends YFunction
     public static YWakeUpMonitor FindWakeUpMonitor(String func)
     {
         YWakeUpMonitor obj;
-        obj = (YWakeUpMonitor) YFunction._FindFromCache("WakeUpMonitor", func);
-        if (obj == null) {
-            obj = new YWakeUpMonitor(func);
-            YFunction._AddToCache("WakeUpMonitor", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YWakeUpMonitor) YFunction._FindFromCache("WakeUpMonitor", func);
+            if (obj == null) {
+                obj = new YWakeUpMonitor(func);
+                YFunction._AddToCache("WakeUpMonitor", func, obj);
+            }
         }
         return obj;
     }
@@ -512,10 +546,12 @@ public class YWakeUpMonitor extends YFunction
     public static YWakeUpMonitor FindWakeUpMonitorInContext(YAPIContext yctx,String func)
     {
         YWakeUpMonitor obj;
-        obj = (YWakeUpMonitor) YFunction._FindFromCacheInContext(yctx, "WakeUpMonitor", func);
-        if (obj == null) {
-            obj = new YWakeUpMonitor(yctx, func);
-            YFunction._AddToCache("WakeUpMonitor", func, obj);
+        synchronized (yctx) {
+            obj = (YWakeUpMonitor) YFunction._FindFromCacheInContext(yctx, "WakeUpMonitor", func);
+            if (obj == null) {
+                obj = new YWakeUpMonitor(yctx, func);
+                YFunction._AddToCache("WakeUpMonitor", func, obj);
+            }
         }
         return obj;
     }

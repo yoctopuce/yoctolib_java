@@ -3,7 +3,7 @@ package com.yoctopuce.YoctoAPI;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class TCPNotificationHandler extends NotificationHandler
+class TCPNotificationHandler extends NotificationHandler
 {
     private volatile boolean _sendPingNotification = false;
     private volatile boolean _connected = false;

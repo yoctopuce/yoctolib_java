@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 26468 2017-01-24 17:01:29Z seb $
+ * $Id: YMessageBox.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -181,12 +181,16 @@ public class YMessageBox extends YFunction
      */
     public int get_slotsInUse() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SLOTSINUSE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SLOTSINUSE_INVALID;
+                }
             }
+            res = _slotsInUse;
         }
-        return _slotsInUse;
+        return res;
     }
 
     /**
@@ -210,12 +214,16 @@ public class YMessageBox extends YFunction
      */
     public int get_slotsCount() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SLOTSCOUNT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SLOTSCOUNT_INVALID;
+                }
             }
+            res = _slotsCount;
         }
-        return _slotsCount;
+        return res;
     }
 
     /**
@@ -235,12 +243,16 @@ public class YMessageBox extends YFunction
      */
     public String get_slotsBitmap() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SLOTSBITMAP_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SLOTSBITMAP_INVALID;
+                }
             }
+            res = _slotsBitmap;
         }
-        return _slotsBitmap;
+        return res;
     }
 
     /**
@@ -260,12 +272,16 @@ public class YMessageBox extends YFunction
      */
     public int get_pduSent() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PDUSENT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PDUSENT_INVALID;
+                }
             }
+            res = _pduSent;
         }
-        return _pduSent;
+        return res;
     }
 
     /**
@@ -292,8 +308,10 @@ public class YMessageBox extends YFunction
     public int set_pduSent(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("pduSent",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("pduSent",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -320,12 +338,16 @@ public class YMessageBox extends YFunction
      */
     public int get_pduReceived() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PDURECEIVED_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PDURECEIVED_INVALID;
+                }
             }
+            res = _pduReceived;
         }
-        return _pduReceived;
+        return res;
     }
 
     /**
@@ -352,8 +374,10 @@ public class YMessageBox extends YFunction
     public int set_pduReceived(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("pduReceived",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("pduReceived",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -376,12 +400,16 @@ public class YMessageBox extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -395,8 +423,10 @@ public class YMessageBox extends YFunction
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -431,10 +461,12 @@ public class YMessageBox extends YFunction
     public static YMessageBox FindMessageBox(String func)
     {
         YMessageBox obj;
-        obj = (YMessageBox) YFunction._FindFromCache("MessageBox", func);
-        if (obj == null) {
-            obj = new YMessageBox(func);
-            YFunction._AddToCache("MessageBox", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YMessageBox) YFunction._FindFromCache("MessageBox", func);
+            if (obj == null) {
+                obj = new YMessageBox(func);
+                YFunction._AddToCache("MessageBox", func, obj);
+            }
         }
         return obj;
     }
@@ -466,10 +498,12 @@ public class YMessageBox extends YFunction
     public static YMessageBox FindMessageBoxInContext(YAPIContext yctx,String func)
     {
         YMessageBox obj;
-        obj = (YMessageBox) YFunction._FindFromCacheInContext(yctx, "MessageBox", func);
-        if (obj == null) {
-            obj = new YMessageBox(yctx, func);
-            YFunction._AddToCache("MessageBox", func, obj);
+        synchronized (yctx) {
+            obj = (YMessageBox) YFunction._FindFromCacheInContext(yctx, "MessageBox", func);
+            if (obj == null) {
+                obj = new YMessageBox(yctx, func);
+                YFunction._AddToCache("MessageBox", func, obj);
+            }
         }
         return obj;
     }

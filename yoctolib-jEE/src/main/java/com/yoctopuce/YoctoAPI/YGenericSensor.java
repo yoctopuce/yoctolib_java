@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YGenericSensor.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The YGenericSensor class allows you to read and configure Yoctopuce signal
  * transducers. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * to register callback functions, to access the autonomous datalogger.
  * This class adds the ability to configure the automatic conversion between the
  * measured signal and the corresponding engineering unit.
  */
@@ -184,8 +184,10 @@ public class YGenericSensor extends YSensor
     public int set_unit(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("unit",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("unit",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -215,12 +217,16 @@ public class YGenericSensor extends YSensor
      */
     public double get_signalValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALVALUE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALVALUE_INVALID;
+                }
             }
+            res = (double)Math.round(_signalValue * 1000) / 1000;
         }
-        return (double)Math.round(_signalValue * 1000) / 1000;
+        return res;
     }
 
     /**
@@ -245,12 +251,16 @@ public class YGenericSensor extends YSensor
      */
     public String get_signalUnit() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALUNIT_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALUNIT_INVALID;
+                }
             }
+            res = _signalUnit;
         }
-        return _signalUnit;
+        return res;
     }
 
     /**
@@ -274,12 +284,16 @@ public class YGenericSensor extends YSensor
      */
     public String get_signalRange() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALRANGE_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALRANGE_INVALID;
+                }
             }
+            res = _signalRange;
         }
-        return _signalRange;
+        return res;
     }
 
     /**
@@ -295,7 +309,7 @@ public class YGenericSensor extends YSensor
     }
 
     /**
-     * Changes the electric signal range used by the sensor.
+     * Changes the electric signal range used by the sensor. Default value is "-999999.999...999999.999".
      *
      * @param newval : a string corresponding to the electric signal range used by the sensor
      *
@@ -306,13 +320,15 @@ public class YGenericSensor extends YSensor
     public int set_signalRange(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("signalRange",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("signalRange",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes the electric signal range used by the sensor.
+     * Changes the electric signal range used by the sensor. Default value is "-999999.999...999999.999".
      *
      * @param newval : a string corresponding to the electric signal range used by the sensor
      *
@@ -334,12 +350,16 @@ public class YGenericSensor extends YSensor
      */
     public String get_valueRange() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VALUERANGE_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VALUERANGE_INVALID;
+                }
             }
+            res = _valueRange;
         }
-        return _valueRange;
+        return res;
     }
 
     /**
@@ -356,7 +376,7 @@ public class YGenericSensor extends YSensor
 
     /**
      * Changes the physical value range measured by the sensor. As a side effect, the range modification may
-     * automatically modify the display resolution.
+     * automatically modify the display resolution. Default value is "-999999.999...999999.999".
      *
      * @param newval : a string corresponding to the physical value range measured by the sensor
      *
@@ -367,14 +387,16 @@ public class YGenericSensor extends YSensor
     public int set_valueRange(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("valueRange",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("valueRange",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
     /**
      * Changes the physical value range measured by the sensor. As a side effect, the range modification may
-     * automatically modify the display resolution.
+     * automatically modify the display resolution. Default value is "-999999.999...999999.999".
      *
      * @param newval : a string corresponding to the physical value range measured by the sensor
      *
@@ -401,8 +423,10 @@ public class YGenericSensor extends YSensor
     public int set_signalBias(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("signalBias",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("signalBias",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -433,12 +457,16 @@ public class YGenericSensor extends YSensor
      */
     public double get_signalBias() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALBIAS_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALBIAS_INVALID;
+                }
             }
+            res = _signalBias;
         }
-        return _signalBias;
+        return res;
     }
 
     /**
@@ -471,12 +499,16 @@ public class YGenericSensor extends YSensor
      */
     public int get_signalSampling() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALSAMPLING_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALSAMPLING_INVALID;
+                }
             }
+            res = _signalSampling;
         }
-        return _signalSampling;
+        return res;
     }
 
     /**
@@ -517,8 +549,10 @@ public class YGenericSensor extends YSensor
     public int set_signalSampling(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("signalSampling",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("signalSampling",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -569,10 +603,12 @@ public class YGenericSensor extends YSensor
     public static YGenericSensor FindGenericSensor(String func)
     {
         YGenericSensor obj;
-        obj = (YGenericSensor) YFunction._FindFromCache("GenericSensor", func);
-        if (obj == null) {
-            obj = new YGenericSensor(func);
-            YFunction._AddToCache("GenericSensor", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YGenericSensor) YFunction._FindFromCache("GenericSensor", func);
+            if (obj == null) {
+                obj = new YGenericSensor(func);
+                YFunction._AddToCache("GenericSensor", func, obj);
+            }
         }
         return obj;
     }
@@ -604,10 +640,12 @@ public class YGenericSensor extends YSensor
     public static YGenericSensor FindGenericSensorInContext(YAPIContext yctx,String func)
     {
         YGenericSensor obj;
-        obj = (YGenericSensor) YFunction._FindFromCacheInContext(yctx, "GenericSensor", func);
-        if (obj == null) {
-            obj = new YGenericSensor(yctx, func);
-            YFunction._AddToCache("GenericSensor", func, obj);
+        synchronized (yctx) {
+            obj = (YGenericSensor) YFunction._FindFromCacheInContext(yctx, "GenericSensor", func);
+            if (obj == null) {
+                obj = new YGenericSensor(yctx, func);
+                YFunction._AddToCache("GenericSensor", func, obj);
+            }
         }
         return obj;
     }

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 26468 2017-01-24 17:01:29Z seb $
+ * $Id: YGenericHub.java 26571 2017-02-07 17:16:17Z seb $
  *
  * Internal YGenericHub object
  *
@@ -324,7 +324,7 @@ abstract class YGenericHub
     void handleTimedNotification(String serial, String funcid, double deviceTime, ArrayList<Integer> report)
     {
         String hwid = serial + "." + funcid;
-        YSensor func = _yctx._GetTimedReportCallback(hwid);
+        YFunction func = _yctx._GetTimedReportCallback(hwid);
         if (func != null) {
             _yctx._PushDataEvent(new YAPIContext.DataEvent(func, deviceTime, report));
         }

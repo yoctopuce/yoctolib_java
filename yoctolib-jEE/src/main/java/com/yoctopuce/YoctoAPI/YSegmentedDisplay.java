@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSegmentedDisplay.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YSegmentedDisplay.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -142,12 +142,16 @@ public class YSegmentedDisplay extends YFunction
      */
     public String get_displayedText() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISPLAYEDTEXT_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISPLAYEDTEXT_INVALID;
+                }
             }
+            res = _displayedText;
         }
-        return _displayedText;
+        return res;
     }
 
     /**
@@ -174,8 +178,10 @@ public class YSegmentedDisplay extends YFunction
     public int set_displayedText(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("displayedText",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("displayedText",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -198,12 +204,16 @@ public class YSegmentedDisplay extends YFunction
      */
     public int get_displayMode() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISPLAYMODE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISPLAYMODE_INVALID;
+                }
             }
+            res = _displayMode;
         }
-        return _displayMode;
+        return res;
     }
 
     /**
@@ -217,8 +227,10 @@ public class YSegmentedDisplay extends YFunction
     public int set_displayMode(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("displayMode",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("displayMode",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -253,10 +265,12 @@ public class YSegmentedDisplay extends YFunction
     public static YSegmentedDisplay FindSegmentedDisplay(String func)
     {
         YSegmentedDisplay obj;
-        obj = (YSegmentedDisplay) YFunction._FindFromCache("SegmentedDisplay", func);
-        if (obj == null) {
-            obj = new YSegmentedDisplay(func);
-            YFunction._AddToCache("SegmentedDisplay", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YSegmentedDisplay) YFunction._FindFromCache("SegmentedDisplay", func);
+            if (obj == null) {
+                obj = new YSegmentedDisplay(func);
+                YFunction._AddToCache("SegmentedDisplay", func, obj);
+            }
         }
         return obj;
     }
@@ -288,10 +302,12 @@ public class YSegmentedDisplay extends YFunction
     public static YSegmentedDisplay FindSegmentedDisplayInContext(YAPIContext yctx,String func)
     {
         YSegmentedDisplay obj;
-        obj = (YSegmentedDisplay) YFunction._FindFromCacheInContext(yctx, "SegmentedDisplay", func);
-        if (obj == null) {
-            obj = new YSegmentedDisplay(yctx, func);
-            YFunction._AddToCache("SegmentedDisplay", func, obj);
+        synchronized (yctx) {
+            obj = (YSegmentedDisplay) YFunction._FindFromCacheInContext(yctx, "SegmentedDisplay", func);
+            if (obj == null) {
+                obj = new YSegmentedDisplay(yctx, func);
+                YFunction._AddToCache("SegmentedDisplay", func, obj);
+            }
         }
         return obj;
     }

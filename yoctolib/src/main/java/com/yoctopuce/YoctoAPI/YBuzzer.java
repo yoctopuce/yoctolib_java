@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBuzzer.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YBuzzer.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -176,8 +176,10 @@ public class YBuzzer extends YFunction
     public int set_frequency(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("frequency",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("frequency",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -204,12 +206,16 @@ public class YBuzzer extends YFunction
      */
     public double get_frequency() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FREQUENCY_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FREQUENCY_INVALID;
+                }
             }
+            res = _frequency;
         }
-        return _frequency;
+        return res;
     }
 
     /**
@@ -233,12 +239,16 @@ public class YBuzzer extends YFunction
      */
     public int get_volume() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLUME_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VOLUME_INVALID;
+                }
             }
+            res = _volume;
         }
-        return _volume;
+        return res;
     }
 
     /**
@@ -265,8 +275,10 @@ public class YBuzzer extends YFunction
     public int set_volume(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("volume",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("volume",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -293,12 +305,16 @@ public class YBuzzer extends YFunction
      */
     public int get_playSeqSize() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PLAYSEQSIZE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PLAYSEQSIZE_INVALID;
+                }
             }
+            res = _playSeqSize;
         }
-        return _playSeqSize;
+        return res;
     }
 
     /**
@@ -322,12 +338,16 @@ public class YBuzzer extends YFunction
      */
     public int get_playSeqMaxSize() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PLAYSEQMAXSIZE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PLAYSEQMAXSIZE_INVALID;
+                }
             }
+            res = _playSeqMaxSize;
         }
-        return _playSeqMaxSize;
+        return res;
     }
 
     /**
@@ -354,12 +374,16 @@ public class YBuzzer extends YFunction
      */
     public int get_playSeqSignature() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PLAYSEQSIGNATURE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PLAYSEQSIGNATURE_INVALID;
+                }
             }
+            res = _playSeqSignature;
         }
-        return _playSeqSignature;
+        return res;
     }
 
     /**
@@ -382,12 +406,16 @@ public class YBuzzer extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -401,8 +429,10 @@ public class YBuzzer extends YFunction
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -437,10 +467,12 @@ public class YBuzzer extends YFunction
     public static YBuzzer FindBuzzer(String func)
     {
         YBuzzer obj;
-        obj = (YBuzzer) YFunction._FindFromCache("Buzzer", func);
-        if (obj == null) {
-            obj = new YBuzzer(func);
-            YFunction._AddToCache("Buzzer", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YBuzzer) YFunction._FindFromCache("Buzzer", func);
+            if (obj == null) {
+                obj = new YBuzzer(func);
+                YFunction._AddToCache("Buzzer", func, obj);
+            }
         }
         return obj;
     }
@@ -472,10 +504,12 @@ public class YBuzzer extends YFunction
     public static YBuzzer FindBuzzerInContext(YAPIContext yctx,String func)
     {
         YBuzzer obj;
-        obj = (YBuzzer) YFunction._FindFromCacheInContext(yctx, "Buzzer", func);
-        if (obj == null) {
-            obj = new YBuzzer(yctx, func);
-            YFunction._AddToCache("Buzzer", func, obj);
+        synchronized (yctx) {
+            obj = (YBuzzer) YFunction._FindFromCacheInContext(yctx, "Buzzer", func);
+            if (obj == null) {
+                obj = new YBuzzer(yctx, func);
+                YFunction._AddToCache("Buzzer", func, obj);
+            }
         }
         return obj;
     }

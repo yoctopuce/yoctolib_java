@@ -348,7 +348,7 @@ public class YAPIContext
     private final YSSDP _ssdp;
     final YHash _yHash;
     private final ArrayList<YFunction> _ValueCallbackList = new ArrayList<>();
-    private final ArrayList<YSensor> _TimedReportCallbackList = new ArrayList<>();
+    private final ArrayList<YFunction> _TimedReportCallbackList = new ArrayList<>();
     private int _pktAckDelay = 0;
 
 
@@ -548,7 +548,7 @@ public class YAPIContext
             func.isOnline();
             synchronized (_TimedReportCallbackList) {
                 if (!_TimedReportCallbackList.contains(func)) {
-                    _TimedReportCallbackList.add((YSensor) func);
+                    _TimedReportCallbackList.add(func);
                 }
             }
         } else {
@@ -558,10 +558,10 @@ public class YAPIContext
         }
     }
 
-    YSensor _GetTimedReportCallback(String hwid)
+    YFunction _GetTimedReportCallback(String hwid)
     {
         synchronized (_TimedReportCallbackList) {
-            for (YSensor func : _TimedReportCallbackList) {
+            for (YFunction func : _TimedReportCallbackList) {
                 try {
                     if (func.getHardwareId().equals(hwid)) {
                         return func;

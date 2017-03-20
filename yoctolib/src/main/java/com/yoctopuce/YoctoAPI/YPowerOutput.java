@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPowerOutput.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YPowerOutput.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -137,12 +137,16 @@ public class YPowerOutput extends YFunction
      */
     public int get_voltage() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return VOLTAGE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return VOLTAGE_INVALID;
+                }
             }
+            res = _voltage;
         }
-        return _voltage;
+        return res;
     }
 
     /**
@@ -176,8 +180,10 @@ public class YPowerOutput extends YFunction
     public int set_voltage(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("voltage",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("voltage",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -225,10 +231,12 @@ public class YPowerOutput extends YFunction
     public static YPowerOutput FindPowerOutput(String func)
     {
         YPowerOutput obj;
-        obj = (YPowerOutput) YFunction._FindFromCache("PowerOutput", func);
-        if (obj == null) {
-            obj = new YPowerOutput(func);
-            YFunction._AddToCache("PowerOutput", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YPowerOutput) YFunction._FindFromCache("PowerOutput", func);
+            if (obj == null) {
+                obj = new YPowerOutput(func);
+                YFunction._AddToCache("PowerOutput", func, obj);
+            }
         }
         return obj;
     }
@@ -260,10 +268,12 @@ public class YPowerOutput extends YFunction
     public static YPowerOutput FindPowerOutputInContext(YAPIContext yctx,String func)
     {
         YPowerOutput obj;
-        obj = (YPowerOutput) YFunction._FindFromCacheInContext(yctx, "PowerOutput", func);
-        if (obj == null) {
-            obj = new YPowerOutput(yctx, func);
-            YFunction._AddToCache("PowerOutput", func, obj);
+        synchronized (yctx) {
+            obj = (YPowerOutput) YFunction._FindFromCacheInContext(yctx, "PowerOutput", func);
+            if (obj == null) {
+                obj = new YPowerOutput(yctx, func);
+                YFunction._AddToCache("PowerOutput", func, obj);
+            }
         }
         return obj;
     }

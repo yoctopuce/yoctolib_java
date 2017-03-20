@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDigitalIO.java 25871 2016-11-15 14:32:56Z seb $
+ * $Id: YDigitalIO.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -185,12 +185,16 @@ public class YDigitalIO extends YFunction
      */
     public int get_portState() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTSTATE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTSTATE_INVALID;
+                }
             }
+            res = _portState;
         }
-        return _portState;
+        return res;
     }
 
     /**
@@ -218,8 +222,10 @@ public class YDigitalIO extends YFunction
     public int set_portState(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("portState",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("portState",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -248,12 +254,16 @@ public class YDigitalIO extends YFunction
      */
     public int get_portDirection() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTDIRECTION_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTDIRECTION_INVALID;
+                }
             }
+            res = _portDirection;
         }
-        return _portDirection;
+        return res;
     }
 
     /**
@@ -283,8 +293,10 @@ public class YDigitalIO extends YFunction
     public int set_portDirection(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("portDirection",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("portDirection",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -315,12 +327,16 @@ public class YDigitalIO extends YFunction
      */
     public int get_portOpenDrain() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTOPENDRAIN_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTOPENDRAIN_INVALID;
+                }
             }
+            res = _portOpenDrain;
         }
-        return _portOpenDrain;
+        return res;
     }
 
     /**
@@ -351,8 +367,10 @@ public class YDigitalIO extends YFunction
     public int set_portOpenDrain(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("portOpenDrain",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("portOpenDrain",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -382,12 +400,16 @@ public class YDigitalIO extends YFunction
      */
     public int get_portPolarity() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTPOLARITY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTPOLARITY_INVALID;
+                }
             }
+            res = _portPolarity;
         }
-        return _portPolarity;
+        return res;
     }
 
     /**
@@ -419,8 +441,10 @@ public class YDigitalIO extends YFunction
     public int set_portPolarity(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("portPolarity",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("portPolarity",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -451,12 +475,16 @@ public class YDigitalIO extends YFunction
      */
     public int get_portSize() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PORTSIZE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTSIZE_INVALID;
+                }
             }
+            res = _portSize;
         }
-        return _portSize;
+        return res;
     }
 
     /**
@@ -481,12 +509,16 @@ public class YDigitalIO extends YFunction
      */
     public int get_outputVoltage() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return OUTPUTVOLTAGE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return OUTPUTVOLTAGE_INVALID;
+                }
             }
+            res = _outputVoltage;
         }
-        return _outputVoltage;
+        return res;
     }
 
     /**
@@ -516,8 +548,10 @@ public class YDigitalIO extends YFunction
     public int set_outputVoltage(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("outputVoltage",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("outputVoltage",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -542,12 +576,16 @@ public class YDigitalIO extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -561,8 +599,10 @@ public class YDigitalIO extends YFunction
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -597,10 +637,12 @@ public class YDigitalIO extends YFunction
     public static YDigitalIO FindDigitalIO(String func)
     {
         YDigitalIO obj;
-        obj = (YDigitalIO) YFunction._FindFromCache("DigitalIO", func);
-        if (obj == null) {
-            obj = new YDigitalIO(func);
-            YFunction._AddToCache("DigitalIO", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YDigitalIO) YFunction._FindFromCache("DigitalIO", func);
+            if (obj == null) {
+                obj = new YDigitalIO(func);
+                YFunction._AddToCache("DigitalIO", func, obj);
+            }
         }
         return obj;
     }
@@ -632,10 +674,12 @@ public class YDigitalIO extends YFunction
     public static YDigitalIO FindDigitalIOInContext(YAPIContext yctx,String func)
     {
         YDigitalIO obj;
-        obj = (YDigitalIO) YFunction._FindFromCacheInContext(yctx, "DigitalIO", func);
-        if (obj == null) {
-            obj = new YDigitalIO(yctx, func);
-            YFunction._AddToCache("DigitalIO", func, obj);
+        synchronized (yctx) {
+            obj = (YDigitalIO) YFunction._FindFromCacheInContext(yctx, "DigitalIO", func);
+            if (obj == null) {
+                obj = new YDigitalIO(yctx, func);
+                YFunction._AddToCache("DigitalIO", func, obj);
+            }
         }
         return obj;
     }

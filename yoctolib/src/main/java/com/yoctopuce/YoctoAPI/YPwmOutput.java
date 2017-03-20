@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmOutput.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YPwmOutput.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -191,12 +191,16 @@ public class YPwmOutput extends YFunction
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = _enabled;
         }
-        return _enabled;
+        return res;
     }
 
     /**
@@ -223,8 +227,10 @@ public class YPwmOutput extends YFunction
     public int set_enabled(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("enabled",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("enabled",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -255,8 +261,10 @@ public class YPwmOutput extends YFunction
     public int set_frequency(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("frequency",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("frequency",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -284,12 +292,16 @@ public class YPwmOutput extends YFunction
      */
     public double get_frequency() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return FREQUENCY_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FREQUENCY_INVALID;
+                }
             }
+            res = _frequency;
         }
-        return _frequency;
+        return res;
     }
 
     /**
@@ -316,8 +328,10 @@ public class YPwmOutput extends YFunction
     public int set_period(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("period",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("period",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -344,12 +358,16 @@ public class YPwmOutput extends YFunction
      */
     public double get_period() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PERIOD_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PERIOD_INVALID;
+                }
             }
+            res = _period;
         }
-        return _period;
+        return res;
     }
 
     /**
@@ -376,8 +394,10 @@ public class YPwmOutput extends YFunction
     public int set_dutyCycle(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("dutyCycle",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("dutyCycle",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -404,12 +424,16 @@ public class YPwmOutput extends YFunction
      */
     public double get_dutyCycle() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DUTYCYCLE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DUTYCYCLE_INVALID;
+                }
             }
+            res = _dutyCycle;
         }
-        return _dutyCycle;
+        return res;
     }
 
     /**
@@ -437,8 +461,10 @@ public class YPwmOutput extends YFunction
     public int set_pulseDuration(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("pulseDuration",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("pulseDuration",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -467,12 +493,16 @@ public class YPwmOutput extends YFunction
      */
     public double get_pulseDuration() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSEDURATION_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSEDURATION_INVALID;
+                }
             }
+            res = _pulseDuration;
         }
-        return _pulseDuration;
+        return res;
     }
 
     /**
@@ -493,12 +523,16 @@ public class YPwmOutput extends YFunction
      */
     public String get_pwmTransition() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PWMTRANSITION_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PWMTRANSITION_INVALID;
+                }
             }
+            res = _pwmTransition;
         }
-        return _pwmTransition;
+        return res;
     }
 
     /**
@@ -512,8 +546,10 @@ public class YPwmOutput extends YFunction
     public int set_pwmTransition(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("pwmTransition",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("pwmTransition",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -532,12 +568,16 @@ public class YPwmOutput extends YFunction
      */
     public int get_enabledAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLEDATPOWERON_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLEDATPOWERON_INVALID;
+                }
             }
+            res = _enabledAtPowerOn;
         }
-        return _enabledAtPowerOn;
+        return res;
     }
 
     /**
@@ -567,8 +607,10 @@ public class YPwmOutput extends YFunction
     public int set_enabledAtPowerOn(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("enabledAtPowerOn",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("enabledAtPowerOn",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -601,8 +643,10 @@ public class YPwmOutput extends YFunction
     public int set_dutyCycleAtPowerOn(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("dutyCycleAtPowerOn",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("dutyCycleAtPowerOn",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -631,12 +675,16 @@ public class YPwmOutput extends YFunction
      */
     public double get_dutyCycleAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DUTYCYCLEATPOWERON_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DUTYCYCLEATPOWERON_INVALID;
+                }
             }
+            res = _dutyCycleAtPowerOn;
         }
-        return _dutyCycleAtPowerOn;
+        return res;
     }
 
     /**
@@ -678,10 +726,12 @@ public class YPwmOutput extends YFunction
     public static YPwmOutput FindPwmOutput(String func)
     {
         YPwmOutput obj;
-        obj = (YPwmOutput) YFunction._FindFromCache("PwmOutput", func);
-        if (obj == null) {
-            obj = new YPwmOutput(func);
-            YFunction._AddToCache("PwmOutput", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YPwmOutput) YFunction._FindFromCache("PwmOutput", func);
+            if (obj == null) {
+                obj = new YPwmOutput(func);
+                YFunction._AddToCache("PwmOutput", func, obj);
+            }
         }
         return obj;
     }
@@ -713,10 +763,12 @@ public class YPwmOutput extends YFunction
     public static YPwmOutput FindPwmOutputInContext(YAPIContext yctx,String func)
     {
         YPwmOutput obj;
-        obj = (YPwmOutput) YFunction._FindFromCacheInContext(yctx, "PwmOutput", func);
-        if (obj == null) {
-            obj = new YPwmOutput(yctx, func);
-            YFunction._AddToCache("PwmOutput", func, obj);
+        synchronized (yctx) {
+            obj = (YPwmOutput) YFunction._FindFromCacheInContext(yctx, "PwmOutput", func);
+            if (obj == null) {
+                obj = new YPwmOutput(yctx, func);
+                YFunction._AddToCache("PwmOutput", func, obj);
+            }
         }
         return obj;
     }

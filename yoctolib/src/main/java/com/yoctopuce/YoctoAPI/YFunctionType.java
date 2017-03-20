@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunctionType.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YFunctionType.java 26571 2017-02-07 17:16:17Z seb $
  *
  * Internal YFunctionType object
  *
@@ -37,6 +37,7 @@
 
 package com.yoctopuce.YoctoAPI;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 
@@ -183,9 +184,9 @@ class YFunctionType
                 return hwid;
             }
             // not found neither, may be funcid is a function logicalname
-            int nfun = dev.functionCount();
-            for (int i = 0; i < nfun; i++) {
-                YPEntry yp = dev.getYPEntry(i);
+
+            Collection<YPEntry> functions = dev.getFunctions();
+            for (YPEntry yp : functions) {
                 if (yp.getLogicalName().equals(hwid.getFunction()) && _ypEntries.containsValue(yp)) {
                     return new HWID(serial, yp.getFuncId());
                 }

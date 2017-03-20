@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPressure.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YPressure.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindPressure(), the high-level API for Pressure functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce class YPressure allows you to read and configure Yoctopuce pressure
  * sensors. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * to register callback functions, to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPressure extends YSensor
@@ -142,10 +142,12 @@ public class YPressure extends YSensor
     public static YPressure FindPressure(String func)
     {
         YPressure obj;
-        obj = (YPressure) YFunction._FindFromCache("Pressure", func);
-        if (obj == null) {
-            obj = new YPressure(func);
-            YFunction._AddToCache("Pressure", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YPressure) YFunction._FindFromCache("Pressure", func);
+            if (obj == null) {
+                obj = new YPressure(func);
+                YFunction._AddToCache("Pressure", func, obj);
+            }
         }
         return obj;
     }
@@ -177,10 +179,12 @@ public class YPressure extends YSensor
     public static YPressure FindPressureInContext(YAPIContext yctx,String func)
     {
         YPressure obj;
-        obj = (YPressure) YFunction._FindFromCacheInContext(yctx, "Pressure", func);
-        if (obj == null) {
-            obj = new YPressure(yctx, func);
-            YFunction._AddToCache("Pressure", func, obj);
+        synchronized (yctx) {
+            obj = (YPressure) YFunction._FindFromCacheInContext(yctx, "Pressure", func);
+            if (obj == null) {
+                obj = new YPressure(yctx, func);
+                YFunction._AddToCache("Pressure", func, obj);
+            }
         }
         return obj;
     }

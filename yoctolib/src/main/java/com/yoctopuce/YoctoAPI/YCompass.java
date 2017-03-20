@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCompass.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YCompass.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindCompass(), the high-level API for Compass functions
  *
@@ -158,12 +158,16 @@ public class YCompass extends YSensor
      */
     public int get_bandwidth() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BANDWIDTH_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BANDWIDTH_INVALID;
+                }
             }
+            res = _bandwidth;
         }
-        return _bandwidth;
+        return res;
     }
 
     /**
@@ -191,8 +195,10 @@ public class YCompass extends YSensor
     public int set_bandwidth(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("bandwidth",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("bandwidth",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -216,12 +222,16 @@ public class YCompass extends YSensor
      */
     public int get_axis() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return AXIS_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return AXIS_INVALID;
+                }
             }
+            res = _axis;
         }
-        return _axis;
+        return res;
     }
 
     /**
@@ -241,12 +251,16 @@ public class YCompass extends YSensor
      */
     public double get_magneticHeading() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MAGNETICHEADING_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MAGNETICHEADING_INVALID;
+                }
             }
+            res = _magneticHeading;
         }
-        return _magneticHeading;
+        return res;
     }
 
     /**
@@ -287,10 +301,12 @@ public class YCompass extends YSensor
     public static YCompass FindCompass(String func)
     {
         YCompass obj;
-        obj = (YCompass) YFunction._FindFromCache("Compass", func);
-        if (obj == null) {
-            obj = new YCompass(func);
-            YFunction._AddToCache("Compass", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YCompass) YFunction._FindFromCache("Compass", func);
+            if (obj == null) {
+                obj = new YCompass(func);
+                YFunction._AddToCache("Compass", func, obj);
+            }
         }
         return obj;
     }
@@ -322,10 +338,12 @@ public class YCompass extends YSensor
     public static YCompass FindCompassInContext(YAPIContext yctx,String func)
     {
         YCompass obj;
-        obj = (YCompass) YFunction._FindFromCacheInContext(yctx, "Compass", func);
-        if (obj == null) {
-            obj = new YCompass(yctx, func);
-            YFunction._AddToCache("Compass", func, obj);
+        synchronized (yctx) {
+            obj = (YCompass) YFunction._FindFromCacheInContext(yctx, "Compass", func);
+            if (obj == null) {
+                obj = new YCompass(yctx, func);
+                YFunction._AddToCache("Compass", func, obj);
+            }
         }
         return obj;
     }

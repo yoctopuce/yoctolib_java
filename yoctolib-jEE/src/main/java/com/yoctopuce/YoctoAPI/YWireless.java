@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YWireless.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -175,12 +175,16 @@ public class YWireless extends YFunction
      */
     public int get_linkQuality() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LINKQUALITY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LINKQUALITY_INVALID;
+                }
             }
+            res = _linkQuality;
         }
-        return _linkQuality;
+        return res;
     }
 
     /**
@@ -204,12 +208,16 @@ public class YWireless extends YFunction
      */
     public String get_ssid() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SSID_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SSID_INVALID;
+                }
             }
+            res = _ssid;
         }
-        return _ssid;
+        return res;
     }
 
     /**
@@ -234,12 +242,16 @@ public class YWireless extends YFunction
      */
     public int get_channel() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CHANNEL_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CHANNEL_INVALID;
+                }
             }
+            res = _channel;
         }
-        return _channel;
+        return res;
     }
 
     /**
@@ -266,12 +278,16 @@ public class YWireless extends YFunction
      */
     public int get_security() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SECURITY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SECURITY_INVALID;
+                }
             }
+            res = _security;
         }
-        return _security;
+        return res;
     }
 
     /**
@@ -296,12 +312,16 @@ public class YWireless extends YFunction
      */
     public String get_message() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MESSAGE_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MESSAGE_INVALID;
+                }
             }
+            res = _message;
         }
-        return _message;
+        return res;
     }
 
     /**
@@ -321,12 +341,16 @@ public class YWireless extends YFunction
      */
     public String get_wlanConfig() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return WLANCONFIG_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return WLANCONFIG_INVALID;
+                }
             }
+            res = _wlanConfig;
         }
-        return _wlanConfig;
+        return res;
     }
 
     /**
@@ -340,8 +364,10 @@ public class YWireless extends YFunction
     public int set_wlanConfig(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("wlanConfig",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("wlanConfig",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -376,10 +402,12 @@ public class YWireless extends YFunction
     public static YWireless FindWireless(String func)
     {
         YWireless obj;
-        obj = (YWireless) YFunction._FindFromCache("Wireless", func);
-        if (obj == null) {
-            obj = new YWireless(func);
-            YFunction._AddToCache("Wireless", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YWireless) YFunction._FindFromCache("Wireless", func);
+            if (obj == null) {
+                obj = new YWireless(func);
+                YFunction._AddToCache("Wireless", func, obj);
+            }
         }
         return obj;
     }
@@ -411,10 +439,12 @@ public class YWireless extends YFunction
     public static YWireless FindWirelessInContext(YAPIContext yctx,String func)
     {
         YWireless obj;
-        obj = (YWireless) YFunction._FindFromCacheInContext(yctx, "Wireless", func);
-        if (obj == null) {
-            obj = new YWireless(yctx, func);
-            YFunction._AddToCache("Wireless", func, obj);
+        synchronized (yctx) {
+            obj = (YWireless) YFunction._FindFromCacheInContext(yctx, "Wireless", func);
+            if (obj == null) {
+                obj = new YWireless(yctx, func);
+                YFunction._AddToCache("Wireless", func, obj);
+            }
         }
         return obj;
     }

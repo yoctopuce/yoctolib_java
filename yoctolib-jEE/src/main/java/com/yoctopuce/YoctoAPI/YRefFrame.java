@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YRefFrame.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -233,12 +233,16 @@ public class YRefFrame extends YFunction
      */
     public int get_mountPos() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MOUNTPOS_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MOUNTPOS_INVALID;
+                }
             }
+            res = _mountPos;
         }
-        return _mountPos;
+        return res;
     }
 
     /**
@@ -252,8 +256,10 @@ public class YRefFrame extends YFunction
     public int set_mountPos(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("mountPos",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("mountPos",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -287,8 +293,10 @@ public class YRefFrame extends YFunction
     public int set_bearing(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("bearing",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("bearing",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -330,12 +338,16 @@ public class YRefFrame extends YFunction
      */
     public double get_bearing() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BEARING_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BEARING_INVALID;
+                }
             }
+            res = _bearing;
         }
-        return _bearing;
+        return res;
     }
 
     /**
@@ -357,12 +369,16 @@ public class YRefFrame extends YFunction
      */
     public String get_calibrationParam() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALIBRATIONPARAM_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALIBRATIONPARAM_INVALID;
+                }
             }
+            res = _calibrationParam;
         }
-        return _calibrationParam;
+        return res;
     }
 
     /**
@@ -376,8 +392,10 @@ public class YRefFrame extends YFunction
     public int set_calibrationParam(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("calibrationParam",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("calibrationParam",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -412,10 +430,12 @@ public class YRefFrame extends YFunction
     public static YRefFrame FindRefFrame(String func)
     {
         YRefFrame obj;
-        obj = (YRefFrame) YFunction._FindFromCache("RefFrame", func);
-        if (obj == null) {
-            obj = new YRefFrame(func);
-            YFunction._AddToCache("RefFrame", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YRefFrame) YFunction._FindFromCache("RefFrame", func);
+            if (obj == null) {
+                obj = new YRefFrame(func);
+                YFunction._AddToCache("RefFrame", func, obj);
+            }
         }
         return obj;
     }
@@ -447,10 +467,12 @@ public class YRefFrame extends YFunction
     public static YRefFrame FindRefFrameInContext(YAPIContext yctx,String func)
     {
         YRefFrame obj;
-        obj = (YRefFrame) YFunction._FindFromCacheInContext(yctx, "RefFrame", func);
-        if (obj == null) {
-            obj = new YRefFrame(yctx, func);
-            YFunction._AddToCache("RefFrame", func, obj);
+        synchronized (yctx) {
+            obj = (YRefFrame) YFunction._FindFromCacheInContext(yctx, "RefFrame", func);
+            if (obj == null) {
+                obj = new YRefFrame(yctx, func);
+                YFunction._AddToCache("RefFrame", func, obj);
+            }
         }
         return obj;
     }

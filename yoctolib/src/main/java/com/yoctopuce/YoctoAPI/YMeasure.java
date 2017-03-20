@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMeasure.java 26468 2017-01-24 17:01:29Z seb $
+ * $Id: YMeasure.java 26571 2017-02-07 17:16:17Z seb $
  *
  * Implements yFindMeasure(), the high-level API for Measure functions
  *
@@ -41,7 +41,6 @@ package com.yoctopuce.YoctoAPI;
 
 
 import java.util.Date;
-import java.util.Locale;
 
 //--- (generated code: YMeasure class start)
 /**
@@ -78,12 +77,6 @@ public class YMeasure
 
     public Date get_startTimeUTC_asDate() {
         return new Date((long) (_start * 1000 + 0.5));
-    }
-    public Date get_startTimeUTC_asDate2() {
-        return new Date((long) (_start * 1000 + 0.5));
-    }
-    public String debug() {
-        return String.format(Locale.US,"%.2f",_start);
     }
 
     public Date get_endTimeUTC_asDate() {

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YDisplay.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -220,12 +220,16 @@ public class YDisplay extends YFunction
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = _enabled;
         }
-        return _enabled;
+        return res;
     }
 
     /**
@@ -253,8 +257,10 @@ public class YDisplay extends YFunction
     public int set_enabled(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("enabled",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("enabled",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -281,12 +287,16 @@ public class YDisplay extends YFunction
      */
     public String get_startupSeq() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return STARTUPSEQ_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return STARTUPSEQ_INVALID;
+                }
             }
+            res = _startupSeq;
         }
-        return _startupSeq;
+        return res;
     }
 
     /**
@@ -315,8 +325,10 @@ public class YDisplay extends YFunction
     public int set_startupSeq(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("startupSeq",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("startupSeq",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -345,12 +357,16 @@ public class YDisplay extends YFunction
      */
     public int get_brightness() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BRIGHTNESS_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BRIGHTNESS_INVALID;
+                }
             }
+            res = _brightness;
         }
-        return _brightness;
+        return res;
     }
 
     /**
@@ -379,8 +395,10 @@ public class YDisplay extends YFunction
     public int set_brightness(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("brightness",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("brightness",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -411,12 +429,16 @@ public class YDisplay extends YFunction
      */
     public int get_orientation() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ORIENTATION_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ORIENTATION_INVALID;
+                }
             }
+            res = _orientation;
         }
-        return _orientation;
+        return res;
     }
 
     /**
@@ -446,8 +468,10 @@ public class YDisplay extends YFunction
     public int set_orientation(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("orientation",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("orientation",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -476,12 +500,16 @@ public class YDisplay extends YFunction
      */
     public int get_displayWidth() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISPLAYWIDTH_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISPLAYWIDTH_INVALID;
+                }
             }
+            res = _displayWidth;
         }
-        return _displayWidth;
+        return res;
     }
 
     /**
@@ -505,12 +533,16 @@ public class YDisplay extends YFunction
      */
     public int get_displayHeight() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISPLAYHEIGHT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISPLAYHEIGHT_INVALID;
+                }
             }
+            res = _displayHeight;
         }
-        return _displayHeight;
+        return res;
     }
 
     /**
@@ -535,12 +567,16 @@ public class YDisplay extends YFunction
      */
     public int get_displayType() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DISPLAYTYPE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISPLAYTYPE_INVALID;
+                }
             }
+            res = _displayType;
         }
-        return _displayType;
+        return res;
     }
 
     /**
@@ -565,12 +601,16 @@ public class YDisplay extends YFunction
      */
     public int get_layerWidth() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LAYERWIDTH_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LAYERWIDTH_INVALID;
+                }
             }
+            res = _layerWidth;
         }
-        return _layerWidth;
+        return res;
     }
 
     /**
@@ -594,12 +634,16 @@ public class YDisplay extends YFunction
      */
     public int get_layerHeight() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LAYERHEIGHT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LAYERHEIGHT_INVALID;
+                }
             }
+            res = _layerHeight;
         }
-        return _layerHeight;
+        return res;
     }
 
     /**
@@ -623,12 +667,16 @@ public class YDisplay extends YFunction
      */
     public int get_layerCount() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LAYERCOUNT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LAYERCOUNT_INVALID;
+                }
             }
+            res = _layerCount;
         }
-        return _layerCount;
+        return res;
     }
 
     /**
@@ -648,12 +696,16 @@ public class YDisplay extends YFunction
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -667,8 +719,10 @@ public class YDisplay extends YFunction
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -703,10 +757,12 @@ public class YDisplay extends YFunction
     public static YDisplay FindDisplay(String func)
     {
         YDisplay obj;
-        obj = (YDisplay) YFunction._FindFromCache("Display", func);
-        if (obj == null) {
-            obj = new YDisplay(func);
-            YFunction._AddToCache("Display", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YDisplay) YFunction._FindFromCache("Display", func);
+            if (obj == null) {
+                obj = new YDisplay(func);
+                YFunction._AddToCache("Display", func, obj);
+            }
         }
         return obj;
     }
@@ -738,10 +794,12 @@ public class YDisplay extends YFunction
     public static YDisplay FindDisplayInContext(YAPIContext yctx,String func)
     {
         YDisplay obj;
-        obj = (YDisplay) YFunction._FindFromCacheInContext(yctx, "Display", func);
-        if (obj == null) {
-            obj = new YDisplay(yctx, func);
-            YFunction._AddToCache("Display", func, obj);
+        synchronized (yctx) {
+            obj = (YDisplay) YFunction._FindFromCacheInContext(yctx, "Display", func);
+            if (obj == null) {
+                obj = new YDisplay(yctx, func);
+                YFunction._AddToCache("Display", func, obj);
+            }
         }
         return obj;
     }

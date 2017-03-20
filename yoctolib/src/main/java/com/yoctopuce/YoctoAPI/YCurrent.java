@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrent.java 26183 2016-12-15 00:14:02Z mvuilleu $
+ * $Id: YCurrent.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindCurrent(), the high-level API for Current functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce class YCurrent allows you to read and configure Yoctopuce current
  * sensors. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * to register callback functions, to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YCurrent extends YSensor
@@ -131,12 +131,16 @@ public class YCurrent extends YSensor
      */
     public int get_enabled() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ENABLED_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
             }
+            res = _enabled;
         }
-        return _enabled;
+        return res;
     }
 
     /**
@@ -150,8 +154,10 @@ public class YCurrent extends YSensor
     public int set_enabled(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("enabled",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("enabled",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -186,10 +192,12 @@ public class YCurrent extends YSensor
     public static YCurrent FindCurrent(String func)
     {
         YCurrent obj;
-        obj = (YCurrent) YFunction._FindFromCache("Current", func);
-        if (obj == null) {
-            obj = new YCurrent(func);
-            YFunction._AddToCache("Current", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YCurrent) YFunction._FindFromCache("Current", func);
+            if (obj == null) {
+                obj = new YCurrent(func);
+                YFunction._AddToCache("Current", func, obj);
+            }
         }
         return obj;
     }
@@ -221,10 +229,12 @@ public class YCurrent extends YSensor
     public static YCurrent FindCurrentInContext(YAPIContext yctx,String func)
     {
         YCurrent obj;
-        obj = (YCurrent) YFunction._FindFromCacheInContext(yctx, "Current", func);
-        if (obj == null) {
-            obj = new YCurrent(yctx, func);
-            YFunction._AddToCache("Current", func, obj);
+        synchronized (yctx) {
+            obj = (YCurrent) YFunction._FindFromCacheInContext(yctx, "Current", func);
+            if (obj == null) {
+                obj = new YCurrent(yctx, func);
+                YFunction._AddToCache("Current", func, obj);
+            }
         }
         return obj;
     }

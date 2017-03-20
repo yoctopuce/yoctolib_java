@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YTemperature.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -50,8 +50,8 @@ import java.util.Locale;
  * YTemperature Class: Temperature function interface
  *
  * The Yoctopuce class YTemperature allows you to read and configure Yoctopuce temperature
- * sensors. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * sensors. It inherits from YSensor class the core functions to read measurements, to
+ * register callback functions, to access the autonomous datalogger.
  * This class adds the ability to configure some specific parameters for some
  * sensors (connection type, temperature mapping table).
  */
@@ -186,8 +186,10 @@ public class YTemperature extends YSensor
     public int set_unit(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("unit",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("unit",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -228,12 +230,16 @@ public class YTemperature extends YSensor
      */
     public int get_sensorType() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SENSORTYPE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SENSORTYPE_INVALID;
+                }
             }
+            res = _sensorType;
         }
-        return _sensorType;
+        return res;
     }
 
     /**
@@ -273,8 +279,10 @@ public class YTemperature extends YSensor
     public int set_sensorType(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("sensorType",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("sensorType",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -309,12 +317,16 @@ public class YTemperature extends YSensor
      */
     public double get_signalValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALVALUE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALVALUE_INVALID;
+                }
             }
+            res = (double)Math.round(_signalValue * 1000) / 1000;
         }
-        return (double)Math.round(_signalValue * 1000) / 1000;
+        return res;
     }
 
     /**
@@ -339,12 +351,16 @@ public class YTemperature extends YSensor
      */
     public String get_signalUnit() throws YAPI_Exception
     {
-        if (_cacheExpiration == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SIGNALUNIT_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SIGNALUNIT_INVALID;
+                }
             }
+            res = _signalUnit;
         }
-        return _signalUnit;
+        return res;
     }
 
     /**
@@ -364,12 +380,16 @@ public class YTemperature extends YSensor
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -383,8 +403,10 @@ public class YTemperature extends YSensor
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -419,10 +441,12 @@ public class YTemperature extends YSensor
     public static YTemperature FindTemperature(String func)
     {
         YTemperature obj;
-        obj = (YTemperature) YFunction._FindFromCache("Temperature", func);
-        if (obj == null) {
-            obj = new YTemperature(func);
-            YFunction._AddToCache("Temperature", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YTemperature) YFunction._FindFromCache("Temperature", func);
+            if (obj == null) {
+                obj = new YTemperature(func);
+                YFunction._AddToCache("Temperature", func, obj);
+            }
         }
         return obj;
     }
@@ -454,10 +478,12 @@ public class YTemperature extends YSensor
     public static YTemperature FindTemperatureInContext(YAPIContext yctx,String func)
     {
         YTemperature obj;
-        obj = (YTemperature) YFunction._FindFromCacheInContext(yctx, "Temperature", func);
-        if (obj == null) {
-            obj = new YTemperature(yctx, func);
-            YFunction._AddToCache("Temperature", func, obj);
+        synchronized (yctx) {
+            obj = (YTemperature) YFunction._FindFromCacheInContext(yctx, "Temperature", func);
+            if (obj == null) {
+                obj = new YTemperature(yctx, func);
+                YFunction._AddToCache("Temperature", func, obj);
+            }
         }
         return obj;
     }
@@ -539,7 +565,7 @@ public class YTemperature extends YSensor
     }
 
     /**
-     * Configure NTC thermistor parameters in order to properly compute the temperature from
+     * Configures NTC thermistor parameters in order to properly compute the temperature from
      * the measured resistance. For increased precision, you can enter a complete mapping
      * table using set_thermistorResponseTable. This function can only be used with a
      * temperature sensor based on thermistors.

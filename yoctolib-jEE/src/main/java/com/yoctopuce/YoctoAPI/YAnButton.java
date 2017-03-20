@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAnButton.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YAnButton.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindAnButton(), the high-level API for AnButton functions
  *
@@ -219,12 +219,16 @@ public class YAnButton extends YFunction
      */
     public int get_calibratedValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALIBRATEDVALUE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALIBRATEDVALUE_INVALID;
+                }
             }
+            res = _calibratedValue;
         }
-        return _calibratedValue;
+        return res;
     }
 
     /**
@@ -248,12 +252,16 @@ public class YAnButton extends YFunction
      */
     public int get_rawValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RAWVALUE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RAWVALUE_INVALID;
+                }
             }
+            res = _rawValue;
         }
-        return _rawValue;
+        return res;
     }
 
     /**
@@ -277,12 +285,16 @@ public class YAnButton extends YFunction
      */
     public int get_analogCalibration() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ANALOGCALIBRATION_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ANALOGCALIBRATION_INVALID;
+                }
             }
+            res = _analogCalibration;
         }
-        return _analogCalibration;
+        return res;
     }
 
     /**
@@ -310,8 +322,10 @@ public class YAnButton extends YFunction
     public int set_analogCalibration(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("analogCalibration",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("analogCalibration",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -340,12 +354,16 @@ public class YAnButton extends YFunction
      */
     public int get_calibrationMax() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALIBRATIONMAX_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALIBRATIONMAX_INVALID;
+                }
             }
+            res = _calibrationMax;
         }
-        return _calibrationMax;
+        return res;
     }
 
     /**
@@ -377,8 +395,10 @@ public class YAnButton extends YFunction
     public int set_calibrationMax(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("calibrationMax",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("calibrationMax",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -410,12 +430,16 @@ public class YAnButton extends YFunction
      */
     public int get_calibrationMin() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CALIBRATIONMIN_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALIBRATIONMIN_INVALID;
+                }
             }
+            res = _calibrationMin;
         }
-        return _calibrationMin;
+        return res;
     }
 
     /**
@@ -447,8 +471,10 @@ public class YAnButton extends YFunction
     public int set_calibrationMin(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("calibrationMin",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("calibrationMin",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -480,12 +506,16 @@ public class YAnButton extends YFunction
      */
     public int get_sensitivity() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return SENSITIVITY_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return SENSITIVITY_INVALID;
+                }
             }
+            res = _sensitivity;
         }
-        return _sensitivity;
+        return res;
     }
 
     /**
@@ -519,8 +549,10 @@ public class YAnButton extends YFunction
     public int set_sensitivity(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("sensitivity",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("sensitivity",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -554,12 +586,16 @@ public class YAnButton extends YFunction
      */
     public int get_isPressed() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ISPRESSED_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ISPRESSED_INVALID;
+                }
             }
+            res = _isPressed;
         }
-        return _isPressed;
+        return res;
     }
 
     /**
@@ -587,12 +623,16 @@ public class YAnButton extends YFunction
      */
     public long get_lastTimePressed() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LASTTIMEPRESSED_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LASTTIMEPRESSED_INVALID;
+                }
             }
+            res = _lastTimePressed;
         }
-        return _lastTimePressed;
+        return res;
     }
 
     /**
@@ -622,12 +662,16 @@ public class YAnButton extends YFunction
      */
     public long get_lastTimeReleased() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LASTTIMERELEASED_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LASTTIMERELEASED_INVALID;
+                }
             }
+            res = _lastTimeReleased;
         }
-        return _lastTimeReleased;
+        return res;
     }
 
     /**
@@ -656,12 +700,16 @@ public class YAnButton extends YFunction
      */
     public long get_pulseCounter() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSECOUNTER_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSECOUNTER_INVALID;
+                }
             }
+            res = _pulseCounter;
         }
-        return _pulseCounter;
+        return res;
     }
 
     /**
@@ -681,8 +729,10 @@ public class YAnButton extends YFunction
     public int set_pulseCounter(long  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
-        _setAttr("pulseCounter",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(newval);
+            _setAttr("pulseCounter",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -700,12 +750,16 @@ public class YAnButton extends YFunction
      */
     public long get_pulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSETIMER_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSETIMER_INVALID;
+                }
             }
+            res = _pulseTimer;
         }
-        return _pulseTimer;
+        return res;
     }
 
     /**
@@ -746,10 +800,12 @@ public class YAnButton extends YFunction
     public static YAnButton FindAnButton(String func)
     {
         YAnButton obj;
-        obj = (YAnButton) YFunction._FindFromCache("AnButton", func);
-        if (obj == null) {
-            obj = new YAnButton(func);
-            YFunction._AddToCache("AnButton", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YAnButton) YFunction._FindFromCache("AnButton", func);
+            if (obj == null) {
+                obj = new YAnButton(func);
+                YFunction._AddToCache("AnButton", func, obj);
+            }
         }
         return obj;
     }
@@ -781,10 +837,12 @@ public class YAnButton extends YFunction
     public static YAnButton FindAnButtonInContext(YAPIContext yctx,String func)
     {
         YAnButton obj;
-        obj = (YAnButton) YFunction._FindFromCacheInContext(yctx, "AnButton", func);
-        if (obj == null) {
-            obj = new YAnButton(yctx, func);
-            YFunction._AddToCache("AnButton", func, obj);
+        synchronized (yctx) {
+            obj = (YAnButton) YFunction._FindFromCacheInContext(yctx, "AnButton", func);
+            if (obj == null) {
+                obj = new YAnButton(yctx, func);
+                YFunction._AddToCache("AnButton", func, obj);
+            }
         }
         return obj;
     }

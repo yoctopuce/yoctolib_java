@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YWatchdog.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -253,12 +253,16 @@ public class YWatchdog extends YFunction
      */
     public int get_state() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return STATE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return STATE_INVALID;
+                }
             }
+            res = _state;
         }
-        return _state;
+        return res;
     }
 
     /**
@@ -287,8 +291,10 @@ public class YWatchdog extends YFunction
     public int set_state(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("state",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("state",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -319,12 +325,16 @@ public class YWatchdog extends YFunction
      */
     public int get_stateAtPowerOn() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return STATEATPOWERON_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return STATEATPOWERON_INVALID;
+                }
             }
+            res = _stateAtPowerOn;
         }
-        return _stateAtPowerOn;
+        return res;
     }
 
     /**
@@ -357,8 +367,10 @@ public class YWatchdog extends YFunction
     public int set_stateAtPowerOn(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("stateAtPowerOn",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("stateAtPowerOn",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -388,12 +400,16 @@ public class YWatchdog extends YFunction
      */
     public long get_maxTimeOnStateA() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MAXTIMEONSTATEA_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MAXTIMEONSTATEA_INVALID;
+                }
             }
+            res = _maxTimeOnStateA;
         }
-        return _maxTimeOnStateA;
+        return res;
     }
 
     /**
@@ -422,8 +438,10 @@ public class YWatchdog extends YFunction
     public int set_maxTimeOnStateA(long  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
-        _setAttr("maxTimeOnStateA",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(newval);
+            _setAttr("maxTimeOnStateA",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -452,12 +470,16 @@ public class YWatchdog extends YFunction
      */
     public long get_maxTimeOnStateB() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MAXTIMEONSTATEB_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MAXTIMEONSTATEB_INVALID;
+                }
             }
+            res = _maxTimeOnStateB;
         }
-        return _maxTimeOnStateB;
+        return res;
     }
 
     /**
@@ -486,8 +508,10 @@ public class YWatchdog extends YFunction
     public int set_maxTimeOnStateB(long  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
-        _setAttr("maxTimeOnStateB",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(newval);
+            _setAttr("maxTimeOnStateB",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -516,12 +540,16 @@ public class YWatchdog extends YFunction
      */
     public int get_output() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return OUTPUT_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return OUTPUT_INVALID;
+                }
             }
+            res = _output;
         }
-        return _output;
+        return res;
     }
 
     /**
@@ -550,8 +578,10 @@ public class YWatchdog extends YFunction
     public int set_output(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("output",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("output",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -582,12 +612,16 @@ public class YWatchdog extends YFunction
      */
     public long get_pulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return PULSETIMER_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PULSETIMER_INVALID;
+                }
             }
+            res = _pulseTimer;
         }
-        return _pulseTimer;
+        return res;
     }
 
     /**
@@ -608,8 +642,10 @@ public class YWatchdog extends YFunction
     public int set_pulseTimer(long  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
-        _setAttr("pulseTimer",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(newval);
+            _setAttr("pulseTimer",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -641,12 +677,16 @@ public class YWatchdog extends YFunction
      */
     public YDelayedPulse get_delayedPulseTimer() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return DELAYEDPULSETIMER_INVALID;
+        YDelayedPulse res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DELAYEDPULSETIMER_INVALID;
+                }
             }
+            res = _delayedPulseTimer;
         }
-        return _delayedPulseTimer;
+        return res;
     }
 
     /**
@@ -660,8 +700,10 @@ public class YWatchdog extends YFunction
     public int set_delayedPulseTimer(YDelayedPulse  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
-        _setAttr("delayedPulseTimer",rest_val);
+        synchronized (this) {
+            rest_val = String.format(Locale.US, "%d:%d",newval.target,newval.ms);
+            _setAttr("delayedPulseTimer",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -699,12 +741,16 @@ public class YWatchdog extends YFunction
      */
     public long get_countdown() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COUNTDOWN_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COUNTDOWN_INVALID;
+                }
             }
+            res = _countdown;
         }
-        return _countdown;
+        return res;
     }
 
     /**
@@ -731,12 +777,16 @@ public class YWatchdog extends YFunction
      */
     public int get_autoStart() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return AUTOSTART_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return AUTOSTART_INVALID;
+                }
             }
+            res = _autoStart;
         }
-        return _autoStart;
+        return res;
     }
 
     /**
@@ -765,8 +815,10 @@ public class YWatchdog extends YFunction
     public int set_autoStart(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("autoStart",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("autoStart",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -795,12 +847,16 @@ public class YWatchdog extends YFunction
      */
     public int get_running() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RUNNING_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RUNNING_INVALID;
+                }
             }
+            res = _running;
         }
-        return _running;
+        return res;
     }
 
     /**
@@ -828,8 +884,10 @@ public class YWatchdog extends YFunction
     public int set_running(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("running",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("running",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -874,12 +932,16 @@ public class YWatchdog extends YFunction
      */
     public long get_triggerDelay() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TRIGGERDELAY_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TRIGGERDELAY_INVALID;
+                }
             }
+            res = _triggerDelay;
         }
-        return _triggerDelay;
+        return res;
     }
 
     /**
@@ -908,8 +970,10 @@ public class YWatchdog extends YFunction
     public int set_triggerDelay(long  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
-        _setAttr("triggerDelay",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(newval);
+            _setAttr("triggerDelay",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -937,12 +1001,16 @@ public class YWatchdog extends YFunction
      */
     public long get_triggerDuration() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return TRIGGERDURATION_INVALID;
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TRIGGERDURATION_INVALID;
+                }
             }
+            res = _triggerDuration;
         }
-        return _triggerDuration;
+        return res;
     }
 
     /**
@@ -969,8 +1037,10 @@ public class YWatchdog extends YFunction
     public int set_triggerDuration(long  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(newval);
-        _setAttr("triggerDuration",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(newval);
+            _setAttr("triggerDuration",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1014,10 +1084,12 @@ public class YWatchdog extends YFunction
     public static YWatchdog FindWatchdog(String func)
     {
         YWatchdog obj;
-        obj = (YWatchdog) YFunction._FindFromCache("Watchdog", func);
-        if (obj == null) {
-            obj = new YWatchdog(func);
-            YFunction._AddToCache("Watchdog", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YWatchdog) YFunction._FindFromCache("Watchdog", func);
+            if (obj == null) {
+                obj = new YWatchdog(func);
+                YFunction._AddToCache("Watchdog", func, obj);
+            }
         }
         return obj;
     }
@@ -1049,10 +1121,12 @@ public class YWatchdog extends YFunction
     public static YWatchdog FindWatchdogInContext(YAPIContext yctx,String func)
     {
         YWatchdog obj;
-        obj = (YWatchdog) YFunction._FindFromCacheInContext(yctx, "Watchdog", func);
-        if (obj == null) {
-            obj = new YWatchdog(yctx, func);
-            YFunction._AddToCache("Watchdog", func, obj);
+        synchronized (yctx) {
+            obj = (YWatchdog) YFunction._FindFromCacheInContext(yctx, "Watchdog", func);
+            if (obj == null) {
+                obj = new YWatchdog(yctx, func);
+                YFunction._AddToCache("Watchdog", func, obj);
+            }
         }
         return obj;
     }

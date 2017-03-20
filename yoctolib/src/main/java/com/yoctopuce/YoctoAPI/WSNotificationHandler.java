@@ -1,6 +1,6 @@
 package com.yoctopuce.YoctoAPI;
 
-public class WSNotificationHandler extends NotificationHandler
+class WSNotificationHandler extends NotificationHandler
 {
     @SuppressWarnings("UnusedParameters")
     public WSNotificationHandler(YHTTPHub hub, Object callbackSession) throws YAPI_Exception

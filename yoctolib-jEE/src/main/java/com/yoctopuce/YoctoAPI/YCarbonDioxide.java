@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCarbonDioxide.java 25833 2016-11-08 16:55:24Z seb $
+ * $Id: YCarbonDioxide.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce class YCarbonDioxide allows you to read and configure Yoctopuce CO2
  * sensors. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * to register callback functions,  to access the autonomous datalogger.
  * This class adds the ability to perform manual calibration if reuired.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -143,12 +143,16 @@ public class YCarbonDioxide extends YSensor
      */
     public int get_abcPeriod() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ABCPERIOD_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ABCPERIOD_INVALID;
+                }
             }
+            res = _abcPeriod;
         }
-        return _abcPeriod;
+        return res;
     }
 
     /**
@@ -180,8 +184,10 @@ public class YCarbonDioxide extends YSensor
     public int set_abcPeriod(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("abcPeriod",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("abcPeriod",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -208,12 +214,16 @@ public class YCarbonDioxide extends YSensor
      */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -227,8 +237,10 @@ public class YCarbonDioxide extends YSensor
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -263,10 +275,12 @@ public class YCarbonDioxide extends YSensor
     public static YCarbonDioxide FindCarbonDioxide(String func)
     {
         YCarbonDioxide obj;
-        obj = (YCarbonDioxide) YFunction._FindFromCache("CarbonDioxide", func);
-        if (obj == null) {
-            obj = new YCarbonDioxide(func);
-            YFunction._AddToCache("CarbonDioxide", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YCarbonDioxide) YFunction._FindFromCache("CarbonDioxide", func);
+            if (obj == null) {
+                obj = new YCarbonDioxide(func);
+                YFunction._AddToCache("CarbonDioxide", func, obj);
+            }
         }
         return obj;
     }
@@ -298,10 +312,12 @@ public class YCarbonDioxide extends YSensor
     public static YCarbonDioxide FindCarbonDioxideInContext(YAPIContext yctx,String func)
     {
         YCarbonDioxide obj;
-        obj = (YCarbonDioxide) YFunction._FindFromCacheInContext(yctx, "CarbonDioxide", func);
-        if (obj == null) {
-            obj = new YCarbonDioxide(yctx, func);
-            YFunction._AddToCache("CarbonDioxide", func, obj);
+        synchronized (yctx) {
+            obj = (YCarbonDioxide) YFunction._FindFromCacheInContext(yctx, "CarbonDioxide", func);
+            if (obj == null) {
+                obj = new YCarbonDioxide(yctx, func);
+                YFunction._AddToCache("CarbonDioxide", func, obj);
+            }
         }
         return obj;
     }

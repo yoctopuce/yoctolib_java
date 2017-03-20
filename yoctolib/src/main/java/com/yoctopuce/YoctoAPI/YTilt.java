@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTilt.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YTilt.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindTilt(), the high-level API for Tilt functions
  *
@@ -150,12 +150,16 @@ public class YTilt extends YSensor
      */
     public int get_bandwidth() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BANDWIDTH_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BANDWIDTH_INVALID;
+                }
             }
+            res = _bandwidth;
         }
-        return _bandwidth;
+        return res;
     }
 
     /**
@@ -183,8 +187,10 @@ public class YTilt extends YSensor
     public int set_bandwidth(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("bandwidth",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("bandwidth",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -208,12 +214,16 @@ public class YTilt extends YSensor
      */
     public int get_axis() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return AXIS_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return AXIS_INVALID;
+                }
             }
+            res = _axis;
         }
-        return _axis;
+        return res;
     }
 
     /**
@@ -250,10 +260,12 @@ public class YTilt extends YSensor
     public static YTilt FindTilt(String func)
     {
         YTilt obj;
-        obj = (YTilt) YFunction._FindFromCache("Tilt", func);
-        if (obj == null) {
-            obj = new YTilt(func);
-            YFunction._AddToCache("Tilt", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YTilt) YFunction._FindFromCache("Tilt", func);
+            if (obj == null) {
+                obj = new YTilt(func);
+                YFunction._AddToCache("Tilt", func, obj);
+            }
         }
         return obj;
     }
@@ -285,10 +297,12 @@ public class YTilt extends YSensor
     public static YTilt FindTiltInContext(YAPIContext yctx,String func)
     {
         YTilt obj;
-        obj = (YTilt) YFunction._FindFromCacheInContext(yctx, "Tilt", func);
-        if (obj == null) {
-            obj = new YTilt(yctx, func);
-            YFunction._AddToCache("Tilt", func, obj);
+        synchronized (yctx) {
+            obj = (YTilt) YFunction._FindFromCacheInContext(yctx, "Tilt", func);
+            if (obj == null) {
+                obj = new YTilt(yctx, func);
+                YFunction._AddToCache("Tilt", func, obj);
+            }
         }
         return obj;
     }

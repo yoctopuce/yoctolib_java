@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoc.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YVoc.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindVoc(), the high-level API for Voc functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce class YVoc allows you to read and configure Yoctopuce Volatile Organic
  * Compound sensors. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * to register callback functions, to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YVoc extends YSensor
@@ -142,10 +142,12 @@ public class YVoc extends YSensor
     public static YVoc FindVoc(String func)
     {
         YVoc obj;
-        obj = (YVoc) YFunction._FindFromCache("Voc", func);
-        if (obj == null) {
-            obj = new YVoc(func);
-            YFunction._AddToCache("Voc", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YVoc) YFunction._FindFromCache("Voc", func);
+            if (obj == null) {
+                obj = new YVoc(func);
+                YFunction._AddToCache("Voc", func, obj);
+            }
         }
         return obj;
     }
@@ -177,10 +179,12 @@ public class YVoc extends YSensor
     public static YVoc FindVocInContext(YAPIContext yctx,String func)
     {
         YVoc obj;
-        obj = (YVoc) YFunction._FindFromCacheInContext(yctx, "Voc", func);
-        if (obj == null) {
-            obj = new YVoc(yctx, func);
-            YFunction._AddToCache("Voc", func, obj);
+        synchronized (yctx) {
+            obj = (YVoc) YFunction._FindFromCacheInContext(yctx, "Voc", func);
+            if (obj == null) {
+                obj = new YVoc(yctx, func);
+                YFunction._AddToCache("Voc", func, obj);
+            }
         }
         return obj;
     }

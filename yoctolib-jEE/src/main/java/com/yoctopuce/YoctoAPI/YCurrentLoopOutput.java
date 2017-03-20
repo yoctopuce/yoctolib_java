@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrentLoopOutput.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YCurrentLoopOutput.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -164,8 +164,10 @@ public class YCurrentLoopOutput extends YFunction
     public int set_current(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("current",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("current",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -194,12 +196,16 @@ public class YCurrentLoopOutput extends YFunction
      */
     public double get_current() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CURRENT_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CURRENT_INVALID;
+                }
             }
+            res = _current;
         }
-        return _current;
+        return res;
     }
 
     /**
@@ -219,12 +225,16 @@ public class YCurrentLoopOutput extends YFunction
      */
     public String get_currentTransition() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CURRENTTRANSITION_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CURRENTTRANSITION_INVALID;
+                }
             }
+            res = _currentTransition;
         }
-        return _currentTransition;
+        return res;
     }
 
     /**
@@ -238,8 +248,10 @@ public class YCurrentLoopOutput extends YFunction
     public int set_currentTransition(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("currentTransition",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("currentTransition",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -261,8 +273,10 @@ public class YCurrentLoopOutput extends YFunction
     public int set_currentAtStartUp(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("currentAtStartUp",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("currentAtStartUp",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -290,12 +304,16 @@ public class YCurrentLoopOutput extends YFunction
      */
     public double get_currentAtStartUp() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return CURRENTATSTARTUP_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CURRENTATSTARTUP_INVALID;
+                }
             }
+            res = _currentAtStartUp;
         }
-        return _currentAtStartUp;
+        return res;
     }
 
     /**
@@ -322,12 +340,16 @@ public class YCurrentLoopOutput extends YFunction
      */
     public int get_loopPower() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return LOOPPOWER_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LOOPPOWER_INVALID;
+                }
             }
+            res = _loopPower;
         }
-        return _loopPower;
+        return res;
     }
 
     /**
@@ -371,10 +393,12 @@ public class YCurrentLoopOutput extends YFunction
     public static YCurrentLoopOutput FindCurrentLoopOutput(String func)
     {
         YCurrentLoopOutput obj;
-        obj = (YCurrentLoopOutput) YFunction._FindFromCache("CurrentLoopOutput", func);
-        if (obj == null) {
-            obj = new YCurrentLoopOutput(func);
-            YFunction._AddToCache("CurrentLoopOutput", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YCurrentLoopOutput) YFunction._FindFromCache("CurrentLoopOutput", func);
+            if (obj == null) {
+                obj = new YCurrentLoopOutput(func);
+                YFunction._AddToCache("CurrentLoopOutput", func, obj);
+            }
         }
         return obj;
     }
@@ -406,10 +430,12 @@ public class YCurrentLoopOutput extends YFunction
     public static YCurrentLoopOutput FindCurrentLoopOutputInContext(YAPIContext yctx,String func)
     {
         YCurrentLoopOutput obj;
-        obj = (YCurrentLoopOutput) YFunction._FindFromCacheInContext(yctx, "CurrentLoopOutput", func);
-        if (obj == null) {
-            obj = new YCurrentLoopOutput(yctx, func);
-            YFunction._AddToCache("CurrentLoopOutput", func, obj);
+        synchronized (yctx) {
+            obj = (YCurrentLoopOutput) YFunction._FindFromCacheInContext(yctx, "CurrentLoopOutput", func);
+            if (obj == null) {
+                obj = new YCurrentLoopOutput(yctx, func);
+                YFunction._AddToCache("CurrentLoopOutput", func, obj);
+            }
         }
         return obj;
     }

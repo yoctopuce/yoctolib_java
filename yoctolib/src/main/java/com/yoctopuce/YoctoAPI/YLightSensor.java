@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YLightSensor.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  *
  * The Yoctopuce class YLightSensor allows you to read and configure Yoctopuce light
  * sensors. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * to register callback functions, to access the autonomous datalogger.
  * This class adds the ability to easily perform a one-point linear calibration
  * to compensate the effect of a glass or filter placed in front of the sensor.
  * For some light sensors with several working modes, this class can select the
@@ -136,8 +136,10 @@ public class YLightSensor extends YSensor
     public int set_currentValue(double  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Long.toString(Math.round(newval * 65536.0));
-        _setAttr("currentValue",rest_val);
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("currentValue",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -178,12 +180,16 @@ public class YLightSensor extends YSensor
      */
     public int get_measureType() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return MEASURETYPE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return MEASURETYPE_INVALID;
+                }
             }
+            res = _measureType;
         }
-        return _measureType;
+        return res;
     }
 
     /**
@@ -200,7 +206,7 @@ public class YLightSensor extends YSensor
     }
 
     /**
-     * Modify the light sensor type used in the device. The measure can either
+     * Modifies the light sensor type used in the device. The measure can either
      * approximate the response of the human eye, focus on a specific light
      * spectrum, depending on the capabilities of the light-sensitive cell.
      * Remember to call the saveToFlash() method of the module if the
@@ -217,13 +223,15 @@ public class YLightSensor extends YSensor
     public int set_measureType(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("measureType",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("measureType",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
     /**
-     * Modify the light sensor type used in the device. The measure can either
+     * Modifies the light sensor type used in the device. The measure can either
      * approximate the response of the human eye, focus on a specific light
      * spectrum, depending on the capabilities of the light-sensitive cell.
      * Remember to call the saveToFlash() method of the module if the
@@ -267,10 +275,12 @@ public class YLightSensor extends YSensor
     public static YLightSensor FindLightSensor(String func)
     {
         YLightSensor obj;
-        obj = (YLightSensor) YFunction._FindFromCache("LightSensor", func);
-        if (obj == null) {
-            obj = new YLightSensor(func);
-            YFunction._AddToCache("LightSensor", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YLightSensor) YFunction._FindFromCache("LightSensor", func);
+            if (obj == null) {
+                obj = new YLightSensor(func);
+                YFunction._AddToCache("LightSensor", func, obj);
+            }
         }
         return obj;
     }
@@ -302,10 +312,12 @@ public class YLightSensor extends YSensor
     public static YLightSensor FindLightSensorInContext(YAPIContext yctx,String func)
     {
         YLightSensor obj;
-        obj = (YLightSensor) YFunction._FindFromCacheInContext(yctx, "LightSensor", func);
-        if (obj == null) {
-            obj = new YLightSensor(yctx, func);
-            YFunction._AddToCache("LightSensor", func, obj);
+        synchronized (yctx) {
+            obj = (YLightSensor) YFunction._FindFromCacheInContext(yctx, "LightSensor", func);
+            if (obj == null) {
+                obj = new YLightSensor(yctx, func);
+                YFunction._AddToCache("LightSensor", func, obj);
+            }
         }
         return obj;
     }

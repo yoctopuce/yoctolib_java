@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmPowerSource.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YPwmPowerSource.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -137,12 +137,16 @@ public class YPwmPowerSource extends YFunction
      */
     public int get_powerMode() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return POWERMODE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return POWERMODE_INVALID;
+                }
             }
+            res = _powerMode;
         }
-        return _powerMode;
+        return res;
     }
 
     /**
@@ -177,8 +181,10 @@ public class YPwmPowerSource extends YFunction
     public int set_powerMode(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("powerMode",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("powerMode",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -229,10 +235,12 @@ public class YPwmPowerSource extends YFunction
     public static YPwmPowerSource FindPwmPowerSource(String func)
     {
         YPwmPowerSource obj;
-        obj = (YPwmPowerSource) YFunction._FindFromCache("PwmPowerSource", func);
-        if (obj == null) {
-            obj = new YPwmPowerSource(func);
-            YFunction._AddToCache("PwmPowerSource", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YPwmPowerSource) YFunction._FindFromCache("PwmPowerSource", func);
+            if (obj == null) {
+                obj = new YPwmPowerSource(func);
+                YFunction._AddToCache("PwmPowerSource", func, obj);
+            }
         }
         return obj;
     }
@@ -264,10 +272,12 @@ public class YPwmPowerSource extends YFunction
     public static YPwmPowerSource FindPwmPowerSourceInContext(YAPIContext yctx,String func)
     {
         YPwmPowerSource obj;
-        obj = (YPwmPowerSource) YFunction._FindFromCacheInContext(yctx, "PwmPowerSource", func);
-        if (obj == null) {
-            obj = new YPwmPowerSource(yctx, func);
-            YFunction._AddToCache("PwmPowerSource", func, obj);
+        synchronized (yctx) {
+            obj = (YPwmPowerSource) YFunction._FindFromCacheInContext(yctx, "PwmPowerSource", func);
+            if (obj == null) {
+                obj = new YPwmPowerSource(yctx, func);
+                YFunction._AddToCache("PwmPowerSource", func, obj);
+            }
         }
         return obj;
     }

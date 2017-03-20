@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRangeFinder.java 26329 2017-01-11 14:04:39Z mvuilleu $
+ * $Id: YRangeFinder.java 26826 2017-03-17 11:20:57Z mvuilleu $
  *
  * Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Locale;
 
 //--- (YRangeFinder return codes)
 //--- (end of YRangeFinder return codes)
@@ -47,9 +48,9 @@ import org.json.JSONObject;
 /**
  * YRangeFinder Class: RangeFinder function interface
  *
- * The Yoctopuce class YRangeFinder allows you to use and configure Yoctopuce range finders
- * sensors. It inherits from YSensor class the core functions to read measurements,
- * register callback functions, access to the autonomous datalogger.
+ * The Yoctopuce class YRangeFinder allows you to use and configure Yoctopuce range finder
+ * sensors. It inherits from the YSensor class the core functions to read measurements,
+ * register callback functions, access the autonomous datalogger.
  * This class adds the ability to easily perform a one-point linear calibration
  * to compensate the effect of a glass or filter placed in front of the sensor.
  */
@@ -67,10 +68,20 @@ public class YRangeFinder extends YSensor
     public static final int RANGEFINDERMODE_HIGH_SPEED = 3;
     public static final int RANGEFINDERMODE_INVALID = -1;
     /**
+     * invalid hardwareCalibration value
+     */
+    public static final String HARDWARECALIBRATION_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid currentTemperature value
+     */
+    public static final double CURRENTTEMPERATURE_INVALID = YAPI.INVALID_DOUBLE;
+    /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _rangeFinderMode = RANGEFINDERMODE_INVALID;
+    protected String _hardwareCalibration = HARDWARECALIBRATION_INVALID;
+    protected double _currentTemperature = CURRENTTEMPERATURE_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackRangeFinder = null;
     protected TimedReportCallback _timedReportCallbackRangeFinder = null;
@@ -132,6 +143,12 @@ public class YRangeFinder extends YSensor
         if (json_val.has("rangeFinderMode")) {
             _rangeFinderMode = json_val.getInt("rangeFinderMode");
         }
+        if (json_val.has("hardwareCalibration")) {
+            _hardwareCalibration = json_val.getString("hardwareCalibration");
+        }
+        if (json_val.has("currentTemperature")) {
+            _currentTemperature = Math.round(json_val.getDouble("currentTemperature") * 1000.0 / 65536.0) / 1000.0;
+        }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
         }
@@ -139,13 +156,13 @@ public class YRangeFinder extends YSensor
     }
 
     /**
-     * Changes the measuring unit for the measured temperature. That unit is a string.
-     * String value can be " or mm. Any other value will be ignored.
+     * Changes the measuring unit for the measured range. That unit is a string.
+     * String value can be " or mm. Any other value is ignored.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      * WARNING: if a specific calibration is defined for the rangeFinder function, a
      * unit system change will probably break it.
      *
-     * @param newval : a string corresponding to the measuring unit for the measured temperature
+     * @param newval : a string corresponding to the measuring unit for the measured range
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -154,19 +171,21 @@ public class YRangeFinder extends YSensor
     public int set_unit(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("unit",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("unit",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes the measuring unit for the measured temperature. That unit is a string.
-     * String value can be " or mm. Any other value will be ignored.
+     * Changes the measuring unit for the measured range. That unit is a string.
+     * String value can be " or mm. Any other value is ignored.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      * WARNING: if a specific calibration is defined for the rangeFinder function, a
      * unit system change will probably break it.
      *
-     * @param newval : a string corresponding to the measuring unit for the measured temperature
+     * @param newval : a string corresponding to the measuring unit for the measured range
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -178,31 +197,35 @@ public class YRangeFinder extends YSensor
     }
 
     /**
-     * Returns the rangefinder running mode. The rangefinder running mode
-     * allows to put priority on precision, speed or maximum range.
+     * Returns the range finder running mode. The rangefinder running mode
+     * allows you to put priority on precision, speed or maximum range.
      *
      *  @return a value among YRangeFinder.RANGEFINDERMODE_DEFAULT, YRangeFinder.RANGEFINDERMODE_LONG_RANGE,
      *  YRangeFinder.RANGEFINDERMODE_HIGH_ACCURACY and YRangeFinder.RANGEFINDERMODE_HIGH_SPEED
-     * corresponding to the rangefinder running mode
+     * corresponding to the range finder running mode
      *
      * @throws YAPI_Exception on error
      */
     public int get_rangeFinderMode() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return RANGEFINDERMODE_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return RANGEFINDERMODE_INVALID;
+                }
             }
+            res = _rangeFinderMode;
         }
-        return _rangeFinderMode;
+        return res;
     }
 
     /**
-     * Returns the rangefinder running mode. The rangefinder running mode
-     * allows to put priority on precision, speed or maximum range.
+     * Returns the range finder running mode. The rangefinder running mode
+     * allows you to put priority on precision, speed or maximum range.
      *
      *  @return a value among Y_RANGEFINDERMODE_DEFAULT, Y_RANGEFINDERMODE_LONG_RANGE,
-     * Y_RANGEFINDERMODE_HIGH_ACCURACY and Y_RANGEFINDERMODE_HIGH_SPEED corresponding to the rangefinder running mode
+     * Y_RANGEFINDERMODE_HIGH_ACCURACY and Y_RANGEFINDERMODE_HIGH_SPEED corresponding to the range finder running mode
      *
      * @throws YAPI_Exception on error
      */
@@ -212,13 +235,13 @@ public class YRangeFinder extends YSensor
     }
 
     /**
-     * Changes the rangefinder running mode, allowing to put priority on
+     * Changes the rangefinder running mode, allowing you to put priority on
      * precision, speed or maximum range.
      *
      *  @param newval : a value among YRangeFinder.RANGEFINDERMODE_DEFAULT,
      *  YRangeFinder.RANGEFINDERMODE_LONG_RANGE, YRangeFinder.RANGEFINDERMODE_HIGH_ACCURACY and
-     *  YRangeFinder.RANGEFINDERMODE_HIGH_SPEED corresponding to the rangefinder running mode, allowing to
-     * put priority on
+     *  YRangeFinder.RANGEFINDERMODE_HIGH_SPEED corresponding to the rangefinder running mode, allowing you
+     * to put priority on
      *         precision, speed or maximum range
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -228,18 +251,20 @@ public class YRangeFinder extends YSensor
     public int set_rangeFinderMode(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("rangeFinderMode",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("rangeFinderMode",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes the rangefinder running mode, allowing to put priority on
+     * Changes the rangefinder running mode, allowing you to put priority on
      * precision, speed or maximum range.
      *
      *  @param newval : a value among Y_RANGEFINDERMODE_DEFAULT, Y_RANGEFINDERMODE_LONG_RANGE,
      *  Y_RANGEFINDERMODE_HIGH_ACCURACY and Y_RANGEFINDERMODE_HIGH_SPEED corresponding to the rangefinder
-     * running mode, allowing to put priority on
+     * running mode, allowing you to put priority on
      *         precision, speed or maximum range
      *
      * @return YAPI_SUCCESS if the call succeeds.
@@ -254,14 +279,91 @@ public class YRangeFinder extends YSensor
     /**
      * @throws YAPI_Exception on error
      */
+    public String get_hardwareCalibration() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return HARDWARECALIBRATION_INVALID;
+                }
+            }
+            res = _hardwareCalibration;
+        }
+        return res;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public String getHardwareCalibration() throws YAPI_Exception
+    {
+        return get_hardwareCalibration();
+    }
+
+    public int set_hardwareCalibration(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("hardwareCalibration",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    public int setHardwareCalibration(String newval)  throws YAPI_Exception
+    {
+        return set_hardwareCalibration(newval);
+    }
+
+    /**
+     * Returns the current sensor temperature, as a floating point number.
+     *
+     * @return a floating point number corresponding to the current sensor temperature, as a floating point number
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_currentTemperature() throws YAPI_Exception
+    {
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CURRENTTEMPERATURE_INVALID;
+                }
+            }
+            res = _currentTemperature;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the current sensor temperature, as a floating point number.
+     *
+     * @return a floating point number corresponding to the current sensor temperature, as a floating point number
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getCurrentTemperature() throws YAPI_Exception
+    {
+        return get_currentTemperature();
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
     public String get_command() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return COMMAND_INVALID;
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
             }
+            res = _command;
         }
-        return _command;
+        return res;
     }
 
     /**
@@ -275,8 +377,10 @@ public class YRangeFinder extends YSensor
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = newval;
-        _setAttr("command",rest_val);
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -311,10 +415,12 @@ public class YRangeFinder extends YSensor
     public static YRangeFinder FindRangeFinder(String func)
     {
         YRangeFinder obj;
-        obj = (YRangeFinder) YFunction._FindFromCache("RangeFinder", func);
-        if (obj == null) {
-            obj = new YRangeFinder(func);
-            YFunction._AddToCache("RangeFinder", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YRangeFinder) YFunction._FindFromCache("RangeFinder", func);
+            if (obj == null) {
+                obj = new YRangeFinder(func);
+                YFunction._AddToCache("RangeFinder", func, obj);
+            }
         }
         return obj;
     }
@@ -346,10 +452,12 @@ public class YRangeFinder extends YSensor
     public static YRangeFinder FindRangeFinderInContext(YAPIContext yctx,String func)
     {
         YRangeFinder obj;
-        obj = (YRangeFinder) YFunction._FindFromCacheInContext(yctx, "RangeFinder", func);
-        if (obj == null) {
-            obj = new YRangeFinder(yctx, func);
-            YFunction._AddToCache("RangeFinder", func, obj);
+        synchronized (yctx) {
+            obj = (YRangeFinder) YFunction._FindFromCacheInContext(yctx, "RangeFinder", func);
+            if (obj == null) {
+                obj = new YRangeFinder(yctx, func);
+                YFunction._AddToCache("RangeFinder", func, obj);
+            }
         }
         return obj;
     }
@@ -431,17 +539,111 @@ public class YRangeFinder extends YSensor
     }
 
     /**
+     * Returns the temperature at the time when the latest calibration was performed.
+     * This function can be used to determine if a new calibration for ambient temperature
+     * is required.
+     *
+     * @return a temperature, as a floating point number.
+     * @throws YAPI_Exception on error
+     */
+    public double get_hardwareCalibrationTemperature() throws YAPI_Exception
+    {
+        String hwcal;
+        
+        hwcal = get_hardwareCalibration();
+        if (!((hwcal).substring(0, 1).equals("@"))) {
+            return YAPI.INVALID_DOUBLE;
+        }
+        return YAPIContext._atoi((hwcal).substring(1, 1 + (hwcal).length()));
+    }
+
+    /**
      * Triggers a sensor calibration according to the current ambient temperature. That
      * calibration process needs no physical interaction with the sensor. It is performed
      * automatically at device startup, but it is recommended to start it again when the
-     * temperature delta since last calibration exceeds 8°C.
+     * temperature delta since the latest calibration exceeds 8°C.
      *
      * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
      */
-    public int triggerTempCalibration() throws YAPI_Exception
+    public int triggerTemperatureCalibration() throws YAPI_Exception
     {
         return set_command("T");
+    }
+
+    /**
+     * Triggers the photon detector hardware calibration.
+     * This function is part of the calibration procedure to compensate for the the effect
+     * of a cover glass. Make sure to read the chapter about hardware calibration for details
+     * on the calibration procedure for proper results.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int triggerSpadCalibration() throws YAPI_Exception
+    {
+        return set_command("S");
+    }
+
+    /**
+     * Triggers the hardware offset calibration of the distance sensor.
+     * This function is part of the calibration procedure to compensate for the the effect
+     * of a cover glass. Make sure to read the chapter about hardware calibration for details
+     * on the calibration procedure for proper results.
+     *
+     * @param targetDist : true distance of the calibration target, in mm or inches, depending
+     *         on the unit selected in the device
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int triggerOffsetCalibration(double targetDist) throws YAPI_Exception
+    {
+        int distmm;
+        
+        if (get_unit().equals("\"")) {
+            distmm = (int) (double)Math.round(targetDist * 25.4);
+        } else {
+            distmm = (int) (double)Math.round(targetDist);
+        }
+        return set_command(String.format(Locale.US, "O%d",distmm));
+    }
+
+    /**
+     * Triggers the hardware cross-talk calibration of the distance sensor.
+     * This function is part of the calibration procedure to compensate for the the effect
+     * of a cover glass. Make sure to read the chapter about hardware calibration for details
+     * on the calibration procedure for proper results.
+     *
+     * @param targetDist : true distance of the calibration target, in mm or inches, depending
+     *         on the unit selected in the device
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int triggerXTalkCalibration(double targetDist) throws YAPI_Exception
+    {
+        int distmm;
+        
+        if (get_unit().equals("\"")) {
+            distmm = (int) (double)Math.round(targetDist * 25.4);
+        } else {
+            distmm = (int) (double)Math.round(targetDist);
+        }
+        return set_command(String.format(Locale.US, "X%d",distmm));
+    }
+
+    /**
+     * Cancels the effect of previous hardware calibration procedures to compensate
+     * for cover glass, and restores factory settings.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int cancelCoverGlassCalibrations() throws YAPI_Exception
+    {
+        return set_hardwareCalibration("");
     }
 
     /**

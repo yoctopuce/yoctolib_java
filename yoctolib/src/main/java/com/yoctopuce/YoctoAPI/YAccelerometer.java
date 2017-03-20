@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAccelerometer.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YAccelerometer.java 26670 2017-02-28 13:41:47Z seb $
  *
  * Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -173,12 +173,16 @@ public class YAccelerometer extends YSensor
      */
     public int get_bandwidth() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return BANDWIDTH_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return BANDWIDTH_INVALID;
+                }
             }
+            res = _bandwidth;
         }
-        return _bandwidth;
+        return res;
     }
 
     /**
@@ -206,8 +210,10 @@ public class YAccelerometer extends YSensor
     public int set_bandwidth(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = Integer.toString(newval);
-        _setAttr("bandwidth",rest_val);
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("bandwidth",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -235,12 +241,16 @@ public class YAccelerometer extends YSensor
      */
     public double get_xValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return XVALUE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return XVALUE_INVALID;
+                }
             }
+            res = _xValue;
         }
-        return _xValue;
+        return res;
     }
 
     /**
@@ -264,12 +274,16 @@ public class YAccelerometer extends YSensor
      */
     public double get_yValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return YVALUE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return YVALUE_INVALID;
+                }
             }
+            res = _yValue;
         }
-        return _yValue;
+        return res;
     }
 
     /**
@@ -293,12 +307,16 @@ public class YAccelerometer extends YSensor
      */
     public double get_zValue() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return ZVALUE_INVALID;
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ZVALUE_INVALID;
+                }
             }
+            res = _zValue;
         }
-        return _zValue;
+        return res;
     }
 
     /**
@@ -318,12 +336,16 @@ public class YAccelerometer extends YSensor
      */
     public int get_gravityCancellation() throws YAPI_Exception
     {
-        if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return GRAVITYCANCELLATION_INVALID;
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return GRAVITYCANCELLATION_INVALID;
+                }
             }
+            res = _gravityCancellation;
         }
-        return _gravityCancellation;
+        return res;
     }
 
     /**
@@ -337,8 +359,10 @@ public class YAccelerometer extends YSensor
     public int set_gravityCancellation(int  newval)  throws YAPI_Exception
     {
         String rest_val;
-        rest_val = (newval > 0 ? "1" : "0");
-        _setAttr("gravityCancellation",rest_val);
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("gravityCancellation",rest_val);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -373,10 +397,12 @@ public class YAccelerometer extends YSensor
     public static YAccelerometer FindAccelerometer(String func)
     {
         YAccelerometer obj;
-        obj = (YAccelerometer) YFunction._FindFromCache("Accelerometer", func);
-        if (obj == null) {
-            obj = new YAccelerometer(func);
-            YFunction._AddToCache("Accelerometer", func, obj);
+        synchronized (YAPI.class) {
+            obj = (YAccelerometer) YFunction._FindFromCache("Accelerometer", func);
+            if (obj == null) {
+                obj = new YAccelerometer(func);
+                YFunction._AddToCache("Accelerometer", func, obj);
+            }
         }
         return obj;
     }
@@ -408,10 +434,12 @@ public class YAccelerometer extends YSensor
     public static YAccelerometer FindAccelerometerInContext(YAPIContext yctx,String func)
     {
         YAccelerometer obj;
-        obj = (YAccelerometer) YFunction._FindFromCacheInContext(yctx, "Accelerometer", func);
-        if (obj == null) {
-            obj = new YAccelerometer(yctx, func);
-            YFunction._AddToCache("Accelerometer", func, obj);
+        synchronized (yctx) {
+            obj = (YAccelerometer) YFunction._FindFromCacheInContext(yctx, "Accelerometer", func);
+            if (obj == null) {
+                obj = new YAccelerometer(yctx, func);
+                YFunction._AddToCache("Accelerometer", func, obj);
+            }
         }
         return obj;
     }
