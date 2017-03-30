@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YWatchdog.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 import java.util.Locale;
 
 //--- (YWatchdog return codes)
@@ -190,7 +188,7 @@ public class YWatchdog extends YFunction
     //--- (YWatchdog implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("state")) {
             _state = json_val.getInt("state") > 0 ? 1 : 0;
@@ -211,7 +209,7 @@ public class YWatchdog extends YFunction
             _pulseTimer = json_val.getLong("pulseTimer");
         }
         if (json_val.has("delayedPulseTimer")) {
-            JSONObject subjson = json_val.getJSONObject("delayedPulseTimer");
+            YJSONObject subjson = json_val.getYJSONObject("delayedPulseTimer");
             if (subjson.has("moving")) {
                 _delayedPulseTimer.moving = subjson.getInt("moving");
             }

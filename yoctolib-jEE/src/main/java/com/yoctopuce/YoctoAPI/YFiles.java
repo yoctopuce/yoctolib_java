@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YFiles.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -39,8 +39,6 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -119,7 +117,7 @@ public class YFiles extends YFunction
     //--- (generated code: YFiles implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("filesCount")) {
             _filesCount = json_val.getInt("filesCount");

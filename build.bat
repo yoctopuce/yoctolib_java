@@ -1,10 +1,9 @@
 echo.
 echo Build JAVA API
 echo ==============
-javac -d Binaries -sourcepath JsonParser JsonParser\org\json\*.java || exit /b 1
 javac -d Binaries -classpath Binaries -sourcepath yoctolib\src\main\java yoctolib\src\main\java\com\yoctopuce\YoctoAPI\*.java || exit /b 1
 cd Binaries
-jar -cvf yoctoAPI.jar org\json\*.class com\yoctopuce\YoctoAPI\*.class || exit /b 1
+jar -cvf yoctoAPI.jar com\yoctopuce\YoctoAPI\*.class || exit /b 1
 IF "%1" == "" goto apidone
 rd /s /q com
 rd /s /q org

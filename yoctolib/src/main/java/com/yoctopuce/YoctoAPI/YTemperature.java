@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: YTemperature.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -149,7 +147,7 @@ public class YTemperature extends YSensor
     //--- (YTemperature implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("sensorType")) {
             _sensorType = json_val.getInt("sensorType");

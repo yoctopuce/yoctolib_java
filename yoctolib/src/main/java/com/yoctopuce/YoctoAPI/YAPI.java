@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 26206 2016-12-22 17:14:36Z seb $
+ * $Id: YAPI.java 26934 2017-03-28 08:00:42Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -52,7 +52,7 @@ public class YAPI
     // saves a lots of traffic.
     // Note that a value under 2 ms makes little sense since a USB bus itself
     // has a 2ms round trip period
-    //fixme generated code must use defautl cachevalidity form YAPIContext
+    //fixme generated code must use default cache validity form YAPIContext
     public static int DefaultCacheValidity = 5;
 
     // Return value for invalid strings
@@ -62,7 +62,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "26849";
+    public static final String YOCTO_API_BUILD_STR = "26999";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -237,7 +237,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".26849" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".26999" + YUSBHub.getAPIVersion();
     }
 
     /**

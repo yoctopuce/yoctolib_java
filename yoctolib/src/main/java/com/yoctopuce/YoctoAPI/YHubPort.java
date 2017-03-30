@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHubPort.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YHubPort.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindHubPort(), the high-level API for HubPort functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YHubPort return codes)
 //--- (end of YHubPort return codes)
@@ -133,7 +131,7 @@ public class YHubPort extends YFunction
     //--- (YHubPort implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("enabled")) {
             _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;

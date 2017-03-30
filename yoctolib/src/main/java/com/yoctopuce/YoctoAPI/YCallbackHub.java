@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 26644 2017-02-23 07:51:03Z seb $
+ * $Id: YCallbackHub.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -37,9 +37,6 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,13 +46,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Set;
 
 class YCallbackHub extends YGenericHub
 {
     private final HTTPParams _http_params;
     private final OutputStream _out;
-    private JSONObject _callbackCache;
+    private YJSONObject _callbackCache;
 
     YCallbackHub(YAPIContext yctx, int idx, HTTPParams httpParams, InputStream request, OutputStream response) throws YAPI_Exception
     {
@@ -130,8 +127,9 @@ class YCallbackHub extends YGenericHub
             throw new YAPI_Exception(YAPI.IO_ERROR, errmsg);
         } else {
             try {
-                _callbackCache = new JSONObject(data_str);
-            } catch (JSONException ex) {
+                _callbackCache = new YJSONObject(data_str);
+                _callbackCache.parse();
+            } catch (Exception ex) {
                 String errmsg = "invalid data:[\n" + ex.toString() + data_str + "\n]";
                 _output("\n!YoctoAPI:" + errmsg + "\n");
                 _callbackCache = null;
@@ -152,7 +150,7 @@ class YCallbackHub extends YGenericHub
                     _callbackCache = null;
                     throw new YAPI_Exception(YAPI.UNAUTHORIZED, errmsg);
                 }
-                String sign = _callbackCache.optString("sign");
+                String sign = _callbackCache.getString("sign");
                 String pass = _http_params.getPass();
                 String salt;
                 if (pass.length() == 32) {
@@ -230,12 +228,12 @@ class YCallbackHub extends YGenericHub
                     _output("\n@YoctoAPI:+" + url + "\n");
                     return null;
                 }
-                JSONObject jsonres = _callbackCache.getJSONObject(url);
+                YJSONObject jsonres = _callbackCache.getYJSONObject(url);
                 if (getmodule) {
-                    jsonres = jsonres.getJSONObject("module");
+                    jsonres = jsonres.getYJSONObject("module");
                 }
                 return (jsonres.toString()).getBytes(_yctx._deviceCharset);
-            } catch (JSONException ex) {
+            } catch (Exception ex) {
                 return "".getBytes();
             }
         } else {
@@ -269,42 +267,41 @@ class YCallbackHub extends YGenericHub
         }
         HashMap<String, ArrayList<YPEntry>> yellowPages = new HashMap<>();
         ArrayList<WPEntry> whitePages = new ArrayList<>();
-        JSONObject loadval;
+        YJSONObject loadval;
         try {
-            loadval = new JSONObject(yreq);
-            if (!loadval.has("services") || !loadval.getJSONObject("services").has("whitePages")) {
+            loadval = new YJSONObject(yreq);
+            loadval.parse();
+            if (!loadval.has("services") || !loadval.getYJSONObject("services").has("whitePages")) {
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Device "
                         + _http_params.getHost() + " is not a hub");
             }
 
-            JSONArray whitePages_json = loadval.getJSONObject("services").getJSONArray("whitePages");
-            JSONObject yellowPages_json = loadval.getJSONObject("services").getJSONObject("yellowPages");
+            YJSONArray whitePages_json = loadval.getYJSONObject("services").getYJSONArray("whitePages");
+            YJSONObject yellowPages_json = loadval.getYJSONObject("services").getYJSONObject("yellowPages");
 
             // Reindex all functions from yellow pages
             //HashMap<String, Boolean> refresh = new HashMap<String, Boolean>();
-            Iterator<?> keys = yellowPages_json.keys();
-            while (keys.hasNext()) {
-                String classname = keys.next().toString();
-                JSONArray yprecs_json = yellowPages_json.getJSONArray(classname);
+            Set<String> keys = yellowPages_json.getKeys();
+            for(String classname : keys){
+                YJSONArray yprecs_json = yellowPages_json.getYJSONArray(classname);
                 ArrayList<YPEntry> yprecs_arr = new ArrayList<>(
                         yprecs_json.length());
                 for (int i = 0; i < yprecs_json.length(); i++) {
-                    YPEntry yprec = new YPEntry(yprecs_json.getJSONObject(i));
+                    YPEntry yprec = new YPEntry(yprecs_json.getYJSONObject(i));
                     yprecs_arr.add(yprec);
-
                 }
                 yellowPages.put(classname, yprecs_arr);
             }
 
             // Reindex all devices from white pages
             for (int i = 0; i < whitePages_json.length(); i++) {
-                JSONObject jsonObject = whitePages_json.getJSONObject(i);
+                YJSONObject jsonObject = whitePages_json.getYJSONObject(i);
                 WPEntry devinfo = new WPEntry(jsonObject);
                 int index = jsonObject.getInt("index");
                 _serialByYdx.put(index, devinfo.getSerialNumber());
                 whitePages.add(devinfo);
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new YAPI_Exception(YAPI.IO_ERROR,
                     "Request failed, could not parse API result for "
                             + _http_params.getHost(), e);

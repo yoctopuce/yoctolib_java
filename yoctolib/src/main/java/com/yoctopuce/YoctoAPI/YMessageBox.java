@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YMessageBox.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -41,8 +41,6 @@ package com.yoctopuce.YoctoAPI;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (generated code: YMessageBox return codes)
 //--- (end of generated code: YMessageBox return codes)
@@ -149,7 +147,7 @@ public class YMessageBox extends YFunction
     //--- (generated code: YMessageBox implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("slotsInUse")) {
             _slotsInUse = json_val.getInt("slotsInUse");

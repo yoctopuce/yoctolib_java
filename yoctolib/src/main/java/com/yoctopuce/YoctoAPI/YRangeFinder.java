@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRangeFinder.java 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: YRangeFinder.java 26994 2017-03-30 15:55:45Z seb $
  *
  * Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 import java.util.Locale;
 
 //--- (YRangeFinder return codes)
@@ -138,7 +136,7 @@ public class YRangeFinder extends YSensor
     //--- (YRangeFinder implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("rangeFinderMode")) {
             _rangeFinderMode = json_val.getInt("rangeFinderMode");
@@ -549,7 +547,6 @@ public class YRangeFinder extends YSensor
     public double get_hardwareCalibrationTemperature() throws YAPI_Exception
     {
         String hwcal;
-        
         hwcal = get_hardwareCalibration();
         if (!((hwcal).substring(0, 1).equals("@"))) {
             return YAPI.INVALID_DOUBLE;
@@ -600,7 +597,6 @@ public class YRangeFinder extends YSensor
     public int triggerOffsetCalibration(double targetDist) throws YAPI_Exception
     {
         int distmm;
-        
         if (get_unit().equals("\"")) {
             distmm = (int) (double)Math.round(targetDist * 25.4);
         } else {
@@ -624,7 +620,6 @@ public class YRangeFinder extends YSensor
     public int triggerXTalkCalibration(double targetDist) throws YAPI_Exception
     {
         int distmm;
-        
         if (get_unit().equals("\"")) {
             distmm = (int) (double)Math.round(targetDist * 25.4);
         } else {

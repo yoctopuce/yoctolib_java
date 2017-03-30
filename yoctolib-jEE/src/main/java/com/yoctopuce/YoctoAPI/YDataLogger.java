@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: YDataLogger.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -37,10 +37,6 @@
 
 package com.yoctopuce.YoctoAPI; //test
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -133,7 +129,7 @@ public class YDataLogger extends YFunction
     /**
      * Internal function to retrieve datalogger memory
      */
-    public JSONTokener getData(Integer runIdx, Integer timeIdx) throws YAPI_Exception
+    public String getData(Integer runIdx, Integer timeIdx) throws YAPI_Exception
     {
         if (_dataLoggerURL == null) {
             _dataLoggerURL = "/logger.json";
@@ -157,7 +153,7 @@ public class YDataLogger extends YFunction
             }
             throw ex;
         }
-        return new JSONTokener(result);
+        return  result;
     }
 
 
@@ -197,15 +193,16 @@ public class YDataLogger extends YFunction
     public int get_dataStreams(ArrayList<YDataStream> v) throws YAPI_Exception
     {
 
-        JSONTokener loadval = this.getData(null, null);
+        String loadval = this.getData(null, null);
         try {
-            JSONArray jsonAllStreams = new JSONArray(loadval);
+            YJSONArray jsonAllStreams = new YJSONArray(loadval);
+            jsonAllStreams.parse();
             if (jsonAllStreams.length() == 0)
                 return YAPI.SUCCESS;
-            if (jsonAllStreams.get(0).getClass() == JSONArray.class) {
+            if (jsonAllStreams.get(0).getJSONType() == YJSONContent.YJSONType.ARRAY) {
                 for (int i = 0; i < jsonAllStreams.length(); i++) {
                     // old datalogger format: [runIdx, timerel, utc, interval]
-                    JSONArray arr = jsonAllStreams.getJSONArray(i);
+                    YJSONArray arr = jsonAllStreams.getYJSONArray(i);
                     YOldDataStream stream = new YOldDataStream(this, arr.getInt(0), arr.getInt(1), arr.getLong(2), arr.getInt(3));
                     v.add(stream);
                 }
@@ -215,13 +212,12 @@ public class YDataLogger extends YFunction
                 for (int j = 0; j < sets.size(); j++) {
                     ArrayList<YDataStream> ds = sets.get(j).get_privateDataStreams();
                     for (int si = 0; si < ds.size(); si++) {
-
                         v.add(ds.get(si));
                     }
                 }
                 return YAPI.SUCCESS;
             }
-        } catch (JSONException ex) {
+        } catch (Exception ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
 
@@ -237,7 +233,7 @@ public class YDataLogger extends YFunction
     //--- (generated code: YDataLogger implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("currentRunIndex")) {
             _currentRunIndex = json_val.getInt("currentRunIndex");

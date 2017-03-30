@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAudioIn.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YAudioIn.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindAudioIn(), the high-level API for AudioIn functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YAudioIn return codes)
 //--- (end of YAudioIn return codes)
@@ -135,7 +133,7 @@ public class YAudioIn extends YFunction
     //--- (YAudioIn implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("volume")) {
             _volume = json_val.getInt("volume");

@@ -1,1 +1,1 @@
-- Add YRangeFinder class
+- Update library to be thread safe

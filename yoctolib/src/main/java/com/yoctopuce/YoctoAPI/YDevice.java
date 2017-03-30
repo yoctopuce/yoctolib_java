@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 26571 2017-02-07 17:16:17Z seb $
+ * $Id: YDevice.java 26952 2017-03-28 15:40:09Z seb $
  *
  * Internal YDevice class
  *
@@ -37,9 +37,6 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.*;
 
 
@@ -57,12 +54,12 @@ import java.util.*;
 // this class implements a device-wide API string cache (agnostic of API content).
 // This is in addition to the function-specific cache implemented in YFunction.
 //
-public class YDevice
+class YDevice
 {
     private YGenericHub _hub;
-    WPEntry _wpRec;
+    private final WPEntry _wpRec;
     private long _cache_expiration;
-    private JSONObject _cache_json;
+    private YJSONObject _cache_json;
     private final HashMap<Integer, YPEntry> _ypRecs;
     private double _deviceTime;
     private YPEntry _moduleYPEntry;
@@ -97,36 +94,42 @@ public class YDevice
         return _hub;
     }
 
+    String getNetworkUrl()
+    {
+        return _wpRec.getNetworkUrl();
+    }
+
     // Return the serial number of the device, as found during discovery
-    public String getSerialNumber()
+    String getSerialNumber()
     {
         return _wpRec.getSerialNumber();
     }
 
     // Return the logical name of the device, as found during discovery
-    public String getLogicalName()
+    String getLogicalName()
     {
         return _wpRec.getLogicalName();
     }
 
     // Return the beacon state of the device, as found during discovery
-    public int getBeacon()
+    int getBeacon()
     {
         return _wpRec.getBeacon();
     }
 
     // Get the whole REST API string for a device, from cache if possible
-    public JSONObject requestAPI() throws YAPI_Exception
+    synchronized YJSONObject requestAPI() throws YAPI_Exception
     {
         long tickCount = YAPI.GetTickCount();
         if (_cache_expiration > tickCount) {
             return _cache_json;
         }
         String yreq = requestHTTPSyncAsString("GET /api.json", null);
-        JSONObject cache_json;
+        YJSONObject cache_json;
         try {
-            cache_json = new JSONObject(yreq);
-        } catch (JSONException ex) {
+            cache_json = new YJSONObject(yreq);
+            cache_json.parse();
+        } catch (Exception ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR,
                     "Request failed, could not parse API result for " + this);
         }
@@ -137,17 +140,16 @@ public class YDevice
 
     // Reload a device API (store in cache), and update YAPI function lists accordingly
     // Intended to be called within UpdateDeviceList only
-    public int refresh() throws YAPI_Exception
+    synchronized void refresh() throws YAPI_Exception
     {
-        JSONObject loadval = requestAPI();
+        YJSONObject loadval = requestAPI();
         Boolean reindex = false;
         try {
             // parse module and refresh names if needed
-            Iterator<?> keys = loadval.keys();
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
+            Set<String> keys = loadval.getKeys();
+            for (String key : keys) {
                 if (key.equals("module")) {
-                    JSONObject module = loadval.getJSONObject("module");
+                    YJSONObject module = loadval.getYJSONObject("module");
                     if (!_wpRec.getLogicalName().equals(module.getString("logicalName"))) {
                         _wpRec.setLogicalName(module.getString("logicalName"));
                         _moduleYPEntry.setLogicalName(_wpRec.getLogicalName());
@@ -155,7 +157,7 @@ public class YDevice
                     }
                     _wpRec.setBeacon(module.getInt("beacon"));
                 } else if (!key.equals("services")) {
-                    JSONObject func = loadval.getJSONObject(key);
+                    YJSONObject func = loadval.getYJSONObject(key);
                     String name;
                     if (func.has("logicalName")) {
                         name = func.getString("logicalName");
@@ -177,36 +179,35 @@ public class YDevice
                     }
                 }
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new YAPI_Exception(YAPI.IO_ERROR, "Request failed, could not parse API result");
         }
 
         if (reindex) {
             _hub._yctx._yHash.reindexDevice(this);
         }
-        return YAPI.SUCCESS;
     }
 
     // Force the REST API string in cache to expire immediately
-    public void clearCache()
+    synchronized void clearCache()
     {
         _cache_expiration = 0;
     }
 
     // Retrieve the number of functions (beside "module") in the device
 
-    Collection<YPEntry> getFunctions()
+    synchronized Collection<YPEntry> getFunctions()
     {
         return _ypRecs.values();
     }
 
 
-    YPEntry getYPEntry(int idx)
+    synchronized YPEntry getYPEntry(int idx)
     {
         return _ypRecs.get(idx);
     }
 
-    byte[] requestHTTPSync(String request, byte[] rest_of_request) throws YAPI_Exception
+    synchronized byte[] requestHTTPSync(String request, byte[] rest_of_request) throws YAPI_Exception
     {
         String shortRequest = formatRequest(request);
         try {
@@ -217,13 +218,16 @@ public class YDevice
         }
     }
 
-    String requestHTTPSyncAsString(String request, byte[] rest_of_request) throws YAPI_Exception
+    @SuppressWarnings("SameParameterValue")
+    synchronized String requestHTTPSyncAsString(String request, byte[] rest_of_request) throws YAPI_Exception
     {
         final byte[] bytes = requestHTTPSync(request, rest_of_request);
         return new String(bytes, _hub._yctx._deviceCharset);
     }
 
-    void requestHTTPAsync(String request, byte[] rest_of_request, YGenericHub.RequestAsyncResult asyncResult, Object context) throws YAPI_Exception
+
+    @SuppressWarnings("SameParameterValue")
+    synchronized void requestHTTPAsync(String request, byte[] rest_of_request, YGenericHub.RequestAsyncResult asyncResult, Object context) throws YAPI_Exception
     {
         String shortRequest = formatRequest(request);
         try {
@@ -249,12 +253,12 @@ public class YDevice
     }
 
 
-    public double getDeviceTime()
+    double getDeviceTime()
     {
         return _deviceTime;
     }
 
-    public void setDeviceTime(Integer[] data)
+    void setDeviceTime(Integer[] data)
     {
         double time = (data[0] & 0xff) + 0x100 * (data[1] & 0xff) + 0x10000 * (data[2] & 0xff) + 0x1000000 * (data[3] & 0xff);
         _deviceTime = time + (data[4] & 0xff) / 250.0;

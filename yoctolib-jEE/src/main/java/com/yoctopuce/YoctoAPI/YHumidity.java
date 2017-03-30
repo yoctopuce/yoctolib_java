@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHumidity.java 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: YHumidity.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindHumidity(), the high-level API for Humidity functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YHumidity return codes)
 //--- (end of YHumidity return codes)
@@ -121,7 +119,7 @@ public class YHumidity extends YSensor
     //--- (YHumidity implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("relHum")) {
             _relHum = Math.round(json_val.getDouble("relHum") * 1000.0 / 65536.0) / 1000.0;

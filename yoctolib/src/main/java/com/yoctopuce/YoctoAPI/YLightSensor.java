@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.java 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: YLightSensor.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YLightSensor return codes)
 //--- (end of YLightSensor return codes)
@@ -125,7 +123,7 @@ public class YLightSensor extends YSensor
     //--- (YLightSensor implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("measureType")) {
             _measureType = json_val.getInt("measureType");

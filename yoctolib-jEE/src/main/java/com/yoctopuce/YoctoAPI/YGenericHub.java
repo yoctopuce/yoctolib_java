@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 25921 2016-11-17 16:44:33Z seb $
+ * $Id: YGenericHub.java 26957 2017-03-28 16:08:14Z seb $
  *
  * Internal YGenericHub object
  *
@@ -274,7 +274,7 @@ abstract class YGenericHub
         for (YDevice dev : _devices.values()) {
             String devSerialNumber = dev.getSerialNumber();
             if (devSerialNumber.equals(serialNumber)) {
-                return _http_params.getUrl(true, false) + dev._wpRec.getNetworkUrl();
+                return _http_params.getUrl(true, false) + dev.getNetworkUrl();
             }
         }
         return _http_params.getUrl(true, false);
@@ -286,7 +286,7 @@ abstract class YGenericHub
         for (YDevice dev : _devices.values()) {
             String devSerialNumber = dev.getSerialNumber();
             if (devSerialNumber.equals(serialNumber)) {
-                if (!dev._wpRec.getNetworkUrl().equals("")) {
+                if (!dev.getNetworkUrl().equals("")) {
                     //
                     res.clear();
                     return res;

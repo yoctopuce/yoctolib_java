@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLongitude.java 26640 2017-02-21 18:17:26Z seb $
+ * $Id: YLongitude.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindLongitude(), the high-level API for Longitude functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YLongitude return codes)
 //--- (end of YLongitude return codes)
@@ -112,7 +110,7 @@ public class YLongitude extends YSensor
     //--- (YLongitude implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         super._parseAttr(json_val);
     }

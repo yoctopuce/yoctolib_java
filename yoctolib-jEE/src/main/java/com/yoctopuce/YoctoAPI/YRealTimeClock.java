@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YRealTimeClock.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YRealTimeClock return codes)
 //--- (end of YRealTimeClock return codes)
@@ -133,7 +131,7 @@ public class YRealTimeClock extends YFunction
     //--- (YRealTimeClock implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("unixTime")) {
             _unixTime = json_val.getLong("unixTime");

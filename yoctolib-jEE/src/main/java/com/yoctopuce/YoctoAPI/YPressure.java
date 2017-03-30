@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPressure.java 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: YPressure.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindPressure(), the high-level API for Pressure functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YPressure return codes)
 //--- (end of YPressure return codes)
@@ -111,7 +109,7 @@ public class YPressure extends YSensor
     //--- (YPressure implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         super._parseAttr(json_val);
     }

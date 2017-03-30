@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrent.java 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: YCurrent.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindCurrent(), the high-level API for Current functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YCurrent return codes)
 //--- (end of YCurrent return codes)
@@ -118,7 +116,7 @@ public class YCurrent extends YSensor
     //--- (YCurrent implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("enabled")) {
             _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YModule.java 26934 2017-03-28 08:00:42Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -37,9 +37,6 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.*;
 
@@ -318,36 +315,31 @@ public class YModule extends YFunction
 
     private byte[] _flattenJsonStruct(byte[] actualSettings) throws YAPI_Exception
     {
-        JSONObject json = null;
-        JSONArray out = new JSONArray();
+        YJSONObject json = null;
+        YJSONArray out = new YJSONArray();
         try {
-            json = new JSONObject(new String(actualSettings, _yapi._deviceCharset));
-        } catch (JSONException ex) {
+            json = new YJSONObject(new String(actualSettings, _yapi._deviceCharset));
+            json.parse();
+        } catch (Exception ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
-        Iterator functionList = json.keys();
-        while (functionList.hasNext()) {
-            String fun_key = (String) functionList.next();
+        Set<String> functionList = json.getKeys();
+        for (String fun_key: functionList) {
             if (!fun_key.equals("services")) {
-                JSONObject functionJson = json.optJSONObject(fun_key);
+                YJSONObject functionJson = json.getYJSONObject(fun_key);
                 if (functionJson == null) {
                     continue;
                 }
-                Iterator attr_keys = functionJson.keys();
-                while (attr_keys.hasNext()) {
-                    String attr_key = (String) attr_keys.next();
-                    if (functionJson.optJSONObject(attr_key) != null) {
-                        continue;
-                    }
-                    Object value = functionJson.opt(attr_key);
-                    if (value == null) {
+                Set<String> attr_keys = functionJson.getKeys();
+                for (String attr_key: attr_keys) {
+                    YJSONContent value = functionJson.get(attr_key);
+                    if (value == null || value.getJSONType() == YJSONContent.YJSONType.OBJECT) {
                         continue;
                     }
                     String flat_attr = fun_key + "/" + attr_key + "=" + value.toString();
                     out.put(flat_attr);
                 }
             }
-
         }
         return out.toString().getBytes();
     }
@@ -403,7 +395,7 @@ public class YModule extends YFunction
     // --- (generated code: YModule implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("productName")) {
             _productName = json_val.getString("productName");

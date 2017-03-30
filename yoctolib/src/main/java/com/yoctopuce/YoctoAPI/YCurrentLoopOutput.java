@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrentLoopOutput.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YCurrentLoopOutput.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 import java.util.Locale;
 
 //--- (YCurrentLoopOutput return codes)
@@ -133,7 +131,7 @@ public class YCurrentLoopOutput extends YFunction
     //--- (YCurrentLoopOutput implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("current")) {
             _current = Math.round(json_val.getDouble("current") * 1000.0 / 65536.0) / 1000.0;

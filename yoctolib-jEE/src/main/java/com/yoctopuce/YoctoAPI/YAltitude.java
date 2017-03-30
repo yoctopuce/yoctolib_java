@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAltitude.java 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: YAltitude.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YAltitude return codes)
 //--- (end of YAltitude return codes)
@@ -123,7 +121,7 @@ public class YAltitude extends YSensor
     //--- (YAltitude implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("qnh")) {
             _qnh = Math.round(json_val.getDouble("qnh") * 1000.0 / 65536.0) / 1000.0;

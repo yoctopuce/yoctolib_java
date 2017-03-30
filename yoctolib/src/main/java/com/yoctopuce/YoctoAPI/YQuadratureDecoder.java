@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQuadratureDecoder.java 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: YQuadratureDecoder.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YQuadratureDecoder return codes)
 //--- (end of YQuadratureDecoder return codes)
@@ -123,7 +121,7 @@ public class YQuadratureDecoder extends YSensor
     //--- (YQuadratureDecoder implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("speed")) {
             _speed = Math.round(json_val.getDouble("speed") * 1000.0 / 65536.0) / 1000.0;

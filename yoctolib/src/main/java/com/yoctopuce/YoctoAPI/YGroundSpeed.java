@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGroundSpeed.java 26640 2017-02-21 18:17:26Z seb $
+ * $Id: YGroundSpeed.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindGroundSpeed(), the high-level API for GroundSpeed functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YGroundSpeed return codes)
 //--- (end of YGroundSpeed return codes)
@@ -112,7 +110,7 @@ public class YGroundSpeed extends YSensor
     //--- (YGroundSpeed implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         super._parseAttr(json_val);
     }

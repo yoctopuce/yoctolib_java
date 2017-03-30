@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 26008 2016-11-23 13:47:41Z seb $
+ * $Id: YHTTPHub.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -36,17 +36,14 @@
  *********************************************************************/
 package com.yoctopuce.YoctoAPI;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Random;
+import java.util.Set;
 
 class YHTTPHub extends YGenericHub
 {
@@ -268,32 +265,31 @@ class YHTTPHub extends YGenericHub
         HashMap<String, ArrayList<YPEntry>> yellowPages = new HashMap<>();
         ArrayList<WPEntry> whitePages = new ArrayList<>();
 
-        JSONObject loadval;
+        YJSONObject loadval;
         try
 
         {
-            loadval = new JSONObject(json_data);
-            if (!loadval.has("services") || !loadval.getJSONObject("services").has("whitePages")) {
+            loadval = new YJSONObject(json_data);
+            loadval.parse();
+            if (!loadval.has("services") || !loadval.getYJSONObject("services").has("whitePages")) {
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Device "
                         + _http_params.getHost() + " is not a hub");
             }
-            _serial = loadval.getJSONObject("module").getString("serialNumber");
-            JSONArray whitePages_json = loadval.getJSONObject("services").getJSONArray("whitePages");
-            JSONObject yellowPages_json = loadval.getJSONObject("services").getJSONObject("yellowPages");
+            _serial = loadval.getYJSONObject("module").getString("serialNumber");
+            YJSONArray whitePages_json = loadval.getYJSONObject("services").getYJSONArray("whitePages");
+            YJSONObject yellowPages_json = loadval.getYJSONObject("services").getYJSONObject("yellowPages");
             if (loadval.has("network")) {
-                String adminpass = loadval.getJSONObject("network").getString("adminPassword");
+                String adminpass = loadval.getYJSONObject("network").getString("adminPassword");
                 _writeProtected = adminpass.length() > 0;
             }
             // Reindex all functions from yellow pages
             //HashMap<String, Boolean> refresh = new HashMap<String, Boolean>();
-            Iterator<?> keys = yellowPages_json.keys();
-            while (keys.hasNext()) {
-                String classname = keys.next().toString();
-                JSONArray yprecs_json = yellowPages_json.getJSONArray(classname);
-                ArrayList<YPEntry> yprecs_arr = new ArrayList<>(
-                        yprecs_json.length());
+            Set<String> keys = yellowPages_json.getKeys();
+            for (String classname : keys) {
+                YJSONArray yprecs_json = yellowPages_json.getYJSONArray(classname);
+                ArrayList<YPEntry> yprecs_arr = new ArrayList<>(yprecs_json.length());
                 for (int i = 0; i < yprecs_json.length(); i++) {
-                    YPEntry yprec = new YPEntry(yprecs_json.getJSONObject(i));
+                    YPEntry yprec = new YPEntry(yprecs_json.getYJSONObject(i));
                     yprecs_arr.add(yprec);
                 }
                 yellowPages.put(classname, yprecs_arr);
@@ -302,17 +298,13 @@ class YHTTPHub extends YGenericHub
             _serialByYdx.clear();
             // Reindex all devices from white pages
             for (int i = 0; i < whitePages_json.length(); i++) {
-                JSONObject jsonObject = whitePages_json.getJSONObject(i);
+                YJSONObject jsonObject = whitePages_json.getYJSONObject(i);
                 WPEntry devinfo = new WPEntry(jsonObject);
                 int index = jsonObject.getInt("index");
                 _serialByYdx.put(index, devinfo.getSerialNumber());
                 whitePages.add(devinfo);
             }
-        } catch (
-                JSONException e
-                )
-
-        {
+        } catch (Exception e) {
             throw new YAPI_Exception(YAPI.IO_ERROR,
                     "Request failed, could not parse API result for "
                             + _http_params.getHost(), e);
@@ -364,12 +356,13 @@ class YHTTPHub extends YGenericHub
         byte[] bytes = _notificationHandler.hubRequestSync("GET " + baseurl + "/flash.json?a=state", null, YIO_DEFAULT_TCP_TIMEOUT);
         String uploadstate = new String(bytes);
         try {
-            JSONObject uploadres = new JSONObject(uploadstate);
+            YJSONObject uploadres = new YJSONObject(uploadstate);
+            uploadres.parse();
             String state = uploadres.getString("state");
             if (state.equals("uploading") || state.equals("flashing")) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot start firmware update: busy (" + state + ")");
             }
-        } catch (JSONException ex) {
+        } catch (Exception ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json response :" + ex.getLocalizedMessage());
         }
         // start firmware upload
@@ -381,26 +374,28 @@ class YHTTPHub extends YGenericHub
         bytes = _notificationHandler.hubRequestSync("GET " + baseurl + "/flash.json?a=state", null, YIO_10_MINUTES_TCP_TIMEOUT);
         String uploadresstr = new String(bytes);
         try {
-            JSONObject uploadres = new JSONObject(uploadresstr);
+            YJSONObject uploadres = new YJSONObject(uploadresstr);
+            uploadres.parse();
             if (!uploadres.getString("state").equals("valid")) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, "Upload of firmware failed: invalid firmware(" + uploadres.getString("state") + ")");
             }
             if (uploadres.getInt("progress") != 100) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, "Upload of firmware failed: incomplete upload");
             }
-        } catch (JSONException ex) {
+        } catch (Exception ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json response :" + ex.getLocalizedMessage());
         }
         if (use_self_flash) {
             byte[] startupConf;
             try {
                 String json = new String(settings);
-                JSONObject jsonObject = new JSONObject(json);
-                JSONObject settingsOnly = jsonObject.getJSONObject("api");
+                YJSONObject jsonObject = new YJSONObject(json);
+                jsonObject.parse();
+                YJSONObject settingsOnly = jsonObject.getYJSONObject("api");
                 settingsOnly.remove("services");
                 String startupConfStr = settingsOnly.toString();
                 startupConf = startupConfStr.getBytes();
-            } catch (JSONException ex) {
+            } catch (Exception ex) {
                 startupConf = new byte[0];
             }
             progress.firmware_progress(20, "Upload startupConf.json");
@@ -445,14 +440,15 @@ class YHTTPHub extends YGenericHub
             res = _notificationHandler.hubRequestSync("GET /flash.json?a=flash&s=" + serial, null, YIO_10_MINUTES_TCP_TIMEOUT);
             try {
                 String jsonstr = new String(res);
-                JSONObject flashres = new JSONObject(jsonstr);
-                JSONArray list = flashres.getJSONArray("logs");
+                YJSONObject flashres = new YJSONObject(jsonstr);
+                flashres.parse();
+                YJSONArray list = flashres.getYJSONArray("logs");
                 ArrayList<String> logs = new ArrayList<>(list.length());
                 for (int i = 0; i < list.length(); i++) {
                     logs.add(list.getString(i));
                 }
                 return logs;
-            } catch (JSONException ex) {
+            } catch (Exception ex) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, "invalid response");
             }
         }
@@ -507,12 +503,13 @@ class YHTTPHub extends YGenericHub
         byte[] raw_data = _notificationHandler.hubRequestSync("GET /flash.json?a=list", null, YIO_DEFAULT_TCP_TIMEOUT);
         String jsonstr = new String(raw_data);
         try {
-            JSONObject flashres = new JSONObject(jsonstr);
-            JSONArray list = flashres.getJSONArray("list");
+            YJSONObject flashres = new YJSONObject(jsonstr);
+            flashres.parse();
+            YJSONArray list = flashres.getYJSONArray("list");
             for (int i = 0; i < list.length(); i++) {
                 res.add(list.getString(i));
             }
-        } catch (JSONException ex) {
+        } catch (Exception ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, "Unable to retrieve bootloader list");
         }
         return res;

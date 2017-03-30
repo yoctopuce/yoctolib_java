@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 26640 2017-02-21 18:17:26Z seb $
+ * $Id: YQt.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (generated code: YQt return codes)
 //--- (end of generated code: YQt return codes)
@@ -107,7 +105,7 @@ public class YQt extends YSensor
     //--- (generated code: YQt implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         super._parseAttr(json_val);
     }

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: YFunction.java 26954 2017-03-28 15:53:36Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -37,10 +37,6 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONStringer;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -187,7 +183,7 @@ public class YFunction
     }
 
     //--- (generated code: YFunction implementation)
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("logicalName")) {
             _logicalName = json_val.getString("logicalName");
@@ -542,7 +538,7 @@ public class YFunction
      * @return a string that describes the function
      *         (ex: Relay(MyCustomName.relay1)=RELAYLO1-123456.relay1)
      */
-    public String describe()
+    public synchronized String describe()
     {
         try {
             String hwid = _yapi._yHash.resolveHwID(_className, _func);
@@ -563,12 +559,12 @@ public class YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public String get_hardwareId() throws YAPI_Exception
+    public synchronized String get_hardwareId() throws YAPI_Exception
     {
         return _yapi._yHash.resolveHwID(_className, _func);
     }
 
-    public String getHardwareId() throws YAPI_Exception
+    public synchronized String getHardwareId() throws YAPI_Exception
     {
         return _yapi._yHash.resolveHwID(_className, _func);
     }
@@ -582,12 +578,12 @@ public class YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public String get_functionId() throws YAPI_Exception
+    public synchronized String get_functionId() throws YAPI_Exception
     {
         return _yapi._yHash.resolveFuncId(_className, _func);
     }
 
-    public String getFunctionId() throws YAPI_Exception
+    public synchronized String getFunctionId() throws YAPI_Exception
     {
         return _yapi._yHash.resolveFuncId(_className, _func);
     }
@@ -604,7 +600,7 @@ public class YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public String get_friendlyName() throws YAPI_Exception
+    public synchronized String get_friendlyName() throws YAPI_Exception
     {
         YPEntry yp = _yapi._yHash.resolveFunction(_className, _func);
         return yp.getFriendlyName(_yapi);
@@ -623,11 +619,11 @@ public class YFunction
         return describe();
     }
 
-    protected void _parse(JSONObject json, long msValidity) throws YAPI_Exception
+    protected void _parse(YJSONObject json, long msValidity) throws YAPI_Exception
     {
         try {
             _parseAttr(json);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             _throw(YAPI.IO_ERROR, e.getMessage());
         }
         _parserHelper();
@@ -696,14 +692,15 @@ public class YFunction
 
     protected String _json_get_key(byte[] json, String key) throws YAPI_Exception
     {
-        JSONObject obj = null;
+        YJSONObject obj = null;
         try {
-            obj = new JSONObject(new String(json, _yapi._deviceCharset));
-        } catch (JSONException ex) {
+            obj = new YJSONObject(new String(json, _yapi._deviceCharset));
+            obj.parse();
+        } catch (Exception ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         if (obj.has(key)) {
-            String val = obj.optString(key);
+            String val = obj.getString(key);
             if (val == null)
                 val = obj.toString();
             return val;
@@ -713,40 +710,33 @@ public class YFunction
 
     protected String _json_get_string(byte[] json) throws YAPI_Exception
     {
-        JSONArray array = null;
+        YJSONArray array = null;
         try {
             String s = new String(json, _yapi._deviceCharset);
-            array = new JSONArray("[" + s + "]");
-        } catch (JSONException ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
-        }
-        try {
-            return array.getString(0);
-        } catch (JSONException ex) {
+            YJSONString yjsonString = new YJSONString(s, 0, s.length());
+            yjsonString.parse();
+            return yjsonString.getString();
+        } catch (Exception ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
     }
 
     protected ArrayList<String> _json_get_array(byte[] json) throws YAPI_Exception
     {
-        JSONArray array = null;
+        YJSONArray array = null;
         try {
-            array = new JSONArray(new String(json, _yapi._deviceCharset));
-        } catch (JSONException ex) {
+            array = new YJSONArray(new String(json, _yapi._deviceCharset));
+            array.parse();
+        } catch (Exception ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         ArrayList<String> list = new ArrayList<>();
         int len = array.length();
         for (int i = 0; i < len; i++) {
             try {
-                Object o = array.get(i);
-                if (o.getClass().getName().substring(0, 3).equals("JSO")) {
-                    list.add(o.toString());
-                } else {
-                    String s = new JSONStringer().object().key("X").value(o).endObject().toString();
-                    list.add(s.substring(5, s.length() - 1));
-                }
-            } catch (JSONException ex) {
+                YJSONContent o = array.get(i);
+                list.add(o.toJSON());
+            } catch (Exception ex) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
             }
         }
@@ -754,7 +744,7 @@ public class YFunction
     }
 
 
-    protected String _get_json_path_struct(JSONObject jsonObject, String[] paths, int ofs)
+    protected String _get_json_path_struct(YJSONObject jsonObject, String[] paths, int ofs)
     {
 
         String key = paths[ofs];
@@ -762,78 +752,36 @@ public class YFunction
             return "";
         }
 
-        Object obj = jsonObject.opt(key);
+        YJSONContent obj = jsonObject.get(key);
         if (obj != null) {
             if (paths.length == ofs + 1) {
-                if (obj instanceof Integer) {
-                    return jsonObject.optString(key);
-                } else if (obj instanceof String) {
-                    return JSONObject.quote(jsonObject.optString(key));
-                } else if (obj instanceof JSONArray) {
-                    JSONArray jobj = (JSONArray) obj;
-                    try {
-                        return jobj.toString(0);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        return "";
-                    }
-                } else if (obj instanceof JSONObject) {
-                    JSONObject jobj = (JSONObject) obj;
-                    try {
-                        return jobj.toString(0);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        return "";
-                    }
-                }
+                return obj.toJSON();
             }
-
-            if (obj instanceof JSONArray) {
-                return _get_json_path_array(jsonObject.optJSONArray(key), paths, ofs + 1);
-            } else if (obj instanceof JSONObject) {
-                return _get_json_path_struct(jsonObject.optJSONObject(key), paths, ofs + 1);
+            if (obj.getJSONType() == YJSONContent.YJSONType.ARRAY) {
+                return _get_json_path_array(jsonObject.getYJSONArray(key), paths, ofs + 1);
+            } else if (obj.getJSONType() == YJSONContent.YJSONType.OBJECT) {
+                return _get_json_path_struct(jsonObject.getYJSONObject(key), paths, ofs + 1);
             }
         }
         return "";
     }
 
-    private String _get_json_path_array(JSONArray jsonArray, String[] paths, int ofs)
+    private String _get_json_path_array(YJSONArray jsonArray, String[] paths, int ofs)
     {
         int key = Integer.valueOf(paths[ofs]);
         if (jsonArray.length() <= key) {
             return "";
         }
 
-        Object obj = jsonArray.opt(key);
+        YJSONContent obj = jsonArray.get(key);
         if (obj != null) {
             if (paths.length == ofs + 1) {
-                if (obj instanceof Integer) {
-                    return jsonArray.optString(key);
-                } else if (obj instanceof String) {
-                    return JSONObject.quote(jsonArray.optString(key));
-                } else if (obj instanceof JSONArray) {
-                    JSONArray jobj = (JSONArray) obj;
-                    try {
-                        return jobj.toString(0);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        return "";
-                    }
-                } else if (obj instanceof JSONObject) {
-                    JSONObject jobj = (JSONObject) obj;
-                    try {
-                        return jobj.toString(0);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        return "";
-                    }
-                }
+                return obj.toJSON();
             }
-
-            if (obj instanceof JSONArray) {
-                return _get_json_path_array(jsonArray.optJSONArray(key), paths, ofs + 1);
-            } else if (obj instanceof JSONObject) {
-                return _get_json_path_struct(jsonArray.optJSONObject(key), paths, ofs + 1);
+            if (obj.getJSONType() == YJSONContent.YJSONType.ARRAY) {
+                return _get_json_path_array(jsonArray.getYJSONArray(key), paths, ofs + 1);
+            } else if (obj.getJSONType() == YJSONContent.YJSONType.OBJECT) {
+                return _get_json_path_struct(jsonArray.getYJSONObject(key), paths, ofs + 1);
             }
         }
         return "";
@@ -842,16 +790,16 @@ public class YFunction
 
     protected String _get_json_path(String json, String path)
     {
-        JSONObject jsonObject = null;
+        YJSONObject jsonObject = null;
         try {
-            jsonObject = new JSONObject(json);
-        } catch (JSONException ex) {
+            jsonObject = new YJSONObject(json);
+            jsonObject.parse();
+        } catch (Exception ex) {
             return "";
         }
 
         String[] split = path.split("\\|");
         int ofs = 0;
-
         return _get_json_path_struct(jsonObject, split, 0);
     }
 
@@ -859,9 +807,10 @@ public class YFunction
     {
 
         try {
-            JSONArray array = new JSONArray("[" + json + "]");
-            return array.getString(0);
-        } catch (JSONException ex) {
+            YJSONString yjsonString = new YJSONString(json);
+            yjsonString.parse();
+            return yjsonString.getString();
+        } catch (Exception ex) {
             return "";
         }
     }
@@ -870,21 +819,21 @@ public class YFunction
     // identifier, possibly applying changes
     // Device cache will be preloaded when loading function "module" and
     // leveraged for other modules
-    protected JSONObject _devRequest(String extra) throws YAPI_Exception
+    protected YJSONObject _devRequest(String extra) throws YAPI_Exception
     {
         YDevice dev = getYDevice();
         _hwId = _yapi._yHash.resolveHwID(_className, _func);
         String[] split = _hwId.split("\\.");
         _funId = split[1];
         _serial = split[0];
-        JSONObject loadval = null;
+        YJSONObject loadval = null;
         if (extra.equals("")) {
             // use a cached API string, without reloading unless module is
             // requested
-            JSONObject jsonval = dev.requestAPI();
+            YJSONObject jsonval = dev.requestAPI();
             try {
-                loadval = jsonval.getJSONObject(_funId);
-            } catch (JSONException ex) {
+                loadval = jsonval.getYJSONObject(_funId);
+            } catch (Exception ex) {
                 throw new YAPI_Exception(YAPI.IO_ERROR,
                         "Request failed, could not parse API result for " + dev);
             }
@@ -897,8 +846,9 @@ public class YFunction
                 String httpreq = "GET /api/" + _funId + ".json";
                 String yreq = dev.requestHTTPSyncAsString(httpreq, null);
                 try {
-                    loadval = new JSONObject(yreq);
-                } catch (JSONException ex) {
+                    loadval = new YJSONObject(yreq);
+                    loadval.parse();
+                } catch (Exception ex) {
                     throw new YAPI_Exception(YAPI.IO_ERROR,
                             "Request failed, could not parse API value for "
                                     + httpreq);
@@ -945,7 +895,7 @@ public class YFunction
      *
      * @return true if the function can be reached, and false otherwise
      */
-    public boolean isOnline()
+    public synchronized boolean isOnline()
     {
         // A valid value in cache means that the device is online
         if (_cacheExpiration > YAPI.GetTickCount()) {
@@ -1023,7 +973,7 @@ public class YFunction
      *
      *
      */
-    public void clearCache()
+    public synchronized void clearCache()
     {
         try {
             YDevice dev = getYDevice();
@@ -1050,9 +1000,9 @@ public class YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public int load(long msValidity) throws YAPI_Exception
+    public synchronized int load(long msValidity) throws YAPI_Exception
     {
-        JSONObject json_obj = _devRequest("");
+        YJSONObject json_obj = _devRequest("");
         _parse(json_obj, msValidity);
         _cacheExpiration = YAPI.GetTickCount() + msValidity;
         return YAPI.SUCCESS;
@@ -1065,7 +1015,7 @@ public class YFunction
      *
      * @return an instance of YModule
      */
-    public YModule get_module()
+    public synchronized YModule get_module()
     {
         // try to resolve the function name to a device id without query
         if (_serial != null && !_serial.equals("")) {
@@ -1109,7 +1059,7 @@ public class YFunction
      *
      * If the function has never been contacted, the returned value is YFunction.FUNCTIONDESCRIPTOR_INVALID.
      */
-    public String get_functionDescriptor()
+    public synchronized String get_functionDescriptor()
     {
         // try to resolve the function name to a device id without query
         try {
@@ -1137,7 +1087,7 @@ public class YFunction
      *
      * @return the object stored previously by the caller.
      */
-    public Object get_userData()
+    public synchronized Object get_userData()
     {
         return _userData;
     }
@@ -1159,7 +1109,7 @@ public class YFunction
      * @param data : any kind of object to be stored
      *
      */
-    public void set_userData(Object data)
+    public synchronized void set_userData(Object data)
     {
         _userData = data;
     }

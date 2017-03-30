@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataSet.java 26132 2016-12-01 17:02:38Z seb $
+ * $Id: YDataSet.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -36,10 +36,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -111,8 +107,8 @@ public class YDataSet
     // YDataSet parser for stream list
     protected int _parse(String json_str) throws YAPI_Exception
     {
-        JSONObject json;
-        JSONArray jstreams;
+        YJSONObject json;
+        YJSONArray jstreams;
         double summaryMinVal = Double.MAX_VALUE;
         double summaryMaxVal = Double.MIN_VALUE;
         double summaryTotalTime = 0;
@@ -123,7 +119,8 @@ public class YDataSet
         long endTime = 0;
 
         try {
-            json = new JSONObject(json_str);
+            json = new YJSONObject(json_str);
+            json.parse();
             _functionId = json.getString("id");
             _unit = json.getString("unit");
             if (json.has("calib")) {
@@ -135,7 +132,7 @@ public class YDataSet
             _streams = new ArrayList<>();
             _preview = new ArrayList<>();
             _measures = new ArrayList<>();
-            jstreams = json.getJSONArray("streams");
+            jstreams = json.getYJSONArray("streams");
             for (int i = 0; i < jstreams.length(); i++) {
                 YDataStream stream = _parent._findDataStream(this, jstreams.getString(i));
                 streamStartTime = stream.get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
@@ -181,7 +178,7 @@ public class YDataSet
                 }
                 _summary = new YMeasure(_startTime, _endTime, summaryMinVal, summaryTotalAvg / summaryTotalTime, summaryMaxVal);
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json structure for YDataSet: " + e.getMessage());
         }
         _progress = 0;

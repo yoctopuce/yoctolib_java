@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YSensor.java 26999 2017-03-30 16:42:45Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -38,9 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -285,7 +282,7 @@ public class YSensor extends YFunction
     //--- (generated code: YSensor implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("unit")) {
             _unit = json_val.getString("unit");
@@ -1265,9 +1262,13 @@ public class YSensor extends YFunction
     public int calibrateFromPoints(ArrayList<Double> rawValues,ArrayList<Double> refValues) throws YAPI_Exception
     {
         String rest_val;
+        int res;
         // may throw an exception
-        rest_val = _encodeCalibrationPoints(rawValues, refValues);
-        return _setAttr("calibrationParam", rest_val);
+        synchronized (this) {
+            rest_val = _encodeCalibrationPoints(rawValues, refValues);
+            res = _setAttr("calibrationParam", rest_val);
+        }
+        return res;
     }
 
     /**
@@ -1288,22 +1289,24 @@ public class YSensor extends YFunction
         rawValues.clear();
         refValues.clear();
         // Load function parameters if not yet loaded
-        if (_scale == 0) {
-            if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                return YAPI.DEVICE_NOT_FOUND;
+        synchronized (this) {
+            if (_scale == 0) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return YAPI.DEVICE_NOT_FOUND;
+                }
             }
-        }
-        if (_caltyp < 0) {
-            _throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
-            return YAPI.NOT_SUPPORTED;
-        }
-        rawValues.clear();
-        refValues.clear();
-        for (double ii:_calraw) {
-            rawValues.add(ii);
-        }
-        for (double ii:_calref) {
-            refValues.add(ii);
+            if (_caltyp < 0) {
+                _throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
+                return YAPI.NOT_SUPPORTED;
+            }
+            rawValues.clear();
+            refValues.clear();
+            for (double ii:_calraw) {
+                rawValues.add(ii);
+            }
+            for (double ii:_calref) {
+                refValues.add(ii);
+            }
         }
         return YAPI.SUCCESS;
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDigitalIO.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YDigitalIO.java 26949 2017-03-28 15:36:15Z mvuilleu $
  *
  * Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 import java.util.Locale;
 
 //--- (YDigitalIO return codes)
@@ -75,6 +73,10 @@ public class YDigitalIO extends YFunction
      */
     public static final int PORTPOLARITY_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid portDiags value
+     */
+    public static final int PORTDIAGS_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid portSize value
      */
     public static final int PORTSIZE_INVALID = YAPI.INVALID_UINT;
@@ -93,6 +95,7 @@ public class YDigitalIO extends YFunction
     protected int _portDirection = PORTDIRECTION_INVALID;
     protected int _portOpenDrain = PORTOPENDRAIN_INVALID;
     protected int _portPolarity = PORTPOLARITY_INVALID;
+    protected int _portDiags = PORTDIAGS_INVALID;
     protected int _portSize = PORTSIZE_INVALID;
     protected int _outputVoltage = OUTPUTVOLTAGE_INVALID;
     protected String _command = COMMAND_INVALID;
@@ -150,7 +153,7 @@ public class YDigitalIO extends YFunction
     //--- (YDigitalIO implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("portState")) {
             _portState = json_val.getInt("portState");
@@ -163,6 +166,9 @@ public class YDigitalIO extends YFunction
         }
         if (json_val.has("portPolarity")) {
             _portPolarity = json_val.getInt("portPolarity");
+        }
+        if (json_val.has("portDiags")) {
+            _portDiags = json_val.getInt("portDiags");
         }
         if (json_val.has("portSize")) {
             _portSize = json_val.getInt("portSize");
@@ -464,6 +470,43 @@ public class YDigitalIO extends YFunction
     public int setPortPolarity(int newval)  throws YAPI_Exception
     {
         return set_portPolarity(newval);
+    }
+
+    /**
+     * Returns the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only). Bit 0 indicates a shortcut on
+     * output 0, etc. Bit 8 indicates a power failure, and bit 9 signals overheating (overcurrent).
+     * During normal use, all diagnostic bits should stay clear.
+     *
+     * @return an integer corresponding to the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_portDiags() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PORTDIAGS_INVALID;
+                }
+            }
+            res = _portDiags;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only). Bit 0 indicates a shortcut on
+     * output 0, etc. Bit 8 indicates a power failure, and bit 9 signals overheating (overcurrent).
+     * During normal use, all diagnostic bits should stay clear.
+     *
+     * @return an integer corresponding to the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getPortDiags() throws YAPI_Exception
+    {
+        return get_portDiags();
     }
 
     /**

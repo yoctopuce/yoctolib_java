@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBluetoothLink.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YBluetoothLink.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YBluetoothLink return codes)
 //--- (end of YBluetoothLink return codes)
@@ -167,7 +165,7 @@ public class YBluetoothLink extends YFunction
     //--- (YBluetoothLink implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("ownAddress")) {
             _ownAddress = json_val.getString("ownAddress");

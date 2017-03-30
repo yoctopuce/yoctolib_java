@@ -63,10 +63,6 @@ WARRANTY, OR OTHERWISE.
 
 		Directory with sample programs in Java
 
-* JsonParser/
-
-		Json parser source file (not used by Maven lib)
-
 * Sources/
 
 		Source code of the high-level library (in Java)

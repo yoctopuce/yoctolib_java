@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YDaisyChain return codes)
 //--- (end of YDaisyChain return codes)
@@ -130,7 +128,7 @@ public class YDaisyChain extends YFunction
     //--- (YDaisyChain implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("daisyState")) {
             _daisyState = json_val.getInt("daisyState");

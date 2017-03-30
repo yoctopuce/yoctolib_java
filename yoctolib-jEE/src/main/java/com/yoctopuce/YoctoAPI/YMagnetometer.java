@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMagnetometer.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YMagnetometer.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YMagnetometer return codes)
 //--- (end of YMagnetometer return codes)
@@ -137,7 +135,7 @@ public class YMagnetometer extends YSensor
     //--- (YMagnetometer implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("bandwidth")) {
             _bandwidth = json_val.getInt("bandwidth");

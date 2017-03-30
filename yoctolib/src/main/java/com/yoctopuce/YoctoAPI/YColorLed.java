@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 26670 2017-02-28 13:41:47Z seb $
+ * $Id: YColorLed.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 import java.util.Locale;
 
 //--- (YColorLed return codes)
@@ -161,7 +159,7 @@ public class YColorLed extends YFunction
     //--- (YColorLed implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("rgbColor")) {
             _rgbColor = json_val.getInt("rgbColor");
@@ -170,7 +168,7 @@ public class YColorLed extends YFunction
             _hslColor = json_val.getInt("hslColor");
         }
         if (json_val.has("rgbMove")) {
-            JSONObject subjson = json_val.getJSONObject("rgbMove");
+            YJSONObject subjson = json_val.getYJSONObject("rgbMove");
             if (subjson.has("moving")) {
                 _rgbMove.moving = subjson.getInt("moving");
             }
@@ -182,7 +180,7 @@ public class YColorLed extends YFunction
             }
         }
         if (json_val.has("hslMove")) {
-            JSONObject subjson = json_val.getJSONObject("hslMove");
+            YJSONObject subjson = json_val.getYJSONObject("hslMove");
             if (subjson.has("moving")) {
                 _hslMove.moving = subjson.getInt("moving");
             }

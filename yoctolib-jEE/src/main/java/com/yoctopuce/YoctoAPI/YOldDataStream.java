@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOldDataStream.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YOldDataStream.java 26934 2017-03-28 08:00:42Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -39,16 +39,12 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.util.ArrayList;
 
 /**
  * YOldDataStream Class: Sequence of measured data, returned by the data logger
- *  
+ *
  * A data stream is a small collection of consecutive measures for a set
  * of sensors. A few properties are available directly from the object itself
  * (they are preloaded at instantiation time), while most other properties and
@@ -80,16 +76,17 @@ public class YOldDataStream extends YDataStream
 
     public int loadStream() throws YAPI_Exception
     {
-        JSONArray coldiv = null;
+        YJSONArray coldiv = null;
         int coltyp[] = null;
         double colscl[];
         int colofs[];
 
-        JSONObject jsonObj = null;
+        YJSONObject jsonObj = null;
 
         try {
-            JSONTokener jsonTokenner = _dataLogger.getData(_runNo, _timeStamp);
-            jsonObj = new JSONObject(jsonTokenner);
+            String json_str = _dataLogger.getData(_runNo, _timeStamp);
+            jsonObj = new YJSONObject(json_str);
+            jsonObj.parse();
             if (jsonObj.has("time")) {
                 _timeStamp = jsonObj.getInt("time");
             }
@@ -103,7 +100,7 @@ public class YOldDataStream extends YDataStream
                 _nRows = jsonObj.getInt("nRows");
             }
             if (jsonObj.has("keys")) {
-                JSONArray jsonKeys = jsonObj.getJSONArray("keys");
+                YJSONArray jsonKeys = jsonObj.getYJSONArray("keys");
                 if (_nCols == 0) {
                     _nCols = jsonKeys.length();
                 } else if (_nCols != jsonKeys.length()) {
@@ -117,7 +114,7 @@ public class YOldDataStream extends YDataStream
             }
 
             if (jsonObj.has("div")) {
-                coldiv = jsonObj.getJSONArray("div");
+                coldiv = jsonObj.getYJSONArray("div");
                 if (_nCols == 0) {
                     _nCols = coldiv.length();
                 } else if (_nCols != coldiv.length()) {
@@ -128,7 +125,7 @@ public class YOldDataStream extends YDataStream
 
 
             if (jsonObj.has("type")) {
-                JSONArray types = jsonObj.getJSONArray("type");
+                YJSONArray types = jsonObj.getYJSONArray("type");
                 if (_nCols == 0) {
                     _nCols = types.length();
                 } else if (_nCols != types.length()) {
@@ -143,7 +140,7 @@ public class YOldDataStream extends YDataStream
 
             if (jsonObj.has("scal")) {
 
-                JSONArray json_colscl = jsonObj.getJSONArray("scal");
+                YJSONArray json_colscl = jsonObj.getYJSONArray("scal");
                 if (_nCols == 0) {
                     _nCols = json_colscl.length();
                 } else if (_nCols != json_colscl.length()) {
@@ -169,7 +166,7 @@ public class YOldDataStream extends YDataStream
                 }
 
             }
-        } catch (JSONException ex) {
+        } catch (Exception ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, "json parse error");
         }
 
@@ -179,21 +176,14 @@ public class YOldDataStream extends YDataStream
                 throw new YAPI_Exception(YAPI.IO_ERROR, "DataStream corrupted");
             }
             ArrayList<Integer> udata = null;
-            try {
-                String data = jsonObj.getString("data");
-                udata = YAPIContext._decodeWords(data);
-            } catch (JSONException ignore) {
-            }
+            String data = jsonObj.getString("data");
+            udata = YAPIContext._decodeWords(data);
 
             if (udata == null) {
-                try {
-                    JSONArray jsonData = jsonObj.getJSONArray("data");
-                    udata = new ArrayList<>();
-                    for (int i = 0; i < jsonData.length(); i++) {
-                        udata.add(jsonData.getInt(i));
-                    }
-                } catch (JSONException ex) {
-                    throw new YAPI_Exception(YAPI.IO_ERROR, "");
+                YJSONArray jsonData = jsonObj.getYJSONArray("data");
+                udata = new ArrayList<>();
+                for (int i = 0; i < jsonData.length(); i++) {
+                    udata.add(jsonData.getInt(i));
                 }
 
             }
@@ -227,7 +217,7 @@ public class YOldDataStream extends YDataStream
      * relative to the start of the time the device was powered on, and
      * is always positive.
      * If you need an absolute UTC timestamp, use get_startTimeUTC().
-     * 
+     *
      * @return an unsigned number corresponding to the number of seconds
      *         between the start of the run and the beginning of this data
      *         stream.
@@ -258,7 +248,7 @@ public class YOldDataStream extends YDataStream
      * rows of this data stream. By default, the data logger records one row
      * per second, but there might be alternative streams at lower resolution
      * created by summarizing the original stream for archiving purposes.
-     * 
+     *
      * This method does not cause any access to the device, as the value
      * is preloaded in the object at instantiation time.
      *

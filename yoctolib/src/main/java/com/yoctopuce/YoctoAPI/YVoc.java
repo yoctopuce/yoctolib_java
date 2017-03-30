@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoc.java 26826 2017-03-17 11:20:57Z mvuilleu $
+ * $Id: YVoc.java 26934 2017-03-28 08:00:42Z seb $
  *
  * Implements FindVoc(), the high-level API for Voc functions
  *
@@ -38,8 +38,6 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 //--- (YVoc return codes)
 //--- (end of YVoc return codes)
@@ -111,7 +109,7 @@ public class YVoc extends YSensor
     //--- (YVoc implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
-    protected void  _parseAttr(JSONObject json_val) throws JSONException
+    protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         super._parseAttr(json_val);
     }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWlanRecord.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YWlanRecord.java 26934 2017-03-28 08:00:42Z seb $
  *
  * YWlanRecord Class: Description of a wireless network detected
  *
@@ -39,9 +39,6 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 //--- (generated code: YWlanRecord class start)
 /**
  * YWlanRecord Class: Description of a wireless network
@@ -62,14 +59,14 @@ public class YWlanRecord
 
     YWlanRecord(String json_str) throws YAPI_Exception
     {
-        JSONObject json;
         try {
-            json = new JSONObject(json_str);
+            YJSONObject json = new YJSONObject(json_str);
+            json.parse();
             _ssid = json.getString("ssid");
             _channel = json.getInt("channel");
             _sec = json.getString("sec");
             _rssi = json.getInt("rssi");
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json struct for YWlanRecord");
         }
     }
