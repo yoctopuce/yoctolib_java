@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 26780 2017-03-16 14:02:09Z mvuilleu $
+ * $Id: YRangeFinder.java 27021 2017-03-31 14:58:15Z seb $
  *
  * Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
