@@ -459,10 +459,6 @@ public class YProximity extends YSensor
         return YAPI.SUCCESS;
     }
 
-    public int setPulseCounter(long newval)  throws YAPI_Exception
-    {
-        return set_pulseCounter(newval);
-    }
 
     /**
      * Returns the timer of the pulse counter (ms).

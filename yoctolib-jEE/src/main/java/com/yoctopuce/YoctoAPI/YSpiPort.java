@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSpiPort.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YSpiPort.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -581,9 +581,6 @@ public class YSpiPort extends YFunction
         return set_startupJob(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -598,14 +595,6 @@ public class YSpiPort extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCommand() throws YAPI_Exception
-    {
-        return get_command();
-    }
-
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -616,10 +605,6 @@ public class YSpiPort extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCommand(String newval)  throws YAPI_Exception
-    {
-        return set_command(newval);
-    }
 
     /**
      * Returns the voltage level used on the serial line.
@@ -1141,7 +1126,7 @@ public class YSpiPort extends YFunction
         _rxptr = 0;
         _rxbuffptr = 0;
         _rxbuff = new byte[0];
-        // may throw an exception
+        
         return sendCommand("Z");
     }
 
@@ -1177,6 +1162,7 @@ public class YSpiPort extends YFunction
         buff = (text).getBytes();
         bufflen = (buff).length;
         if (bufflen < 100) {
+            // if string is pure text, we can send it as a simple command (faster)
             ch = 0x20;
             idx = 0;
             while ((idx < bufflen) && (ch != 0)) {
@@ -1233,7 +1219,7 @@ public class YSpiPort extends YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+        
         res = _upload("txdata", buff);
         return res;
     }
@@ -1266,7 +1252,7 @@ public class YSpiPort extends YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+        
         res = _upload("txdata", buff);
         return res;
     }
@@ -1289,6 +1275,7 @@ public class YSpiPort extends YFunction
         buff = (String.format(Locale.US, "%s\r\n",text)).getBytes();
         bufflen = (buff).length-2;
         if (bufflen < 100) {
+            // if string is pure text, we can send it as a simple command (faster)
             ch = 0x20;
             idx = 0;
             while ((idx < bufflen) && (ch != 0)) {
@@ -1361,7 +1348,7 @@ public class YSpiPort extends YFunction
         // still mixed, need to process character by character
         _rxptr = currpos;
         
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=1",_rxptr));
         bufflen = (buff).length - 1;
         endpos = 0;
@@ -1400,7 +1387,7 @@ public class YSpiPort extends YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
         bufflen = (buff).length - 1;
         endpos = 0;
@@ -1437,7 +1424,7 @@ public class YSpiPort extends YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
         bufflen = (buff).length - 1;
         endpos = 0;
@@ -1480,7 +1467,7 @@ public class YSpiPort extends YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
         bufflen = (buff).length - 1;
         endpos = 0;
@@ -1523,7 +1510,7 @@ public class YSpiPort extends YFunction
         if (nBytes > 65535) {
             nBytes = 65535;
         }
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nBytes));
         bufflen = (buff).length - 1;
         endpos = 0;
@@ -1567,7 +1554,7 @@ public class YSpiPort extends YFunction
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
-        // may throw an exception
+        
         url = String.format(Locale.US, "rxmsg.json?pos=%d&len=1&maxw=1",_rxptr);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
@@ -1614,7 +1601,7 @@ public class YSpiPort extends YFunction
         int msglen;
         ArrayList<String> res = new ArrayList<>();
         int idx;
-        // may throw an exception
+        
         url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&pat=%s", _rxptr, maxWait,pattern);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
@@ -1669,7 +1656,7 @@ public class YSpiPort extends YFunction
         byte[] buff;
         int bufflen;
         int res;
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         bufflen = (buff).length - 1;
         while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
@@ -1698,7 +1685,7 @@ public class YSpiPort extends YFunction
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
-        // may throw an exception
+        
         url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,query);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);

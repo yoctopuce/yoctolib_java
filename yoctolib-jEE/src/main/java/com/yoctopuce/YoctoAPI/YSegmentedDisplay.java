@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSegmentedDisplay.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YSegmentedDisplay.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -197,9 +197,6 @@ public class YSegmentedDisplay extends YFunction
         return set_displayedText(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public int get_displayMode() throws YAPI_Exception
     {
         int res;
@@ -214,14 +211,6 @@ public class YSegmentedDisplay extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public int getDisplayMode() throws YAPI_Exception
-    {
-        return get_displayMode();
-    }
-
     public int set_displayMode(int  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -232,10 +221,6 @@ public class YSegmentedDisplay extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setDisplayMode(int newval)  throws YAPI_Exception
-    {
-        return set_displayMode(newval);
-    }
 
     /**
      * Retrieves a segmented display for a given identifier.

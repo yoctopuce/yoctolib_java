@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YDisplay.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -689,9 +689,6 @@ public class YDisplay extends YFunction
         return get_layerCount();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -706,14 +703,6 @@ public class YDisplay extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCommand() throws YAPI_Exception
-    {
-        return get_command();
-    }
-
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -724,10 +713,6 @@ public class YDisplay extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCommand(String newval)  throws YAPI_Exception
-    {
-        return set_command(newval);
-    }
 
     /**
      * Retrieves a display for a given identifier.

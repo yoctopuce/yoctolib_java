@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YMessageBox.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -236,9 +236,6 @@ public class YMessageBox extends YFunction
         return get_slotsCount();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_slotsBitmap() throws YAPI_Exception
     {
         String res;
@@ -251,14 +248,6 @@ public class YMessageBox extends YFunction
             res = _slotsBitmap;
         }
         return res;
-    }
-
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getSlotsBitmap() throws YAPI_Exception
-    {
-        return get_slotsBitmap();
     }
 
     /**
@@ -393,9 +382,6 @@ public class YMessageBox extends YFunction
         return set_pduReceived(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -410,14 +396,6 @@ public class YMessageBox extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCommand() throws YAPI_Exception
-    {
-        return get_command();
-    }
-
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -428,10 +406,6 @@ public class YMessageBox extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCommand(String newval)  throws YAPI_Exception
-    {
-        return set_command(newval);
-    }
 
     /**
      * Retrieves a MessageBox interface for a given identifier.
@@ -566,7 +540,7 @@ public class YMessageBox extends YFunction
         String hexPdu;
         YSms sms;
         
-        // may throw an exception
+        
         binPdu = _download(String.format(Locale.US, "sms.json?pos=%d&len=1",slot));
         arrPdu = _json_get_array(binPdu);
         hexPdu = _decode_json_string(arrPdu.get(0));
@@ -651,6 +625,7 @@ public class YMessageBox extends YFunction
         }
         i = 0;
         while (i < 4) {
+            // mark escape sequences
             _iso2gsm[91+i] = (byte)(27 & 0xff);
             _iso2gsm[123+i] = (byte)(27 & 0xff);
             i = i + 1;
@@ -863,6 +838,7 @@ public class YMessageBox extends YFunction
                 extra = extra + 1;
             }
             if (gsm7 == 0) {
+                // cannot use standard GSM encoding
                 res = new byte[0];
                 return res;
             }
@@ -935,7 +911,7 @@ public class YMessageBox extends YFunction
         ArrayList<String> signatures = new ArrayList<>();
         YSms sms;
         
-        // may throw an exception
+        
         bitmapStr = get_slotsBitmap();
         if (bitmapStr.equals(_prevBitmapStr)) {
             return YAPI.SUCCESS;
@@ -1059,7 +1035,7 @@ public class YMessageBox extends YFunction
     public int clearPduCounters() throws YAPI_Exception
     {
         int retcode;
-        // may throw an exception
+        
         retcode = set_pduReceived(0);
         if (retcode != YAPI.SUCCESS) {
             return retcode;
@@ -1086,7 +1062,7 @@ public class YMessageBox extends YFunction
     public int sendTextMessage(String recipient,String message) throws YAPI_Exception
     {
         YSms sms;
-        // may throw an exception
+        
         sms = new YSms(this);
         sms.set_recipient(recipient);
         sms.addText(message);
@@ -1112,7 +1088,7 @@ public class YMessageBox extends YFunction
     public int sendFlashMessage(String recipient,String message) throws YAPI_Exception
     {
         YSms sms;
-        // may throw an exception
+        
         sms = new YSms(this);
         sms.set_recipient(recipient);
         sms.set_msgClass(0);

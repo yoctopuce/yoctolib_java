@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YProximity.java 27021 2017-03-31 14:58:15Z seb $
+ * $Id: YProximity.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindProximity(), the high-level API for Proximity functions
  *
@@ -459,10 +459,6 @@ public class YProximity extends YSensor
         return YAPI.SUCCESS;
     }
 
-    public int setPulseCounter(long newval)  throws YAPI_Exception
-    {
-        return set_pulseCounter(newval);
-    }
 
     /**
      * Returns the timer of the pulse counter (ms).

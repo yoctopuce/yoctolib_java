@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YServo.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YServo.java 27118 2017-04-06 22:38:36Z seb $
  *
  * Implements FindServo(), the high-level API for Servo functions
  *
@@ -480,9 +480,6 @@ public class YServo extends YFunction
         return set_neutral(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public YMove get_move() throws YAPI_Exception
     {
         YMove res;
@@ -497,14 +494,6 @@ public class YServo extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public YMove getMove() throws YAPI_Exception
-    {
-        return get_move();
-    }
-
     public int set_move(YMove  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -515,10 +504,6 @@ public class YServo extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setMove(YMove newval)  throws YAPI_Exception
-    {
-        return set_move(newval);
-    }
 
     /**
      * Performs a smooth move at constant speed toward a given position.

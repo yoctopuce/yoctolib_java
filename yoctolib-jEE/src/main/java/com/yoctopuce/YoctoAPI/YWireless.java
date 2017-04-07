@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YWireless.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -334,9 +334,6 @@ public class YWireless extends YFunction
         return get_message();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_wlanConfig() throws YAPI_Exception
     {
         String res;
@@ -351,14 +348,6 @@ public class YWireless extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getWlanConfig() throws YAPI_Exception
-    {
-        return get_wlanConfig();
-    }
-
     public int set_wlanConfig(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -369,10 +358,6 @@ public class YWireless extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setWlanConfig(String newval)  throws YAPI_Exception
-    {
-        return set_wlanConfig(newval);
-    }
 
     /**
      * Retrieves a wireless lan interface for a given identifier.
@@ -569,7 +554,7 @@ public class YWireless extends YFunction
         byte[] json;
         ArrayList<String> wlanlist = new ArrayList<>();
         ArrayList<YWlanRecord> res = new ArrayList<>();
-        // may throw an exception
+        
         json = _download("wlan.json?by=name");
         wlanlist = _json_get_array(json);
         res.clear();

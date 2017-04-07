@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmOutput.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YPwmOutput.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -516,9 +516,6 @@ public class YPwmOutput extends YFunction
         return get_pulseDuration();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_pwmTransition() throws YAPI_Exception
     {
         String res;
@@ -533,14 +530,6 @@ public class YPwmOutput extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getPwmTransition() throws YAPI_Exception
-    {
-        return get_pwmTransition();
-    }
-
     public int set_pwmTransition(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -551,10 +540,6 @@ public class YPwmOutput extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setPwmTransition(String newval)  throws YAPI_Exception
-    {
-        return set_pwmTransition(newval);
-    }
 
     /**
      * Returns the state of the PWM at device power on.

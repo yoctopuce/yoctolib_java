@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YStepperMotor.java 27021 2017-03-31 14:58:15Z seb $
+ * $Id: YStepperMotor.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -904,9 +904,6 @@ public class YStepperMotor extends YFunction
         return set_tCurrRun(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_alertMode() throws YAPI_Exception
     {
         String res;
@@ -921,14 +918,6 @@ public class YStepperMotor extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getAlertMode() throws YAPI_Exception
-    {
-        return get_alertMode();
-    }
-
     public int set_alertMode(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -939,14 +928,7 @@ public class YStepperMotor extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setAlertMode(String newval)  throws YAPI_Exception
-    {
-        return set_alertMode(newval);
-    }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_auxMode() throws YAPI_Exception
     {
         String res;
@@ -961,14 +943,6 @@ public class YStepperMotor extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getAuxMode() throws YAPI_Exception
-    {
-        return get_auxMode();
-    }
-
     public int set_auxMode(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -979,10 +953,6 @@ public class YStepperMotor extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setAuxMode(String newval)  throws YAPI_Exception
-    {
-        return set_auxMode(newval);
-    }
 
     /**
      * Returns the current value of the signal generated on the auxiliary output.
@@ -1052,9 +1022,6 @@ public class YStepperMotor extends YFunction
         return set_auxSignal(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -1069,14 +1036,6 @@ public class YStepperMotor extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCommand() throws YAPI_Exception
-    {
-        return get_command();
-    }
-
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -1087,10 +1046,6 @@ public class YStepperMotor extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCommand(String newval)  throws YAPI_Exception
-    {
-        return set_command(newval);
-    }
 
     /**
      * Retrieves a stepper motor for a given identifier.

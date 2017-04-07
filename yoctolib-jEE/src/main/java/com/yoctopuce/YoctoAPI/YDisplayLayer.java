@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YDisplayLayer.java 27053 2017-04-04 16:01:11Z seb $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *
@@ -264,7 +264,7 @@ public class YDisplayLayer
      * but you can disable it if you prefer. This setting has no effect
      * on monochrome displays.
      *
-     * @param mode : <t>true</t> to enable antialiasing, <t>false</t> to
+     * @param mode : true to enable antialiasing, false to
      *         disable it.
      *
      * @return YAPI.SUCCESS if the call succeeds.

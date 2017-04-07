@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoltage.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YVoltage.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindVoltage(), the high-level API for Voltage functions
  *
@@ -124,9 +124,6 @@ public class YVoltage extends YSensor
         super._parseAttr(json_val);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public int get_enabled() throws YAPI_Exception
     {
         int res;
@@ -141,14 +138,6 @@ public class YVoltage extends YSensor
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public int getEnabled() throws YAPI_Exception
-    {
-        return get_enabled();
-    }
-
     public int set_enabled(int  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -159,10 +148,6 @@ public class YVoltage extends YSensor
         return YAPI.SUCCESS;
     }
 
-    public int setEnabled(int newval)  throws YAPI_Exception
-    {
-        return set_enabled(newval);
-    }
 
     /**
      * Retrieves a voltage sensor for a given identifier.

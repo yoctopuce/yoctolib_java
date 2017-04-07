@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrentLoopOutput.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YCurrentLoopOutput.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -218,9 +218,6 @@ public class YCurrentLoopOutput extends YFunction
         return get_current();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_currentTransition() throws YAPI_Exception
     {
         String res;
@@ -235,14 +232,6 @@ public class YCurrentLoopOutput extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCurrentTransition() throws YAPI_Exception
-    {
-        return get_currentTransition();
-    }
-
     public int set_currentTransition(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -253,10 +242,6 @@ public class YCurrentLoopOutput extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCurrentTransition(String newval)  throws YAPI_Exception
-    {
-        return set_currentTransition(newval);
-    }
 
     /**
      * Changes the loop current at device start up. Remember to call the matching
@@ -499,7 +484,7 @@ public class YCurrentLoopOutput extends YFunction
             mA_target = 21.0;
         }
         newval = String.format(Locale.US, "%d:%d", (int) (double)Math.round(mA_target*1000),ms_duration);
-        // may throw an exception
+        
         return set_currentTransition(newval);
     }
 

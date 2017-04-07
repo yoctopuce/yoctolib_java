@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YGyro.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -558,7 +558,7 @@ public class YGyro extends YSensor
         double sqz;
         double norm;
         double delta;
-        // may throw an exception
+        
         if (_loadQuaternion() != YAPI.SUCCESS) {
             return YAPI.DEVICE_NOT_FOUND;
         }
@@ -570,10 +570,12 @@ public class YGyro extends YSensor
             norm = sqx + sqy + sqz + sqw;
             delta = _y * _w - _x * _z;
             if (delta > 0.499 * norm) {
+                // singularity at north pole
                 _pitch = 90.0;
                 _head  = (double)Math.round(2.0 * 1800.0/java.lang.Math.PI * java.lang.Math.atan2(_x,-_w)) / 10.0;
             } else {
                 if (delta < -0.499 * norm) {
+                    // singularity at south pole
                     _pitch = -90.0;
                     _head  = (double)Math.round(-2.0 * 1800.0/java.lang.Math.PI * java.lang.Math.atan2(_x,-_w)) / 10.0;
                 } else {

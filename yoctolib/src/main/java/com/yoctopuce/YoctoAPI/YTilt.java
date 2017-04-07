@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTilt.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YTilt.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindTilt(), the high-level API for Tilt functions
  *
@@ -207,9 +207,6 @@ public class YTilt extends YSensor
         return set_bandwidth(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public int get_axis() throws YAPI_Exception
     {
         int res;
@@ -222,14 +219,6 @@ public class YTilt extends YSensor
             res = _axis;
         }
         return res;
-    }
-
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public int getAxis() throws YAPI_Exception
-    {
-        return get_axis();
     }
 
     /**

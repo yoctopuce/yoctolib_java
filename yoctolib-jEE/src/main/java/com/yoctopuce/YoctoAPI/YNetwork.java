@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YNetwork.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements FindNetwork(), the high-level API for Network functions
  *
@@ -590,10 +590,6 @@ public class YNetwork extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setIpConfig(String newval)  throws YAPI_Exception
-    {
-        return set_ipConfig(newval);
-    }
 
     /**
      * Returns the IP address of the primary name server to be used by the module.
@@ -2062,7 +2058,7 @@ public class YNetwork extends YFunction
     public String ping(String host) throws YAPI_Exception
     {
         byte[] content;
-        // may throw an exception
+        
         content = _download(String.format(Locale.US, "ping.txt?host=%s",host));
         return new String(content);
     }

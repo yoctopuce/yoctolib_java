@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YColorLedCluster.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -325,9 +325,6 @@ public class YColorLedCluster extends YFunction
         return get_blinkSeqMaxSize();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -342,14 +339,6 @@ public class YColorLedCluster extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCommand() throws YAPI_Exception
-    {
-        return get_command();
-    }
-
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -360,10 +349,6 @@ public class YColorLedCluster extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCommand(String newval)  throws YAPI_Exception
-    {
-        return set_command(newval);
-    }
 
     /**
      * Retrieves a RGB LED cluster for a given identifier.
@@ -866,7 +851,7 @@ public class YColorLedCluster extends YFunction
             buff[3*idx+2] = (byte)(((rgb) & (255)) & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+        
         res = _upload(String.format(Locale.US, "rgb:0:%d",ledIndex), buff);
         return res;
     }
@@ -900,7 +885,7 @@ public class YColorLedCluster extends YFunction
             buff[3*idx+2] = (byte)(((rgb) & (255)) & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+        
         res = _upload(String.format(Locale.US, "rgb:%d",delay), buff);
         return res;
     }
@@ -951,7 +936,7 @@ public class YColorLedCluster extends YFunction
             buff[3*idx+2] = (byte)(((hsl) & (255)) & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+        
         res = _upload(String.format(Locale.US, "hsl:0:%d",ledIndex), buff);
         return res;
     }
@@ -985,7 +970,7 @@ public class YColorLedCluster extends YFunction
             buff[3*idx+2] = (byte)(((hsl) & (255)) & 0xff);
             idx = idx + 1;
         }
-        // may throw an exception
+        
         res = _upload(String.format(Locale.US, "hsl:%d",delay), buff);
         return res;
     }
@@ -1027,7 +1012,7 @@ public class YColorLedCluster extends YFunction
         int r;
         int g;
         int b;
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rgb.bin?typ=0&pos=%d&len=%d",3*ledIndex,3*count));
         res.clear();
         idx = 0;
@@ -1061,7 +1046,7 @@ public class YColorLedCluster extends YFunction
         int r;
         int g;
         int b;
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rgb.bin?typ=4&pos=%d&len=%d",3*ledIndex,3*count));
         res.clear();
         idx = 0;
@@ -1093,7 +1078,7 @@ public class YColorLedCluster extends YFunction
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int seq;
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rgb.bin?typ=1&pos=%d&len=%d",ledIndex,count));
         res.clear();
         idx = 0;
@@ -1126,7 +1111,7 @@ public class YColorLedCluster extends YFunction
         int hl;
         int lh;
         int ll;
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rgb.bin?typ=2&pos=%d&len=%d",4*seqIndex,4*count));
         res.clear();
         idx = 0;
@@ -1158,7 +1143,7 @@ public class YColorLedCluster extends YFunction
         int idx;
         int lh;
         int ll;
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rgb.bin?typ=6&pos=%d&len=%d",seqIndex,count));
         res.clear();
         idx = 0;
@@ -1187,7 +1172,7 @@ public class YColorLedCluster extends YFunction
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int started;
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rgb.bin?typ=5&pos=%d&len=%d",seqIndex,count));
         res.clear();
         idx = 0;
@@ -1215,7 +1200,7 @@ public class YColorLedCluster extends YFunction
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int started;
-        // may throw an exception
+        
         buff = _download(String.format(Locale.US, "rgb.bin?typ=3&pos=%d&len=%d",seqIndex,count));
         res.clear();
         idx = 0;

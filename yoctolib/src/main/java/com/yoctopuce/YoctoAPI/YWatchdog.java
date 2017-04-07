@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YWatchdog.java 27118 2017-04-06 22:38:36Z seb $
  *
  * Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -647,10 +647,6 @@ public class YWatchdog extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setPulseTimer(long newval)  throws YAPI_Exception
-    {
-        return set_pulseTimer(newval);
-    }
 
     /**
      * Sets the relay to output B (active) for a specified duration, then brings it
@@ -670,9 +666,6 @@ public class YWatchdog extends YFunction
         return YAPI.SUCCESS;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public YDelayedPulse get_delayedPulseTimer() throws YAPI_Exception
     {
         YDelayedPulse res;
@@ -687,14 +680,6 @@ public class YWatchdog extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public YDelayedPulse getDelayedPulseTimer() throws YAPI_Exception
-    {
-        return get_delayedPulseTimer();
-    }
-
     public int set_delayedPulseTimer(YDelayedPulse  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -705,10 +690,6 @@ public class YWatchdog extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setDelayedPulseTimer(YDelayedPulse newval)  throws YAPI_Exception
-    {
-        return set_delayedPulseTimer(newval);
-    }
 
     /**
      * Schedules a pulse.

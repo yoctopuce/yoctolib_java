@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPower.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YPower.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindPower(), the high-level API for Power functions
  *
@@ -186,10 +186,6 @@ public class YPower extends YSensor
         return YAPI.SUCCESS;
     }
 
-    public int setMeter(double newval)  throws YAPI_Exception
-    {
-        return set_meter(newval);
-    }
 
     /**
      * Returns the energy counter, maintained by the wattmeter by integrating the power consumption over time.

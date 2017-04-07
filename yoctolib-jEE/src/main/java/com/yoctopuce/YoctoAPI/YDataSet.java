@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataSet.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YDataSet.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -203,7 +203,7 @@ public class YDataSet
         int minCol;
         int avgCol;
         int maxCol;
-        // may throw an exception
+        
         if (progress != _progress) {
             return _progress;
         }
@@ -446,7 +446,7 @@ public class YDataSet
         int minCol;
         int avgCol;
         int maxCol;
-        // may throw an exception
+        
         startUtc = (long) (double)Math.round(measure.get_startTimeUTC());
         stream = null;
         for (YDataStream ii:_streams) {

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBuzzer.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YBuzzer.java 27088 2017-04-06 20:52:42Z seb $
  *
  * Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -399,9 +399,6 @@ public class YBuzzer extends YFunction
         return get_playSeqSignature();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -416,14 +413,6 @@ public class YBuzzer extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCommand() throws YAPI_Exception
-    {
-        return get_command();
-    }
-
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -434,10 +423,6 @@ public class YBuzzer extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCommand(String newval)  throws YAPI_Exception
-    {
-        return set_command(newval);
-    }
 
     /**
      * Retrieves a buzzer for a given identifier.
@@ -602,9 +587,182 @@ public class YBuzzer extends YFunction
     }
 
     /**
+     * Adds notes to the playing sequence. Notes are provided as text words, separated by
+     * spaces. The pitch is specified using the usual letter from A to G. The duration is
+     * specified as the divisor of a whole note: 4 for a fourth, 8 for an eight note, etc.
+     * Some modifiers are supported: # and b to alter a note pitch,
+     * ' and , to move to the upper/lower octave, . to enlarge
+     * the note duration.
+     *
+     * @param notes : notes to be played, as a text string.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int addNotesToPlaySeq(String notes) throws YAPI_Exception
+    {
+        int tempo;
+        int prevPitch;
+        int prevDuration;
+        int prevFreq;
+        int note;
+        int num;
+        int typ;
+        byte[] ascNotes;
+        int notesLen;
+        int i;
+        int ch;
+        int dNote;
+        int pitch;
+        int freq;
+        int ms;
+        int ms16;
+        int rest;
+        tempo = 100;
+        prevPitch = 3;
+        prevDuration = 4;
+        prevFreq = 110;
+        note = -99;
+        num = 0;
+        typ = 3;
+        ascNotes = (notes).getBytes();
+        notesLen = (ascNotes).length;
+        i = 0;
+        while (i < notesLen) {
+            ch = (ascNotes[i] & 0xff);
+            // A (note))
+            if (ch == 65) {
+                note = 0;
+            }
+            // B (note)
+            if (ch == 66) {
+                note = 2;
+            }
+            // C (note)
+            if (ch == 67) {
+                note = 3;
+            }
+            // D (note)
+            if (ch == 68) {
+                note = 5;
+            }
+            // E (note)
+            if (ch == 69) {
+                note = 7;
+            }
+            // F (note)
+            if (ch == 70) {
+                note = 8;
+            }
+            // G (note)
+            if (ch == 71) {
+                note = 10;
+            }
+            // '#' (sharp modifier)
+            if (ch == 35) {
+                note = note + 1;
+            }
+            // 'b' (flat modifier)
+            if (ch == 98) {
+                note = note - 1;
+            }
+            // ' (octave up)
+            if (ch == 39) {
+                prevPitch = prevPitch + 12;
+            }
+            // , (octave down)
+            if (ch == 44) {
+                prevPitch = prevPitch - 12;
+            }
+            // R (rest)
+            if (ch == 82) {
+                typ = 0;
+            }
+            // ! (staccato modifier)
+            if (ch == 33) {
+                typ = 1;
+            }
+            // ^ (short modifier)
+            if (ch == 94) {
+                typ = 2;
+            }
+            // _ (legato modifier)
+            if (ch == 95) {
+                typ = 4;
+            }
+            // - (glissando modifier)
+            if (ch == 45) {
+                typ = 5;
+            }
+            // % (tempo change)
+            if ((ch == 37) && (num > 0)) {
+                tempo = num;
+                num = 0;
+            }
+            if ((ch >= 48) && (ch <= 57)) {
+                // 0-9 (number)
+                num = (num * 10) + (ch - 48);
+            }
+            if (ch == 46) {
+                // . (duration modifier)
+                num = ((num * 2) / (3));
+            }
+            if (((ch == 32) || (i+1 == notesLen)) && ((note > -99) || (typ != 3))) {
+                if (num == 0) {
+                    num = prevDuration;
+                } else {
+                    prevDuration = num;
+                }
+                ms = (int) (double)Math.round(320000.0 / (tempo * num));
+                if (typ == 0) {
+                    addPulseToPlaySeq(0, ms);
+                } else {
+                    dNote = note - (((prevPitch) % (12)));
+                    if (dNote > 6) {
+                        dNote = dNote - 12;
+                    }
+                    if (dNote <= -6) {
+                        dNote = dNote + 12;
+                    }
+                    pitch = prevPitch + dNote;
+                    freq = (int) (double)Math.round(440 * java.lang.Math.exp(pitch * 0.05776226504666));
+                    ms16 = ((ms) >> (4));
+                    rest = 0;
+                    if (typ == 3) {
+                        rest = 2 * ms16;
+                    }
+                    if (typ == 2) {
+                        rest = 8 * ms16;
+                    }
+                    if (typ == 1) {
+                        rest = 12 * ms16;
+                    }
+                    if (typ == 5) {
+                        addPulseToPlaySeq(prevFreq, ms16);
+                        addFreqMoveToPlaySeq(freq, 8 * ms16);
+                        addPulseToPlaySeq(freq, ms - 9 * ms16);
+                    } else {
+                        addPulseToPlaySeq(freq, ms - rest);
+                        if (rest > 0) {
+                            addPulseToPlaySeq(0, rest);
+                        }
+                    }
+                    prevFreq = freq;
+                    prevPitch = pitch;
+                }
+                note = -99;
+                num = 0;
+                typ = 3;
+            }
+            i = i + 1;
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
      * Starts the preprogrammed playing sequence. The sequence
      * runs in loop until it is stopped by stopPlaySeq or an explicit
-     * change.
+     * change. To play the sequence only once, use oncePlaySeq().
      *
      * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error
@@ -634,6 +792,17 @@ public class YBuzzer extends YFunction
     public int resetPlaySeq() throws YAPI_Exception
     {
         return sendCommand("Z");
+    }
+
+    /**
+     * Starts the preprogrammed playing sequence and run it once only.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int oncePlaySeq() throws YAPI_Exception
+    {
+        return sendCommand("s");
     }
 
     /**
@@ -679,6 +848,26 @@ public class YBuzzer extends YFunction
     public int volumeMove(int volume,int duration) throws YAPI_Exception
     {
         return set_command(String.format(Locale.US, "V%d,%d",volume,duration));
+    }
+
+    /**
+     * Immediately play a note sequence. Notes are provided as text words, separated by
+     * spaces. The pitch is specified using the usual letter from A to G. The duration is
+     * specified as the divisor of a whole note: 4 for a fourth, 8 for an eight note, etc.
+     * Some modifiers are supported: # and b to alter a note pitch,
+     * ' and , to move to the upper/lower octave, . to enlarge
+     * the note duration.
+     *
+     * @param notes : notes to be played, as a text string.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int playNotes(String notes) throws YAPI_Exception
+    {
+        resetPlaySeq();
+        addNotesToPlaySeq(notes);
+        return oncePlaySeq();
     }
 
     /**

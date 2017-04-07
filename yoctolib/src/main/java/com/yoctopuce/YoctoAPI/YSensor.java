@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 26999 2017-03-30 16:42:45Z seb $
+ * $Id: YSensor.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -721,9 +721,6 @@ public class YSensor extends YFunction
         return set_reportFrequency(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_calibrationParam() throws YAPI_Exception
     {
         String res;
@@ -738,14 +735,6 @@ public class YSensor extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCalibrationParam() throws YAPI_Exception
-    {
-        return get_calibrationParam();
-    }
-
     public int set_calibrationParam(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -756,10 +745,6 @@ public class YSensor extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCalibrationParam(String newval)  throws YAPI_Exception
-    {
-        return set_calibrationParam(newval);
-    }
 
     /**
      * Changes the resolution of the measured physical values. The resolution corresponds to the numerical precision
@@ -1013,19 +998,23 @@ public class YSensor extends YFunction
             return 0;
         }
         if ((_calibrationParam).indexOf(",") >= 0) {
+            // Plain text format
             iCalib = YAPIContext._decodeFloats(_calibrationParam);
             _caltyp = ((iCalib.get(0).intValue()) / (1000));
             if (_caltyp > 0) {
                 if (_caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
+                    // Unknown calibration type: calibrated value will be provided by the device
                     _caltyp = -1;
                     return 0;
                 }
                 _calhdl = _yapi._getCalibrationHandler(_caltyp);
                 if (!(_calhdl != null)) {
+                    // Unknown calibration type: calibrated value will be provided by the device
                     _caltyp = -1;
                     return 0;
                 }
             }
+            // New 32bit text format
             _isScal = true;
             _isScal32 = true;
             _offset = 0;
@@ -1050,11 +1039,14 @@ public class YSensor extends YFunction
                 position = position + 2;
             }
         } else {
+            // Recorder-encoded format, including encoding
             iCalib = YAPIContext._decodeWords(_calibrationParam);
+            // In case of unknown format, calibrated value will be provided by the device
             if (iCalib.size() < 2) {
                 _caltyp = -1;
                 return 0;
             }
+            // Save variable format (scale for scalar, or decimal exponent)
             _isScal = (iCalib.get(1).intValue() > 0);
             if (_isScal) {
                 _offset = iCalib.get(0).doubleValue();
@@ -1073,12 +1065,14 @@ public class YSensor extends YFunction
                     position = position - 1;
                 }
             }
+            // Shortcut when there is no calibration parameter
             if (iCalib.size() == 2) {
                 _caltyp = 0;
                 return 0;
             }
             _caltyp = iCalib.get(2).intValue();
             _calhdl = _yapi._getCalibrationHandler(_caltyp);
+            // parse calibration points
             if (_caltyp <= 10) {
                 maxpos = _caltyp;
             } else {
@@ -1147,7 +1141,7 @@ public class YSensor extends YFunction
     public int startDataLogger() throws YAPI_Exception
     {
         byte[] res;
-        // may throw an exception
+        
         res = _download("api/dataLogger/recording?recording=1");
         //noinspection DoubleNegation
         if (!((res).length>0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to start datalogger");}
@@ -1162,7 +1156,7 @@ public class YSensor extends YFunction
     public int stopDataLogger() throws YAPI_Exception
     {
         byte[] res;
-        // may throw an exception
+        
         res = _download("api/dataLogger/recording?recording=0");
         //noinspection DoubleNegation
         if (!((res).length>0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to stop datalogger");}
@@ -1199,7 +1193,7 @@ public class YSensor extends YFunction
     {
         String funcid;
         String funit;
-        // may throw an exception
+        
         funcid = get_functionId();
         funit = get_unit();
         return new YDataSet(this, funcid, funit, startTime, endTime);
@@ -1263,7 +1257,7 @@ public class YSensor extends YFunction
     {
         String rest_val;
         int res;
-        // may throw an exception
+        
         synchronized (this) {
             rest_val = _encodeCalibrationPoints(rawValues, refValues);
             res = _setAttr("calibrationParam", rest_val);
@@ -1339,6 +1333,7 @@ public class YSensor extends YFunction
             return "0";
         }
         if (_isScal32) {
+            // 32-bit fixed-point encoding
             res = String.format(Locale.US, "%d",YAPI.YOCTO_CALIB_TYPE_OFS);
             idx = 0;
             while (idx < npt) {
@@ -1347,6 +1342,7 @@ public class YSensor extends YFunction
             }
         } else {
             if (_isScal) {
+                // 16-bit fixed-point encoding
                 res = String.format(Locale.US, "%d",npt);
                 idx = 0;
                 while (idx < npt) {
@@ -1356,6 +1352,7 @@ public class YSensor extends YFunction
                     idx = idx + 1;
                 }
             } else {
+                // 16-bit floating-point decimal encoding
                 res = String.format(Locale.US, "%d",10 + npt);
                 idx = 0;
                 while (idx < npt) {
@@ -1408,7 +1405,9 @@ public class YSensor extends YFunction
             startTime = endTime;
         }
         if (report.get(0).intValue() == 2) {
+            // 32bit timed report format
             if (report.size() <= 5) {
+                // sub-second report, 1-4 bytes
                 poww = 1;
                 avgRaw = 0;
                 byteVal = 0;
@@ -1431,6 +1430,7 @@ public class YSensor extends YFunction
                 minVal = avgVal;
                 maxVal = avgVal;
             } else {
+                // averaged report: avg,avg-min,max-avg
                 sublen = 1 + ((report.get(1).intValue()) & (3));
                 poww = 1;
                 avgRaw = 0;
@@ -1480,7 +1480,9 @@ public class YSensor extends YFunction
                 }
             }
         } else {
+            // 16bit timed report format
             if (report.get(0).intValue() == 0) {
+                // sub-second report, 1-4 bytes
                 poww = 1;
                 avgRaw = 0;
                 byteVal = 0;
@@ -1502,6 +1504,7 @@ public class YSensor extends YFunction
                 minVal = avgVal;
                 maxVal = avgVal;
             } else {
+                // averaged report 2+4+2 bytes
                 minRaw = report.get(1).intValue() + 0x100 * report.get(2).intValue();
                 maxRaw = report.get(3).intValue() + 0x100 * report.get(4).intValue();
                 avgRaw = report.get(5).intValue() + 0x100 * report.get(6).intValue() + 0x10000 * report.get(7).intValue();

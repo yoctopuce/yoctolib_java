@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAccelerometer.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YAccelerometer.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -329,9 +329,6 @@ public class YAccelerometer extends YSensor
         return get_zValue();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public int get_gravityCancellation() throws YAPI_Exception
     {
         int res;
@@ -346,14 +343,6 @@ public class YAccelerometer extends YSensor
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public int getGravityCancellation() throws YAPI_Exception
-    {
-        return get_gravityCancellation();
-    }
-
     public int set_gravityCancellation(int  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -364,10 +353,6 @@ public class YAccelerometer extends YSensor
         return YAPI.SUCCESS;
     }
 
-    public int setGravityCancellation(int newval)  throws YAPI_Exception
-    {
-        return set_gravityCancellation(newval);
-    }
 
     /**
      * Retrieves an accelerometer for a given identifier.

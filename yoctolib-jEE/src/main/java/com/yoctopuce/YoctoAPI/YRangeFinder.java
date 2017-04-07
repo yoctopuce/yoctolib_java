@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRangeFinder.java 27021 2017-03-31 14:58:15Z seb $
+ * $Id: YRangeFinder.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -274,9 +274,6 @@ public class YRangeFinder extends YSensor
         return set_rangeFinderMode(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_hardwareCalibration() throws YAPI_Exception
     {
         String res;
@@ -291,14 +288,6 @@ public class YRangeFinder extends YSensor
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getHardwareCalibration() throws YAPI_Exception
-    {
-        return get_hardwareCalibration();
-    }
-
     public int set_hardwareCalibration(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -309,10 +298,6 @@ public class YRangeFinder extends YSensor
         return YAPI.SUCCESS;
     }
 
-    public int setHardwareCalibration(String newval)  throws YAPI_Exception
-    {
-        return set_hardwareCalibration(newval);
-    }
 
     /**
      * Returns the current sensor temperature, as a floating point number.
@@ -347,9 +332,6 @@ public class YRangeFinder extends YSensor
         return get_currentTemperature();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -364,14 +346,6 @@ public class YRangeFinder extends YSensor
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCommand() throws YAPI_Exception
-    {
-        return get_command();
-    }
-
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -382,10 +356,6 @@ public class YRangeFinder extends YSensor
         return YAPI.SUCCESS;
     }
 
-    public int setCommand(String newval)  throws YAPI_Exception
-    {
-        return set_command(newval);
-    }
 
     /**
      * Retrieves a range finder for a given identifier.

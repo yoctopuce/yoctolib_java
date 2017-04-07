@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YDataLogger.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -578,9 +578,6 @@ public class YDataLogger extends YFunction
         return set_beaconDriven(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public int get_clearHistory() throws YAPI_Exception
     {
         int res;
@@ -595,14 +592,6 @@ public class YDataLogger extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public int getClearHistory() throws YAPI_Exception
-    {
-        return get_clearHistory();
-    }
-
     public int set_clearHistory(int  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -613,10 +602,6 @@ public class YDataLogger extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setClearHistory(int newval)  throws YAPI_Exception
-    {
-        return set_clearHistory(newval);
-    }
 
     /**
      * Retrieves a data logger for a given identifier.
@@ -767,7 +752,7 @@ public class YDataLogger extends YFunction
         ArrayList<String> dslist = new ArrayList<>();
         YDataSet dataset;
         ArrayList<YDataSet> res = new ArrayList<>();
-        // may throw an exception
+        
         dslist = _json_get_array(json);
         res.clear();
         for (String ii:dslist) {

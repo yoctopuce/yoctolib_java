@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YColorLed.java 27118 2017-04-06 22:38:36Z seb $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -347,9 +347,6 @@ public class YColorLed extends YFunction
         return set_hslColor(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public YMove get_rgbMove() throws YAPI_Exception
     {
         YMove res;
@@ -364,14 +361,6 @@ public class YColorLed extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public YMove getRgbMove() throws YAPI_Exception
-    {
-        return get_rgbMove();
-    }
-
     public int set_rgbMove(YMove  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -382,10 +371,6 @@ public class YColorLed extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setRgbMove(YMove newval)  throws YAPI_Exception
-    {
-        return set_rgbMove(newval);
-    }
 
     /**
      * Performs a smooth transition in the RGB color space between the current color and a target color.
@@ -405,9 +390,6 @@ public class YColorLed extends YFunction
         return YAPI.SUCCESS;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public YMove get_hslMove() throws YAPI_Exception
     {
         YMove res;
@@ -422,14 +404,6 @@ public class YColorLed extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public YMove getHslMove() throws YAPI_Exception
-    {
-        return get_hslMove();
-    }
-
     public int set_hslMove(YMove  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -440,10 +414,6 @@ public class YColorLed extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setHslMove(YMove newval)  throws YAPI_Exception
-    {
-        return set_hslMove(newval);
-    }
 
     /**
      * Performs a smooth transition in the HSL color space between the current color and a target color.
@@ -636,9 +606,6 @@ public class YColorLed extends YFunction
         return get_blinkSeqSignature();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -653,14 +620,6 @@ public class YColorLed extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCommand() throws YAPI_Exception
-    {
-        return get_command();
-    }
-
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -671,10 +630,6 @@ public class YColorLed extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCommand(String newval)  throws YAPI_Exception
-    {
-        return set_command(newval);
-    }
 
     /**
      * Retrieves an RGB LED for a given identifier.

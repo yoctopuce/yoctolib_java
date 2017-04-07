@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YRefFrame.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -226,9 +226,6 @@ public class YRefFrame extends YFunction
         super._parseAttr(json_val);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public int get_mountPos() throws YAPI_Exception
     {
         int res;
@@ -243,14 +240,6 @@ public class YRefFrame extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public int getMountPos() throws YAPI_Exception
-    {
-        return get_mountPos();
-    }
-
     public int set_mountPos(int  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -261,10 +250,6 @@ public class YRefFrame extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setMountPos(int newval)  throws YAPI_Exception
-    {
-        return set_mountPos(newval);
-    }
 
     /**
      * Changes the reference bearing used by the compass. The relative bearing
@@ -362,9 +347,6 @@ public class YRefFrame extends YFunction
         return get_bearing();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_calibrationParam() throws YAPI_Exception
     {
         String res;
@@ -379,14 +361,6 @@ public class YRefFrame extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCalibrationParam() throws YAPI_Exception
-    {
-        return get_calibrationParam();
-    }
-
     public int set_calibrationParam(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -397,10 +371,6 @@ public class YRefFrame extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCalibrationParam(String newval)  throws YAPI_Exception
-    {
-        return set_calibrationParam(newval);
-    }
 
     /**
      * Retrieves a reference frame for a given identifier.
@@ -616,7 +586,7 @@ public class YRefFrame extends YFunction
         ArrayList<Integer> iCalib = new ArrayList<>();
         int caltyp;
         int res;
-        // may throw an exception
+        
         calibParam = get_calibrationParam();
         iCalib = YAPIContext._decodeFloats(calibParam);
         caltyp = ((iCalib.get(0).intValue()) / (1000));
@@ -646,7 +616,7 @@ public class YRefFrame extends YFunction
         ArrayList<Integer> iCalib = new ArrayList<>();
         int caltyp;
         int res;
-        // may throw an exception
+        
         calibParam = get_calibrationParam();
         iCalib = YAPIContext._decodeFloats(calibParam);
         caltyp = ((iCalib.get(0).intValue()) / (1000));
@@ -844,6 +814,7 @@ public class YRefFrame extends YFunction
         }
         // Discard measures that are not in the proper orientation
         if (_calibStageProgress == 0) {
+            // New stage, check that this orientation is not yet done
             idx = 0;
             err = 0;
             while (idx + 1 < _calibStage) {
@@ -858,6 +829,7 @@ public class YRefFrame extends YFunction
             }
             _calibOrient.add(orient);
         } else {
+            // Make sure device is not turned before stage is completed
             if (orient != _calibOrient.get(_calibStage-1).intValue()) {
                 _calibStageHint = "Not yet done, please move back to the previous face";
                 return YAPI.SUCCESS;
@@ -984,7 +956,7 @@ public class YRefFrame extends YFunction
                 return YAPI.SUCCESS;
             }
         }
-        // may throw an exception
+        
         calibParam = _download("api/refFrame/calibrationParam.txt");
         iCalib = YAPIContext._decodeFloats(new String(calibParam));
         cal3 = ((iCalib.get(1).intValue()) / (1000));
@@ -1170,7 +1142,7 @@ public class YRefFrame extends YFunction
         if (_calibStage == 0) {
             return YAPI.SUCCESS;
         }
-        // may throw an exception
+        
         _calibStage = 0;
         return set_calibrationParam(_calibSavedParams);
     }

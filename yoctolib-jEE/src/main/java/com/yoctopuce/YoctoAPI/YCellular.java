@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YCellular.java 27108 2017-04-06 22:18:22Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -909,10 +909,6 @@ public class YCellular extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setApnSecret(String newval)  throws YAPI_Exception
-    {
-        return set_apnSecret(newval);
-    }
 
     /**
      * Returns the automated connectivity check interval, in seconds.
@@ -1112,9 +1108,6 @@ public class YCellular extends YFunction
         return set_dataReceived(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -1129,14 +1122,6 @@ public class YCellular extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCommand() throws YAPI_Exception
-    {
-        return get_command();
-    }
-
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -1147,10 +1132,6 @@ public class YCellular extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCommand(String newval)  throws YAPI_Exception
-    {
-        return set_command(newval);
-    }
 
     /**
      * Retrieves a cellular interface for a given identifier.
@@ -1318,7 +1299,7 @@ public class YCellular extends YFunction
     public int clearDataCounters() throws YAPI_Exception
     {
         int retcode;
-        // may throw an exception
+        
         retcode = set_dataReceived(0);
         if (retcode != YAPI.SUCCESS) {
             return retcode;
@@ -1384,11 +1365,13 @@ public class YCellular extends YFunction
                 idx = idx - 1;
             }
             if ((buff[idx] & 0xff) == 64) {
+                // continuation detected
                 suffixlen = bufflen - idx;
                 cmd = String.format(Locale.US, "at.txt?cmd=%s",(buffstr).substring( buffstrlen - suffixlen,  buffstrlen - suffixlen + suffixlen));
                 buffstr = (buffstr).substring(0, buffstrlen - suffixlen);
                 waitMore = waitMore - 1;
             } else {
+                // request complete
                 waitMore = 0;
             }
             res = String.format(Locale.US, "%s%s", res,buffstr);
@@ -1411,7 +1394,7 @@ public class YCellular extends YFunction
         int idx;
         int slen;
         ArrayList<String> res = new ArrayList<>();
-        // may throw an exception
+        
         cops = _AT("+COPS=?");
         slen = (cops).length();
         res.clear();
@@ -1458,7 +1441,7 @@ public class YCellular extends YFunction
         int tad;
         String oper;
         ArrayList<YCellRecord> res = new ArrayList<>();
-        // may throw an exception
+        
         moni = _AT("+CCED=0;#MONI=7;#MONI");
         mccs = (moni).substring(7, 7 + 3);
         if ((mccs).substring(0, 1).equals("0")) {

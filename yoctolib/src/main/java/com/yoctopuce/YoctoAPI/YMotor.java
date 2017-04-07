@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMotor.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YMotor.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindMotor(), the high-level API for Motor functions
  *
@@ -264,10 +264,6 @@ public class YMotor extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setMotorStatus(int newval)  throws YAPI_Exception
-    {
-        return set_motorStatus(newval);
-    }
 
     /**
      * Changes immediately the power sent to the motor. The value is a percentage between -100%
@@ -821,9 +817,6 @@ public class YMotor extends YFunction
         return set_failSafeTimeout(newval);
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -838,14 +831,6 @@ public class YMotor extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCommand() throws YAPI_Exception
-    {
-        return get_command();
-    }
-
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -856,10 +841,6 @@ public class YMotor extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCommand(String newval)  throws YAPI_Exception
-    {
-        return set_command(newval);
-    }
 
     /**
      * Retrieves a motor for a given identifier.

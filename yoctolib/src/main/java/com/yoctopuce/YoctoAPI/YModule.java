@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YModule.java 27108 2017-04-06 22:18:22Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -646,10 +646,6 @@ public class YModule extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setPersistentSettings(int newval)  throws YAPI_Exception
-    {
-        return set_persistentSettings(newval);
-    }
 
     /**
      * Returns the luminosity of the  module informative leds (from 0 to 100).
@@ -902,10 +898,6 @@ public class YModule extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setRebootCountdown(int newval)  throws YAPI_Exception
-    {
-        return set_rebootCountdown(newval);
-    }
 
     /**
      * Returns the value previously stored in this attribute.
@@ -1187,7 +1179,7 @@ public class YModule extends YFunction
     {
         String serial;
         byte[] settings;
-        // may throw an exception
+        
         serial = get_serialNumber();
         settings = get_allSettings();
         if ((settings).length == 0) {
@@ -1235,7 +1227,7 @@ public class YModule extends YFunction
         String ext_settings;
         ArrayList<String> filelist = new ArrayList<>();
         ArrayList<String> templist = new ArrayList<>();
-        // may throw an exception
+        
         settings = _download("api.json");
         if ((settings).length == 0) {
             return settings;
@@ -1291,7 +1283,7 @@ public class YModule extends YFunction
         int ofs;
         int size;
         url = "api/" + funcId + ".json?command=Z";
-        // may throw an exception
+        
         _download(url);
         // add records in growing resistance value
         values = _json_get_array((jsonExtra).getBytes());
@@ -1390,7 +1382,7 @@ public class YModule extends YFunction
         int count;
         int i;
         String fid;
-        // may throw an exception
+        
         count  = functionCount();
         i = 0;
         while (i < count) {
@@ -1416,7 +1408,7 @@ public class YModule extends YFunction
         int i;
         String ftype;
         ArrayList<String> res = new ArrayList<>();
-        // may throw an exception
+        
         count = functionCount();
         i = 0;
         while (i < count) {
@@ -1514,9 +1506,11 @@ public class YModule extends YFunction
         paramScale = funScale;
         paramOffset = funOffset;
         if (funVer < 3) {
+            // Read the effective device scale if available
             if (funVer == 2) {
                 words = YAPIContext._decodeWords(currentFuncValue);
                 if ((words.get(0).intValue() == 1366) && (words.get(1).intValue() == 12500)) {
+                    // Yocto-3D RefFrame used a special encoding
                     funScale = 1;
                     funOffset = 0;
                 } else {
@@ -1534,9 +1528,11 @@ public class YModule extends YFunction
         calibData.clear();
         calibType = 0;
         if (paramVer < 3) {
+            // Handle old 16 bit parameters formats
             if (paramVer == 2) {
                 words = YAPIContext._decodeWords(param);
                 if ((words.get(0).intValue() == 1366) && (words.get(1).intValue() == 12500)) {
+                    // Yocto-3D RefFrame used a special encoding
                     paramScale = 1;
                     paramOffset = 0;
                 } else {
@@ -1589,13 +1585,16 @@ public class YModule extends YFunction
             i = 0;
             while (i < calibData.size()) {
                 if (paramScale > 0) {
+                    // scalar decoding
                     calibData.set( i, (calibData.get(i).doubleValue() - paramOffset) / paramScale);
                 } else {
+                    // floating-point decoding
                     calibData.set( i, YAPIContext._decimalToDouble((int) (double)Math.round(calibData.get(i).doubleValue())));
                 }
                 i = i + 1;
             }
         } else {
+            // Handle latest 32bit parameter format
             iCalib = YAPIContext._decodeFloats(param);
             calibType = (int) (double)Math.round(iCalib.get(0).doubleValue() / 1000.0);
             if (calibType >= 30) {
@@ -1608,6 +1607,7 @@ public class YModule extends YFunction
             }
         }
         if (funVer >= 3) {
+            // Encode parameters in new format
             if (calibData.size() == 0) {
                 param = "0,";
             } else {
@@ -1626,6 +1626,7 @@ public class YModule extends YFunction
             }
         } else {
             if (funVer >= 1) {
+                // Encode parameters for older devices
                 nPoints = ((calibData.size()) / (2));
                 param = Integer.toString(nPoints);
                 i = 0;
@@ -1639,6 +1640,7 @@ public class YModule extends YFunction
                     i = i + 1;
                 }
             } else {
+                // Initial V0 encoding used for old Yocto-Light
                 if (calibData.size() == 4) {
                     param = Double.toString((double)Math.round(1000 * (calibData.get(3).doubleValue() - calibData.get(1).doubleValue()) / calibData.get(2).doubleValue() - calibData.get(0).doubleValue()));
                 }
@@ -1703,6 +1705,7 @@ public class YModule extends YFunction
         old_dslist = _json_get_array(old_json_flat);
         for (String ii:old_dslist) {
             each_str = _json_get_string((ii).getBytes());
+            // split json path and attr
             leng = (each_str).length();
             eqpos = (each_str).indexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
@@ -1716,12 +1719,14 @@ public class YModule extends YFunction
             old_jpath_len.add((jpath).length());
             old_val_arr.add(value);
         }
-        // may throw an exception
+        
         actualSettings = _download("api.json");
         actualSettings = _flattenJsonStruct(actualSettings);
         new_dslist = _json_get_array(actualSettings);
         for (String ii:new_dslist) {
+            // remove quotes
             each_str = _json_get_string((ii).getBytes());
+            // split json path and attr
             leng = (each_str).length();
             eqpos = (each_str).indexOf("=");
             if ((eqpos < 0) || (leng == 0)) {
@@ -1965,7 +1970,7 @@ public class YModule extends YFunction
     public String get_lastLogs() throws YAPI_Exception
     {
         byte[] content;
-        // may throw an exception
+        
         content = _download("logs.txt");
         return new String(content);
     }

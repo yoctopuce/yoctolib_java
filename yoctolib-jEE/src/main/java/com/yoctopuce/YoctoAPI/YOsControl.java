@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YOsControl.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YOsControl.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -168,10 +168,6 @@ public class YOsControl extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setShutdownCountdown(int newval)  throws YAPI_Exception
-    {
-        return set_shutdownCountdown(newval);
-    }
 
     /**
      * Retrieves OS control for a given identifier.

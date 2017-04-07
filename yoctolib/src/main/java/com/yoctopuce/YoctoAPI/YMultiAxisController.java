@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMultiAxisController.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YMultiAxisController.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -247,9 +247,6 @@ public class YMultiAxisController extends YFunction
         return get_globalState();
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -264,14 +261,6 @@ public class YMultiAxisController extends YFunction
         return res;
     }
 
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public String getCommand() throws YAPI_Exception
-    {
-        return get_command();
-    }
-
     public int set_command(String  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -282,10 +271,6 @@ public class YMultiAxisController extends YFunction
         return YAPI.SUCCESS;
     }
 
-    public int setCommand(String newval)  throws YAPI_Exception
-    {
-        return set_command(newval);
-    }
 
     /**
      * Retrieves a multi-axis controller for a given identifier.

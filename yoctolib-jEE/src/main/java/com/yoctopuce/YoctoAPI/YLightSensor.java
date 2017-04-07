@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YLightSensor.java 27053 2017-04-04 16:01:11Z seb $
  *
  * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -141,10 +141,6 @@ public class YLightSensor extends YSensor
         return YAPI.SUCCESS;
     }
 
-    public int setCurrentValue(double newval)  throws YAPI_Exception
-    {
-        return set_currentValue(newval);
-    }
 
     /**
      * Changes the sensor-specific calibration parameter so that the current value
