@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YServo.java 27118 2017-04-06 22:38:36Z seb $
+ * $Id: YServo.java 27165 2017-04-13 10:23:14Z seb $
  *
  * Implements FindServo(), the high-level API for Servo functions
  *
@@ -174,10 +174,10 @@ public class YServo extends YFunction
                 _move.moving = subjson.getInt("moving");
             }
             if (subjson.has("target")) {
-                _move.moving = subjson.getInt("target");
+                _move.target = subjson.getInt("target");
             }
             if (subjson.has("ms")) {
-                _move.moving = subjson.getInt("ms");
+                _move.ms = subjson.getInt("ms");
             }
         }
         if (json_val.has("positionAtPowerOn")) {

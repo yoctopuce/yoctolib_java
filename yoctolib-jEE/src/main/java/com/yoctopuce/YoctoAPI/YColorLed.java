@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 27118 2017-04-06 22:38:36Z seb $
+ * $Id: YColorLed.java 27165 2017-04-13 10:23:14Z seb $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -173,10 +173,10 @@ public class YColorLed extends YFunction
                 _rgbMove.moving = subjson.getInt("moving");
             }
             if (subjson.has("target")) {
-                _rgbMove.moving = subjson.getInt("target");
+                _rgbMove.target = subjson.getInt("target");
             }
             if (subjson.has("ms")) {
-                _rgbMove.moving = subjson.getInt("ms");
+                _rgbMove.ms = subjson.getInt("ms");
             }
         }
         if (json_val.has("hslMove")) {
@@ -185,10 +185,10 @@ public class YColorLed extends YFunction
                 _hslMove.moving = subjson.getInt("moving");
             }
             if (subjson.has("target")) {
-                _hslMove.moving = subjson.getInt("target");
+                _hslMove.target = subjson.getInt("target");
             }
             if (subjson.has("ms")) {
-                _hslMove.moving = subjson.getInt("ms");
+                _hslMove.ms = subjson.getInt("ms");
             }
         }
         if (json_val.has("rgbColorAtPowerOn")) {

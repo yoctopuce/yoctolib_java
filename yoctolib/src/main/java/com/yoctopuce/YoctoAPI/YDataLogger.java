@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 27108 2017-04-06 22:18:22Z seb $
+ * $Id: YDataLogger.java 27168 2017-04-13 10:25:51Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -208,7 +208,7 @@ public class YDataLogger extends YFunction
                 }
             } else {
                 // new datalogger format: {"id":"...","unit":"...","streams":["...",...]}
-                ArrayList<YDataSet> sets = this.parse_dataSets(jsonAllStreams.toString().getBytes());
+                ArrayList<YDataSet> sets = this.parse_dataSets(jsonAllStreams.toJSON().getBytes());
                 for (int j = 0; j < sets.size(); j++) {
                     ArrayList<YDataStream> ds = sets.get(j).get_privateDataStreams();
                     for (int si = 0; si < ds.size(); si++) {

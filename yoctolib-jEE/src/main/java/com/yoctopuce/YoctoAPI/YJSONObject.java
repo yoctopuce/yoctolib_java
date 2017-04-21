@@ -1,11 +1,13 @@
 package com.yoctopuce.YoctoAPI;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
 class YJSONObject extends YJSONContent
 {
     private HashMap<String, YJSONContent> _parsed = new HashMap<>();
+    private ArrayList<String> _keys = new ArrayList<>(16);
 
 
     YJSONObject(String data)
@@ -16,7 +18,6 @@ class YJSONObject extends YJSONContent
     YJSONObject(String data, int start, int len)
     {
         super(data, start, len, YJSONType.OBJECT);
-
     }
 
     @Override
@@ -74,6 +75,7 @@ class YJSONObject extends YJSONContent
                         int len = jobj.parse();
                         cur_pos += len;
                         _parsed.put(current_name, jobj);
+                        _keys.add(current_name);
                         state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
                         //cur_pos is already incremented
                         continue;
@@ -82,6 +84,7 @@ class YJSONObject extends YJSONContent
                         int len = jobj.parse();
                         cur_pos += len;
                         _parsed.put(current_name, jobj);
+                        _keys.add(current_name);
                         state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
                         //cur_pos is already incremented
                         continue;
@@ -90,6 +93,7 @@ class YJSONObject extends YJSONContent
                         int len = jobj.parse();
                         cur_pos += len;
                         _parsed.put(current_name, jobj);
+                        _keys.add(current_name);
                         state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
                         //cur_pos is already incremented
                         continue;
@@ -98,6 +102,7 @@ class YJSONObject extends YJSONContent
                         int len = jobj.parse();
                         cur_pos += len;
                         _parsed.put(current_name, jobj);
+                        _keys.add(current_name);
                         state = Tjstate.JWAITFORNEXTSTRUCTMEMBER;
                         //cur_pos is already incremented
                         continue;
@@ -232,5 +237,49 @@ class YJSONObject extends YJSONContent
         }
         res.append('}');
         return res.toString();
+    }
+
+    public void parseWithRef(YJSONObject reference) throws Exception
+    {
+        if (reference != null) {
+            try {
+                YJSONArray yzon = new YJSONArray(_data, _data_start, _data_boundary);
+                yzon.parse();
+                convert(reference, yzon);
+                return;
+            } catch (Exception ignored) {
+
+            }
+        }
+        this.parse();
+    }
+
+    private void convert(YJSONObject reference, YJSONArray newArray) throws Exception
+    {
+        int length = newArray.length();
+        for (int i = 0; i < length; i++) {
+            String key = reference.getKeyFromIdx(i);
+            YJSONContent new_item = newArray.get(i);
+            YJSONContent reference_item = reference.get(key);
+
+            if (new_item.getJSONType() == reference_item.getJSONType()) {
+                _parsed.put(key, new_item);
+                _keys.add(key);
+            } else if (new_item.getJSONType() == YJSONType.ARRAY && reference_item.getJSONType() == YJSONType.OBJECT) {
+                YJSONObject jobj = new YJSONObject(new_item._data, new_item._data_start, reference_item._data_boundary);
+                jobj.convert((YJSONObject) reference_item, (YJSONArray) new_item);
+                _parsed.put(key, jobj);
+                _keys.add(key);
+            } else {
+                throw new Exception(String.format("Unable to convert %s to %s",
+                        new_item.getJSONType().toString(), reference.getJSONType().toString()));
+
+            }
+        }
+    }
+
+    private String getKeyFromIdx(int i)
+    {
+        return _keys.get(i);
     }
 }

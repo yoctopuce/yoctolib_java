@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMultiAxisController.java 27053 2017-04-04 16:01:11Z seb $
+ * $Id: YMultiAxisController.java 27160 2017-04-07 21:21:28Z mvuilleu $
  *
  * Implements FindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -418,7 +418,7 @@ public class YMultiAxisController extends YFunction
         ndim = speed.size();
         cmd = String.format(Locale.US, "H%d",(int) (double)Math.round(1000*speed.get(0).intValue()));
         i = 1;
-        while (i + 1 < ndim) {
+        while (i < ndim) {
             cmd = String.format(Locale.US, "%s,%d", cmd,(int) (double)Math.round(1000*speed.get(i).intValue()));
             i = i + 1;
         }
@@ -444,7 +444,7 @@ public class YMultiAxisController extends YFunction
         ndim = absPos.size();
         cmd = String.format(Locale.US, "M%d",(int) (double)Math.round(16*absPos.get(0).intValue()));
         i = 1;
-        while (i + 1 < ndim) {
+        while (i < ndim) {
             cmd = String.format(Locale.US, "%s,%d", cmd,(int) (double)Math.round(16*absPos.get(i).intValue()));
             i = i + 1;
         }
@@ -470,7 +470,7 @@ public class YMultiAxisController extends YFunction
         ndim = relPos.size();
         cmd = String.format(Locale.US, "m%d",(int) (double)Math.round(16*relPos.get(0).intValue()));
         i = 1;
-        while (i + 1 < ndim) {
+        while (i < ndim) {
             cmd = String.format(Locale.US, "%s,%d", cmd,(int) (double)Math.round(16*relPos.get(i).intValue()));
             i = i + 1;
         }

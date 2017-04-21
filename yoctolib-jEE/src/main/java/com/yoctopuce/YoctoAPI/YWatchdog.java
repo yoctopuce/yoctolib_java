@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.java 27118 2017-04-06 22:38:36Z seb $
+ * $Id: YWatchdog.java 27165 2017-04-13 10:23:14Z seb $
  *
  * Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -214,10 +214,10 @@ public class YWatchdog extends YFunction
                 _delayedPulseTimer.moving = subjson.getInt("moving");
             }
             if (subjson.has("target")) {
-                _delayedPulseTimer.moving = subjson.getInt("target");
+                _delayedPulseTimer.target = subjson.getInt("target");
             }
             if (subjson.has("ms")) {
-                _delayedPulseTimer.moving = subjson.getInt("ms");
+                _delayedPulseTimer.ms = subjson.getInt("ms");
             }
         }
         if (json_val.has("countdown")) {

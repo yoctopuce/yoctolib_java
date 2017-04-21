@@ -7,7 +7,7 @@
     <groupId>com.yoctopuce.java</groupId>
     <artifactId>javabundle</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.27127-SNAPSHOT</version>
+    <version>1.10.27216-SNAPSHOT</version>
     <name>Yoctopuce Java API (with examples)</name>
     <description>Official Yoctopuce Library for Java with examples</description>
     <url>http://www.yoctopuce.com</url>
@@ -46,6 +46,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-PT100</module>
         <module>Examples/Doc-GettingStarted-Yocto-PWM-Rx</module>
         <module>Examples/Doc-GettingStarted-Yocto-PWM-Tx</module>
+        <module>Examples/Doc-GettingStarted-Yocto-RangeFinder</module>
         <module>Examples/Doc-GettingStarted-Yocto-Relay</module>
         <module>Examples/Doc-GettingStarted-Yocto-RS232</module>
         <module>Examples/Doc-GettingStarted-Yocto-RS485</module>

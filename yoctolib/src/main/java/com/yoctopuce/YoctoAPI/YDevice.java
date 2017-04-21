@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 26952 2017-03-28 15:40:09Z seb $
+ * $Id: YDevice.java 27157 2017-04-07 16:26:10Z seb $
  *
  * Internal YDevice class
  *
@@ -124,12 +124,18 @@ class YDevice
         if (_cache_expiration > tickCount) {
             return _cache_json;
         }
-        String yreq = requestHTTPSyncAsString("GET /api.json", null);
+
+        String request = "GET /api.json";
+        if (_cache_json != null) {
+            request += "?fw=" + _cache_json.getYJSONObject("module").getString("firmwareRelease");
+        }
+        String yreq = requestHTTPSyncAsString(request, null);
         YJSONObject cache_json;
         try {
             cache_json = new YJSONObject(yreq);
-            cache_json.parse();
+            cache_json.parseWithRef(_cache_json);
         } catch (Exception ex) {
+            _cache_json = null;
             throw new YAPI_Exception(YAPI.IO_ERROR,
                     "Request failed, could not parse API result for " + this);
         }
