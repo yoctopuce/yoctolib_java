@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSpiPort.java 27108 2017-04-06 22:18:22Z seb $
+ * $Id: YSpiPort.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -1126,7 +1126,7 @@ public class YSpiPort extends YFunction
         _rxptr = 0;
         _rxbuffptr = 0;
         _rxbuff = new byte[0];
-        
+
         return sendCommand("Z");
     }
 
@@ -1219,7 +1219,7 @@ public class YSpiPort extends YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        
+
         res = _upload("txdata", buff);
         return res;
     }
@@ -1252,7 +1252,7 @@ public class YSpiPort extends YFunction
             buff[idx] = (byte)(hexb & 0xff);
             idx = idx + 1;
         }
-        
+
         res = _upload("txdata", buff);
         return res;
     }
@@ -1312,7 +1312,7 @@ public class YSpiPort extends YFunction
         int mult;
         int endpos;
         int res;
-        
+
         // first check if we have the requested character in the look-ahead buffer
         bufflen = (_rxbuff).length;
         if ((_rxptr >= _rxbuffptr) && (_rxptr < _rxbuffptr+bufflen)) {
@@ -1320,7 +1320,7 @@ public class YSpiPort extends YFunction
             _rxptr = _rxptr + 1;
             return res;
         }
-        
+
         // try to preload more than one byte to speed-up byte-per-byte access
         currpos = _rxptr;
         reqlen = 1024;
@@ -1347,8 +1347,8 @@ public class YSpiPort extends YFunction
         }
         // still mixed, need to process character by character
         _rxptr = currpos;
-        
-        
+
+
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=1",_rxptr));
         bufflen = (buff).length - 1;
         endpos = 0;
@@ -1387,7 +1387,7 @@ public class YSpiPort extends YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        
+
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
         bufflen = (buff).length - 1;
         endpos = 0;
@@ -1424,7 +1424,7 @@ public class YSpiPort extends YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        
+
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
         bufflen = (buff).length - 1;
         endpos = 0;
@@ -1467,7 +1467,7 @@ public class YSpiPort extends YFunction
         if (nChars > 65535) {
             nChars = 65535;
         }
-        
+
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nChars));
         bufflen = (buff).length - 1;
         endpos = 0;
@@ -1510,7 +1510,7 @@ public class YSpiPort extends YFunction
         if (nBytes > 65535) {
             nBytes = 65535;
         }
-        
+
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=%d", _rxptr,nBytes));
         bufflen = (buff).length - 1;
         endpos = 0;
@@ -1554,7 +1554,7 @@ public class YSpiPort extends YFunction
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
-        
+
         url = String.format(Locale.US, "rxmsg.json?pos=%d&len=1&maxw=1",_rxptr);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
@@ -1601,7 +1601,7 @@ public class YSpiPort extends YFunction
         int msglen;
         ArrayList<String> res = new ArrayList<>();
         int idx;
-        
+
         url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&pat=%s", _rxptr, maxWait,pattern);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
@@ -1656,7 +1656,7 @@ public class YSpiPort extends YFunction
         byte[] buff;
         int bufflen;
         int res;
-        
+
         buff = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         bufflen = (buff).length - 1;
         while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
@@ -1685,7 +1685,7 @@ public class YSpiPort extends YFunction
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
-        
+
         url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,query);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);

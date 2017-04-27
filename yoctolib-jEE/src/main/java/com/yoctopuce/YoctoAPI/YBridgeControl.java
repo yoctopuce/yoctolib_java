@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBridgeControl.java 27021 2017-03-31 14:58:15Z seb $
+ * $Id: YBridgeControl.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements FindBridgeControl(), the high-level API for BridgeControl functions
  *

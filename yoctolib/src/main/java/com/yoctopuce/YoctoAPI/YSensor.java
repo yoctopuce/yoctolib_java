@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 27108 2017-04-06 22:18:22Z seb $
+ * $Id: YSensor.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -1141,7 +1141,7 @@ public class YSensor extends YFunction
     public int startDataLogger() throws YAPI_Exception
     {
         byte[] res;
-        
+
         res = _download("api/dataLogger/recording?recording=1");
         //noinspection DoubleNegation
         if (!((res).length>0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to start datalogger");}
@@ -1156,7 +1156,7 @@ public class YSensor extends YFunction
     public int stopDataLogger() throws YAPI_Exception
     {
         byte[] res;
-        
+
         res = _download("api/dataLogger/recording?recording=0");
         //noinspection DoubleNegation
         if (!((res).length>0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to stop datalogger");}
@@ -1193,7 +1193,7 @@ public class YSensor extends YFunction
     {
         String funcid;
         String funit;
-        
+
         funcid = get_functionId();
         funit = get_unit();
         return new YDataSet(this, funcid, funit, startTime, endTime);
@@ -1257,7 +1257,7 @@ public class YSensor extends YFunction
     {
         String rest_val;
         int res;
-        
+
         synchronized (this) {
             rest_val = _encodeCalibrationPoints(rawValues, refValues);
             res = _setAttr("calibrationParam", rest_val);

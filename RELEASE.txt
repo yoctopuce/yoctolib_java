@@ -1,1 +1,1 @@
-- Add support for new JZON protocol (improve overall performance)
+- Improve error reporting for WebSocket callback

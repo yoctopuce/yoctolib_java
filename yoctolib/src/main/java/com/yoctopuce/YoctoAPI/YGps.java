@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGps.java 27053 2017-04-04 16:01:11Z seb $
+ * $Id: YGps.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements FindGps(), the high-level API for Gps functions
  *

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 27108 2017-04-06 22:18:22Z seb $
+ * $Id: YModule.java 27277 2017-04-25 15:41:31Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -233,7 +233,7 @@ public class YModule extends YFunction
      *  @param functionIndex : the index of the function for which the information is desired, starting at
      * 0 for the first function.
      *
-     * @return a the type of the function
+     * @return a string corresponding to the type of the function
      *
      * @throws YAPI_Exception on error
      */
@@ -244,11 +244,14 @@ public class YModule extends YFunction
     }
 
     /**
-     * Retrieve the function base type of the nth function (beside "module") in the device
+     * Retrieves the base type of the <i>n</i>th function on the module.
+     * For instance, the base type of all measuring functions is "Sensor".
      *
-     * @param functionIndex : the index of the function for which the information is desired, starting at
-     *                      0 for the first function.
-     * @return a the type of the function
+     *  @param functionIndex : the index of the function for which the information is desired, starting at
+     * 0 for the first function.
+     *
+     * @return a string corresponding to the base type of the function
+     *
      * @throws YAPI_Exception on error
      */
     public String functionBaseType(int functionIndex) throws YAPI_Exception
@@ -1179,7 +1182,7 @@ public class YModule extends YFunction
     {
         String serial;
         byte[] settings;
-        
+
         serial = get_serialNumber();
         settings = get_allSettings();
         if ((settings).length == 0) {
@@ -1227,7 +1230,7 @@ public class YModule extends YFunction
         String ext_settings;
         ArrayList<String> filelist = new ArrayList<>();
         ArrayList<String> templist = new ArrayList<>();
-        
+
         settings = _download("api.json");
         if ((settings).length == 0) {
             return settings;
@@ -1283,7 +1286,7 @@ public class YModule extends YFunction
         int ofs;
         int size;
         url = "api/" + funcId + ".json?command=Z";
-        
+
         _download(url);
         // add records in growing resistance value
         values = _json_get_array((jsonExtra).getBytes());
@@ -1382,7 +1385,7 @@ public class YModule extends YFunction
         int count;
         int i;
         String fid;
-        
+
         count  = functionCount();
         i = 0;
         while (i < count) {
@@ -1408,7 +1411,7 @@ public class YModule extends YFunction
         int i;
         String ftype;
         ArrayList<String> res = new ArrayList<>();
-        
+
         count = functionCount();
         i = 0;
         while (i < count) {
@@ -1719,7 +1722,7 @@ public class YModule extends YFunction
             old_jpath_len.add((jpath).length());
             old_val_arr.add(value);
         }
-        
+
         actualSettings = _download("api.json");
         actualSettings = _flattenJsonStruct(actualSettings);
         new_dslist = _json_get_array(actualSettings);
@@ -1970,7 +1973,7 @@ public class YModule extends YFunction
     public String get_lastLogs() throws YAPI_Exception
     {
         byte[] content;
-        
+
         content = _download("logs.txt");
         return new String(content);
     }

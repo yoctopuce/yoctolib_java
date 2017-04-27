@@ -37,6 +37,10 @@ abstract class NotificationHandler implements Runnable
         _hub = hub;
     }
 
+
+    abstract String getThreadLabel();
+
+
     // Network notification format: 7x7bit (mapped to 7 chars in range 32..159)
     //                              used to represent 1 flag (RAW6BYTES) + 6 bytes
     // INPUT:  [R765432][1076543][2107654][3210765][4321076][5432107][6543210]

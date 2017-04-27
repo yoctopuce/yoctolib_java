@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 27108 2017-04-06 22:18:22Z seb $
+ * $Id: YMessageBox.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -539,8 +539,8 @@ public class YMessageBox extends YFunction
         ArrayList<String> arrPdu = new ArrayList<>();
         String hexPdu;
         YSms sms;
-        
-        
+
+
         binPdu = _download(String.format(Locale.US, "sms.json?pos=%d&len=1",slot));
         arrPdu = _json_get_array(binPdu);
         hexPdu = _decode_json_string(arrPdu.get(0));
@@ -554,7 +554,7 @@ public class YMessageBox extends YFunction
     {
         int i;
         int uni;
-        
+
         _gsm2unicode.clear();
         // 00-07
         _gsm2unicode.add(64);
@@ -632,7 +632,7 @@ public class YMessageBox extends YFunction
         }
         // Done
         _gsm2unicodeReady = true;
-        
+
         return YAPI.SUCCESS;
     }
 
@@ -643,7 +643,7 @@ public class YMessageBox extends YFunction
         int reslen;
         ArrayList<Integer> res = new ArrayList<>();
         int uni;
-        
+
         if (!(_gsm2unicodeReady)) {
             initGsm2Unicode();
         }
@@ -729,7 +729,7 @@ public class YMessageBox extends YFunction
         byte[] resbin;
         String resstr;
         int uni;
-        
+
         if (!(_gsm2unicodeReady)) {
             initGsm2Unicode();
         }
@@ -823,7 +823,7 @@ public class YMessageBox extends YFunction
         int extra;
         byte[] res;
         int wpos;
-        
+
         if (!(_gsm2unicodeReady)) {
             initGsm2Unicode();
         }
@@ -910,8 +910,8 @@ public class YMessageBox extends YFunction
         ArrayList<YSms> newAgg = new ArrayList<>();
         ArrayList<String> signatures = new ArrayList<>();
         YSms sms;
-        
-        
+
+
         bitmapStr = get_slotsBitmap();
         if (bitmapStr.equals(_prevBitmapStr)) {
             return YAPI.SUCCESS;
@@ -1015,7 +1015,7 @@ public class YMessageBox extends YFunction
             i = i + 1;
         }
         _messages = newMsg;
-        
+
         return YAPI.SUCCESS;
     }
 
@@ -1035,7 +1035,7 @@ public class YMessageBox extends YFunction
     public int clearPduCounters() throws YAPI_Exception
     {
         int retcode;
-        
+
         retcode = set_pduReceived(0);
         if (retcode != YAPI.SUCCESS) {
             return retcode;
@@ -1062,7 +1062,7 @@ public class YMessageBox extends YFunction
     public int sendTextMessage(String recipient,String message) throws YAPI_Exception
     {
         YSms sms;
-        
+
         sms = new YSms(this);
         sms.set_recipient(recipient);
         sms.addText(message);
@@ -1088,7 +1088,7 @@ public class YMessageBox extends YFunction
     public int sendFlashMessage(String recipient,String message) throws YAPI_Exception
     {
         YSms sms;
-        
+
         sms = new YSms(this);
         sms.set_recipient(recipient);
         sms.set_msgClass(0);
@@ -1125,7 +1125,7 @@ public class YMessageBox extends YFunction
     public ArrayList<YSms> get_messages() throws YAPI_Exception
     {
         checkNewMessages();
-        
+
         return _messages;
     }
 

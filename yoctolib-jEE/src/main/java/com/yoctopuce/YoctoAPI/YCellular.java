@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 27108 2017-04-06 22:18:22Z seb $
+ * $Id: YCellular.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -1299,7 +1299,7 @@ public class YCellular extends YFunction
     public int clearDataCounters() throws YAPI_Exception
     {
         int retcode;
-        
+
         retcode = set_dataReceived(0);
         if (retcode != YAPI.SUCCESS) {
             return retcode;
@@ -1394,7 +1394,7 @@ public class YCellular extends YFunction
         int idx;
         int slen;
         ArrayList<String> res = new ArrayList<>();
-        
+
         cops = _AT("+COPS=?");
         slen = (cops).length();
         res.clear();
@@ -1441,7 +1441,7 @@ public class YCellular extends YFunction
         int tad;
         String oper;
         ArrayList<YCellRecord> res = new ArrayList<>();
-        
+
         moni = _AT("+CCED=0;#MONI=7;#MONI");
         mccs = (moni).substring(7, 7 + 3);
         if ((mccs).substring(0, 1).equals("0")) {

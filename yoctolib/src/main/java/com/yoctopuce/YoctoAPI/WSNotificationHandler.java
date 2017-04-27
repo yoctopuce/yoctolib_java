@@ -10,6 +10,12 @@ class WSNotificationHandler extends NotificationHandler
     }
 
     @Override
+    String getThreadLabel()
+    {
+        return "";
+    }
+
+    @Override
     byte[] hubRequestSync(String req_first_line, byte[] req_head_and_body, int mstimeout) throws YAPI_Exception, InterruptedException
     {
         return new byte[0];

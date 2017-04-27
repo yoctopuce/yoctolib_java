@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 27108 2017-04-06 22:18:22Z seb $
+ * $Id: YTemperature.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -610,7 +610,7 @@ public class YTemperature extends YSensor
         if (!(siz >= 2)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "thermistor response table must have at least two points");}
         //noinspection DoubleNegation
         if (!(siz == resValues.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "table sizes mismatch");}
-        
+
         res = set_command("Z");
         //noinspection DoubleNegation
         if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermistor parameters");}
@@ -672,7 +672,7 @@ public class YTemperature extends YSensor
         double currRes;
         tempValues.clear();
         resValues.clear();
-        
+
         id = get_functionId();
         id = (id).substring( 11,  11 + (id).length() - 11);
         bin_json = _download(String.format(Locale.US, "extra.json?page=%s",id));

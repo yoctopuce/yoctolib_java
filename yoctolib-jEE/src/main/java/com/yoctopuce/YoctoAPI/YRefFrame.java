@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 27108 2017-04-06 22:18:22Z seb $
+ * $Id: YRefFrame.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -586,7 +586,7 @@ public class YRefFrame extends YFunction
         ArrayList<Integer> iCalib = new ArrayList<>();
         int caltyp;
         int res;
-        
+
         calibParam = get_calibrationParam();
         iCalib = YAPIContext._decodeFloats(calibParam);
         caltyp = ((iCalib.get(0).intValue()) / (1000));
@@ -616,7 +616,7 @@ public class YRefFrame extends YFunction
         ArrayList<Integer> iCalib = new ArrayList<>();
         int caltyp;
         int res;
-        
+
         calibParam = get_calibrationParam();
         iCalib = YAPIContext._decodeFloats(calibParam);
         caltyp = ((iCalib.get(0).intValue()) / (1000));
@@ -956,7 +956,7 @@ public class YRefFrame extends YFunction
                 return YAPI.SUCCESS;
             }
         }
-        
+
         calibParam = _download("api/refFrame/calibrationParam.txt");
         iCalib = YAPIContext._decodeFloats(new String(calibParam));
         cal3 = ((iCalib.get(1).intValue()) / (1000));
@@ -1142,7 +1142,7 @@ public class YRefFrame extends YFunction
         if (_calibStage == 0) {
             return YAPI.SUCCESS;
         }
-        
+
         _calibStage = 0;
         return set_calibrationParam(_calibSavedParams);
     }

@@ -9,7 +9,9 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.*;
 
 @ClientEndpoint
@@ -161,7 +163,7 @@ class WSNotificationHandler extends NotificationHandler implements MessageHandle
             WSLOG("WebSocket is not open");
             return;
         }
-
+        String errmsg = "WebSocket session is closed";
         RemoteEndpoint.Basic basicRemote = _session.getBasicRemote();
         try {
             long timeout = System.currentTimeMillis() + 10000;
@@ -177,7 +179,7 @@ class WSNotificationHandler extends NotificationHandler implements MessageHandle
                 }
             }
 
-            while (!Thread.currentThread().isInterrupted() && !_muststop) {
+            while (!Thread.currentThread().isInterrupted() && !_muststop && _session.isOpen()) {
                 long now = YAPI.GetTickCount();
                 long wait;
                 if (_next_transmit_tm >= now) {
@@ -198,15 +200,25 @@ class WSNotificationHandler extends NotificationHandler implements MessageHandle
                 }
                 processRequests(basicRemote);
             }
-        } catch (IOException | InterruptedException ex) {
-            // put all request in error
-            synchronized (_workingRequests) {
-                for (int i = 0; i < NB_TCP_CHANNEL; i++) {
-                    for (WSRequest request : _workingRequests.get(i)) {
-                        request.setError(YAPI.IO_ERROR, ex.getLocalizedMessage(), ex);
-                    }
-                    _workingRequests.get(i).clear();
+        } catch (Exception ex) {
+            errmsg = ex.getLocalizedMessage();
+        }
+
+        try {
+            WSRequest wsRequest = _pendingRequests.poll(10, TimeUnit.MILLISECONDS);
+            while (wsRequest != null) {
+                wsRequest.setError(YAPI.IO_ERROR, errmsg);
+                wsRequest = _pendingRequests.poll(10, TimeUnit.MILLISECONDS);
+            }
+        } catch (InterruptedException ignored) {
+        }
+        // put all request in error
+        synchronized (_workingRequests) {
+            for (int i = 0; i < NB_TCP_CHANNEL; i++) {
+                for (WSRequest request : _workingRequests.get(i)) {
+                    request.setError(YAPI.IO_ERROR, errmsg);
                 }
+                _workingRequests.get(i).clear();
             }
         }
         synchronized (_stateLock) {
@@ -288,6 +300,12 @@ class WSNotificationHandler extends NotificationHandler implements MessageHandle
             return Arrays.copyOfRange(full_result, hpos + 4, full_result.length);
         }
         return full_result;
+    }
+
+    @Override
+    String getThreadLabel()
+    {
+        return "WS Notification handler session " + _session.getId();
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java 27108 2017-04-06 22:18:22Z seb $
+ * $Id: YGyro.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -558,7 +558,7 @@ public class YGyro extends YSensor
         double sqz;
         double norm;
         double delta;
-        
+
         if (_loadQuaternion() != YAPI.SUCCESS) {
             return YAPI.DEVICE_NOT_FOUND;
         }

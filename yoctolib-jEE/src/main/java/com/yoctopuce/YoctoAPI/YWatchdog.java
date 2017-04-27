@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.java 27165 2017-04-13 10:23:14Z seb $
+ * $Id: YWatchdog.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements FindWatchdog(), the high-level API for Watchdog functions
  *

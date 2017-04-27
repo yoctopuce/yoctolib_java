@@ -15,6 +15,12 @@ class TCPNotificationHandler extends NotificationHandler
         super(hub);
     }
 
+    @Override
+    String getThreadLabel()
+    {
+        return "HTTP Notification handler";
+    }
+
 
     @Override
     public void run()

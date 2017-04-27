@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YHTTPHub.java 27289 2017-04-27 14:14:11Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -191,7 +191,7 @@ class YHTTPHub extends YGenericHub
         } else {
             _notificationHandler = new TCPNotificationHandler(this);
         }
-        _thread = new Thread(_notificationHandler, "Notification handler for " + getHost());
+        _thread = new Thread(_notificationHandler, _notificationHandler.getThreadLabel());
         _thread.start();
     }
 

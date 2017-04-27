@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTilt.java 27053 2017-04-04 16:01:11Z seb $
+ * $Id: YTilt.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements FindTilt(), the high-level API for Tilt functions
  *

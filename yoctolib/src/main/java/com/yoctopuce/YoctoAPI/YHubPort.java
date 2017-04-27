@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHubPort.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YHubPort.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements FindHubPort(), the high-level API for HubPort functions
  *

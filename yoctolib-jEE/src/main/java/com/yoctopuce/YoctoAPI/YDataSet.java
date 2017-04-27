@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataSet.java 27108 2017-04-06 22:18:22Z seb $
+ * $Id: YDataSet.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -203,7 +203,7 @@ public class YDataSet
         int minCol;
         int avgCol;
         int maxCol;
-        
+
         if (progress != _progress) {
             return _progress;
         }
@@ -239,7 +239,7 @@ public class YDataSet
         } else {
             maxCol = 0;
         }
-        
+
         for (ArrayList<Double> ii:dataRows) {
             if ((tim >= _startTime) && ((_endTime == 0) || (tim <= _endTime))) {
                 _measures.add(new YMeasure(tim - itv, tim, ii.get(minCol).doubleValue(), ii.get(avgCol).doubleValue(), ii.get(maxCol).doubleValue()));
@@ -446,7 +446,7 @@ public class YDataSet
         int minCol;
         int avgCol;
         int maxCol;
-        
+
         startUtc = (long) (double)Math.round(measure.get_startTimeUTC());
         stream = null;
         for (YDataStream ii:_streams) {
@@ -478,7 +478,7 @@ public class YDataSet
         } else {
             maxCol = 0;
         }
-        
+
         for (ArrayList<Double> ii:dataRows) {
             if ((tim >= _startTime) && ((_endTime == 0) || (tim <= _endTime))) {
                 measures.add(new YMeasure(tim - itv, tim, ii.get(minCol).doubleValue(), ii.get(avgCol).doubleValue(), ii.get(maxCol).doubleValue()));

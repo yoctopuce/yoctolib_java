@@ -37,17 +37,16 @@ class WSRequest
     void checkError() throws YAPI_Exception
     {
         if (_errorCode != YAPI.SUCCESS) {
-            throw new YAPI_Exception(_errorCode, _errorMsg, _errorEx);
+            throw new YAPI_Exception(_errorCode, _errorMsg);
         }
     }
 
-    synchronized void setError(int ioError, String reasonPhrase, Exception ex)
+    synchronized void setError(int ioError, String reasonPhrase)
     {
         _errorCode = ioError;
         _errorMsg = reasonPhrase;
-        _errorEx = ex;
         _state = State.ERROR;
-        logProcess("error:" + reasonPhrase);
+        //logProcess("error:" + reasonPhrase);
         this.notifyAll();
     }
 
@@ -57,7 +56,7 @@ class WSRequest
         long write = _tmOut - _tmProcess;
         long read = _tmIn - _tmOut;
         long end = _tmClose - _tmOpen;
-        System.out.println(String.format("%s:%s in %d+%d+%d =%d ms", this, msg, process, write, read, end));
+        //System.out.println(String.format("%s:%s in %d+%d+%d =%d ms", this, msg, process, write, read, end));
     }
 
 

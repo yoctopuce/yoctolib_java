@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPowerOutput.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YPowerOutput.java 27277 2017-04-25 15:41:31Z seb $
  *
  * Implements FindPowerOutput(), the high-level API for PowerOutput functions
  *
