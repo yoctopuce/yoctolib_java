@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YSms.java 27277 2017-04-25 15:41:31Z seb $
+ * $Id: YSms.java 27415 2017-05-11 09:57:43Z seb $
  *
  * Implements FindSms(), the high-level API for Sms functions
  *
@@ -161,7 +161,6 @@ public class YSms
         byte[] isolatin;
         int isosize;
         int i;
-
         if (_alphab == 0) {
             // using GSM standard 7-bit alphabet
             return _mbox.gsm2str(_udata);
@@ -177,7 +176,6 @@ public class YSms
             }
             return new String(isolatin);
         }
-
         // default: convert 8 bit to string as-is
         return new String(_udata);
     }
@@ -188,7 +186,6 @@ public class YSms
         int unisize;
         int unival;
         int i;
-
         if (_alphab == 0) {
             // using GSM standard 7-bit alphabet
             return _mbox.gsm2unicode(_udata);
@@ -365,7 +362,6 @@ public class YSms
         int udatalen;
         int i;
         int uni;
-
         if (_alphab == 2) {
             return YAPI.SUCCESS;
         }
@@ -384,7 +380,6 @@ public class YSms
         _alphab = 2;
         _udata = new byte[0];
         addUnicodeData(ucs2);
-
         return YAPI.SUCCESS;
     }
 
@@ -395,11 +390,9 @@ public class YSms
         byte[] newdata;
         int newdatalen;
         int i;
-
         if ((val).length() == 0) {
             return YAPI.SUCCESS;
         }
-
         if (_alphab == 0) {
             // Try to append using GSM 7-bit alphabet
             newdata = _mbox.str2gsm(val);
@@ -444,7 +437,6 @@ public class YSms
                 i = i + 1;
             }
         }
-
         return set_userData(udata);
     }
 
@@ -457,7 +449,6 @@ public class YSms
         byte[] udata;
         int udatalen;
         int surrogate;
-
         if (_alphab != 2) {
             convertToUnicode();
         }
@@ -496,7 +487,6 @@ public class YSms
             udatalen = udatalen + 2;
             i = i + 1;
         }
-
         return set_userData(udata);
     }
 
@@ -522,7 +512,6 @@ public class YSms
         if (_npdu == 0) {
             return YAPI.INVALID_ARGUMENT;
         }
-
         sorted.clear();
         partno = 0;
         while (partno < _npdu) {
@@ -1089,7 +1078,6 @@ public class YSms
         int iei;
         int ielen;
         String sig;
-
         _aggSig = "";
         _aggIdx = 0;
         _aggCnt = 0;
@@ -1136,10 +1124,8 @@ public class YSms
         int carry;
         int nbits;
         int thisb;
-
         _pdu = pdu;
         _npdu = 1;
-
         // parse meta-data
         _smsc = decodeAddress(pdu, 1, 2*((pdu[0] & 0xff)-1));
         rpos = 1+(pdu[0] & 0xff);
@@ -1178,7 +1164,6 @@ public class YSms
         _mclass = ((dcs) & (16+3));
         _stamp = decodeTimeStamp(pdu, rpos, tslen);
         rpos = rpos + tslen;
-
         // parse user data (including udh)
         nbits = 0;
         carry = 0;
@@ -1241,7 +1226,6 @@ public class YSms
             }
         }
         parseUserDataHeader();
-
         return YAPI.SUCCESS;
     }
 

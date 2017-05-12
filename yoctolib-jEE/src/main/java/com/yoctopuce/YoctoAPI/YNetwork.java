@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.java 27277 2017-04-25 15:41:31Z seb $
+ * $Id: YNetwork.java 27415 2017-05-11 09:57:43Z seb $
  *
  * Implements FindNetwork(), the high-level API for Network functions
  *
@@ -2027,6 +2027,21 @@ public class YNetwork extends YFunction
     public int useDHCP(String fallbackIpAddr,int fallbackSubnetMaskLen,String fallbackRouter) throws YAPI_Exception
     {
         return set_ipConfig(String.format(Locale.US, "DHCP:%s/%d/%s", fallbackIpAddr, fallbackSubnetMaskLen,fallbackRouter));
+    }
+
+    /**
+     * Changes the configuration of the network interface to enable the use of an
+     * IP address received from a DHCP server. Until an address is received from a DHCP
+     * server, the module uses an IP of the network 169.254.0.0/16 (APIPA).
+     * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int useDHCPauto() throws YAPI_Exception
+    {
+        return set_ipConfig("DHCP:");
     }
 
     /**

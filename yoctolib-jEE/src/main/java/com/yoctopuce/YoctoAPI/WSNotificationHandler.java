@@ -278,7 +278,8 @@ class WSNotificationHandler extends NotificationHandler implements MessageHandle
         WSRequest.State state = wsRequest.waitProcessingEnd(mstimeout);
         if (!state.equals(WSRequest.State.CLOSED)) {
             wsRequest.checkError();
-            throw new YAPI_Exception(YAPI.TIMEOUT, "Last request did not finished correctly");
+            wsRequest.log("Timeout");
+            throw new YAPI_Exception(YAPI.TIMEOUT, "request did not finished correctly");
 
         }
         byte[] full_result = wsRequest.getResponseBytes();

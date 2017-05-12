@@ -1,1 +1,2 @@
+- Add YNetwork.useDHCPauto(), YWireless.startWlanScan() and YWireless.get_wlanState() methods
 - Improve error reporting for WebSocket callback

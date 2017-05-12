@@ -50,13 +50,13 @@ class WSRequest
         this.notifyAll();
     }
 
-    private void logProcess(String msg)
+    void log(String msg)
     {
         long process = _tmProcess - _tmOpen;
         long write = _tmOut - _tmProcess;
         long read = _tmIn - _tmOut;
         long end = _tmClose - _tmOpen;
-        //System.out.println(String.format("%s:%s in %d+%d+%d =%d ms", this, msg, process, write, read, end));
+        System.out.println(String.format("%s:%s in %d+%d+%d =%d ms", this, msg, process, write, read, end));
     }
 
 

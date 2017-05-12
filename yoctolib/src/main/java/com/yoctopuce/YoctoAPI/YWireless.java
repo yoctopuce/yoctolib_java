@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 27277 2017-04-25 15:41:31Z seb $
+ * $Id: YWireless.java 27437 2017-05-12 13:13:55Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -86,12 +86,21 @@ public class YWireless extends YFunction
      * invalid wlanConfig value
      */
     public static final String WLANCONFIG_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid wlanState value
+     */
+    public static final int WLANSTATE_DOWN = 0;
+    public static final int WLANSTATE_SCANNING = 1;
+    public static final int WLANSTATE_CONNECTED = 2;
+    public static final int WLANSTATE_REJECTED = 3;
+    public static final int WLANSTATE_INVALID = -1;
     protected int _linkQuality = LINKQUALITY_INVALID;
     protected String _ssid = SSID_INVALID;
     protected int _channel = CHANNEL_INVALID;
     protected int _security = SECURITY_INVALID;
     protected String _message = MESSAGE_INVALID;
     protected String _wlanConfig = WLANCONFIG_INVALID;
+    protected int _wlanState = WLANSTATE_INVALID;
     protected UpdateCallback _valueCallbackWireless = null;
 
     /**
@@ -160,6 +169,9 @@ public class YWireless extends YFunction
         }
         if (json_val.has("wlanConfig")) {
             _wlanConfig = json_val.getString("wlanConfig");
+        }
+        if (json_val.has("wlanState")) {
+            _wlanState = json_val.getInt("wlanState");
         }
         super._parseAttr(json_val);
     }
@@ -360,6 +372,68 @@ public class YWireless extends YFunction
 
 
     /**
+     *  Returns the current state of the wireless interface. The state YWireless.WLANSTATE_DOWN means that
+     * the network interface is
+     *  not connected to a network. The state YWireless.WLANSTATE_SCANNING means that the network interface
+     * is scanning available
+     *  frequencies. During this stage, the device is not reachable, and the network settings are not yet
+     * applied. The state
+     *  YWireless.WLANSTATE_CONNECTED means that the network settings have been successfully applied ant
+     * that the device is reachable
+     *  from the wireless network. If the device is configured to use ad-hoc or Soft AP mode, it means that
+     * the wireless network
+     *  is up and that other devices can join the network. The state YWireless.WLANSTATE_REJECTED means
+     * that the network interface has
+     *  not been able to join the requested network. The description of the error can be obtain with the
+     * get_message() method.
+     *
+     *  @return a value among YWireless.WLANSTATE_DOWN, YWireless.WLANSTATE_SCANNING,
+     *  YWireless.WLANSTATE_CONNECTED and YWireless.WLANSTATE_REJECTED corresponding to the current state
+     * of the wireless interface
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_wlanState() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return WLANSTATE_INVALID;
+                }
+            }
+            res = _wlanState;
+        }
+        return res;
+    }
+
+    /**
+     *  Returns the current state of the wireless interface. The state Y_WLANSTATE_DOWN means that the
+     * network interface is
+     *  not connected to a network. The state Y_WLANSTATE_SCANNING means that the network interface is
+     * scanning available
+     *  frequencies. During this stage, the device is not reachable, and the network settings are not yet
+     * applied. The state
+     *  Y_WLANSTATE_CONNECTED means that the network settings have been successfully applied ant that the
+     * device is reachable
+     *  from the wireless network. If the device is configured to use ad-hoc or Soft AP mode, it means that
+     * the wireless network
+     *  is up and that other devices can join the network. The state Y_WLANSTATE_REJECTED means that the
+     * network interface has
+     *  not been able to join the requested network. The description of the error can be obtain with the
+     * get_message() method.
+     *
+     *  @return a value among Y_WLANSTATE_DOWN, Y_WLANSTATE_SCANNING, Y_WLANSTATE_CONNECTED and
+     * Y_WLANSTATE_REJECTED corresponding to the current state of the wireless interface
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getWlanState() throws YAPI_Exception
+    {
+        return get_wlanState();
+    }
+
+    /**
      * Retrieves a wireless lan interface for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
@@ -474,6 +548,24 @@ public class YWireless extends YFunction
     }
 
     /**
+     * Triggers a scan of the wireless frequency and builds the list of available networks.
+     * The scan forces a disconnection from the current network. At then end of the process, the
+     * the network interface attempts to reconnect to the previous network. During the scan, the wlanState
+     * switches to YWireless.WLANSTATE_DOWN, then to YWireless.WLANSTATE_SCANNING. When the scan is completed,
+     * get_wlanState() returns either YWireless.WLANSTATE_DOWN or YWireless.WLANSTATE_SCANNING. At this
+     * point, the list of detected network can be retrieved with the get_detectedWlans() method.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int startWlanScan() throws YAPI_Exception
+    {
+        String config;
+        config = get_wlanConfig();
+        // a full scan is triggered when a config is applied
+        return set_wlanConfig(config);
+    }
+
+    /**
      * Changes the configuration of the wireless lan interface to connect to an existing
      * access point (infrastructure mode).
      * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
@@ -541,8 +633,8 @@ public class YWireless extends YFunction
     /**
      * Returns a list of YWlanRecord objects that describe detected Wireless networks.
      * This list is not updated when the module is already connected to an acces point (infrastructure mode).
-     * To force an update of this list, adhocNetwork() must be called to disconnect
-     * the module from the current network. The returned list must be unallocated by the caller.
+     * To force an update of this list, startWlanScan() must be called.
+     * Note that an languages without garbage collections, the returned list must be freed by the caller.
      *
      * @return a list of YWlanRecord objects, containing the SSID, channel,
      *         link quality and the type of security of the wireless network.
