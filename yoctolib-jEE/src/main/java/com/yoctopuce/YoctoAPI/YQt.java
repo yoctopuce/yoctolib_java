@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YQt.java 27710 2017-06-01 12:39:47Z seb $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -128,6 +128,10 @@ public class YQt extends YSensor
      * a quaternion component by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
+     *
+     * If a call to this object's is_online() method returns FALSE although
+     * you are certain that the matching device is plugged, make sure that you did
+     * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the quaternion component
      *

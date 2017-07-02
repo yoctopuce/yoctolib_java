@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 27277 2017-04-25 15:41:31Z seb $
+ * $Id: YModule.java 27710 2017-06-01 12:39:47Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -938,7 +938,8 @@ public class YModule extends YFunction
     }
 
     /**
-     * Returns the value previously stored in this attribute.
+     * Stores a 32 bit value in the device RAM. This attribute is at programmer disposal,
+     * should he need to store a state variable.
      * On startup and after a device reboot, the value is always reset to zero.
      *
      * @param newval : an integer
@@ -958,7 +959,8 @@ public class YModule extends YFunction
     }
 
     /**
-     * Returns the value previously stored in this attribute.
+     * Stores a 32 bit value in the device RAM. This attribute is at programmer disposal,
+     * should he need to store a state variable.
      * On startup and after a device reboot, the value is always reset to zero.
      *
      * @param newval : an integer
@@ -982,6 +984,10 @@ public class YModule extends YFunction
      * a module by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
+     *
+     * If a call to this object's is_online() method returns FALSE although
+     * you are certain that the device is plugged, make sure that you did
+     * call registerHub() at application initialization time.
      *
      * @param func : a string containing either the serial number or
      *         the logical name of the desired module

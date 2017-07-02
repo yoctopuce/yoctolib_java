@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpSchedule.java 27277 2017-04-25 15:41:31Z seb $
+ * $Id: YWakeUpSchedule.java 27710 2017-06-01 12:39:47Z seb $
  *
  * Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -616,6 +616,10 @@ public class YWakeUpSchedule extends YFunction
      * a wake up schedule by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
+     *
+     * If a call to this object's is_online() method returns FALSE although
+     * you are certain that the matching device is plugged, make sure that you did
+     * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the wake up schedule
      *

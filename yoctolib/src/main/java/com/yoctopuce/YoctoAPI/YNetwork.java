@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.java 27415 2017-05-11 09:57:43Z seb $
+ * $Id: YNetwork.java 27726 2017-06-02 13:18:52Z mvuilleu $
  *
  * Implements FindNetwork(), the high-level API for Network functions
  *
@@ -145,6 +145,7 @@ public class YNetwork extends YFunction
     public static final int CALLBACKENCODING_AZURE = 7;
     public static final int CALLBACKENCODING_INFLUXDB = 8;
     public static final int CALLBACKENCODING_MQTT = 9;
+    public static final int CALLBACKENCODING_YOCTO_API_JZON = 10;
     public static final int CALLBACKENCODING_INVALID = -1;
     /**
      * invalid callbackCredentials value
@@ -1404,8 +1405,9 @@ public class YNetwork extends YFunction
      *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV,
      *  YNetwork.CALLBACKENCODING_YOCTO_API, YNetwork.CALLBACKENCODING_JSON_NUM,
      *  YNetwork.CALLBACKENCODING_EMONCMS, YNetwork.CALLBACKENCODING_AZURE,
-     *  YNetwork.CALLBACKENCODING_INFLUXDB and YNetwork.CALLBACKENCODING_MQTT corresponding to the encoding
-     * standard to use for representing notification values
+     *  YNetwork.CALLBACKENCODING_INFLUXDB, YNetwork.CALLBACKENCODING_MQTT and
+     *  YNetwork.CALLBACKENCODING_YOCTO_API_JZON corresponding to the encoding standard to use for
+     * representing notification values
      *
      * @throws YAPI_Exception on error
      */
@@ -1429,8 +1431,8 @@ public class YNetwork extends YFunction
      *  @return a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
      *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV, Y_CALLBACKENCODING_YOCTO_API,
      *  Y_CALLBACKENCODING_JSON_NUM, Y_CALLBACKENCODING_EMONCMS, Y_CALLBACKENCODING_AZURE,
-     *  Y_CALLBACKENCODING_INFLUXDB and Y_CALLBACKENCODING_MQTT corresponding to the encoding standard to
-     * use for representing notification values
+     *  Y_CALLBACKENCODING_INFLUXDB, Y_CALLBACKENCODING_MQTT and Y_CALLBACKENCODING_YOCTO_API_JZON
+     * corresponding to the encoding standard to use for representing notification values
      *
      * @throws YAPI_Exception on error
      */
@@ -1446,8 +1448,9 @@ public class YNetwork extends YFunction
      *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV,
      *  YNetwork.CALLBACKENCODING_YOCTO_API, YNetwork.CALLBACKENCODING_JSON_NUM,
      *  YNetwork.CALLBACKENCODING_EMONCMS, YNetwork.CALLBACKENCODING_AZURE,
-     *  YNetwork.CALLBACKENCODING_INFLUXDB and YNetwork.CALLBACKENCODING_MQTT corresponding to the encoding
-     * standard to use for representing notification values
+     *  YNetwork.CALLBACKENCODING_INFLUXDB, YNetwork.CALLBACKENCODING_MQTT and
+     *  YNetwork.CALLBACKENCODING_YOCTO_API_JZON corresponding to the encoding standard to use for
+     * representing notification values
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -1469,8 +1472,8 @@ public class YNetwork extends YFunction
      *  @param newval : a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
      *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV, Y_CALLBACKENCODING_YOCTO_API,
      *  Y_CALLBACKENCODING_JSON_NUM, Y_CALLBACKENCODING_EMONCMS, Y_CALLBACKENCODING_AZURE,
-     *  Y_CALLBACKENCODING_INFLUXDB and Y_CALLBACKENCODING_MQTT corresponding to the encoding standard to
-     * use for representing notification values
+     *  Y_CALLBACKENCODING_INFLUXDB, Y_CALLBACKENCODING_MQTT and Y_CALLBACKENCODING_YOCTO_API_JZON
+     * corresponding to the encoding standard to use for representing notification values
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -1913,6 +1916,10 @@ public class YNetwork extends YFunction
      * a network interface by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
+     *
+     * If a call to this object's is_online() method returns FALSE although
+     * you are certain that the matching device is plugged, make sure that you did
+     * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the network interface
      *
