@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataSet.java 27277 2017-04-25 15:41:31Z seb $
+ * $Id: YDataSet.java 28024 2017-07-10 08:50:02Z mvuilleu $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -368,6 +368,12 @@ public class YDataSet
         YDataStream stream;
         if (_progress < 0) {
             url = String.format(Locale.US, "logger.json?id=%s",_functionId);
+            if (_startTime != 0) {
+                url = String.format(Locale.US, "%s&from=%d",url,_startTime);
+            }
+            if (_endTime != 0) {
+                url = String.format(Locale.US, "%s&to=%d",url,_endTime);
+            }
         } else {
             if (_progress >= _streams.size()) {
                 return 100;

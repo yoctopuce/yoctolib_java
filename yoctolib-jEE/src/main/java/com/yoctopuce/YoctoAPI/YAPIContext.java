@@ -1067,7 +1067,7 @@ public class YAPIContext
     }
 
     /**
-     * Force a hub discovery, if a callback as been registered with yRegisterDeviceRemovalCallback it
+     * Force a hub discovery, if a callback as been registered with yRegisterHubDiscoveryCallback it
      * will be called for each net work hub that will respond to the discovery.
      *
      * @return YAPI.SUCCESS when the call succeeds.
@@ -1146,8 +1146,8 @@ public class YAPIContext
      * network hub (this URL can be passed to RegisterHub). This callback will be invoked
      * while yUpdateDeviceList is running. You will have to call this function on a regular basis.
      *
-     * @param hubDiscoveryCallback : a procedure taking two string parameter, or null
-     *         to unregister a previously registered  callback.
+     * @param hubDiscoveryCallback : a procedure taking two string parameter, the serial
+     *         number and the hub URL. Use null to unregister a previously registered  callback.
      */
     public void RegisterHubDiscoveryCallback(YAPI.HubDiscoveryCallback hubDiscoveryCallback)
     {
