@@ -9,9 +9,9 @@
         <version>1.10.1234-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>doc-savesettings</artifactId>
+    <artifactId>prog-yoctohubsettings</artifactId>
     <packaging>jar</packaging>
-    <name>Doc-SaveSettings</name>
+    <name>Prog-YoctoHubSettings</name>
     <version>1.10.1234-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YSensor.java 28159 2017-07-27 09:37:52Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -1133,6 +1133,30 @@ public class YSensor extends YFunction
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns the YDatalogger object of the device hosting the sensor. This method returns an object of
+     * class YDatalogger that can control global parameters of the data logger. The returned object
+     * should not be freed.
+     *
+     * @return an YDataLogger object or null on error.
+     */
+    public YDataLogger get_dataLogger() throws YAPI_Exception
+    {
+        YDataLogger logger;
+        YModule modu;
+        String serial;
+        String hwid;
+
+        modu = get_module();
+        serial = modu.get_serialNumber();
+        if (serial.equals(YAPI.INVALID_STRING)) {
+            return null;
+        }
+        hwid = serial + ".dataLogger";
+        logger  = YDataLogger.FindDataLogger(hwid);
+        return logger;
     }
 
     /**

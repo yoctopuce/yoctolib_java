@@ -91,12 +91,14 @@ class YHash
         }
     }
 
-    synchronized private YFunctionType getFnByType(String className)
+    private YFunctionType getFnByType(String className)
     {
-        if (!_fnByType.containsKey(className)) {
-            _fnByType.put(className, new YFunctionType(className, _yctx));
+        YFunctionType yFunctionType = _fnByType.get(className);
+        if (yFunctionType == null) {
+            yFunctionType = new YFunctionType(className, _yctx);
+            _fnByType.put(className, yFunctionType);
         }
-        return _fnByType.get(className);
+        return yFunctionType;
     }
 
     // Find the best known identifier (hardware Id) for a given function
@@ -155,7 +157,7 @@ class YHash
     }
 
     // Set a function advertised value by hardware id
-    synchronized void setFunctionValue(String hwid, String pubval)
+    void setFunctionValue(String hwid, String pubval)
     {
         String classname = YAPIContext.functionClass(hwid);
         synchronized (this) {

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YPEntry.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YPEntry.java 28108 2017-07-24 13:53:13Z seb $
  *
  * Yellow page implementation
  *
@@ -71,17 +71,19 @@ class YPEntry
     private final String _classname;
     private final String _serial;
     private final String _funcId;
+    private final String _hwId;
     private String _logicalName = "";
     private String _advertisedValue = "";
     private int _index = -1;
     private final BaseClass _baseclass;
 
-    public YPEntry(YJSONObject json) throws Exception
+    YPEntry(YJSONObject json) throws Exception
     {
         String hardwareId = json.getString("hardwareId");
         int pos = hardwareId.indexOf('.');
         _serial = hardwareId.substring(0, pos);
         _funcId = hardwareId.substring(pos + 1);
+        _hwId = _serial + "." + _funcId;
         _classname = YAPIContext.functionClass(_funcId);
         _logicalName = json.getString("logicalName");
         _advertisedValue = json.getString("advertisedValue");
@@ -98,19 +100,21 @@ class YPEntry
         }
     }
 
-    public YPEntry(String serial, String functionID, BaseClass baseclass)
+    YPEntry(String serial, String functionID, BaseClass baseclass)
     {
         _serial = serial;
         _funcId = functionID;
+        _hwId = _serial + "." + _funcId;
         _baseclass = baseclass;
         _classname = YAPIContext.functionClass(_funcId);
     }
 
     //called from Jni
-    public YPEntry(String classname, String serial, String funcId, String logicalName, String advertisedValue, int baseType, int funYdx)
+    YPEntry(String classname, String serial, String funcId, String logicalName, String advertisedValue, int baseType, int funYdx)
     {
         _serial = serial;
         _funcId = funcId;
+        _hwId = _serial + "." + _funcId;
         _logicalName = logicalName;
         _advertisedValue = advertisedValue;
         _baseclass = BaseClass.values()[baseType];
@@ -132,67 +136,62 @@ class YPEntry
                 '}';
     }
 
-    public String getAdvertisedValue()
+    String getAdvertisedValue()
     {
         return _advertisedValue;
     }
 
-    public void setAdvertisedValue(String _advertisedValue)
+    void setAdvertisedValue(String _advertisedValue)
     {
         this._advertisedValue = _advertisedValue;
     }
 
-    public String getHardwareId()
+    String getHardwareId()
     {
-        return _serial + "." + _funcId;
+        return _hwId;
     }
 
-    public String getSerial()
+    String getSerial()
     {
         return _serial;
     }
 
-    public String getFuncId()
+    String getFuncId()
     {
         return _funcId;
     }
 
-    public int getIndex()
+    int getIndex()
     {
         return _index;
     }
 
-    public void setIndex(int index)
+    void setIndex(int index)
     {
         _index = index;
     }
 
-    public BaseClass getBaseClass()
-    {
-        return _baseclass;
-    }
-
-    public boolean matchBaseType(BaseClass baseclass)
+    boolean matchBaseType(BaseClass baseclass)
     {
         return baseclass.equals(BaseClass.Function) || baseclass.equals(_baseclass);
     }
 
-    public String getBaseType()
+    String getBaseType()
     {
         return _baseclass.toString();
     }
 
-    public String getLogicalName()
+    String getLogicalName()
     {
         return _logicalName;
     }
 
-    public void setLogicalName(String _logicalName)
+    void setLogicalName(String _logicalName)
     {
         this._logicalName = _logicalName;
     }
 
-    public String getClassname()
+    String getClassname()
     {
         return _classname;
     }
@@ -200,7 +199,7 @@ class YPEntry
     // Find the exact Hardware Id of the specified function, if currently connected
     // If device is not known as connected, return a clean error
     // This function will not cause any network access
-    public String getFriendlyName(YAPIContext ctx) throws YAPI_Exception
+    String getFriendlyName(YAPIContext ctx) throws YAPI_Exception
     {
         if (_classname.equals("Module")) {
             if (_logicalName.equals(""))

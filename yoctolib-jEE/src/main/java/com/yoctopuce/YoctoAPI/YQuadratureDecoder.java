@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQuadratureDecoder.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YQuadratureDecoder.java 28159 2017-07-27 09:37:52Z seb $
  *
  * Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -168,9 +168,9 @@ public class YQuadratureDecoder extends YSensor
     }
 
     /**
-     * Returns the PWM frequency in Hz.
+     * Returns the increments frequency, in Hz.
      *
-     * @return a floating point number corresponding to the PWM frequency in Hz
+     * @return a floating point number corresponding to the increments frequency, in Hz
      *
      * @throws YAPI_Exception on error
      */
@@ -189,9 +189,9 @@ public class YQuadratureDecoder extends YSensor
     }
 
     /**
-     * Returns the PWM frequency in Hz.
+     * Returns the increments frequency, in Hz.
      *
-     * @return a floating point number corresponding to the PWM frequency in Hz
+     * @return a floating point number corresponding to the increments frequency, in Hz
      *
      * @throws YAPI_Exception on error
      */
