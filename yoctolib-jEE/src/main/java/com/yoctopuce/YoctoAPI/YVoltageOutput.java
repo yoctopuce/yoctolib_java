@@ -432,7 +432,7 @@ public class YVoltageOutput extends YFunction
         if (V_target > 10.0) {
             V_target = 10.0;
         }
-        newval = String.format(Locale.US, "%d:%d", (int) (double)Math.round(V_target*1000),ms_duration);
+        newval = String.format(Locale.US, "%d:%d", (int) (double)Math.round(V_target*65536),ms_duration);
 
         return set_voltageTransition(newval);
     }

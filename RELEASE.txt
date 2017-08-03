@@ -1,3 +1,4 @@
+- Add get_dataLogger() method to YSensor class
 - Add support for Yocto-0-10V-Tx and Yocto-Bridge
-- Add getDataLogger() method to YSensor class
 - Fix HTTP callback (broken in rev 26999)
+- Fix voltage/current transitions for Yocto-4-20mA-Tx and Yocto-0-10V-Tx
