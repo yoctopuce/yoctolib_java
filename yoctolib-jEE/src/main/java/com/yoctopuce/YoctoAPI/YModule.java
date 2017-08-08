@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YModule.java 28309 2017-08-04 08:00:06Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -220,7 +220,7 @@ public class YModule extends YFunction
         Collection<YPEntry> functions = dev.getFunctions();
         int i = 0;
         for (YPEntry yp : functions) {
-            if (i == functionIndex)
+            if (i++ == functionIndex)
                 return yp.getFuncId();
         }
         _throw(YAPI.INVALID_ARGUMENT, String.format(Locale.US, "Invalid function index (%d/%d)", functionIndex, functions.size()));

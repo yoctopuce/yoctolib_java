@@ -137,9 +137,9 @@ public class YVoltageOutput extends YFunction
     }
 
     /**
-     * Changes the output voltage. Valid range is from 0 to 10V.
+     * Changes the output voltage, in V. Valid range is from 0 to 10V.
      *
-     * @param newval : a floating point number corresponding to the output voltage
+     * @param newval : a floating point number corresponding to the output voltage, in V
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -156,9 +156,9 @@ public class YVoltageOutput extends YFunction
     }
 
     /**
-     * Changes the output voltage. Valid range is from 0 to 10V.
+     * Changes the output voltage, in V. Valid range is from 0 to 10V.
      *
-     * @param newval : a floating point number corresponding to the output voltage
+     * @param newval : a floating point number corresponding to the output voltage, in V
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -170,9 +170,9 @@ public class YVoltageOutput extends YFunction
     }
 
     /**
-     * Returns the loop current set point in mA.
+     * Returns the output voltage set point, in V
      *
-     * @return a floating point number corresponding to the loop current set point in mA
+     * @return a floating point number corresponding to the output voltage set point, in V
      *
      * @throws YAPI_Exception on error
      */
@@ -191,9 +191,9 @@ public class YVoltageOutput extends YFunction
     }
 
     /**
-     * Returns the loop current set point in mA.
+     * Returns the output voltage set point, in V
      *
-     * @return a floating point number corresponding to the loop current set point in mA
+     * @return a floating point number corresponding to the output voltage set point, in V
      *
      * @throws YAPI_Exception on error
      */
