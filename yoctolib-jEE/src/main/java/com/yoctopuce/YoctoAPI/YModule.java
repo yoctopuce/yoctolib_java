@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 28309 2017-08-04 08:00:06Z seb $
+ * $Id: YModule.java 28365 2017-08-16 09:25:03Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -344,7 +344,7 @@ public class YModule extends YFunction
                 }
             }
         }
-        return out.toString().getBytes();
+        return out.toJSON().getBytes();
     }
 
 

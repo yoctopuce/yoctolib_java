@@ -1,1 +1,1 @@
-- Fix bug in method functionId(int functionIndex) of YModule class
+- Fix JSON error during firmware update of YoctoHubs

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YFirmwareUpdate.java 28365 2017-08-16 09:25:03Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -269,6 +269,10 @@ public class YFirmwareUpdate
                                         _progress(5 + percent * 80 / 100, message);
                                     }
                                 });
+                                if (hub.isCallbackMode() && hub.getSerialNumber().equals(_serial)){
+                                    _progress(100, "Success (WebSocket Callback)");
+                                    return;
+                                }
                                 //80%-> 98%
                                 _progress(80, "wait to the device restart");
                                 long timeout = YAPI.GetTickCount() + 60000;

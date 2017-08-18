@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 27289 2017-04-27 14:14:11Z seb $
+ * $Id: YHTTPHub.java 28365 2017-08-16 09:25:03Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -393,7 +393,7 @@ class YHTTPHub extends YGenericHub
                 jsonObject.parse();
                 YJSONObject settingsOnly = jsonObject.getYJSONObject("api");
                 settingsOnly.remove("services");
-                String startupConfStr = settingsOnly.toString();
+                String startupConfStr = settingsOnly.toJSON();
                 startupConf = startupConfStr.getBytes();
             } catch (Exception ex) {
                 startupConf = new byte[0];
@@ -522,6 +522,12 @@ class YHTTPHub extends YGenericHub
         yHTTPRequest req = new yHTTPRequest(this, "getBootloaders");
         req.RequestSync("GET /api/module/firmwareRelease.json", null, mstimeout);
         return YAPI.SUCCESS;
+    }
+
+    @Override
+    boolean isCallbackMode()
+    {
+        return _callbackSession != null;
     }
 
 }

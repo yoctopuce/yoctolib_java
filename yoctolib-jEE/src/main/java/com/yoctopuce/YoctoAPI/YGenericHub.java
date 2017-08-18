@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 26957 2017-03-28 16:08:14Z seb $
+ * $Id: YGenericHub.java 28365 2017-08-16 09:25:03Z seb $
  *
  * Internal YGenericHub object
  *
@@ -340,6 +340,9 @@ abstract class YGenericHub
     {
         return "";
     }
+
+    abstract boolean isCallbackMode();
+
 
     interface UpdateProgress
     {

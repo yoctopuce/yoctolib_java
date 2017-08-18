@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 28108 2017-07-24 13:53:13Z seb $
+ * $Id: YCallbackHub.java 28365 2017-08-16 09:25:03Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -323,6 +323,12 @@ class YCallbackHub extends YGenericHub
     public int ping(int mstimeout) throws YAPI_Exception
     {
         throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Not yet implemented");
+    }
+
+    @Override
+    boolean isCallbackMode()
+    {
+        return true;
     }
 
     @Override
