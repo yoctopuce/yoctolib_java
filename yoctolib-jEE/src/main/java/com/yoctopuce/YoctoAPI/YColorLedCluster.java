@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YColorLedCluster.java 28443 2017-09-01 14:45:46Z mvuilleu $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -618,6 +618,39 @@ public class YColorLedCluster extends YFunction
     public int addMirrorToBlinkSeq(int seqIndex) throws YAPI_Exception
     {
         return sendCommand(String.format(Locale.US, "AC%d,0,0",seqIndex));
+    }
+
+    /**
+     * Adds to a sequence a jump to another sequence. When a pixel will reach this jump,
+     * it will be automatically relinked to the new sequence, and will run it starting
+     * from the beginning.
+     *
+     * @param seqIndex : sequence index.
+     * @param linkSeqIndex : index of the sequence to chain.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int addJumpToBlinkSeq(int seqIndex,int linkSeqIndex) throws YAPI_Exception
+    {
+        return sendCommand(String.format(Locale.US, "AC%d,100,%d,1000",seqIndex,linkSeqIndex));
+    }
+
+    /**
+     * Adds a to a sequence a hard stop code. When a pixel will reach this stop code,
+     * instead of restarting the sequence in a loop it will automatically be unlinked
+     * from the sequence.
+     *
+     * @param seqIndex : sequence index.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int addUnlinkToBlinkSeq(int seqIndex) throws YAPI_Exception
+    {
+        return sendCommand(String.format(Locale.US, "AC%d,100,-1,1000",seqIndex));
     }
 
     /**

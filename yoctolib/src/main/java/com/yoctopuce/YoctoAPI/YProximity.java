@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YProximity.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YProximity.java 28557 2017-09-15 15:00:25Z seb $
  *
  * Implements FindProximity(), the high-level API for Proximity functions
  *
@@ -533,13 +533,15 @@ public class YProximity extends YSensor
     }
 
     /**
-     *  Modifies the  parameter  type (sensor value, presence or pulse count) returned by the
+     *  Changes the  parameter  type (sensor value, presence or pulse count) returned by the
      * get_currentValue function and callbacks.
      *  The edge count value is limited to the 6 lowest digits. For values greater than one million, use
      * get_pulseCounter().
      *
      *  @param newval : a value among YProximity.PROXIMITYREPORTMODE_NUMERIC,
-     * YProximity.PROXIMITYREPORTMODE_PRESENCE and YProximity.PROXIMITYREPORTMODE_PULSECOUNT
+     *  YProximity.PROXIMITYREPORTMODE_PRESENCE and YProximity.PROXIMITYREPORTMODE_PULSECOUNT corresponding
+     *  to the  parameter  type (sensor value, presence or pulse count) returned by the get_currentValue
+     * function and callbacks
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -556,13 +558,14 @@ public class YProximity extends YSensor
     }
 
     /**
-     *  Modifies the  parameter  type (sensor value, presence or pulse count) returned by the
+     *  Changes the  parameter  type (sensor value, presence or pulse count) returned by the
      * get_currentValue function and callbacks.
      *  The edge count value is limited to the 6 lowest digits. For values greater than one million, use
      * get_pulseCounter().
      *
      *  @param newval : a value among Y_PROXIMITYREPORTMODE_NUMERIC, Y_PROXIMITYREPORTMODE_PRESENCE and
-     * Y_PROXIMITYREPORTMODE_PULSECOUNT
+     *  Y_PROXIMITYREPORTMODE_PULSECOUNT corresponding to the  parameter  type (sensor value, presence or
+     * pulse count) returned by the get_currentValue function and callbacks
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

@@ -1,1 +1,2 @@
-- Fix JSON error during firmware update of YoctoHubs
+- Add support for jumps and stops in ColorLedCluster sequences
+- Improve error reporting during firmware update

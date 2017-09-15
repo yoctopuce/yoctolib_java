@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YRefFrame.java 28457 2017-09-06 08:34:21Z mvuilleu $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -70,6 +70,15 @@ public class YRefFrame extends YFunction
      * invalid calibrationParam value
      */
     public static final String CALIBRATIONPARAM_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid fusionMode value
+     */
+    public static final int FUSIONMODE_NDOF = 0;
+    public static final int FUSIONMODE_NDOF_FMC_OFF = 1;
+    public static final int FUSIONMODE_M4G = 2;
+    public static final int FUSIONMODE_COMPASS = 3;
+    public static final int FUSIONMODE_IMU = 4;
+    public static final int FUSIONMODE_INVALID = -1;
     public enum MOUNTPOSITION {
         BOTTOM(0),
         TOP(1),
@@ -137,6 +146,7 @@ public class YRefFrame extends YFunction
     protected int _mountPos = MOUNTPOS_INVALID;
     protected double _bearing = BEARING_INVALID;
     protected String _calibrationParam = CALIBRATIONPARAM_INVALID;
+    protected int _fusionMode = FUSIONMODE_INVALID;
     protected UpdateCallback _valueCallbackRefFrame = null;
     protected boolean _calibV2;
     protected int _calibStage = 0;
@@ -222,6 +232,9 @@ public class YRefFrame extends YFunction
         }
         if (json_val.has("calibrationParam")) {
             _calibrationParam = json_val.getString("calibrationParam");
+        }
+        if (json_val.has("fusionMode")) {
+            _fusionMode = json_val.getInt("fusionMode");
         }
         super._parseAttr(json_val);
     }
@@ -367,6 +380,31 @@ public class YRefFrame extends YFunction
         synchronized (this) {
             rest_val = newval;
             _setAttr("calibrationParam",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+
+    public int get_fusionMode() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return FUSIONMODE_INVALID;
+                }
+            }
+            res = _fusionMode;
+        }
+        return res;
+    }
+
+    public int set_fusionMode(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("fusionMode",rest_val);
         }
         return YAPI.SUCCESS;
     }

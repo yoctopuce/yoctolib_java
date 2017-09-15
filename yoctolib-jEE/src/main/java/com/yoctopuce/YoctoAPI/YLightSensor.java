@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YLightSensor.java 28557 2017-09-15 15:00:25Z seb $
  *
  * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -200,7 +200,7 @@ public class YLightSensor extends YSensor
     }
 
     /**
-     * Modifies the light sensor type used in the device. The measure can either
+     * Changes the light sensor type used in the device. The measure can either
      * approximate the response of the human eye, focus on a specific light
      * spectrum, depending on the capabilities of the light-sensitive cell.
      * Remember to call the saveToFlash() method of the module if the
@@ -208,7 +208,8 @@ public class YLightSensor extends YSensor
      *
      *  @param newval : a value among YLightSensor.MEASURETYPE_HUMAN_EYE,
      *  YLightSensor.MEASURETYPE_WIDE_SPECTRUM, YLightSensor.MEASURETYPE_INFRARED,
-     * YLightSensor.MEASURETYPE_HIGH_RATE and YLightSensor.MEASURETYPE_HIGH_ENERGY
+     *  YLightSensor.MEASURETYPE_HIGH_RATE and YLightSensor.MEASURETYPE_HIGH_ENERGY corresponding to the
+     * light sensor type used in the device
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -225,14 +226,15 @@ public class YLightSensor extends YSensor
     }
 
     /**
-     * Modifies the light sensor type used in the device. The measure can either
+     * Changes the light sensor type used in the device. The measure can either
      * approximate the response of the human eye, focus on a specific light
      * spectrum, depending on the capabilities of the light-sensitive cell.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
      *  @param newval : a value among Y_MEASURETYPE_HUMAN_EYE, Y_MEASURETYPE_WIDE_SPECTRUM,
-     * Y_MEASURETYPE_INFRARED, Y_MEASURETYPE_HIGH_RATE and Y_MEASURETYPE_HIGH_ENERGY
+     *  Y_MEASURETYPE_INFRARED, Y_MEASURETYPE_HIGH_RATE and Y_MEASURETYPE_HIGH_ENERGY corresponding to the
+     * light sensor type used in the device
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

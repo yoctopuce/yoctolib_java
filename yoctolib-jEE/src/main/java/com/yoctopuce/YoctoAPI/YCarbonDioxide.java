@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCarbonDioxide.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YCarbonDioxide.java 28557 2017-09-15 15:00:25Z seb $
  *
  * Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -167,13 +167,13 @@ public class YCarbonDioxide extends YSensor
     }
 
     /**
-     * Modifies Automatic Baseline Calibration period, in hours. If you need
+     * Changes Automatic Baseline Calibration period, in hours. If you need
      * to disable automatic baseline calibration (for instance when using the
      * sensor in an environment that is constantly above 400ppm CO2), set the
      * period to -1. Remember to call the saveToFlash() method of the
      * module if the modification must be kept.
      *
-     * @param newval : an integer
+     * @param newval : an integer corresponding to Automatic Baseline Calibration period, in hours
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -190,13 +190,13 @@ public class YCarbonDioxide extends YSensor
     }
 
     /**
-     * Modifies Automatic Baseline Calibration period, in hours. If you need
+     * Changes Automatic Baseline Calibration period, in hours. If you need
      * to disable automatic baseline calibration (for instance when using the
      * sensor in an environment that is constantly above 400ppm CO2), set the
      * period to -1. Remember to call the saveToFlash() method of the
      * module if the modification must be kept.
      *
-     * @param newval : an integer
+     * @param newval : an integer corresponding to Automatic Baseline Calibration period, in hours
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

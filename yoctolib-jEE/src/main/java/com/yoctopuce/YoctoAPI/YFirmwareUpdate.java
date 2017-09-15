@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 28365 2017-08-16 09:25:03Z seb $
+ * $Id: YFirmwareUpdate.java 28492 2017-09-12 13:26:27Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -289,9 +289,14 @@ public class YFirmwareUpdate
                                         module.set_allSettingsAndFiles(_settings);
                                         module.saveToFlash();
                                     }
-                                    _progress(100, "Success");
+                                    String realFw = module.get_firmwareRelease();
+                                    if (realFw.equals(firmware.getFirmwareRelease())) {
+                                        _progress(100, "Success");
+                                    } else {
+                                        _progress(YAPI.IO_ERROR, "Unable to update firmware");
+                                    }
                                 } else {
-                                    _progress(-1, "Device did not reboot correctly");
+                                    _progress(YAPI.DEVICE_NOT_FOUND, "Device did not reboot correctly");
                                 }
                             } catch (YAPI_Exception e) {
                                 _progress(e.errorType, e.getLocalizedMessage());

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: pic24config.php 28204 2017-07-28 13:25:31Z mvuilleu $
+ * $Id: YVoltageOutput.java 28491 2017-09-12 13:25:28Z seb $
  *
  * Implements FindVoltageOutput(), the high-level API for VoltageOutput functions
  *
@@ -170,7 +170,7 @@ public class YVoltageOutput extends YFunction
     }
 
     /**
-     * Returns the output voltage set point, in V
+     * Returns the output voltage set point, in V.
      *
      * @return a floating point number corresponding to the output voltage set point, in V
      *
@@ -191,7 +191,7 @@ public class YVoltageOutput extends YFunction
     }
 
     /**
-     * Returns the output voltage set point, in V
+     * Returns the output voltage set point, in V.
      *
      * @return a floating point number corresponding to the output voltage set point, in V
      *

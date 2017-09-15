@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 28159 2017-07-27 09:37:52Z seb $
+ * $Id: YSensor.java 28557 2017-09-15 15:00:25Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -91,6 +91,14 @@ public class YSensor extends YFunction
      */
     public static final String REPORTFREQUENCY_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid advMode value
+     */
+    public static final int ADVMODE_IMMEDIATE = 0;
+    public static final int ADVMODE_PERIOD_AVG = 1;
+    public static final int ADVMODE_PERIOD_MIN = 2;
+    public static final int ADVMODE_PERIOD_MAX = 3;
+    public static final int ADVMODE_INVALID = -1;
+    /**
      * invalid calibrationParam value
      */
     public static final String CALIBRATIONPARAM_INVALID = YAPI.INVALID_STRING;
@@ -109,6 +117,7 @@ public class YSensor extends YFunction
     protected double _currentRawValue = CURRENTRAWVALUE_INVALID;
     protected String _logFrequency = LOGFREQUENCY_INVALID;
     protected String _reportFrequency = REPORTFREQUENCY_INVALID;
+    protected int _advMode = ADVMODE_INVALID;
     protected String _calibrationParam = CALIBRATIONPARAM_INVALID;
     protected double _resolution = RESOLUTION_INVALID;
     protected int _sensorState = SENSORSTATE_INVALID;
@@ -304,6 +313,9 @@ public class YSensor extends YFunction
         }
         if (json_val.has("reportFrequency")) {
             _reportFrequency = json_val.getString("reportFrequency");
+        }
+        if (json_val.has("advMode")) {
+            _advMode = json_val.getInt("advMode");
         }
         if (json_val.has("calibrationParam")) {
             _calibrationParam = json_val.getString("calibrationParam");
@@ -719,6 +731,78 @@ public class YSensor extends YFunction
     public int setReportFrequency(String newval)  throws YAPI_Exception
     {
         return set_reportFrequency(newval);
+    }
+
+    /**
+     * Returns the measuring mode used for the advertised value pushed to the parent hub.
+     *
+     *  @return a value among YSensor.ADVMODE_IMMEDIATE, YSensor.ADVMODE_PERIOD_AVG,
+     *  YSensor.ADVMODE_PERIOD_MIN and YSensor.ADVMODE_PERIOD_MAX corresponding to the measuring mode used
+     * for the advertised value pushed to the parent hub
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_advMode() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return ADVMODE_INVALID;
+                }
+            }
+            res = _advMode;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the measuring mode used for the advertised value pushed to the parent hub.
+     *
+     *  @return a value among Y_ADVMODE_IMMEDIATE, Y_ADVMODE_PERIOD_AVG, Y_ADVMODE_PERIOD_MIN and
+     * Y_ADVMODE_PERIOD_MAX corresponding to the measuring mode used for the advertised value pushed to the parent hub
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getAdvMode() throws YAPI_Exception
+    {
+        return get_advMode();
+    }
+
+    /**
+     * Changes the measuring mode used for the advertised value pushed to the parent hub.
+     *
+     *  @param newval : a value among YSensor.ADVMODE_IMMEDIATE, YSensor.ADVMODE_PERIOD_AVG,
+     *  YSensor.ADVMODE_PERIOD_MIN and YSensor.ADVMODE_PERIOD_MAX corresponding to the measuring mode used
+     * for the advertised value pushed to the parent hub
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_advMode(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("advMode",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the measuring mode used for the advertised value pushed to the parent hub.
+     *
+     *  @param newval : a value among Y_ADVMODE_IMMEDIATE, Y_ADVMODE_PERIOD_AVG, Y_ADVMODE_PERIOD_MIN and
+     * Y_ADVMODE_PERIOD_MAX corresponding to the measuring mode used for the advertised value pushed to the parent hub
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setAdvMode(int newval)  throws YAPI_Exception
+    {
+        return set_advMode(newval);
     }
 
     public String get_calibrationParam() throws YAPI_Exception

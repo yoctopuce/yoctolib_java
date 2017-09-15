@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmInput.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YPwmInput.java 28557 2017-09-15 15:00:25Z seb $
  *
  * Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -88,6 +88,10 @@ public class YPwmInput extends YSensor
     public static final int PWMREPORTMODE_PWM_PULSEDURATION = 2;
     public static final int PWMREPORTMODE_PWM_EDGECOUNT = 3;
     public static final int PWMREPORTMODE_INVALID = -1;
+    /**
+     * invalid debouncePeriod value
+     */
+    public static final int DEBOUNCEPERIOD_INVALID = YAPI.INVALID_UINT;
     protected double _dutyCycle = DUTYCYCLE_INVALID;
     protected double _pulseDuration = PULSEDURATION_INVALID;
     protected double _frequency = FREQUENCY_INVALID;
@@ -95,6 +99,7 @@ public class YPwmInput extends YSensor
     protected long _pulseCounter = PULSECOUNTER_INVALID;
     protected long _pulseTimer = PULSETIMER_INVALID;
     protected int _pwmReportMode = PWMREPORTMODE_INVALID;
+    protected int _debouncePeriod = DEBOUNCEPERIOD_INVALID;
     protected UpdateCallback _valueCallbackPwmInput = null;
     protected TimedReportCallback _timedReportCallbackPwmInput = null;
 
@@ -172,6 +177,9 @@ public class YPwmInput extends YSensor
         }
         if (json_val.has("pwmReportMode")) {
             _pwmReportMode = json_val.getInt("pwmReportMode");
+        }
+        if (json_val.has("debouncePeriod")) {
+            _debouncePeriod = json_val.getInt("debouncePeriod");
         }
         super._parseAttr(json_val);
     }
@@ -432,14 +440,15 @@ public class YPwmInput extends YSensor
     }
 
     /**
-     *  Modifies the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the
+     *  Changes the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the
      * get_currentValue function and callbacks.
      *  The edge count value is limited to the 6 lowest digits. For values greater than one million, use
      * get_pulseCounter().
      *
      *  @param newval : a value among YPwmInput.PWMREPORTMODE_PWM_DUTYCYCLE,
      *  YPwmInput.PWMREPORTMODE_PWM_FREQUENCY, YPwmInput.PWMREPORTMODE_PWM_PULSEDURATION and
-     * YPwmInput.PWMREPORTMODE_PWM_EDGECOUNT
+     *  YPwmInput.PWMREPORTMODE_PWM_EDGECOUNT corresponding to the  parameter  type (frequency/duty cycle,
+     * pulse width, or edge count) returned by the get_currentValue function and callbacks
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -456,13 +465,14 @@ public class YPwmInput extends YSensor
     }
 
     /**
-     *  Modifies the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the
+     *  Changes the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the
      * get_currentValue function and callbacks.
      *  The edge count value is limited to the 6 lowest digits. For values greater than one million, use
      * get_pulseCounter().
      *
      *  @param newval : a value among Y_PWMREPORTMODE_PWM_DUTYCYCLE, Y_PWMREPORTMODE_PWM_FREQUENCY,
-     * Y_PWMREPORTMODE_PWM_PULSEDURATION and Y_PWMREPORTMODE_PWM_EDGECOUNT
+     *  Y_PWMREPORTMODE_PWM_PULSEDURATION and Y_PWMREPORTMODE_PWM_EDGECOUNT corresponding to the  parameter
+     *  type (frequency/duty cycle, pulse width, or edge count) returned by the get_currentValue function and callbacks
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -471,6 +481,72 @@ public class YPwmInput extends YSensor
     public int setPwmReportMode(int newval)  throws YAPI_Exception
     {
         return set_pwmReportMode(newval);
+    }
+
+    /**
+     * Returns the shortest expected pulse duration, in ms. Any shorter pulse will be automatically ignored (debounce).
+     *
+     * @return an integer corresponding to the shortest expected pulse duration, in ms
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_debouncePeriod() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DEBOUNCEPERIOD_INVALID;
+                }
+            }
+            res = _debouncePeriod;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the shortest expected pulse duration, in ms. Any shorter pulse will be automatically ignored (debounce).
+     *
+     * @return an integer corresponding to the shortest expected pulse duration, in ms
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getDebouncePeriod() throws YAPI_Exception
+    {
+        return get_debouncePeriod();
+    }
+
+    /**
+     * Changes the shortest expected pulse duration, in ms. Any shorter pulse will be automatically ignored (debounce).
+     *
+     * @param newval : an integer corresponding to the shortest expected pulse duration, in ms
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_debouncePeriod(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("debouncePeriod",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the shortest expected pulse duration, in ms. Any shorter pulse will be automatically ignored (debounce).
+     *
+     * @param newval : an integer corresponding to the shortest expected pulse duration, in ms
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setDebouncePeriod(int newval)  throws YAPI_Exception
+    {
+        return set_debouncePeriod(newval);
     }
 
     /**
