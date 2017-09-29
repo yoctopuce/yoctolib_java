@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSpiPort.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YSpiPort.java 28654 2017-09-26 15:29:31Z seb $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -1316,7 +1316,6 @@ public class YSpiPort extends YFunction
         int mult;
         int endpos;
         int res;
-
         // first check if we have the requested character in the look-ahead buffer
         bufflen = (_rxbuff).length;
         if ((_rxptr >= _rxbuffptr) && (_rxptr < _rxbuffptr+bufflen)) {
@@ -1324,7 +1323,6 @@ public class YSpiPort extends YFunction
             _rxptr = _rxptr + 1;
             return res;
         }
-
         // try to preload more than one byte to speed-up byte-per-byte access
         currpos = _rxptr;
         reqlen = 1024;
@@ -1351,7 +1349,6 @@ public class YSpiPort extends YFunction
         }
         // still mixed, need to process character by character
         _rxptr = currpos;
-
 
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=1",_rxptr));
         bufflen = (buff).length - 1;

@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 27948 2017-06-30 14:46:55Z mvuilleu $
+ * $Id: YSerialPort.java 28654 2017-09-26 15:29:31Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -23,7 +23,7 @@
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
  *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
@@ -41,9 +41,9 @@ package com.yoctopuce.YoctoAPI;
 import java.util.Locale;
 import java.util.ArrayList;
 
-//--- (YSerialPort return codes)
-//--- (end of YSerialPort return codes)
-//--- (YSerialPort class start)
+//--- (generated code: YSerialPort return codes)
+//--- (end of generated code: YSerialPort return codes)
+//--- (generated code: YSerialPort class start)
 /**
  * YSerialPort Class: SerialPort function interface
  *
@@ -56,8 +56,8 @@ import java.util.ArrayList;
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YSerialPort extends YFunction
 {
-//--- (end of YSerialPort class start)
-//--- (YSerialPort definitions)
+//--- (end of generated code: YSerialPort class start)
+//--- (generated code: YSerialPort definitions)
     /**
      * invalid rxCount value
      */
@@ -155,7 +155,7 @@ public class YSerialPort extends YFunction
          */
         void timedReportCallback(YSerialPort  function, YMeasure measure);
     }
-    //--- (end of YSerialPort definitions)
+    //--- (end of generated code: YSerialPort definitions)
 
 
     /**
@@ -166,8 +166,8 @@ public class YSerialPort extends YFunction
     {
         super(ctx, func);
         _className = "SerialPort";
-        //--- (YSerialPort attributes initialization)
-        //--- (end of YSerialPort attributes initialization)
+        //--- (generated code: YSerialPort attributes initialization)
+        //--- (end of generated code: YSerialPort attributes initialization)
     }
 
     /**
@@ -179,7 +179,7 @@ public class YSerialPort extends YFunction
         this(YAPI.GetYCtx(true), func);
     }
 
-    //--- (YSerialPort implementation)
+    //--- (generated code: YSerialPort implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(YJSONObject json_val) throws Exception
@@ -1183,7 +1183,6 @@ public class YSerialPort extends YFunction
         int mult;
         int endpos;
         int res;
-
         // first check if we have the requested character in the look-ahead buffer
         bufflen = (_rxbuff).length;
         if ((_rxptr >= _rxbuffptr) && (_rxptr < _rxbuffptr+bufflen)) {
@@ -1191,7 +1190,6 @@ public class YSerialPort extends YFunction
             _rxptr = _rxptr + 1;
             return res;
         }
-
         // try to preload more than one byte to speed-up byte-per-byte access
         currpos = _rxptr;
         reqlen = 1024;
@@ -1218,7 +1216,6 @@ public class YSerialPort extends YFunction
         }
         // still mixed, need to process character by character
         _rxptr = currpos;
-
 
         buff = _download(String.format(Locale.US, "rxdata.bin?pos=%d&len=1",_rxptr));
         bufflen = (buff).length - 1;
@@ -1639,6 +1636,49 @@ public class YSerialPort extends YFunction
         //noinspection DoubleNegation
         if (!((buff).length == 1)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "invalid CTS reply");}
         res = (buff[0] & 0xff) - 48;
+        return res;
+    }
+
+    /**
+     * Retrieves messages (both direction) in the serial port buffer, starting at current position.
+     * This function will only compare and return printable characters in the message strings.
+     * Binary protocols are handled as hexadecimal strings.
+     *
+     * If no message is found, the search waits for one up to the specified maximum timeout
+     * (in milliseconds).
+     *
+     * @param maxWait : the maximum number of milliseconds to wait for a message if none is found
+     *         in the receive buffer.
+     *
+     * @return an array of YSnoopingRecord objects containing the messages found, if any.
+     *         Binary messages are converted to hexadecimal representation.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public ArrayList<YSnoopingRecord> snoopMessages(int maxWait) throws YAPI_Exception
+    {
+        String url;
+        byte[] msgbin;
+        ArrayList<String> msgarr = new ArrayList<>();
+        int msglen;
+        ArrayList<YSnoopingRecord> res = new ArrayList<>();
+        int idx;
+
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&t=0", _rxptr,maxWait);
+        msgbin = _download(url);
+        msgarr = _json_get_array(msgbin);
+        msglen = msgarr.size();
+        if (msglen == 0) {
+            return res;
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        idx = 0;
+        while (idx < msglen) {
+            res.add(new YSnoopingRecord(msgarr.get(idx)));
+            idx = idx + 1;
+        }
         return res;
     }
 
@@ -2234,6 +2274,6 @@ public class YSerialPort extends YFunction
         return FindSerialPortInContext(yctx, next_hwid);
     }
 
-    //--- (end of YSerialPort implementation)
+    //--- (end of generated code: YSerialPort implementation)
 }
 
