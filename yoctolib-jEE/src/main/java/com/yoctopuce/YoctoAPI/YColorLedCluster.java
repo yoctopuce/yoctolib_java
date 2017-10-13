@@ -1,10 +1,10 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 28443 2017-09-01 14:45:46Z mvuilleu $
+ * $Id: YColorLedCluster.java 28738 2017-10-03 08:06:35Z seb $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
- * - - - - - - - - - License information: - - - - - - - - - 
+ * - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -23,7 +23,7 @@
  *  obligations.
  *
  *  THE SOFTWARE AND DOCUMENTATION ARE PROVIDED 'AS IS' WITHOUT
- *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING 
+ *  WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
  *  WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS
  *  FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO
  *  EVENT SHALL LICENSOR BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
@@ -730,7 +730,7 @@ public class YColorLedCluster extends YFunction
 
     /**
      * Starts a sequence execution: every LED linked to that sequence starts to
-     * run it in a loop.
+     * run it in a loop. Note that a sequence with a zero duration can't be started.
      *
      * @param seqIndex :  index of the sequence to start.
      *
@@ -775,7 +775,8 @@ public class YColorLedCluster extends YFunction
 
     /**
      * Configures a sequence to make it start automatically at device
-     * startup. Don't forget to call saveBlinkSeq() to make sure the
+     * startup. Note that a sequence with a zero duration can't be started.
+     * Don't forget to call saveBlinkSeq() to make sure the
      * modification is saved in the device flash memory.
      *
      * @param seqIndex :  index of the sequence to reset.
