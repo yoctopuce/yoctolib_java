@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 28365 2017-08-16 09:25:03Z seb $
+ * $Id: YModule.java 29240 2017-11-23 13:29:57Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -1940,6 +1940,7 @@ public class YModule extends YFunction
         for (String ii:restoreLast) {
             _download(ii);
         }
+        clearCache();
         return YAPI.SUCCESS;
     }
 

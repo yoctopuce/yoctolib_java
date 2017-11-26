@@ -56,6 +56,13 @@ public class YJniWrapper
                         throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot load libyapi-armhf.so. Check your java.library.path property.");
                     }
                     loaded = true;
+                 } else if (os_arch.equals("aarch64")) {
+                    try {
+                        System.loadLibrary("yapi-aarch64");
+                    } catch (UnsatisfiedLinkError ex) {
+                        throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot load libyapi-aarch64.so. Check your java.library.path property.");
+                    }
+                    loaded = true;
                 } else {
                     loaded = false;
                     throw new YAPI_Exception("Unsupported Linux architecture:" + os_name + " (" + os_arch + ")");

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YColorLedCluster.java 29186 2017-11-16 10:04:13Z seb $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -899,6 +899,7 @@ public class YColorLedCluster extends YFunction
      * color codes. The first color code represents the target RGB value of the first LED,
      * the next color code represents the target value of the next LED, etc.
      *
+     * @param ledIndex : index of the first LED which should be updated
      * @param rgbList : a list of target 24bit RGB codes, in the form 0xRRGGBB
      * @param delay   : transition duration in ms
      *
@@ -906,7 +907,7 @@ public class YColorLedCluster extends YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public int rgbArray_move(ArrayList<Integer> rgbList,int delay) throws YAPI_Exception
+    public int rgbArrayOfs_move(int ledIndex,ArrayList<Integer> rgbList,int delay) throws YAPI_Exception
     {
         int listlen;
         byte[] buff;
@@ -924,7 +925,27 @@ public class YColorLedCluster extends YFunction
             idx = idx + 1;
         }
 
-        res = _upload(String.format(Locale.US, "rgb:%d",delay), buff);
+        res = _upload(String.format(Locale.US, "rgb:%d:%d",delay,ledIndex), buff);
+        return res;
+    }
+
+    /**
+     * Sets up a smooth RGB color transition to the specified pixel-by-pixel list of RGB
+     * color codes. The first color code represents the target RGB value of the first LED,
+     * the next color code represents the target value of the next LED, etc.
+     *
+     * @param rgbList : a list of target 24bit RGB codes, in the form 0xRRGGBB
+     * @param delay   : transition duration in ms
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int rgbArray_move(ArrayList<Integer> rgbList,int delay) throws YAPI_Exception
+    {
+        int res;
+
+        res = rgbArrayOfs_move(0,rgbList,delay);
         return res;
     }
 
@@ -993,6 +1014,27 @@ public class YColorLedCluster extends YFunction
      */
     public int hslArray_move(ArrayList<Integer> hslList,int delay) throws YAPI_Exception
     {
+        int res;
+
+        res = hslArrayOfs_move(0,hslList, delay);
+        return res;
+    }
+
+    /**
+     * Sets up a smooth HSL color transition to the specified pixel-by-pixel list of HSL
+     * color codes. The first color code represents the target HSL value of the first LED,
+     * the second color code represents the target value of the second LED, etc.
+     *
+     * @param ledIndex : index of the first LED which should be updated
+     * @param hslList : a list of target 24bit HSL codes, in the form 0xHHSSLL
+     * @param delay   : transition duration in ms
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int hslArrayOfs_move(int ledIndex,ArrayList<Integer> hslList,int delay) throws YAPI_Exception
+    {
         int listlen;
         byte[] buff;
         int idx;
@@ -1009,7 +1051,7 @@ public class YColorLedCluster extends YFunction
             idx = idx + 1;
         }
 
-        res = _upload(String.format(Locale.US, "hsl:%d",delay), buff);
+        res = _upload(String.format(Locale.US, "hsl:%d:%d",delay,ledIndex), buff);
         return res;
     }
 

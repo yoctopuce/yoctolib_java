@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YNetwork.java 29055 2017-11-01 17:36:08Z seb $
  *
  * Implements FindNetwork(), the high-level API for Network functions
  *
@@ -853,6 +853,8 @@ public class YNetwork extends YFunction
     public int set_userPassword(String  newval)  throws YAPI_Exception
     {
         String rest_val;
+        if (newval.length() > YAPI.HASH_BUF_SIZE)
+            _throw(YAPI.INVALID_ARGUMENT,String.format(Locale.US,"Password too long (max %d chars) :%s",YAPI.HASH_BUF_SIZE,  newval));
         synchronized (this) {
             rest_val = newval;
             _setAttr("userPassword",rest_val);
@@ -931,6 +933,8 @@ public class YNetwork extends YFunction
     public int set_adminPassword(String  newval)  throws YAPI_Exception
     {
         String rest_val;
+        if (newval.length() > YAPI.HASH_BUF_SIZE)
+            _throw(YAPI.INVALID_ARGUMENT,String.format(Locale.US,"Password too long (max %d chars) :%s",YAPI.HASH_BUF_SIZE,  newval));
         synchronized (this) {
             rest_val = newval;
             _setAttr("adminPassword",rest_val);

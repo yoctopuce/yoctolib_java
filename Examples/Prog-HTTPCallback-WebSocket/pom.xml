@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.yoctopuce.java</groupId>
         <artifactId>javabundle</artifactId>
-        <version>1.10.28878-SNAPSHOT</version>
+        <version>1.10.29281-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>prog-httpcallback-websocket</artifactId>
     <packaging>war</packaging>
     <name>Prog-HTTPCallback</name>
-    <version>1.10.28878-SNAPSHOT</version>
+    <version>1.10.29281-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>
         <developer>
