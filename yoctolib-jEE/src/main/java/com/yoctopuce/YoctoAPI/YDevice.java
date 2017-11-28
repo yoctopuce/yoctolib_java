@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 27157 2017-04-07 16:26:10Z seb $
+ * $Id: YDevice.java 29314 2017-11-27 14:53:38Z seb $
  *
  * Internal YDevice class
  *
@@ -58,9 +58,9 @@ class YDevice
 {
     private YGenericHub _hub;
     private final WPEntry _wpRec;
+    private final HashMap<Integer, YPEntry> _ypRecs;
     private long _cache_expiration;
     private YJSONObject _cache_json;
-    private final HashMap<Integer, YPEntry> _ypRecs;
     private double _deviceTime;
     private YPEntry _moduleYPEntry;
     private YModule.LogCallback _logCallback = null;
@@ -202,13 +202,13 @@ class YDevice
 
     // Retrieve the number of functions (beside "module") in the device
 
-    synchronized Collection<YPEntry> getFunctions()
+    Collection<YPEntry> getFunctions()
     {
         return _ypRecs.values();
     }
 
 
-    synchronized YPEntry getYPEntry(int idx)
+    YPEntry getYPEntry(int idx)
     {
         return _ypRecs.get(idx);
     }

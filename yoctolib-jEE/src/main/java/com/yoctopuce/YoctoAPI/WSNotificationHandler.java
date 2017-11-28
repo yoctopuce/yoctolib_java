@@ -15,7 +15,7 @@ import java.util.Random;
 import java.util.concurrent.*;
 
 @ClientEndpoint
-class WSNotificationHandler extends NotificationHandler implements MessageHandler
+public class WSNotificationHandler extends NotificationHandler implements MessageHandler
 {
 
     private static final int NB_TCP_CHANNEL = 4;
@@ -306,7 +306,11 @@ class WSNotificationHandler extends NotificationHandler implements MessageHandle
     @Override
     String getThreadLabel()
     {
-        return "WS Notification handler session " + _session.getId();
+        String label = "WS Notification handler session ";
+        if (_session != null) {
+            label += "(session " + _session.getId() + ")";
+        }
+        return label;
     }
 
     @Override
@@ -802,9 +806,8 @@ class WSNotificationHandler extends NotificationHandler implements MessageHandle
     private void decodeTCPNotif(String tcpNofif)
     {
         _notificationsFifo.append(tcpNofif);
-        int pos;
-        do {
-            pos = _notificationsFifo.indexOf("\n");
+        while (true) {
+            int pos = _notificationsFifo.indexOf("\n");
             if (pos < 0) break;
             // discard ping notification (pos==0)
             if (pos > 0) {
@@ -816,8 +819,6 @@ class WSNotificationHandler extends NotificationHandler implements MessageHandle
             }
             _notificationsFifo.delete(0, pos + 1);
         }
-
-        while (pos >= 0);
     }
 
 
