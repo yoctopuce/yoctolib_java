@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YStepperMotor.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YStepperMotor.java 29507 2017-12-28 14:14:56Z mvuilleu $
  *
  * Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1167,7 +1167,24 @@ public class YStepperMotor extends YFunction
 
     public int sendCommand(String command) throws YAPI_Exception
     {
-        return set_command(command);
+        String id;
+        String url;
+        byte[] retBin;
+        int res;
+        id = get_functionId();
+        id = (id).substring( 12,  12 + 1);
+        url = String.format(Locale.US, "cmd.txt?%s=%s", id,command);
+        //may throw an exception
+        retBin = _download(url);
+        res = (retBin[0] & 0xff);
+        if (res == 49) {
+            //noinspection DoubleNegation
+            if (!(res == 48)) { throw new YAPI_Exception( YAPI.DEVICE_BUSY,  "Motor command pipeline is full, try again later");}
+        } else {
+            //noinspection DoubleNegation
+            if (!(res == 48)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "Motor command failed permanently");}
+        }
+        return YAPI.SUCCESS;
     }
 
     /**
@@ -1240,6 +1257,22 @@ public class YStepperMotor extends YFunction
     }
 
     /**
+     * Starts the motor to reach a given relative position, keeping the speed under the
+     * specified limit. The time needed to reach the requested position will depend on
+     * the acceleration parameters configured for the motor.
+     *
+     * @param relPos : relative position, measured in steps from the current position.
+     * @param maxSpeed : limit speed, in steps per second.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int moveRelSlow(double relPos,double maxSpeed) throws YAPI_Exception
+    {
+        return sendCommand(String.format(Locale.US, "m%d@%d",(int) (double)Math.round(16*relPos),(int) (double)Math.round(1000*maxSpeed)));
+    }
+
+    /**
      * Keep the motor in the same state for the specified amount of time, before processing next command.
      *
      * @param waitMs : wait time, specified in milliseconds.
@@ -1274,6 +1307,26 @@ public class YStepperMotor extends YFunction
     public int alertStepOut() throws YAPI_Exception
     {
         return sendCommand(".");
+    }
+
+    /**
+     * Move one single step in the selected direction without regards to end switches.
+     * The move occures even if the system is still in alert mode (end switch depressed). Caution.
+     * use this function with great care as it may cause mechanical damages !
+     *
+     * @param dir : Value +1 ou -1, according to the desired direction of the move
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int alertStepDir(int dir) throws YAPI_Exception
+    {
+        //noinspection DoubleNegation
+        if (!(dir != 0)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "direction must be +1 or -1");}
+        if (dir > 0) {
+            return sendCommand(".+");
+        }
+        return sendCommand(".-");
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWeighScale.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YWeighScale.java 29472 2017-12-20 11:34:07Z mvuilleu $
  *
  * Implements FindWeighScale(), the high-level API for WeighScale functions
  *
@@ -66,13 +66,17 @@ public class YWeighScale extends YSensor
     public static final int EXCITATION_AC = 2;
     public static final int EXCITATION_INVALID = -1;
     /**
-     * invalid adaptRatio value
+     * invalid compTempAdaptRatio value
      */
-    public static final double ADAPTRATIO_INVALID = YAPI.INVALID_DOUBLE;
+    public static final double COMPTEMPADAPTRATIO_INVALID = YAPI.INVALID_DOUBLE;
     /**
-     * invalid compTemperature value
+     * invalid compTempAvg value
      */
-    public static final double COMPTEMPERATURE_INVALID = YAPI.INVALID_DOUBLE;
+    public static final double COMPTEMPAVG_INVALID = YAPI.INVALID_DOUBLE;
+    /**
+     * invalid compTempChg value
+     */
+    public static final double COMPTEMPCHG_INVALID = YAPI.INVALID_DOUBLE;
     /**
      * invalid compensation value
      */
@@ -86,8 +90,9 @@ public class YWeighScale extends YSensor
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _excitation = EXCITATION_INVALID;
-    protected double _adaptRatio = ADAPTRATIO_INVALID;
-    protected double _compTemperature = COMPTEMPERATURE_INVALID;
+    protected double _compTempAdaptRatio = COMPTEMPADAPTRATIO_INVALID;
+    protected double _compTempAvg = COMPTEMPAVG_INVALID;
+    protected double _compTempChg = COMPTEMPCHG_INVALID;
     protected double _compensation = COMPENSATION_INVALID;
     protected double _zeroTracking = ZEROTRACKING_INVALID;
     protected String _command = COMMAND_INVALID;
@@ -151,11 +156,14 @@ public class YWeighScale extends YSensor
         if (json_val.has("excitation")) {
             _excitation = json_val.getInt("excitation");
         }
-        if (json_val.has("adaptRatio")) {
-            _adaptRatio = Math.round(json_val.getDouble("adaptRatio") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("compTempAdaptRatio")) {
+            _compTempAdaptRatio = Math.round(json_val.getDouble("compTempAdaptRatio") * 1000.0 / 65536.0) / 1000.0;
         }
-        if (json_val.has("compTemperature")) {
-            _compTemperature = Math.round(json_val.getDouble("compTemperature") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("compTempAvg")) {
+            _compTempAvg = Math.round(json_val.getDouble("compTempAvg") * 1000.0 / 65536.0) / 1000.0;
+        }
+        if (json_val.has("compTempChg")) {
+            _compTempChg = Math.round(json_val.getDouble("compTempChg") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("compensation")) {
             _compensation = Math.round(json_val.getDouble("compensation") * 1000.0 / 65536.0) / 1000.0;
@@ -240,104 +248,149 @@ public class YWeighScale extends YSensor
     }
 
     /**
-     * Changes the compensation temperature update rate, in percents.
+     * Changes the averaged temperature update rate, in percents.
+     * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
+     * to the difference between the measures ambiant temperature and the current compensation
+     * temperature. The standard rate is 0.04 percents, and the maximal rate is 65 percents.
      *
-     * @param newval : a floating point number corresponding to the compensation temperature update rate, in percents
+     * @param newval : a floating point number corresponding to the averaged temperature update rate, in percents
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int set_adaptRatio(double  newval)  throws YAPI_Exception
+    public int set_compTempAdaptRatio(double  newval)  throws YAPI_Exception
     {
         String rest_val;
         synchronized (this) {
             rest_val = Long.toString(Math.round(newval * 65536.0));
-            _setAttr("adaptRatio",rest_val);
+            _setAttr("compTempAdaptRatio",rest_val);
         }
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes the compensation temperature update rate, in percents.
+     * Changes the averaged temperature update rate, in percents.
+     * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
+     * to the difference between the measures ambiant temperature and the current compensation
+     * temperature. The standard rate is 0.04 percents, and the maximal rate is 65 percents.
      *
-     * @param newval : a floating point number corresponding to the compensation temperature update rate, in percents
+     * @param newval : a floating point number corresponding to the averaged temperature update rate, in percents
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int setAdaptRatio(double newval)  throws YAPI_Exception
+    public int setCompTempAdaptRatio(double newval)  throws YAPI_Exception
     {
-        return set_adaptRatio(newval);
+        return set_compTempAdaptRatio(newval);
     }
 
     /**
-     * Returns the compensation temperature update rate, in percents.
-     * the maximal value is 65 percents.
+     * Returns the averaged temperature update rate, in percents.
+     * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
+     * to the difference between the measures ambiant temperature and the current compensation
+     * temperature. The standard rate is 0.04 percents, and the maximal rate is 65 percents.
      *
-     * @return a floating point number corresponding to the compensation temperature update rate, in percents
+     * @return a floating point number corresponding to the averaged temperature update rate, in percents
      *
      * @throws YAPI_Exception on error
      */
-    public double get_adaptRatio() throws YAPI_Exception
+    public double get_compTempAdaptRatio() throws YAPI_Exception
     {
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
                 if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                    return ADAPTRATIO_INVALID;
+                    return COMPTEMPADAPTRATIO_INVALID;
                 }
             }
-            res = _adaptRatio;
+            res = _compTempAdaptRatio;
         }
         return res;
     }
 
     /**
-     * Returns the compensation temperature update rate, in percents.
-     * the maximal value is 65 percents.
+     * Returns the averaged temperature update rate, in percents.
+     * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
+     * to the difference between the measures ambiant temperature and the current compensation
+     * temperature. The standard rate is 0.04 percents, and the maximal rate is 65 percents.
      *
-     * @return a floating point number corresponding to the compensation temperature update rate, in percents
+     * @return a floating point number corresponding to the averaged temperature update rate, in percents
      *
      * @throws YAPI_Exception on error
      */
-    public double getAdaptRatio() throws YAPI_Exception
+    public double getCompTempAdaptRatio() throws YAPI_Exception
     {
-        return get_adaptRatio();
+        return get_compTempAdaptRatio();
     }
 
     /**
-     * Returns the current compensation temperature.
+     * Returns the current averaged temperature, used for thermal compensation.
      *
-     * @return a floating point number corresponding to the current compensation temperature
+     * @return a floating point number corresponding to the current averaged temperature, used for thermal compensation
      *
      * @throws YAPI_Exception on error
      */
-    public double get_compTemperature() throws YAPI_Exception
+    public double get_compTempAvg() throws YAPI_Exception
     {
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
                 if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                    return COMPTEMPERATURE_INVALID;
+                    return COMPTEMPAVG_INVALID;
                 }
             }
-            res = _compTemperature;
+            res = _compTempAvg;
         }
         return res;
     }
 
     /**
-     * Returns the current compensation temperature.
+     * Returns the current averaged temperature, used for thermal compensation.
      *
-     * @return a floating point number corresponding to the current compensation temperature
+     * @return a floating point number corresponding to the current averaged temperature, used for thermal compensation
      *
      * @throws YAPI_Exception on error
      */
-    public double getCompTemperature() throws YAPI_Exception
+    public double getCompTempAvg() throws YAPI_Exception
     {
-        return get_compTemperature();
+        return get_compTempAvg();
+    }
+
+    /**
+     * Returns the current temperature variation, used for thermal compensation.
+     *
+     *  @return a floating point number corresponding to the current temperature variation, used for
+     * thermal compensation
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_compTempChg() throws YAPI_Exception
+    {
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMPTEMPCHG_INVALID;
+                }
+            }
+            res = _compTempChg;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the current temperature variation, used for thermal compensation.
+     *
+     *  @return a floating point number corresponding to the current temperature variation, used for
+     * thermal compensation
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getCompTempChg() throws YAPI_Exception
+    {
+        return get_compTempChg();
     }
 
     /**
@@ -650,12 +703,87 @@ public class YWeighScale extends YSensor
         return set_command(String.format(Locale.US, "S%d:%d", (int) (double)Math.round(1000*currWeight),(int) (double)Math.round(1000*maxWeight)));
     }
 
+    public int setCompensationTable(int tableIndex,ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
+    {
+        int siz;
+        int res;
+        int idx;
+        int found;
+        double prev;
+        double curr;
+        double currComp;
+        double idxTemp;
+        siz = tempValues.size();
+        //noinspection DoubleNegation
+        if (!(siz != 1)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "thermal compensation table must have at least two points");}
+        //noinspection DoubleNegation
+        if (!(siz == compValues.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "table sizes mismatch");}
+
+        res = set_command(String.format(Locale.US, "%dZ",tableIndex));
+        //noinspection DoubleNegation
+        if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermal compensation table");}
+        // add records in growing temperature value
+        found = 1;
+        prev = -999999.0;
+        while (found > 0) {
+            found = 0;
+            curr = 99999999.0;
+            currComp = -999999.0;
+            idx = 0;
+            while (idx < siz) {
+                idxTemp = tempValues.get(idx).doubleValue();
+                if ((idxTemp > prev) && (idxTemp < curr)) {
+                    curr = idxTemp;
+                    currComp = compValues.get(idx).doubleValue();
+                    found = 1;
+                }
+                idx = idx + 1;
+            }
+            if (found > 0) {
+                res = set_command(String.format(Locale.US, "%dm%d:%d", tableIndex, (int) (double)Math.round(1000*curr),(int) (double)Math.round(1000*currComp)));
+                //noinspection DoubleNegation
+                if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to set thermal compensation table");}
+                prev = curr;
+            }
+        }
+        return YAPI.SUCCESS;
+    }
+
+    public int loadCompensationTable(int tableIndex,ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
+    {
+        String id;
+        byte[] bin_json;
+        ArrayList<String> paramlist = new ArrayList<>();
+        int siz;
+        int idx;
+        double temp;
+        double comp;
+
+        id = get_functionId();
+        id = (id).substring( 10,  10 + (id).length() - 10);
+        bin_json = _download(String.format(Locale.US, "extra.json?page=%d",(4*YAPIContext._atoi(id))+tableIndex));
+        paramlist = _json_get_array(bin_json);
+        // convert all values to float and append records
+        siz = ((paramlist.size()) >> (1));
+        tempValues.clear();
+        compValues.clear();
+        idx = 0;
+        while (idx < siz) {
+            temp = Double.valueOf(paramlist.get(2*idx))/1000.0;
+            comp = Double.valueOf(paramlist.get(2*idx+1))/1000.0;
+            tempValues.add(temp);
+            compValues.add(comp);
+            idx = idx + 1;
+        }
+        return YAPI.SUCCESS;
+    }
+
     /**
      * Records a weight offset thermal compensation table, in order to automatically correct the
-     * measured weight based on the compensation temperature.
+     * measured weight based on the averaged compensation temperature.
      * The weight correction will be applied by linear interpolation between specified points.
      *
-     * @param tempValues : array of floating point numbers, corresponding to all
+     * @param tempValues : array of floating point numbers, corresponding to all averaged
      *         temperatures for which an offset correction is specified.
      * @param compValues : array of floating point numbers, corresponding to the offset correction
      *         to apply for each of the temperature included in the first
@@ -665,59 +793,18 @@ public class YWeighScale extends YSensor
      *
      * @throws YAPI_Exception on error
      */
-    public int set_offsetCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
+    public int set_offsetAvgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
     {
-        int siz;
-        int res;
-        int idx;
-        int found;
-        double prev;
-        double curr;
-        double currComp;
-        double idxTemp;
-        siz = tempValues.size();
-        //noinspection DoubleNegation
-        if (!(siz != 1)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "thermal compensation table must have at least two points");}
-        //noinspection DoubleNegation
-        if (!(siz == compValues.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "table sizes mismatch");}
-
-        res = set_command("2Z");
-        //noinspection DoubleNegation
-        if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermal compensation table");}
-        // add records in growing temperature value
-        found = 1;
-        prev = -999999.0;
-        while (found > 0) {
-            found = 0;
-            curr = 99999999.0;
-            currComp = -999999.0;
-            idx = 0;
-            while (idx < siz) {
-                idxTemp = tempValues.get(idx).doubleValue();
-                if ((idxTemp > prev) && (idxTemp < curr)) {
-                    curr = idxTemp;
-                    currComp = compValues.get(idx).doubleValue();
-                    found = 1;
-                }
-                idx = idx + 1;
-            }
-            if (found > 0) {
-                res = set_command(String.format(Locale.US, "2m%d:%d", (int) (double)Math.round(1000*curr),(int) (double)Math.round(1000*currComp)));
-                //noinspection DoubleNegation
-                if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to set thermal compensation table");}
-                prev = curr;
-            }
-        }
-        return YAPI.SUCCESS;
+        return setCompensationTable(0, tempValues, compValues);
     }
 
     /**
      * Retrieves the weight offset thermal compensation table previously configured using the
-     * set_offsetCompensationTable function.
+     * set_offsetAvgCompensationTable function.
      * The weight correction is applied by linear interpolation between specified points.
      *
      * @param tempValues : array of floating point numbers, that is filled by the function
-     *         with all temperatures for which an offset correction is specified.
+     *         with all averaged temperatures for which an offset correction is specified.
      * @param compValues : array of floating point numbers, that is filled by the function
      *         with the offset correction applied for each of the temperature
      *         included in the first argument, index by index.
@@ -726,33 +813,49 @@ public class YWeighScale extends YSensor
      *
      * @throws YAPI_Exception on error
      */
-    public int loadOffsetCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
+    public int loadOffsetAvgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
     {
-        String id;
-        byte[] bin_json;
-        ArrayList<String> paramlist = new ArrayList<>();
-        int siz;
-        int idx;
-        double temp;
-        double comp;
+        return loadCompensationTable(0, tempValues, compValues);
+    }
 
-        id = get_functionId();
-        id = (id).substring( 11,  11 + (id).length() - 11);
-        bin_json = _download("extra.json?page=2");
-        paramlist = _json_get_array(bin_json);
-        // convert all values to float and append records
-        siz = ((paramlist.size()) >> (1));
-        tempValues.clear();
-        compValues.clear();
-        idx = 0;
-        while (idx < siz) {
-            temp = Double.valueOf(paramlist.get(2*idx))/1000.0;
-            comp = Double.valueOf(paramlist.get(2*idx+1))/1000.0;
-            tempValues.add(temp);
-            compValues.add(comp);
-            idx = idx + 1;
-        }
-        return YAPI.SUCCESS;
+    /**
+     * Records a weight offset thermal compensation table, in order to automatically correct the
+     * measured weight based on the variation of temperature.
+     * The weight correction will be applied by linear interpolation between specified points.
+     *
+     * @param tempValues : array of floating point numbers, corresponding to temperature
+     *         variations for which an offset correction is specified.
+     * @param compValues : array of floating point numbers, corresponding to the offset correction
+     *         to apply for each of the temperature variation included in the first
+     *         argument, index by index.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_offsetChgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
+    {
+        return setCompensationTable(1, tempValues, compValues);
+    }
+
+    /**
+     * Retrieves the weight offset thermal compensation table previously configured using the
+     * set_offsetChgCompensationTable function.
+     * The weight correction is applied by linear interpolation between specified points.
+     *
+     * @param tempValues : array of floating point numbers, that is filled by the function
+     *         with all temperature variations for which an offset correction is specified.
+     * @param compValues : array of floating point numbers, that is filled by the function
+     *         with the offset correction applied for each of the temperature
+     *         variation included in the first argument, index by index.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int loadOffsetChgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
+    {
+        return loadCompensationTable(1, tempValues, compValues);
     }
 
     /**
@@ -760,7 +863,7 @@ public class YWeighScale extends YSensor
      * measured weight based on the compensation temperature.
      * The weight correction will be applied by linear interpolation between specified points.
      *
-     * @param tempValues : array of floating point numbers, corresponding to all
+     * @param tempValues : array of floating point numbers, corresponding to all averaged
      *         temperatures for which a span correction is specified.
      * @param compValues : array of floating point numbers, corresponding to the span correction
      *         (in percents) to apply for each of the temperature included in the first
@@ -770,59 +873,18 @@ public class YWeighScale extends YSensor
      *
      * @throws YAPI_Exception on error
      */
-    public int set_spanCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
+    public int set_spanAvgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
     {
-        int siz;
-        int res;
-        int idx;
-        int found;
-        double prev;
-        double curr;
-        double currComp;
-        double idxTemp;
-        siz = tempValues.size();
-        //noinspection DoubleNegation
-        if (!(siz != 1)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "thermal compensation table must have at least two points");}
-        //noinspection DoubleNegation
-        if (!(siz == compValues.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "table sizes mismatch");}
-
-        res = set_command("3Z");
-        //noinspection DoubleNegation
-        if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermal compensation table");}
-        // add records in growing temperature value
-        found = 1;
-        prev = -999999.0;
-        while (found > 0) {
-            found = 0;
-            curr = 99999999.0;
-            currComp = -999999.0;
-            idx = 0;
-            while (idx < siz) {
-                idxTemp = tempValues.get(idx).doubleValue();
-                if ((idxTemp > prev) && (idxTemp < curr)) {
-                    curr = idxTemp;
-                    currComp = compValues.get(idx).doubleValue();
-                    found = 1;
-                }
-                idx = idx + 1;
-            }
-            if (found > 0) {
-                res = set_command(String.format(Locale.US, "3m%d:%d", (int) (double)Math.round(1000*curr),(int) (double)Math.round(1000*currComp)));
-                //noinspection DoubleNegation
-                if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to set thermal compensation table");}
-                prev = curr;
-            }
-        }
-        return YAPI.SUCCESS;
+        return setCompensationTable(2, tempValues, compValues);
     }
 
     /**
      * Retrieves the weight span thermal compensation table previously configured using the
-     * set_spanCompensationTable function.
+     * set_spanAvgCompensationTable function.
      * The weight correction is applied by linear interpolation between specified points.
      *
      * @param tempValues : array of floating point numbers, that is filled by the function
-     *         with all temperatures for which an span correction is specified.
+     *         with all averaged temperatures for which an span correction is specified.
      * @param compValues : array of floating point numbers, that is filled by the function
      *         with the span correction applied for each of the temperature
      *         included in the first argument, index by index.
@@ -831,33 +893,49 @@ public class YWeighScale extends YSensor
      *
      * @throws YAPI_Exception on error
      */
-    public int loadSpanCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
+    public int loadSpanAvgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
     {
-        String id;
-        byte[] bin_json;
-        ArrayList<String> paramlist = new ArrayList<>();
-        int siz;
-        int idx;
-        double temp;
-        double comp;
+        return loadCompensationTable(2, tempValues, compValues);
+    }
 
-        id = get_functionId();
-        id = (id).substring( 11,  11 + (id).length() - 11);
-        bin_json = _download("extra.json?page=3");
-        paramlist = _json_get_array(bin_json);
-        // convert all values to float and append records
-        siz = ((paramlist.size()) >> (1));
-        tempValues.clear();
-        compValues.clear();
-        idx = 0;
-        while (idx < siz) {
-            temp = Double.valueOf(paramlist.get(2*idx))/1000.0;
-            comp = Double.valueOf(paramlist.get(2*idx+1))/1000.0;
-            tempValues.add(temp);
-            compValues.add(comp);
-            idx = idx + 1;
-        }
-        return YAPI.SUCCESS;
+    /**
+     * Records a weight span thermal compensation table, in order to automatically correct the
+     * measured weight based on the variation of temperature.
+     * The weight correction will be applied by linear interpolation between specified points.
+     *
+     * @param tempValues : array of floating point numbers, corresponding to all variations of
+     *         temperatures for which a span correction is specified.
+     * @param compValues : array of floating point numbers, corresponding to the span correction
+     *         (in percents) to apply for each of the temperature variation included
+     *         in the first argument, index by index.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_spanChgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
+    {
+        return setCompensationTable(3, tempValues, compValues);
+    }
+
+    /**
+     * Retrieves the weight span thermal compensation table previously configured using the
+     * set_spanChgCompensationTable function.
+     * The weight correction is applied by linear interpolation between specified points.
+     *
+     * @param tempValues : array of floating point numbers, that is filled by the function
+     *         with all variation of temperature for which an span correction is specified.
+     * @param compValues : array of floating point numbers, that is filled by the function
+     *         with the span correction applied for each of variation of temperature
+     *         included in the first argument, index by index.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int loadSpanChgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
+    {
+        return loadCompensationTable(3, tempValues, compValues);
     }
 
     /**

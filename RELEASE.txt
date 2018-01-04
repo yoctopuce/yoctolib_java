@@ -1,1 +1,2 @@
+- Add YMultiCellWeighScale class
 - Fix race condition that could lead to a deadlock

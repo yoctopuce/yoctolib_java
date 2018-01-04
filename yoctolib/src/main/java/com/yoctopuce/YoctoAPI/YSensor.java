@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 28557 2017-09-15 15:00:25Z seb $
+ * $Id: YSensor.java 29466 2017-12-20 08:11:49Z mvuilleu $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -403,7 +403,8 @@ public class YSensor extends YFunction
     }
 
     /**
-     * Changes the recorded minimal value observed.
+     * Changes the recorded minimal value observed. Can be used to reset the value returned
+     * by get_lowestValue().
      *
      * @param newval : a floating point number corresponding to the recorded minimal value observed
      *
@@ -422,7 +423,8 @@ public class YSensor extends YFunction
     }
 
     /**
-     * Changes the recorded minimal value observed.
+     * Changes the recorded minimal value observed. Can be used to reset the value returned
+     * by get_lowestValue().
      *
      * @param newval : a floating point number corresponding to the recorded minimal value observed
      *
@@ -437,6 +439,7 @@ public class YSensor extends YFunction
 
     /**
      * Returns the minimal value observed for the measure since the device was started.
+     * Can be reset to an arbitrary value thanks to set_lowestValue().
      *
      *  @return a floating point number corresponding to the minimal value observed for the measure since
      * the device was started
@@ -460,6 +463,7 @@ public class YSensor extends YFunction
 
     /**
      * Returns the minimal value observed for the measure since the device was started.
+     * Can be reset to an arbitrary value thanks to set_lowestValue().
      *
      *  @return a floating point number corresponding to the minimal value observed for the measure since
      * the device was started
@@ -472,7 +476,8 @@ public class YSensor extends YFunction
     }
 
     /**
-     * Changes the recorded maximal value observed.
+     * Changes the recorded maximal value observed. Can be used to reset the value returned
+     * by get_lowestValue().
      *
      * @param newval : a floating point number corresponding to the recorded maximal value observed
      *
@@ -491,7 +496,8 @@ public class YSensor extends YFunction
     }
 
     /**
-     * Changes the recorded maximal value observed.
+     * Changes the recorded maximal value observed. Can be used to reset the value returned
+     * by get_lowestValue().
      *
      * @param newval : a floating point number corresponding to the recorded maximal value observed
      *
@@ -506,6 +512,7 @@ public class YSensor extends YFunction
 
     /**
      * Returns the maximal value observed for the measure since the device was started.
+     * Can be reset to an arbitrary value thanks to set_highestValue().
      *
      *  @return a floating point number corresponding to the maximal value observed for the measure since
      * the device was started
@@ -529,6 +536,7 @@ public class YSensor extends YFunction
 
     /**
      * Returns the maximal value observed for the measure since the device was started.
+     * Can be reset to an arbitrary value thanks to set_highestValue().
      *
      *  @return a floating point number corresponding to the maximal value observed for the measure since
      * the device was started

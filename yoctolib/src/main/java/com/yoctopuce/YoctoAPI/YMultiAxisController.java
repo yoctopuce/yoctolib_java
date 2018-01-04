@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMultiAxisController.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YMultiAxisController.java 29507 2017-12-28 14:14:56Z mvuilleu $
  *
  * Implements FindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -38,8 +38,8 @@
  *********************************************************************/
 
 package com.yoctopuce.YoctoAPI;
-import java.util.ArrayList;
 import java.util.Locale;
+import java.util.ArrayList;
 
 //--- (YMultiAxisController return codes)
 //--- (end of YMultiAxisController return codes)
@@ -392,7 +392,21 @@ public class YMultiAxisController extends YFunction
 
     public int sendCommand(String command) throws YAPI_Exception
     {
-        return set_command(command);
+        String url;
+        byte[] retBin;
+        int res;
+        url = String.format(Locale.US, "cmd.txt?X=%s",command);
+        //may throw an exception
+        retBin = _download(url);
+        res = (retBin[0] & 0xff);
+        if (res == 49) {
+            //noinspection DoubleNegation
+            if (!(res == 48)) { throw new YAPI_Exception( YAPI.DEVICE_BUSY,  "Motor command pipeline is full, try again later");}
+        } else {
+            //noinspection DoubleNegation
+            if (!(res == 48)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "Motor command failed permanently");}
+        }
+        return YAPI.SUCCESS;
     }
 
     /**

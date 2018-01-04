@@ -1,8 +1,8 @@
 /*********************************************************************
  *
- * $Id: YWeighScale.java 29472 2017-12-20 11:34:07Z mvuilleu $
+ * $Id: YMultiCellWeighScale.java 29478 2017-12-21 08:10:05Z seb $
  *
- * Implements FindWeighScale(), the high-level API for WeighScale functions
+ * Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
@@ -39,25 +39,28 @@
 
 package com.yoctopuce.YoctoAPI;
 import java.util.Locale;
-import java.util.ArrayList;
 
-//--- (YWeighScale return codes)
-//--- (end of YWeighScale return codes)
-//--- (YWeighScale class start)
+//--- (YMultiCellWeighScale return codes)
+//--- (end of YMultiCellWeighScale return codes)
+//--- (YMultiCellWeighScale class start)
 /**
- * YWeighScale Class: WeighScale function interface
+ * YMultiCellWeighScale Class: MultiCellWeighScale function interface
  *
- * The YWeighScale class provides a weight measurement from a ratiometric load cell
+ * The YMultiCellWeighScale class provides a weight measurement from a set of ratiometric load cells
  * sensor. It can be used to control the bridge excitation parameters, in order to avoid
  * measure shifts caused by temperature variation in the electronics, and can also
  * automatically apply an additional correction factor based on temperature to
- * compensate for offsets in the load cell itself.
+ * compensate for offsets in the load cells themselves.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
-public class YWeighScale extends YSensor
+public class YMultiCellWeighScale extends YSensor
 {
-//--- (end of YWeighScale class start)
-//--- (YWeighScale definitions)
+//--- (end of YMultiCellWeighScale class start)
+//--- (YMultiCellWeighScale definitions)
+    /**
+     * invalid cellCount value
+     */
+    public static final int CELLCOUNT_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid excitation value
      */
@@ -89,6 +92,7 @@ public class YWeighScale extends YSensor
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
+    protected int _cellCount = CELLCOUNT_INVALID;
     protected int _excitation = EXCITATION_INVALID;
     protected double _compTempAdaptRatio = COMPTEMPADAPTRATIO_INVALID;
     protected double _compTempAvg = COMPTEMPAVG_INVALID;
@@ -96,11 +100,11 @@ public class YWeighScale extends YSensor
     protected double _compensation = COMPENSATION_INVALID;
     protected double _zeroTracking = ZEROTRACKING_INVALID;
     protected String _command = COMMAND_INVALID;
-    protected UpdateCallback _valueCallbackWeighScale = null;
-    protected TimedReportCallback _timedReportCallbackWeighScale = null;
+    protected UpdateCallback _valueCallbackMultiCellWeighScale = null;
+    protected TimedReportCallback _timedReportCallbackMultiCellWeighScale = null;
 
     /**
-     * Deprecated UpdateCallback for WeighScale
+     * Deprecated UpdateCallback for MultiCellWeighScale
      */
     public interface UpdateCallback
     {
@@ -109,11 +113,11 @@ public class YWeighScale extends YSensor
          * @param function      : the function object of which the value has changed
          * @param functionValue : the character string describing the new advertised value
          */
-        void yNewValue(YWeighScale function, String functionValue);
+        void yNewValue(YMultiCellWeighScale function, String functionValue);
     }
 
     /**
-     * TimedReportCallback for WeighScale
+     * TimedReportCallback for MultiCellWeighScale
      */
     public interface TimedReportCallback
     {
@@ -122,37 +126,40 @@ public class YWeighScale extends YSensor
          * @param function : the function object of which the value has changed
          * @param measure  : measure
          */
-        void timedReportCallback(YWeighScale  function, YMeasure measure);
+        void timedReportCallback(YMultiCellWeighScale  function, YMeasure measure);
     }
-    //--- (end of YWeighScale definitions)
+    //--- (end of YMultiCellWeighScale definitions)
 
 
     /**
      *
      * @param func : functionid
      */
-    protected YWeighScale(YAPIContext ctx, String func)
+    protected YMultiCellWeighScale(YAPIContext ctx, String func)
     {
         super(ctx, func);
-        _className = "WeighScale";
-        //--- (YWeighScale attributes initialization)
-        //--- (end of YWeighScale attributes initialization)
+        _className = "MultiCellWeighScale";
+        //--- (YMultiCellWeighScale attributes initialization)
+        //--- (end of YMultiCellWeighScale attributes initialization)
     }
 
     /**
      *
      * @param func : functionid
      */
-    protected YWeighScale(String func)
+    protected YMultiCellWeighScale(String func)
     {
         this(YAPI.GetYCtx(true), func);
     }
 
-    //--- (YWeighScale implementation)
+    //--- (YMultiCellWeighScale implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
+        if (json_val.has("cellCount")) {
+            _cellCount = json_val.getInt("cellCount");
+        }
         if (json_val.has("excitation")) {
             _excitation = json_val.getInt("excitation");
         }
@@ -178,10 +185,76 @@ public class YWeighScale extends YSensor
     }
 
     /**
+     * Returns the number of load cells in use.
+     *
+     * @return an integer corresponding to the number of load cells in use
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_cellCount() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return CELLCOUNT_INVALID;
+                }
+            }
+            res = _cellCount;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the number of load cells in use.
+     *
+     * @return an integer corresponding to the number of load cells in use
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getCellCount() throws YAPI_Exception
+    {
+        return get_cellCount();
+    }
+
+    /**
+     * Changes the number of load cells in use.
+     *
+     * @param newval : an integer corresponding to the number of load cells in use
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_cellCount(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("cellCount",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the number of load cells in use.
+     *
+     * @param newval : an integer corresponding to the number of load cells in use
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setCellCount(int newval)  throws YAPI_Exception
+    {
+        return set_cellCount(newval);
+    }
+
+    /**
      * Returns the current load cell bridge excitation method.
      *
-     *  @return a value among YWeighScale.EXCITATION_OFF, YWeighScale.EXCITATION_DC and
-     * YWeighScale.EXCITATION_AC corresponding to the current load cell bridge excitation method
+     *  @return a value among YMultiCellWeighScale.EXCITATION_OFF, YMultiCellWeighScale.EXCITATION_DC and
+     * YMultiCellWeighScale.EXCITATION_AC corresponding to the current load cell bridge excitation method
      *
      * @throws YAPI_Exception on error
      */
@@ -215,8 +288,9 @@ public class YWeighScale extends YSensor
     /**
      * Changes the current load cell bridge excitation method.
      *
-     *  @param newval : a value among YWeighScale.EXCITATION_OFF, YWeighScale.EXCITATION_DC and
-     * YWeighScale.EXCITATION_AC corresponding to the current load cell bridge excitation method
+     *  @param newval : a value among YMultiCellWeighScale.EXCITATION_OFF,
+     *  YMultiCellWeighScale.EXCITATION_DC and YMultiCellWeighScale.EXCITATION_AC corresponding to the
+     * current load cell bridge excitation method
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -522,7 +596,7 @@ public class YWeighScale extends YSensor
 
 
     /**
-     * Retrieves a weighing scale sensor for a given identifier.
+     * Retrieves a multi-cell weighing scale sensor for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -532,11 +606,11 @@ public class YWeighScale extends YSensor
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the weighing scale sensor is online at the time
+     * This function does not require that the multi-cell weighing scale sensor is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YWeighScale.isOnline() to test if the weighing scale sensor is
+     * Use the method YMultiCellWeighScale.isOnline() to test if the multi-cell weighing scale sensor is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a weighing scale sensor by logical name, no error is notified: the first instance
+     * a multi-cell weighing scale sensor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
@@ -544,25 +618,25 @@ public class YWeighScale extends YSensor
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the weighing scale sensor
+     * @param func : a string that uniquely characterizes the multi-cell weighing scale sensor
      *
-     * @return a YWeighScale object allowing you to drive the weighing scale sensor.
+     * @return a YMultiCellWeighScale object allowing you to drive the multi-cell weighing scale sensor.
      */
-    public static YWeighScale FindWeighScale(String func)
+    public static YMultiCellWeighScale FindMultiCellWeighScale(String func)
     {
-        YWeighScale obj;
+        YMultiCellWeighScale obj;
         synchronized (YAPI.class) {
-            obj = (YWeighScale) YFunction._FindFromCache("WeighScale", func);
+            obj = (YMultiCellWeighScale) YFunction._FindFromCache("MultiCellWeighScale", func);
             if (obj == null) {
-                obj = new YWeighScale(func);
-                YFunction._AddToCache("WeighScale", func, obj);
+                obj = new YMultiCellWeighScale(func);
+                YFunction._AddToCache("MultiCellWeighScale", func, obj);
             }
         }
         return obj;
     }
 
     /**
-     * Retrieves a weighing scale sensor for a given identifier in a YAPI context.
+     * Retrieves a multi-cell weighing scale sensor for a given identifier in a YAPI context.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -572,27 +646,27 @@ public class YWeighScale extends YSensor
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the weighing scale sensor is online at the time
+     * This function does not require that the multi-cell weighing scale sensor is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YWeighScale.isOnline() to test if the weighing scale sensor is
+     * Use the method YMultiCellWeighScale.isOnline() to test if the multi-cell weighing scale sensor is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a weighing scale sensor by logical name, no error is notified: the first instance
+     * a multi-cell weighing scale sensor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the weighing scale sensor
+     * @param func : a string that uniquely characterizes the multi-cell weighing scale sensor
      *
-     * @return a YWeighScale object allowing you to drive the weighing scale sensor.
+     * @return a YMultiCellWeighScale object allowing you to drive the multi-cell weighing scale sensor.
      */
-    public static YWeighScale FindWeighScaleInContext(YAPIContext yctx,String func)
+    public static YMultiCellWeighScale FindMultiCellWeighScaleInContext(YAPIContext yctx,String func)
     {
-        YWeighScale obj;
+        YMultiCellWeighScale obj;
         synchronized (yctx) {
-            obj = (YWeighScale) YFunction._FindFromCacheInContext(yctx, "WeighScale", func);
+            obj = (YMultiCellWeighScale) YFunction._FindFromCacheInContext(yctx, "MultiCellWeighScale", func);
             if (obj == null) {
-                obj = new YWeighScale(yctx, func);
-                YFunction._AddToCache("WeighScale", func, obj);
+                obj = new YMultiCellWeighScale(yctx, func);
+                YFunction._AddToCache("MultiCellWeighScale", func, obj);
             }
         }
         return obj;
@@ -617,7 +691,7 @@ public class YWeighScale extends YSensor
         } else {
             YFunction._UpdateValueCallbackList(this, false);
         }
-        _valueCallbackWeighScale = callback;
+        _valueCallbackMultiCellWeighScale = callback;
         // Immediately invoke value callback with current value
         if (callback != null && isOnline()) {
             val = _advertisedValue;
@@ -631,8 +705,8 @@ public class YWeighScale extends YSensor
     @Override
     public int _invokeValueCallback(String value)
     {
-        if (_valueCallbackWeighScale != null) {
-            _valueCallbackWeighScale.yNewValue(this, value);
+        if (_valueCallbackMultiCellWeighScale != null) {
+            _valueCallbackMultiCellWeighScale.yNewValue(this, value);
         } else {
             super._invokeValueCallback(value);
         }
@@ -659,15 +733,15 @@ public class YWeighScale extends YSensor
         } else {
             YFunction._UpdateTimedReportCallbackList(sensor, false);
         }
-        _timedReportCallbackWeighScale = callback;
+        _timedReportCallbackMultiCellWeighScale = callback;
         return 0;
     }
 
     @Override
     public int _invokeTimedReportCallback(YMeasure value)
     {
-        if (_timedReportCallbackWeighScale != null) {
-            _timedReportCallbackWeighScale.timedReportCallback(this, value);
+        if (_timedReportCallbackMultiCellWeighScale != null) {
+            _timedReportCallbackMultiCellWeighScale.timedReportCallback(this, value);
         } else {
             super._invokeTimedReportCallback(value);
         }
@@ -675,7 +749,7 @@ public class YWeighScale extends YSensor
     }
 
     /**
-     * Adapts the load cell signal bias (stored in the corresponding genericSensor)
+     * Adapts the load cells signal bias (stored in the corresponding genericSensor)
      * so that the current signal corresponds to a zero weight.
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -688,7 +762,7 @@ public class YWeighScale extends YSensor
     }
 
     /**
-     * Configures the load cell span parameters (stored in the corresponding genericSensor)
+     * Configures the load cells span parameters (stored in the corresponding genericSensors)
      * so that the current signal corresponds to the specified reference weight.
      *
      * @param currWeight : reference weight presently on the load cell.
@@ -703,249 +777,14 @@ public class YWeighScale extends YSensor
         return set_command(String.format(Locale.US, "S%d:%d", (int) (double)Math.round(1000*currWeight),(int) (double)Math.round(1000*maxWeight)));
     }
 
-    public int setCompensationTable(int tableIndex,ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
-    {
-        int siz;
-        int res;
-        int idx;
-        int found;
-        double prev;
-        double curr;
-        double currComp;
-        double idxTemp;
-        siz = tempValues.size();
-        //noinspection DoubleNegation
-        if (!(siz != 1)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "thermal compensation table must have at least two points");}
-        //noinspection DoubleNegation
-        if (!(siz == compValues.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "table sizes mismatch");}
-
-        res = set_command(String.format(Locale.US, "%dZ",tableIndex));
-        //noinspection DoubleNegation
-        if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermal compensation table");}
-        // add records in growing temperature value
-        found = 1;
-        prev = -999999.0;
-        while (found > 0) {
-            found = 0;
-            curr = 99999999.0;
-            currComp = -999999.0;
-            idx = 0;
-            while (idx < siz) {
-                idxTemp = tempValues.get(idx).doubleValue();
-                if ((idxTemp > prev) && (idxTemp < curr)) {
-                    curr = idxTemp;
-                    currComp = compValues.get(idx).doubleValue();
-                    found = 1;
-                }
-                idx = idx + 1;
-            }
-            if (found > 0) {
-                res = set_command(String.format(Locale.US, "%dm%d:%d", tableIndex, (int) (double)Math.round(1000*curr),(int) (double)Math.round(1000*currComp)));
-                //noinspection DoubleNegation
-                if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to set thermal compensation table");}
-                prev = curr;
-            }
-        }
-        return YAPI.SUCCESS;
-    }
-
-    public int loadCompensationTable(int tableIndex,ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
-    {
-        String id;
-        byte[] bin_json;
-        ArrayList<String> paramlist = new ArrayList<>();
-        int siz;
-        int idx;
-        double temp;
-        double comp;
-
-        id = get_functionId();
-        id = (id).substring( 10,  10 + (id).length() - 10);
-        bin_json = _download(String.format(Locale.US, "extra.json?page=%d",(4*YAPIContext._atoi(id))+tableIndex));
-        paramlist = _json_get_array(bin_json);
-        // convert all values to float and append records
-        siz = ((paramlist.size()) >> (1));
-        tempValues.clear();
-        compValues.clear();
-        idx = 0;
-        while (idx < siz) {
-            temp = Double.valueOf(paramlist.get(2*idx))/1000.0;
-            comp = Double.valueOf(paramlist.get(2*idx+1))/1000.0;
-            tempValues.add(temp);
-            compValues.add(comp);
-            idx = idx + 1;
-        }
-        return YAPI.SUCCESS;
-    }
-
     /**
-     * Records a weight offset thermal compensation table, in order to automatically correct the
-     * measured weight based on the averaged compensation temperature.
-     * The weight correction will be applied by linear interpolation between specified points.
+     * Continues the enumeration of multi-cell weighing scale sensors started using yFirstMultiCellWeighScale().
      *
-     * @param tempValues : array of floating point numbers, corresponding to all averaged
-     *         temperatures for which an offset correction is specified.
-     * @param compValues : array of floating point numbers, corresponding to the offset correction
-     *         to apply for each of the temperature included in the first
-     *         argument, index by index.
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
+     * @return a pointer to a YMultiCellWeighScale object, corresponding to
+     *         a multi-cell weighing scale sensor currently online, or a null pointer
+     *         if there are no more multi-cell weighing scale sensors to enumerate.
      */
-    public int set_offsetAvgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
-    {
-        return setCompensationTable(0, tempValues, compValues);
-    }
-
-    /**
-     * Retrieves the weight offset thermal compensation table previously configured using the
-     * set_offsetAvgCompensationTable function.
-     * The weight correction is applied by linear interpolation between specified points.
-     *
-     * @param tempValues : array of floating point numbers, that is filled by the function
-     *         with all averaged temperatures for which an offset correction is specified.
-     * @param compValues : array of floating point numbers, that is filled by the function
-     *         with the offset correction applied for each of the temperature
-     *         included in the first argument, index by index.
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int loadOffsetAvgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
-    {
-        return loadCompensationTable(0, tempValues, compValues);
-    }
-
-    /**
-     * Records a weight offset thermal compensation table, in order to automatically correct the
-     * measured weight based on the variation of temperature.
-     * The weight correction will be applied by linear interpolation between specified points.
-     *
-     * @param tempValues : array of floating point numbers, corresponding to temperature
-     *         variations for which an offset correction is specified.
-     * @param compValues : array of floating point numbers, corresponding to the offset correction
-     *         to apply for each of the temperature variation included in the first
-     *         argument, index by index.
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_offsetChgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
-    {
-        return setCompensationTable(1, tempValues, compValues);
-    }
-
-    /**
-     * Retrieves the weight offset thermal compensation table previously configured using the
-     * set_offsetChgCompensationTable function.
-     * The weight correction is applied by linear interpolation between specified points.
-     *
-     * @param tempValues : array of floating point numbers, that is filled by the function
-     *         with all temperature variations for which an offset correction is specified.
-     * @param compValues : array of floating point numbers, that is filled by the function
-     *         with the offset correction applied for each of the temperature
-     *         variation included in the first argument, index by index.
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int loadOffsetChgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
-    {
-        return loadCompensationTable(1, tempValues, compValues);
-    }
-
-    /**
-     * Records a weight span thermal compensation table, in order to automatically correct the
-     * measured weight based on the compensation temperature.
-     * The weight correction will be applied by linear interpolation between specified points.
-     *
-     * @param tempValues : array of floating point numbers, corresponding to all averaged
-     *         temperatures for which a span correction is specified.
-     * @param compValues : array of floating point numbers, corresponding to the span correction
-     *         (in percents) to apply for each of the temperature included in the first
-     *         argument, index by index.
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_spanAvgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
-    {
-        return setCompensationTable(2, tempValues, compValues);
-    }
-
-    /**
-     * Retrieves the weight span thermal compensation table previously configured using the
-     * set_spanAvgCompensationTable function.
-     * The weight correction is applied by linear interpolation between specified points.
-     *
-     * @param tempValues : array of floating point numbers, that is filled by the function
-     *         with all averaged temperatures for which an span correction is specified.
-     * @param compValues : array of floating point numbers, that is filled by the function
-     *         with the span correction applied for each of the temperature
-     *         included in the first argument, index by index.
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int loadSpanAvgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
-    {
-        return loadCompensationTable(2, tempValues, compValues);
-    }
-
-    /**
-     * Records a weight span thermal compensation table, in order to automatically correct the
-     * measured weight based on the variation of temperature.
-     * The weight correction will be applied by linear interpolation between specified points.
-     *
-     * @param tempValues : array of floating point numbers, corresponding to all variations of
-     *         temperatures for which a span correction is specified.
-     * @param compValues : array of floating point numbers, corresponding to the span correction
-     *         (in percents) to apply for each of the temperature variation included
-     *         in the first argument, index by index.
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_spanChgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
-    {
-        return setCompensationTable(3, tempValues, compValues);
-    }
-
-    /**
-     * Retrieves the weight span thermal compensation table previously configured using the
-     * set_spanChgCompensationTable function.
-     * The weight correction is applied by linear interpolation between specified points.
-     *
-     * @param tempValues : array of floating point numbers, that is filled by the function
-     *         with all variation of temperature for which an span correction is specified.
-     * @param compValues : array of floating point numbers, that is filled by the function
-     *         with the span correction applied for each of variation of temperature
-     *         included in the first argument, index by index.
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int loadSpanChgCompensationTable(ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
-    {
-        return loadCompensationTable(3, tempValues, compValues);
-    }
-
-    /**
-     * Continues the enumeration of weighing scale sensors started using yFirstWeighScale().
-     *
-     * @return a pointer to a YWeighScale object, corresponding to
-     *         a weighing scale sensor currently online, or a null pointer
-     *         if there are no more weighing scale sensors to enumerate.
-     */
-    public YWeighScale nextWeighScale()
+    public YMultiCellWeighScale nextMultiCellWeighScale()
     {
         String next_hwid;
         try {
@@ -955,45 +794,45 @@ public class YWeighScale extends YSensor
             next_hwid = null;
         }
         if(next_hwid == null) return null;
-        return FindWeighScaleInContext(_yapi, next_hwid);
+        return FindMultiCellWeighScaleInContext(_yapi, next_hwid);
     }
 
     /**
-     * Starts the enumeration of weighing scale sensors currently accessible.
-     * Use the method YWeighScale.nextWeighScale() to iterate on
-     * next weighing scale sensors.
+     * Starts the enumeration of multi-cell weighing scale sensors currently accessible.
+     * Use the method YMultiCellWeighScale.nextMultiCellWeighScale() to iterate on
+     * next multi-cell weighing scale sensors.
      *
-     * @return a pointer to a YWeighScale object, corresponding to
-     *         the first weighing scale sensor currently online, or a null pointer
+     * @return a pointer to a YMultiCellWeighScale object, corresponding to
+     *         the first multi-cell weighing scale sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static YWeighScale FirstWeighScale()
+    public static YMultiCellWeighScale FirstMultiCellWeighScale()
     {
         YAPIContext yctx = YAPI.GetYCtx(false);
         if (yctx == null)  return null;
-        String next_hwid = yctx._yHash.getFirstHardwareId("WeighScale");
+        String next_hwid = yctx._yHash.getFirstHardwareId("MultiCellWeighScale");
         if (next_hwid == null)  return null;
-        return FindWeighScaleInContext(yctx, next_hwid);
+        return FindMultiCellWeighScaleInContext(yctx, next_hwid);
     }
 
     /**
-     * Starts the enumeration of weighing scale sensors currently accessible.
-     * Use the method YWeighScale.nextWeighScale() to iterate on
-     * next weighing scale sensors.
+     * Starts the enumeration of multi-cell weighing scale sensors currently accessible.
+     * Use the method YMultiCellWeighScale.nextMultiCellWeighScale() to iterate on
+     * next multi-cell weighing scale sensors.
      *
      * @param yctx : a YAPI context.
      *
-     * @return a pointer to a YWeighScale object, corresponding to
-     *         the first weighing scale sensor currently online, or a null pointer
+     * @return a pointer to a YMultiCellWeighScale object, corresponding to
+     *         the first multi-cell weighing scale sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static YWeighScale FirstWeighScaleInContext(YAPIContext yctx)
+    public static YMultiCellWeighScale FirstMultiCellWeighScaleInContext(YAPIContext yctx)
     {
-        String next_hwid = yctx._yHash.getFirstHardwareId("WeighScale");
+        String next_hwid = yctx._yHash.getFirstHardwareId("MultiCellWeighScale");
         if (next_hwid == null)  return null;
-        return FindWeighScaleInContext(yctx, next_hwid);
+        return FindMultiCellWeighScaleInContext(yctx, next_hwid);
     }
 
-    //--- (end of YWeighScale implementation)
+    //--- (end of YMultiCellWeighScale implementation)
 }
 
