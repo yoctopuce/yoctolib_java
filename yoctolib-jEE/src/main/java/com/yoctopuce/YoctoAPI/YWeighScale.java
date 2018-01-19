@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWeighScale.java 29472 2017-12-20 11:34:07Z mvuilleu $
+ * $Id: YWeighScale.java 29661 2018-01-18 13:32:13Z mvuilleu $
  *
  * Implements FindWeighScale(), the high-level API for WeighScale functions
  *
@@ -175,6 +175,43 @@ public class YWeighScale extends YSensor
             _command = json_val.getString("command");
         }
         super._parseAttr(json_val);
+    }
+
+    /**
+     * Changes the measuring unit for the weight.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : a string corresponding to the measuring unit for the weight
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_unit(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("unit",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the measuring unit for the weight.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : a string corresponding to the measuring unit for the weight
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setUnit(String newval)  throws YAPI_Exception
+    {
+        return set_unit(newval);
     }
 
     /**

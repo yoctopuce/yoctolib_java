@@ -1,2 +1,1 @@
-- Add YMultiCellWeighScale class
-- Fix race condition that could lead to a deadlock
+- Fix native USB access on Windows

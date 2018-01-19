@@ -9,9 +9,9 @@
         <version>1.10.29670-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>prog-modbus</artifactId>
+    <artifactId>doc-gettingstarted-yocto-maxibridge</artifactId>
     <packaging>jar</packaging>
-    <name>Prog-MODBUS</name>
+    <name>Doc-GettingStarted-Yocto-MaxiBridge</name>
     <version>1.10.29670-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>

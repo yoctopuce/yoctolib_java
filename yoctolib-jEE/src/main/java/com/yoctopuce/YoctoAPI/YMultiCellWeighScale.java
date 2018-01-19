@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMultiCellWeighScale.java 29478 2017-12-21 08:10:05Z seb $
+ * $Id: YMultiCellWeighScale.java 29661 2018-01-18 13:32:13Z mvuilleu $
  *
  * Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -182,6 +182,43 @@ public class YMultiCellWeighScale extends YSensor
             _command = json_val.getString("command");
         }
         super._parseAttr(json_val);
+    }
+
+    /**
+     * Changes the measuring unit for the weight.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : a string corresponding to the measuring unit for the weight
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_unit(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("unit",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the measuring unit for the weight.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : a string corresponding to the measuring unit for the weight
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setUnit(String newval)  throws YAPI_Exception
+    {
+        return set_unit(newval);
     }
 
     /**
