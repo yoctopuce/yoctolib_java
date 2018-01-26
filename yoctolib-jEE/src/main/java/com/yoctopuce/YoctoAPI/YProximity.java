@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YProximity.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YProximity.java 29767 2018-01-26 08:53:27Z seb $
  *
  * Implements FindProximity(), the high-level API for Proximity functions
  *
@@ -65,6 +65,18 @@ public class YProximity extends YSensor
      */
     public static final int DETECTIONTHRESHOLD_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid detectionHysteresis value
+     */
+    public static final int DETECTIONHYSTERESIS_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid presenceMinTime value
+     */
+    public static final int PRESENCEMINTIME_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid removalMinTime value
+     */
+    public static final int REMOVALMINTIME_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid isPresent value
      */
     public static final int ISPRESENT_FALSE = 0;
@@ -95,6 +107,9 @@ public class YProximity extends YSensor
     public static final int PROXIMITYREPORTMODE_INVALID = -1;
     protected double _signalValue = SIGNALVALUE_INVALID;
     protected int _detectionThreshold = DETECTIONTHRESHOLD_INVALID;
+    protected int _detectionHysteresis = DETECTIONHYSTERESIS_INVALID;
+    protected int _presenceMinTime = PRESENCEMINTIME_INVALID;
+    protected int _removalMinTime = REMOVALMINTIME_INVALID;
     protected int _isPresent = ISPRESENT_INVALID;
     protected long _lastTimeApproached = LASTTIMEAPPROACHED_INVALID;
     protected long _lastTimeRemoved = LASTTIMEREMOVED_INVALID;
@@ -163,6 +178,15 @@ public class YProximity extends YSensor
         }
         if (json_val.has("detectionThreshold")) {
             _detectionThreshold = json_val.getInt("detectionThreshold");
+        }
+        if (json_val.has("detectionHysteresis")) {
+            _detectionHysteresis = json_val.getInt("detectionHysteresis");
+        }
+        if (json_val.has("presenceMinTime")) {
+            _presenceMinTime = json_val.getInt("presenceMinTime");
+        }
+        if (json_val.has("removalMinTime")) {
+            _removalMinTime = json_val.getInt("removalMinTime");
         }
         if (json_val.has("isPresent")) {
             _isPresent = json_val.getInt("isPresent") > 0 ? 1 : 0;
@@ -294,6 +318,224 @@ public class YProximity extends YSensor
     public int setDetectionThreshold(int newval)  throws YAPI_Exception
     {
         return set_detectionThreshold(newval);
+    }
+
+    /**
+     * Returns the hysteresis used to determine the logical state of the proximity sensor, when considered
+     * as a binary input (on/off).
+     *
+     *  @return an integer corresponding to the hysteresis used to determine the logical state of the
+     * proximity sensor, when considered
+     *         as a binary input (on/off)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_detectionHysteresis() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return DETECTIONHYSTERESIS_INVALID;
+                }
+            }
+            res = _detectionHysteresis;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the hysteresis used to determine the logical state of the proximity sensor, when considered
+     * as a binary input (on/off).
+     *
+     *  @return an integer corresponding to the hysteresis used to determine the logical state of the
+     * proximity sensor, when considered
+     *         as a binary input (on/off)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getDetectionHysteresis() throws YAPI_Exception
+    {
+        return get_detectionHysteresis();
+    }
+
+    /**
+     * Changes the hysteresis used to determine the logical state of the proximity sensor, when considered
+     * as a binary input (on/off).
+     *
+     *  @param newval : an integer corresponding to the hysteresis used to determine the logical state of
+     * the proximity sensor, when considered
+     *         as a binary input (on/off)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_detectionHysteresis(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("detectionHysteresis",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the hysteresis used to determine the logical state of the proximity sensor, when considered
+     * as a binary input (on/off).
+     *
+     *  @param newval : an integer corresponding to the hysteresis used to determine the logical state of
+     * the proximity sensor, when considered
+     *         as a binary input (on/off)
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setDetectionHysteresis(int newval)  throws YAPI_Exception
+    {
+        return set_detectionHysteresis(newval);
+    }
+
+    /**
+     * Returns the minimal detection duration before signaling a presence event. Any shorter detection is
+     * considered as noise or bounce (false positive) and filtered out.
+     *
+     * @return an integer corresponding to the minimal detection duration before signaling a presence event
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_presenceMinTime() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return PRESENCEMINTIME_INVALID;
+                }
+            }
+            res = _presenceMinTime;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the minimal detection duration before signaling a presence event. Any shorter detection is
+     * considered as noise or bounce (false positive) and filtered out.
+     *
+     * @return an integer corresponding to the minimal detection duration before signaling a presence event
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getPresenceMinTime() throws YAPI_Exception
+    {
+        return get_presenceMinTime();
+    }
+
+    /**
+     * Changes the minimal detection duration before signaling a presence event. Any shorter detection is
+     * considered as noise or bounce (false positive) and filtered out.
+     *
+     * @param newval : an integer corresponding to the minimal detection duration before signaling a presence event
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_presenceMinTime(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("presenceMinTime",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the minimal detection duration before signaling a presence event. Any shorter detection is
+     * considered as noise or bounce (false positive) and filtered out.
+     *
+     * @param newval : an integer corresponding to the minimal detection duration before signaling a presence event
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setPresenceMinTime(int newval)  throws YAPI_Exception
+    {
+        return set_presenceMinTime(newval);
+    }
+
+    /**
+     * Returns the minimal detection duration before signaling a removal event. Any shorter detection is
+     * considered as noise or bounce (false positive) and filtered out.
+     *
+     * @return an integer corresponding to the minimal detection duration before signaling a removal event
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_removalMinTime() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return REMOVALMINTIME_INVALID;
+                }
+            }
+            res = _removalMinTime;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the minimal detection duration before signaling a removal event. Any shorter detection is
+     * considered as noise or bounce (false positive) and filtered out.
+     *
+     * @return an integer corresponding to the minimal detection duration before signaling a removal event
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getRemovalMinTime() throws YAPI_Exception
+    {
+        return get_removalMinTime();
+    }
+
+    /**
+     * Changes the minimal detection duration before signaling a removal event. Any shorter detection is
+     * considered as noise or bounce (false positive) and filtered out.
+     *
+     * @param newval : an integer corresponding to the minimal detection duration before signaling a removal event
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_removalMinTime(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("removalMinTime",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the minimal detection duration before signaling a removal event. Any shorter detection is
+     * considered as noise or bounce (false positive) and filtered out.
+     *
+     * @param newval : an integer corresponding to the minimal detection duration before signaling a removal event
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setRemovalMinTime(int newval)  throws YAPI_Exception
+    {
+        return set_removalMinTime(newval);
     }
 
     /**

@@ -1,8 +1,18 @@
 package com.yoctopuce.YoctoAPI;
 
 import java.io.IOException;
-import java.net.*;
-import java.util.*;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Locale;
 
 
 /**
@@ -10,10 +20,12 @@ import java.util.*;
  * <p/>
  * this class is used to detect all YoctoHub using SSDP
  */
-class YSSDP {
+class YSSDP
+{
 
 
-    interface YSSDPReportInterface {
+    interface YSSDPReportInterface
+    {
         /**
          * @param serial          : the serial number of the discovered Hub
          * @param urlToRegister   : the new URL to register
@@ -39,7 +51,7 @@ class YSSDP {
     private final YAPIContext _yctx;
     private final ArrayList<NetworkInterface> _netInterfaces = new ArrayList<>(1);
     private final HashMap<String, YSSDPCacheEntry> _cache = new HashMap<>();
-    private InetAddress mMcastAddr;
+    private InetSocketAddress mMcastAddr;
     private boolean _Listening;
     private YSSDPReportInterface _callbacks;
     private Thread[] _listenMSearchThread;
@@ -125,14 +137,15 @@ class YSSDP {
             }
         }
 
-        mMcastAddr = InetAddress.getByName(SSDP_MCAST_ADDR);
+        mMcastAddr = new InetSocketAddress(InetAddress.getByName(SSDP_MCAST_ADDR), SSDP_PORT);
         int size = _netInterfaces.size();
         _listenBcastThread = new Thread[size];
         _listenMSearchThread = new Thread[size];
         _Listening = false;
         for (int i = 0; i < size; i++) {
             final NetworkInterface netIf = _netInterfaces.get(i);
-            _listenBcastThread[i] = new Thread(new Runnable() {
+            _listenBcastThread[i] = new Thread(new Runnable()
+            {
                 public void run()
                 {
                     DatagramPacket pkt;
@@ -140,11 +153,12 @@ class YSSDP {
                     String ssdpMessage;
                     MulticastSocket socketReception = null;
                     try {
-                        socketReception = new MulticastSocket(SSDP_PORT);
-                        socketReception.joinGroup(mMcastAddr);
+                        socketReception = new MulticastSocket();
+                        socketReception.joinGroup(mMcastAddr, netIf);
                         socketReception.setSoTimeout(10000);
-                        socketReception.setNetworkInterface(netIf);
                     } catch (IOException e) {
+                        _yctx._Log(String.format(Locale.US, "Unable to join MCAST group for %s: %s",
+                                netIf.getName(), e.getLocalizedMessage()));
                         e.printStackTrace();
                         //fixme: better error handling
                         return;
@@ -166,7 +180,8 @@ class YSSDP {
                 }
             });
             _listenBcastThread[i].start();
-            _listenMSearchThread[i] = new Thread(new Runnable() {
+            _listenMSearchThread[i] = new Thread(new Runnable()
+            {
                 public void run()
                 {
                     DatagramPacket pkt;
@@ -180,7 +195,7 @@ class YSSDP {
                         msearchSocket.setTimeToLive(15);
                         msearchSocket.setNetworkInterface(netIf);
                         byte[] outPktContent = SSDP_DISCOVERY_MESSAGE.getBytes();
-                        DatagramPacket outPkt = new DatagramPacket(outPktContent, outPktContent.length, mMcastAddr, SSDP_PORT);
+                        DatagramPacket outPkt = new DatagramPacket(outPktContent, outPktContent.length, mMcastAddr);
                         msearchSocket.send(outPkt);
                     } catch (IOException ex) {
                         //todo: more user friendy error report

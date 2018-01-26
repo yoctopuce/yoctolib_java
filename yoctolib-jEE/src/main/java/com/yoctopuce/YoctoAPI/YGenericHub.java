@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 28365 2017-08-16 09:25:03Z seb $
+ * $Id: YGenericHub.java 29770 2018-01-26 08:58:52Z seb $
  *
  * Internal YGenericHub object
  *
@@ -375,6 +375,7 @@ abstract class YGenericHub
         private final String _user;
         private final String _pass;
         private final String _proto;
+        private final String _subdomain;
 
         public HTTPParams(String url)
         {
@@ -407,6 +408,13 @@ abstract class YGenericHub
             int end_url = url.indexOf('/', pos);
             if (end_url < 0) {
                 end_url = url.length();
+                _subdomain = "";
+            } else {
+                int next_slash = url.indexOf("/", end_url + 1);
+                if (next_slash < 0) {
+                    next_slash = url.length();
+                }
+                _subdomain = url.substring(end_url, next_slash);
             }
             int portpos = url.indexOf(':', pos);
             if (portpos > 0) {
@@ -448,7 +456,6 @@ abstract class YGenericHub
             return getUrl(false, true);
         }
 
-
         String getUrl(boolean withProto, boolean withUserPass)
         {
             StringBuilder url = new StringBuilder();
@@ -466,6 +473,7 @@ abstract class YGenericHub
             url.append(_host);
             url.append(":");
             url.append(_port);
+            url.append(_subdomain);
             return url.toString();
         }
 
@@ -478,5 +486,6 @@ abstract class YGenericHub
         {
             return !_user.equals("");
         }
+
     }
 }

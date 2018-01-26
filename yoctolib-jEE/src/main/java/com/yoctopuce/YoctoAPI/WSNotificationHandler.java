@@ -112,7 +112,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         } else {
             // client mode
             WebSocketContainer webSocketContainer = ContainerProvider.getWebSocketContainer();
-            String url = "ws://" + _hub._http_params.getUrl(false, false) + "/not.byn";
+            String url = _hub._http_params.getUrl(true, false) + "/not.byn";
             URI uri;
             try {
                 uri = new URI(url);
@@ -131,8 +131,25 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                 synchronized (_stateLock) {
                     _connectionState = ConnectionState.CONNECTING;
                 }
+
                 try {
                     _session = webSocketContainer.connectToServer(this, uri);
+/*
+                    _session = webSocketContainer.connectToServer(new Endpoint()
+                    {
+                        @Override
+                        public void onOpen(Session session, EndpointConfig endpointConfig)
+                        {
+                            WSNotificationHandler.this.onOpen(session);
+                        }
+
+                        @Override
+                        public void onClose(Session session, CloseReason closeReason)
+                        {
+                            WSNotificationHandler.this.onClose(session, closeReason);
+                        }
+                    }, clientEndpointConfig, uri);
+                    */
                     runOnSession();
                 } catch (DeploymentException | IOException e) {
                     e.printStackTrace();
@@ -637,9 +654,9 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
 
 
     /*
-    *   look through all pending request if there is some data that we can send
-    *
-    */
+     *   look through all pending request if there is some data that we can send
+     *
+     */
     private void processRequests(RemoteEndpoint.Basic remote) throws IOException
     {
         int tcpchan;
@@ -838,7 +855,11 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
             _connectionState = ConnectionState.DEAD;
             if (errno != YAPI.SUCCESS) {
                 _session_errno = errno;
-                _session_error = closeReason;
+                if (!closeReason.equals("")) {
+                    _session_error = closeReason;
+                } else {
+                    _session_error = "WebSocket connection has been closed";
+                }
             }
             _stateLock.notifyAll();
         }
