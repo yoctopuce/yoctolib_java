@@ -21,7 +21,7 @@ public class Demo {
                 System.exit(1);
             }
         } else {
-            gps = YGps.FindGps(args[0] + ".temperature");
+            gps = YGps.FindGps(args[0] + ".gps");
         }
 
         while (true) {

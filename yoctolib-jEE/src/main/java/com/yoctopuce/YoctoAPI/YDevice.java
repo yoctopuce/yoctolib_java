@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 29314 2017-11-27 14:53:38Z seb $
+ * $Id: YDevice.java 30233 2018-03-05 14:16:18Z seb $
  *
  * Internal YDevice class
  *
@@ -37,6 +37,8 @@
 
 package com.yoctopuce.YoctoAPI;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 
 
@@ -117,6 +119,17 @@ class YDevice
         return _wpRec.getBeacon();
     }
 
+
+    String getProductName()
+    {
+        return _wpRec.getProductName();
+    }
+
+    int getProductId()
+    {
+        return _wpRec.getProductId();
+    }
+
     // Get the whole REST API string for a device, from cache if possible
     synchronized YJSONObject requestAPI() throws YAPI_Exception
     {
@@ -127,7 +140,12 @@ class YDevice
 
         String request = "GET /api.json";
         if (_cache_json != null) {
-            request += "?fw=" + _cache_json.getYJSONObject("module").getString("firmwareRelease");
+            String fwrelease = _cache_json.getYJSONObject("module").getString("firmwareRelease");
+            try {
+                fwrelease = URLEncoder.encode(fwrelease, _hub._yctx._defaultEncoding);
+            } catch (UnsupportedEncodingException ignored) {
+            }
+            request += "?fw=" + fwrelease;
         }
         String yreq = requestHTTPSyncAsString(request, null);
         YJSONObject cache_json;

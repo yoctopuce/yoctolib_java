@@ -134,22 +134,6 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
 
                 try {
                     _session = webSocketContainer.connectToServer(this, uri);
-/*
-                    _session = webSocketContainer.connectToServer(new Endpoint()
-                    {
-                        @Override
-                        public void onOpen(Session session, EndpointConfig endpointConfig)
-                        {
-                            WSNotificationHandler.this.onOpen(session);
-                        }
-
-                        @Override
-                        public void onClose(Session session, CloseReason closeReason)
-                        {
-                            WSNotificationHandler.this.onClose(session, closeReason);
-                        }
-                    }, clientEndpointConfig, uri);
-                    */
                     runOnSession();
                 } catch (DeploymentException | IOException e) {
                     e.printStackTrace();

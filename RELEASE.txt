@@ -1,1 +1,1 @@
-- Add support and examples for Yocto-Bridge and Yocto-MaxiBridge
+- Fix Device that was not removed from inventory after unplug

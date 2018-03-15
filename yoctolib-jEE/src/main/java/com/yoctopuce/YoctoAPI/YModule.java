@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 29240 2017-11-23 13:29:57Z seb $
+ * $Id: YModule.java 30233 2018-03-05 14:16:18Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -449,8 +449,13 @@ public class YModule extends YFunction
     public String get_productName() throws YAPI_Exception
     {
         String res;
+        YDevice dev;
         synchronized (this) {
             if (_cacheExpiration == 0) {
+                dev = this._getDev();
+                if (!(dev == null)) {
+                    return dev.getProductName();
+                }
                 if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PRODUCTNAME_INVALID;
                 }
@@ -482,8 +487,13 @@ public class YModule extends YFunction
     public String get_serialNumber() throws YAPI_Exception
     {
         String res;
+        YDevice dev;
         synchronized (this) {
             if (_cacheExpiration == 0) {
+                dev = this._getDev();
+                if (!(dev == null)) {
+                    return dev.getSerialNumber();
+                }
                 if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return SERIALNUMBER_INVALID;
                 }
@@ -515,8 +525,13 @@ public class YModule extends YFunction
     public int get_productId() throws YAPI_Exception
     {
         int res;
+        YDevice dev;
         synchronized (this) {
             if (_cacheExpiration == 0) {
+                dev = this._getDev();
+                if (!(dev == null)) {
+                    return dev.getProductId();
+                }
                 if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return PRODUCTID_INVALID;
                 }
@@ -732,8 +747,13 @@ public class YModule extends YFunction
     public int get_beacon() throws YAPI_Exception
     {
         int res;
+        YDevice dev;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                dev = this._getDev();
+                if (!(dev == null)) {
+                    return dev.getBeacon();
+                }
                 if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
                     return BEACON_INVALID;
                 }

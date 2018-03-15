@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmInput.java 28807 2017-10-12 09:46:33Z seb $
+ * $Id: YPwmInput.java 29968 2018-02-19 15:12:34Z seb $
  *
  * Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -91,6 +91,8 @@ public class YPwmInput extends YSensor
     public static final int PWMREPORTMODE_PWM_CPS = 5;
     public static final int PWMREPORTMODE_PWM_CPM = 6;
     public static final int PWMREPORTMODE_PWM_STATE = 7;
+    public static final int PWMREPORTMODE_PWM_FREQ_CPS = 8;
+    public static final int PWMREPORTMODE_PWM_FREQ_CPM = 9;
     public static final int PWMREPORTMODE_INVALID = -1;
     /**
      * invalid debouncePeriod value
@@ -410,7 +412,8 @@ public class YPwmInput extends YSensor
      *  @return a value among YPwmInput.PWMREPORTMODE_PWM_DUTYCYCLE, YPwmInput.PWMREPORTMODE_PWM_FREQUENCY,
      *  YPwmInput.PWMREPORTMODE_PWM_PULSEDURATION, YPwmInput.PWMREPORTMODE_PWM_EDGECOUNT,
      *  YPwmInput.PWMREPORTMODE_PWM_PULSECOUNT, YPwmInput.PWMREPORTMODE_PWM_CPS,
-     *  YPwmInput.PWMREPORTMODE_PWM_CPM and YPwmInput.PWMREPORTMODE_PWM_STATE corresponding to the
+     *  YPwmInput.PWMREPORTMODE_PWM_CPM, YPwmInput.PWMREPORTMODE_PWM_STATE,
+     *  YPwmInput.PWMREPORTMODE_PWM_FREQ_CPS and YPwmInput.PWMREPORTMODE_PWM_FREQ_CPM corresponding to the
      *  parameter (frequency/duty cycle, pulse width, edges count) returned by the get_currentValue
      * function and callbacks
      *
@@ -436,9 +439,9 @@ public class YPwmInput extends YSensor
      *
      *  @return a value among Y_PWMREPORTMODE_PWM_DUTYCYCLE, Y_PWMREPORTMODE_PWM_FREQUENCY,
      *  Y_PWMREPORTMODE_PWM_PULSEDURATION, Y_PWMREPORTMODE_PWM_EDGECOUNT, Y_PWMREPORTMODE_PWM_PULSECOUNT,
-     *  Y_PWMREPORTMODE_PWM_CPS, Y_PWMREPORTMODE_PWM_CPM and Y_PWMREPORTMODE_PWM_STATE corresponding to the
-     *  parameter (frequency/duty cycle, pulse width, edges count) returned by the get_currentValue
-     * function and callbacks
+     *  Y_PWMREPORTMODE_PWM_CPS, Y_PWMREPORTMODE_PWM_CPM, Y_PWMREPORTMODE_PWM_STATE,
+     *  Y_PWMREPORTMODE_PWM_FREQ_CPS and Y_PWMREPORTMODE_PWM_FREQ_CPM corresponding to the parameter
+     * (frequency/duty cycle, pulse width, edges count) returned by the get_currentValue function and callbacks
      *
      * @throws YAPI_Exception on error
      */
@@ -456,8 +459,9 @@ public class YPwmInput extends YSensor
      *  @param newval : a value among YPwmInput.PWMREPORTMODE_PWM_DUTYCYCLE,
      *  YPwmInput.PWMREPORTMODE_PWM_FREQUENCY, YPwmInput.PWMREPORTMODE_PWM_PULSEDURATION,
      *  YPwmInput.PWMREPORTMODE_PWM_EDGECOUNT, YPwmInput.PWMREPORTMODE_PWM_PULSECOUNT,
-     *  YPwmInput.PWMREPORTMODE_PWM_CPS, YPwmInput.PWMREPORTMODE_PWM_CPM and
-     *  YPwmInput.PWMREPORTMODE_PWM_STATE corresponding to the  parameter  type (frequency/duty cycle,
+     *  YPwmInput.PWMREPORTMODE_PWM_CPS, YPwmInput.PWMREPORTMODE_PWM_CPM,
+     *  YPwmInput.PWMREPORTMODE_PWM_STATE, YPwmInput.PWMREPORTMODE_PWM_FREQ_CPS and
+     *  YPwmInput.PWMREPORTMODE_PWM_FREQ_CPM corresponding to the  parameter  type (frequency/duty cycle,
      * pulse width, or edge count) returned by the get_currentValue function and callbacks
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -482,9 +486,9 @@ public class YPwmInput extends YSensor
      *
      *  @param newval : a value among Y_PWMREPORTMODE_PWM_DUTYCYCLE, Y_PWMREPORTMODE_PWM_FREQUENCY,
      *  Y_PWMREPORTMODE_PWM_PULSEDURATION, Y_PWMREPORTMODE_PWM_EDGECOUNT, Y_PWMREPORTMODE_PWM_PULSECOUNT,
-     *  Y_PWMREPORTMODE_PWM_CPS, Y_PWMREPORTMODE_PWM_CPM and Y_PWMREPORTMODE_PWM_STATE corresponding to the
-     *   parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the
-     * get_currentValue function and callbacks
+     *  Y_PWMREPORTMODE_PWM_CPS, Y_PWMREPORTMODE_PWM_CPM, Y_PWMREPORTMODE_PWM_STATE,
+     *  Y_PWMREPORTMODE_PWM_FREQ_CPS and Y_PWMREPORTMODE_PWM_FREQ_CPM corresponding to the  parameter  type
+     * (frequency/duty cycle, pulse width, or edge count) returned by the get_currentValue function and callbacks
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
