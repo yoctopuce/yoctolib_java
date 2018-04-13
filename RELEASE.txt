@@ -1,1 +1,1 @@
-- Fix Device that was not removed from inventory after unplug
+- Add new PWMOutput methods

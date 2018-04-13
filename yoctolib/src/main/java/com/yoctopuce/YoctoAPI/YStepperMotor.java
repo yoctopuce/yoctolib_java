@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YStepperMotor.java 29507 2017-12-28 14:14:56Z mvuilleu $
+ * $Id: YStepperMotor.java 30483 2018-03-29 07:43:07Z mvuilleu $
  *
  * Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1195,7 +1195,7 @@ public class YStepperMotor extends YFunction
      */
     public int reset() throws YAPI_Exception
     {
-        return sendCommand("Z");
+        return set_command("Z");
     }
 
     /**
@@ -1293,7 +1293,7 @@ public class YStepperMotor extends YFunction
      */
     public int emergencyStop() throws YAPI_Exception
     {
-        return sendCommand("!");
+        return set_command("!");
     }
 
     /**
@@ -1306,7 +1306,7 @@ public class YStepperMotor extends YFunction
      */
     public int alertStepOut() throws YAPI_Exception
     {
-        return sendCommand(".");
+        return set_command(".");
     }
 
     /**
@@ -1324,9 +1324,9 @@ public class YStepperMotor extends YFunction
         //noinspection DoubleNegation
         if (!(dir != 0)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "direction must be +1 or -1");}
         if (dir > 0) {
-            return sendCommand(".+");
+            return set_command(".+");
         }
-        return sendCommand(".-");
+        return set_command(".-");
     }
 
     /**
@@ -1337,7 +1337,7 @@ public class YStepperMotor extends YFunction
      */
     public int abortAndBrake() throws YAPI_Exception
     {
-        return sendCommand("B");
+        return set_command("B");
     }
 
     /**
@@ -1348,7 +1348,7 @@ public class YStepperMotor extends YFunction
      */
     public int abortAndHiZ() throws YAPI_Exception
     {
-        return sendCommand("z");
+        return set_command("z");
     }
 
     /**

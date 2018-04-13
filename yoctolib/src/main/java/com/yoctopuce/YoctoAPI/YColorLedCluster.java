@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 29186 2017-11-16 10:04:13Z seb $
+ * $Id: YColorLedCluster.java 30500 2018-04-04 07:53:46Z mvuilleu $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -66,6 +66,12 @@ public class YColorLedCluster extends YFunction
      */
     public static final int ACTIVELEDCOUNT_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid ledType value
+     */
+    public static final int LEDTYPE_RGB = 0;
+    public static final int LEDTYPE_RGBW = 1;
+    public static final int LEDTYPE_INVALID = -1;
+    /**
      * invalid maxLedCount value
      */
     public static final int MAXLEDCOUNT_INVALID = YAPI.INVALID_UINT;
@@ -82,6 +88,7 @@ public class YColorLedCluster extends YFunction
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _activeLedCount = ACTIVELEDCOUNT_INVALID;
+    protected int _ledType = LEDTYPE_INVALID;
     protected int _maxLedCount = MAXLEDCOUNT_INVALID;
     protected int _blinkSeqMaxCount = BLINKSEQMAXCOUNT_INVALID;
     protected int _blinkSeqMaxSize = BLINKSEQMAXSIZE_INVALID;
@@ -144,6 +151,9 @@ public class YColorLedCluster extends YFunction
     {
         if (json_val.has("activeLedCount")) {
             _activeLedCount = json_val.getInt("activeLedCount");
+        }
+        if (json_val.has("ledType")) {
+            _ledType = json_val.getInt("ledType");
         }
         if (json_val.has("maxLedCount")) {
             _maxLedCount = json_val.getInt("maxLedCount");
@@ -224,6 +234,75 @@ public class YColorLedCluster extends YFunction
     public int setActiveLedCount(int newval)  throws YAPI_Exception
     {
         return set_activeLedCount(newval);
+    }
+
+    /**
+     * Returns the RGB LED type currently handled by the device.
+     *
+     *  @return either YColorLedCluster.LEDTYPE_RGB or YColorLedCluster.LEDTYPE_RGBW, according to the RGB
+     * LED type currently handled by the device
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_ledType() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return LEDTYPE_INVALID;
+                }
+            }
+            res = _ledType;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the RGB LED type currently handled by the device.
+     *
+     * @return either Y_LEDTYPE_RGB or Y_LEDTYPE_RGBW, according to the RGB LED type currently handled by the device
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getLedType() throws YAPI_Exception
+    {
+        return get_ledType();
+    }
+
+    /**
+     * Changes the RGB LED type currently handled by the device.
+     *
+     *  @param newval : either YColorLedCluster.LEDTYPE_RGB or YColorLedCluster.LEDTYPE_RGBW, according to
+     * the RGB LED type currently handled by the device
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_ledType(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("ledType",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the RGB LED type currently handled by the device.
+     *
+     *  @param newval : either Y_LEDTYPE_RGB or Y_LEDTYPE_RGBW, according to the RGB LED type currently
+     * handled by the device
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setLedType(int newval)  throws YAPI_Exception
+    {
+        return set_ledType(newval);
     }
 
     /**
