@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 28654 2017-09-26 15:29:31Z seb $
+ * $Id: YSerialPort.java 30685 2018-04-24 13:46:18Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -1012,7 +1012,7 @@ public class YSerialPort extends YFunction
      */
     public int writeByte(int code) throws YAPI_Exception
     {
-        return sendCommand(String.format(Locale.US, "$%02x",code));
+        return sendCommand(String.format(Locale.US, "$%02X",code));
     }
 
     /**
@@ -1392,11 +1392,11 @@ public class YSerialPort extends YFunction
         res = "";
         ofs = 0;
         while (ofs + 3 < bufflen) {
-            res = String.format(Locale.US, "%s%02x%02x%02x%02x", res, (buff[ofs] & 0xff), (buff[ofs + 1] & 0xff), (buff[ofs + 2] & 0xff),(buff[ofs + 3] & 0xff));
+            res = String.format(Locale.US, "%s%02X%02X%02X%02X", res, (buff[ofs] & 0xff), (buff[ofs + 1] & 0xff), (buff[ofs + 2] & 0xff),(buff[ofs + 3] & 0xff));
             ofs = ofs + 4;
         }
         while (ofs < bufflen) {
-            res = String.format(Locale.US, "%s%02x", res,(buff[ofs] & 0xff));
+            res = String.format(Locale.US, "%s%02X", res,(buff[ofs] & 0xff));
             ofs = ofs + 1;
         }
         return res;
@@ -1726,11 +1726,11 @@ public class YSerialPort extends YFunction
         int hexb;
         funCode = pduBytes.get(0).intValue();
         nib = ((funCode) >> (4));
-        pat = String.format(Locale.US, "%02x[%x%x]%x.*", slaveNo, nib, (nib+8),((funCode) & (15)));
-        cmd = String.format(Locale.US, "%02x%02x", slaveNo,funCode);
+        pat = String.format(Locale.US, "%02X[%X%X]%X.*", slaveNo, nib, (nib+8),((funCode) & (15)));
+        cmd = String.format(Locale.US, "%02X%02X", slaveNo,funCode);
         i = 1;
         while (i < pduBytes.size()) {
-            cmd = String.format(Locale.US, "%s%02x", cmd,((pduBytes.get(i).intValue()) & (0xff)));
+            cmd = String.format(Locale.US, "%s%02X", cmd,((pduBytes.get(i).intValue()) & (0xff)));
             i = i + 1;
         }
 

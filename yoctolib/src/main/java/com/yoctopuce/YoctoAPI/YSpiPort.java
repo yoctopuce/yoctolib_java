@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSpiPort.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YSpiPort.java 30685 2018-04-24 13:46:18Z seb $
  *
  * Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -1145,7 +1145,7 @@ public class YSpiPort extends YFunction
      */
     public int writeByte(int code) throws YAPI_Exception
     {
-        return sendCommand(String.format(Locale.US, "$%02x",code));
+        return sendCommand(String.format(Locale.US, "$%02X",code));
     }
 
     /**
@@ -1525,11 +1525,11 @@ public class YSpiPort extends YFunction
         res = "";
         ofs = 0;
         while (ofs + 3 < bufflen) {
-            res = String.format(Locale.US, "%s%02x%02x%02x%02x", res, (buff[ofs] & 0xff), (buff[ofs + 1] & 0xff), (buff[ofs + 2] & 0xff),(buff[ofs + 3] & 0xff));
+            res = String.format(Locale.US, "%s%02X%02X%02X%02X", res, (buff[ofs] & 0xff), (buff[ofs + 1] & 0xff), (buff[ofs + 2] & 0xff),(buff[ofs + 3] & 0xff));
             ofs = ofs + 4;
         }
         while (ofs < bufflen) {
-            res = String.format(Locale.US, "%s%02x", res,(buff[ofs] & 0xff));
+            res = String.format(Locale.US, "%s%02X", res,(buff[ofs] & 0xff));
             ofs = ofs + 1;
         }
         return res;

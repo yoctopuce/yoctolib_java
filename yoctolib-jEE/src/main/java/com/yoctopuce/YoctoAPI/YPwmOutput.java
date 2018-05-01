@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmOutput.java 30595 2018-04-12 21:36:11Z mvuilleu $
+ * $Id: YPwmOutput.java 30688 2018-04-24 15:09:08Z seb $
  *
  * Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -936,6 +936,16 @@ public class YPwmOutput extends YFunction
         }
         newval = String.format(Locale.US, "%fHz*%d", target,n_pulses);
         return set_pwmTransition(newval);
+    }
+
+    public int markForRepeat() throws YAPI_Exception
+    {
+        return set_pwmTransition(":");
+    }
+
+    public int repeatFromMark() throws YAPI_Exception
+    {
+        return set_pwmTransition("R");
     }
 
     /**
