@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 29055 2017-11-01 17:36:08Z seb $
+ * $Id: YAPI.java 30829 2018-05-14 13:11:26Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -62,7 +62,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "30760";
+    public static final String YOCTO_API_BUILD_STR = "31315";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -199,6 +199,56 @@ public class YAPI
     }
 
 
+    static String Base64Encode(byte[] data, int ofs, int len)
+    {
+        int i, j;
+        StringBuilder res = new StringBuilder(len * 3 / 2);
+
+        // Get 3 input octets and split them into 4 output hextets (6-bits each)
+        while (len > 0) {
+            byte[] tmp_buff = new byte[4];
+            // Start out treating the output as all padding
+            tmp_buff[0] = (byte) 0xFF;
+            tmp_buff[1] = (byte) 0xFF;
+            tmp_buff[2] = (byte) 0xFF;
+            tmp_buff[3] = (byte) 0xFF;
+
+            i = data[ofs++] & 0xff;
+            len--;
+            tmp_buff[0] = (byte) ((i & 0xFC) >> 2);
+            tmp_buff[1] = (byte) ((i & 0x03) << 4);
+            if (len > 0) {
+                i = data[ofs++];
+                len--;
+                tmp_buff[1] |= (i & 0xF0) >> 4;
+                tmp_buff[2] = (byte) ((i & 0x0F) << 2);
+                if (len > 0) {
+                    i = data[ofs++];
+                    len--;
+                    tmp_buff[2] |= (i & 0xC0) >> 6;
+                    tmp_buff[3] = (byte) (i & 0x3F);
+                }
+            }
+
+            // Convert hextets into Base 64 alphabet and store result
+            for (i = 0; i < 4; i++) {
+                j = tmp_buff[i] & 0xff;
+                if (j <= 25)
+                    res.append((char) ('A' + j));
+                else if (j <= 51)
+                    res.append((char) ('a' + j - 26));
+                else if (j <= 61)
+                    res.append((char) ('0' + j - 52));
+                else if (j == 62)
+                    res.append('+');
+                else if (j == 63)
+                    res.append('/');
+                else                // Padding
+                    res.append('=');
+            }
+        }
+        return res.toString();
+    }
     //PUBLIC STATIC METHOD:
 
 
@@ -239,7 +289,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".30760" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".31315" + YUSBHub.getAPIVersion();
     }
 
     /**

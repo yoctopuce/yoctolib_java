@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 30233 2018-03-05 14:16:18Z seb $
+ * $Id: YModule.java 31242 2018-07-17 16:13:21Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -123,6 +123,7 @@ public class YModule extends YFunction
     protected int _userVar = USERVAR_INVALID;
     protected UpdateCallback _valueCallbackModule = null;
     protected YModule.LogCallback _logCallback = null;
+    protected YModule.ConfigChangeCallback _confChangeCallback = null;
 
     public interface LogCallback
     {
@@ -132,6 +133,14 @@ public class YModule extends YFunction
          * @param logline : the log line (without carriage return)
          */
         void logCallback(YModule module, String logline);
+    }
+    public interface ConfigChangeCallback
+    {
+        /**
+         *
+         * @param module  : the module object of the device
+         */
+        void configChangeCallback(YModule module);
     }
     /**
      * Deprecated UpdateCallback for Module
@@ -327,14 +336,14 @@ public class YModule extends YFunction
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         Set<String> functionList = json.getKeys();
-        for (String fun_key: functionList) {
+        for (String fun_key : functionList) {
             if (!fun_key.equals("services")) {
                 YJSONObject functionJson = json.getYJSONObject(fun_key);
                 if (functionJson == null) {
                     continue;
                 }
                 Set<String> attr_keys = functionJson.getKeys();
-                for (String attr_key: attr_keys) {
+                for (String attr_key : attr_keys) {
                     YJSONContent value = functionJson.get(attr_key);
                     if (value == null || value.getJSONType() == YJSONContent.YJSONType.OBJECT) {
                         continue;
@@ -1159,6 +1168,36 @@ public class YModule extends YFunction
     public int triggerFirmwareUpdate(int secBeforeReboot) throws YAPI_Exception
     {
         return set_rebootCountdown(-secBeforeReboot);
+    }
+
+    /**
+     * Register a callback function, to be called when a persistent settings in
+     * a device configuration has been changed (e.g. change of unit, etc).
+     *
+     * @param callback : a procedure taking a YModule parameter, or null
+     *         to unregister a previously registered  callback.
+     */
+    public int registerConfigChangeCallback(YModule.ConfigChangeCallback callback)
+    {
+        _confChangeCallback = callback;
+        return 0;
+    }
+
+    public int _invokeConfigChangeCallback()
+    {
+        if (_confChangeCallback != null) {
+            _confChangeCallback.configChangeCallback(this);
+        }
+        return 0;
+    }
+
+    /**
+     * Triggers a configuration change callback, to check if they are supported or not.
+     */
+    public int triggerConfigChangeCallback() throws YAPI_Exception
+    {
+        _setAttr("persistentSettings","2");
+        return 0;
     }
 
     /**

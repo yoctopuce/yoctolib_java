@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 28365 2017-08-16 09:25:03Z seb $
+ * $Id: YHTTPHub.java 30929 2018-05-29 11:45:59Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -518,9 +518,14 @@ class YHTTPHub extends YGenericHub
     @Override
     public int ping(int mstimeout) throws YAPI_Exception
     {
-        // ping dot not use Notification handler but a one shot http request
-        yHTTPRequest req = new yHTTPRequest(this, "getBootloaders");
-        req.RequestSync("GET /api/module/firmwareRelease.json", null, mstimeout);
+        startNotifications();
+        try {
+            _notificationHandler.hubRequestSync("GET /api/module/firmwareRelease.json", null, mstimeout);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            stopNotifications();
+        }
         return YAPI.SUCCESS;
     }
 

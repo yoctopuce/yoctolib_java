@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMultiCellWeighScale.java 29804 2018-01-30 18:05:21Z mvuilleu $
+ * $Id: YMultiCellWeighScale.java 31016 2018-06-04 08:45:40Z mvuilleu $
  *
  * Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -69,9 +69,13 @@ public class YMultiCellWeighScale extends YSensor
     public static final int EXCITATION_AC = 2;
     public static final int EXCITATION_INVALID = -1;
     /**
-     * invalid compTempAdaptRatio value
+     * invalid tempAvgAdaptRatio value
      */
-    public static final double COMPTEMPADAPTRATIO_INVALID = YAPI.INVALID_DOUBLE;
+    public static final double TEMPAVGADAPTRATIO_INVALID = YAPI.INVALID_DOUBLE;
+    /**
+     * invalid tempChgAdaptRatio value
+     */
+    public static final double TEMPCHGADAPTRATIO_INVALID = YAPI.INVALID_DOUBLE;
     /**
      * invalid compTempAvg value
      */
@@ -94,7 +98,8 @@ public class YMultiCellWeighScale extends YSensor
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _cellCount = CELLCOUNT_INVALID;
     protected int _excitation = EXCITATION_INVALID;
-    protected double _compTempAdaptRatio = COMPTEMPADAPTRATIO_INVALID;
+    protected double _tempAvgAdaptRatio = TEMPAVGADAPTRATIO_INVALID;
+    protected double _tempChgAdaptRatio = TEMPCHGADAPTRATIO_INVALID;
     protected double _compTempAvg = COMPTEMPAVG_INVALID;
     protected double _compTempChg = COMPTEMPCHG_INVALID;
     protected double _compensation = COMPENSATION_INVALID;
@@ -163,8 +168,11 @@ public class YMultiCellWeighScale extends YSensor
         if (json_val.has("excitation")) {
             _excitation = json_val.getInt("excitation");
         }
-        if (json_val.has("compTempAdaptRatio")) {
-            _compTempAdaptRatio = Math.round(json_val.getDouble("compTempAdaptRatio") * 1000.0 / 65536.0) / 1000.0;
+        if (json_val.has("tempAvgAdaptRatio")) {
+            _tempAvgAdaptRatio = Math.round(json_val.getDouble("tempAvgAdaptRatio") * 1000.0 / 65536.0) / 1000.0;
+        }
+        if (json_val.has("tempChgAdaptRatio")) {
+            _tempChgAdaptRatio = Math.round(json_val.getDouble("tempChgAdaptRatio") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("compTempAvg")) {
             _compTempAvg = Math.round(json_val.getDouble("compTempAvg") * 1000.0 / 65536.0) / 1000.0;
@@ -359,81 +367,163 @@ public class YMultiCellWeighScale extends YSensor
     }
 
     /**
-     * Changes the averaged temperature update rate, in percents.
+     * Changes the averaged temperature update rate, in per mille.
+     * The purpose of this adaptation ratio is to model the thermal inertia of the load cell.
      * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambiant temperature and the current compensation
-     * temperature. The standard rate is 0.04 percents, and the maximal rate is 65 percents.
+     * temperature. The standard rate is 0.2 per mille, and the maximal rate is 65 per mille.
      *
-     * @param newval : a floating point number corresponding to the averaged temperature update rate, in percents
+     * @param newval : a floating point number corresponding to the averaged temperature update rate, in per mille
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int set_compTempAdaptRatio(double  newval)  throws YAPI_Exception
+    public int set_tempAvgAdaptRatio(double  newval)  throws YAPI_Exception
     {
         String rest_val;
         synchronized (this) {
             rest_val = Long.toString(Math.round(newval * 65536.0));
-            _setAttr("compTempAdaptRatio",rest_val);
+            _setAttr("tempAvgAdaptRatio",rest_val);
         }
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes the averaged temperature update rate, in percents.
+     * Changes the averaged temperature update rate, in per mille.
+     * The purpose of this adaptation ratio is to model the thermal inertia of the load cell.
      * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambiant temperature and the current compensation
-     * temperature. The standard rate is 0.04 percents, and the maximal rate is 65 percents.
+     * temperature. The standard rate is 0.2 per mille, and the maximal rate is 65 per mille.
      *
-     * @param newval : a floating point number corresponding to the averaged temperature update rate, in percents
+     * @param newval : a floating point number corresponding to the averaged temperature update rate, in per mille
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int setCompTempAdaptRatio(double newval)  throws YAPI_Exception
+    public int setTempAvgAdaptRatio(double newval)  throws YAPI_Exception
     {
-        return set_compTempAdaptRatio(newval);
+        return set_tempAvgAdaptRatio(newval);
     }
 
     /**
-     * Returns the averaged temperature update rate, in percents.
+     * Returns the averaged temperature update rate, in per mille.
+     * The purpose of this adaptation ratio is to model the thermal inertia of the load cell.
      * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambiant temperature and the current compensation
-     * temperature. The standard rate is 0.04 percents, and the maximal rate is 65 percents.
+     * temperature. The standard rate is 0.2 per mille, and the maximal rate is 65 per mille.
      *
-     * @return a floating point number corresponding to the averaged temperature update rate, in percents
+     * @return a floating point number corresponding to the averaged temperature update rate, in per mille
      *
      * @throws YAPI_Exception on error
      */
-    public double get_compTempAdaptRatio() throws YAPI_Exception
+    public double get_tempAvgAdaptRatio() throws YAPI_Exception
     {
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
                 if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
-                    return COMPTEMPADAPTRATIO_INVALID;
+                    return TEMPAVGADAPTRATIO_INVALID;
                 }
             }
-            res = _compTempAdaptRatio;
+            res = _tempAvgAdaptRatio;
         }
         return res;
     }
 
     /**
-     * Returns the averaged temperature update rate, in percents.
+     * Returns the averaged temperature update rate, in per mille.
+     * The purpose of this adaptation ratio is to model the thermal inertia of the load cell.
      * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambiant temperature and the current compensation
-     * temperature. The standard rate is 0.04 percents, and the maximal rate is 65 percents.
+     * temperature. The standard rate is 0.2 per mille, and the maximal rate is 65 per mille.
      *
-     * @return a floating point number corresponding to the averaged temperature update rate, in percents
+     * @return a floating point number corresponding to the averaged temperature update rate, in per mille
      *
      * @throws YAPI_Exception on error
      */
-    public double getCompTempAdaptRatio() throws YAPI_Exception
+    public double getTempAvgAdaptRatio() throws YAPI_Exception
     {
-        return get_compTempAdaptRatio();
+        return get_tempAvgAdaptRatio();
+    }
+
+    /**
+     * Changes the temperature change update rate, in per mille.
+     * The temperature change is updated every 10 seconds, by applying this adaptation rate
+     * to the difference between the measures ambiant temperature and the current temperature used for
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     *
+     * @param newval : a floating point number corresponding to the temperature change update rate, in per mille
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_tempChgAdaptRatio(double  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("tempChgAdaptRatio",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the temperature change update rate, in per mille.
+     * The temperature change is updated every 10 seconds, by applying this adaptation rate
+     * to the difference between the measures ambiant temperature and the current temperature used for
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     *
+     * @param newval : a floating point number corresponding to the temperature change update rate, in per mille
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setTempChgAdaptRatio(double newval)  throws YAPI_Exception
+    {
+        return set_tempChgAdaptRatio(newval);
+    }
+
+    /**
+     * Returns the temperature change update rate, in per mille.
+     * The temperature change is updated every 10 seconds, by applying this adaptation rate
+     * to the difference between the measures ambiant temperature and the current temperature used for
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     *
+     * @return a floating point number corresponding to the temperature change update rate, in per mille
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_tempChgAdaptRatio() throws YAPI_Exception
+    {
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                    return TEMPCHGADAPTRATIO_INVALID;
+                }
+            }
+            res = _tempChgAdaptRatio;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the temperature change update rate, in per mille.
+     * The temperature change is updated every 10 seconds, by applying this adaptation rate
+     * to the difference between the measures ambiant temperature and the current temperature used for
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     *
+     * @return a floating point number corresponding to the temperature change update rate, in per mille
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getTempChgAdaptRatio() throws YAPI_Exception
+    {
+        return get_tempChgAdaptRatio();
     }
 
     /**

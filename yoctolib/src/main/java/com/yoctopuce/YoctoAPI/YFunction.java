@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 28108 2017-07-24 13:53:13Z seb $
+ * $Id: YFunction.java 31298 2018-07-19 14:55:46Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -1021,13 +1021,19 @@ public class YFunction
         if (_serial != null && !_serial.equals("")) {
             return YModule.FindModuleInContext(_yapi, _serial + ".module");
         }
-        if (_func.indexOf('.') == -1) {
+        final int ofs = _func.indexOf('.');
+        if (ofs == -1) {
             try {
                 String serial = _yapi._yHash.resolveSerial(_className, _func);
                 return YModule.FindModuleInContext(_yapi, serial + ".module");
             } catch (YAPI_Exception ignored) {
             }
         }
+        if (ofs >= 0) {
+            String serial = _func.substring(0, ofs);
+            return YModule.FindModuleInContext(_yapi, serial + ".module");
+        }
+
         try {
             // device not resolved for now, force a communication for a last chance resolution
             if (load(YAPI.DefaultCacheValidity) == YAPI.SUCCESS) {

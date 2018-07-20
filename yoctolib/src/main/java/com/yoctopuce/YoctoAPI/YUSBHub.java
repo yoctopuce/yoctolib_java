@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 28365 2017-08-16 09:25:03Z seb $
+ * $Id: YUSBHub.java 31305 2018-07-20 07:00:01Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -66,6 +66,13 @@ class YUSBHub extends YGenericHub
             return "";
         }
     }
+
+    /*
+     * Config change callback are not supported on purpose, because it does
+     * not make a lot of sense since only nobody can remotely change de
+     * configuration
+     */
+
 
     @Override
     boolean isCallbackMode()

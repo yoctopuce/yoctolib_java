@@ -1,21 +1,17 @@
 package com.yoctopuce.YoctoAPI;
 
-import javax.websocket.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.*;
 
-@ClientEndpoint
-public class WSNotificationHandler extends NotificationHandler implements MessageHandler
+class WSNotificationHandler extends NotificationHandler implements WSHandlerInterface.WSHandlerResponseInterface
 {
 
     private static final int NB_TCP_CHANNEL = 4;
@@ -29,10 +25,9 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     private static final int DEFAULT_TCP_MAX_WINDOW_SIZE = 4 * 65536;
 
     private final ExecutorService _executorService;
-    private final boolean _isHttpCallback;
     private MessageDigest _sha1 = null;
     private MessageDigest _md5 = null;
-    private Session _session;
+    private WSHandlerInterface _wsHandler;
 
 
     private final BlockingQueue<WSRequest> _pendingRequests = new LinkedBlockingQueue<>();
@@ -61,6 +56,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     private long _next_transmit_tm = 0;
 
     private final Object _sendLock = new Object();
+    private int _notifAbsPos;
 
     private enum ConnectionState
     {
@@ -70,19 +66,10 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     WSNotificationHandler(YHTTPHub hub, Object session)
     {
         super(hub);
-        _session = (Session) session;
-        _isHttpCallback = session != null;
-        if (_isHttpCallback) {
-            // server mode
-            Whole<ByteBuffer> messageHandler = new Whole<ByteBuffer>()
-            {
-                @Override
-                public void onMessage(ByteBuffer byteBuffer)
-                {
-                    parseBinaryMessage(byteBuffer);
-                }
-            };
-            _session.addMessageHandler(messageHandler);
+        if (session != null) {
+            _wsHandler = new WSHandlerJEE(this, session);
+        } else {
+            _wsHandler = new WSHandlerYocto(this);
         }
         _workingRequests = new ArrayList<>(NB_TCP_CHANNEL);
 
@@ -105,50 +92,35 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     public void run()
     {
         _firstNotif = true;
-        if (_isHttpCallback) {
-            // send go to the VirtualHub
-            //sendAnnounceMeta();
-            runOnSession();
-        } else {
-            // client mode
-            WebSocketContainer webSocketContainer = ContainerProvider.getWebSocketContainer();
-            String url = _hub._http_params.getUrl(true, false) + "/not.byn";
-            URI uri;
-            try {
-                uri = new URI(url);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-                return;
-            }
-            while (!Thread.currentThread().isInterrupted() && !_muststop) {
-                if (_error_delay > 0) {
-                    try {
-                        Thread.sleep(_error_delay);
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
-                synchronized (_stateLock) {
-                    _connectionState = ConnectionState.CONNECTING;
-                }
-
+        do {
+            if (_error_delay > 0) {
                 try {
-                    _session = webSocketContainer.connectToServer(this, uri);
-                    runOnSession();
-                } catch (DeploymentException | IOException e) {
-                    e.printStackTrace();
+                    Thread.sleep(_error_delay);
+                } catch (InterruptedException e) {
+                    break;
                 }
-                _firstNotif = true;
-                _notifRetryCount++;
-                _hub._devListValidity = 500;
-                _error_delay = 100 << (_notifRetryCount > 4 ? 4 : _notifRetryCount);
             }
-        }
-        try {
-            _session.close();
-        } catch (IOException ignored) {
-            ignored.printStackTrace();
-        }
+            synchronized (_stateLock) {
+                _connectionState = ConnectionState.CONNECTING;
+            }
+
+            try {
+                _wsHandler.connect(_hub, _firstNotif, 10000, _notifAbsPos);
+                runOnSession();
+            } catch (YAPI_Exception e) {
+                //e.printStackTrace();
+                if (e.errorType == YAPI.INVALID_ARGUMENT) {
+                    _muststop = true;
+                    _session_errno = YAPI.IO_ERROR;
+                    _session_error = e.getLocalizedMessage();
+                }
+            }
+            _firstNotif = true;
+            _notifRetryCount++;
+            _hub._devListValidity = 500;
+            _error_delay = 100 << (_notifRetryCount > 4 ? 4 : _notifRetryCount);
+        } while (!Thread.currentThread().isInterrupted() && !_muststop && !_wsHandler.isCallback());
+        _wsHandler.close();
         synchronized (_stateLock) {
             _connectionState = ConnectionState.DEAD;
             if (_session_errno == 0) {
@@ -156,16 +128,17 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                 _session_error = "WS Session is closed";
             }
         }
+
     }
 
     private void runOnSession()
     {
-        if (!_session.isOpen()) {
+        if (!_wsHandler.isOpen()) {
             WSLOG("WebSocket is not open");
             return;
         }
         String errmsg = "WebSocket session is closed";
-        RemoteEndpoint.Basic basicRemote = _session.getBasicRemote();
+        //RemoteEndpoint.Basic basicRemote = _session.getBasicRemote();
         try {
             long timeout = System.currentTimeMillis() + 10000;
             synchronized (_stateLock) {
@@ -180,7 +153,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                 }
             }
 
-            while (!Thread.currentThread().isInterrupted() && !_muststop && _session.isOpen()) {
+            while (!Thread.currentThread().isInterrupted() && !_muststop && _wsHandler.isOpen()) {
                 long now = YAPI.GetTickCount();
                 long wait;
                 if (_next_transmit_tm >= now) {
@@ -199,7 +172,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         _workingRequests.get(request.getChannel()).add(request);
                     }
                 }
-                processRequests(basicRemote);
+                processRequests();
             }
         } catch (Exception ex) {
             errmsg = ex.getLocalizedMessage();
@@ -229,7 +202,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
 
     }
 
-    private WSRequest sendRequest(String req_first_line, byte[] req_head_and_body, int tcpchanel, boolean async, YGenericHub.RequestProgress progress, Object context) throws YAPI_Exception, InterruptedException
+    private WSRequest sendRequest(String req_first_line, byte[] req_head_and_body, int tcpchanel, boolean async, YGenericHub.RequestProgress progress, Object context, long expiration) throws YAPI_Exception, InterruptedException
     {
         WSRequest request;
         byte[] full_request;
@@ -247,14 +220,17 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         }
 
         long timeout = System.currentTimeMillis() + WS_REQUEST_MAX_DURATION;
+        if (timeout < expiration) {
+            expiration = timeout;
+        }
         synchronized (_stateLock) {
             while ((_connectionState != ConnectionState.CONNECTED && _connectionState != ConnectionState.DEAD)) {
                 _stateLock.wait(1000);
-                if (timeout < System.currentTimeMillis()) {
+                if (expiration < System.currentTimeMillis()) {
                     if (_connectionState != ConnectionState.CONNECTED && _connectionState != ConnectionState.CONNECTING) {
                         throw new YAPI_Exception(YAPI.IO_ERROR, "IO error with hub");
                     } else {
-                        throw new YAPI_Exception(YAPI.TIMEOUT, "Last request did not finished correctly");
+                        throw new YAPI_Exception(YAPI.TIMEOUT, "Unable to start the request in time");
                     }
                 }
             }
@@ -274,9 +250,9 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         return request;
     }
 
-    private byte[] getRequestResponse(WSRequest wsRequest, int mstimeout) throws YAPI_Exception, InterruptedException
+    private byte[] getRequestResponse(WSRequest wsRequest, long expiration) throws YAPI_Exception, InterruptedException
     {
-        WSRequest.State state = wsRequest.waitProcessingEnd(mstimeout);
+        WSRequest.State state = wsRequest.waitProcessingEnd(expiration);
         if (!state.equals(WSRequest.State.CLOSED)) {
             wsRequest.checkError();
             wsRequest.log("Timeout");
@@ -307,11 +283,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     @Override
     String getThreadLabel()
     {
-        String label = "WS Notification handler session ";
-        if (_session != null) {
-            label += "(session " + _session.getId() + ")";
-        }
-        return label;
+        return _wsHandler.getThreadLabel() + "_" + _hub._http_params.toString();
     }
 
     @Override
@@ -322,8 +294,9 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
             // simulate a wait indefinitely
             mstimeout = 86400000; //24h
         }
-        WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, HUB_TCP_CHANNEL, false, null, null);
-        return getRequestResponse(wsRequest, mstimeout);
+        long expiration = System.currentTimeMillis() + mstimeout;
+        WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, HUB_TCP_CHANNEL, false, null, null, expiration);
+        return getRequestResponse(wsRequest, expiration);
     }
 
 
@@ -335,8 +308,9 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
             // simulate a wait indefinitely
             mstimeout = 86400000; //24h
         }
-        WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, DEVICE_TCP_CHANNEL, false, progress, context);
-        return getRequestResponse(wsRequest, mstimeout);
+        long expiration = System.currentTimeMillis() + mstimeout;
+        WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, DEVICE_TCP_CHANNEL, false, progress, context, expiration);
+        return getRequestResponse(wsRequest, expiration);
     }
 
     @Override
@@ -344,7 +318,8 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                          final YGenericHub.RequestAsyncResult asyncResult, final Object asyncContext) throws
             YAPI_Exception, InterruptedException
     {
-        final WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, DEVICE_TCP_CHANNEL, true, null, null);
+        final long expiration = System.currentTimeMillis() + WS_REQUEST_MAX_DURATION;
+        final WSRequest wsRequest = sendRequest(req_first_line, req_head_and_body, DEVICE_TCP_CHANNEL, true, null, null, expiration);
         _executorService.execute(new Runnable()
         {
             @Override
@@ -354,7 +329,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                 int error_code = YAPI.SUCCESS;
                 String errmsg = null;
                 try {
-                    response = getRequestResponse(wsRequest, YHTTPHub.YIO_DEFAULT_TCP_TIMEOUT);
+                    response = getRequestResponse(wsRequest, expiration);
                 } catch (YAPI_Exception e) {
                     error_code = e.errorType;
                     errmsg = e.getLocalizedMessage();
@@ -375,12 +350,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         _executorService.shutdown();
         boolean allTerminated = _executorService.awaitTermination(timeout, TimeUnit.MILLISECONDS);
         _muststop = true;
-        try {
-            _session.close();
-        } catch (IOException | IllegalStateException e) {
-            WSLOG("error on ws close : " + e.getMessage());
-            e.printStackTrace();
-        }
+        _wsHandler.close();
         return !allTerminated;
     }
 
@@ -401,24 +371,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     }
 
 
-    @OnOpen
-    public void onOpen(Session session)
-    {
-        _session = session;
-    }
-
-
-    @OnMessage
-    public void onMessage(ByteBuffer raw_data, Session session)
-    {
-
-        if (_session != session) {
-            return;
-        }
-        parseBinaryMessage(raw_data);
-    }
-
-    private void parseBinaryMessage(ByteBuffer raw_data)
+    public void parseBinaryMessage(ByteBuffer raw_data)
     {
         WSStream stream;
         WSRequest workingRequest;
@@ -444,7 +397,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                 }
                 byte[] chars = new byte[raw_data.remaining()];
                 raw_data.get(chars);
-                String tcpNotif = new String(chars, StandardCharsets.ISO_8859_1);
+                String tcpNotif = new String(chars, Charset.forName("ISO-8859-1"));
                 decodeTCPNotif(tcpNotif);
                 break;
             case YGenericHub.YSTREAM_EMPTY:
@@ -478,11 +431,10 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                     if (ystream == YGenericHub.YSTREAM_TCP_CLOSE) {
                         WSStream outstream = new WSStream(YGenericHub.YSTREAM_TCP_CLOSE, tcpChanel, 0, null);
                         try {
-                            RemoteEndpoint.Basic basicRemote = _session.getBasicRemote();
                             synchronized (_sendLock) {
-                                basicRemote.sendBinary(outstream.getContent(), true);
+                                _wsHandler.sendBinary(outstream.getContent(), true);
                             }
-                        } catch (IOException e) {
+                        } catch (YAPI_Exception e) {
                             e.printStackTrace();
                         }
                         workingRequest.setState(WSRequest.State.CLOSED);
@@ -517,7 +469,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                                 break;
                             }
                         }
-                        _remoteSerial = new String(serial_char, 0, len, StandardCharsets.ISO_8859_1);
+                        _remoteSerial = new String(serial_char, 0, len, Charset.forName("ISO-8859-1"));
                         _remoteNouce = nounce;
                         _connectionTime = YAPI.GetTickCount();
                         Random randomGenerator = new Random();
@@ -539,7 +491,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         }
                         _tcpRoundTripTime = YAPI.GetTickCount() - _connectionTime + 1;
                         long uploadRate = _tcpMaxWindowSize * 1000 / _tcpRoundTripTime;
-                        _hub._yctx._Log(String.format("WS:RTT=%dms, WS=%d, uploadRate=%f KB/s\n", _tcpRoundTripTime, _tcpMaxWindowSize, uploadRate / 1000.0));
+                        _hub._yctx._Log(String.format(Locale.US, "WS:RTT=%dms, WS=%d, uploadRate=%f KB/s\n", _tcpRoundTripTime, _tcpMaxWindowSize, uploadRate / 1000.0));
                         int flags = raw_data.getShort() & 0xffff;
                         raw_data.getInt(); // drop nounce
                         if ((flags & YGenericHub.USB_META_WS_AUTH_FLAGS_RW) != 0)
@@ -580,7 +532,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         if (html_error == 401) {
                             errorOnSession(YAPI.UNAUTHORIZED, "Authentication failed");
                         } else {
-                            errorOnSession(YAPI.IO_ERROR, String.format("Remote hub closed connection with error %d", html_error));
+                            errorOnSession(YAPI.IO_ERROR, String.format(Locale.US, "Remote hub closed connection with error %d", html_error));
                         }
                         break;
                     case YGenericHub.USB_META_ACK_UPLOAD:
@@ -609,7 +561,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                                 workingRequest.reportProgress(ackBytes);
                                 double newRate = deltaBytes * 1000.0 / deltaTime;
                                 _uploadRate = (int) (0.8 * _uploadRate + 0.3 * newRate);// +10% intentionally
-                                _hub._yctx._Log(String.format("Upload rate: %.2f KB/s (based on %.2f KB in %fs)\n", newRate / 1000.0, deltaBytes / 1000.0, deltaTime / 1000.0));
+                                _hub._yctx._Log(String.format(Locale.US, "Upload rate: %.2f KB/s (based on %.2f KB in %fs)\n", newRate / 1000.0, deltaBytes / 1000.0, deltaTime / 1000.0));
                             } else {
                                 _hub._yctx._Log("First Ack received\n");
                                 _lastUploadAckBytes[tcpchan] = ackBytes;
@@ -621,7 +573,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         }
                         break;
                     default:
-                        WSLOG(String.format("unhandled Meta pkt %d", ystream));
+                        WSLOG(String.format(Locale.US, "unhandled Meta pkt %d", ystream));
                         break;
                 }
 
@@ -631,7 +583,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
             case YGenericHub.YSTREAM_REPORT_V2:
             case YGenericHub.YSTREAM_NOTICE_V2:
             default:
-                _hub._yctx._Log(String.format("Invalid WS stream type (%d)\n", ystream));
+                _hub._yctx._Log(String.format(Locale.US, "Invalid WS stream type (%d)\n", ystream));
         }
 
     }
@@ -641,7 +593,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
      *   look through all pending request if there is some data that we can send
      *
      */
-    private void processRequests(RemoteEndpoint.Basic remote) throws IOException
+    private void processRequests() throws YAPI_Exception
     {
         int tcpchan;
 
@@ -682,12 +634,12 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         if (toBeSent + bytesOnTheAir > DEFAULT_TCP_MAX_WINDOW_SIZE) {
                             toBeSent = DEFAULT_TCP_MAX_WINDOW_SIZE - bytesOnTheAir;
                         }
-                        WSLOG(String.format("throttling: %d bytes/s (%d + %d = %d)", _uploadRate, toBeSent, bytesOnTheAir, bytesOnTheAir + toBeSent));
+                        WSLOG(String.format(Locale.US, "throttling: %d bytes/s (%d + %d = %d)", _uploadRate, toBeSent, bytesOnTheAir, bytesOnTheAir + toBeSent));
                         if (toBeSent < 64) {
                             long waitTime = 1000 * (128 - toBeSent) / _uploadRate;
                             if (waitTime < 2) waitTime = 2;
                             _next_transmit_tm = YAPI.GetTickCount() + waitTime;
-                            WSLOG(String.format("WS: %d sent %dms ago, waiting %dms...", bytesOnTheAir, timeOnTheAir, waitTime));
+                            WSLOG(String.format(Locale.US, "WS: %d sent %dms ago, waiting %dms...", bytesOnTheAir, timeOnTheAir, waitTime));
                             throttle_end = 0;
                         }
                         if (throttle_end > requestBytes.position() + toBeSent) {
@@ -710,7 +662,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                             // last frame is already full we must send the async close in another one
                             wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, datalen, requestBytes);
                             synchronized (_sendLock) {
-                                remote.sendBinary(wsstream.getContent(), true);
+                                _wsHandler.sendBinary(wsstream.getContent(), true);
                             }
                             req.reportDataSent();
                             //WSLOG(String.format("ws_req:%s: send %d bytes on chan%d (%d/%d)\n", req, datalen, tcpchan, requestBytes.position(), requestBytes.limit()));
@@ -718,14 +670,14 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         }
                         wsstream = new WSStream(YGenericHub.YSTREAM_TCP_ASYNCCLOSE, tcpchan, datalen, requestBytes, req.getAsyncId());
                         synchronized (_sendLock) {
-                            remote.sendBinary(wsstream.getContent(), true);
+                            _wsHandler.sendBinary(wsstream.getContent(), true);
                         }
                         req.reportDataSent();
                         //WSLOG(String.format("req(%s:%s) sent async close %d\n", _hub.getHost(), req, req.getAsyncId()));
                     } else {
                         wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, datalen, requestBytes);
                         synchronized (_sendLock) {
-                            remote.sendBinary(wsstream.getContent(), true);
+                            _wsHandler.sendBinary(wsstream.getContent(), true);
                         }
                         req.reportDataSent();
                         //WSLOG("ws_req:%p: sent %d bytes on chan%d (%d/%d)\n", req, datalen, tcpchan, req->ws.requestpos, req->ws.requestsize);
@@ -738,7 +690,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
                         long waitTime = 1000 * sent / _uploadRate;
                         if (waitTime < 2) waitTime = 2;
                         _next_transmit_tm = YAPI.GetTickCount() + waitTime;
-                        WSLOG(String.format("Sent %dbytes, waiting %dms...", sent, waitTime));
+                        WSLOG(String.format(Locale.US, "Sent %dbytes, waiting %dms...", sent, waitTime));
                     } else {
                         _next_transmit_tm = YAPI.GetTickCount() + 100;
                     }
@@ -751,7 +703,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         }
     }
 
-    private void WSLOG(String s)
+    public void WSLOG(String s)
     {
         //System.out.println("WSLOG:"+s);
         _hub._yctx._Log(s + "\n");
@@ -777,12 +729,12 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
         }
         auth.rewind();
         WSStream stream = new WSStream(YGenericHub.YSTREAM_META, 0, YGenericHub.USB_META_WS_AUTHENTICATION_SIZE, auth);
-        RemoteEndpoint.Basic remote = _session.getBasicRemote();
+
         try {
             synchronized (_sendLock) {
-                remote.sendBinary(stream.getContent(), true);
+                _wsHandler.sendBinary(stream.getContent(), true);
             }
-        } catch (IOException e) {
+        } catch (YAPI_Exception e) {
             e.printStackTrace();
         }
     }
@@ -823,13 +775,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
     }
 
 
-    @OnClose
-    public void onClose(@SuppressWarnings("UnusedParameters") Session session, CloseReason closeReason)
-    {
-        errorOnSession(YAPI.IO_ERROR, closeReason.getReasonPhrase());
-    }
-
-    private void errorOnSession(int errno, String closeReason)
+    public void errorOnSession(int errno, String closeReason)
     {
         synchronized (_stateLock) {
             if (_connectionState == ConnectionState.DEAD) {
@@ -847,11 +793,7 @@ public class WSNotificationHandler extends NotificationHandler implements Messag
             }
             _stateLock.notifyAll();
         }
-        try {
-            _session.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        _wsHandler.close();
         WSRequest fakeRequest = new WSRequest(YAPI.IO_ERROR, closeReason);
         try {
             _pendingRequests.put(fakeRequest);

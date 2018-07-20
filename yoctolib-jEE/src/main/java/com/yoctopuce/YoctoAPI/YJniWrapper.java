@@ -1,7 +1,6 @@
 package com.yoctopuce.YoctoAPI;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class YJniWrapper
 {

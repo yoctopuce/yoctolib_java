@@ -1,27 +1,32 @@
 
 import com.yoctopuce.YoctoAPI.*;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Demo {
+public class Demo
+{
 
     static class EventHandler implements YAPI.DeviceArrivalCallback, YAPI.DeviceRemovalCallback,
-            YAnButton.UpdateCallback, YSensor.UpdateCallback, YSensor.TimedReportCallback {
+            YAnButton.UpdateCallback, YSensor.UpdateCallback, YSensor.TimedReportCallback, YModule.ConfigChangeCallback
+    {
 
         @Override
-        public void yNewValue(YAnButton fct, String value) {
+        public void yNewValue(YAnButton fct, String value)
+        {
             try {
                 int apival = fct.get_calibratedValue();
                 fct.clearCache();
                 int value1 = fct.get_calibratedValue();
-                System.out.println(String.format("%s: %s=%d (%d)", fct.get_hardwareId(), value,  value1,apival));
+                System.out.println(String.format("%s: %s=%d (%d)", fct.get_hardwareId(), value, value1, apival));
             } catch (YAPI_Exception ex) {
                 Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
         @Override
-        public void yNewValue(YSensor fct, String value) {
+        public void yNewValue(YSensor fct, String value)
+        {
             try {
                 System.out.println(fct.get_hardwareId() + ": " + value + " (new value)");
             } catch (YAPI_Exception ex) {
@@ -30,7 +35,8 @@ public class Demo {
         }
 
         @Override
-        public void timedReportCallback(YSensor fct, YMeasure measure) {
+        public void timedReportCallback(YSensor fct, YMeasure measure)
+        {
             try {
                 System.out.println(fct.get_hardwareId() + ": " + measure.get_averageValue() + " " + fct.get_unit() + " (timed report)");
             } catch (YAPI_Exception ex) {
@@ -39,10 +45,13 @@ public class Demo {
         }
 
         @Override
-        public void yDeviceArrival(YModule module) {
+        public void yDeviceArrival(YModule module)
+        {
             try {
                 String serial = module.get_serialNumber();
                 System.out.println("Device arrival : " + serial);
+                module.registerConfigChangeCallback(this);
+
 
                 // First solution: look for a specific type of function (eg. anButton)
                 int fctcount = module.functionCount();
@@ -75,13 +84,20 @@ public class Demo {
         }
 
         @Override
-        public void yDeviceRemoval(YModule module) {
+        public void yDeviceRemoval(YModule module)
+        {
             System.out.println("Device removal : " + module);
         }
 
+        @Override
+        public void configChangeCallback(YModule module)
+        {
+            System.out.println("Configuration changed for  " + module);
+        }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         try {
             YAPI.DefaultCacheValidity = 5000;
             try {

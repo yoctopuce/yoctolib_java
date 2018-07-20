@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 29770 2018-01-26 08:58:52Z seb $
+ * $Id: YGenericHub.java 31244 2018-07-17 16:22:14Z seb $
  *
  * Internal YGenericHub object
  *
@@ -309,6 +309,13 @@ abstract class YGenericHub
 
     }
 
+    void handleConfigChangeNotification(String serial)
+    {
+        YModule module = YModule.FindModuleInContext(_yctx,serial+".module");
+        _yctx._PushDataEvent(new YAPIContext.DataEvent(module));
+    }
+
+
     //called from Jni
     protected void handleTimedNotification(String serial, String funcid, double deviceTime, byte[] report)
     {
@@ -375,7 +382,7 @@ abstract class YGenericHub
         private final String _user;
         private final String _pass;
         private final String _proto;
-        private final String _subdomain;
+        private final String _subDomain;
 
         public HTTPParams(String url)
         {
@@ -383,6 +390,9 @@ abstract class YGenericHub
             if (url.startsWith("ws://")) {
                 pos = 5;
                 _proto = "ws";
+            } else if (url.startsWith("wss://")) {
+                pos = 6;
+                _proto = "wss";
             } else if (url.startsWith("usb://")) {
                 pos = 6;
                 _proto = "usb";
@@ -408,13 +418,13 @@ abstract class YGenericHub
             int end_url = url.indexOf('/', pos);
             if (end_url < 0) {
                 end_url = url.length();
-                _subdomain = "";
+                _subDomain = "";
             } else {
                 int next_slash = url.indexOf("/", end_url + 1);
                 if (next_slash < 0) {
                     next_slash = url.length();
                 }
-                _subdomain = url.substring(end_url, next_slash);
+                _subDomain = url.substring(end_url, next_slash);
             }
             int portpos = url.indexOf(':', pos);
             if (portpos > 0) {
@@ -473,19 +483,37 @@ abstract class YGenericHub
             url.append(_host);
             url.append(":");
             url.append(_port);
-            url.append(_subdomain);
+            url.append(_subDomain);
             return url.toString();
         }
 
-        public boolean isWebSocket()
+        boolean isWebSocket()
         {
-            return _proto.equals("ws");
+            return _proto.startsWith("ws");
         }
 
-        public boolean hasAuthParam()
+        /**
+         * @return subdomain (starting with a /
+         */
+        String getSubDomain()
+        {
+            return _subDomain;
+        }
+
+        boolean hasAuthParam()
         {
             return !_user.equals("");
         }
 
+        boolean useSecureSocket()
+        {
+            return "wss".equals(_proto);
+        }
+
+        @Override
+        public String toString()
+        {
+            return _proto + "/" + _host + ':' + _port +_subDomain;
+        }
     }
 }

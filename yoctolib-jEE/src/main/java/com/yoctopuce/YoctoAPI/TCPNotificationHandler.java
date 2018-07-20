@@ -10,7 +10,7 @@ class TCPNotificationHandler extends NotificationHandler
     private HashMap<YDevice, yHTTPRequest> _httpReqByDev = new HashMap<>();
 
 
-    public TCPNotificationHandler(YHTTPHub hub)
+    TCPNotificationHandler(YHTTPHub hub)
     {
         super(hub);
     }
@@ -18,7 +18,7 @@ class TCPNotificationHandler extends NotificationHandler
     @Override
     String getThreadLabel()
     {
-        return "HTTP Notification handler";
+        return "TCPNotHandler_" + _hub._http_params.toString();
     }
 
 

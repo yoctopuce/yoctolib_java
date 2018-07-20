@@ -1,3 +1,6 @@
-- Add new PWMOutput methods
-- Improve function documentation in French for PWM-Tx
-- Fix Modbus ASCII message handling
+Java v1.10.31315
+
+- New WebSocket implementation that work also with Java SE
+- Add support for phaseMove in PWMOutput class
+- Add support for config change notifications
+- Fix race condition that can lead to a dead lock during user callback

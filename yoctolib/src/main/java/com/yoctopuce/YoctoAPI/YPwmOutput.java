@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmOutput.java 30686 2018-04-24 13:47:28Z seb $
+ * $Id: YPwmOutput.java 31296 2018-07-19 12:34:36Z mvuilleu $
  *
  * Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -870,6 +870,27 @@ public class YPwmOutput extends YFunction
     }
 
     /**
+     * Performs a smooth transition toward a specified value of the phase shift between this channel
+     * and the other channel. The phase shift is executed by slightly changing the frequency
+     * temporarily during the specified duration. This function only makes sense when both channels
+     * are running, either at the same frequency, or at a multiple of the channel frequency.
+     * Any period, frequency, duty cycle or pulse width change will cancel any ongoing transition process.
+     *
+     * @param target      : phase shift at the end of the transition, in milliseconds (floating-point number)
+     * @param ms_duration : total duration of the transition, in milliseconds
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int phaseMove(double target,int ms_duration) throws YAPI_Exception
+    {
+        String newval;
+        newval = String.format(Locale.US, "%fps:%d", target,ms_duration);
+        return set_pwmTransition(newval);
+    }
+
+    /**
      * Trigger a given number of pulses of specified duration, at current frequency.
      * At the end of the pulse train, revert to the original state of the PWM generator.
      *
@@ -921,7 +942,6 @@ public class YPwmOutput extends YFunction
      * At the end of the pulse train, revert to the original state of the PWM generator.
      *
      * @param target   : desired frequency for the generated pulses (floating-point number)
-     *         (percentage, floating-point number between 0 and 100)
      * @param n_pulses : desired pulse count
      *
      * @return YAPI.SUCCESS when the call succeeds.

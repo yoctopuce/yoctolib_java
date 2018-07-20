@@ -11,6 +11,7 @@ abstract class NotificationHandler implements Runnable
     private final static char NOTIFY_NETPKT_FUNCNAME = '4';
     private final static char NOTIFY_NETPKT_FUNCVAL = '5';
     private final static char NOTIFY_NETPKT_FUNCNAMEYDX = '8';
+    private final static char NOTIFY_NETPKT_CONFCHGYDX = 's';
     private final static char NOTIFY_NETPKT_FLUSHV2YDX = 't';
     private final static char NOTIFY_NETPKT_FUNCV2YDX = 'u';
     private final static char NOTIFY_NETPKT_TIMEV2YDX = 'v';
@@ -86,8 +87,7 @@ abstract class NotificationHandler implements Runnable
     void handleNetNotification(String notification_line)
     {
         String ev = notification_line.trim();
-
-        if (ev.length() >= 3 && ev.charAt(0) >= NOTIFY_NETPKT_FLUSHV2YDX && ev.charAt(0) <= NOTIFY_NETPKT_TIMEAVGYDX) {
+        if (ev.length() >= 3 && ev.charAt(0) >= NOTIFY_NETPKT_CONFCHGYDX && ev.charAt(0) <= NOTIFY_NETPKT_TIMEAVGYDX) {
             // function value ydx (tiny notification)
             _hub._devListValidity = 10000;
             _notifRetryCount = 0;
@@ -118,6 +118,9 @@ abstract class NotificationHandler implements Runnable
                         case NOTIFY_NETPKT_DEVLOGYDX:
                             ydev.triggerLogPull();
                             break;
+                        case NOTIFY_NETPKT_CONFCHGYDX:
+                            _hub.handleConfigChangeNotification(serial);
+                        break;
                         case NOTIFY_NETPKT_TIMEVALYDX:
                         case NOTIFY_NETPKT_TIMEAVGYDX:
                         case NOTIFY_NETPKT_TIMEV2YDX:
@@ -230,8 +233,9 @@ abstract class NotificationHandler implements Runnable
      */
     abstract boolean waitAndFreeAsyncTasks(long timeout) throws InterruptedException;
 
-    public abstract boolean isConnected();
+    abstract boolean isConnected();
 
-    public abstract boolean hasRwAccess();
+    abstract boolean hasRwAccess();
+
 
 }

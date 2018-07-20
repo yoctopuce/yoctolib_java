@@ -21,17 +21,30 @@ public class YAPIContext
         private final String _value;
         private final ArrayList<Integer> _report;
         private final double _timestamp;
+        private final YModule _module;
 
-        public DataEvent(YFunction fun, String value)
+        DataEvent(YFunction fun, String value)
         {
+            _module = null;
             _fun = fun;
             _value = value;
             _report = null;
             _timestamp = 0;
         }
 
-        public DataEvent(YFunction fun, double timestamp, ArrayList<Integer> report)
+        DataEvent(YModule module)
         {
+            _module = module;
+            _fun = null;
+            _value = null;
+            _report = null;
+            _timestamp = 0;
+        }
+
+
+        DataEvent(YFunction fun, double timestamp, ArrayList<Integer> report)
+        {
+            _module = null;
             _fun = fun;
             _value = null;
             _timestamp = timestamp;
@@ -40,13 +53,19 @@ public class YAPIContext
 
         public void invoke()
         {
-            if (_value == null) {
-                YSensor sensor = (YSensor) _fun;
-                YMeasure mesure = sensor._decodeTimedReport(_timestamp, _report);
-                sensor._invokeTimedReportCallback(mesure);
+            if (_module != null) {
+                _module._invokeConfigChangeCallback();
             } else {
-                // new value
-                _fun._invokeValueCallback(_value);
+                if (_value == null) {
+                    YSensor sensor = (YSensor) _fun;
+                    assert sensor != null;
+                    YMeasure mesure = sensor._decodeTimedReport(_timestamp, _report);
+                    sensor._invokeTimedReportCallback(mesure);
+                } else {
+                    // new value
+                    assert _fun != null;
+                    _fun._invokeValueCallback(_value);
+                }
             }
         }
 
@@ -228,10 +247,9 @@ public class YAPIContext
             return -1;
         }
         int ret = -1;
-        int spos = 0;
         int mpos = 0;
         byte m = match[mpos];
-        for (; spos < source.length; spos++) {
+        for (int spos = 0; spos < source.length; spos++) {
             if (m == source[spos]) {
                 // starting match
                 if (mpos == 0) {
@@ -278,7 +296,7 @@ public class YAPIContext
         return Integer.valueOf(str);
     }
 
-    final protected static char[] _hexArray = "0123456789ABCDEF".toCharArray();
+    private final static char[] _hexArray = "0123456789ABCDEF".toCharArray();
 
     static String _bytesToHexStr(byte[] bytes, int offset, int len)
     {
@@ -335,13 +353,15 @@ public class YAPIContext
     final Charset _deviceCharset;
     private int _apiMode;
     final ArrayList<YGenericHub> _hubs = new ArrayList<>(1); // array of root urls
-    private boolean _firstArrival;
     private final Queue<PlugEvent> _pendingCallbacks = new LinkedList<>();
     private final Queue<DataEvent> _data_events = new LinkedList<>();
+
+    private final Object _regCbLock = new Object();
     private YAPI.DeviceArrivalCallback _arrivalCallback;
     private YAPI.DeviceChangeCallback _namechgCallback;
     private YAPI.DeviceRemovalCallback _removalCallback;
     private YAPI.LogCallback _logCallback;
+
     private final Object _newHubCallbackLock = new Object();
     private YAPI.HubDiscoveryCallback _HubDiscoveryCallback;
     private final HashMap<Integer, YAPI.CalibrationHandlerCallback> _calibHandlers = new HashMap<>();
@@ -432,7 +452,6 @@ public class YAPIContext
     private void resetContext()
     {
         _apiMode = 0;
-        _firstArrival = true;
         _pendingCallbacks.clear();
         _data_events.clear();
         _arrivalCallback = null;
@@ -616,22 +635,20 @@ public class YAPIContext
     }
 
 
-    private synchronized void _updateDeviceList_internal(boolean forceupdate, boolean invokecallbacks) throws YAPI_Exception
+    private void _updateDeviceList_internal(boolean forceupdate, boolean invokecallbacks) throws YAPI_Exception
     {
-        if (_firstArrival && invokecallbacks && _arrivalCallback != null) {
-            forceupdate = true;
-        }
+        synchronized (this) {
 
-        // Rescan all hubs and update list of online devices
-        for (YGenericHub h : _hubs) {
-            try {
-                h.updateDeviceList(forceupdate);
-            } catch (InterruptedException e) {
-                throw new YAPI_Exception(YAPI.IO_ERROR,
-                        "Thread has been interrupted");
+            // Rescan all hubs and update list of online devices
+            for (YGenericHub h : _hubs) {
+                try {
+                    h.updateDeviceList(forceupdate);
+                } catch (InterruptedException e) {
+                    throw new YAPI_Exception(YAPI.IO_ERROR,
+                            "Thread has been interrupted");
+                }
             }
         }
-
         // after processing all hubs, invoke pending callbacks if required
         if (invokecallbacks) {
             while (true) {
@@ -642,38 +659,40 @@ public class YAPIContext
                     }
                     evt = _pendingCallbacks.poll();
                 }
-                switch (evt.ev) {
-                    case PLUG:
-                        if (_arrivalCallback != null) {
-                            YModule module = YModule.FindModuleInContext(this, evt.serial + ".module");
-                            _arrivalCallback.yDeviceArrival(module);
-                        }
-                        break;
-                    case CHANGE:
-                        if (_namechgCallback != null) {
-                            YModule module = YModule.FindModuleInContext(this, evt.serial + ".module");
-                            _namechgCallback.yDeviceChange(module);
-                        }
-                        break;
-                    case UNPLUG:
-                        if (_removalCallback != null) {
-                            YModule module = YModule.FindModuleInContext(this, evt.serial + ".module");
-                            _removalCallback.yDeviceRemoval(module);
-                        }
-                        _yHash.forgetDevice(evt.serial);
-                        break;
+                synchronized (_regCbLock) {
+                    switch (evt.ev) {
+                        case PLUG:
+                            if (_arrivalCallback != null) {
+                                YModule module = YModule.FindModuleInContext(this, evt.serial + ".module");
+                                _arrivalCallback.yDeviceArrival(module);
+                            }
+
+                            break;
+                        case CHANGE:
+                            if (_namechgCallback != null) {
+                                YModule module = YModule.FindModuleInContext(this, evt.serial + ".module");
+                                _namechgCallback.yDeviceChange(module);
+                            }
+                            break;
+                        case UNPLUG:
+                            if (_removalCallback != null) {
+                                YModule module = YModule.FindModuleInContext(this, evt.serial + ".module");
+                                _removalCallback.yDeviceRemoval(module);
+                            }
+                            _yHash.forgetDevice(evt.serial);
+                            break;
+                    }
                 }
-            }
-            if (_arrivalCallback != null && _firstArrival) {
-                _firstArrival = false;
             }
         }
     }
 
     void _Log(String message)
     {
-        if (_logCallback != null) {
-            _logCallback.yLog(message);
+        synchronized (_regCbLock) {
+            if (_logCallback != null) {
+                _logCallback.yLog(message);
+            }
         }
     }
 
@@ -1008,7 +1027,7 @@ public class YAPIContext
      * the information pushed by the modules on the communication channels.
      * This is not strictly necessary, but it may improve the reactivity
      * of the library for the following commands.
-     *
+     * <p>
      * This function may signal an error in case there is a communication problem
      * while contacting a module.
      *
@@ -1120,12 +1139,16 @@ public class YAPIContext
      */
     public void RegisterDeviceArrivalCallback(YAPI.DeviceArrivalCallback arrivalCallback)
     {
-        _arrivalCallback = arrivalCallback;
+        synchronized (_regCbLock) {
+            _arrivalCallback = arrivalCallback;
+        }
     }
 
     public void RegisterDeviceChangeCallback(YAPI.DeviceChangeCallback changeCallback)
     {
-        _namechgCallback = changeCallback;
+        synchronized (_regCbLock) {
+            _namechgCallback = changeCallback;
+        }
     }
 
     /**
@@ -1138,7 +1161,9 @@ public class YAPIContext
      */
     public void RegisterDeviceRemovalCallback(YAPI.DeviceRemovalCallback removalCallback)
     {
-        _removalCallback = removalCallback;
+        synchronized (_regCbLock) {
+            _removalCallback = removalCallback;
+        }
     }
 
     /**
@@ -1171,7 +1196,9 @@ public class YAPIContext
      */
     public void RegisterLogFunction(YAPI.LogCallback logfun)
     {
-        _logCallback = logfun;
+        synchronized (_regCbLock) {
+            _logCallback = logfun;
+        }
     }
 
 
