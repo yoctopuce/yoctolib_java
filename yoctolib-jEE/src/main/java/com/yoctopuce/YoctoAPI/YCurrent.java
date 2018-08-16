@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrent.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YCurrent.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindCurrent(), the high-level API for Current functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YCurrent return codes)
 //--- (end of YCurrent return codes)
+//--- (YCurrent yapiwrapper)
+//--- (end of YCurrent yapiwrapper)
 //--- (YCurrent class start)
 /**
  * YCurrent Class: Current function interface
@@ -129,7 +131,7 @@ public class YCurrent extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ENABLED_INVALID;
                 }
             }

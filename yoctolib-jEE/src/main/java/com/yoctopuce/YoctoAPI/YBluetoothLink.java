@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBluetoothLink.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YBluetoothLink.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YBluetoothLink return codes)
 //--- (end of YBluetoothLink return codes)
+//--- (YBluetoothLink yapiwrapper)
+//--- (end of YBluetoothLink yapiwrapper)
 //--- (YBluetoothLink class start)
 /**
  * YBluetoothLink Class: BluetoothLink function interface
@@ -213,7 +215,7 @@ public class YBluetoothLink extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return OWNADDRESS_INVALID;
                 }
             }
@@ -251,7 +253,7 @@ public class YBluetoothLink extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PAIRINGPIN_INVALID;
                 }
             }
@@ -325,7 +327,7 @@ public class YBluetoothLink extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return REMOTEADDRESS_INVALID;
                 }
             }
@@ -391,7 +393,7 @@ public class YBluetoothLink extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return REMOTENAME_INVALID;
                 }
             }
@@ -425,7 +427,7 @@ public class YBluetoothLink extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MUTE_INVALID;
                 }
             }
@@ -494,7 +496,7 @@ public class YBluetoothLink extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PREAMPLIFIER_INVALID;
                 }
             }
@@ -560,7 +562,7 @@ public class YBluetoothLink extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return VOLUME_INVALID;
                 }
             }
@@ -628,7 +630,7 @@ public class YBluetoothLink extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return LINKSTATE_INVALID;
                 }
             }
@@ -663,7 +665,7 @@ public class YBluetoothLink extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return LINKQUALITY_INVALID;
                 }
             }
@@ -690,7 +692,7 @@ public class YBluetoothLink extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YMessageBox.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -182,7 +182,7 @@ public class YMessageBox extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SLOTSINUSE_INVALID;
                 }
             }
@@ -215,7 +215,7 @@ public class YMessageBox extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SLOTSCOUNT_INVALID;
                 }
             }
@@ -241,7 +241,7 @@ public class YMessageBox extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SLOTSBITMAP_INVALID;
                 }
             }
@@ -262,7 +262,7 @@ public class YMessageBox extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PDUSENT_INVALID;
                 }
             }
@@ -328,7 +328,7 @@ public class YMessageBox extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PDURECEIVED_INVALID;
                 }
             }
@@ -387,7 +387,7 @@ public class YMessageBox extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

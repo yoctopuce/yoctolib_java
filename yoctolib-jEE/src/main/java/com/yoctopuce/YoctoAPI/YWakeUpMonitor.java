@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpMonitor.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YWakeUpMonitor.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YWakeUpMonitor return codes)
 //--- (end of YWakeUpMonitor return codes)
+//--- (YWakeUpMonitor yapiwrapper)
+//--- (end of YWakeUpMonitor yapiwrapper)
 //--- (YWakeUpMonitor class start)
 /**
  * YWakeUpMonitor Class: WakeUpMonitor function interface
@@ -181,7 +183,7 @@ public class YWakeUpMonitor extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return POWERDURATION_INVALID;
                 }
             }
@@ -249,7 +251,7 @@ public class YWakeUpMonitor extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SLEEPCOUNTDOWN_INVALID;
                 }
             }
@@ -315,7 +317,7 @@ public class YWakeUpMonitor extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return NEXTWAKEUP_INVALID;
                 }
             }
@@ -384,7 +386,7 @@ public class YWakeUpMonitor extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return WAKEUPREASON_INVALID;
                 }
             }
@@ -420,7 +422,7 @@ public class YWakeUpMonitor extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return WAKEUPSTATE_INVALID;
                 }
             }
@@ -457,7 +459,7 @@ public class YWakeUpMonitor extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return RTCTIME_INVALID;
                 }
             }

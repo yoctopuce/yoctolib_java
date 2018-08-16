@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YDisplay.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -221,7 +221,7 @@ public class YDisplay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ENABLED_INVALID;
                 }
             }
@@ -288,7 +288,7 @@ public class YDisplay extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return STARTUPSEQ_INVALID;
                 }
             }
@@ -358,7 +358,7 @@ public class YDisplay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return BRIGHTNESS_INVALID;
                 }
             }
@@ -430,7 +430,7 @@ public class YDisplay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ORIENTATION_INVALID;
                 }
             }
@@ -501,7 +501,7 @@ public class YDisplay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYWIDTH_INVALID;
                 }
             }
@@ -534,7 +534,7 @@ public class YDisplay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYHEIGHT_INVALID;
                 }
             }
@@ -568,7 +568,7 @@ public class YDisplay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration == 0) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYTYPE_INVALID;
                 }
             }
@@ -602,7 +602,7 @@ public class YDisplay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration == 0) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return LAYERWIDTH_INVALID;
                 }
             }
@@ -635,7 +635,7 @@ public class YDisplay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration == 0) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return LAYERHEIGHT_INVALID;
                 }
             }
@@ -668,7 +668,7 @@ public class YDisplay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration == 0) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return LAYERCOUNT_INVALID;
                 }
             }
@@ -694,7 +694,7 @@ public class YDisplay extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

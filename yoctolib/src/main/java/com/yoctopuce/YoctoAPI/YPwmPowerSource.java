@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmPowerSource.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YPwmPowerSource.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YPwmPowerSource return codes)
 //--- (end of YPwmPowerSource return codes)
+//--- (YPwmPowerSource yapiwrapper)
+//--- (end of YPwmPowerSource yapiwrapper)
 //--- (YPwmPowerSource class start)
 /**
  * YPwmPowerSource Class: PwmPowerSource function interface
@@ -138,7 +140,7 @@ public class YPwmPowerSource extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return POWERMODE_INVALID;
                 }
             }

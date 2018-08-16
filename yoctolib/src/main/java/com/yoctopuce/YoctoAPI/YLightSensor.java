@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLightSensor.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YLightSensor.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YLightSensor return codes)
 //--- (end of YLightSensor return codes)
+//--- (YLightSensor yapiwrapper)
+//--- (end of YLightSensor yapiwrapper)
 //--- (YLightSensor class start)
 /**
  * YLightSensor Class: LightSensor function interface
@@ -177,7 +179,7 @@ public class YLightSensor extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MEASURETYPE_INVALID;
                 }
             }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLatitude.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YLatitude.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindLatitude(), the high-level API for Latitude functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YLatitude return codes)
 //--- (end of YLatitude return codes)
+//--- (YLatitude yapiwrapper)
+//--- (end of YLatitude yapiwrapper)
 //--- (YLatitude class start)
 /**
  * YLatitude Class: Latitude function interface

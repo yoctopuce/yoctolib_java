@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 30233 2018-03-05 14:16:18Z seb $
+ * $Id: YDevice.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Internal YDevice class
  *
@@ -157,7 +157,7 @@ class YDevice
             throw new YAPI_Exception(YAPI.IO_ERROR,
                     "Request failed, could not parse API result for " + this);
         }
-        this._cache_expiration = YAPI.GetTickCount() + YAPI.DefaultCacheValidity;
+        this._cache_expiration = YAPI.GetTickCount() + _hub._yctx._cacheValidity;
         this._cache_json = cache_json;
         return cache_json;
     }

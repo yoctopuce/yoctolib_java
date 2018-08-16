@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 31305 2018-07-20 07:00:01Z seb $
+ * $Id: YModule.java 31530 2018-08-10 15:22:53Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -325,7 +325,7 @@ public class YModule extends YFunction
         return _logCallback;
     }
 
-    private byte[] _flattenJsonStruct(byte[] actualSettings) throws YAPI_Exception
+    private byte[] _flattenJsonStruct_internal(byte[] actualSettings) throws YAPI_Exception
     {
         YJSONObject json = null;
         YJSONArray out = new YJSONArray();
@@ -357,14 +357,8 @@ public class YModule extends YFunction
     }
 
 
-    /**
-     * Returns a list of all the modules that are plugged into the current module.
-     * This method only makes sense when called for a YoctoHub/VirtualHub.
-     * Otherwise, an empty array will be returned.
-     *
-     * @return an array of strings containing the sub modules.
-     */
-    public ArrayList<String> get_subDevices() throws YAPI_Exception
+
+    private ArrayList<String> get_subDevices_internal() throws YAPI_Exception
     {
         YDevice dev = _getDev();
         YGenericHub hub = dev.getHub();
@@ -372,14 +366,8 @@ public class YModule extends YFunction
     }
 
 
-    /**
-     * Returns the serial number of the YoctoHub on which this module is connected.
-     * If the module is connected by USB, or if the module is the root YoctoHub, an
-     * empty string is returned.
-     *
-     * @return a string with the serial number of the YoctoHub or an empty string
-     */
-    public String get_parentHub() throws YAPI_Exception
+
+    private String get_parentHub_internal() throws YAPI_Exception
     {
         YDevice dev = _getDev();
         YGenericHub hub = dev.getHub();
@@ -390,13 +378,7 @@ public class YModule extends YFunction
     }
 
 
-    /**
-     * Returns the URL used to access the module. If the module is connected by USB, the
-     * string 'usb' is returned.
-     *
-     * @return a string with the URL of the module.
-     */
-    public String get_url() throws YAPI_Exception
+    private String get_url_internal() throws YAPI_Exception
     {
         YDevice dev = _getDev();
         YGenericHub hub = dev.getHub();
@@ -465,7 +447,7 @@ public class YModule extends YFunction
                 if (!(dev == null)) {
                     return dev.getProductName();
                 }
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PRODUCTNAME_INVALID;
                 }
             }
@@ -503,7 +485,7 @@ public class YModule extends YFunction
                 if (!(dev == null)) {
                     return dev.getSerialNumber();
                 }
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SERIALNUMBER_INVALID;
                 }
             }
@@ -541,7 +523,7 @@ public class YModule extends YFunction
                 if (!(dev == null)) {
                     return dev.getProductId();
                 }
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PRODUCTID_INVALID;
                 }
             }
@@ -574,7 +556,7 @@ public class YModule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PRODUCTRELEASE_INVALID;
                 }
             }
@@ -607,7 +589,7 @@ public class YModule extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return FIRMWARERELEASE_INVALID;
                 }
             }
@@ -641,7 +623,7 @@ public class YModule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PERSISTENTSETTINGS_INVALID;
                 }
             }
@@ -686,7 +668,7 @@ public class YModule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return LUMINOSITY_INVALID;
                 }
             }
@@ -763,7 +745,7 @@ public class YModule extends YFunction
                 if (!(dev == null)) {
                     return dev.getBeacon();
                 }
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return BEACON_INVALID;
                 }
             }
@@ -829,7 +811,7 @@ public class YModule extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return UPTIME_INVALID;
                 }
             }
@@ -862,7 +844,7 @@ public class YModule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return USBCURRENT_INVALID;
                 }
             }
@@ -897,7 +879,7 @@ public class YModule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return REBOOTCOUNTDOWN_INVALID;
                 }
             }
@@ -944,7 +926,7 @@ public class YModule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return USERVAR_INVALID;
                 }
             }
@@ -1494,9 +1476,13 @@ public class YModule extends YFunction
         return res;
     }
 
-    //cannot be generated for Java:
-    //public byte[] _flattenJsonStruct(byte[] jsoncomplex) throws YAPI_Exception
+    public byte[] _flattenJsonStruct(byte[] jsoncomplex) throws YAPI_Exception
+    {
+        return _flattenJsonStruct_internal(jsoncomplex);
+    }
 
+    //cannot be generated for Java:
+    //public byte[] _flattenJsonStruct_internal(byte[] jsoncomplex) throws YAPI_Exception
     public int calibVersion(String cparams)
     {
         if (cparams.equals("0,")) {
@@ -2060,15 +2046,47 @@ public class YModule extends YFunction
         return _upload("logs.txt", (text).getBytes());
     }
 
-    //cannot be generated for Java:
-    //public ArrayList<String> get_subDevices() throws YAPI_Exception
+    /**
+     * Returns a list of all the modules that are plugged into the current module.
+     * This method only makes sense when called for a YoctoHub/VirtualHub.
+     * Otherwise, an empty array will be returned.
+     *
+     * @return an array of strings containing the sub modules.
+     */
+    public ArrayList<String> get_subDevices() throws YAPI_Exception
+    {
+        return get_subDevices_internal();
+    }
 
     //cannot be generated for Java:
-    //public String get_parentHub() throws YAPI_Exception
+    //public ArrayList<String> get_subDevices_internal() throws YAPI_Exception
+    /**
+     * Returns the serial number of the YoctoHub on which this module is connected.
+     * If the module is connected by USB, or if the module is the root YoctoHub, an
+     * empty string is returned.
+     *
+     * @return a string with the serial number of the YoctoHub or an empty string
+     */
+    public String get_parentHub() throws YAPI_Exception
+    {
+        return get_parentHub_internal();
+    }
 
     //cannot be generated for Java:
-    //public String get_url() throws YAPI_Exception
+    //public String get_parentHub_internal() throws YAPI_Exception
+    /**
+     * Returns the URL used to access the module. If the module is connected by USB, the
+     * string 'usb' is returned.
+     *
+     * @return a string with the URL of the module.
+     */
+    public String get_url() throws YAPI_Exception
+    {
+        return get_url_internal();
+    }
 
+    //cannot be generated for Java:
+    //public String get_url_internal() throws YAPI_Exception
     /**
      * Continues the module enumeration started using yFirstModule().
      *

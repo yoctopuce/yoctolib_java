@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 30813 2018-05-11 14:58:49Z seb $
+ * $Id: YAPI.java 31520 2018-08-10 13:01:44Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -48,12 +48,6 @@ import java.util.HashMap;
 @SuppressWarnings("unused")
 public class YAPI
 {
-    // Default cache validity (in [ms]) before reloading data from device. This
-    // saves a lots of traffic.
-    // Note that a value under 2 ms makes little sense since a USB bus itself
-    // has a 2ms round trip period
-    //fixme generated code must use default cache validity form YAPIContext
-    public static int DefaultCacheValidity = 5;
 
     // Return value for invalid strings
     public static final String INVALID_STRING = "!INVALID!";
@@ -62,7 +56,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "31315";
+    public static final String YOCTO_API_BUILD_STR = "31701";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -289,7 +283,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".31315" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".31701" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -677,5 +671,63 @@ public class YAPI
     {
         GetYCtx(true).RegisterLogFunction(logfun);
     }
+
+
+//--- (generated code: YAPIContext yapiwrapper)
+    /**
+     * Change the time between each forced enumeration of the YoctoHub used.
+     * By default, the library performs a complete enumeration every 10 seconds.
+     * To reduce network traffic it is possible to increase this delay.
+     * This is particularly useful when a YoctoHub is connected to a GSM network
+     * where the traffic is charged. This setting does not affect modules connected by USB,
+     * nor the operation of arrival/removal callbacks.
+     * Note: This function must be called after yInitAPI.
+     *
+     * @param deviceListValidity : number of seconds between each enumeration.
+     */
+    public static void SetDeviceListValidity(int deviceListValidity)
+    {
+        GetYCtx(true).SetDeviceListValidity(deviceListValidity);
+    }
+    /**
+     * Returns the time between each forced enumeration of the YoctoHub used.
+     * Note: This function must be called after yInitAPI.
+     *
+     * @return the number of seconds between each enumeration.
+     */
+    public static int GetDeviceListValidity()
+    {
+        return GetYCtx(true).GetDeviceListValidity();
+    }
+    /**
+     * Change the validity period of the data loaded by the library.
+     * By default, when accessing a module, all the attributes of the
+     * module functions are automatically kept in cache for the standard
+     * duration (5 ms). This method can be used to change this standard duration,
+     * for example in order to reduce network or USB traffic. This parameter
+     * does not affect value change callbacks
+     * Note: This function must be called after yInitAPI.
+     *
+     * @param cacheValidityMs : an integer corresponding to the validity attributed to the
+     *         loaded function parameters, in milliseconds
+     */
+    public static void SetCacheValidity(long cacheValidityMs)
+    {
+        GetYCtx(true).SetCacheValidity(cacheValidityMs);
+    }
+    /**
+     * Returns the validity period of the data loaded by the library.
+     * This method returns the cache validity of all attributes
+     * module functions.
+     * Note: This function must be called after yInitAPI .
+     *
+     * @return an integer corresponding to the validity attributed to the
+     *         loaded function parameters, in milliseconds
+     */
+    public static long GetCacheValidity()
+    {
+        return GetYCtx(true).GetCacheValidity();
+    }
+//--- (end of generated code: YAPIContext yapiwrapper)
 
 }

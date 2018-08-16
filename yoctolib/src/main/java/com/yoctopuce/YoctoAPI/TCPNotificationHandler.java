@@ -78,7 +78,7 @@ class TCPNotificationHandler extends NotificationHandler
                 yreq._requestStop();
                 yreq._requestRelease();
                 _notifRetryCount++;
-                _hub._devListValidity = 500;
+                _hub._isNotifWorking = false;
                 _error_delay = 100 << (_notifRetryCount > 4 ? 4 : _notifRetryCount);
             }
         }

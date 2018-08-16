@@ -117,7 +117,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
             }
             _firstNotif = true;
             _notifRetryCount++;
-            _hub._devListValidity = 500;
+            _hub._isNotifWorking = false;
             _error_delay = 100 << (_notifRetryCount > 4 ? 4 : _notifRetryCount);
         } while (!Thread.currentThread().isInterrupted() && !_muststop && !_wsHandler.isCallback());
         _wsHandler.close();

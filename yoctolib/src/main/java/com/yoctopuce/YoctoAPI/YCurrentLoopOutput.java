@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrentLoopOutput.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YCurrentLoopOutput.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -42,6 +42,8 @@ import java.util.Locale;
 
 //--- (YCurrentLoopOutput return codes)
 //--- (end of YCurrentLoopOutput return codes)
+//--- (YCurrentLoopOutput yapiwrapper)
+//--- (end of YCurrentLoopOutput yapiwrapper)
 //--- (YCurrentLoopOutput class start)
 /**
  * YCurrentLoopOutput Class: CurrentLoopOutput function interface
@@ -197,7 +199,7 @@ public class YCurrentLoopOutput extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CURRENT_INVALID;
                 }
             }
@@ -223,7 +225,7 @@ public class YCurrentLoopOutput extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CURRENTTRANSITION_INVALID;
                 }
             }
@@ -290,7 +292,7 @@ public class YCurrentLoopOutput extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CURRENTATSTARTUP_INVALID;
                 }
             }
@@ -326,7 +328,7 @@ public class YCurrentLoopOutput extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return LOOPPOWER_INVALID;
                 }
             }

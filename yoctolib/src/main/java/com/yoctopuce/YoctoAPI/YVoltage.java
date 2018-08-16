@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoltage.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YVoltage.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindVoltage(), the high-level API for Voltage functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YVoltage return codes)
 //--- (end of YVoltage return codes)
+//--- (YVoltage yapiwrapper)
+//--- (end of YVoltage yapiwrapper)
 //--- (YVoltage class start)
 /**
  * YVoltage Class: Voltage function interface
@@ -129,7 +131,7 @@ public class YVoltage extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ENABLED_INVALID;
                 }
             }

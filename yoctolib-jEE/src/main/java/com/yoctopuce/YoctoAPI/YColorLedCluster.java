@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 30500 2018-04-04 07:53:46Z mvuilleu $
+ * $Id: YColorLedCluster.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -43,6 +43,8 @@ import java.util.ArrayList;
 
 //--- (YColorLedCluster return codes)
 //--- (end of YColorLedCluster return codes)
+//--- (YColorLedCluster yapiwrapper)
+//--- (end of YColorLedCluster yapiwrapper)
 //--- (YColorLedCluster class start)
 /**
  * YColorLedCluster Class: ColorLedCluster function interface
@@ -182,7 +184,7 @@ public class YColorLedCluster extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ACTIVELEDCOUNT_INVALID;
                 }
             }
@@ -249,7 +251,7 @@ public class YColorLedCluster extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return LEDTYPE_INVALID;
                 }
             }
@@ -317,7 +319,7 @@ public class YColorLedCluster extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration == 0) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MAXLEDCOUNT_INVALID;
                 }
             }
@@ -350,7 +352,7 @@ public class YColorLedCluster extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration == 0) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return BLINKSEQMAXCOUNT_INVALID;
                 }
             }
@@ -383,7 +385,7 @@ public class YColorLedCluster extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration == 0) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return BLINKSEQMAXSIZE_INVALID;
                 }
             }
@@ -409,7 +411,7 @@ public class YColorLedCluster extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

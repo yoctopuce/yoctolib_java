@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDualPower.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YDualPower.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindDualPower(), the high-level API for DualPower functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YDualPower return codes)
 //--- (end of YDualPower return codes)
+//--- (YDualPower yapiwrapper)
+//--- (end of YDualPower yapiwrapper)
 //--- (YDualPower class start)
 /**
  * YDualPower Class: External power supply control interface
@@ -160,7 +162,7 @@ public class YDualPower extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return POWERSTATE_INVALID;
                 }
             }
@@ -196,7 +198,7 @@ public class YDualPower extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return POWERCONTROL_INVALID;
                 }
             }
@@ -267,7 +269,7 @@ public class YDualPower extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return EXTVOLTAGE_INVALID;
                 }
             }

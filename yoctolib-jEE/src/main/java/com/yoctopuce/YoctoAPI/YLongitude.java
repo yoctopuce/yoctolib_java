@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YLongitude.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YLongitude.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindLongitude(), the high-level API for Longitude functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YLongitude return codes)
 //--- (end of YLongitude return codes)
+//--- (YLongitude yapiwrapper)
+//--- (end of YLongitude yapiwrapper)
 //--- (YLongitude class start)
 /**
  * YLongitude Class: Longitude function interface

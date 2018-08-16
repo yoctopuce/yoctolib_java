@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 28492 2017-09-12 13:26:27Z seb $
+ * $Id: YFirmwareUpdate.java 31530 2018-08-10 15:22:53Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -188,7 +188,6 @@ public class YFirmwareUpdate
     }
 
 
-
     public YFirmwareUpdate(YAPIContext yctx, String serial, String path, byte[] settings, boolean force)
     {
         _serial = serial;
@@ -203,7 +202,7 @@ public class YFirmwareUpdate
 
     public YFirmwareUpdate(YAPIContext yctx, String serial, String path, byte[] settings)
     {
-        this(yctx,serial,path,settings,false);
+        this(yctx, serial, path, settings, false);
     }
 
     public YFirmwareUpdate(String serial, String path, byte[] settings)
@@ -219,13 +218,14 @@ public class YFirmwareUpdate
         }
     }
 
-    private void _processMore(int start)
+    private int _processMore_internal(int start)
     {
         synchronized (this) {
             if (start > 0) {
                 if (_thread == null || !_thread.isAlive()) {
                     _progress(0, "Firmware update started");
-                    _thread = new Thread(new Runnable() {
+                    _thread = new Thread(new Runnable()
+                    {
                         @Override
                         public void run()
                         {
@@ -269,7 +269,7 @@ public class YFirmwareUpdate
                                         _progress(5 + percent * 80 / 100, message);
                                     }
                                 });
-                                if (hub.isCallbackMode() && hub.getSerialNumber().equals(_serial)){
+                                if (hub.isCallbackMode() && hub.getSerialNumber().equals(_serial)) {
                                     _progress(100, "Success (WebSocket Callback)");
                                     return;
                                 }
@@ -285,7 +285,7 @@ public class YFirmwareUpdate
                                     }
                                 }
                                 if (module.isOnline()) {
-                                    if (_settings!=null) {
+                                    if (_settings != null) {
                                         module.set_allSettingsAndFiles(_settings);
                                         module.saveToFlash();
                                     }
@@ -310,71 +310,54 @@ public class YFirmwareUpdate
                 }
             }
         }
+        return 0;
     }
 
 
-    /**
-     * Test if the byn file is valid for this module. It is possible to pass a directory instead of a file.
-     * In that case, this method returns the path of the most recent appropriate byn file. This method will
-     * ignore any firmware older than minrelease.
-     *
-     * @param serial : the serial number of the module to update
-     * @param path : the path of a byn file or a directory that contains byn files
-     * @param minrelease : a positive integer
-     *
-     * @return : the path of the byn file to use, or an empty string if no byn files matches the requirement
-     *
-     * On failure, returns a string that starts with "error:".
-     */
-    public static String CheckFirmware(String serial, String path, int minrelease) throws YAPI_Exception
+    private static String CheckFirmware_internal(String serial, String path, int minrelease)
     {
         String link = "";
         Integer best_rev = 0;
         Integer current_rev;
 
+        try {
 
-        if (path.startsWith("www.yoctopuce.com") || path.startsWith("http://www.yoctopuce.com")) {
-            byte[] json = YFirmwareUpdate._downloadfile("http://www.yoctopuce.com//FR/common/getLastFirmwareLink.php?serial=" + serial);
-            YJSONObject obj;
-            try {
-                obj = new YJSONObject(new String(json, Charset.forName("ISO_8859_1")));
-                obj.parse();
-            } catch (Exception ex) {
-                throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
+            if (path.startsWith("www.yoctopuce.com") || path.startsWith("http://www.yoctopuce.com")) {
+                byte[] json = YFirmwareUpdate._downloadfile("http://www.yoctopuce.com//FR/common/getLastFirmwareLink.php?serial=" + serial);
+                YJSONObject obj;
+                try {
+                    obj = new YJSONObject(new String(json, Charset.forName("ISO_8859_1")));
+                    obj.parse();
+                } catch (Exception ex) {
+                    throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
+                }
+                try {
+                    link = obj.getString("link");
+                    best_rev = obj.getInt("version");
+                } catch (Exception e) {
+                    throw new YAPI_Exception(YAPI.IO_ERROR, "invalid respond form www.yoctopuce.com" + e.getLocalizedMessage());
+                }
+            } else {
+                File folder = new File(path);
+                YFirmwareFile firmware = YFirmwareUpdate.checkFirmware_r(folder, serial.substring(0, YAPI.YOCTO_BASE_SERIAL_LEN));
+                if (firmware != null) {
+                    best_rev = firmware.getFirmwareReleaseAsInt();
+                    link = firmware.getPath();
+                }
             }
-            try {
-                link = obj.getString("link");
-                best_rev = obj.getInt("version");
-            } catch (Exception e) {
-                throw new YAPI_Exception(YAPI.IO_ERROR, "invalid respond form www.yoctopuce.com" + e.getLocalizedMessage());
+            if (minrelease != 0) {
+                if (minrelease < best_rev)
+                    return link;
+                else
+                    return "";
             }
-        } else {
-            File folder = new File(path);
-            YFirmwareFile firmware = YFirmwareUpdate.checkFirmware_r(folder, serial.substring(0, YAPI.YOCTO_BASE_SERIAL_LEN));
-            if (firmware != null) {
-                best_rev = firmware.getFirmwareReleaseAsInt();
-                link = firmware.getPath();
-            }
+            return link;
+        } catch (Exception ex) {
+            return "error:" + ex.getLocalizedMessage();
         }
-        if (minrelease != 0) {
-            if (minrelease < best_rev)
-                return link;
-            else
-                return "";
-        }
-        return link;
     }
 
-    /**
-     * Returns a list of all the modules in "firmware update" mode. Only devices
-     * connected over USB are listed. For devices connected to a YoctoHub, you
-     * must connect to the YoctoHub web interface.
-     *
-     * @param yctx : a YAPI context.
-     *
-     * @return an array of strings containing the serial numbers of devices in "firmware update" mode.
-     */
-    public static ArrayList<String> GetAllBootLoadersInContext(YAPIContext yctx)
+    private static ArrayList<String> GetAllBootLoadersInContext_internal(YAPIContext yctx)
     {
         ArrayList<String> res = new ArrayList<>();
         for (YGenericHub h : yctx._hubs) {
@@ -396,6 +379,21 @@ public class YFirmwareUpdate
         return res;
     }
 
+    private static ArrayList<String> GetAllBootLoaders_internal()
+    {
+        return GetAllBootLoadersInContext(YAPI.GetYCtx(false));
+    }
+
+
+    //--- (generated code: YFirmwareUpdate implementation)
+
+    public int _processMore(int newupdate)
+    {
+        return _processMore_internal(newupdate);
+    }
+
+    //cannot be generated for Java:
+    //public int _processMore_internal(int newupdate)
     /**
      * Returns a list of all the modules in "firmware update" mode. Only devices
      * connected over USB are listed. For devices connected to a YoctoHub, you
@@ -405,24 +403,47 @@ public class YFirmwareUpdate
      */
     public static ArrayList<String> GetAllBootLoaders()
     {
-        return GetAllBootLoadersInContext(YAPI.GetYCtx(false));
+        return GetAllBootLoaders_internal();
     }
 
-
-    //--- (generated code: YFirmwareUpdate implementation)
+    //cannot be generated for Java:
+    //public static ArrayList<String> GetAllBootLoaders_internal()
+    /**
+     * Returns a list of all the modules in "firmware update" mode. Only devices
+     * connected over USB are listed. For devices connected to a YoctoHub, you
+     * must connect to the YoctoHub web interface.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return an array of strings containing the serial numbers of devices in "firmware update" mode.
+     */
+    public static ArrayList<String> GetAllBootLoadersInContext(YAPIContext yctx)
+    {
+        return GetAllBootLoadersInContext_internal(yctx);
+    }
 
     //cannot be generated for Java:
-    //public int _processMore(int newupdate) throws YAPI_Exception
+    //public static ArrayList<String> GetAllBootLoadersInContext_internal(YAPIContext yctx)
+    /**
+     * Test if the byn file is valid for this module. It is possible to pass a directory instead of a file.
+     * In that case, this method returns the path of the most recent appropriate byn file. This method will
+     * ignore any firmware older than minrelease.
+     *
+     * @param serial : the serial number of the module to update
+     * @param path : the path of a byn file or a directory that contains byn files
+     * @param minrelease : a positive integer
+     *
+     * @return : the path of the byn file to use, or an empty string if no byn files matches the requirement
+     *
+     * On failure, returns a string that starts with "error:".
+     */
+    public static String CheckFirmware(String serial,String path,int minrelease)
+    {
+        return CheckFirmware_internal(serial, path, minrelease);
+    }
 
     //cannot be generated for Java:
-    //public static ArrayList<String> GetAllBootLoaders()
-
-    //cannot be generated for Java:
-    //public static ArrayList<String> GetAllBootLoadersInContext(YAPIContext yctx)
-
-    //cannot be generated for Java:
-    //public static String CheckFirmware(String serial,String path,int minrelease)
-
+    //public static String CheckFirmware_internal(String serial,String path,int minrelease)
     /**
      * Returns the progress of the firmware update, on a scale from 0 to 100. When the object is
      * instantiated, the progress is zero. The value is updated during the firmware update process until

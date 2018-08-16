@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMultiAxisController.java 30483 2018-03-29 07:43:07Z mvuilleu $
+ * $Id: YMultiAxisController.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -43,6 +43,8 @@ import java.util.ArrayList;
 
 //--- (YMultiAxisController return codes)
 //--- (end of YMultiAxisController return codes)
+//--- (YMultiAxisController yapiwrapper)
+//--- (end of YMultiAxisController yapiwrapper)
 //--- (YMultiAxisController class start)
 /**
  * YMultiAxisController Class: MultiAxisController function interface
@@ -155,7 +157,7 @@ public class YMultiAxisController extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return NAXIS_INVALID;
                 }
             }
@@ -224,7 +226,7 @@ public class YMultiAxisController extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return GLOBALSTATE_INVALID;
                 }
             }
@@ -252,7 +254,7 @@ public class YMultiAxisController extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

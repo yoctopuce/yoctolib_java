@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPowerOutput.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YPowerOutput.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YPowerOutput return codes)
 //--- (end of YPowerOutput return codes)
+//--- (YPowerOutput yapiwrapper)
+//--- (end of YPowerOutput yapiwrapper)
 //--- (YPowerOutput class start)
 /**
  * YPowerOutput Class: External power supply control interface
@@ -136,7 +138,7 @@ public class YPowerOutput extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return VOLTAGE_INVALID;
                 }
             }

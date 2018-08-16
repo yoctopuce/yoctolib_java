@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YNetwork.java 30462 2018-03-26 09:19:24Z mvuilleu $
+ * $Id: YNetwork.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindNetwork(), the high-level API for Network functions
  *
@@ -42,6 +42,8 @@ import java.util.Locale;
 
 //--- (YNetwork return codes)
 //--- (end of YNetwork return codes)
+//--- (YNetwork yapiwrapper)
+//--- (end of YNetwork yapiwrapper)
 //--- (YNetwork class start)
 /**
  * YNetwork Class: Network function interface
@@ -354,7 +356,7 @@ public class YNetwork extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return READINESS_INVALID;
                 }
             }
@@ -402,7 +404,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration == 0) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MACADDRESS_INVALID;
                 }
             }
@@ -437,7 +439,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return IPADDRESS_INVALID;
                 }
             }
@@ -471,7 +473,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SUBNETMASK_INVALID;
                 }
             }
@@ -504,7 +506,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ROUTER_INVALID;
                 }
             }
@@ -549,7 +551,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return IPCONFIG_INVALID;
                 }
             }
@@ -605,7 +607,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PRIMARYDNS_INVALID;
                 }
             }
@@ -675,7 +677,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SECONDARYDNS_INVALID;
                 }
             }
@@ -745,7 +747,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return NTPSERVER_INVALID;
                 }
             }
@@ -815,7 +817,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return USERPASSWORD_INVALID;
                 }
             }
@@ -895,7 +897,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ADMINPASSWORD_INVALID;
                 }
             }
@@ -973,7 +975,7 @@ public class YNetwork extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return HTTPPORT_INVALID;
                 }
             }
@@ -1043,7 +1045,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return DEFAULTPAGE_INVALID;
                 }
             }
@@ -1116,7 +1118,7 @@ public class YNetwork extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return DISCOVERABLE_INVALID;
                 }
             }
@@ -1195,7 +1197,7 @@ public class YNetwork extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return WWWWATCHDOGDELAY_INVALID;
                 }
             }
@@ -1275,7 +1277,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKURL_INVALID;
                 }
             }
@@ -1345,7 +1347,7 @@ public class YNetwork extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKMETHOD_INVALID;
                 }
             }
@@ -1421,7 +1423,7 @@ public class YNetwork extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKENCODING_INVALID;
                 }
             }
@@ -1503,7 +1505,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKCREDENTIALS_INVALID;
                 }
             }
@@ -1608,7 +1610,7 @@ public class YNetwork extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKINITIALDELAY_INVALID;
                 }
             }
@@ -1676,7 +1678,7 @@ public class YNetwork extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKSCHEDULE_INVALID;
                 }
             }
@@ -1742,7 +1744,7 @@ public class YNetwork extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKMINDELAY_INVALID;
                 }
             }
@@ -1808,7 +1810,7 @@ public class YNetwork extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CALLBACKMAXDELAY_INVALID;
                 }
             }
@@ -1879,7 +1881,7 @@ public class YNetwork extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return POECURRENT_INVALID;
                 }
             }

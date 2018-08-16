@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YRefFrame.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -43,6 +43,8 @@ import java.util.Locale;
 
 //--- (YRefFrame return codes)
 //--- (end of YRefFrame return codes)
+//--- (YRefFrame yapiwrapper)
+//--- (end of YRefFrame yapiwrapper)
 //--- (YRefFrame class start)
 /**
  * YRefFrame Class: Reference frame configuration
@@ -244,7 +246,7 @@ public class YRefFrame extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MOUNTPOS_INVALID;
                 }
             }
@@ -337,7 +339,7 @@ public class YRefFrame extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return BEARING_INVALID;
                 }
             }
@@ -365,7 +367,7 @@ public class YRefFrame extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CALIBRATIONPARAM_INVALID;
                 }
             }
@@ -390,7 +392,7 @@ public class YRefFrame extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return FUSIONMODE_INVALID;
                 }
             }

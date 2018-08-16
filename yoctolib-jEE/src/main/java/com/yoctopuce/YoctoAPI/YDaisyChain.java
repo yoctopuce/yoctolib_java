@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDaisyChain.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YDaisyChain.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindDaisyChain(), the high-level API for DaisyChain functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YDaisyChain return codes)
 //--- (end of YDaisyChain return codes)
+//--- (YDaisyChain yapiwrapper)
+//--- (end of YDaisyChain yapiwrapper)
 //--- (YDaisyChain class start)
 /**
  * YDaisyChain Class: DaisyChain function interface
@@ -156,7 +158,7 @@ public class YDaisyChain extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return DAISYSTATE_INVALID;
                 }
             }
@@ -191,7 +193,7 @@ public class YDaisyChain extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CHILDCOUNT_INVALID;
                 }
             }
@@ -224,7 +226,7 @@ public class YDaisyChain extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return REQUIREDCHILDCOUNT_INVALID;
                 }
             }

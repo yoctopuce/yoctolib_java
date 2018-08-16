@@ -1,6 +1,5 @@
-Java v1.10.31315
+Java v1.10.31701
 
-- New WebSocket implementation that work also with Java SE
-- Add support for phaseMove in PWMOutput class
-- Add support for config change notifications
-- Fix race condition that can lead to a dead lock during user callback
+- Add methods do change DeviceListValidity and CacheValidity
+- Add support for ConfigChange callbacks
+- Improve error recovery during DataSet.loadMore

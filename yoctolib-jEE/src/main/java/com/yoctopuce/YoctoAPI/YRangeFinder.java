@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRangeFinder.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YRangeFinder.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -42,6 +42,8 @@ import java.util.Locale;
 
 //--- (YRangeFinder return codes)
 //--- (end of YRangeFinder return codes)
+//--- (YRangeFinder yapiwrapper)
+//--- (end of YRangeFinder yapiwrapper)
 //--- (YRangeFinder class start)
 /**
  * YRangeFinder Class: RangeFinder function interface
@@ -209,7 +211,7 @@ public class YRangeFinder extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return RANGEFINDERMODE_INVALID;
                 }
             }
@@ -279,7 +281,7 @@ public class YRangeFinder extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return HARDWARECALIBRATION_INVALID;
                 }
             }
@@ -311,7 +313,7 @@ public class YRangeFinder extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CURRENTTEMPERATURE_INVALID;
                 }
             }
@@ -337,7 +339,7 @@ public class YRangeFinder extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

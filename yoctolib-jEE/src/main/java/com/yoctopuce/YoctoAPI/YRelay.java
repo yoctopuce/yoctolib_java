@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRelay.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YRelay.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindRelay(), the high-level API for Relay functions
  *
@@ -42,6 +42,8 @@ import java.util.Locale;
 
 //--- (YRelay return codes)
 //--- (end of YRelay return codes)
+//--- (YRelay yapiwrapper)
+//--- (end of YRelay yapiwrapper)
 //--- (YRelay class start)
 /**
  * YRelay Class: Relay function interface
@@ -219,7 +221,7 @@ public class YRelay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return STATE_INVALID;
                 }
             }
@@ -291,7 +293,7 @@ public class YRelay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return STATEATPOWERON_INVALID;
                 }
             }
@@ -366,7 +368,7 @@ public class YRelay extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MAXTIMEONSTATEA_INVALID;
                 }
             }
@@ -436,7 +438,7 @@ public class YRelay extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MAXTIMEONSTATEB_INVALID;
                 }
             }
@@ -506,7 +508,7 @@ public class YRelay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return OUTPUT_INVALID;
                 }
             }
@@ -578,7 +580,7 @@ public class YRelay extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PULSETIMER_INVALID;
                 }
             }
@@ -636,7 +638,7 @@ public class YRelay extends YFunction
         YDelayedPulse res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return DELAYEDPULSETIMER_INVALID;
                 }
             }
@@ -688,7 +690,7 @@ public class YRelay extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COUNTDOWN_INVALID;
                 }
             }

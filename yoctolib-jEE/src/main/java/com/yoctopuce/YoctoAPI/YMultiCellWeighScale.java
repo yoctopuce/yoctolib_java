@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMultiCellWeighScale.java 31016 2018-06-04 08:45:40Z mvuilleu $
+ * $Id: YMultiCellWeighScale.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -42,6 +42,8 @@ import java.util.Locale;
 
 //--- (YMultiCellWeighScale return codes)
 //--- (end of YMultiCellWeighScale return codes)
+//--- (YMultiCellWeighScale yapiwrapper)
+//--- (end of YMultiCellWeighScale yapiwrapper)
 //--- (YMultiCellWeighScale class start)
 /**
  * YMultiCellWeighScale Class: MultiCellWeighScale function interface
@@ -241,7 +243,7 @@ public class YMultiCellWeighScale extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CELLCOUNT_INVALID;
                 }
             }
@@ -308,7 +310,7 @@ public class YMultiCellWeighScale extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return EXCITATION_INVALID;
                 }
             }
@@ -423,7 +425,7 @@ public class YMultiCellWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return TEMPAVGADAPTRATIO_INVALID;
                 }
             }
@@ -502,7 +504,7 @@ public class YMultiCellWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return TEMPCHGADAPTRATIO_INVALID;
                 }
             }
@@ -538,7 +540,7 @@ public class YMultiCellWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMPTEMPAVG_INVALID;
                 }
             }
@@ -572,7 +574,7 @@ public class YMultiCellWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMPTEMPCHG_INVALID;
                 }
             }
@@ -606,7 +608,7 @@ public class YMultiCellWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMPENSATION_INVALID;
                 }
             }
@@ -678,7 +680,7 @@ public class YMultiCellWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ZEROTRACKING_INVALID;
                 }
             }
@@ -706,7 +708,7 @@ public class YMultiCellWeighScale extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

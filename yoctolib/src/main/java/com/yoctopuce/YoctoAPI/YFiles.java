@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YFiles.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -140,7 +140,7 @@ public class YFiles extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return FILESCOUNT_INVALID;
                 }
             }
@@ -173,7 +173,7 @@ public class YFiles extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return FREESPACE_INVALID;
                 }
             }

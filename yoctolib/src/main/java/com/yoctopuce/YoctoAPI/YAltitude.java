@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAltitude.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YAltitude.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YAltitude return codes)
 //--- (end of YAltitude return codes)
+//--- (YAltitude yapiwrapper)
+//--- (end of YAltitude yapiwrapper)
 //--- (YAltitude class start)
 /**
  * YAltitude Class: Altitude function interface
@@ -222,7 +224,7 @@ public class YAltitude extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return QNH_INVALID;
                 }
             }
@@ -259,7 +261,7 @@ public class YAltitude extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return TECHNOLOGY_INVALID;
                 }
             }

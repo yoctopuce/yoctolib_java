@@ -10,9 +10,19 @@ import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Queue;
 
-@SuppressWarnings("unused")
+//--- (generated code: YAPIContext return codes)
+//--- (end of generated code: YAPIContext return codes)
+//--- (generated code: YAPIContext class start)
+/**
+ * YAPIContext Class: Control interface for the firmware update process
+ *
+ *
+ */
+@SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YAPIContext
 {
+//--- (end of generated code: YAPIContext class start)
+
 
     static class DataEvent
     {
@@ -348,7 +358,6 @@ public class YAPIContext
     }
 
 
-    public int DefaultCacheValidity = 5;
     String _defaultEncoding = YAPI.DefaultEncoding;
     final Charset _deviceCharset;
     private int _apiMode;
@@ -370,6 +379,13 @@ public class YAPIContext
     private final ArrayList<YFunction> _ValueCallbackList = new ArrayList<>();
     private final ArrayList<YFunction> _TimedReportCallbackList = new ArrayList<>();
     private int _pktAckDelay = 0;
+
+    protected long _deviceListValidityMs = 10000;
+
+    //--- (generated code: YAPIContext definitions)
+    protected long _cacheValidity = 5;
+
+    //--- (end of generated code: YAPIContext definitions)
 
 
     private final YSSDP.YSSDPReportInterface _ssdpCallback = new YSSDP.YSSDPReportInterface()
@@ -447,6 +463,9 @@ public class YAPIContext
         _yHash = new YHash(this);
         _ssdp = new YSSDP(this);
         resetContext();
+        //--- (generated code: YAPIContext attributes initialization)
+        //--- (end of generated code: YAPIContext attributes initialization)
+
     }
 
     private void resetContext()
@@ -638,7 +657,6 @@ public class YAPIContext
     private void _updateDeviceList_internal(boolean forceupdate, boolean invokecallbacks) throws YAPI_Exception
     {
         synchronized (this) {
-
             // Rescan all hubs and update list of online devices
             for (YGenericHub h : _hubs) {
                 try {
@@ -698,7 +716,82 @@ public class YAPIContext
 
 
     //PUBLIC METHOD:
+    //--- (generated code: YAPIContext implementation)
 
+    /**
+     * Change the time between each forced enumeration of the YoctoHub used.
+     * By default, the library performs a complete enumeration every 10 seconds.
+     * To reduce network traffic it is possible to increase this delay.
+     * This is particularly useful when a YoctoHub is connected to a GSM network
+     * where the traffic is charged. This setting does not affect modules connected by USB,
+     * nor the operation of arrival/removal callbacks.
+     * Note: This function must be called after yInitAPI.
+     *
+     * @param deviceListValidity : number of seconds between each enumeration.
+     */
+    public void SetDeviceListValidity(int deviceListValidity)
+    {
+        SetDeviceListValidity_internal(deviceListValidity);
+    }
+
+    //cannot be generated for Java:
+    //public void SetDeviceListValidity_internal(int deviceListValidity)
+    /**
+     * Returns the time between each forced enumeration of the YoctoHub used.
+     * Note: This function must be called after yInitAPI.
+     *
+     * @return the number of seconds between each enumeration.
+     */
+    public int GetDeviceListValidity()
+    {
+        return GetDeviceListValidity_internal();
+    }
+
+    //cannot be generated for Java:
+    //public int GetDeviceListValidity_internal()
+    /**
+     * Change the validity period of the data loaded by the library.
+     * By default, when accessing a module, all the attributes of the
+     * module functions are automatically kept in cache for the standard
+     * duration (5 ms). This method can be used to change this standard duration,
+     * for example in order to reduce network or USB traffic. This parameter
+     * does not affect value change callbacks
+     * Note: This function must be called after yInitAPI.
+     *
+     * @param cacheValidityMs : an integer corresponding to the validity attributed to the
+     *         loaded function parameters, in milliseconds
+     */
+    public void SetCacheValidity(long cacheValidityMs)
+    {
+        _cacheValidity = cacheValidityMs;
+    }
+
+    /**
+     * Returns the validity period of the data loaded by the library.
+     * This method returns the cache validity of all attributes
+     * module functions.
+     * Note: This function must be called after yInitAPI .
+     *
+     * @return an integer corresponding to the validity attributed to the
+     *         loaded function parameters, in milliseconds
+     */
+    public long GetCacheValidity()
+    {
+        return _cacheValidity;
+    }
+
+    //--- (end of generated code: YAPIContext implementation)
+
+
+    private void SetDeviceListValidity_internal(long deviceListValidity)
+    {
+        _deviceListValidityMs = deviceListValidity*1000;
+    }
+
+    private int GetDeviceListValidity_internal()
+    {
+        return (int)(_deviceListValidityMs/1000);
+    }
 
     /**
      * Enables the acknowledge of every USB packet received by the Yoctopuce library.
@@ -1027,14 +1120,14 @@ public class YAPIContext
      * the information pushed by the modules on the communication channels.
      * This is not strictly necessary, but it may improve the reactivity
      * of the library for the following commands.
-     * <p>
+     *
      * This function may signal an error in case there is a communication problem
      * while contacting a module.
      *
      * @return YAPI.SUCCESS when the call succeeds.
+     *
      * @throws YAPI_Exception on error
      */
-    @SuppressWarnings("RedundantThrows")
     public int HandleEvents() throws YAPI_Exception
     {
         // handle pending events

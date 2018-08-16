@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMotor.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YMotor.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindMotor(), the high-level API for Motor functions
  *
@@ -42,6 +42,8 @@ import java.util.Locale;
 
 //--- (YMotor return codes)
 //--- (end of YMotor return codes)
+//--- (YMotor yapiwrapper)
+//--- (end of YMotor yapiwrapper)
 //--- (YMotor class start)
 /**
  * YMotor Class: Motor function interface
@@ -221,7 +223,7 @@ public class YMotor extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MOTORSTATUS_INVALID;
                 }
             }
@@ -319,7 +321,7 @@ public class YMotor extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return DRIVINGFORCE_INVALID;
                 }
             }
@@ -393,7 +395,7 @@ public class YMotor extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return BRAKINGFORCE_INVALID;
                 }
             }
@@ -476,7 +478,7 @@ public class YMotor extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return CUTOFFVOLTAGE_INVALID;
                 }
             }
@@ -515,7 +517,7 @@ public class YMotor extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return OVERCURRENTLIMIT_INVALID;
                 }
             }
@@ -632,7 +634,7 @@ public class YMotor extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return FREQUENCY_INVALID;
                 }
             }
@@ -668,7 +670,7 @@ public class YMotor extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return STARTERTIME_INVALID;
                 }
             }
@@ -748,7 +750,7 @@ public class YMotor extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return FAILSAFETIMEOUT_INVALID;
                 }
             }
@@ -822,7 +824,7 @@ public class YMotor extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

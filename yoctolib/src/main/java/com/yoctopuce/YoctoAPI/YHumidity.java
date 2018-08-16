@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHumidity.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YHumidity.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindHumidity(), the high-level API for Humidity functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YHumidity return codes)
 //--- (end of YHumidity return codes)
+//--- (YHumidity yapiwrapper)
+//--- (end of YHumidity yapiwrapper)
 //--- (YHumidity class start)
 /**
  * YHumidity Class: Humidity function interface
@@ -187,7 +189,7 @@ public class YHumidity extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return RELHUM_INVALID;
                 }
             }
@@ -220,7 +222,7 @@ public class YHumidity extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ABSHUM_INVALID;
                 }
             }

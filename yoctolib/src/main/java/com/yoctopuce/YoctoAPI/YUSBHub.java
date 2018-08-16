@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 31305 2018-07-20 07:00:01Z seb $
+ * $Id: YUSBHub.java 31423 2018-08-07 11:52:08Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -168,7 +168,7 @@ class YUSBHub extends YGenericHub
 
         // reset device list cache timeout for this hub
         now = YAPI.GetTickCount();
-        _devListExpires = now + _devListValidity;
+        _devListExpires = now + 500;
     }
 
     @Override

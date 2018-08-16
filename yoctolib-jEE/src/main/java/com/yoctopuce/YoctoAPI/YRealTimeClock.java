@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YRealTimeClock.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YRealTimeClock return codes)
 //--- (end of YRealTimeClock return codes)
+//--- (YRealTimeClock yapiwrapper)
+//--- (end of YRealTimeClock yapiwrapper)
 //--- (YRealTimeClock class start)
 /**
  * YRealTimeClock Class: Real Time Clock function interface
@@ -161,7 +163,7 @@ public class YRealTimeClock extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return UNIXTIME_INVALID;
                 }
             }
@@ -228,7 +230,7 @@ public class YRealTimeClock extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return DATETIME_INVALID;
                 }
             }
@@ -261,7 +263,7 @@ public class YRealTimeClock extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return UTCOFFSET_INVALID;
                 }
             }
@@ -330,7 +332,7 @@ public class YRealTimeClock extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return TIMESET_INVALID;
                 }
             }

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataSet.java 28024 2017-07-10 08:50:02Z mvuilleu $
+ * $Id: YDataSet.java 31435 2018-08-07 14:11:47Z mvuilleu $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -382,7 +382,11 @@ public class YDataSet
                 url = stream._get_url();
             }
         }
-        return processMore(_progress, _parent._download(url));
+        try {
+            return processMore(_progress, _parent._download(url));
+        } catch (Exception ex) {
+            return processMore(_progress, _parent._download(url));
+        }
     }
 
     /**

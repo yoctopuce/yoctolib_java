@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCompass.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YCompass.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindCompass(), the high-level API for Compass functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YCompass return codes)
 //--- (end of YCompass return codes)
+//--- (YCompass yapiwrapper)
+//--- (end of YCompass yapiwrapper)
 //--- (YCompass class start)
 /**
  * YCompass Class: Compass function interface
@@ -159,7 +161,7 @@ public class YCompass extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return BANDWIDTH_INVALID;
                 }
             }
@@ -220,7 +222,7 @@ public class YCompass extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return AXIS_INVALID;
                 }
             }
@@ -241,7 +243,7 @@ public class YCompass extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MAGNETICHEADING_INVALID;
                 }
             }

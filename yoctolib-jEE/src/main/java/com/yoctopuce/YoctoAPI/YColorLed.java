@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLed.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YColorLed.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -42,6 +42,8 @@ import java.util.Locale;
 
 //--- (YColorLed return codes)
 //--- (end of YColorLed return codes)
+//--- (YColorLed yapiwrapper)
+//--- (end of YColorLed yapiwrapper)
 //--- (YColorLed class start)
 /**
  * YColorLed Class: ColorLed function interface
@@ -227,7 +229,7 @@ public class YColorLed extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return RGBCOLOR_INVALID;
                 }
             }
@@ -293,7 +295,7 @@ public class YColorLed extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return HSLCOLOR_INVALID;
                 }
             }
@@ -352,7 +354,7 @@ public class YColorLed extends YFunction
         YMove res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return RGBMOVE_INVALID;
                 }
             }
@@ -395,7 +397,7 @@ public class YColorLed extends YFunction
         YMove res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return HSLMOVE_INVALID;
                 }
             }
@@ -445,7 +447,7 @@ public class YColorLed extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return RGBCOLORATPOWERON_INVALID;
                 }
             }
@@ -513,7 +515,7 @@ public class YColorLed extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return BLINKSEQSIZE_INVALID;
                 }
             }
@@ -546,7 +548,7 @@ public class YColorLed extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration == 0) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return BLINKSEQMAXSIZE_INVALID;
                 }
             }
@@ -582,7 +584,7 @@ public class YColorLed extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return BLINKSEQSIGNATURE_INVALID;
                 }
             }
@@ -611,7 +613,7 @@ public class YColorLed extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

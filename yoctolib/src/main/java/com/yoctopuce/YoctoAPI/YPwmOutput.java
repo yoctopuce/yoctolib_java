@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YPwmOutput.java 31296 2018-07-19 12:34:36Z mvuilleu $
+ * $Id: YPwmOutput.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -42,6 +42,8 @@ import java.util.Locale;
 
 //--- (YPwmOutput return codes)
 //--- (end of YPwmOutput return codes)
+//--- (YPwmOutput yapiwrapper)
+//--- (end of YPwmOutput yapiwrapper)
 //--- (YPwmOutput class start)
 /**
  * YPwmOutput Class: PwmOutput function interface
@@ -192,7 +194,7 @@ public class YPwmOutput extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ENABLED_INVALID;
                 }
             }
@@ -293,7 +295,7 @@ public class YPwmOutput extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return FREQUENCY_INVALID;
                 }
             }
@@ -359,7 +361,7 @@ public class YPwmOutput extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PERIOD_INVALID;
                 }
             }
@@ -425,7 +427,7 @@ public class YPwmOutput extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return DUTYCYCLE_INVALID;
                 }
             }
@@ -494,7 +496,7 @@ public class YPwmOutput extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PULSEDURATION_INVALID;
                 }
             }
@@ -521,7 +523,7 @@ public class YPwmOutput extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PWMTRANSITION_INVALID;
                 }
             }
@@ -554,7 +556,7 @@ public class YPwmOutput extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ENABLEDATPOWERON_INVALID;
                 }
             }
@@ -661,7 +663,7 @@ public class YPwmOutput extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return DUTYCYCLEATPOWERON_INVALID;
                 }
             }

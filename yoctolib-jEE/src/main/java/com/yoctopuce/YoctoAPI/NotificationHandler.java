@@ -87,9 +87,12 @@ abstract class NotificationHandler implements Runnable
     void handleNetNotification(String notification_line)
     {
         String ev = notification_line.trim();
+        if ("".equals(ev)) {
+            return;
+        }
         if (ev.length() >= 3 && ev.charAt(0) >= NOTIFY_NETPKT_CONFCHGYDX && ev.charAt(0) <= NOTIFY_NETPKT_TIMEAVGYDX) {
             // function value ydx (tiny notification)
-            _hub._devListValidity = 10000;
+            _hub._isNotifWorking = true;
             _notifRetryCount = 0;
             if (_notifyPos >= 0) {
                 _notifyPos += ev.length() + 1;
@@ -120,7 +123,7 @@ abstract class NotificationHandler implements Runnable
                             break;
                         case NOTIFY_NETPKT_CONFCHGYDX:
                             _hub.handleConfigChangeNotification(serial);
-                        break;
+                            break;
                         case NOTIFY_NETPKT_TIMEVALYDX:
                         case NOTIFY_NETPKT_TIMEAVGYDX:
                         case NOTIFY_NETPKT_TIMEV2YDX:
@@ -165,7 +168,7 @@ abstract class NotificationHandler implements Runnable
                 }
             }
         } else if (ev.length() >= 5 && ev.startsWith("YN01")) {
-            _hub._devListValidity = 10000;
+            _hub._isNotifWorking = true;
             _notifRetryCount = 0;
             if (_notifyPos >= 0) {
                 _notifyPos += ev.length() + 1;
@@ -189,7 +192,7 @@ abstract class NotificationHandler implements Runnable
             }
         } else {
             // oops, bad notification ? be safe until a good one comes
-            _hub._devListValidity = 500;
+            _hub._isNotifWorking = false;
             _notifyPos = -1;
         }
     }

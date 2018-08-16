@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHubPort.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YHubPort.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindHubPort(), the high-level API for HubPort functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YHubPort return codes)
 //--- (end of YHubPort return codes)
+//--- (YHubPort yapiwrapper)
+//--- (end of YHubPort yapiwrapper)
 //--- (YHubPort class start)
 /**
  * YHubPort Class: Yocto-hub port interface
@@ -158,7 +160,7 @@ public class YHubPort extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return ENABLED_INVALID;
                 }
             }
@@ -229,7 +231,7 @@ public class YHubPort extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return PORTSTATE_INVALID;
                 }
             }
@@ -265,7 +267,7 @@ public class YHubPort extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return BAUDRATE_INVALID;
                 }
             }

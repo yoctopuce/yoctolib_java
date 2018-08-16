@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWakeUpSchedule.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YWakeUpSchedule.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YWakeUpSchedule return codes)
 //--- (end of YWakeUpSchedule return codes)
+//--- (YWakeUpSchedule yapiwrapper)
+//--- (end of YWakeUpSchedule yapiwrapper)
 //--- (YWakeUpSchedule class start)
 /**
  * YWakeUpSchedule Class: WakeUpSchedule function interface
@@ -181,7 +183,7 @@ public class YWakeUpSchedule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MINUTESA_INVALID;
                 }
             }
@@ -247,7 +249,7 @@ public class YWakeUpSchedule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MINUTESB_INVALID;
                 }
             }
@@ -313,7 +315,7 @@ public class YWakeUpSchedule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return HOURS_INVALID;
                 }
             }
@@ -379,7 +381,7 @@ public class YWakeUpSchedule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return WEEKDAYS_INVALID;
                 }
             }
@@ -445,7 +447,7 @@ public class YWakeUpSchedule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MONTHDAYS_INVALID;
                 }
             }
@@ -511,7 +513,7 @@ public class YWakeUpSchedule extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return MONTHS_INVALID;
                 }
             }
@@ -577,7 +579,7 @@ public class YWakeUpSchedule extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return NEXTOCCURENCE_INVALID;
                 }
             }

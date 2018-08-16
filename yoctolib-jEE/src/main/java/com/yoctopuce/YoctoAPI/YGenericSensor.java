@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YGenericSensor.java 28738 2017-10-03 08:06:35Z seb $
+ * $Id: YGenericSensor.java 31372 2018-07-26 12:43:47Z seb $
  *
  * Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -41,6 +41,8 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (YGenericSensor return codes)
 //--- (end of YGenericSensor return codes)
+//--- (YGenericSensor yapiwrapper)
+//--- (end of YGenericSensor yapiwrapper)
 //--- (YGenericSensor class start)
 /**
  * YGenericSensor Class: GenericSensor function interface
@@ -218,7 +220,7 @@ public class YGenericSensor extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SIGNALVALUE_INVALID;
                 }
             }
@@ -252,7 +254,7 @@ public class YGenericSensor extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration == 0) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SIGNALUNIT_INVALID;
                 }
             }
@@ -285,7 +287,7 @@ public class YGenericSensor extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SIGNALRANGE_INVALID;
                 }
             }
@@ -351,7 +353,7 @@ public class YGenericSensor extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return VALUERANGE_INVALID;
                 }
             }
@@ -458,7 +460,7 @@ public class YGenericSensor extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SIGNALBIAS_INVALID;
                 }
             }
@@ -500,7 +502,7 @@ public class YGenericSensor extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(YAPI.DefaultCacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
                     return SIGNALSAMPLING_INVALID;
                 }
             }
