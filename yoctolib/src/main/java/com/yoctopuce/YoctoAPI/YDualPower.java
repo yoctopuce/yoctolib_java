@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDualPower.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YDualPower.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindDualPower(), the high-level API for DualPower functions
  *
@@ -162,7 +162,7 @@ public class YDualPower extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return POWERSTATE_INVALID;
                 }
             }
@@ -198,7 +198,7 @@ public class YDualPower extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return POWERCONTROL_INVALID;
                 }
             }
@@ -269,7 +269,7 @@ public class YDualPower extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return EXTVOLTAGE_INVALID;
                 }
             }

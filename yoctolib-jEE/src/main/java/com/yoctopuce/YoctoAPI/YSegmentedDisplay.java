@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSegmentedDisplay.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YSegmentedDisplay.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -145,7 +145,7 @@ public class YSegmentedDisplay extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYEDTEXT_INVALID;
                 }
             }
@@ -204,7 +204,7 @@ public class YSegmentedDisplay extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYMODE_INVALID;
                 }
             }

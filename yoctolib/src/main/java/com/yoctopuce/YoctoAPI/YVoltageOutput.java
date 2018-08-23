@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YVoltageOutput.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YVoltageOutput.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindVoltageOutput(), the high-level API for VoltageOutput functions
  *
@@ -183,7 +183,7 @@ public class YVoltageOutput extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENTVOLTAGE_INVALID;
                 }
             }
@@ -209,7 +209,7 @@ public class YVoltageOutput extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return VOLTAGETRANSITION_INVALID;
                 }
             }
@@ -276,7 +276,7 @@ public class YVoltageOutput extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return VOLTAGEATSTARTUP_INVALID;
                 }
             }

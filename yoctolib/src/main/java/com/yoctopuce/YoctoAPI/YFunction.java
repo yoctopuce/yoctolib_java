@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YFunction.java 31736 2018-08-17 08:40:55Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -205,7 +205,7 @@ public class YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return LOGICALNAME_INVALID;
                 }
             }
@@ -279,7 +279,7 @@ public class YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return ADVERTISEDVALUE_INVALID;
                 }
             }
@@ -903,7 +903,7 @@ public class YFunction
         }
         try {
             // Check that the function is available without throwing exceptions
-            load(_yapi._cacheValidity);
+            load(_yapi._defaultCacheValidity);
         } catch (YAPI_Exception ex) {
             return false;
         }
@@ -1036,7 +1036,7 @@ public class YFunction
 
         try {
             // device not resolved for now, force a communication for a last chance resolution
-            if (load(_yapi._cacheValidity) == YAPI.SUCCESS) {
+            if (load(_yapi._defaultCacheValidity) == YAPI.SUCCESS) {
                 String serial = _yapi._yHash.resolveSerial(_className, _func);
                 return YModule.FindModuleInContext(_yapi, serial + ".module");
             }

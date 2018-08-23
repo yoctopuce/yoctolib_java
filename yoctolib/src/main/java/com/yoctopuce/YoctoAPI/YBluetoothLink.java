@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YBluetoothLink.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YBluetoothLink.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -215,7 +215,7 @@ public class YBluetoothLink extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return OWNADDRESS_INVALID;
                 }
             }
@@ -253,7 +253,7 @@ public class YBluetoothLink extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return PAIRINGPIN_INVALID;
                 }
             }
@@ -327,7 +327,7 @@ public class YBluetoothLink extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return REMOTEADDRESS_INVALID;
                 }
             }
@@ -393,7 +393,7 @@ public class YBluetoothLink extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return REMOTENAME_INVALID;
                 }
             }
@@ -427,7 +427,7 @@ public class YBluetoothLink extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return MUTE_INVALID;
                 }
             }
@@ -496,7 +496,7 @@ public class YBluetoothLink extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return PREAMPLIFIER_INVALID;
                 }
             }
@@ -562,7 +562,7 @@ public class YBluetoothLink extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return VOLUME_INVALID;
                 }
             }
@@ -630,7 +630,7 @@ public class YBluetoothLink extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return LINKSTATE_INVALID;
                 }
             }
@@ -665,7 +665,7 @@ public class YBluetoothLink extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return LINKQUALITY_INVALID;
                 }
             }
@@ -692,7 +692,7 @@ public class YBluetoothLink extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

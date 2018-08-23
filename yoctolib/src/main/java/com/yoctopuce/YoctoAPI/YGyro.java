@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YGyro.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -203,7 +203,7 @@ public class YGyro extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return BANDWIDTH_INVALID;
                 }
             }
@@ -272,7 +272,7 @@ public class YGyro extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return XVALUE_INVALID;
                 }
             }
@@ -307,7 +307,7 @@ public class YGyro extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return YVALUE_INVALID;
                 }
             }
@@ -342,7 +342,7 @@ public class YGyro extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return ZVALUE_INVALID;
                 }
             }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YTemperature.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YTemperature.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -234,7 +234,7 @@ public class YTemperature extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return SENSORTYPE_INVALID;
                 }
             }
@@ -323,7 +323,7 @@ public class YTemperature extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNALVALUE_INVALID;
                 }
             }
@@ -357,7 +357,7 @@ public class YTemperature extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration == 0) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNALUNIT_INVALID;
                 }
             }
@@ -383,7 +383,7 @@ public class YTemperature extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

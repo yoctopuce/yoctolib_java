@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YProximity.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YProximity.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindProximity(), the high-level API for Proximity functions
  *
@@ -223,7 +223,7 @@ public class YProximity extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return SIGNALVALUE_INVALID;
                 }
             }
@@ -259,7 +259,7 @@ public class YProximity extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return DETECTIONTHRESHOLD_INVALID;
                 }
             }
@@ -337,7 +337,7 @@ public class YProximity extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return DETECTIONHYSTERESIS_INVALID;
                 }
             }
@@ -413,7 +413,7 @@ public class YProximity extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return PRESENCEMINTIME_INVALID;
                 }
             }
@@ -483,7 +483,7 @@ public class YProximity extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return REMOVALMINTIME_INVALID;
                 }
             }
@@ -555,7 +555,7 @@ public class YProximity extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return ISPRESENT_INVALID;
                 }
             }
@@ -593,7 +593,7 @@ public class YProximity extends YSensor
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return LASTTIMEAPPROACHED_INVALID;
                 }
             }
@@ -632,7 +632,7 @@ public class YProximity extends YSensor
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return LASTTIMEREMOVED_INVALID;
                 }
             }
@@ -670,7 +670,7 @@ public class YProximity extends YSensor
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return PULSECOUNTER_INVALID;
                 }
             }
@@ -716,7 +716,7 @@ public class YProximity extends YSensor
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return PULSETIMER_INVALID;
                 }
             }
@@ -752,7 +752,7 @@ public class YProximity extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return PROXIMITYREPORTMODE_INVALID;
                 }
             }

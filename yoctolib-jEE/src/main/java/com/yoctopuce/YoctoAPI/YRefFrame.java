@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRefFrame.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YRefFrame.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -246,7 +246,7 @@ public class YRefFrame extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return MOUNTPOS_INVALID;
                 }
             }
@@ -339,7 +339,7 @@ public class YRefFrame extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return BEARING_INVALID;
                 }
             }
@@ -367,7 +367,7 @@ public class YRefFrame extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return CALIBRATIONPARAM_INVALID;
                 }
             }
@@ -392,7 +392,7 @@ public class YRefFrame extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return FUSIONMODE_INVALID;
                 }
             }

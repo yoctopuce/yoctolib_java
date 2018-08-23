@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWeighScale.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YWeighScale.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindWeighScale(), the high-level API for WeighScale functions
  *
@@ -237,7 +237,7 @@ public class YWeighScale extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return EXCITATION_INVALID;
                 }
             }
@@ -351,7 +351,7 @@ public class YWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return TEMPAVGADAPTRATIO_INVALID;
                 }
             }
@@ -430,7 +430,7 @@ public class YWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return TEMPCHGADAPTRATIO_INVALID;
                 }
             }
@@ -466,7 +466,7 @@ public class YWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return COMPTEMPAVG_INVALID;
                 }
             }
@@ -500,7 +500,7 @@ public class YWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return COMPTEMPCHG_INVALID;
                 }
             }
@@ -534,7 +534,7 @@ public class YWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return COMPENSATION_INVALID;
                 }
             }
@@ -606,7 +606,7 @@ public class YWeighScale extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return ZEROTRACKING_INVALID;
                 }
             }
@@ -634,7 +634,7 @@ public class YWeighScale extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

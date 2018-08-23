@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQuadratureDecoder.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YQuadratureDecoder.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -181,7 +181,7 @@ public class YQuadratureDecoder extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return SPEED_INVALID;
                 }
             }
@@ -215,7 +215,7 @@ public class YQuadratureDecoder extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return DECODING_INVALID;
                 }
             }

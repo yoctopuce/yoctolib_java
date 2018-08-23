@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWatchdog.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YWatchdog.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -256,7 +256,7 @@ public class YWatchdog extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return STATE_INVALID;
                 }
             }
@@ -328,7 +328,7 @@ public class YWatchdog extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return STATEATPOWERON_INVALID;
                 }
             }
@@ -403,7 +403,7 @@ public class YWatchdog extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return MAXTIMEONSTATEA_INVALID;
                 }
             }
@@ -473,7 +473,7 @@ public class YWatchdog extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return MAXTIMEONSTATEB_INVALID;
                 }
             }
@@ -543,7 +543,7 @@ public class YWatchdog extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return OUTPUT_INVALID;
                 }
             }
@@ -615,7 +615,7 @@ public class YWatchdog extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return PULSETIMER_INVALID;
                 }
             }
@@ -673,7 +673,7 @@ public class YWatchdog extends YFunction
         YDelayedPulse res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return DELAYEDPULSETIMER_INVALID;
                 }
             }
@@ -725,7 +725,7 @@ public class YWatchdog extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return COUNTDOWN_INVALID;
                 }
             }
@@ -761,7 +761,7 @@ public class YWatchdog extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return AUTOSTART_INVALID;
                 }
             }
@@ -831,7 +831,7 @@ public class YWatchdog extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return RUNNING_INVALID;
                 }
             }
@@ -916,7 +916,7 @@ public class YWatchdog extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return TRIGGERDELAY_INVALID;
                 }
             }
@@ -985,7 +985,7 @@ public class YWatchdog extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return TRIGGERDURATION_INVALID;
                 }
             }

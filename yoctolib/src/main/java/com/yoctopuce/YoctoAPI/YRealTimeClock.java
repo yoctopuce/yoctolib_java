@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRealTimeClock.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YRealTimeClock.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -163,7 +163,7 @@ public class YRealTimeClock extends YFunction
         long res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return UNIXTIME_INVALID;
                 }
             }
@@ -230,7 +230,7 @@ public class YRealTimeClock extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return DATETIME_INVALID;
                 }
             }
@@ -263,7 +263,7 @@ public class YRealTimeClock extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return UTCOFFSET_INVALID;
                 }
             }
@@ -332,7 +332,7 @@ public class YRealTimeClock extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return TIMESET_INVALID;
                 }
             }

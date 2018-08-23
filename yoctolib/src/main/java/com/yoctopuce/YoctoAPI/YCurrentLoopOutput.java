@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCurrentLoopOutput.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YCurrentLoopOutput.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -199,7 +199,7 @@ public class YCurrentLoopOutput extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENT_INVALID;
                 }
             }
@@ -225,7 +225,7 @@ public class YCurrentLoopOutput extends YFunction
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENTTRANSITION_INVALID;
                 }
             }
@@ -292,7 +292,7 @@ public class YCurrentLoopOutput extends YFunction
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENTATSTARTUP_INVALID;
                 }
             }
@@ -328,7 +328,7 @@ public class YCurrentLoopOutput extends YFunction
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return LOOPPOWER_INVALID;
                 }
             }

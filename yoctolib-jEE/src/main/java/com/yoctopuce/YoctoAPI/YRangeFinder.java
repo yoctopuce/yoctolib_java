@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YRangeFinder.java 31372 2018-07-26 12:43:47Z seb $
+ * $Id: YRangeFinder.java 31728 2018-08-17 08:23:25Z seb $
  *
  * Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -211,7 +211,7 @@ public class YRangeFinder extends YSensor
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return RANGEFINDERMODE_INVALID;
                 }
             }
@@ -281,7 +281,7 @@ public class YRangeFinder extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return HARDWARECALIBRATION_INVALID;
                 }
             }
@@ -313,7 +313,7 @@ public class YRangeFinder extends YSensor
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return CURRENTTEMPERATURE_INVALID;
                 }
             }
@@ -339,7 +339,7 @@ public class YRangeFinder extends YSensor
         String res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._cacheValidity) != YAPI.SUCCESS) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return COMMAND_INVALID;
                 }
             }

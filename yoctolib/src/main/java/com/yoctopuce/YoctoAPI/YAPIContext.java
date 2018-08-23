@@ -383,7 +383,7 @@ public class YAPIContext
     protected long _deviceListValidityMs = 10000;
 
     //--- (generated code: YAPIContext definitions)
-    protected long _cacheValidity = 5;
+    protected long _defaultCacheValidity = 5;
 
     //--- (end of generated code: YAPIContext definitions)
 
@@ -728,6 +728,7 @@ public class YAPIContext
      * Note: This function must be called after yInitAPI.
      *
      * @param deviceListValidity : number of seconds between each enumeration.
+     *
      */
     public void SetDeviceListValidity(int deviceListValidity)
     {
@@ -759,11 +760,12 @@ public class YAPIContext
      * Note: This function must be called after yInitAPI.
      *
      * @param cacheValidityMs : an integer corresponding to the validity attributed to the
-     *         loaded function parameters, in milliseconds
+     *         loaded function parameters, in milliseconds.
+     *
      */
     public void SetCacheValidity(long cacheValidityMs)
     {
-        _cacheValidity = cacheValidityMs;
+        _defaultCacheValidity = cacheValidityMs;
     }
 
     /**
@@ -777,7 +779,7 @@ public class YAPIContext
      */
     public long GetCacheValidity()
     {
-        return _cacheValidity;
+        return _defaultCacheValidity;
     }
 
     //--- (end of generated code: YAPIContext implementation)
