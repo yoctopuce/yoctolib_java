@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YColorLedCluster.java 31728 2018-08-17 08:23:25Z seb $
+ * $Id: YColorLedCluster.java 31894 2018-08-24 21:29:05Z seb $
  *
  * Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -587,6 +587,27 @@ public class YColorLedCluster extends YFunction
      */
     public int set_rgbColorAtPowerOn(int ledIndex,int count,int rgbValue) throws YAPI_Exception
     {
+        return sendCommand(String.format(Locale.US, "SC%d,%d,%x",ledIndex,count,rgbValue));
+    }
+
+    /**
+     *  Changes the  color at device startup of consecutve LEDs in the cluster, using a HSL color. Encoding
+     * is done as follows: 0xHHSSLL.
+     *  Don't forget to call saveLedsConfigAtPowerOn() to make sure the modification is saved in the device
+     * flash memory.
+     *
+     * @param ledIndex :  index of the first affected LED.
+     * @param count    :  affected LED count.
+     * @param hslValue :  new color.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_hslColorAtPowerOn(int ledIndex,int count,int hslValue) throws YAPI_Exception
+    {
+        int rgbValue;
+        rgbValue = hsl2rgb(hslValue);
         return sendCommand(String.format(Locale.US, "SC%d,%d,%x",ledIndex,count,rgbValue));
     }
 
@@ -1370,6 +1391,78 @@ public class YColorLedCluster extends YFunction
             res.add(started);
             idx = idx + 1;
         }
+        return res;
+    }
+
+    public int hsl2rgbInt(int temp1,int temp2,int temp3)
+    {
+        if (temp3 >= 170) {
+            return (((temp1 + 127)) / (255));
+        }
+        if (temp3 > 42) {
+            if (temp3 <= 127) {
+                return (((temp2 + 127)) / (255));
+            }
+            temp3 = 170 - temp3;
+        }
+        return (((temp1*255 + (temp2-temp1) * (6 * temp3) + 32512)) / (65025));
+    }
+
+    public int hsl2rgb(int hslValue)
+    {
+        int R;
+        int G;
+        int B;
+        int H;
+        int S;
+        int L;
+        int temp1;
+        int temp2;
+        int temp3;
+        int res;
+        L = ((hslValue) & (0xff));
+        S = ((((hslValue) >> (8))) & (0xff));
+        H = ((((hslValue) >> (16))) & (0xff));
+        if (S==0) {
+            res = ((L) << (16))+((L) << (8))+L;
+            return res;
+        }
+        if (L<=127) {
+            temp2 = L * (255 + S);
+        } else {
+            temp2 = (L+S) * 255 - L*S;
+        }
+        temp1 = 510 * L - temp2;
+        // R
+        temp3 = (H + 85);
+        if (temp3 > 255) {
+            temp3 = temp3-255;
+        }
+        R = hsl2rgbInt(temp1, temp2, temp3);
+        // G
+        temp3 = H;
+        if (temp3 > 255) {
+            temp3 = temp3-255;
+        }
+        G = hsl2rgbInt(temp1, temp2, temp3);
+        // B
+        if (H >= 85) {
+            temp3 = H - 85 ;
+        } else {
+            temp3 = H + 170;
+        }
+        B = hsl2rgbInt(temp1, temp2, temp3);
+        // just in case
+        if (R>255) {
+            R=255;
+        }
+        if (G>255) {
+            G=255;
+        }
+        if (B>255) {
+            B=255;
+        }
+        res = ((R) << (16))+((G) << (8))+B;
         return res;
     }
 
