@@ -4,11 +4,7 @@ package com.yoctopuce.YoctoAPI;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Queue;
+import java.util.*;
 
 //--- (generated code: YAPIContext return codes)
 //--- (end of generated code: YAPIContext return codes)
@@ -32,6 +28,7 @@ public class YAPIContext
         private final ArrayList<Integer> _report;
         private final double _timestamp;
         private final YModule _module;
+        private final int _beacon;
 
         DataEvent(YFunction fun, String value)
         {
@@ -40,6 +37,7 @@ public class YAPIContext
             _value = value;
             _report = null;
             _timestamp = 0;
+            _beacon = -1;
         }
 
         DataEvent(YModule module)
@@ -49,6 +47,17 @@ public class YAPIContext
             _value = null;
             _report = null;
             _timestamp = 0;
+            _beacon = -1;
+        }
+
+        DataEvent(YModule module, int beacon)
+        {
+            _module = module;
+            _fun = null;
+            _value = null;
+            _report = null;
+            _timestamp = 0;
+            _beacon = beacon;
         }
 
 
@@ -59,12 +68,17 @@ public class YAPIContext
             _value = null;
             _timestamp = timestamp;
             _report = report;
+            _beacon = -1;
         }
 
         public void invoke()
         {
             if (_module != null) {
-                _module._invokeConfigChangeCallback();
+                if (_beacon < 0) {
+                    _module._invokeConfigChangeCallback();
+                } else {
+                    _module._invokeBeaconCallback(_beacon);
+                }
             } else {
                 if (_value == null) {
                     YSensor sensor = (YSensor) _fun;
@@ -378,6 +392,8 @@ public class YAPIContext
     final YHash _yHash;
     private final ArrayList<YFunction> _ValueCallbackList = new ArrayList<>();
     private final ArrayList<YFunction> _TimedReportCallbackList = new ArrayList<>();
+    private final Map<YModule, Integer> _moduleCallbackList = new HashMap<>();
+
     private int _pktAckDelay = 0;
 
     protected long _deviceListValidityMs = 10000;
@@ -484,6 +500,7 @@ public class YAPIContext
         _yHash.reset();
         _ValueCallbackList.clear();
         _TimedReportCallbackList.clear();
+        _moduleCallbackList.clear();
         for (int i = 1; i <= 20; i++) {
             _calibHandlers.put(i, linearCalibrationHandler);
         }
@@ -594,6 +611,40 @@ public class YAPIContext
             }
         }
     }
+
+
+    void _UpdateModuleCallbackList(YModule module, boolean add)
+    {
+        if (add) {
+            module.isOnline();
+            synchronized (_moduleCallbackList) {
+                if (!_moduleCallbackList.containsKey(module)) {
+                    _moduleCallbackList.put(module, 1);
+                } else {
+                    _moduleCallbackList.put(module, _moduleCallbackList.get(module) + 1);
+                }
+            }
+        } else {
+            synchronized (_moduleCallbackList) {
+                if (_moduleCallbackList.containsKey(module) && _moduleCallbackList.get(module) > 1) {
+                    _moduleCallbackList.put(module, _moduleCallbackList.get(module) - 1);
+                }
+            }
+        }
+    }
+
+
+    YModule _GetModuleCallack(String serial)
+    {
+        YModule module = YModule.FindModuleInContext(this, serial + ".module");
+        synchronized (_moduleCallbackList) {
+            if (_moduleCallbackList.containsKey(module) && _moduleCallbackList.get(module) > 0) {
+                return module;
+            }
+        }
+        return null;
+    }
+
 
     YFunction _GetTimedReportCallback(String hwid)
     {
@@ -787,12 +838,12 @@ public class YAPIContext
 
     private void SetDeviceListValidity_internal(long deviceListValidity)
     {
-        _deviceListValidityMs = deviceListValidity*1000;
+        _deviceListValidityMs = deviceListValidity * 1000;
     }
 
     private int GetDeviceListValidity_internal()
     {
-        return (int)(_deviceListValidityMs/1000);
+        return (int) (_deviceListValidityMs / 1000);
     }
 
     /**

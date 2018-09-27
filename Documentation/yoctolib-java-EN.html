@@ -6,7 +6,7 @@
 <style type="text/css">
 /*********************************************************************
  *
- * $Id: yoctolib-java-EN.html 31887 2018-08-24 14:33:28Z seb $
+ * $Id: yoctolib-java-EN.html 32388 2018-09-27 08:27:10Z seb $
  *
  * Searchable documentation browser for Yoctopuce Library
  *
@@ -257,7 +257,7 @@ var minusimage="data:image/gif;base64,R0lGODlhEAAQAIAAAEJCQv///yH5BAAAAP8ALAAAAA
 
 var marginSize=250;
 var resizeCallBacks= new Array();
-var SVN_Id = '$Id: yoctolib-java-EN.html 31887 2018-08-24 14:33:28Z seb $';
+var SVN_Id = '$Id: yoctolib-java-EN.html 32388 2018-09-27 08:27:10Z seb $';
 var Version = (SVN_Id.split(' '))[3];
 var doc = new Array();
 
@@ -311,7 +311,7 @@ var ReturnLabel='Returns :';
 var AbbrevHint='The API features two syntaxes : one is purely object oriented, the other is more compact.';
 var NotFound='No match found';
 var AbbrevLabel='Use abbreviated names';
-var UseShortcuts=false;
+var UseShortcuts=null;
 var sub={YAPI_SUCCESS:'YAPI.SUCCESS',YAPI_NOT_INITIALIZED:'YAPI.NOT_INITIALIZED',YAPI_INVALID_ARGUMENT:'YAPI.INVALID_ARGUMENT',YAPI_NOT_SUPPORTED:'YAPI.NOT_SUPPORTED',YAPI_DEVICE_NOT_FOUND:'YAPI.DEVICE_NOT_FOUND',YAPI_VERSION_MISMATCH:'YAPI.VERSION_MISMATCH',YAPI_DEVICE_BUSY:'YAPI.DEVICE_BUSY',YAPI_TIMEOUT:'YAPI.TIMEOUT',YAPI_IO_ERROR:'YAPI.IO_ERROR',YAPI_NO_MORE_DATA:'YAPI.NO_MORE_DATA',YAPI_EXHAUSTED:'YAPI.EXHAUSTED',YAPI_DOUBLE_ACCES:'YAPI.DOUBLE_ACCES',YAPI_UNAUTHORIZED:'YAPI.UNAUTHORIZED',YAPI_RTC_NOT_READY:'YAPI.RTC_NOT_READY',YAPI_FILE_NOT_FOUND:'YAPI.FILE_NOT_FOUND',null:'null'};
 doc['Module']={'':{syn:'Module control interface',inc:'import com.yoctopuce.YoctoAPI.YModule;',cmt:'<p>This interface is identical for all Yoctopuce USB modules. It can be used to control the module global parameters, and to enumerate the functions provided by each module.</p>'}};
 doc['Module']['FindModule']={syn:'Allows you to find a module from its serial number or from its logical name.',lib:'YModule.FindModule()',pro:'YModule FindModule(String <span id=pn>func</span>)',cmt:'<p>Allows you to find a module from its serial number or from its logical name.</p><p> This function does not require that the module is online at the time it is invoked. The returned object is nevertheless valid. Use the method <tt>YModule.isOnline()</tt> to test if the module is indeed online at a given time. In case of ambiguity when looking for a module by logical name, no error is notified: the first instance found is returned. The search is performed first by hardware name, then by logical name.</p><p> If a call to this object\x27s is_online() method returns FALSE although you are certain that the device is plugged, make sure that you did call registerHub() at application initialization time.</p>',par:{func:'a string containing either the serial number or the logical name of the desired module'},ret:'a <tt>YModule</tt> object allowing you to drive the module or get additional information on the module.'};
@@ -357,6 +357,7 @@ doc['Module']['load']={syn:'Preloads the module cache with a specified validity 
 doc['Module']['log']={syn:'Adds a text message to the device logs.',lib:'module.log()',pro:'int log(String <span id=pn>text</span>)',cmt:'<p>Adds a text message to the device logs. This function is useful in particular to trace the execution of HTTP callbacks. If a newline is desired after the message, it must be included in the string.</p>',par:{text:'the string to append to the logs.'},ret:'<tt>YAPI_SUCCESS</tt> if the call succeeds.',ext:'On failure, throws an exception or returns a negative error code.'};
 doc['Module']['nextModule']={syn:'Continues the module enumeration started using <tt>yFirstModule()</tt>.',lib:'module.nextModule()',pro:'YModule nextModule()',cmt:'<p>Continues the module enumeration started using <tt>yFirstModule()</tt>.</p>',ret:'a pointer to a <tt>YModule</tt> object, corresponding to the next module found, or a <tt>null</tt> pointer if there are no more modules to enumerate.'};
 doc['Module']['reboot']={syn:'Schedules a simple module reboot after the given number of seconds.',lib:'module.reboot()',pro:'int reboot(int <span id=pn>secBeforeReboot</span>)',cmt:'<p>Schedules a simple module reboot after the given number of seconds.</p>',par:{secBeforeReboot:'number of seconds before rebooting'},ret:'<tt>YAPI_SUCCESS</tt> when the call succeeds.',ext:'On failure, throws an exception or returns a negative error code.'};
+doc['Module']['registerBeaconCallback']={syn:'Register a callback function, to be called when the localization beacon of the module has been changed.',lib:'module.registerBeaconCallback()',pro:'int registerBeaconCallback(BeaconCallback <span id=pn>callback</span>)',cmt:'<p>Register a callback function, to be called when the localization beacon of the module has been changed. The callback function should take two arguments: the YModule object of which the beacon has changed, and an integer describing the new beacon state.</p>',par:{callback:'The callback function to call, or <tt>null</tt> to unregister a previously registered callback.'}};
 doc['Module']['registerConfigChangeCallback']={syn:'Register a callback function, to be called when a persistent settings in a device configuration has been changed (e.g.',lib:'module.registerConfigChangeCallback()',pro:'int registerConfigChangeCallback(ConfigChangeCallback <span id=pn>callback</span>)',cmt:'<p>Register a callback function, to be called when a persistent settings in a device configuration has been changed (e.g. change of unit, etc).</p>',par:{callback:'a procedure taking a YModule parameter, or <tt>null</tt> to unregister a previously registered callback.'}};
 doc['Module']['registerLogCallback']={syn:'Registers a device log callback function.',lib:'module.registerLogCallback()',pro:'void registerLogCallback(LogCallback <span id=pn>callback</span>)',cmt:'<p>Registers a device log callback function. This callback will be called each time that a module sends a new log message. Mostly useful to debug a Yoctopuce module.</p>',par:{callback:'the callback function to call, or a null pointer. The callback function should take two arguments: the module object that emitted the log message, and the character string containing the log.'}};
 doc['Module']['revertFromFlash']={syn:'Reloads the settings stored in the nonvolatile memory, as when the module is powered on.',lib:'module.revertFromFlash()',pro:'int revertFromFlash()',cmt:'<p>Reloads the settings stored in the nonvolatile memory, as when the module is powered on.</p>',ret:'<tt>YAPI_SUCCESS</tt> when the call succeeds.',ext:'On failure, throws an exception or returns a negative error code.'};

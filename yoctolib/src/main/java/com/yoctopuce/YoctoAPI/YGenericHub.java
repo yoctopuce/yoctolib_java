@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 31423 2018-08-07 11:52:08Z seb $
+ * $Id: YGenericHub.java 32361 2018-09-26 15:28:10Z seb $
  *
  * Internal YGenericHub object
  *
@@ -116,6 +116,7 @@ abstract class YGenericHub
     private HashMap<String, YDevice> _devices = new HashMap<>();
     final boolean _reportConnnectionLost;
     private String _hubSerialNumber = null;
+    private HashMap<String, Integer> _beaconss = new HashMap<>();
 
     YGenericHub(YAPIContext yctx, HTTPParams httpParams, int idx, boolean reportConnnectionLost)
     {
@@ -311,8 +312,22 @@ abstract class YGenericHub
 
     void handleConfigChangeNotification(String serial)
     {
-        YModule module = YModule.FindModuleInContext(_yctx, serial + ".module");
-        _yctx._PushDataEvent(new YAPIContext.DataEvent(module));
+        YModule module = _yctx._GetModuleCallack(serial);
+        if (module != null) {
+            _yctx._PushDataEvent(new YAPIContext.DataEvent(module));
+        }
+    }
+
+    void handleBeaconNotification(String serial, String logicalName, int beacon)
+    {
+        if (!_beaconss.containsKey(serial) || _beaconss.get(serial) != beacon) {
+            _beaconss.put(serial, beacon);
+
+            YModule module = _yctx._GetModuleCallack(serial);
+            if (module != null) {
+                _yctx._PushDataEvent(new YAPIContext.DataEvent(module, beacon));
+            }
+        }
     }
 
 

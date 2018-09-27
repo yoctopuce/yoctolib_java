@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 31728 2018-08-17 08:23:25Z seb $
+ * $Id: YModule.java 32376 2018-09-27 07:57:07Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -124,6 +124,7 @@ public class YModule extends YFunction
     protected UpdateCallback _valueCallbackModule = null;
     protected YModule.LogCallback _logCallback = null;
     protected YModule.ConfigChangeCallback _confChangeCallback = null;
+    protected YModule.BeaconCallback _beaconCallback = null;
 
     public interface LogCallback
     {
@@ -141,6 +142,18 @@ public class YModule extends YFunction
          * @param module  : the module object of the device
          */
         void configChangeCallback(YModule module);
+    }
+    public interface BeaconCallback
+    {
+        /**
+         *
+         * @param module  : the module object of the device
+         */
+        /**
+         *
+         * @param beacon  : the beacon state
+         */
+        void beaconCallback(YModule module, int beacon);
     }
     /**
      * Deprecated UpdateCallback for Module
@@ -168,6 +181,11 @@ public class YModule extends YFunction
         void timedReportCallback(YModule  function, YMeasure measure);
     }
     //--- (end of generated code: YModule definitions)
+
+    private static void _updateModuleCallbackList(YModule module, boolean add)
+    {
+        module._yapi._UpdateModuleCallbackList(module,add);
+    }
 
 
     // Return the internal device object hosting the function
@@ -357,14 +375,12 @@ public class YModule extends YFunction
     }
 
 
-
     private ArrayList<String> get_subDevices_internal() throws YAPI_Exception
     {
         YDevice dev = _getDev();
         YGenericHub hub = dev.getHub();
         return hub.get_subDeviceOf(_serialNumber);
     }
-
 
 
     private String get_parentHub_internal() throws YAPI_Exception
@@ -1161,6 +1177,11 @@ public class YModule extends YFunction
      */
     public int registerConfigChangeCallback(YModule.ConfigChangeCallback callback)
     {
+        if (callback != null) {
+            YModule._updateModuleCallbackList(this, true);
+        } else {
+            YModule._updateModuleCallbackList(this, false);
+        }
         _confChangeCallback = callback;
         return 0;
     }
@@ -1174,11 +1195,38 @@ public class YModule extends YFunction
     }
 
     /**
+     * Register a callback function, to be called when the localization beacon of the module
+     * has been changed. The callback function should take two arguments: the YModule object of
+     * which the beacon has changed, and an integer describing the new beacon state.
+     *
+     * @param callback : The callback function to call, or null to unregister a
+     *         previously registered callback.
+     */
+    public int registerBeaconCallback(YModule.BeaconCallback callback)
+    {
+        if (callback != null) {
+            YModule._updateModuleCallbackList(this, true);
+        } else {
+            YModule._updateModuleCallbackList(this, false);
+        }
+        _beaconCallback = callback;
+        return 0;
+    }
+
+    public int _invokeBeaconCallback(int beaconState)
+    {
+        if (_beaconCallback != null) {
+            _beaconCallback.beaconCallback(this, beaconState);
+        }
+        return 0;
+    }
+
+    /**
      * Triggers a configuration change callback, to check if they are supported or not.
      */
     public int triggerConfigChangeCallback() throws YAPI_Exception
     {
-        _setAttr("persistentSettings","2");
+        _setAttr("persistentSettings", "2");
         return 0;
     }
 
@@ -1209,7 +1257,7 @@ public class YModule extends YFunction
         }
         //may throw an exception
         serial = get_serialNumber();
-        tmp_res = YFirmwareUpdate.CheckFirmware(serial,path, release);
+        tmp_res = YFirmwareUpdate.CheckFirmware(serial, path, release);
         if ((tmp_res).indexOf("error:") == 0) {
             _throw(YAPI.INVALID_ARGUMENT, tmp_res);
         }
@@ -1433,10 +1481,10 @@ public class YModule extends YFunction
         int i;
         String fid;
 
-        count  = functionCount();
+        count = functionCount();
         i = 0;
         while (i < count) {
-            fid  = functionId(i);
+            fid = functionId(i);
             if (fid.equals(funcId)) {
                 return true;
             }

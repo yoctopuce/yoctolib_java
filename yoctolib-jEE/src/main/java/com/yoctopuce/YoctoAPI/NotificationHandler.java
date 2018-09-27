@@ -177,15 +177,23 @@ abstract class NotificationHandler implements Runnable
             if (notype == NOTIFY_NETPKT_NOT_SYNC) {
                 _notifyPos = Integer.valueOf(ev.substring(5));
             } else {
+                String[] parts;
                 switch (notype) {
                     case NOTIFY_NETPKT_NAME: // device name change, or arrival
+                        parts = ev.substring(5).split(",");
+                        try {
+                            int beacon = Integer.valueOf(parts[2]);
+                            _hub.handleBeaconNotification(parts[0], parts[1], beacon);
+                        } catch (NumberFormatException ignore) {
+                        }
+                        // no break on purpose
                     case NOTIFY_NETPKT_CHILD: // device plug/unplug
                     case NOTIFY_NETPKT_FUNCNAME: // function name change
                     case NOTIFY_NETPKT_FUNCNAMEYDX: // function name change (ydx)
                         _hub._devListExpires = 0;
                         break;
                     case NOTIFY_NETPKT_FUNCVAL: // function value (long notification)
-                        String[] parts = ev.substring(5).split(",");
+                        parts = ev.substring(5).split(",");
                         _hub.handleValueNotification(parts[0], parts[1], parts[2]);
                         break;
                 }

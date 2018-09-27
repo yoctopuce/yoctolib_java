@@ -8,7 +8,7 @@ public class Demo
 {
 
     static class EventHandler implements YAPI.DeviceArrivalCallback, YAPI.DeviceRemovalCallback,
-            YAnButton.UpdateCallback, YSensor.UpdateCallback, YSensor.TimedReportCallback, YModule.ConfigChangeCallback
+            YAnButton.UpdateCallback, YSensor.UpdateCallback, YSensor.TimedReportCallback, YModule.ConfigChangeCallback, YModule.BeaconCallback
     {
 
         @Override
@@ -48,6 +48,7 @@ public class Demo
                 String serial = module.get_serialNumber();
                 System.out.println("Device arrival : " + serial);
                 module.registerConfigChangeCallback(this);
+                module.registerBeaconCallback(this);
 
 
                 // First solution: look for a specific type of function (eg. anButton)
@@ -90,6 +91,12 @@ public class Demo
         public void configChangeCallback(YModule module)
         {
             System.out.println("Configuration changed for  " + module);
+        }
+
+        @Override
+        public void beaconCallback(YModule module, int beacon)
+        {
+            System.out.println(String.format("Beacon changed to %d : %s", beacon, module));
         }
     }
 
