@@ -1,3 +1,17 @@
+/*
+ *
+ *  $Id: Demo.java 32627 2018-10-10 13:37:29Z seb $
+ *
+ *  An example that show how to use a  Yocto-MaxiThermistor
+ *
+ *  You can find more information on our web site:
+ *   Yocto-MaxiThermistor documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-maxithermistor/doc.html
+ *   JAVA API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
+ *
+ */
+
 import com.yoctopuce.YoctoAPI.*;
 
 public class Demo {

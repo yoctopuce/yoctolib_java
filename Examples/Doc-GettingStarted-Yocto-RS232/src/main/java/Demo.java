@@ -1,3 +1,17 @@
+/*
+ *
+ *  $Id: Demo.java 32627 2018-10-10 13:37:29Z seb $
+ *
+ *  An example that show how to use a  Yocto-RS232
+ *
+ *  You can find more information on our web site:
+ *   Yocto-RS232 documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-rs232/doc.html
+ *   JAVA API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
+ *
+ */
+
 import com.yoctopuce.YoctoAPI.YAPI;
 import com.yoctopuce.YoctoAPI.YAPI_Exception;
 import com.yoctopuce.YoctoAPI.YSerialPort;
@@ -6,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 public class Demo {
-
 
     public static void main(String[] args)
     {

@@ -1,3 +1,17 @@
+/*
+ *
+ *  $Id: Demo.java 32627 2018-10-10 13:37:29Z seb $
+ *
+ *  An example that show how to use a  Yocto-Knob
+ *
+ *  You can find more information on our web site:
+ *   Yocto-Knob documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-knob/doc.html
+ *   JAVA API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
+ *
+ */
+
 import com.yoctopuce.YoctoAPI.*;
 
 public class Demo {
@@ -30,7 +44,6 @@ public class Demo {
         }
         YAnButton input1 = YAnButton.FindAnButton(serial + ".anButton1");
         YAnButton input5 = YAnButton.FindAnButton(serial + ".anButton5");
-
 
         while (true) {
             try {

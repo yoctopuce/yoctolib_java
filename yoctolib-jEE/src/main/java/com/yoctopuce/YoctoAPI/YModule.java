@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 32376 2018-09-27 07:57:07Z seb $
+ * $Id: YModule.java 32520 2018-10-05 08:26:08Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -2035,6 +2035,22 @@ public class YModule extends YFunction
         }
         clearCache();
         return YAPI.SUCCESS;
+    }
+
+    /**
+     * Returns the unique hardware identifier of the module.
+     * The unique hardware identifier is made of the device serial
+     * number followed by string ".module".
+     *
+     * @return a string that uniquely identifies the module
+     */
+    @Override
+    public String get_hardwareId() throws YAPI_Exception
+    {
+        String serial;
+
+        serial = get_serialNumber();
+        return serial + ".module";
     }
 
     /**

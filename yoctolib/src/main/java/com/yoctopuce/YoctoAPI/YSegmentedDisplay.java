@@ -1,10 +1,10 @@
-/*********************************************************************
+/*
  *
- * $Id: YSegmentedDisplay.java 31728 2018-08-17 08:23:25Z seb $
+ *  $Id: YSegmentedDisplay.java 32610 2018-10-10 06:52:20Z seb $
  *
- * Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
+ *  Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -35,7 +35,7 @@
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
  *  WARRANTY, OR OTHERWISE.
  *
- *********************************************************************/
+ */
 
 package com.yoctopuce.YoctoAPI;
 

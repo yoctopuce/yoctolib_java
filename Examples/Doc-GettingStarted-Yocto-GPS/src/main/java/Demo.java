@@ -1,3 +1,17 @@
+/*
+ *
+ *  $Id: Demo.java 32627 2018-10-10 13:37:29Z seb $
+ *
+ *  An example that show how to use a  Yocto-GPS
+ *
+ *  You can find more information on our web site:
+ *   Yocto-GPS documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-gps/doc.html
+ *   JAVA API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
+ *
+ */
+
 import com.yoctopuce.YoctoAPI.*;
 
 public class Demo {

@@ -1,10 +1,10 @@
-/*********************************************************************
+/*
  *
- * $Id: YPwmInput.java 31728 2018-08-17 08:23:25Z seb $
+ *  $Id: YPwmInput.java 32610 2018-10-10 06:52:20Z seb $
  *
- * Implements FindPwmInput(), the high-level API for PwmInput functions
+ *  Implements FindPwmInput(), the high-level API for PwmInput functions
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -35,7 +35,7 @@
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
  *  WARRANTY, OR OTHERWISE.
  *
- *********************************************************************/
+ */
 
 package com.yoctopuce.YoctoAPI;
 
@@ -190,6 +190,45 @@ public class YPwmInput extends YSensor
             _debouncePeriod = json_val.getInt("debouncePeriod");
         }
         super._parseAttr(json_val);
+    }
+
+    /**
+     * Changes the measuring unit for the measured quantity. That unit
+     * is just a string which is automatically initialized each time
+     * the measurement mode is changed. But is can be set to an
+     * arbitrary value.
+     *
+     * @param newval : a string corresponding to the measuring unit for the measured quantity
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_unit(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("unit",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the measuring unit for the measured quantity. That unit
+     * is just a string which is automatically initialized each time
+     * the measurement mode is changed. But is can be set to an
+     * arbitrary value.
+     *
+     * @param newval : a string corresponding to the measuring unit for the measured quantity
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setUnit(String newval)  throws YAPI_Exception
+    {
+        return set_unit(newval);
     }
 
     /**

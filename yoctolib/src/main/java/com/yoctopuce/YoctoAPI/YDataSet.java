@@ -1,5 +1,5 @@
-/*********************************************************************
- * $Id: YDataSet.java 31435 2018-08-07 14:11:47Z mvuilleu $
+/*
+ * $Id: YDataSet.java 32612 2018-10-10 07:45:30Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -33,7 +33,7 @@
  * CONTRIBUTION, OR OTHER SIMILAR COSTS, WHETHER ASSERTED ON THE
  * BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
  * WARRANTY, OR OTHERWISE.
- *********************************************************************/
+ */
 
 package com.yoctopuce.YoctoAPI;
 

@@ -1,10 +1,10 @@
-/*********************************************************************
+/*
  *
- * $Id: YLongitude.java 31372 2018-07-26 12:43:47Z seb $
+ *  $Id: YLongitude.java 32610 2018-10-10 06:52:20Z seb $
  *
- * Implements FindLongitude(), the high-level API for Longitude functions
+ *  Implements FindLongitude(), the high-level API for Longitude functions
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -35,7 +35,7 @@
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
  *  WARRANTY, OR OTHERWISE.
  *
- *********************************************************************/
+ */
 
 package com.yoctopuce.YoctoAPI;
 

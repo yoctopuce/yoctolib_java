@@ -1,3 +1,17 @@
+/*
+ *
+ *  $Id: Demo.java 32627 2018-10-10 13:37:29Z seb $
+ *
+ *  An example that show how to use a  Yocto-Servo
+ *
+ *  You can find more information on our web site:
+ *   Yocto-Servo documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-servo/doc.html
+ *   JAVA API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
+ *
+ */
+
 import com.yoctopuce.YoctoAPI.*;
 
 public class Demo {
@@ -30,8 +44,6 @@ public class Demo {
         }
         YServo servo1 = YServo.FindServo(serial + ".servo1");
         YServo servo5 = YServo.FindServo(serial + ".servo5");
-
-
 
         int pos[] = {-1000,1000,0};
         for(int p : pos) {

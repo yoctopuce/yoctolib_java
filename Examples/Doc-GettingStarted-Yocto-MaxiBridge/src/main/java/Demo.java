@@ -1,3 +1,16 @@
+/*
+ *
+ *  $Id: Demo.java 32627 2018-10-10 13:37:29Z seb $
+ *
+ *  An example that show how to use a  Yocto-MaxiBridge
+ *
+ *  You can find more information on our web site:
+ *   Yocto-MaxiBridge documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-maxibridge/doc.html
+ *   JAVA API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
+ *
+ */
 
 import com.yoctopuce.YoctoAPI.YAPI;
 import com.yoctopuce.YoctoAPI.YAPI_Exception;

@@ -1,4 +1,18 @@
 /*
+ *
+ *  $Id: Demo.java 32627 2018-10-10 13:37:29Z seb $
+ *
+ *  An example that show how to use a  Yocto-Demo
+ *
+ *  You can find more information on our web site:
+ *   Yocto-Demo documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-demo/doc.html
+ *   JAVA API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
+ *
+ */
+
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */

@@ -1,10 +1,23 @@
+/*
+ *
+ *  $Id: Demo.java 32627 2018-10-10 13:37:29Z seb $
+ *
+ *  An example that show how to use a  Yocto-SPI
+ *
+ *  You can find more information on our web site:
+ *   Yocto-SPI documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-spi/doc.html
+ *   JAVA API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
+ *
+ */
+
 import com.yoctopuce.YoctoAPI.*;
 
 import java.util.ArrayList;
 
 public class Demo
 {
-
 
     public static void main(String[] args)
     {
@@ -16,7 +29,6 @@ public class Demo
             System.out.println("Ensure that the VirtualHub application is running");
             System.exit(1);
         }
-
 
         YSpiPort spiPort;
         if (args.length > 0) {

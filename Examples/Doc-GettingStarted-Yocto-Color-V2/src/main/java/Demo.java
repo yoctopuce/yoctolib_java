@@ -1,3 +1,17 @@
+/*
+ *
+ *  $Id: Demo.java 32627 2018-10-10 13:37:29Z seb $
+ *
+ *  An example that show how to use a  Yocto-Color-V2
+ *
+ *  You can find more information on our web site:
+ *   Yocto-Color-V2 documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-color-v2/doc.html
+ *   JAVA API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
+ *
+ */
+
 import com.yoctopuce.YoctoAPI.YAPI;
 import com.yoctopuce.YoctoAPI.YAPI_Exception;
 import com.yoctopuce.YoctoAPI.YColorLedCluster;
@@ -30,7 +44,6 @@ public class Demo
             int nb_leds = 2;
             ledCluster.set_activeLedCount(nb_leds);
             ledCluster.set_ledType(YColorLedCluster.LEDTYPE_RGB);
-
 
             int all_colors[] = {0xff0000, 0x00ff00, 0x0000ff};
             for (int color : all_colors) {

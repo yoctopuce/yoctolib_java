@@ -1,10 +1,10 @@
-/*********************************************************************
+/*
  *
- * $Id: YWeighScale.java 31728 2018-08-17 08:23:25Z seb $
+ *  $Id: YWeighScale.java 32610 2018-10-10 06:52:20Z seb $
  *
- * Implements FindWeighScale(), the high-level API for WeighScale functions
+ *  Implements FindWeighScale(), the high-level API for WeighScale functions
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -35,7 +35,7 @@
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
  *  WARRANTY, OR OTHERWISE.
  *
- *********************************************************************/
+ */
 
 package com.yoctopuce.YoctoAPI;
 import java.util.Locale;

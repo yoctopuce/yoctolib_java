@@ -1,10 +1,10 @@
-/*********************************************************************
+/*
  *
- * $Id: YLatitude.java 31372 2018-07-26 12:43:47Z seb $
+ *  $Id: YLatitude.java 32610 2018-10-10 06:52:20Z seb $
  *
- * Implements FindLatitude(), the high-level API for Latitude functions
+ *  Implements FindLatitude(), the high-level API for Latitude functions
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -35,7 +35,7 @@
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
  *  WARRANTY, OR OTHERWISE.
  *
- *********************************************************************/
+ */
 
 package com.yoctopuce.YoctoAPI;
 
