@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 31736 2018-08-17 08:40:55Z seb $
+ * $Id: YFunction.java 33181 2018-11-16 16:28:34Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -875,7 +875,11 @@ public class YFunction
             return _dataStreams.get(key);
         }
 
-        YDataStream newDataStream = new YDataStream(this, dataset, YAPIContext._decodeWords(def));
+        ArrayList<Integer> encoded = YAPIContext._decodeWords(def);
+        if (encoded.size()<14) {
+            _throw(YAPI.VERSION_MISMATCH, "device firmware is too old");
+        }
+        YDataStream newDataStream = new YDataStream(this, dataset, encoded);
         _dataStreams.put(key, newDataStream);
         return newDataStream;
     }

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTemperature.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YTemperature.java 33082 2018-11-08 18:08:16Z seb $
  *
  *  Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -78,6 +78,7 @@ public class YTemperature extends YSensor
     public static final int SENSORTYPE_RES_NTC = 12;
     public static final int SENSORTYPE_RES_LINEAR = 13;
     public static final int SENSORTYPE_RES_INTERNAL = 14;
+    public static final int SENSORTYPE_IR = 15;
     public static final int SENSORTYPE_INVALID = -1;
     /**
      * invalid signalValue value
@@ -224,8 +225,8 @@ public class YTemperature extends YSensor
      *  YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S, YTemperature.SENSORTYPE_TYPE_T,
      *  YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES,
      *  YTemperature.SENSORTYPE_PT100_2WIRES, YTemperature.SENSORTYPE_RES_OHM,
-     *  YTemperature.SENSORTYPE_RES_NTC, YTemperature.SENSORTYPE_RES_LINEAR and
-     * YTemperature.SENSORTYPE_RES_INTERNAL corresponding to the temperature sensor type
+     *  YTemperature.SENSORTYPE_RES_NTC, YTemperature.SENSORTYPE_RES_LINEAR,
+     * YTemperature.SENSORTYPE_RES_INTERNAL and YTemperature.SENSORTYPE_IR corresponding to the temperature sensor type
      *
      * @throws YAPI_Exception on error
      */
@@ -249,8 +250,8 @@ public class YTemperature extends YSensor
      *  @return a value among Y_SENSORTYPE_DIGITAL, Y_SENSORTYPE_TYPE_K, Y_SENSORTYPE_TYPE_E,
      *  Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
      *  Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES,
-     *  Y_SENSORTYPE_PT100_2WIRES, Y_SENSORTYPE_RES_OHM, Y_SENSORTYPE_RES_NTC, Y_SENSORTYPE_RES_LINEAR and
-     * Y_SENSORTYPE_RES_INTERNAL corresponding to the temperature sensor type
+     *  Y_SENSORTYPE_PT100_2WIRES, Y_SENSORTYPE_RES_OHM, Y_SENSORTYPE_RES_NTC, Y_SENSORTYPE_RES_LINEAR,
+     * Y_SENSORTYPE_RES_INTERNAL and Y_SENSORTYPE_IR corresponding to the temperature sensor type
      *
      * @throws YAPI_Exception on error
      */
@@ -271,8 +272,8 @@ public class YTemperature extends YSensor
      *  YTemperature.SENSORTYPE_TYPE_R, YTemperature.SENSORTYPE_TYPE_S, YTemperature.SENSORTYPE_TYPE_T,
      *  YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES,
      *  YTemperature.SENSORTYPE_PT100_2WIRES, YTemperature.SENSORTYPE_RES_OHM,
-     *  YTemperature.SENSORTYPE_RES_NTC, YTemperature.SENSORTYPE_RES_LINEAR and
-     * YTemperature.SENSORTYPE_RES_INTERNAL corresponding to the temperature sensor type
+     *  YTemperature.SENSORTYPE_RES_NTC, YTemperature.SENSORTYPE_RES_LINEAR,
+     * YTemperature.SENSORTYPE_RES_INTERNAL and YTemperature.SENSORTYPE_IR corresponding to the temperature sensor type
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -298,8 +299,8 @@ public class YTemperature extends YSensor
      *  @param newval : a value among Y_SENSORTYPE_DIGITAL, Y_SENSORTYPE_TYPE_K, Y_SENSORTYPE_TYPE_E,
      *  Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
      *  Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES,
-     *  Y_SENSORTYPE_PT100_2WIRES, Y_SENSORTYPE_RES_OHM, Y_SENSORTYPE_RES_NTC, Y_SENSORTYPE_RES_LINEAR and
-     * Y_SENSORTYPE_RES_INTERNAL corresponding to the temperature sensor type
+     *  Y_SENSORTYPE_PT100_2WIRES, Y_SENSORTYPE_RES_OHM, Y_SENSORTYPE_RES_NTC, Y_SENSORTYPE_RES_LINEAR,
+     * Y_SENSORTYPE_RES_INTERNAL and Y_SENSORTYPE_IR corresponding to the temperature sensor type
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -725,6 +726,9 @@ public class YTemperature extends YSensor
 
     /**
      * Continues the enumeration of temperature sensors started using yFirstTemperature().
+     * Caution: You can't make any assumption about the returned temperature sensors order.
+     * If you want to find a specific a temperature sensor, use Temperature.findTemperature()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YTemperature object, corresponding to
      *         a temperature sensor currently online, or a null pointer

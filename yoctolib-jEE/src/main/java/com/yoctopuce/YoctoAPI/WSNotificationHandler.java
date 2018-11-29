@@ -34,7 +34,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
 
     private final ArrayList<ArrayList<WSRequest>> _workingRequests;
     private final Object _stateLock = new Object();
-    private volatile boolean _firstNotif;
+    private volatile boolean _waitingForConnectionState;
     private volatile boolean _muststop;
     private long _connectionTime = 0;
     private ConnectionState _connectionState = ConnectionState.CONNECTING;
@@ -91,7 +91,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
     @Override
     public void run()
     {
-        _firstNotif = true;
+        _waitingForConnectionState = true;
         do {
             if (_error_delay > 0) {
                 try {
@@ -105,7 +105,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
             }
 
             try {
-                _wsHandler.connect(_hub, _firstNotif, 10000, _notifAbsPos);
+                _wsHandler.connect(_hub, _waitingForConnectionState, 10000, _notifAbsPos);
                 runOnSession();
             } catch (YAPI_Exception e) {
                 //e.printStackTrace();
@@ -115,7 +115,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                     _session_error = e.getLocalizedMessage();
                 }
             }
-            _firstNotif = true;
+            _waitingForConnectionState = true;
             _notifRetryCount++;
             _hub._isNotifWorking = false;
             _error_delay = 100 << (_notifRetryCount > 4 ? 4 : _notifRetryCount);
@@ -384,13 +384,13 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
         ArrayList<WSRequest> requestOfTCPChan = _workingRequests.get(tcpChanel);
         switch (ystream) {
             case YGenericHub.YSTREAM_TCP_NOTIF:
-                if (_firstNotif) {
+                if (_waitingForConnectionState) {
                     if (!_hub._http_params.hasAuthParam()) {
                         synchronized (_stateLock) {
                             _connectionState = ConnectionState.CONNECTED;
                             _stateLock.notifyAll();
                         }
-                        _firstNotif = false;
+                        _waitingForConnectionState = false;
                     } else {
                         return;
                     }
@@ -505,6 +505,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                                     _connectionState = ConnectionState.CONNECTED;
                                     _stateLock.notifyAll();
                                 }
+                                _waitingForConnectionState = false;
                             } else {
                                 errorOnSession(YAPI.UNAUTHORIZED, String.format("Authentication as %s failed", _hub._http_params.getUser()));
                                 break;
@@ -515,6 +516,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                                     _connectionState = ConnectionState.CONNECTED;
                                     _stateLock.notifyAll();
                                 }
+                                _waitingForConnectionState = false;
                             } else {
                                 if (_hub._http_params.getUser().equals("admin") && !_rwAccess) {
                                     errorOnSession(YAPI.UNAUTHORIZED, String.format("Authentication as %s failed", _hub._http_params.getUser()));

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YQuadratureDecoder.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YQuadratureDecoder.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -427,6 +427,9 @@ public class YQuadratureDecoder extends YSensor
 
     /**
      * Continues the enumeration of quadrature decoders started using yFirstQuadratureDecoder().
+     * Caution: You can't make any assumption about the returned quadrature decoders order.
+     * If you want to find a specific a quadrature decoder, use QuadratureDecoder.findQuadratureDecoder()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YQuadratureDecoder object, corresponding to
      *         a quadrature decoder currently online, or a null pointer

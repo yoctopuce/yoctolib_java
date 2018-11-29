@@ -7,7 +7,7 @@
     <groupId>com.yoctopuce.java</groupId>
     <artifactId>javabundle</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.32759-SNAPSHOT</version>
+    <version>1.10.33423-SNAPSHOT</version>
     <name>Yoctopuce Java API (with examples)</name>
     <description>Official Yoctopuce Library for Java with examples</description>
     <url>http://www.yoctopuce.com</url>
@@ -60,6 +60,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-SPI</module>
         <module>Examples/Doc-GettingStarted-Yocto-Thermistor-C</module>
         <module>Examples/Doc-GettingStarted-Yocto-Temperature</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Temperature-IR</module>
         <module>Examples/Doc-GettingStarted-Yocto-Thermocouple</module>
         <module>Examples/Doc-GettingStarted-Yocto-VOC</module>
         <module>Examples/Doc-GettingStarted-Yocto-Volt</module>
@@ -80,7 +81,6 @@
         <module>Examples/Prog-HubDiscovery-method2</module>
         <module>Examples/Prog-DevicesTree</module>
         <module>Examples/Prog-MODBUS</module>
-        <module>Examples/Prog-OldDataLogger</module>
         <module>Examples/Prog-FirmwareUpdate</module>
     </modules>
 

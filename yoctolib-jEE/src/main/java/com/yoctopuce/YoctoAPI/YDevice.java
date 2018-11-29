@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 31736 2018-08-17 08:40:55Z seb $
+ * $Id: YDevice.java 33088 2018-11-09 10:06:21Z seb $
  *
  * Internal YDevice class
  *
@@ -58,16 +58,18 @@ import java.util.*;
 //
 class YDevice
 {
-    private YGenericHub _hub;
+    private final YGenericHub _hub;
     private final WPEntry _wpRec;
     private final HashMap<Integer, YPEntry> _ypRecs;
     private long _cache_expiration;
     private YJSONObject _cache_json;
-    private double _deviceTime;
+    private double _lastTimeRef;
+    private double _lastDuration;
     private YPEntry _moduleYPEntry;
     private YModule.LogCallback _logCallback = null;
     private int _logpos = 0;
     private boolean _logIsPulling = false;
+    private boolean _logNeedPulling = false;
 
     // Device constructor. Automatically call the YAPI functin to reindex device
     YDevice(YGenericHub hub, WPEntry wpRec, HashMap<String, ArrayList<YPEntry>> ypRecs)
@@ -234,24 +236,32 @@ class YDevice
     synchronized byte[] requestHTTPSync(String request, byte[] rest_of_request) throws YAPI_Exception
     {
         String shortRequest = formatRequest(request);
+        byte[] res;
         try {
-            return _hub.devRequestSync(this, shortRequest, rest_of_request, null, null);
+            res = _hub.devRequestSync(this, shortRequest, rest_of_request, null, null);
         } catch (InterruptedException e) {
             throw new YAPI_Exception(YAPI.IO_ERROR,
                     "Thread has been interrupted");
         }
+        if (_logNeedPulling) {
+            triggerLogPull();
+        }
+        return res;
     }
 
     @SuppressWarnings("SameParameterValue")
-    synchronized String requestHTTPSyncAsString(String request, byte[] rest_of_request) throws YAPI_Exception
+    String requestHTTPSyncAsString(String request, byte[] rest_of_request) throws YAPI_Exception
     {
         final byte[] bytes = requestHTTPSync(request, rest_of_request);
+        if (_logNeedPulling) {
+            triggerLogPull();
+        }
         return new String(bytes, _hub._yctx._deviceCharset);
     }
 
 
     @SuppressWarnings("SameParameterValue")
-    synchronized void requestHTTPAsync(String request, byte[] rest_of_request, YGenericHub.RequestAsyncResult asyncResult, Object context) throws YAPI_Exception
+    void requestHTTPAsync(String request, byte[] rest_of_request, YGenericHub.RequestAsyncResult asyncResult, Object context) throws YAPI_Exception
     {
         String shortRequest = formatRequest(request);
         try {
@@ -259,6 +269,9 @@ class YDevice
         } catch (InterruptedException e) {
             throw new YAPI_Exception(YAPI.IO_ERROR,
                     "Thread has been interrupted");
+        }
+        if (_logNeedPulling) {
+            triggerLogPull();
         }
     }
 
@@ -277,15 +290,33 @@ class YDevice
     }
 
 
-    double getDeviceTime()
+    double getLastTimeRef()
     {
-        return _deviceTime;
+        return _lastTimeRef;
     }
 
-    void setDeviceTime(Integer[] data)
+    double getLastDuration()
+    {
+        return _lastDuration;
+    }
+
+    void setLastTimeRef(Integer[] data)
     {
         double time = (data[0] & 0xff) + 0x100 * (data[1] & 0xff) + 0x10000 * (data[2] & 0xff) + 0x1000000 * (data[3] & 0xff);
-        _deviceTime = time + (data[4] & 0xff) / 250.0;
+        long ms = (data[4] & 0xff) * 4;
+        if (data.length >= 6) {
+            ms += (data[5] & 0xff) >> 6;
+            long freq = data[6];
+            freq += (data[5] & 0xf) * 0x100;
+            if ((data[5] & 0x10) != 0) {
+                _lastDuration = freq;
+            } else {
+                _lastDuration = freq / 1000.0;
+            }
+        } else {
+            _lastDuration = 0;
+        }
+        _lastTimeRef = time + ms / 1000.0;
     }
 
     YPEntry getModuleYPEntry()
@@ -325,7 +356,7 @@ class YDevice
         }
     };
 
-    void triggerLogPull()
+    private void triggerLogPull()
     {
         if (_logCallback == null || _logIsPulling)
             return;
@@ -338,10 +369,18 @@ class YDevice
         }
     }
 
+    void setDeviceLogPending(boolean value)
+    {
+        _logNeedPulling = value;
+    }
+
+
     void registerLogCallback(YModule.LogCallback callback)
     {
         _logCallback = callback;
-        triggerLogPull();
+        if (callback!=null) {
+            triggerLogPull();
+        }
     }
 
     static byte[] formatHTTPUpload(String path, byte[] content)

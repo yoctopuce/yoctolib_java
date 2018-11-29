@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 32361 2018-09-26 15:28:10Z seb $
+ * $Id: YGenericHub.java 32919 2018-11-02 15:01:30Z seb $
  *
  * Internal YGenericHub object
  *
@@ -332,23 +332,23 @@ abstract class YGenericHub
 
 
     //called from Jni
-    protected void handleTimedNotification(String serial, String funcid, double deviceTime, byte[] report)
+    protected void handleTimedNotification(String serial, String funcid, double time, double duration, byte[] report)
     {
         ArrayList<Integer> arrayList = new ArrayList<>(report.length);
         for (byte b : report) {
             int i = b & 0xff;
             arrayList.add(i);
         }
-        handleTimedNotification(serial, funcid, deviceTime, arrayList);
+        handleTimedNotification(serial, funcid, time, duration, arrayList);
     }
 
 
-    void handleTimedNotification(String serial, String funcid, double deviceTime, ArrayList<Integer> report)
+    void handleTimedNotification(String serial, String funcid, double time, double duration, ArrayList<Integer> report)
     {
         String hwid = serial + "." + funcid;
         YFunction func = _yctx._GetTimedReportCallback(hwid);
         if (func != null) {
-            _yctx._PushDataEvent(new YAPIContext.DataEvent(func, deviceTime, report));
+            _yctx._PushDataEvent(new YAPIContext.DataEvent(func, time, duration, report));
         }
     }
 

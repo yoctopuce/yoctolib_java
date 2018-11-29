@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 27277 2017-04-25 15:41:31Z seb $
+ * $Id: YDataStream.java 33293 2018-11-22 11:10:33Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -68,21 +68,17 @@ public class YDataStream
     protected long _utcStamp = 0;
     protected int _nCols = 0;
     protected int _nRows = 0;
-    protected int _duration = 0;
+    protected double _startTime = 0;
+    protected double _duration = 0;
+    protected double _dataSamplesInterval = 0;
+    protected double _firstMeasureDuration = 0;
     protected ArrayList<String> _columnNames = new ArrayList<>();
     protected String _functionId;
     protected boolean _isClosed;
     protected boolean _isAvg;
-    protected boolean _isScal;
-    protected boolean _isScal32;
-    protected int _decimals = 0;
-    protected double _offset = 0;
-    protected double _scale = 0;
-    protected int _samplesPerHour = 0;
     protected double _minVal = 0;
     protected double _avgVal = 0;
     protected double _maxVal = 0;
-    protected double _decexp = 0;
     protected int _caltyp = 0;
     protected ArrayList<Integer> _calpar = new ArrayList<>();
     protected ArrayList<Double> _calraw = new ArrayList<>();
@@ -92,10 +88,6 @@ public class YDataStream
     //--- (end of generated code: YDataStream definitions)
     protected YAPI.CalibrationHandlerCallback _calhdl = null;
 
-    protected YDataStream(YFunction parent)
-    {
-        _parent = parent;
-    }
 
     YDataStream(YFunction parent, YDataSet dataset, ArrayList<Integer> encoded)
     {
@@ -110,51 +102,45 @@ public class YDataStream
         int val;
         int i;
         int maxpos;
-        int iRaw;
-        int iRef;
+        int ms_offset;
+        int samplesPerHour;
         double fRaw;
         double fRef;
-        double duration_float;
         ArrayList<Integer> iCalib = new ArrayList<>();
         // decode sequence header to extract data
         _runNo = encoded.get(0).intValue() + (((encoded.get(1).intValue()) << (16)));
         _utcStamp = encoded.get(2).intValue() + (((encoded.get(3).intValue()) << (16)));
         val = encoded.get(4).intValue();
         _isAvg = (((val) & (0x100)) == 0);
-        _samplesPerHour = ((val) & (0xff));
+        samplesPerHour = ((val) & (0xff));
         if (((val) & (0x100)) != 0) {
-            _samplesPerHour = _samplesPerHour * 3600;
+            samplesPerHour = samplesPerHour * 3600;
         } else {
             if (((val) & (0x200)) != 0) {
-                _samplesPerHour = _samplesPerHour * 60;
+                samplesPerHour = samplesPerHour * 60;
             }
         }
-        val = encoded.get(5).intValue();
-        if (val > 32767) {
-            val = val - 65536;
+        _dataSamplesInterval = 3600.0 / samplesPerHour;
+        ms_offset = encoded.get(6).intValue();
+        if (ms_offset < 1000) {
+            // new encoding . add the ms to the UTC timestamp
+            _startTime = _utcStamp + (ms_offset / 1000.0);
+        } else {
+            // legacy encoding subtract the measure interval form the UTC timestamp
+            _startTime = _utcStamp -  _dataSamplesInterval;
         }
-        _decimals = val;
-        _offset = val;
-        _scale = encoded.get(6).intValue();
-        _isScal = (_scale != 0);
-        _isScal32 = (encoded.size() >= 14);
+        _firstMeasureDuration = encoded.get(5).intValue();
+        if (!(_isAvg)) {
+            _firstMeasureDuration = _firstMeasureDuration / 1000.0;
+        }
         val = encoded.get(7).intValue();
         _isClosed = (val != 0xffff);
         if (val == 0xffff) {
             val = 0;
         }
         _nRows = val;
-        duration_float = _nRows * 3600 / _samplesPerHour;
-        _duration = (int) (double)Math.round(duration_float);
+        _duration = _nRows * _dataSamplesInterval;
         // precompute decoding parameters
-        _decexp = 1.0;
-        if (_scale == 0) {
-            i = 0;
-            while (i < _decimals) {
-                _decexp = _decexp * 10.0;
-                i = i + 1;
-            }
-        }
         iCalib = dataset._get_calibration();
         _caltyp = iCalib.get(0).intValue();
         if (_caltyp != 0) {
@@ -163,42 +149,20 @@ public class YDataStream
             _calpar.clear();
             _calraw.clear();
             _calref.clear();
-            if (_isScal32) {
-                i = 1;
-                while (i < maxpos) {
-                    _calpar.add(iCalib.get(i));
-                    i = i + 1;
-                }
-                i = 1;
-                while (i + 1 < maxpos) {
-                    fRaw = iCalib.get(i).doubleValue();
-                    fRaw = fRaw / 1000.0;
-                    fRef = iCalib.get(i + 1).doubleValue();
-                    fRef = fRef / 1000.0;
-                    _calraw.add(fRaw);
-                    _calref.add(fRef);
-                    i = i + 2;
-                }
-            } else {
-                i = 1;
-                while (i + 1 < maxpos) {
-                    iRaw = iCalib.get(i).intValue();
-                    iRef = iCalib.get(i + 1).intValue();
-                    _calpar.add(iRaw);
-                    _calpar.add(iRef);
-                    if (_isScal) {
-                        fRaw = iRaw;
-                        fRaw = (fRaw - _offset) / _scale;
-                        fRef = iRef;
-                        fRef = (fRef - _offset) / _scale;
-                        _calraw.add(fRaw);
-                        _calref.add(fRef);
-                    } else {
-                        _calraw.add(YAPIContext._decimalToDouble(iRaw));
-                        _calref.add(YAPIContext._decimalToDouble(iRef));
-                    }
-                    i = i + 2;
-                }
+            i = 1;
+            while (i < maxpos) {
+                _calpar.add(iCalib.get(i));
+                i = i + 1;
+            }
+            i = 1;
+            while (i + 1 < maxpos) {
+                fRaw = iCalib.get(i).doubleValue();
+                fRaw = fRaw / 1000.0;
+                fRef = iCalib.get(i + 1).doubleValue();
+                fRef = fRef / 1000.0;
+                _calraw.add(fRaw);
+                _calref.add(fRef);
+                i = i + 2;
             }
         }
         // preload column names for backward-compatibility
@@ -216,15 +180,9 @@ public class YDataStream
         }
         // decode min/avg/max values for the sequence
         if (_nRows > 0) {
-            if (_isScal32) {
-                _avgVal = _decodeAvg(encoded.get(8).intValue() + (((((encoded.get(9).intValue()) ^ (0x8000))) << (16))), 1);
-                _minVal = _decodeVal(encoded.get(10).intValue() + (((encoded.get(11).intValue()) << (16))));
-                _maxVal = _decodeVal(encoded.get(12).intValue() + (((encoded.get(13).intValue()) << (16))));
-            } else {
-                _minVal = _decodeVal(encoded.get(8).intValue());
-                _maxVal = _decodeVal(encoded.get(9).intValue());
-                _avgVal = _decodeAvg(encoded.get(10).intValue() + (((encoded.get(11).intValue()) << (16))), _nRows);
-            }
+            _avgVal = _decodeAvg(encoded.get(8).intValue() + (((((encoded.get(9).intValue()) ^ (0x8000))) << (16))), 1);
+            _minVal = _decodeVal(encoded.get(10).intValue() + (((encoded.get(11).intValue()) << (16))));
+            _maxVal = _decodeVal(encoded.get(12).intValue() + (((encoded.get(13).intValue()) << (16))));
         }
         return 0;
     }
@@ -245,34 +203,18 @@ public class YDataStream
         if (_isAvg) {
             while (idx + 3 < udat.size()) {
                 dat.clear();
-                if (_isScal32) {
-                    dat.add(_decodeVal(udat.get(idx + 2).intValue() + (((udat.get(idx + 3).intValue()) << (16)))));
-                    dat.add(_decodeAvg(udat.get(idx).intValue() + (((((udat.get(idx + 1).intValue()) ^ (0x8000))) << (16))), 1));
-                    dat.add(_decodeVal(udat.get(idx + 4).intValue() + (((udat.get(idx + 5).intValue()) << (16)))));
-                    idx = idx + 6;
-                } else {
-                    dat.add(_decodeVal(udat.get(idx).intValue()));
-                    dat.add(_decodeAvg(udat.get(idx + 2).intValue() + (((udat.get(idx + 3).intValue()) << (16))), 1));
-                    dat.add(_decodeVal(udat.get(idx + 1).intValue()));
-                    idx = idx + 4;
-                }
+                dat.add(_decodeVal(udat.get(idx + 2).intValue() + (((udat.get(idx + 3).intValue()) << (16)))));
+                dat.add(_decodeAvg(udat.get(idx).intValue() + (((((udat.get(idx + 1).intValue()) ^ (0x8000))) << (16))), 1));
+                dat.add(_decodeVal(udat.get(idx + 4).intValue() + (((udat.get(idx + 5).intValue()) << (16)))));
+                idx = idx + 6;
                 _values.add(new ArrayList<Double>(dat));
             }
         } else {
-            if (_isScal && !(_isScal32)) {
-                while (idx < udat.size()) {
-                    dat.clear();
-                    dat.add(_decodeVal(udat.get(idx).intValue()));
-                    _values.add(new ArrayList<Double>(dat));
-                    idx = idx + 1;
-                }
-            } else {
-                while (idx + 1 < udat.size()) {
-                    dat.clear();
-                    dat.add(_decodeAvg(udat.get(idx).intValue() + (((((udat.get(idx + 1).intValue()) ^ (0x8000))) << (16))), 1));
-                    _values.add(new ArrayList<Double>(dat));
-                    idx = idx + 2;
-                }
+            while (idx + 1 < udat.size()) {
+                dat.clear();
+                dat.add(_decodeAvg(udat.get(idx).intValue() + (((((udat.get(idx + 1).intValue()) ^ (0x8000))) << (16))), 1));
+                _values.add(new ArrayList<Double>(dat));
+                idx = idx + 2;
             }
         }
 
@@ -297,15 +239,7 @@ public class YDataStream
     {
         double val;
         val = w;
-        if (_isScal32) {
-            val = val / 1000.0;
-        } else {
-            if (_isScal) {
-                val = (val - _offset) / _scale;
-            } else {
-                val = YAPIContext._decimalToDouble(w);
-            }
-        }
+        val = val / 1000.0;
         if (_caltyp != 0) {
             if (_calhdl != null) {
                 val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
@@ -318,15 +252,7 @@ public class YDataStream
     {
         double val;
         val = dw;
-        if (_isScal32) {
-            val = val / 1000.0;
-        } else {
-            if (_isScal) {
-                val = (val / (100 * count) - _offset) / _scale;
-            } else {
-                val = val / (count * _decexp);
-            }
-        }
+        val = val / 1000.0;
         if (_caltyp != 0) {
             if (_calhdl != null) {
                 val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
@@ -358,7 +284,9 @@ public class YDataStream
      * If the device uses a firmware older than version 13000, value is
      * relative to the start of the time the device was powered on, and
      * is always positive.
-     * If you need an absolute UTC timestamp, use get_startTimeUTC().
+     * If you need an absolute UTC timestamp, use get_realStartTimeUTC().
+     *
+     * <b>DEPRECATED</b>: This method has been replaced by get_realStartTimeUTC().
      *
      * @return an unsigned number corresponding to the number of seconds
      *         between the start of the run and the beginning of this data
@@ -374,13 +302,29 @@ public class YDataStream
      * If the UTC time was not set in the datalogger at the time of the recording
      * of this data stream, this method returns 0.
      *
+     * <b>DEPRECATED</b>: This method has been replaced by get_realStartTimeUTC().
+     *
      * @return an unsigned number corresponding to the number of seconds
      *         between the Jan 1, 1970 and the beginning of this data
      *         stream (i.e. Unix time representation of the absolute time).
      */
     public long get_startTimeUTC()
     {
-        return _utcStamp;
+        return (int) (double)Math.round(_startTime);
+    }
+
+    /**
+     * Returns the start time of the data stream, relative to the Jan 1, 1970.
+     * If the UTC time was not set in the datalogger at the time of the recording
+     * of this data stream, this method returns 0.
+     *
+     * @return a floating-point number  corresponding to the number of seconds
+     *         between the Jan 1, 1970 and the beginning of this data
+     *         stream (i.e. Unix time representation of the absolute time).
+     */
+    public double get_realStartTimeUTC()
+    {
+        return _startTime;
     }
 
     /**
@@ -393,12 +337,17 @@ public class YDataStream
      */
     public int get_dataSamplesIntervalMs()
     {
-        return ((3600000) / (_samplesPerHour));
+        return (int) (double)Math.round(_dataSamplesInterval*1000);
     }
 
     public double get_dataSamplesInterval()
     {
-        return 3600.0 / _samplesPerHour;
+        return _dataSamplesInterval;
+    }
+
+    public double get_firstDataSamplesInterval()
+    {
+        return _firstMeasureDuration;
     }
 
     /**
@@ -514,19 +463,12 @@ public class YDataStream
         return _maxVal;
     }
 
-    /**
-     * Returns the approximate duration of this stream, in seconds.
-     *
-     * @return the number of seconds covered by this stream.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int get_duration() throws YAPI_Exception
+    public double get_realDuration()
     {
         if (_isClosed) {
             return _duration;
         }
-        return (int)((System.currentTimeMillis() / 1000L) - _utcStamp);
+        return (double) (System.currentTimeMillis() / 1000L) - _utcStamp;
     }
 
     /**

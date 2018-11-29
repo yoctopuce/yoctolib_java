@@ -4,7 +4,12 @@ package com.yoctopuce.YoctoAPI;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Queue;
 
 //--- (generated code: YAPIContext return codes)
 //--- (end of generated code: YAPIContext return codes)
@@ -27,6 +32,7 @@ public class YAPIContext
         private final String _value;
         private final ArrayList<Integer> _report;
         private final double _timestamp;
+        private final double _duration;
         private final YModule _module;
         private final int _beacon;
 
@@ -37,6 +43,7 @@ public class YAPIContext
             _value = value;
             _report = null;
             _timestamp = 0;
+            _duration = 0;
             _beacon = -1;
         }
 
@@ -47,6 +54,7 @@ public class YAPIContext
             _value = null;
             _report = null;
             _timestamp = 0;
+            _duration = 0;
             _beacon = -1;
         }
 
@@ -57,16 +65,18 @@ public class YAPIContext
             _value = null;
             _report = null;
             _timestamp = 0;
+            _duration = 0;
             _beacon = beacon;
         }
 
 
-        DataEvent(YFunction fun, double timestamp, ArrayList<Integer> report)
+        DataEvent(YFunction fun, double timestamp, double duration, ArrayList<Integer> report)
         {
             _module = null;
             _fun = fun;
             _value = null;
             _timestamp = timestamp;
+            _duration = duration;
             _report = report;
             _beacon = -1;
         }
@@ -83,7 +93,7 @@ public class YAPIContext
                 if (_value == null) {
                     YSensor sensor = (YSensor) _fun;
                     assert sensor != null;
-                    YMeasure mesure = sensor._decodeTimedReport(_timestamp, _report);
+                    YMeasure mesure = sensor._decodeTimedReport(_timestamp, _duration, _report);
                     sensor._invokeTimedReportCallback(mesure);
                 } else {
                     // new value
@@ -383,6 +393,7 @@ public class YAPIContext
     private YAPI.DeviceArrivalCallback _arrivalCallback;
     private YAPI.DeviceChangeCallback _namechgCallback;
     private YAPI.DeviceRemovalCallback _removalCallback;
+    private final Object _logCallbackLock = new Object();
     private YAPI.LogCallback _logCallback;
 
     private final Object _newHubCallbackLock = new Object();
@@ -758,7 +769,7 @@ public class YAPIContext
 
     void _Log(String message)
     {
-        synchronized (_regCbLock) {
+        synchronized (_logCallbackLock) {
             if (_logCallback != null) {
                 _logCallback.yLog(message);
             }

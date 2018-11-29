@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 27710 2017-06-01 12:39:47Z seb $
+ * $Id: YQt.java 32904 2018-11-02 10:15:00Z seb $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -265,6 +265,9 @@ public class YQt extends YSensor
 
     /**
      * Continues the enumeration of quaternion components started using yFirstQt().
+     * Caution: You can't make any assumption about the returned quaternion components order.
+     * If you want to find a specific a quaternion component, use Qt.findQt()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YQt object, corresponding to
      *         a quaternion component currently online, or a null pointer

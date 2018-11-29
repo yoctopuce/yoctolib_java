@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLongitude.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YLongitude.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindLongitude(), the high-level API for Longitude functions
  *
@@ -272,6 +272,9 @@ public class YLongitude extends YSensor
 
     /**
      * Continues the enumeration of longitude sensors started using yFirstLongitude().
+     * Caution: You can't make any assumption about the returned longitude sensors order.
+     * If you want to find a specific a longitude sensor, use Longitude.findLongitude()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YLongitude object, corresponding to
      *         a longitude sensor currently online, or a null pointer

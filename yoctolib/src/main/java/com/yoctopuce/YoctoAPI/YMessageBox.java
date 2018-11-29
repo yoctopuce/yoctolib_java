@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 31728 2018-08-17 08:23:25Z seb $
+ * $Id: YMessageBox.java 32904 2018-11-02 10:15:00Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -1126,6 +1126,9 @@ public class YMessageBox extends YFunction
 
     /**
      * Continues the enumeration of MessageBox interfaces started using yFirstMessageBox().
+     * Caution: You can't make any assumption about the returned MessageBox interfaces order.
+     * If you want to find a specific a MessageBox interface, use MessageBox.findMessageBox()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YMessageBox object, corresponding to
      *         a MessageBox interface currently online, or a null pointer

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 31728 2018-08-17 08:23:25Z seb $
+ * $Id: YFiles.java 32904 2018-11-02 10:15:00Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -447,6 +447,9 @@ public class YFiles extends YFunction
 
     /**
      * Continues the enumeration of filesystems started using yFirstFiles().
+     * Caution: You can't make any assumption about the returned filesystems order.
+     * If you want to find a specific a filesystem, use Files.findFiles()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YFiles object, corresponding to
      *         a filesystem currently online, or a null pointer

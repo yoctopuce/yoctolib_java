@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRealTimeClock.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YRealTimeClock.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -474,6 +474,9 @@ public class YRealTimeClock extends YFunction
 
     /**
      * Continues the enumeration of clocks started using yFirstRealTimeClock().
+     * Caution: You can't make any assumption about the returned clocks order.
+     * If you want to find a specific a clock, use RealTimeClock.findRealTimeClock()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YRealTimeClock object, corresponding to
      *         a clock currently online, or a null pointer

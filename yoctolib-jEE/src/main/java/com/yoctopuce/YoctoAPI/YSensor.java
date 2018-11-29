@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 32328 2018-09-25 08:33:35Z seb $
+ * $Id: YSensor.java 33400 2018-11-27 07:58:29Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -128,8 +128,6 @@ public class YSensor extends YFunction
     protected double _offset = 0;
     protected double _scale = 0;
     protected double _decexp = 0;
-    protected boolean _isScal;
-    protected boolean _isScal32;
     protected int _caltyp = 0;
     protected ArrayList<Integer> _calpar = new ArrayList<>();
     protected ArrayList<Double> _calraw = new ArrayList<>();
@@ -1077,7 +1075,6 @@ public class YSensor extends YFunction
         double fRef;
         _caltyp = -1;
         _scale = -1;
-        _isScal32 = false;
         _calpar.clear();
         _calraw.clear();
         _calref.clear();
@@ -1111,8 +1108,6 @@ public class YSensor extends YFunction
                 }
             }
             // New 32bit text format
-            _isScal = true;
-            _isScal32 = true;
             _offset = 0;
             _scale = 1000;
             maxpos = iCalib.size();
@@ -1143,23 +1138,13 @@ public class YSensor extends YFunction
                 return 0;
             }
             // Save variable format (scale for scalar, or decimal exponent)
-            _isScal = (iCalib.get(1).intValue() > 0);
-            if (_isScal) {
-                _offset = iCalib.get(0).doubleValue();
-                if (_offset > 32767) {
-                    _offset = _offset - 65536;
-                }
-                _scale = iCalib.get(1).doubleValue();
-                _decexp = 0;
-            } else {
-                _offset = 0;
-                _scale = 1;
-                _decexp = 1.0;
-                position = iCalib.get(0).intValue();
-                while (position > 0) {
-                    _decexp = _decexp * 10;
-                    position = position - 1;
-                }
+            _offset = 0;
+            _scale = 1;
+            _decexp = 1.0;
+            position = iCalib.get(0).intValue();
+            while (position > 0) {
+                _decexp = _decexp * 10;
+                position = position - 1;
             }
             // Shortcut when there is no calibration parameter
             if (iCalib.size() == 2) {
@@ -1191,17 +1176,8 @@ public class YSensor extends YFunction
                 iRef = iCalib.get(position + 1).intValue();
                 _calpar.add(iRaw);
                 _calpar.add(iRef);
-                if (_isScal) {
-                    fRaw = iRaw;
-                    fRaw = (fRaw - _offset) / _scale;
-                    fRef = iRef;
-                    fRef = (fRef - _offset) / _scale;
-                    _calraw.add(fRaw);
-                    _calref.add(fRef);
-                } else {
-                    _calraw.add(YAPIContext._decimalToDouble(iRaw));
-                    _calref.add(YAPIContext._decimalToDouble(iRef));
-                }
+                _calraw.add(YAPIContext._decimalToDouble(iRaw));
+                _calref.add(YAPIContext._decimalToDouble(iRef));
                 position = position + 2;
             }
         }
@@ -1309,7 +1285,7 @@ public class YSensor extends YFunction
      *         data. Past measures can be loaded progressively
      *         using methods from the YDataSet object.
      */
-    public YDataSet get_recordedData(long startTime,long endTime) throws YAPI_Exception
+    public YDataSet get_recordedData(double startTime,double endTime) throws YAPI_Exception
     {
         String funcid;
         String funit;
@@ -1430,8 +1406,6 @@ public class YSensor extends YFunction
         String res;
         int npt;
         int idx;
-        int iRaw;
-        int iRef;
         npt = rawValues.size();
         if (npt != refValues.size()) {
             _throw(YAPI.INVALID_ARGUMENT, "Invalid calibration parameters (size mismatch)");
@@ -1452,36 +1426,12 @@ public class YSensor extends YFunction
             _throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
             return "0";
         }
-        if (_isScal32) {
-            // 32-bit fixed-point encoding
-            res = String.format(Locale.US, "%d",YAPI.YOCTO_CALIB_TYPE_OFS);
-            idx = 0;
-            while (idx < npt) {
-                res = String.format(Locale.US, "%s,%f,%f", res, rawValues.get(idx).doubleValue(),refValues.get(idx).doubleValue());
-                idx = idx + 1;
-            }
-        } else {
-            if (_isScal) {
-                // 16-bit fixed-point encoding
-                res = String.format(Locale.US, "%d",npt);
-                idx = 0;
-                while (idx < npt) {
-                    iRaw = (int) (double)Math.round(rawValues.get(idx).doubleValue() * _scale + _offset);
-                    iRef = (int) (double)Math.round(refValues.get(idx).doubleValue() * _scale + _offset);
-                    res = String.format(Locale.US, "%s,%d,%d", res, iRaw,iRef);
-                    idx = idx + 1;
-                }
-            } else {
-                // 16-bit floating-point decimal encoding
-                res = String.format(Locale.US, "%d",10 + npt);
-                idx = 0;
-                while (idx < npt) {
-                    iRaw = (int) YAPIContext._doubleToDecimal(rawValues.get(idx).doubleValue());
-                    iRef = (int) YAPIContext._doubleToDecimal(refValues.get(idx).doubleValue());
-                    res = String.format(Locale.US, "%s,%d,%d", res, iRaw,iRef);
-                    idx = idx + 1;
-                }
-            }
+        // 32-bit fixed-point encoding
+        res = String.format(Locale.US, "%d",YAPI.YOCTO_CALIB_TYPE_OFS);
+        idx = 0;
+        while (idx < npt) {
+            res = String.format(Locale.US, "%s,%f,%f", res, rawValues.get(idx).doubleValue(),refValues.get(idx).doubleValue());
+            idx = idx + 1;
         }
         return res;
     }
@@ -1503,140 +1453,103 @@ public class YSensor extends YFunction
         return _calhdl.yCalibrationHandler(rawValue, _caltyp, _calpar, _calraw, _calref);
     }
 
-    public YMeasure _decodeTimedReport(double timestamp,ArrayList<Integer> report)
+    public YMeasure _decodeTimedReport(double timestamp,double duration,ArrayList<Integer> report)
     {
         int i;
         int byteVal;
-        int poww;
-        int minRaw;
-        int avgRaw;
-        int maxRaw;
+        double poww;
+        double minRaw;
+        double avgRaw;
+        double maxRaw;
         int sublen;
-        int difRaw;
+        double difRaw;
         double startTime;
         double endTime;
         double minVal;
         double avgVal;
         double maxVal;
-        startTime = _prevTimedReport;
+        if (duration > 0) {
+            startTime = timestamp - duration;
+        } else {
+            startTime = _prevTimedReport;
+        }
         endTime = timestamp;
         _prevTimedReport = endTime;
         if (startTime == 0) {
             startTime = endTime;
         }
-        if (report.get(0).intValue() == 2) {
-            // 32bit timed report format
-            if (report.size() <= 5) {
-                // sub-second report, 1-4 bytes
-                poww = 1;
-                avgRaw = 0;
-                byteVal = 0;
-                i = 1;
-                while (i < report.size()) {
-                    byteVal = report.get(i).intValue();
-                    avgRaw = avgRaw + poww * byteVal;
-                    poww = poww * 0x100;
-                    i = i + 1;
-                }
-                if (((byteVal) & (0x80)) != 0) {
-                    avgRaw = avgRaw - poww;
-                }
-                avgVal = avgRaw / 1000.0;
-                if (_caltyp != 0) {
-                    if (_calhdl != null) {
-                        avgVal = _calhdl.yCalibrationHandler(avgVal, _caltyp, _calpar, _calraw, _calref);
-                    }
-                }
-                minVal = avgVal;
-                maxVal = avgVal;
-            } else {
-                // averaged report: avg,avg-min,max-avg
-                sublen = 1 + ((report.get(1).intValue()) & (3));
-                poww = 1;
-                avgRaw = 0;
-                byteVal = 0;
-                i = 2;
-                while ((sublen > 0) && (i < report.size())) {
-                    byteVal = report.get(i).intValue();
-                    avgRaw = avgRaw + poww * byteVal;
-                    poww = poww * 0x100;
-                    i = i + 1;
-                    sublen = sublen - 1;
-                }
-                if (((byteVal) & (0x80)) != 0) {
-                    avgRaw = avgRaw - poww;
-                }
-                sublen = 1 + ((((report.get(1).intValue()) >> (2))) & (3));
-                poww = 1;
-                difRaw = 0;
-                while ((sublen > 0) && (i < report.size())) {
-                    byteVal = report.get(i).intValue();
-                    difRaw = difRaw + poww * byteVal;
-                    poww = poww * 0x100;
-                    i = i + 1;
-                    sublen = sublen - 1;
-                }
-                minRaw = avgRaw - difRaw;
-                sublen = 1 + ((((report.get(1).intValue()) >> (4))) & (3));
-                poww = 1;
-                difRaw = 0;
-                while ((sublen > 0) && (i < report.size())) {
-                    byteVal = report.get(i).intValue();
-                    difRaw = difRaw + poww * byteVal;
-                    poww = poww * 0x100;
-                    i = i + 1;
-                    sublen = sublen - 1;
-                }
-                maxRaw = avgRaw + difRaw;
-                avgVal = avgRaw / 1000.0;
-                minVal = minRaw / 1000.0;
-                maxVal = maxRaw / 1000.0;
-                if (_caltyp != 0) {
-                    if (_calhdl != null) {
-                        avgVal = _calhdl.yCalibrationHandler(avgVal, _caltyp, _calpar, _calraw, _calref);
-                        minVal = _calhdl.yCalibrationHandler(minVal, _caltyp, _calpar, _calraw, _calref);
-                        maxVal = _calhdl.yCalibrationHandler(maxVal, _caltyp, _calpar, _calraw, _calref);
-                    }
+        // 32bit timed report format
+        if (report.size() <= 5) {
+            // sub-second report, 1-4 bytes
+            poww = 1;
+            avgRaw = 0;
+            byteVal = 0;
+            i = 1;
+            while (i < report.size()) {
+                byteVal = report.get(i).intValue();
+                avgRaw = avgRaw + poww * byteVal;
+                poww = poww * 0x100;
+                i = i + 1;
+            }
+            if (((byteVal) & (0x80)) != 0) {
+                avgRaw = avgRaw - poww;
+            }
+            avgVal = avgRaw / 1000.0;
+            if (_caltyp != 0) {
+                if (_calhdl != null) {
+                    avgVal = _calhdl.yCalibrationHandler(avgVal, _caltyp, _calpar, _calraw, _calref);
                 }
             }
+            minVal = avgVal;
+            maxVal = avgVal;
         } else {
-            // 16bit timed report format
-            if (report.get(0).intValue() == 0) {
-                // sub-second report, 1-4 bytes
-                poww = 1;
-                avgRaw = 0;
-                byteVal = 0;
-                i = 1;
-                while (i < report.size()) {
-                    byteVal = report.get(i).intValue();
-                    avgRaw = avgRaw + poww * byteVal;
-                    poww = poww * 0x100;
-                    i = i + 1;
+            // averaged report: avg,avg-min,max-avg
+            sublen = 1 + ((report.get(1).intValue()) & (3));
+            poww = 1;
+            avgRaw = 0;
+            byteVal = 0;
+            i = 2;
+            while ((sublen > 0) && (i < report.size())) {
+                byteVal = report.get(i).intValue();
+                avgRaw = avgRaw + poww * byteVal;
+                poww = poww * 0x100;
+                i = i + 1;
+                sublen = sublen - 1;
+            }
+            if (((byteVal) & (0x80)) != 0) {
+                avgRaw = avgRaw - poww;
+            }
+            sublen = 1 + ((((report.get(1).intValue()) >> (2))) & (3));
+            poww = 1;
+            difRaw = 0;
+            while ((sublen > 0) && (i < report.size())) {
+                byteVal = report.get(i).intValue();
+                difRaw = difRaw + poww * byteVal;
+                poww = poww * 0x100;
+                i = i + 1;
+                sublen = sublen - 1;
+            }
+            minRaw = avgRaw - difRaw;
+            sublen = 1 + ((((report.get(1).intValue()) >> (4))) & (3));
+            poww = 1;
+            difRaw = 0;
+            while ((sublen > 0) && (i < report.size())) {
+                byteVal = report.get(i).intValue();
+                difRaw = difRaw + poww * byteVal;
+                poww = poww * 0x100;
+                i = i + 1;
+                sublen = sublen - 1;
+            }
+            maxRaw = avgRaw + difRaw;
+            avgVal = avgRaw / 1000.0;
+            minVal = minRaw / 1000.0;
+            maxVal = maxRaw / 1000.0;
+            if (_caltyp != 0) {
+                if (_calhdl != null) {
+                    avgVal = _calhdl.yCalibrationHandler(avgVal, _caltyp, _calpar, _calraw, _calref);
+                    minVal = _calhdl.yCalibrationHandler(minVal, _caltyp, _calpar, _calraw, _calref);
+                    maxVal = _calhdl.yCalibrationHandler(maxVal, _caltyp, _calpar, _calraw, _calref);
                 }
-                if (_isScal) {
-                    avgVal = _decodeVal(avgRaw);
-                } else {
-                    if (((byteVal) & (0x80)) != 0) {
-                        avgRaw = avgRaw - poww;
-                    }
-                    avgVal = _decodeAvg(avgRaw);
-                }
-                minVal = avgVal;
-                maxVal = avgVal;
-            } else {
-                // averaged report 2+4+2 bytes
-                minRaw = report.get(1).intValue() + 0x100 * report.get(2).intValue();
-                maxRaw = report.get(3).intValue() + 0x100 * report.get(4).intValue();
-                avgRaw = report.get(5).intValue() + 0x100 * report.get(6).intValue() + 0x10000 * report.get(7).intValue();
-                byteVal = report.get(8).intValue();
-                if (((byteVal) & (0x80)) == 0) {
-                    avgRaw = avgRaw + 0x1000000 * byteVal;
-                } else {
-                    avgRaw = avgRaw - 0x1000000 * (0x100 - byteVal);
-                }
-                minVal = _decodeVal(minRaw);
-                avgVal = _decodeAvg(avgRaw);
-                maxVal = _decodeVal(maxRaw);
             }
         }
         return new YMeasure(startTime, endTime, minVal, avgVal, maxVal);
@@ -1646,11 +1559,6 @@ public class YSensor extends YFunction
     {
         double val;
         val = w;
-        if (_isScal) {
-            val = (val - _offset) / _scale;
-        } else {
-            val = YAPIContext._decimalToDouble(w);
-        }
         if (_caltyp != 0) {
             if (_calhdl != null) {
                 val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
@@ -1663,11 +1571,6 @@ public class YSensor extends YFunction
     {
         double val;
         val = dw;
-        if (_isScal) {
-            val = (val / 100 - _offset) / _scale;
-        } else {
-            val = val / _decexp;
-        }
         if (_caltyp != 0) {
             if (_calhdl != null) {
                 val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
@@ -1678,6 +1581,9 @@ public class YSensor extends YFunction
 
     /**
      * Continues the enumeration of sensors started using yFirstSensor().
+     * Caution: You can't make any assumption about the returned sensors order.
+     * If you want to find a specific a sensor, use Sensor.findSensor()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YSensor object, corresponding to
      *         a sensor currently online, or a null pointer

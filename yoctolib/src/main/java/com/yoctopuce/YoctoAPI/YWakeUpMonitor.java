@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpMonitor.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YWakeUpMonitor.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -676,6 +676,9 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Continues the enumeration of monitors started using yFirstWakeUpMonitor().
+     * Caution: You can't make any assumption about the returned monitors order.
+     * If you want to find a specific a monitor, use WakeUpMonitor.findWakeUpMonitor()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YWakeUpMonitor object, corresponding to
      *         a monitor currently online, or a null pointer

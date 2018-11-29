@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YStepperMotor.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YStepperMotor.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1355,6 +1355,9 @@ public class YStepperMotor extends YFunction
 
     /**
      * Continues the enumeration of stepper motors started using yFirstStepperMotor().
+     * Caution: You can't make any assumption about the returned stepper motors order.
+     * If you want to find a specific a stepper motor, use StepperMotor.findStepperMotor()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YStepperMotor object, corresponding to
      *         a stepper motor currently online, or a null pointer

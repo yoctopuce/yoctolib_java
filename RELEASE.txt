@@ -1,4 +1,9 @@
-Java v1.10.32759
+Java v1.10.33423
 
-- YModule.get_hardwareId() method return last know hardwareId when the module is disconnected
-- Code clean-up in Doc-XXX examples
+- Improve precision of dataLogger retrieval boundaries
+- Add TVoc and MultiSensController class
+- Add support for devices with dynamic functions activation (ex: Yocto-Temperature-IR)
+- Remove old dataLogger API (deprecated since 2014)
+- Fix notification that was not working with GatewayHub (and authentication)
+- Fix restart of serial scripts after settings restoration
+- Fix timed notifications with wrong start time

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPowerSupply.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YPowerSupply.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -983,6 +983,9 @@ public class YPowerSupply extends YFunction
 
     /**
      * Continues the enumeration of regulated power supplies started using yFirstPowerSupply().
+     * Caution: You can't make any assumption about the returned regulated power supplies order.
+     * If you want to find a specific a regulated power supply, use PowerSupply.findPowerSupply()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YPowerSupply object, corresponding to
      *         a regulated power supply currently online, or a null pointer

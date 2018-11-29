@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YOsControl.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YOsControl.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -305,6 +305,9 @@ public class YOsControl extends YFunction
 
     /**
      * Continues the enumeration of OS control started using yFirstOsControl().
+     * Caution: You can't make any assumption about the returned OS control order.
+     * If you want to find a specific OS control, use OsControl.findOsControl()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YOsControl object, corresponding to
      *         OS control currently online, or a null pointer

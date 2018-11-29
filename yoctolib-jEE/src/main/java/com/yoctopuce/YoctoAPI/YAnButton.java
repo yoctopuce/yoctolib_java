@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAnButton.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YAnButton.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindAnButton(), the high-level API for AnButton functions
  *
@@ -902,6 +902,9 @@ public class YAnButton extends YFunction
 
     /**
      * Continues the enumeration of analog inputs started using yFirstAnButton().
+     * Caution: You can't make any assumption about the returned analog inputs order.
+     * If you want to find a specific an analog input, use AnButton.findAnButton()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YAnButton object, corresponding to
      *         an analog input currently online, or a null pointer

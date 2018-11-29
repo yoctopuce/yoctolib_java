@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YServo.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YServo.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindServo(), the high-level API for Servo functions
  *
@@ -783,6 +783,9 @@ public class YServo extends YFunction
 
     /**
      * Continues the enumeration of servos started using yFirstServo().
+     * Caution: You can't make any assumption about the returned servos order.
+     * If you want to find a specific a servo, use Servo.findServo()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YServo object, corresponding to
      *         a servo currently online, or a null pointer

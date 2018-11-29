@@ -108,7 +108,7 @@ abstract class NotificationHandler implements Runnable
             String serial = _hub._serialByYdx.get(devydx);
             String funcid;
             if (serial != null) {
-                YDevice ydev = _hub._yctx._yHash.getDevice(serial);
+                final YDevice ydev = _hub._yctx._yHash.getDevice(serial);
                 if (ydev != null) {
                     switch (ev.charAt(0)) {
                         case NOTIFY_NETPKT_FUNCVALYDX:
@@ -119,7 +119,7 @@ abstract class NotificationHandler implements Runnable
                             }
                             break;
                         case NOTIFY_NETPKT_DEVLOGYDX:
-                            ydev.triggerLogPull();
+                            ydev.setDeviceLogPending(true);
                             break;
                         case NOTIFY_NETPKT_CONFCHGYDX:
                             _hub.handleConfigChangeNotification(serial);
@@ -128,12 +128,13 @@ abstract class NotificationHandler implements Runnable
                         case NOTIFY_NETPKT_TIMEAVGYDX:
                         case NOTIFY_NETPKT_TIMEV2YDX:
                             if (funydx == 0xf) {
-                                Integer[] data = new Integer[5];
-                                for (int i = 0; i < 5; i++) {
+                                int not_len = value.length() / 2;
+                                Integer[] data = new Integer[not_len];
+                                for (int i = 0; i < not_len; i++) {
                                     String part = value.substring(i * 2, i * 2 + 2);
                                     data[i] = Integer.parseInt(part, 16);
                                 }
-                                ydev.setDeviceTime(data);
+                                ydev.setLastTimeRef(data);
                             } else {
                                 funcid = ydev.getYPEntry(funydx).getFuncId();
                                 if (!funcid.equals("")) {
@@ -145,7 +146,7 @@ abstract class NotificationHandler implements Runnable
                                         int intval = Integer.parseInt(value.substring(pos, pos + 2), 16);
                                         report.add(intval);
                                     }
-                                    _hub.handleTimedNotification(serial, funcid, ydev.getDeviceTime(), report);
+                                    _hub.handleTimedNotification(serial, funcid, ydev.getLastTimeRef(), ydev.getLastDuration(), report);
                                 }
                             }
                             break;

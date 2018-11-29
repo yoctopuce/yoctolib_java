@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 32520 2018-10-05 08:26:08Z seb $
+ * $Id: YModule.java 33272 2018-11-22 09:04:14Z mvuilleu $
  *
  * YModule Class: Module control interface
  *
@@ -320,28 +320,6 @@ public class YModule extends YFunction
         return dev.getYPEntry(functionIndex).getAdvertisedValue();
     }
 
-    /**
-     * Registers a device log callback function. This callback will be called each time
-     * that a module sends a new log message. Mostly useful to debug a Yoctopuce module.
-     *
-     * @param callback : the callback function to call, or a null pointer. The callback function should take two
-     *         arguments: the module object that emitted the log message, and the character string containing the log.
-     *
-     */
-    public void registerLogCallback(LogCallback callback)
-    {
-        _logCallback = callback;
-        YDevice ydev = _yapi._yHash.getDevice(_serialNumber);
-        if (ydev != null) {
-            ydev.registerLogCallback(callback);
-        }
-    }
-
-
-    LogCallback get_logCallback()
-    {
-        return _logCallback;
-    }
 
     private byte[] _flattenJsonStruct_internal(byte[] actualSettings) throws YAPI_Exception
     {
@@ -399,6 +377,14 @@ public class YModule extends YFunction
         YDevice dev = _getDev();
         YGenericHub hub = dev.getHub();
         return hub.get_urlOf(_serialNumber);
+    }
+
+    public void _startStopDevLog_internal(String serial,boolean start) throws YAPI_Exception
+    {
+        YDevice ydev = _yapi._yHash.getDevice(serial);
+        if (ydev != null) {
+            ydev.registerLogCallback(_logCallback);
+        }
     }
 
 
@@ -1012,6 +998,7 @@ public class YModule extends YFunction
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
+     *
      * If a call to this object's is_online() method returns FALSE although
      * you are certain that the device is plugged, make sure that you did
      * call registerHub() at application initialization time.
@@ -1166,6 +1153,39 @@ public class YModule extends YFunction
     public int triggerFirmwareUpdate(int secBeforeReboot) throws YAPI_Exception
     {
         return set_rebootCountdown(-secBeforeReboot);
+    }
+
+    public void _startStopDevLog(String serial,boolean start) throws YAPI_Exception
+    {
+        _startStopDevLog_internal(serial, start);
+    }
+
+    //cannot be generated for Java:
+    //public void _startStopDevLog_internal(String serial,boolean start) throws YAPI_Exception
+    /**
+     * Registers a device log callback function. This callback will be called each time
+     * that a module sends a new log message. Mostly useful to debug a Yoctopuce module.
+     *
+     * @param callback : the callback function to call, or a null pointer. The callback function should take two
+     *         arguments: the module object that emitted the log message, and the character string containing the log.
+     * @throws YAPI_Exception on error
+     */
+    public int registerLogCallback(YModule.LogCallback callback) throws YAPI_Exception
+    {
+        String serial;
+
+        serial = get_serialNumber();
+        if (serial.equals(YAPI.INVALID_STRING)) {
+            return YAPI.DEVICE_NOT_FOUND;
+        }
+        _logCallback = callback;
+        _startStopDevLog(serial, callback != null);
+        return 0;
+    }
+
+    public YModule.LogCallback get_logCallback()
+    {
+        return _logCallback;
     }
 
     /**
@@ -1464,6 +1484,8 @@ public class YModule extends YFunction
                 _upload(name, YAPIContext._hexStrToBin(data));
             }
         }
+        // Apply settings a second time for file-dependent settings and dynamic sensor nodes
+        set_allSettings((json_api).getBytes());
         return YAPI.SUCCESS;
     }
 
@@ -2153,6 +2175,9 @@ public class YModule extends YFunction
     //public String get_url_internal() throws YAPI_Exception
     /**
      * Continues the module enumeration started using yFirstModule().
+     * Caution: You can't make any assumption about the returned modules order.
+     * If you want to find a specific module, use Module.findModule()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YModule object, corresponding to
      *         the next module found, or a null pointer

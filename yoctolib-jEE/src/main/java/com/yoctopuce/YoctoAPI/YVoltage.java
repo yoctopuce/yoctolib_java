@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YVoltage.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YVoltage.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindVoltage(), the high-level API for Voltage functions
  *
@@ -306,6 +306,9 @@ public class YVoltage extends YSensor
 
     /**
      * Continues the enumeration of voltage sensors started using yFirstVoltage().
+     * Caution: You can't make any assumption about the returned voltage sensors order.
+     * If you want to find a specific a voltage sensor, use Voltage.findVoltage()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YVoltage object, corresponding to
      *         a voltage sensor currently online, or a null pointer

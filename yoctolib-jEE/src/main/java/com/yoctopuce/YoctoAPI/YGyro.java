@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java 31728 2018-08-17 08:23:25Z seb $
+ * $Id: YGyro.java 32904 2018-11-02 10:15:00Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -821,6 +821,9 @@ public class YGyro extends YSensor
 
     /**
      * Continues the enumeration of gyroscopes started using yFirstGyro().
+     * Caution: You can't make any assumption about the returned gyroscopes order.
+     * If you want to find a specific a gyroscope, use Gyro.findGyro()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YGyro object, corresponding to
      *         a gyroscope currently online, or a null pointer

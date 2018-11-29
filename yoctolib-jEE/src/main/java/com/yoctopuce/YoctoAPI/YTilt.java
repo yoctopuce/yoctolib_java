@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTilt.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YTilt.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindTilt(), the high-level API for Tilt functions
  *
@@ -378,6 +378,9 @@ public class YTilt extends YSensor
 
     /**
      * Continues the enumeration of tilt sensors started using yFirstTilt().
+     * Caution: You can't make any assumption about the returned tilt sensors order.
+     * If you want to find a specific a tilt sensor, use Tilt.findTilt()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YTilt object, corresponding to
      *         a tilt sensor currently online, or a null pointer

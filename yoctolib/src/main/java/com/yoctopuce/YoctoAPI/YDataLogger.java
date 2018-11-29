@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 31728 2018-08-17 08:23:25Z seb $
+ * $Id: YDataLogger.java 33181 2018-11-16 16:28:34Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -134,25 +134,15 @@ public class YDataLogger extends YFunction
         if (_dataLoggerURL == null) {
             _dataLoggerURL = "/logger.json";
         }
-
         // get the device serial number
         String devid = this.module().get_serialNumber();
-
         String httpreq = "GET " + _dataLoggerURL;
         if (timeIdx != null) {
             httpreq += String.format(Locale.US, "?run=%d&time=%d", runIdx, timeIdx);
         }
         String result;
         YDevice dev = _yapi._yHash.getDevice(devid);
-        try {
-            result = dev.requestHTTPSyncAsString(httpreq, null);
-        } catch (YAPI_Exception ex) {
-            if (!_dataLoggerURL.equals("/dataLogger.json")) {
-                _dataLoggerURL = "/dataLogger.json";
-                return getData(runIdx, timeIdx);
-            }
-            throw ex;
-        }
+        result = dev.requestHTTPSyncAsString(httpreq, null);
         return  result;
     }
 
@@ -171,63 +161,6 @@ public class YDataLogger extends YFunction
     protected YDataLogger(String func)
     {
         this(YAPI.GetYCtx(true), func);
-    }
-
-    /**
-     * Builds a list of all data streams hold by the data logger (legacy method).
-     * The caller must pass by reference an empty array to hold YDataStream
-     * objects, and the function fills it with objects describing available
-     * data sequences.
-     *
-     * This is the old way to retrieve data from the DataLogger.
-     * For new applications, you should rather use get_dataSets()
-     * method, or call directly get_recordedData() on the
-     * sensor object.
-     *
-     * @param v : an array of YDataStream objects to be filled in
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int get_dataStreams(ArrayList<YDataStream> v) throws YAPI_Exception
-    {
-
-        String loadval = this.getData(null, null);
-        try {
-            YJSONArray jsonAllStreams = new YJSONArray(loadval);
-            jsonAllStreams.parse();
-            if (jsonAllStreams.length() == 0)
-                return YAPI.SUCCESS;
-            if (jsonAllStreams.get(0).getJSONType() == YJSONContent.YJSONType.ARRAY) {
-                for (int i = 0; i < jsonAllStreams.length(); i++) {
-                    // old datalogger format: [runIdx, timerel, utc, interval]
-                    YJSONArray arr = jsonAllStreams.getYJSONArray(i);
-                    YOldDataStream stream = new YOldDataStream(this, arr.getInt(0), arr.getInt(1), arr.getLong(2), arr.getInt(3));
-                    v.add(stream);
-                }
-            } else {
-                // new datalogger format: {"id":"...","unit":"...","streams":["...",...]}
-                ArrayList<YDataSet> sets = this.parse_dataSets(jsonAllStreams.toJSON().getBytes());
-                for (int j = 0; j < sets.size(); j++) {
-                    ArrayList<YDataStream> ds = sets.get(j).get_privateDataStreams();
-                    for (int si = 0; si < ds.size(); si++) {
-                        v.add(ds.get(si));
-                    }
-                }
-                return YAPI.SUCCESS;
-            }
-        } catch (Exception ex) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
-        }
-
-
-        return YAPI.SUCCESS;
-    }
-
-    public int getDataStreams(ArrayList<YDataStream> v) throws YAPI_Exception
-    {
-        return this.get_dataStreams(v);
     }
 
     //--- (generated code: YDataLogger implementation)
@@ -769,6 +702,9 @@ public class YDataLogger extends YFunction
 
     /**
      * Continues the enumeration of data loggers started using yFirstDataLogger().
+     * Caution: You can't make any assumption about the returned data loggers order.
+     * If you want to find a specific a data logger, use DataLogger.findDataLogger()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YDataLogger object, corresponding to
      *         a data logger currently online, or a null pointer

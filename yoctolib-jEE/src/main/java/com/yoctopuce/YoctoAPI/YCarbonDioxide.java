@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCarbonDioxide.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YCarbonDioxide.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -439,6 +439,9 @@ public class YCarbonDioxide extends YSensor
 
     /**
      * Continues the enumeration of CO2 sensors started using yFirstCarbonDioxide().
+     * Caution: You can't make any assumption about the returned CO2 sensors order.
+     * If you want to find a specific a CO2 sensor, use CarbonDioxide.findCarbonDioxide()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YCarbonDioxide object, corresponding to
      *         a CO2 sensor currently online, or a null pointer

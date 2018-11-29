@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 31728 2018-08-17 08:23:25Z seb $
+ * $Id: YWireless.java 32904 2018-11-02 10:15:00Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -662,6 +662,9 @@ public class YWireless extends YFunction
 
     /**
      * Continues the enumeration of wireless lan interfaces started using yFirstWireless().
+     * Caution: You can't make any assumption about the returned wireless lan interfaces order.
+     * If you want to find a specific a wireless lan interface, use Wireless.findWireless()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YWireless object, corresponding to
      *         a wireless lan interface currently online, or a null pointer

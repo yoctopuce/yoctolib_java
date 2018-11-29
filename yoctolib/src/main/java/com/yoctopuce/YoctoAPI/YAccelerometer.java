@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAccelerometer.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YAccelerometer.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -511,6 +511,9 @@ public class YAccelerometer extends YSensor
 
     /**
      * Continues the enumeration of accelerometers started using yFirstAccelerometer().
+     * Caution: You can't make any assumption about the returned accelerometers order.
+     * If you want to find a specific an accelerometer, use Accelerometer.findAccelerometer()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YAccelerometer object, corresponding to
      *         an accelerometer currently online, or a null pointer

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAltitude.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YAltitude.java 32950 2018-11-05 17:15:46Z seb $
  *
  *  Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -172,7 +172,7 @@ public class YAltitude extends YSensor
     /**
      * Changes the barometric pressure adjusted to sea level used to compute
      * the altitude (QNH). This enables you to compensate for atmospheric pressure
-     * changes due to weather conditions.
+     * changes due to weather conditions. Applicable to barometric altimeters only.
      *
      *  @param newval : a floating point number corresponding to the barometric pressure adjusted to sea
      * level used to compute
@@ -195,7 +195,7 @@ public class YAltitude extends YSensor
     /**
      * Changes the barometric pressure adjusted to sea level used to compute
      * the altitude (QNH). This enables you to compensate for atmospheric pressure
-     * changes due to weather conditions.
+     * changes due to weather conditions. Applicable to barometric altimeters only.
      *
      *  @param newval : a floating point number corresponding to the barometric pressure adjusted to sea
      * level used to compute
@@ -212,7 +212,7 @@ public class YAltitude extends YSensor
 
     /**
      * Returns the barometric pressure adjusted to sea level used to compute
-     * the altitude (QNH).
+     * the altitude (QNH). Applicable to barometric altimeters only.
      *
      * @return a floating point number corresponding to the barometric pressure adjusted to sea level used to compute
      *         the altitude (QNH)
@@ -235,7 +235,7 @@ public class YAltitude extends YSensor
 
     /**
      * Returns the barometric pressure adjusted to sea level used to compute
-     * the altitude (QNH).
+     * the altitude (QNH). Applicable to barometric altimeters only.
      *
      * @return a floating point number corresponding to the barometric pressure adjusted to sea level used to compute
      *         the altitude (QNH)
@@ -439,6 +439,9 @@ public class YAltitude extends YSensor
 
     /**
      * Continues the enumeration of altimeters started using yFirstAltitude().
+     * Caution: You can't make any assumption about the returned altimeters order.
+     * If you want to find a specific an altimeter, use Altitude.findAltitude()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YAltitude object, corresponding to
      *         an altimeter currently online, or a null pointer

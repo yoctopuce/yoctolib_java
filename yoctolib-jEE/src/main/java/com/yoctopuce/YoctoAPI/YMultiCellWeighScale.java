@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiCellWeighScale.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YMultiCellWeighScale.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -912,6 +912,10 @@ public class YMultiCellWeighScale extends YSensor
 
     /**
      * Continues the enumeration of multi-cell weighing scale sensors started using yFirstMultiCellWeighScale().
+     * Caution: You can't make any assumption about the returned multi-cell weighing scale sensors order.
+     *  If you want to find a specific a multi-cell weighing scale sensor, use
+     * MultiCellWeighScale.findMultiCellWeighScale()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YMultiCellWeighScale object, corresponding to
      *         a multi-cell weighing scale sensor currently online, or a null pointer

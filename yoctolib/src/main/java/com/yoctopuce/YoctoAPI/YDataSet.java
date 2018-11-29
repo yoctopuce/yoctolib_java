@@ -1,5 +1,5 @@
 /*
- * $Id: YDataSet.java 32612 2018-10-10 07:45:30Z seb $
+ * $Id: YDataSet.java 33358 2018-11-23 10:32:57Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -70,8 +70,8 @@ public class YDataSet
     protected String _hardwareId;
     protected String _functionId;
     protected String _unit;
-    protected long _startTime = 0;
-    protected long _endTime = 0;
+    protected double _startTime = 0;
+    protected double _endTime = 0;
     protected int _progress = 0;
     protected ArrayList<Integer> _calib = new ArrayList<>();
     protected ArrayList<YDataStream> _streams = new ArrayList<>();
@@ -82,7 +82,7 @@ public class YDataSet
     //--- (end of generated code: YDataSet definitions)
 
     // YDataSet constructor, when instantiated directly by a function
-    public YDataSet(YFunction parent, String functionId, String unit, long startTime, long endTime)
+    YDataSet(YFunction parent, String functionId, String unit, double startTime, double endTime)
     {
         _parent = parent;
         _functionId = functionId;
@@ -113,10 +113,10 @@ public class YDataSet
         double summaryMaxVal = Double.MIN_VALUE;
         double summaryTotalTime = 0;
         double summaryTotalAvg = 0;
-        long streamStartTime;
-        long streamEndTime;
-        long startTime = 0x7fffffff;
-        long endTime = 0;
+        double streamStartTime;
+        double streamEndTime;
+        double startTime = 0x7fffffff;
+        double endTime = 0;
 
         try {
             json = new YJSONObject(json_str);
@@ -135,11 +135,11 @@ public class YDataSet
             jstreams = json.getYJSONArray("streams");
             for (int i = 0; i < jstreams.length(); i++) {
                 YDataStream stream = _parent._findDataStream(this, jstreams.getString(i));
-                streamStartTime = stream.get_startTimeUTC() - stream.get_dataSamplesIntervalMs() / 1000;
-                streamEndTime = stream.get_startTimeUTC() + stream.get_duration();
+                streamStartTime = stream.get_realStartTimeUTC();
+                streamEndTime = streamStartTime + stream.get_realDuration();
                 if (_startTime > 0 && streamEndTime <= _startTime) {
                     // this stream is too early, drop it
-                } else if (_endTime > 0 && stream.get_startTimeUTC() > _endTime) {
+                } else if (_endTime > 0 && streamStartTime >= _endTime) {
                     // this stream is too late, drop it
                 } else {
                     _streams.add(stream);
@@ -150,16 +150,16 @@ public class YDataSet
                         endTime = streamEndTime;
                     }
 
-                    if (stream.isClosed() && stream.get_startTimeUTC() >= _startTime &&
+                    if (stream.isClosed() && streamStartTime >= _startTime &&
                             (_endTime == 0 || streamEndTime <= _endTime)) {
                         if (summaryMinVal > stream.get_minValue())
                             summaryMinVal = stream.get_minValue();
                         if (summaryMaxVal < stream.get_maxValue())
                             summaryMaxVal = stream.get_maxValue();
-                        summaryTotalAvg += stream.get_averageValue() * stream.get_duration();
-                        summaryTotalTime += stream.get_duration();
+                        summaryTotalAvg += stream.get_averageValue() * stream.get_realDuration();
+                        summaryTotalTime += stream.get_realDuration();
 
-                        YMeasure rec = new YMeasure(stream.get_startTimeUTC(),
+                        YMeasure rec = new YMeasure(streamStartTime,
                                 streamEndTime,
                                 stream.get_minValue(),
                                 stream.get_averageValue(),
@@ -199,10 +199,13 @@ public class YDataSet
         String strdata;
         double tim;
         double itv;
+        double fitv;
+        double end_;
         int nCols;
         int minCol;
         int avgCol;
         int maxCol;
+        boolean firstMeasure;
 
         if (progress != _progress) {
             return _progress;
@@ -222,8 +225,12 @@ public class YDataSet
         if (dataRows.size() == 0) {
             return get_progress();
         }
-        tim = (double) stream.get_startTimeUTC();
+        tim = stream.get_realStartTimeUTC();
+        fitv = stream.get_firstDataSamplesInterval();
         itv = stream.get_dataSamplesInterval();
+        if (fitv == 0) {
+            fitv = itv;
+        }
         if (tim < itv) {
             tim = itv;
         }
@@ -240,12 +247,18 @@ public class YDataSet
             maxCol = 0;
         }
 
+        firstMeasure = true;
         for (ArrayList<Double> ii:dataRows) {
-            if ((tim >= _startTime) && ((_endTime == 0) || (tim <= _endTime))) {
-                _measures.add(new YMeasure(tim - itv, tim, ii.get(minCol).doubleValue(), ii.get(avgCol).doubleValue(), ii.get(maxCol).doubleValue()));
+            if (firstMeasure) {
+                end_ = tim + fitv;
+                firstMeasure = false;
+            } else {
+                end_ = tim + itv;
             }
-            tim = tim + itv;
-            tim = (double)Math.round(tim * 1000) / 1000.0;
+            if ((tim >= _startTime) && ((_endTime == 0) || (end_ <= _endTime))) {
+                _measures.add(new YMeasure(tim, end_, ii.get(minCol).doubleValue(), ii.get(avgCol).doubleValue(), ii.get(maxCol).doubleValue()));
+            }
+            tim = end_;
         }
         return get_progress();
     }
@@ -307,13 +320,21 @@ public class YDataSet
      * to reflect the timestamp of the first measure actually found in the
      * dataLogger within the specified range.
      *
+     * <b>DEPRECATED</b>: This method has been replaced by get_summary()
+     * which contain more precise informations on the YDataSet.
+     *
      * @return an unsigned number corresponding to the number of seconds
      *         between the Jan 1, 1970 and the beginning of this data
      *         set (i.e. Unix time representation of the absolute time).
      */
     public long get_startTimeUTC()
     {
-        return _startTime;
+        return imm_get_startTimeUTC();
+    }
+
+    public long imm_get_startTimeUTC()
+    {
+        return (long) _startTime;
     }
 
     /**
@@ -324,13 +345,22 @@ public class YDataSet
      * to reflect the timestamp of the last measure actually found in the
      * dataLogger within the specified range.
      *
+     * <b>DEPRECATED</b>: This method has been replaced by get_summary()
+     * which contain more precise informations on the YDataSet.
+     *
+     *
      * @return an unsigned number corresponding to the number of seconds
      *         between the Jan 1, 1970 and the end of this data
      *         set (i.e. Unix time representation of the absolute time).
      */
     public long get_endTimeUTC()
     {
-        return _endTime;
+        return imm_get_endTimeUTC();
+    }
+
+    public long imm_get_endTimeUTC()
+    {
+        return (long) (double)Math.round(_endTime);
     }
 
     /**
@@ -369,10 +399,10 @@ public class YDataSet
         if (_progress < 0) {
             url = String.format(Locale.US, "logger.json?id=%s",_functionId);
             if (_startTime != 0) {
-                url = String.format(Locale.US, "%s&from=%d",url,_startTime);
+                url = String.format(Locale.US, "%s&from=%d",url,imm_get_startTimeUTC());
             }
             if (_endTime != 0) {
-                url = String.format(Locale.US, "%s&to=%d",url,_endTime);
+                url = String.format(Locale.US, "%s&to=%d",url,imm_get_endTimeUTC()+1);
             }
         } else {
             if (_progress >= _streams.size()) {
@@ -446,21 +476,22 @@ public class YDataSet
      */
     public ArrayList<YMeasure> get_measuresAt(YMeasure measure) throws YAPI_Exception
     {
-        long startUtc;
+        double startUtc;
         YDataStream stream;
         ArrayList<ArrayList<Double>> dataRows = new ArrayList<>();
         ArrayList<YMeasure> measures = new ArrayList<>();
         double tim;
         double itv;
+        double end_;
         int nCols;
         int minCol;
         int avgCol;
         int maxCol;
 
-        startUtc = (long) (double)Math.round(measure.get_startTimeUTC());
+        startUtc = measure.get_startTimeUTC();
         stream = null;
         for (YDataStream ii:_streams) {
-            if (ii.get_startTimeUTC() == startUtc) {
+            if (ii.get_realStartTimeUTC() == startUtc) {
                 stream = ii;
             }
         }
@@ -471,7 +502,7 @@ public class YDataSet
         if (dataRows.size() == 0) {
             return measures;
         }
-        tim = (double) stream.get_startTimeUTC();
+        tim = stream.get_realStartTimeUTC();
         itv = stream.get_dataSamplesInterval();
         if (tim < itv) {
             tim = itv;
@@ -490,10 +521,11 @@ public class YDataSet
         }
 
         for (ArrayList<Double> ii:dataRows) {
-            if ((tim >= _startTime) && ((_endTime == 0) || (tim <= _endTime))) {
-                measures.add(new YMeasure(tim - itv, tim, ii.get(minCol).doubleValue(), ii.get(avgCol).doubleValue(), ii.get(maxCol).doubleValue()));
+            end_ = tim + itv;
+            if ((tim >= _startTime) && ((_endTime == 0) || (end_ <= _endTime))) {
+                measures.add(new YMeasure(tim, end_, ii.get(minCol).doubleValue(), ii.get(avgCol).doubleValue(), ii.get(maxCol).doubleValue()));
             }
-            tim = tim + itv;
+            tim = end_;
         }
         return measures;
     }

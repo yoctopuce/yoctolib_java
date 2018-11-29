@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGenericSensor.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YGenericSensor.java 33114 2018-11-09 21:58:19Z mvuilleu $
  *
  *  Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -85,6 +85,7 @@ public class YGenericSensor extends YSensor
     public static final int SIGNALSAMPLING_HIGH_RATE_FILTERED = 1;
     public static final int SIGNALSAMPLING_LOW_NOISE = 2;
     public static final int SIGNALSAMPLING_LOW_NOISE_FILTERED = 3;
+    public static final int SIGNALSAMPLING_HIGHEST_RATE = 4;
     public static final int SIGNALSAMPLING_INVALID = -1;
     protected double _signalValue = SIGNALVALUE_INVALID;
     protected String _signalUnit = SIGNALUNIT_INVALID;
@@ -492,8 +493,9 @@ public class YGenericSensor extends YSensor
      * to get measures as stable as possible when working on a noisy signal.
      *
      *  @return a value among YGenericSensor.SIGNALSAMPLING_HIGH_RATE,
-     *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE and
-     * YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED corresponding to the electric signal sampling method to use
+     *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE,
+     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED and YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE
+     * corresponding to the electric signal sampling method to use
      *
      * @throws YAPI_Exception on error
      */
@@ -520,8 +522,8 @@ public class YGenericSensor extends YSensor
      * to get measures as stable as possible when working on a noisy signal.
      *
      *  @return a value among Y_SIGNALSAMPLING_HIGH_RATE, Y_SIGNALSAMPLING_HIGH_RATE_FILTERED,
-     *  Y_SIGNALSAMPLING_LOW_NOISE and Y_SIGNALSAMPLING_LOW_NOISE_FILTERED corresponding to the electric
-     * signal sampling method to use
+     *  Y_SIGNALSAMPLING_LOW_NOISE, Y_SIGNALSAMPLING_LOW_NOISE_FILTERED and Y_SIGNALSAMPLING_HIGHEST_RATE
+     * corresponding to the electric signal sampling method to use
      *
      * @throws YAPI_Exception on error
      */
@@ -539,8 +541,9 @@ public class YGenericSensor extends YSensor
      * to get measures as stable as possible when working on a noisy signal.
      *
      *  @param newval : a value among YGenericSensor.SIGNALSAMPLING_HIGH_RATE,
-     *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE and
-     * YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED corresponding to the electric signal sampling method to use
+     *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE,
+     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED and YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE
+     * corresponding to the electric signal sampling method to use
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -565,8 +568,8 @@ public class YGenericSensor extends YSensor
      * to get measures as stable as possible when working on a noisy signal.
      *
      *  @param newval : a value among Y_SIGNALSAMPLING_HIGH_RATE, Y_SIGNALSAMPLING_HIGH_RATE_FILTERED,
-     *  Y_SIGNALSAMPLING_LOW_NOISE and Y_SIGNALSAMPLING_LOW_NOISE_FILTERED corresponding to the electric
-     * signal sampling method to use
+     *  Y_SIGNALSAMPLING_LOW_NOISE, Y_SIGNALSAMPLING_LOW_NOISE_FILTERED and Y_SIGNALSAMPLING_HIGHEST_RATE
+     * corresponding to the electric signal sampling method to use
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -749,6 +752,9 @@ public class YGenericSensor extends YSensor
 
     /**
      * Continues the enumeration of generic sensors started using yFirstGenericSensor().
+     * Caution: You can't make any assumption about the returned generic sensors order.
+     * If you want to find a specific a generic sensor, use GenericSensor.findGenericSensor()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YGenericSensor object, corresponding to
      *         a generic sensor currently online, or a null pointer

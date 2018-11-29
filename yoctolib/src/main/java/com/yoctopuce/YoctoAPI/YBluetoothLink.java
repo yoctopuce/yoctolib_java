@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YBluetoothLink.java 32610 2018-10-10 06:52:20Z seb $
+ *  $Id: YBluetoothLink.java 32904 2018-11-02 10:15:00Z seb $
  *
  *  Implements FindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -856,6 +856,9 @@ public class YBluetoothLink extends YFunction
 
     /**
      * Continues the enumeration of cellular interfaces started using yFirstBluetoothLink().
+     * Caution: You can't make any assumption about the returned cellular interfaces order.
+     * If you want to find a specific a cellular interface, use BluetoothLink.findBluetoothLink()
+     * and a hardwareID or a logical name.
      *
      * @return a pointer to a YBluetoothLink object, corresponding to
      *         a cellular interface currently online, or a null pointer
