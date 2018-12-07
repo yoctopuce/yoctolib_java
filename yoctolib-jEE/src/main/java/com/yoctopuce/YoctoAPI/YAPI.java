@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 33181 2018-11-16 16:28:34Z seb $
+ * $Id: YAPI.java 33466 2018-11-30 14:36:01Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -52,16 +52,18 @@ public class YAPI
     // Return value for invalid strings
     public static final String INVALID_STRING = "!INVALID!";
     public static final double INVALID_DOUBLE = -1.79769313486231E+308;
+    static final double MAX_DOUBLE = Double.MAX_VALUE;
+    static final double MIN_DOUBLE = Double.MIN_VALUE;
     public static final int INVALID_INT = -2147483648;
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "33423";
+    public static final String YOCTO_API_BUILD_STR = "33576";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
     public static final int YOCTO_DEVID_BOOTLOADER = 2;
-    public static final int HASH_BUF_SIZE = 28;
+    static final int HASH_BUF_SIZE = 28;
 
     // --- (generated code: YFunction return codes)
     // Yoctopuce error codes, used by default as function return value
@@ -106,8 +108,6 @@ public class YAPI
     public static final int DETECT_NET = 2;
     public static final int RESEND_MISSING_PKT = 4;
     public static final int DETECT_ALL = DETECT_USB | DETECT_NET;
-
-
 
 
     /**
@@ -285,7 +285,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".33423" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".33576" + YUSBHub.getAPIVersion();
     }
 
     /**

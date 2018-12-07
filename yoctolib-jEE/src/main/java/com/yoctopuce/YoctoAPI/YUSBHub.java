@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 31423 2018-08-07 11:52:08Z seb $
+ * $Id: YUSBHub.java 33451 2018-11-29 13:32:59Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -163,6 +163,10 @@ class YUSBHub extends YGenericHub
             if (!yellowPages.containsKey(classname))
                 yellowPages.put(classname, new ArrayList<YPEntry>());
             yellowPages.get(classname).add(yp);
+        }
+        // Reindex all devices from white pages
+        for (int i = 0; i < whitePages.size(); i++) {
+            _serialByYdx.put(i, whitePages.get(i).getSerialNumber());
         }
         updateFromWpAndYp(whitePages, yellowPages);
 
