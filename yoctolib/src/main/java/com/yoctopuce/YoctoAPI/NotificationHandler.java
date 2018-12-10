@@ -119,7 +119,7 @@ abstract class NotificationHandler implements Runnable
                             }
                             break;
                         case NOTIFY_NETPKT_DEVLOGYDX:
-                            ydev.setDeviceLogPending(true);
+                            ydev.setDeviceLogPending();
                             break;
                         case NOTIFY_NETPKT_CONFCHGYDX:
                             _hub.handleConfigChangeNotification(serial);

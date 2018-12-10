@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 33088 2018-11-09 10:06:21Z seb $
+ * $Id: YDevice.java 33632 2018-12-10 14:43:52Z seb $
  *
  * Internal YDevice class
  *
@@ -367,11 +367,12 @@ class YDevice
         } catch (YAPI_Exception ex) {
             _hub._yctx._Log("LOG error:" + ex.getLocalizedMessage());
         }
+        _logNeedPulling = false;
     }
 
-    void setDeviceLogPending(boolean value)
+    void setDeviceLogPending()
     {
-        _logNeedPulling = value;
+        _logNeedPulling = true;
     }
 
 

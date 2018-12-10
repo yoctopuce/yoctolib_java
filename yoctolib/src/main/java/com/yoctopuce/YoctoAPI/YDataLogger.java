@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 33181 2018-11-16 16:28:34Z seb $
+ * $Id: YDataLogger.java 33601 2018-12-09 14:30:31Z mvuilleu $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -84,6 +84,10 @@ public class YDataLogger extends YFunction
     public static final int BEACONDRIVEN_ON = 1;
     public static final int BEACONDRIVEN_INVALID = -1;
     /**
+     * invalid usage value
+     */
+    public static final int USAGE_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid clearHistory value
      */
     public static final int CLEARHISTORY_FALSE = 0;
@@ -94,6 +98,7 @@ public class YDataLogger extends YFunction
     protected int _recording = RECORDING_INVALID;
     protected int _autoStart = AUTOSTART_INVALID;
     protected int _beaconDriven = BEACONDRIVEN_INVALID;
+    protected int _usage = USAGE_INVALID;
     protected int _clearHistory = CLEARHISTORY_INVALID;
     protected UpdateCallback _valueCallbackDataLogger = null;
 
@@ -182,6 +187,9 @@ public class YDataLogger extends YFunction
         }
         if (json_val.has("beaconDriven")) {
             _beaconDriven = json_val.getInt("beaconDriven") > 0 ? 1 : 0;
+        }
+        if (json_val.has("usage")) {
+            _usage = json_val.getInt("usage");
         }
         if (json_val.has("clearHistory")) {
             _clearHistory = json_val.getInt("clearHistory") > 0 ? 1 : 0;
@@ -509,6 +517,39 @@ public class YDataLogger extends YFunction
     public int setBeaconDriven(int newval)  throws YAPI_Exception
     {
         return set_beaconDriven(newval);
+    }
+
+    /**
+     * Returns the percentage of datalogger memory in use.
+     *
+     * @return an integer corresponding to the percentage of datalogger memory in use
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_usage() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return USAGE_INVALID;
+                }
+            }
+            res = _usage;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the percentage of datalogger memory in use.
+     *
+     * @return an integer corresponding to the percentage of datalogger memory in use
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getUsage() throws YAPI_Exception
+    {
+        return get_usage();
     }
 
     public int get_clearHistory() throws YAPI_Exception

@@ -1353,7 +1353,7 @@ public class YAPIContext
      */
     public void RegisterLogFunction(YAPI.LogCallback logfun)
     {
-        synchronized (_regCbLock) {
+        synchronized (_logCallbackLock) {
             _logCallback = logfun;
         }
     }
