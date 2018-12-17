@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 32904 2018-11-02 10:15:00Z seb $
+ * $Id: YFiles.java 33713 2018-12-14 14:20:19Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -344,7 +344,7 @@ public class YFiles extends YFunction
      * in the filesystem.
      *
      * @param pattern : an optional filter pattern, using star and question marks
-     *         as wildcards. When an empty pattern is provided, all file records
+     *         as wild cards. When an empty pattern is provided, all file records
      *         are returned.
      *
      * @return a list of YFileRecord objects, containing the file path
@@ -371,7 +371,7 @@ public class YFiles extends YFunction
      *
      * @param filename : the file name to test.
      *
-     * @return a true if the file existe, false ortherwise.
+     * @return a true if the file exist, false otherwise.
      *
      * @throws YAPI_Exception on error
      */

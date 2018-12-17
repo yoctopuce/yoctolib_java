@@ -1,5 +1,5 @@
 /*
- * $Id: YDataSet.java 33505 2018-12-05 14:45:46Z seb $
+ * $Id: YDataSet.java 33713 2018-12-14 14:20:19Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -213,7 +213,7 @@ public class YDataSet
         summaryStartMs = YAPI.MAX_DOUBLE;
         summaryStopMs = YAPI.MIN_DOUBLE;
 
-        // Parse comlete streams
+        // Parse complete streams
         for (YDataStream ii: _streams) {
             streamStartTimeMs = (double)Math.round(ii.get_realStartTimeUTC() *1000);
             streamDuration = ii.get_realDuration() ;
@@ -228,7 +228,7 @@ public class YDataSet
                 previewDuration = streamDuration;
             } else {
                 // stream that are partially in the dataset
-                // we need to parse data to filter value outide the dataset
+                // we need to parse data to filter value outside the dataset
                 url = ii._get_url();
                 data = _parent._download(url);
                 ii._parseStream(data);

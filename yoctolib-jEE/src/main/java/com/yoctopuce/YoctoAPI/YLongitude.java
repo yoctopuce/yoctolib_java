@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLongitude.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YLongitude.java 33713 2018-12-14 14:20:19Z seb $
  *
  *  Implements FindLongitude(), the high-level API for Longitude functions
  *
@@ -48,7 +48,7 @@ package com.yoctopuce.YoctoAPI;
  * YLongitude Class: Longitude function interface
  *
  * The Yoctopuce class YLongitude allows you to read the longitude from Yoctopuce
- * geolocalization sensors. It inherits from the YSensor class the core functions to
+ * geolocation sensors. It inherits from the YSensor class the core functions to
  * read measurements, register callback functions, access the autonomous
  * datalogger.
  */

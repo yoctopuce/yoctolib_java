@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTemperature.java 33082 2018-11-08 18:08:16Z seb $
+ *  $Id: YTemperature.java 33713 2018-12-14 14:20:19Z seb $
  *
  *  Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -595,7 +595,7 @@ public class YTemperature extends YSensor
      * sensor based on thermistors.
      *
      * @param tempValues : array of floating point numbers, corresponding to all
-     *         temperatures (in degrees Celcius) for which the resistance of the
+     *         temperatures (in degrees Celsius) for which the resistance of the
      *         thermistor is specified.
      * @param resValues : array of floating point numbers, corresponding to the resistance
      *         values (in Ohms) for each of the temperature included in the first
@@ -657,7 +657,7 @@ public class YTemperature extends YSensor
      * temperature sensor based on thermistors.
      *
      * @param tempValues : array of floating point numbers, that is filled by the function
-     *         with all temperatures (in degrees Celcius) for which the resistance
+     *         with all temperatures (in degrees Celsius) for which the resistance
      *         of the thermistor is specified.
      * @param resValues : array of floating point numbers, that is filled by the function
      *         with the value (in Ohms) for each of the temperature included in the

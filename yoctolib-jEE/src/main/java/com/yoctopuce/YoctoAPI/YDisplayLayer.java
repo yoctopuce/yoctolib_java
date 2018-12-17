@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 27053 2017-04-04 16:01:11Z seb $
+ * $Id: YDisplayLayer.java 33713 2018-12-14 14:20:19Z seb $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *
@@ -224,7 +224,7 @@ public class YDisplayLayer
     /**
      * Selects the pen gray level for all subsequent drawing functions,
      * including text drawing. The gray level is provided as a number between
-     * 0 (black) and 255 (white, or whichever the lighest color is).
+     * 0 (black) and 255 (white, or whichever the lightest color is).
      * For monochrome displays (without gray levels), any value
      * lower than 128 is rendered as black, and any value equal
      * or above to 128 is non-black.
@@ -258,13 +258,13 @@ public class YDisplayLayer
     /**
      * Enables or disables anti-aliasing for drawing oblique lines and circles.
      * Anti-aliasing provides a smoother aspect when looked from far enough,
-     * but it can add fuzzyness when the display is looked from very close.
+     * but it can add fuzziness when the display is looked from very close.
      * At the end of the day, it is your personal choice.
      * Anti-aliasing is enabled by default on grayscale and color displays,
      * but you can disable it if you prefer. This setting has no effect
      * on monochrome displays.
      *
-     * @param mode : true to enable antialiasing, false to
+     * @param mode : true to enable anti-aliasing, false to
      *         disable it.
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -532,7 +532,7 @@ public class YDisplayLayer
     }
 
     /**
-     * Sets up the wrapping behaviour used by the consoleOut function.
+     * Sets up the wrapping behavior used by the consoleOut function.
      *
      * @param wordwrap : true to wrap only between words,
      *         false to wrap on the last column anyway.
@@ -579,7 +579,7 @@ public class YDisplayLayer
     }
 
     /**
-     * Hides the layer. The state of the layer is perserved but the layer is not displayed
+     * Hides the layer. The state of the layer is preserved but the layer is not displayed
      * on the screen until the next call to unhide(). Hiding the layer can positively
      * affect the drawing speed, since it postpones the rendering until all operations are
      * completed (double-buffering).

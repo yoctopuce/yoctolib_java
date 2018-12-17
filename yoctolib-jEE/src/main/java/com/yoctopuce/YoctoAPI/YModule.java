@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 33272 2018-11-22 09:04:14Z mvuilleu $
+ * $Id: YModule.java 33713 2018-12-14 14:20:19Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -659,9 +659,9 @@ public class YModule extends YFunction
 
 
     /**
-     * Returns the luminosity of the  module informative leds (from 0 to 100).
+     * Returns the luminosity of the  module informative LEDs (from 0 to 100).
      *
-     * @return an integer corresponding to the luminosity of the  module informative leds (from 0 to 100)
+     * @return an integer corresponding to the luminosity of the  module informative LEDs (from 0 to 100)
      *
      * @throws YAPI_Exception on error
      */
@@ -680,9 +680,9 @@ public class YModule extends YFunction
     }
 
     /**
-     * Returns the luminosity of the  module informative leds (from 0 to 100).
+     * Returns the luminosity of the  module informative LEDs (from 0 to 100).
      *
-     * @return an integer corresponding to the luminosity of the  module informative leds (from 0 to 100)
+     * @return an integer corresponding to the luminosity of the  module informative LEDs (from 0 to 100)
      *
      * @throws YAPI_Exception on error
      */

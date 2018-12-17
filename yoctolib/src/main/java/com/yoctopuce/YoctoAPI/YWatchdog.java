@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWatchdog.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YWatchdog.java 33713 2018-12-14 14:20:19Z seb $
  *
  *  Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -48,11 +48,11 @@ import java.util.Locale;
 /**
  * YWatchdog Class: Watchdog function interface
  *
- * The watchog function works like a relay and can cause a brief power cut
+ * The watchdog function works like a relay and can cause a brief power cut
  * to an appliance after a preset delay to force this appliance to
  * reset. The Watchdog must be called from time to time to reset the
  * timer and prevent the appliance reset.
- * The watchdog can be driven direcly with <i>pulse</i> and <i>delayedpulse</i> methods to switch
+ * The watchdog can be driven directly with <i>pulse</i> and <i>delayedpulse</i> methods to switch
  * off an appliance for a given duration.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -654,7 +654,7 @@ public class YWatchdog extends YFunction
      * Sets the relay to output B (active) for a specified duration, then brings it
      * automatically back to output A (idle state).
      *
-     * @param ms_duration : pulse duration, in millisecondes
+     * @param ms_duration : pulse duration, in milliseconds
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -696,8 +696,8 @@ public class YWatchdog extends YFunction
     /**
      * Schedules a pulse.
      *
-     * @param ms_delay : waiting time before the pulse, in millisecondes
-     * @param ms_duration : pulse duration, in millisecondes
+     * @param ms_delay : waiting time before the pulse, in milliseconds
+     * @param ms_duration : pulse duration, in milliseconds
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -749,9 +749,9 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Returns the watchdog runing state at module power on.
+     * Returns the watchdog running state at module power on.
      *
-     *  @return either YWatchdog.AUTOSTART_OFF or YWatchdog.AUTOSTART_ON, according to the watchdog runing
+     *  @return either YWatchdog.AUTOSTART_OFF or YWatchdog.AUTOSTART_ON, according to the watchdog running
      * state at module power on
      *
      * @throws YAPI_Exception on error
@@ -771,9 +771,9 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Returns the watchdog runing state at module power on.
+     * Returns the watchdog running state at module power on.
      *
-     * @return either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the watchdog runing state at module power on
+     * @return either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the watchdog running state at module power on
      *
      * @throws YAPI_Exception on error
      */
@@ -783,11 +783,11 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Changes the watchdog runningsttae at module power on. Remember to call the
+     * Changes the watchdog running state at module power on. Remember to call the
      * saveToFlash() method and then to reboot the module to apply this setting.
      *
      *  @param newval : either YWatchdog.AUTOSTART_OFF or YWatchdog.AUTOSTART_ON, according to the watchdog
-     * runningsttae at module power on
+     * running state at module power on
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -804,11 +804,11 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Changes the watchdog runningsttae at module power on. Remember to call the
+     * Changes the watchdog running state at module power on. Remember to call the
      * saveToFlash() method and then to reboot the module to apply this setting.
      *
-     *  @param newval : either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the watchdog runningsttae at
-     * module power on
+     *  @param newval : either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the watchdog running state
+     * at module power on
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -888,7 +888,7 @@ public class YWatchdog extends YFunction
 
     /**
      * Resets the watchdog. When the watchdog is running, this function
-     * must be called on a regular basis to prevent the watchog to
+     * must be called on a regular basis to prevent the watchdog to
      * trigger
      *
      * @return YAPI.SUCCESS if the call succeeds.

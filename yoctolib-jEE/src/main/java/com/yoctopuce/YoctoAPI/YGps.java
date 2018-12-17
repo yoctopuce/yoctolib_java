@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGps.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YGps.java 33713 2018-12-14 14:20:19Z seb $
  *
  *  Implements FindGps(), the high-level API for Gps functions
  *
@@ -47,10 +47,10 @@ package com.yoctopuce.YoctoAPI;
 /**
  * YGps Class: GPS function interface
  *
- * The Gps function allows you to extract positionning
+ * The GPS function allows you to extract positioning
  * data from the GPS device. This class can provides
- * complete positionning information: However, if you
- * whish to define callbacks on position changes, you
+ * complete positioning information: However, if you
+ * wish to define callbacks on position changes, you
  * should use the YLatitude et YLongitude classes.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})

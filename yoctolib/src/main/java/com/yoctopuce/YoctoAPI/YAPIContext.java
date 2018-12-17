@@ -956,7 +956,7 @@ public class YAPIContext
      * parameter will determine how the API will work. Use the following values:
      *
      * <b>usb</b>: When the usb keyword is used, the API will work with
-     * devices connected directly to the USB bus. Some programming languages such a Javascript,
+     * devices connected directly to the USB bus. Some programming languages such a JavaScript,
      * PHP, and Java don't provide direct access to USB hardware, so usb will
      * not work with these. In this case, use a VirtualHub or a networked YoctoHub (see below).
      *

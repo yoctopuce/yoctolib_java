@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 33400 2018-11-27 07:58:29Z seb $
+ * $Id: YSensor.java 33713 2018-12-14 14:20:19Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -702,7 +702,7 @@ public class YSensor extends YFunction
      * Changes the timed value notification frequency for this function.
      * The frequency can be specified as samples per second,
      * as sample per minute (for instance "15/m") or in samples per
-     * hour (eg. "4/h"). To disable timed value notifications for this
+     * hour (e.g. "4/h"). To disable timed value notifications for this
      * function, use the value "OFF".
      *
      * @param newval : a string corresponding to the timed value notification frequency for this function
@@ -725,7 +725,7 @@ public class YSensor extends YFunction
      * Changes the timed value notification frequency for this function.
      * The frequency can be specified as samples per second,
      * as sample per minute (for instance "15/m") or in samples per
-     * hour (eg. "4/h"). To disable timed value notifications for this
+     * hour (e.g. "4/h"). To disable timed value notifications for this
      * function, use the value "OFF".
      *
      * @param newval : a string corresponding to the timed value notification frequency for this function
@@ -1107,7 +1107,7 @@ public class YSensor extends YFunction
                     return 0;
                 }
             }
-            // New 32bit text format
+            // New 32 bits text format
             _offset = 0;
             _scale = 1000;
             maxpos = iCalib.size();
@@ -1275,11 +1275,11 @@ public class YSensor extends YFunction
      * @param startTime : the start of the desired measure time interval,
      *         as a Unix timestamp, i.e. the number of seconds since
      *         January 1, 1970 UTC. The special value 0 can be used
-     *         to include any meaasure, without initial limit.
+     *         to include any measure, without initial limit.
      * @param endTime : the end of the desired measure time interval,
      *         as a Unix timestamp, i.e. the number of seconds since
      *         January 1, 1970 UTC. The special value 0 can be used
-     *         to include any meaasure, without ending limit.
+     *         to include any measure, without ending limit.
      *
      * @return an instance of YDataSet, providing access to historical
      *         data. Past measures can be loaded progressively
@@ -1478,7 +1478,7 @@ public class YSensor extends YFunction
         if (startTime == 0) {
             startTime = endTime;
         }
-        // 32bit timed report format
+        // 32 bits timed report format
         if (report.size() <= 5) {
             // sub-second report, 1-4 bytes
             poww = 1;

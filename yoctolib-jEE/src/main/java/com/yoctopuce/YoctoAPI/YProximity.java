@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YProximity.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YProximity.java 33713 2018-12-14 14:20:19Z seb $
  *
  *  Implements FindProximity(), the high-level API for Proximity functions
  *
@@ -401,10 +401,10 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Returns the minimal detection duration before signaling a presence event. Any shorter detection is
+     * Returns the minimal detection duration before signalling a presence event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
      *
-     * @return an integer corresponding to the minimal detection duration before signaling a presence event
+     * @return an integer corresponding to the minimal detection duration before signalling a presence event
      *
      * @throws YAPI_Exception on error
      */
@@ -423,10 +423,10 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Returns the minimal detection duration before signaling a presence event. Any shorter detection is
+     * Returns the minimal detection duration before signalling a presence event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
      *
-     * @return an integer corresponding to the minimal detection duration before signaling a presence event
+     * @return an integer corresponding to the minimal detection duration before signalling a presence event
      *
      * @throws YAPI_Exception on error
      */
@@ -436,10 +436,10 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Changes the minimal detection duration before signaling a presence event. Any shorter detection is
+     * Changes the minimal detection duration before signalling a presence event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
      *
-     * @param newval : an integer corresponding to the minimal detection duration before signaling a presence event
+     * @param newval : an integer corresponding to the minimal detection duration before signalling a presence event
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -456,10 +456,10 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Changes the minimal detection duration before signaling a presence event. Any shorter detection is
+     * Changes the minimal detection duration before signalling a presence event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
      *
-     * @param newval : an integer corresponding to the minimal detection duration before signaling a presence event
+     * @param newval : an integer corresponding to the minimal detection duration before signalling a presence event
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -471,10 +471,10 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Returns the minimal detection duration before signaling a removal event. Any shorter detection is
+     * Returns the minimal detection duration before signalling a removal event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
      *
-     * @return an integer corresponding to the minimal detection duration before signaling a removal event
+     * @return an integer corresponding to the minimal detection duration before signalling a removal event
      *
      * @throws YAPI_Exception on error
      */
@@ -493,10 +493,10 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Returns the minimal detection duration before signaling a removal event. Any shorter detection is
+     * Returns the minimal detection duration before signalling a removal event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
      *
-     * @return an integer corresponding to the minimal detection duration before signaling a removal event
+     * @return an integer corresponding to the minimal detection duration before signalling a removal event
      *
      * @throws YAPI_Exception on error
      */
@@ -506,10 +506,10 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Changes the minimal detection duration before signaling a removal event. Any shorter detection is
+     * Changes the minimal detection duration before signalling a removal event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
      *
-     * @param newval : an integer corresponding to the minimal detection duration before signaling a removal event
+     * @param newval : an integer corresponding to the minimal detection duration before signalling a removal event
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -526,10 +526,10 @@ public class YProximity extends YSensor
     }
 
     /**
-     * Changes the minimal detection duration before signaling a removal event. Any shorter detection is
+     * Changes the minimal detection duration before signalling a removal event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
      *
-     * @param newval : an integer corresponding to the minimal detection duration before signaling a removal event
+     * @param newval : an integer corresponding to the minimal detection duration before signalling a removal event
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

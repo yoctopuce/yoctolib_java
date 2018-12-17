@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpSchedule.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YWakeUpSchedule.java 33713 2018-12-14 14:20:19Z seb $
  *
  *  Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -238,9 +238,9 @@ public class YWakeUpSchedule extends YFunction
     }
 
     /**
-     * Returns the minutes in the 30-59 intervalof each hour scheduled for wake up.
+     * Returns the minutes in the 30-59 interval of each hour scheduled for wake up.
      *
-     * @return an integer corresponding to the minutes in the 30-59 intervalof each hour scheduled for wake up
+     * @return an integer corresponding to the minutes in the 30-59 interval of each hour scheduled for wake up
      *
      * @throws YAPI_Exception on error
      */
@@ -259,9 +259,9 @@ public class YWakeUpSchedule extends YFunction
     }
 
     /**
-     * Returns the minutes in the 30-59 intervalof each hour scheduled for wake up.
+     * Returns the minutes in the 30-59 interval of each hour scheduled for wake up.
      *
-     * @return an integer corresponding to the minutes in the 30-59 intervalof each hour scheduled for wake up
+     * @return an integer corresponding to the minutes in the 30-59 interval of each hour scheduled for wake up
      *
      * @throws YAPI_Exception on error
      */
@@ -568,9 +568,9 @@ public class YWakeUpSchedule extends YFunction
     }
 
     /**
-     * Returns the date/time (seconds) of the next wake up occurence.
+     * Returns the date/time (seconds) of the next wake up occurrence.
      *
-     * @return an integer corresponding to the date/time (seconds) of the next wake up occurence
+     * @return an integer corresponding to the date/time (seconds) of the next wake up occurrence
      *
      * @throws YAPI_Exception on error
      */
@@ -589,9 +589,9 @@ public class YWakeUpSchedule extends YFunction
     }
 
     /**
-     * Returns the date/time (seconds) of the next wake up occurence.
+     * Returns the date/time (seconds) of the next wake up occurrence.
      *
-     * @return an integer corresponding to the date/time (seconds) of the next wake up occurence
+     * @return an integer corresponding to the date/time (seconds) of the next wake up occurrence
      *
      * @throws YAPI_Exception on error
      */

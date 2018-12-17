@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 33466 2018-11-30 14:36:01Z seb $
+ * $Id: YAPI.java 33713 2018-12-14 14:20:19Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -58,7 +58,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "33636";
+    public static final String YOCTO_API_BUILD_STR = "33736";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -285,7 +285,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".33636" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".33736" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -346,7 +346,7 @@ public class YAPI
      * parameter will determine how the API will work. Use the following values:
      *
      * <b>usb</b>: When the usb keyword is used, the API will work with
-     * devices connected directly to the USB bus. Some programming languages such a Javascript,
+     * devices connected directly to the USB bus. Some programming languages such a JavaScript,
      * PHP, and Java don't provide direct access to USB hardware, so usb will
      * not work with these. In this case, use a VirtualHub or a networked YoctoHub (see below).
      *

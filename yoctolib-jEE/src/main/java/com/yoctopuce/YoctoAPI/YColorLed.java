@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLed.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YColorLed.java 33713 2018-12-14 14:20:19Z seb $
  *
  *  Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -760,7 +760,7 @@ public class YColorLed extends YFunction
      * Add a new transition to the blinking sequence, the move will
      * be performed in the HSL space.
      *
-     * @param HSLcolor : desired HSL color when the traisntion is completed
+     * @param HSLcolor : desired HSL color when the transition is completed
      * @param msDelay : duration of the color transition, in milliseconds.
      *
      * @return YAPI.SUCCESS if the call succeeds.

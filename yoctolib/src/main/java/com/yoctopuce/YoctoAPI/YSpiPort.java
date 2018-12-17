@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSpiPort.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YSpiPort.java 33722 2018-12-14 15:04:43Z seb $
  *
  *  Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -122,11 +122,11 @@ public class YSpiPort extends YFunction
     public static final int SSPOLARITY_ACTIVE_HIGH = 1;
     public static final int SSPOLARITY_INVALID = -1;
     /**
-     * invalid shitftSampling value
+     * invalid shiftSampling value
      */
-    public static final int SHITFTSAMPLING_OFF = 0;
-    public static final int SHITFTSAMPLING_ON = 1;
-    public static final int SHITFTSAMPLING_INVALID = -1;
+    public static final int SHIFTSAMPLING_OFF = 0;
+    public static final int SHIFTSAMPLING_ON = 1;
+    public static final int SHIFTSAMPLING_INVALID = -1;
     protected int _rxCount = RXCOUNT_INVALID;
     protected int _txCount = TXCOUNT_INVALID;
     protected int _errCount = ERRCOUNT_INVALID;
@@ -140,7 +140,7 @@ public class YSpiPort extends YFunction
     protected String _protocol = PROTOCOL_INVALID;
     protected String _spiMode = SPIMODE_INVALID;
     protected int _ssPolarity = SSPOLARITY_INVALID;
-    protected int _shitftSampling = SHITFTSAMPLING_INVALID;
+    protected int _shiftSampling = SHIFTSAMPLING_INVALID;
     protected UpdateCallback _valueCallbackSpiPort = null;
     protected int _rxptr = 0;
     protected byte[] _rxbuff;
@@ -239,8 +239,8 @@ public class YSpiPort extends YFunction
         if (json_val.has("ssPolarity")) {
             _ssPolarity = json_val.getInt("ssPolarity") > 0 ? 1 : 0;
         }
-        if (json_val.has("shitftSampling")) {
-            _shitftSampling = json_val.getInt("shitftSampling") > 0 ? 1 : 0;
+        if (json_val.has("shiftSampling")) {
+            _shiftSampling = json_val.getInt("shiftSampling") > 0 ? 1 : 0;
         }
         super._parseAttr(json_val);
     }
@@ -927,21 +927,21 @@ public class YSpiPort extends YFunction
     /**
      * Returns true when the SDI line phase is shifted with regards to the SDO line.
      *
-     *  @return either YSpiPort.SHITFTSAMPLING_OFF or YSpiPort.SHITFTSAMPLING_ON, according to true when
-     * the SDI line phase is shifted with regards to the SDO line
+     *  @return either YSpiPort.SHIFTSAMPLING_OFF or YSpiPort.SHIFTSAMPLING_ON, according to true when the
+     * SDI line phase is shifted with regards to the SDO line
      *
      * @throws YAPI_Exception on error
      */
-    public int get_shitftSampling() throws YAPI_Exception
+    public int get_shiftSampling() throws YAPI_Exception
     {
         int res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
                 if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
-                    return SHITFTSAMPLING_INVALID;
+                    return SHIFTSAMPLING_INVALID;
                 }
             }
-            res = _shitftSampling;
+            res = _shiftSampling;
         }
         return res;
     }
@@ -949,14 +949,14 @@ public class YSpiPort extends YFunction
     /**
      * Returns true when the SDI line phase is shifted with regards to the SDO line.
      *
-     *  @return either Y_SHITFTSAMPLING_OFF or Y_SHITFTSAMPLING_ON, according to true when the SDI line
-     * phase is shifted with regards to the SDO line
+     *  @return either Y_SHIFTSAMPLING_OFF or Y_SHIFTSAMPLING_ON, according to true when the SDI line phase
+     * is shifted with regards to the SDO line
      *
      * @throws YAPI_Exception on error
      */
-    public int getShitftSampling() throws YAPI_Exception
+    public int getShiftSampling() throws YAPI_Exception
     {
-        return get_shitftSampling();
+        return get_shiftSampling();
     }
 
     /**
@@ -964,19 +964,19 @@ public class YSpiPort extends YFunction
      * sampled in the middle of data output time. When enabled, SDI line is
      * samples at the end of data output time.
      *
-     *  @param newval : either YSpiPort.SHITFTSAMPLING_OFF or YSpiPort.SHITFTSAMPLING_ON, according to the
+     *  @param newval : either YSpiPort.SHIFTSAMPLING_OFF or YSpiPort.SHIFTSAMPLING_ON, according to the
      * SDI line sampling shift
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int set_shitftSampling(int  newval)  throws YAPI_Exception
+    public int set_shiftSampling(int  newval)  throws YAPI_Exception
     {
         String rest_val;
         synchronized (this) {
             rest_val = (newval > 0 ? "1" : "0");
-            _setAttr("shitftSampling",rest_val);
+            _setAttr("shiftSampling",rest_val);
         }
         return YAPI.SUCCESS;
     }
@@ -986,15 +986,15 @@ public class YSpiPort extends YFunction
      * sampled in the middle of data output time. When enabled, SDI line is
      * samples at the end of data output time.
      *
-     * @param newval : either Y_SHITFTSAMPLING_OFF or Y_SHITFTSAMPLING_ON, according to the SDI line sampling shift
+     * @param newval : either Y_SHIFTSAMPLING_OFF or Y_SHIFTSAMPLING_ON, according to the SDI line sampling shift
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int setShitftSampling(int newval)  throws YAPI_Exception
+    public int setShiftSampling(int newval)  throws YAPI_Exception
     {
-        return set_shitftSampling(newval);
+        return set_shiftSampling(newval);
     }
 
     /**

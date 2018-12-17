@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRelay.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YRelay.java 33713 2018-12-14 14:20:19Z seb $
  *
  *  Implements FindRelay(), the high-level API for Relay functions
  *
@@ -619,7 +619,7 @@ public class YRelay extends YFunction
      * Sets the relay to output B (active) for a specified duration, then brings it
      * automatically back to output A (idle state).
      *
-     * @param ms_duration : pulse duration, in millisecondes
+     * @param ms_duration : pulse duration, in milliseconds
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -661,8 +661,8 @@ public class YRelay extends YFunction
     /**
      * Schedules a pulse.
      *
-     * @param ms_delay : waiting time before the pulse, in millisecondes
-     * @param ms_duration : pulse duration, in millisecondes
+     * @param ms_delay : waiting time before the pulse, in milliseconds
+     * @param ms_duration : pulse duration, in milliseconds
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

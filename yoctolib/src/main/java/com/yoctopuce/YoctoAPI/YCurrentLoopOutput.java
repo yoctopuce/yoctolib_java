@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCurrentLoopOutput.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YCurrentLoopOutput.java 33713 2018-12-14 14:20:19Z seb $
  *
  *  Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -152,7 +152,7 @@ public class YCurrentLoopOutput extends YFunction
 
     /**
      * Changes the current loop, the valid range is from 3 to 21mA. If the loop is
-     * not propely powered, the  target current is not reached and
+     * not properly powered, the  target current is not reached and
      * loopPower is set to LOWPWR.
      *
      * @param newval : a floating point number corresponding to the current loop, the valid range is from 3 to 21mA
@@ -173,7 +173,7 @@ public class YCurrentLoopOutput extends YFunction
 
     /**
      * Changes the current loop, the valid range is from 3 to 21mA. If the loop is
-     * not propely powered, the  target current is not reached and
+     * not properly powered, the  target current is not reached and
      * loopPower is set to LOWPWR.
      *
      * @param newval : a floating point number corresponding to the current loop, the valid range is from 3 to 21mA
@@ -471,7 +471,7 @@ public class YCurrentLoopOutput extends YFunction
     }
 
     /**
-     * Performs a smooth transistion of current flowing in the loop. Any current explicit
+     * Performs a smooth transition of current flowing in the loop. Any current explicit
      * change cancels any ongoing transition process.
      *
      * @param mA_target   : new current value at the end of the transition

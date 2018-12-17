@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YStepperMotor.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YStepperMotor.java 33713 2018-12-14 14:20:19Z seb $
  *
  *  Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1300,7 +1300,7 @@ public class YStepperMotor extends YFunction
 
     /**
      * Move one step in the direction opposite the direction set when the most recent alert was raised.
-     * The move occures even if the system is still in alert mode (end switch depressed). Caution.
+     * The move occurs even if the system is still in alert mode (end switch depressed). Caution.
      * use this function with great care as it may cause mechanical damages !
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -1313,10 +1313,10 @@ public class YStepperMotor extends YFunction
 
     /**
      * Move one single step in the selected direction without regards to end switches.
-     * The move occures even if the system is still in alert mode (end switch depressed). Caution.
+     * The move occurs even if the system is still in alert mode (end switch depressed). Caution.
      * use this function with great care as it may cause mechanical damages !
      *
-     * @param dir : Value +1 ou -1, according to the desired direction of the move
+     * @param dir : Value +1 or -1, according to the desired direction of the move
      *
      * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error

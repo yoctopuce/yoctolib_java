@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 32904 2018-11-02 10:15:00Z seb $
+ * $Id: YDisplay.java 33713 2018-12-14 14:20:19Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -347,9 +347,9 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Returns the luminosity of the  module informative leds (from 0 to 100).
+     * Returns the luminosity of the  module informative LEDs (from 0 to 100).
      *
-     * @return an integer corresponding to the luminosity of the  module informative leds (from 0 to 100)
+     * @return an integer corresponding to the luminosity of the  module informative LEDs (from 0 to 100)
      *
      * @throws YAPI_Exception on error
      */
@@ -368,9 +368,9 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Returns the luminosity of the  module informative leds (from 0 to 100).
+     * Returns the luminosity of the  module informative LEDs (from 0 to 100).
      *
-     * @return an integer corresponding to the luminosity of the  module informative leds (from 0 to 100)
+     * @return an integer corresponding to the luminosity of the  module informative LEDs (from 0 to 100)
      *
      * @throws YAPI_Exception on error
      */
@@ -994,7 +994,7 @@ public class YDisplay extends YFunction
      * Swaps the whole content of two layers. The color and transparency of all the pixels from
      * the two layers are swapped. This method only affects the displayed content, but does
      * not change any property of the layer objects. In particular, the visibility of each
-     * layer stays unchanged. When used between onae hidden layer and a visible layer,
+     * layer stays unchanged. When used between one hidden layer and a visible layer,
      * this method makes it possible to easily implement double-buffering.
      * Note that layer 0 has no transparency support (it is always completely opaque).
      *

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 32904 2018-11-02 10:15:00Z seb $
+ * $Id: YWireless.java 33713 2018-12-14 14:20:19Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -636,7 +636,7 @@ public class YWireless extends YFunction
 
     /**
      * Returns a list of YWlanRecord objects that describe detected Wireless networks.
-     * This list is not updated when the module is already connected to an acces point (infrastructure mode).
+     * This list is not updated when the module is already connected to an access point (infrastructure mode).
      * To force an update of this list, startWlanScan() must be called.
      * Note that an languages without garbage collections, the returned list must be freed by the caller.
      *
