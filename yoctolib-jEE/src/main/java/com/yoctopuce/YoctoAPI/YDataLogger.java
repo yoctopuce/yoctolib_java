@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 33601 2018-12-09 14:30:31Z mvuilleu $
+ * $Id: YDataLogger.java 33797 2018-12-20 15:56:41Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -49,7 +49,8 @@ import java.util.Locale;
  * Yoctopuce sensors include a non-volatile memory capable of storing ongoing measured
  * data automatically, without requiring a permanent connection to a computer.
  * The DataLogger function controls the global parameters of the internal data
- * logger.
+ * logger. Recording control (start/stop) as well as data retreival is done at
+ * sensor objects level.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YDataLogger extends YFunction
@@ -408,8 +409,10 @@ public class YDataLogger extends YFunction
 
     /**
      * Changes the default activation state of the data logger on power up.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
+     * Do not forget to call the saveToFlash() method of the module to save the
+     * configuration change.  Note: if the device doesn't have any time source at his disposal when
+     * starting up, it will wait for ~8 seconds before automatically starting to record  with
+     * an arbitrary timestamp
      *
      *  @param newval : either YDataLogger.AUTOSTART_OFF or YDataLogger.AUTOSTART_ON, according to the
      * default activation state of the data logger on power up
@@ -430,8 +433,10 @@ public class YDataLogger extends YFunction
 
     /**
      * Changes the default activation state of the data logger on power up.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
+     * Do not forget to call the saveToFlash() method of the module to save the
+     * configuration change.  Note: if the device doesn't have any time source at his disposal when
+     * starting up, it will wait for ~8 seconds before automatically starting to record  with
+     * an arbitrary timestamp
      *
      *  @param newval : either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the default activation state
      * of the data logger on power up

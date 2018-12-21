@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 33713 2018-12-14 14:20:19Z seb $
+ * $Id: YSensor.java 33827 2018-12-21 15:09:19Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -625,7 +625,9 @@ public class YSensor extends YFunction
      * The frequency can be specified as samples per second,
      * as sample per minute (for instance "15/m") or in samples per
      * hour (eg. "4/h"). To disable recording for this function, use
-     * the value "OFF".
+     * the value "OFF". Note that setting the  datalogger recording frequency
+     * to a greater value than the sensor native sampling frequency is unless,
+     * and even counterproductive: those two frequencies are not related.
      *
      * @param newval : a string corresponding to the datalogger recording frequency for this function
      *
@@ -648,7 +650,9 @@ public class YSensor extends YFunction
      * The frequency can be specified as samples per second,
      * as sample per minute (for instance "15/m") or in samples per
      * hour (eg. "4/h"). To disable recording for this function, use
-     * the value "OFF".
+     * the value "OFF". Note that setting the  datalogger recording frequency
+     * to a greater value than the sensor native sampling frequency is unless,
+     * and even counterproductive: those two frequencies are not related.
      *
      * @param newval : a string corresponding to the datalogger recording frequency for this function
      *
@@ -703,7 +707,10 @@ public class YSensor extends YFunction
      * The frequency can be specified as samples per second,
      * as sample per minute (for instance "15/m") or in samples per
      * hour (e.g. "4/h"). To disable timed value notifications for this
-     * function, use the value "OFF".
+     * function, use the value "OFF". Note that setting the  timed value
+     * notification frequency to a greater value than the sensor native
+     * sampling frequency is unless, and even counterproductive: those two
+     * frequencies are not related.
      *
      * @param newval : a string corresponding to the timed value notification frequency for this function
      *
@@ -726,7 +733,10 @@ public class YSensor extends YFunction
      * The frequency can be specified as samples per second,
      * as sample per minute (for instance "15/m") or in samples per
      * hour (e.g. "4/h"). To disable timed value notifications for this
-     * function, use the value "OFF".
+     * function, use the value "OFF". Note that setting the  timed value
+     * notification frequency to a greater value than the sensor native
+     * sampling frequency is unless, and even counterproductive: those two
+     * frequencies are not related.
      *
      * @param newval : a string corresponding to the timed value notification frequency for this function
      *

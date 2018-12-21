@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: Demo.java 33796 2018-12-20 15:56:11Z seb $
  *
  *  An example that show how to use a  Yocto-Temperature-IR
  *

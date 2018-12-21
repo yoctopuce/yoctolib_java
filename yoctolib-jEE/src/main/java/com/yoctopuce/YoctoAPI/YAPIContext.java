@@ -1165,7 +1165,9 @@ public class YAPIContext
      * in case a change in the list of connected devices is detected.
      *
      * This function can be called as frequently as desired to refresh the device list
-     * and to make the application aware of hot-plug events.
+     * and to make the application aware of hot-plug events. However, since device
+     * detection is quite a heavy process, UpdateDeviceList shouldn't be called more
+     * than once every two seconds.
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
