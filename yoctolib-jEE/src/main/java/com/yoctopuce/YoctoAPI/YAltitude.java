@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAltitude.java 32950 2018-11-05 17:15:46Z seb $
+ *  $Id: YAltitude.java 34115 2019-01-23 14:23:54Z seb $
  *
  *  Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -135,7 +135,7 @@ public class YAltitude extends YSensor
     }
 
     /**
-     * Changes the current estimated altitude. This allows to compensate for
+     * Changes the current estimated altitude. This allows one to compensate for
      * ambient pressure variations and to work in relative mode.
      *
      * @param newval : a floating point number corresponding to the current estimated altitude
@@ -155,7 +155,7 @@ public class YAltitude extends YSensor
     }
 
     /**
-     * Changes the current estimated altitude. This allows to compensate for
+     * Changes the current estimated altitude. This allows one to compensate for
      * ambient pressure variations and to work in relative mode.
      *
      * @param newval : a floating point number corresponding to the current estimated altitude

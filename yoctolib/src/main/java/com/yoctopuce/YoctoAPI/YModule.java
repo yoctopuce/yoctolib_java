@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 33713 2018-12-14 14:20:19Z seb $
+ * $Id: YModule.java 33916 2018-12-28 10:38:18Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -184,7 +184,7 @@ public class YModule extends YFunction
 
     private static void _updateModuleCallbackList(YModule module, boolean add)
     {
-        module._yapi._UpdateModuleCallbackList(module,add);
+        module._yapi._UpdateModuleCallbackList(module, add);
     }
 
 
@@ -231,6 +231,20 @@ public class YModule extends YFunction
         return dev.getFunctions().size();
     }
 
+
+    private YPEntry getYPFromIndex(int index) throws YAPI_Exception
+    {
+        YDevice dev = _getDev();
+        Collection<YPEntry> functions = dev.getFunctions();
+        int i = 0;
+        for (YPEntry yp : functions) {
+            if (i++ == index)
+                return yp;
+        }
+        throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, String.format(Locale.US, "Invalid function index (%d/%d)", index, functions.size()));
+    }
+
+
     /**
      * Retrieves the hardware identifier of the <i>n</i>th function on the module.
      *
@@ -243,15 +257,8 @@ public class YModule extends YFunction
      */
     public String functionId(int functionIndex) throws YAPI_Exception
     {
-        YDevice dev = _getDev();
-        Collection<YPEntry> functions = dev.getFunctions();
-        int i = 0;
-        for (YPEntry yp : functions) {
-            if (i++ == functionIndex)
-                return yp.getFuncId();
-        }
-        _throw(YAPI.INVALID_ARGUMENT, String.format(Locale.US, "Invalid function index (%d/%d)", functionIndex, functions.size()));
-        return "";
+        YPEntry ypEntry = getYPFromIndex(functionIndex);
+        return ypEntry.getFuncId();
     }
 
     /**
@@ -266,8 +273,8 @@ public class YModule extends YFunction
      */
     public String functionType(int functionIndex) throws YAPI_Exception
     {
-        YDevice dev = _getDev();
-        return dev.getYPEntry(functionIndex).getClassname();
+        YPEntry ypEntry = getYPFromIndex(functionIndex);
+        return ypEntry.getClassname();
     }
 
     /**
@@ -283,8 +290,8 @@ public class YModule extends YFunction
      */
     public String functionBaseType(int functionIndex) throws YAPI_Exception
     {
-        YDevice dev = _getDev();
-        return dev.getYPEntry(functionIndex).getBaseType();
+        YPEntry ypEntry = getYPFromIndex(functionIndex);
+        return ypEntry.getBaseType();
     }
 
     /**
@@ -299,8 +306,8 @@ public class YModule extends YFunction
      */
     public String functionName(int functionIndex) throws YAPI_Exception
     {
-        YDevice dev = _getDev();
-        return dev.getYPEntry(functionIndex).getLogicalName();
+        YPEntry ypEntry = getYPFromIndex(functionIndex);
+        return ypEntry.getLogicalName();
     }
 
     /**
@@ -316,8 +323,8 @@ public class YModule extends YFunction
      */
     public String functionValue(int functionIndex) throws YAPI_Exception
     {
-        YDevice dev = _getDev();
-        return dev.getYPEntry(functionIndex).getAdvertisedValue();
+        YPEntry ypEntry = getYPFromIndex(functionIndex);
+        return ypEntry.getAdvertisedValue();
     }
 
 
@@ -379,7 +386,7 @@ public class YModule extends YFunction
         return hub.get_urlOf(_serialNumber);
     }
 
-    public void _startStopDevLog_internal(String serial,boolean start) throws YAPI_Exception
+    public void _startStopDevLog_internal(String serial, boolean start) throws YAPI_Exception
     {
         YDevice ydev = _yapi._yHash.getDevice(serial);
         if (ydev != null) {
@@ -477,6 +484,7 @@ public class YModule extends YFunction
      *
      * @throws YAPI_Exception on error
      */
+    @Override
     public String get_serialNumber() throws YAPI_Exception
     {
         String res;

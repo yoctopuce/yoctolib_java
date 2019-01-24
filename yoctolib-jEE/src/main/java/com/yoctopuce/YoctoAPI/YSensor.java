@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 33827 2018-12-21 15:09:19Z seb $
+ * $Id: YSensor.java 33853 2018-12-24 08:38:31Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -362,6 +362,13 @@ public class YSensor extends YFunction
 
     /**
      * Returns the current value of the measure, in the specified unit, as a floating point number.
+     * Note that a get_currentValue() call will *not* start a measure in the device, it
+     * will just return the last measure that occurred in the device. Indeed, internally, each Yoctopuce
+     * devices is continuously making measurements at a hardware specific frequency.
+     *
+     * If continuously calling  get_currentValue() leads you to performances issues, then
+     * you might consider to switch to callback programming model. Check the "advanced
+     * programming" chapter in in your device user manual for more information.
      *
      *  @return a floating point number corresponding to the current value of the measure, in the specified
      * unit, as a floating point number
@@ -389,6 +396,13 @@ public class YSensor extends YFunction
 
     /**
      * Returns the current value of the measure, in the specified unit, as a floating point number.
+     * Note that a get_currentValue() call will *not* start a measure in the device, it
+     * will just return the last measure that occurred in the device. Indeed, internally, each Yoctopuce
+     * devices is continuously making measurements at a hardware specific frequency.
+     *
+     * If continuously calling  get_currentValue() leads you to performances issues, then
+     * you might consider to switch to callback programming model. Check the "advanced
+     * programming" chapter in in your device user manual for more information.
      *
      *  @return a floating point number corresponding to the current value of the measure, in the specified
      * unit, as a floating point number
@@ -626,7 +640,7 @@ public class YSensor extends YFunction
      * as sample per minute (for instance "15/m") or in samples per
      * hour (eg. "4/h"). To disable recording for this function, use
      * the value "OFF". Note that setting the  datalogger recording frequency
-     * to a greater value than the sensor native sampling frequency is unless,
+     * to a greater value than the sensor native sampling frequency is useless,
      * and even counterproductive: those two frequencies are not related.
      *
      * @param newval : a string corresponding to the datalogger recording frequency for this function
@@ -651,7 +665,7 @@ public class YSensor extends YFunction
      * as sample per minute (for instance "15/m") or in samples per
      * hour (eg. "4/h"). To disable recording for this function, use
      * the value "OFF". Note that setting the  datalogger recording frequency
-     * to a greater value than the sensor native sampling frequency is unless,
+     * to a greater value than the sensor native sampling frequency is useless,
      * and even counterproductive: those two frequencies are not related.
      *
      * @param newval : a string corresponding to the datalogger recording frequency for this function

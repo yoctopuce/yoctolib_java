@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 32919 2018-11-02 15:01:30Z seb $
+ * $Id: YGenericHub.java 33863 2018-12-24 13:19:20Z seb $
  *
  * Internal YGenericHub object
  *
@@ -43,7 +43,9 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingDeque;
 
 
 abstract class YGenericHub
@@ -388,6 +390,30 @@ abstract class YGenericHub
 
     abstract byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestProgress progress, Object context) throws YAPI_Exception, InterruptedException;
 
+    private final BlockingQueue<YDevice> _logPullList = new LinkedBlockingDeque<>();
+
+    void addDevForLogPull(YDevice yDevice)
+    {
+        _logPullList.offer(yDevice);
+    }
+
+    void testLogPull() throws InterruptedException
+    {
+        YDevice device = _logPullList.poll();
+        if (device == null) {
+            return;
+        }
+        try {
+            String logRequest = device.getLogRequest();
+            if (logRequest == null) {
+                return;
+            }
+            RequestAsyncResult logCallbackHandler = device.getLogCallbackHandler();
+            this.devRequestAsync(device, logRequest, null, logCallbackHandler, null);
+        } catch (YAPI_Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     static class HTTPParams
     {

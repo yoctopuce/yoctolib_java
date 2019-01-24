@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 33181 2018-11-16 16:28:34Z seb $
+ * $Id: YFunction.java 33903 2018-12-28 08:49:26Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -475,6 +475,20 @@ public class YFunction
         url = String.format(Locale.US, "api/%s/%s", get_functionId(),attrName);
         attrVal = _download(url);
         return new String(attrVal);
+    }
+
+    /**
+     * Returns the serial number of the module, as set by the factory.
+     *
+     * @return a string corresponding to the serial number of the module, as set by the factory.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_serialNumber() throws YAPI_Exception
+    {
+        YModule m;
+        m = get_module();
+        return m.get_serialNumber();
     }
 
     public int _parserHelper()

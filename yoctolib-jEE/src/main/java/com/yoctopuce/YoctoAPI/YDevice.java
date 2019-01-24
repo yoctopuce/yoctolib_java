@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 33632 2018-12-10 14:43:52Z seb $
+ * $Id: YDevice.java 33883 2018-12-27 12:07:12Z seb $
  *
  * Internal YDevice class
  *
@@ -149,7 +149,18 @@ class YDevice
             }
             request += "?fw=" + fwrelease;
         }
-        String yreq = requestHTTPSyncAsString(request, null);
+        String yreq;
+        try {
+            yreq = requestHTTPSyncAsString(request, null);
+        } catch (YAPI_Exception ex) {
+            try {
+                _hub.updateDeviceList(true);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new YAPI_Exception(YAPI.IO_ERROR,"Thread interrupted",e);
+            }
+            yreq = requestHTTPSyncAsString(request, null);
+        }
         YJSONObject cache_json;
         try {
             cache_json = new YJSONObject(yreq);
@@ -324,6 +335,7 @@ class YDevice
         return _moduleYPEntry;
     }
 
+
     private YGenericHub.RequestAsyncResult _logCallbackHandler = new YGenericHub.RequestAsyncResult()
     {
         @Override
@@ -356,30 +368,27 @@ class YDevice
         }
     };
 
-    private void triggerLogPull()
+    String getLogRequest() throws YAPI_Exception
     {
-        if (_logCallback == null || _logIsPulling)
-            return;
-        _logIsPulling = true;
-        String request = "GET logs.txt?pos=" + _logpos;
-        try {
-            requestHTTPAsync(request, null, _logCallbackHandler, _logpos);
-        } catch (YAPI_Exception ex) {
-            _hub._yctx._Log("LOG error:" + ex.getLocalizedMessage());
-        }
-        _logNeedPulling = false;
+        if (_logIsPulling || _logCallback == null)
+            return null;
+        return formatRequest("GET logs.txt?pos=" + _logpos);
     }
 
-    void setDeviceLogPending()
+    YGenericHub.RequestAsyncResult getLogCallbackHandler()
     {
-        _logNeedPulling = true;
+        return _logCallbackHandler;
     }
 
+    void triggerLogPull()
+    {
+        _hub.addDevForLogPull(this);
+    }
 
     void registerLogCallback(YModule.LogCallback callback)
     {
         _logCallback = callback;
-        if (callback!=null) {
+        if (callback != null) {
             triggerLogPull();
         }
     }

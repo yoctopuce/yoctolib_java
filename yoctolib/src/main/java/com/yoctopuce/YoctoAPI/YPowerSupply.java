@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPowerSupply.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YPowerSupply.java 34115 2019-01-23 14:23:54Z seb $
  *
  *  Implements FindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -961,7 +961,7 @@ public class YPowerSupply extends YFunction
     }
 
     /**
-     * Performs a smooth transistion of output voltage. Any explicit voltage
+     * Performs a smooth transition of output voltage. Any explicit voltage
      * change cancels any ongoing transition process.
      *
      * @param V_target   : new output voltage value at the end of the transition

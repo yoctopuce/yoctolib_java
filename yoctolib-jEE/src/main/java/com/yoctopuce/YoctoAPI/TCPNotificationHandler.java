@@ -49,6 +49,13 @@ class TCPNotificationHandler extends NotificationHandler
                 String fifo = "";
                 do {
                     byte[] partial;
+                    try {
+                        _hub.testLogPull();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        Thread.currentThread().interrupt();
+                        throw new YAPI_Exception(e.getLocalizedMessage());
+                    }
                     yreq._requestProcesss();
                     partial = yreq.getPartialResult();
                     if (partial != null) {

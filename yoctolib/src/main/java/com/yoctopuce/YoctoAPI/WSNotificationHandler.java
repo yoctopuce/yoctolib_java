@@ -173,6 +173,8 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                     }
                 }
                 processRequests();
+                _hub.testLogPull();
+
             }
         } catch (Exception ex) {
             errmsg = ex.getLocalizedMessage();

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YNetwork.java 34022 2019-01-15 18:21:34Z seb $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -769,7 +769,8 @@ public class YNetwork extends YFunction
     }
 
     /**
-     * Changes the IP address of the NTP server to be used by the module.
+     * Changes the IP address of the NTP server to be used by the module. Use an empty
+     * string to restore the factory set  address.
      * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
      *
      * @param newval : a string corresponding to the IP address of the NTP server to be used by the module
@@ -789,7 +790,8 @@ public class YNetwork extends YFunction
     }
 
     /**
-     * Changes the IP address of the NTP server to be used by the module.
+     * Changes the IP address of the NTP server to be used by the module. Use an empty
+     * string to restore the factory set  address.
      * Remember to call the saveToFlash() method and then to reboot the module to apply this setting.
      *
      * @param newval : a string corresponding to the IP address of the NTP server to be used by the module

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Random;
 
 
 /**
@@ -79,6 +80,7 @@ class YSSDP
             // already started
             return;
         _callbacks = callback;
+        stopThreads();
         if (!_Listening) {
             try {
                 startListening();
@@ -95,13 +97,16 @@ class YSSDP
             cacheValidity = 1800;
         cacheValidity *= 1000;
 
+        //Log.d("SSDP", "update cache for " + uuid + " " + url);
         if (_cache.containsKey(uuid)) {
             YSSDPCacheEntry entry = _cache.get(uuid);
             if (!entry.getURL().equals(url)) {
                 _callbacks.HubDiscoveryCallback(entry.getSerial(), url, entry.getURL());
                 entry.setURL(url);
             } else {
-                _callbacks.HubDiscoveryCallback(entry.getSerial(), url, null);
+                if (entry.hasExpired()) {
+                    _callbacks.HubDiscoveryCallback(entry.getSerial(), url, null);
+                }
             }
             entry.resetExpiration(cacheValidity);
             return;
@@ -128,7 +133,7 @@ class YSSDP
 
     private void startListening() throws IOException
     {
-
+        //Log.i("SSDP", "Start listening..");
 
         Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
         for (NetworkInterface netint : Collections.list(nets)) {
@@ -144,6 +149,8 @@ class YSSDP
         _Listening = false;
         for (int i = 0; i < size; i++) {
             final NetworkInterface netIf = _netInterfaces.get(i);
+            final String if_name = netIf.getDisplayName();
+            //Log.i("SSDP", "Start discovery for  " + if_name);
             _listenBcastThread[i] = new Thread(new Runnable()
             {
                 public void run()
@@ -152,15 +159,15 @@ class YSSDP
                     byte[] pktContent;
                     String ssdpMessage;
                     MulticastSocket socketReception = null;
+                    _yctx._Log("Start listening for SSDP on " + netIf.getDisplayName());
                     try {
-                        socketReception = new MulticastSocket();
+                        socketReception = new MulticastSocket(SSDP_PORT);
                         socketReception.joinGroup(mMcastAddr, netIf);
                         socketReception.setSoTimeout(10000);
                     } catch (IOException e) {
                         _yctx._Log(String.format(Locale.US, "Unable to join MCAST group for %s: %s",
                                 netIf.getName(), e.getLocalizedMessage()));
                         e.printStackTrace();
-                        //fixme: better error handling
                         return;
                     }
 
@@ -177,55 +184,77 @@ class YSSDP
                         }
                         checkCacheExpiration();
                     }
+                    _yctx._Log("Stop listening for SSDP on " + netIf.getDisplayName());
+
                 }
-            });
+            }, "ssdp_mcast_" + if_name);
             _listenBcastThread[i].start();
             _listenMSearchThread[i] = new Thread(new Runnable()
             {
                 public void run()
                 {
-                    DatagramPacket pkt;
-                    byte[] pktContent;
-                    String ssdpMessage;
-                    Date date = new Date();
-
-                    MulticastSocket msearchSocket;
                     try {
-                        msearchSocket = new MulticastSocket();
-                        msearchSocket.setTimeToLive(15);
-                        msearchSocket.setNetworkInterface(netIf);
-                        byte[] outPktContent = SSDP_DISCOVERY_MESSAGE.getBytes();
-                        DatagramPacket outPkt = new DatagramPacket(outPktContent, outPktContent.length, mMcastAddr);
-                        msearchSocket.send(outPkt);
-                    } catch (IOException ex) {
-                        //todo: more user friendy error report
-                        _yctx._Log("Unable to Send SSDP mSearch:" + ex.getLocalizedMessage());
-                        return;
-                    }
-
-                    //look for response only during 3 minutes
-                    while (_Listening && (new Date().getTime() - date.getTime()) < 180000) {
-                        pktContent = new byte[1536];
-                        pkt = new DatagramPacket(pktContent, pktContent.length);
-                        try {
-                            msearchSocket.receive(pkt);
-                            ssdpMessage = new String(pktContent, pkt.getOffset(), pkt.getLength());
-                            parseIncomingMessage(ssdpMessage);
-                        } catch (IOException ex) {
-                            //todo: more user friendy error report
-                            _yctx._Log("SSDP error:" + ex.getLocalizedMessage());
-                            return;
-                        }
+                        doMSearch(netIf);
+                    } catch (IOException | InterruptedException e) {
+                        _yctx._Log(String.format(Locale.US, "MSearch request failed (%s)", e.getLocalizedMessage()));
+                        e.printStackTrace();
                     }
                 }
-            });
+            }, "ssdp_msearch_" + if_name);
             _listenMSearchThread[i].start();
         }
         _Listening = true;
     }
 
+    private void doMSearch(NetworkInterface netIf) throws IOException, InterruptedException
+    {
+        DatagramPacket pkt;
+        byte[] pktContent;
+        String ssdpMessage;
+        Random rand = new Random();
+        _yctx._Log("Start SSDP MSearch on " + netIf.getDisplayName());
+        // setup upd socket
+        MulticastSocket msearchSocket;
+        DatagramPacket outPkt;
+        msearchSocket = new MulticastSocket();
+        msearchSocket.setTimeToLive(15);
+        msearchSocket.setNetworkInterface(netIf);
+        // format MSEARCH packet with MX=5s
+        byte[] outPktContent = SSDP_DISCOVERY_MESSAGE.getBytes();
+        outPkt = new DatagramPacket(outPktContent, outPktContent.length, mMcastAddr);
+        int response_delay = 20000;
+        msearchSocket.setSoTimeout(response_delay);
+
+        for (int i = 0; i < 5; i++) {
+            //Log.d("SSDP", String.format(Locale.US, "send MSEACH on %s and wait %dms", netIf.getDisplayName(), response_delay));
+            msearchSocket.send(outPkt);
+            int sleep_delay = rand.nextInt(100);
+            Thread.sleep(sleep_delay);
+        }
+        long wait_until = System.currentTimeMillis() + response_delay;
+        //look for response only during 3 minutes
+        while (_Listening && System.currentTimeMillis() < wait_until) {
+            pktContent = new byte[1536];
+            pkt = new DatagramPacket(pktContent, pktContent.length);
+            try {
+                msearchSocket.receive(pkt);
+                ssdpMessage = new String(pktContent, pkt.getOffset(), pkt.getLength());
+                parseIncomingMessage(ssdpMessage);
+            } catch (SocketTimeoutException ignore) {
+            }
+        }
+        _yctx._Log("End of SSDP MSearch on " + netIf.getDisplayName());
+
+    }
+
 
     void Stop()
+    {
+        stopThreads();
+        _cache.clear();
+    }
+
+    private void stopThreads()
     {
         _Listening = false;
         for (int i = 0; i < _netInterfaces.size(); i++) {
@@ -236,7 +265,6 @@ class YSSDP
                 _listenBcastThread[i].interrupt();
             _listenBcastThread[i] = null;
         }
-        _cache.clear();
     }
 
 

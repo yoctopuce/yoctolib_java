@@ -1,3 +1,6 @@
-Java v1.10.33831
+Java v1.10.34131
 
-- Add support for aarch64 dynamic library
+- Add get_serialNumber() method to YFunction class
+- Improve error recovery (Request API implicitly do an updateDeviceList when device does not respond)
+- Improve network discovery of YoctoHubs
+- Fixed some typos
