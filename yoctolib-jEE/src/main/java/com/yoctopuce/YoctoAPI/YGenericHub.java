@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 33863 2018-12-24 13:19:20Z seb $
+ * $Id: YGenericHub.java 34163 2019-01-28 14:59:51Z seb $
  *
  * Internal YGenericHub object
  *
@@ -77,7 +77,7 @@ abstract class YGenericHub
     static final int USB_META_WS_ERROR = 6;
     static final int USB_META_ACK_UPLOAD = 7;
 
-    static final int USB_META_UTCTIME_SIZE = 5;
+    static final int USB_META_UTCTIME_SIZE = 6;
     static final int USB_META_DLFLUSH_SIZE = 1;
     static final int USB_META_ACK_D2H_PACKET_SIZE = 2;
     static final int USB_META_WS_ANNOUNCE_SIZE = 8 + YAPI.YOCTO_SERIAL_LEN;

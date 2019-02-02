@@ -217,7 +217,7 @@ class YSSDP
         MulticastSocket msearchSocket;
         DatagramPacket outPkt;
         msearchSocket = new MulticastSocket();
-        msearchSocket.setTimeToLive(15);
+        msearchSocket.setTimeToLive(2);
         msearchSocket.setNetworkInterface(netIf);
         // format MSEARCH packet with MX=5s
         byte[] outPktContent = SSDP_DISCOVERY_MESSAGE.getBytes();
