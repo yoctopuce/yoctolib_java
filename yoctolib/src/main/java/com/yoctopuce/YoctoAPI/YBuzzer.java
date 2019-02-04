@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YBuzzer.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YBuzzer.java 34289 2019-02-03 21:12:49Z mvuilleu $
  *
  *  Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -809,6 +809,28 @@ public class YBuzzer extends YFunction
     public int oncePlaySeq() throws YAPI_Exception
     {
         return sendCommand("s");
+    }
+
+    /**
+     * Saves the preprogrammed playing sequence to flash memory.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int savePlaySeq() throws YAPI_Exception
+    {
+        return sendCommand("W");
+    }
+
+    /**
+     * Reloads the preprogrammed playing sequence from the flash memory.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     * @throws YAPI_Exception on error
+     */
+    public int reloadPlaySeq() throws YAPI_Exception
+    {
+        return sendCommand("R");
     }
 
     /**
