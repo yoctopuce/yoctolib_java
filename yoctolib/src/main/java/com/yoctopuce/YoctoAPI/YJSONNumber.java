@@ -18,7 +18,7 @@ class YJSONNumber extends YJSONContent
         int start;
         char sti;
         int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
-        if (_data == null) {
+        if (cur_pos >= _data_boundary || _data == null) {
             throw new Exception("no data");
         }
         sti = _data.charAt(cur_pos);

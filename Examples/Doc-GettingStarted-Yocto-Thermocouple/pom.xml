@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.yoctopuce.java</groupId>
         <artifactId>javabundle</artifactId>
-        <version>1.10.34302-SNAPSHOT</version>
+        <version>1.10.34560-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>doc-gettingstarted-yocto-thermocouple</artifactId>
     <packaging>jar</packaging>
     <name>Doc-GettingStarted-Yocto-Thermocouple</name>
-    <version>1.10.34302-SNAPSHOT</version>
+    <version>1.10.34560-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>
         <developer>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.yoctopuce.java</groupId>
             <artifactId>yoctolib</artifactId>
-            <version>1.10.34302-SNAPSHOT</version>
+            <version>1.10.34560-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

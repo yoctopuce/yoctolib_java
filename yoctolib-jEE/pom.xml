@@ -7,7 +7,7 @@
     <artifactId>yoctolib-jee</artifactId>
     <packaging>jar</packaging>
     <name>Yoctopuce Java EE API</name>
-    <version>1.10.34302-SNAPSHOT</version>
+    <version>1.10.34560-SNAPSHOT</version>
     <description>Official Yoctopuce Library for Java EE</description>
     <url>http://www.yoctopuce.com</url>
 

@@ -27,7 +27,7 @@ class YJSONObject extends YJSONContent
         int name_start = _data_start;
         int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
 
-        if (_data.length() <= cur_pos || _data.charAt(cur_pos) != '{') {
+        if (_data.length() <= cur_pos || cur_pos >= _data_boundary ||_data.charAt(cur_pos) != '{') {
             throw new Exception(formatError("Opening braces was expected", cur_pos));
         }
         cur_pos++;
