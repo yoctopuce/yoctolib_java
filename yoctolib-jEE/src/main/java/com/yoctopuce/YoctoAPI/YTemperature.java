@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTemperature.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YTemperature.java 34584 2019-03-08 09:36:55Z mvuilleu $
  *
  *  Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -685,6 +685,9 @@ public class YTemperature extends YSensor
 
         id = get_functionId();
         id = (id).substring( 11,  11 + (id).length() - 11);
+        if (id.equals("")) {
+            id = "1";
+        }
         bin_json = _download(String.format(Locale.US, "extra.json?page=%s",id));
         paramlist = _json_get_array(bin_json);
         // first convert all temperatures to float

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFileRecord.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YFileRecord.java 34651 2019-03-15 17:21:54Z seb $
  *
  * YFileRecord Class: Description of a file on the device filesystem
  *
@@ -44,7 +44,8 @@ package com.yoctopuce.YoctoAPI;
 /**
  * YFileRecord Class: Description of a file on the device filesystem
  *
- *
+ * YFileRecord objects are used to describe a file that is stored on a Yoctopuce device.
+ * These objects are used in particular in conjunction with the YFiles class.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YFileRecord
@@ -73,16 +74,31 @@ public class YFileRecord
 
     //--- (generated code: YFileRecord implementation)
 
+    /**
+     * Returns the name of the file.
+     *
+     * @return a string with the name of the file.
+     */
     public String get_name()
     {
         return _name;
     }
 
+    /**
+     * Returns the size of the file in bytes.
+     *
+     * @return the size of the file.
+     */
     public int get_size()
     {
         return _size;
     }
 
+    /**
+     * Returns the 32-bit CRC of the file content.
+     *
+     * @return the 32-bit CRC of the file content.
+     */
     public int get_crc()
     {
         return _crc;

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWatchdog.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YWatchdog.java 34976 2019-04-05 06:47:49Z seb $
  *
  *  Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -137,6 +137,7 @@ public class YWatchdog extends YFunction
     protected long _triggerDelay = TRIGGERDELAY_INVALID;
     protected long _triggerDuration = TRIGGERDURATION_INVALID;
     protected UpdateCallback _valueCallbackWatchdog = null;
+    protected int _firm = 0;
 
     /**
      * Deprecated UpdateCallback for Watchdog
@@ -1155,6 +1156,42 @@ public class YWatchdog extends YFunction
             super._invokeValueCallback(value);
         }
         return 0;
+    }
+
+    /**
+     * Switch the relay to the opposite state.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int toggle() throws YAPI_Exception
+    {
+        int sta;
+        String fw;
+        YModule mo;
+        if (_firm == 0) {
+            mo = get_module();
+            fw = mo.get_firmwareRelease();
+            if (fw.equals(YModule.FIRMWARERELEASE_INVALID)) {
+                return STATE_INVALID;
+            }
+            _firm = YAPIContext._atoi(fw);
+        }
+        if (_firm < 34921) {
+            sta = get_state();
+            if (sta == STATE_INVALID) {
+                return STATE_INVALID;
+            }
+            if (sta == STATE_B) {
+                set_state(STATE_A);
+            } else {
+                set_state(STATE_B);
+            }
+            return YAPI.SUCCESS;
+        } else {
+            return _setAttr("state","X");
+        }
     }
 
     /**

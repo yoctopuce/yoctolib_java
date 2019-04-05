@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWlanRecord.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: YWlanRecord.java 34651 2019-03-15 17:21:54Z seb $
  *
  * YWlanRecord Class: Description of a wireless network detected
  *
@@ -43,7 +43,9 @@ package com.yoctopuce.YoctoAPI;
 /**
  * YWlanRecord Class: Description of a wireless network
  *
- *
+ * YWlanRecord objects are used to describe a wireless network.
+ * These objects are  used in particular in conjunction with the
+ * YWireless class.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YWlanRecord
@@ -73,21 +75,41 @@ public class YWlanRecord
 
     //--- (generated code: YWlanRecord implementation)
 
+    /**
+     * Returns the name of the wireless network (SSID).
+     *
+     * @return a string with the name of the wireless network (SSID).
+     */
     public String get_ssid()
     {
         return _ssid;
     }
 
+    /**
+     * Returns the 802.11 channel.
+     *
+     * @return the 802.11 channel.
+     */
     public int get_channel()
     {
         return _channel;
     }
 
+    /**
+     * Returns the security algorithm used by the wireless network.
+     *
+     * @return a string with the security algorithm.
+     */
     public String get_security()
     {
         return _sec;
     }
 
+    /**
+     * Returns the quality of the wireless network link, in per cents.
+     *
+     * @return the quality of the wireless network link, in per cents.
+     */
     public int get_linkQuality()
     {
         return _rssi;

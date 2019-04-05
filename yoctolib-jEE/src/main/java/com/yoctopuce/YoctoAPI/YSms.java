@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YSms.java 28732 2017-10-02 13:34:20Z seb $
+ * $Id: YSms.java 34658 2019-03-18 09:39:54Z seb $
  *
  * Implements FindSms(), the high-level API for Sms functions
  *
@@ -45,7 +45,8 @@ import java.util.Locale;
 /**
  * YSms Class: SMS message sent or received
  *
- *
+ * YSms objects are used to describe a SMS.
+ * These objects are used in particular in conjunction with the YMessageBox class.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YSms
@@ -156,6 +157,11 @@ public class YSms
         return _udata;
     }
 
+    /**
+     * Returns the content of the message.
+     *
+     * @return  a string with the content of the message.
+     */
     public String get_textData()
     {
         byte[] isolatin;
@@ -383,6 +389,16 @@ public class YSms
         return YAPI.SUCCESS;
     }
 
+    /**
+     * Add a regular text to the SMS. This function support messages
+     * of more than 160 characters. ISO-latin accented characters
+     * are supported. For messages with special unicode characters such as asian
+     * characters and emoticons, use the  addUnicodeData method.
+     *
+     * @param val : the text to be sent in the message
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     */
     public int addText(String val)
     {
         byte[] udata;
@@ -440,6 +456,14 @@ public class YSms
         return set_userData(udata);
     }
 
+    /**
+     * Add a unicode text to the SMS. This function support messages
+     * of more than 160 characters, using SMS concatenation.
+     *
+     * @param val : an array of special unicode characters
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     */
     public int addUnicodeData(ArrayList<Integer> val)
     {
         int arrlen;
@@ -1229,6 +1253,14 @@ public class YSms
         return YAPI.SUCCESS;
     }
 
+    /**
+     * Sends the SMS to the recipient. Messages of more than 160 characters are supported
+     * using SMS concatenation.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
     public int send() throws YAPI_Exception
     {
         int i;
