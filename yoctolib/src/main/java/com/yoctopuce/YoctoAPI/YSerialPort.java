@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 32904 2018-11-02 10:15:00Z seb $
+ * $Id: YSerialPort.java 35124 2019-04-12 09:03:41Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -1554,7 +1554,7 @@ public class YSerialPort extends YFunction
         int msglen;
         String res;
 
-        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,query);
+        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSpiPort.java 33722 2018-12-14 15:04:43Z seb $
+ *  $Id: YSpiPort.java 35124 2019-04-12 09:03:41Z seb $
  *
  *  Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -1689,7 +1689,7 @@ public class YSpiPort extends YFunction
         int msglen;
         String res;
 
-        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,query);
+        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
