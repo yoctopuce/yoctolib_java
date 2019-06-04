@@ -7,7 +7,7 @@
     <artifactId>yoctolib</artifactId>
     <packaging>jar</packaging>
     <name>Yoctopuce Java API</name>
-    <version>1.10.35622-SNAPSHOT</version>
+    <version>1.10.35635-SNAPSHOT</version>
     <description>Official Yoctopuce Library for Java SE</description>
     <url>http://www.yoctopuce.com</url>
 
