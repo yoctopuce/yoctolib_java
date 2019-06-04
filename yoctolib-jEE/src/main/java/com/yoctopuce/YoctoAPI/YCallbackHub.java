@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 31423 2018-08-07 11:52:08Z seb $
+ * $Id: YCallbackHub.java 35436 2019-05-14 15:00:48Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -329,6 +329,12 @@ class YCallbackHub extends YGenericHub
     boolean isCallbackMode()
     {
         return true;
+    }
+
+    @Override
+    boolean isReadOnly()
+    {
+        return false;
     }
 
     @Override

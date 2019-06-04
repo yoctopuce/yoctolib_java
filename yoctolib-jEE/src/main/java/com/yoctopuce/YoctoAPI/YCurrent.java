@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCurrent.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YCurrent.java 35360 2019-05-09 09:02:29Z mvuilleu $
  *
  *  Implements FindCurrent(), the high-level API for Current functions
  *
@@ -126,6 +126,13 @@ public class YCurrent extends YSensor
         super._parseAttr(json_val);
     }
 
+    /**
+     * Returns the activation state of this input.
+     *
+     * @return either YCurrent.ENABLED_FALSE or YCurrent.ENABLED_TRUE, according to the activation state of this input
+     *
+     * @throws YAPI_Exception on error
+     */
     public int get_enabled() throws YAPI_Exception
     {
         int res;
@@ -140,6 +147,30 @@ public class YCurrent extends YSensor
         return res;
     }
 
+    /**
+     * Returns the activation state of this input.
+     *
+     * @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation state of this input
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getEnabled() throws YAPI_Exception
+    {
+        return get_enabled();
+    }
+
+    /**
+     * Changes the activation state of this input. When an input is disabled,
+     * its value is no more updated. On some devices, disabling an input can
+     * improve the refresh rate of the other active inputs.
+     *
+     *  @param newval : either YCurrent.ENABLED_FALSE or YCurrent.ENABLED_TRUE, according to the activation
+     * state of this input
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
     public int set_enabled(int  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -150,6 +181,21 @@ public class YCurrent extends YSensor
         return YAPI.SUCCESS;
     }
 
+    /**
+     * Changes the activation state of this input. When an input is disabled,
+     * its value is no more updated. On some devices, disabling an input can
+     * improve the refresh rate of the other active inputs.
+     *
+     * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation state of this input
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setEnabled(int newval)  throws YAPI_Exception
+    {
+        return set_enabled(newval);
+    }
 
     /**
      * Retrieves a current sensor for a given identifier.

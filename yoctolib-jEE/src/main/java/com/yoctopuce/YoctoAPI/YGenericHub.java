@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 34163 2019-01-28 14:59:51Z seb $
+ * $Id: YGenericHub.java 35436 2019-05-14 15:00:48Z seb $
  *
  * Internal YGenericHub object
  *
@@ -367,6 +367,8 @@ abstract class YGenericHub
 
     abstract boolean isCallbackMode();
 
+    abstract boolean isReadOnly();
+
 
     interface UpdateProgress
     {
@@ -428,9 +430,9 @@ abstract class YGenericHub
         public HTTPParams(String url)
         {
             int pos = 0;
-            if (url.startsWith("ws://")) {
-                pos = 5;
-                _proto = "ws";
+            if (url.startsWith("http://")) {
+                pos = 7;
+                _proto = "http";
             } else if (url.startsWith("wss://")) {
                 pos = 6;
                 _proto = "wss";
@@ -438,10 +440,11 @@ abstract class YGenericHub
                 pos = 6;
                 _proto = "usb";
             } else {
-                _proto = "http";
-                if (url.startsWith("http://")) {
-                    pos = 7;
+
+                if (url.startsWith("ws://")) {
+                    pos = 5;
                 }
+                _proto = "ws";
             }
             int end_auth = url.indexOf('@', pos);
             int end_user = url.indexOf(':', pos);

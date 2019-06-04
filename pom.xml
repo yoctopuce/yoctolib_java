@@ -7,7 +7,7 @@
     <groupId>com.yoctopuce.java</groupId>
     <artifactId>javabundle</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.35153-SNAPSHOT</version>
+    <version>1.10.35622-SNAPSHOT</version>
     <name>Yoctopuce Java API (with examples)</name>
     <description>Official Yoctopuce Library for Java with examples</description>
     <url>http://www.yoctopuce.com</url>
@@ -47,6 +47,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-Motor-DC</module>
         <module>Examples/Doc-GettingStarted-Yocto-PowerColor</module>
         <module>Examples/Doc-GettingStarted-Yocto-PowerRelay</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Pressure</module>
         <module>Examples/Doc-GettingStarted-Yocto-Proximity</module>
         <module>Examples/Doc-GettingStarted-Yocto-PT100</module>
         <module>Examples/Doc-GettingStarted-Yocto-PWM-Rx</module>
@@ -82,6 +83,7 @@
         <module>Examples/Prog-DevicesTree</module>
         <module>Examples/Prog-MODBUS</module>
         <module>Examples/Prog-FirmwareUpdate</module>
+        <module>Examples/Prog-YoctoHubSettings</module>
     </modules>
 
     <developers>

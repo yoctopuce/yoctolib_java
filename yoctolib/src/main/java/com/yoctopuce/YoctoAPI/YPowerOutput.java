@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPowerOutput.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YPowerOutput.java 35468 2019-05-16 14:43:42Z seb $
  *
  *  Implements FindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -61,6 +61,8 @@ public class YPowerOutput extends YFunction
     public static final int VOLTAGE_OFF = 0;
     public static final int VOLTAGE_OUT3V3 = 1;
     public static final int VOLTAGE_OUT5V = 2;
+    public static final int VOLTAGE_OUT4V7 = 3;
+    public static final int VOLTAGE_OUT1V8 = 4;
     public static final int VOLTAGE_INVALID = -1;
     protected int _voltage = VOLTAGE_INVALID;
     protected UpdateCallback _valueCallbackPowerOutput = null;
@@ -128,8 +130,9 @@ public class YPowerOutput extends YFunction
     /**
      * Returns the voltage on the power output featured by the module.
      *
-     *  @return a value among YPowerOutput.VOLTAGE_OFF, YPowerOutput.VOLTAGE_OUT3V3 and
-     * YPowerOutput.VOLTAGE_OUT5V corresponding to the voltage on the power output featured by the module
+     *  @return a value among YPowerOutput.VOLTAGE_OFF, YPowerOutput.VOLTAGE_OUT3V3,
+     *  YPowerOutput.VOLTAGE_OUT5V, YPowerOutput.VOLTAGE_OUT4V7 and YPowerOutput.VOLTAGE_OUT1V8
+     * corresponding to the voltage on the power output featured by the module
      *
      * @throws YAPI_Exception on error
      */
@@ -150,8 +153,8 @@ public class YPowerOutput extends YFunction
     /**
      * Returns the voltage on the power output featured by the module.
      *
-     *  @return a value among Y_VOLTAGE_OFF, Y_VOLTAGE_OUT3V3 and Y_VOLTAGE_OUT5V corresponding to the
-     * voltage on the power output featured by the module
+     *  @return a value among Y_VOLTAGE_OFF, Y_VOLTAGE_OUT3V3, Y_VOLTAGE_OUT5V, Y_VOLTAGE_OUT4V7 and
+     * Y_VOLTAGE_OUT1V8 corresponding to the voltage on the power output featured by the module
      *
      * @throws YAPI_Exception on error
      */
@@ -165,8 +168,9 @@ public class YPowerOutput extends YFunction
      * module. Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     *  @param newval : a value among YPowerOutput.VOLTAGE_OFF, YPowerOutput.VOLTAGE_OUT3V3 and
-     * YPowerOutput.VOLTAGE_OUT5V corresponding to the voltage on the power output provided by the
+     *  @param newval : a value among YPowerOutput.VOLTAGE_OFF, YPowerOutput.VOLTAGE_OUT3V3,
+     *  YPowerOutput.VOLTAGE_OUT5V, YPowerOutput.VOLTAGE_OUT4V7 and YPowerOutput.VOLTAGE_OUT1V8
+     * corresponding to the voltage on the power output provided by the
      *         module
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -188,8 +192,8 @@ public class YPowerOutput extends YFunction
      * module. Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     *  @param newval : a value among Y_VOLTAGE_OFF, Y_VOLTAGE_OUT3V3 and Y_VOLTAGE_OUT5V corresponding to
-     * the voltage on the power output provided by the
+     *  @param newval : a value among Y_VOLTAGE_OFF, Y_VOLTAGE_OUT3V3, Y_VOLTAGE_OUT5V, Y_VOLTAGE_OUT4V7
+     * and Y_VOLTAGE_OUT1V8 corresponding to the voltage on the power output provided by the
      *         module
      *
      * @return YAPI_SUCCESS if the call succeeds.

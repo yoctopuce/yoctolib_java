@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRangeFinder.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YRangeFinder.java 35185 2019-04-16 19:43:18Z mvuilleu $
  *
  *  Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -68,6 +68,14 @@ public class YRangeFinder extends YSensor
     public static final int RANGEFINDERMODE_HIGH_SPEED = 3;
     public static final int RANGEFINDERMODE_INVALID = -1;
     /**
+     * invalid timeFrame value
+     */
+    public static final long TIMEFRAME_INVALID = YAPI.INVALID_LONG;
+    /**
+     * invalid quality value
+     */
+    public static final int QUALITY_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid hardwareCalibration value
      */
     public static final String HARDWARECALIBRATION_INVALID = YAPI.INVALID_STRING;
@@ -80,6 +88,8 @@ public class YRangeFinder extends YSensor
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _rangeFinderMode = RANGEFINDERMODE_INVALID;
+    protected long _timeFrame = TIMEFRAME_INVALID;
+    protected int _quality = QUALITY_INVALID;
     protected String _hardwareCalibration = HARDWARECALIBRATION_INVALID;
     protected double _currentTemperature = CURRENTTEMPERATURE_INVALID;
     protected String _command = COMMAND_INVALID;
@@ -142,6 +152,12 @@ public class YRangeFinder extends YSensor
     {
         if (json_val.has("rangeFinderMode")) {
             _rangeFinderMode = json_val.getInt("rangeFinderMode");
+        }
+        if (json_val.has("timeFrame")) {
+            _timeFrame = json_val.getLong("timeFrame");
+        }
+        if (json_val.has("quality")) {
+            _quality = json_val.getInt("quality");
         }
         if (json_val.has("hardwareCalibration")) {
             _hardwareCalibration = json_val.getString("hardwareCalibration");
@@ -274,6 +290,117 @@ public class YRangeFinder extends YSensor
     public int setRangeFinderMode(int newval)  throws YAPI_Exception
     {
         return set_rangeFinderMode(newval);
+    }
+
+    /**
+     * Returns the time frame used to measure the distance and estimate the measure
+     * reliability. The time frame is expressed in milliseconds.
+     *
+     * @return an integer corresponding to the time frame used to measure the distance and estimate the measure
+     *         reliability
+     *
+     * @throws YAPI_Exception on error
+     */
+    public long get_timeFrame() throws YAPI_Exception
+    {
+        long res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return TIMEFRAME_INVALID;
+                }
+            }
+            res = _timeFrame;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the time frame used to measure the distance and estimate the measure
+     * reliability. The time frame is expressed in milliseconds.
+     *
+     * @return an integer corresponding to the time frame used to measure the distance and estimate the measure
+     *         reliability
+     *
+     * @throws YAPI_Exception on error
+     */
+    public long getTimeFrame() throws YAPI_Exception
+    {
+        return get_timeFrame();
+    }
+
+    /**
+     * Changes the time frame used to measure the distance and estimate the measure
+     * reliability. The time frame is expressed in milliseconds. A larger timeframe
+     * improves stability and reliability, at the cost of higher latency, but prevents
+     * the detection of events shorter than the time frame.
+     *
+     * @param newval : an integer corresponding to the time frame used to measure the distance and estimate the measure
+     *         reliability
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_timeFrame(long  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Long.toString(newval);
+            _setAttr("timeFrame",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the time frame used to measure the distance and estimate the measure
+     * reliability. The time frame is expressed in milliseconds. A larger timeframe
+     * improves stability and reliability, at the cost of higher latency, but prevents
+     * the detection of events shorter than the time frame.
+     *
+     * @param newval : an integer corresponding to the time frame used to measure the distance and estimate the measure
+     *         reliability
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setTimeFrame(long newval)  throws YAPI_Exception
+    {
+        return set_timeFrame(newval);
+    }
+
+    /**
+     * Returns a measure quality estimate, based on measured dispersion.
+     *
+     * @return an integer corresponding to a measure quality estimate, based on measured dispersion
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_quality() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return QUALITY_INVALID;
+                }
+            }
+            res = _quality;
+        }
+        return res;
+    }
+
+    /**
+     * Returns a measure quality estimate, based on measured dispersion.
+     *
+     * @return an integer corresponding to a measure quality estimate, based on measured dispersion
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getQuality() throws YAPI_Exception
+    {
+        return get_quality();
     }
 
     public String get_hardwareCalibration() throws YAPI_Exception

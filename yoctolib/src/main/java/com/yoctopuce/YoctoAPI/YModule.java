@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 33916 2018-12-28 10:38:18Z seb $
+ * $Id: YModule.java 35620 2019-06-04 08:29:58Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -1020,11 +1020,18 @@ public class YModule extends YFunction
     public static YModule FindModule(String func)
     {
         YModule obj;
+        String cleanHwId;
+        int modpos;
         synchronized (YAPI.class) {
-            obj = (YModule) YFunction._FindFromCache("Module", func);
+            cleanHwId = func;
+            modpos = (func).indexOf(".module");
+            if (modpos != ((func).length() - 7)) {
+                cleanHwId = func + ".module";
+            }
+            obj = (YModule) YFunction._FindFromCache("Module", cleanHwId);
             if (obj == null) {
-                obj = new YModule(func);
-                YFunction._AddToCache("Module", func, obj);
+                obj = new YModule(cleanHwId);
+                YFunction._AddToCache("Module", cleanHwId, obj);
             }
         }
         return obj;
@@ -1057,11 +1064,18 @@ public class YModule extends YFunction
     public static YModule FindModuleInContext(YAPIContext yctx,String func)
     {
         YModule obj;
+        String cleanHwId;
+        int modpos;
         synchronized (yctx) {
-            obj = (YModule) YFunction._FindFromCacheInContext(yctx, "Module", func);
+            cleanHwId = func;
+            modpos = (func).indexOf(".module");
+            if (modpos != ((func).length() - 7)) {
+                cleanHwId = func + ".module";
+            }
+            obj = (YModule) YFunction._FindFromCacheInContext(yctx, "Module", cleanHwId);
             if (obj == null) {
-                obj = new YModule(yctx, func);
-                YFunction._AddToCache("Module", func, obj);
+                obj = new YModule(yctx, cleanHwId);
+                YFunction._AddToCache("Module", cleanHwId, obj);
             }
         }
         return obj;
@@ -1365,15 +1379,17 @@ public class YModule extends YFunction
             if (YAPIContext._atoi(get_firmwareRelease()) > 9000) {
                 url = String.format(Locale.US, "api/%s/sensorType",ii);
                 t_type = new String(_download(url));
-                if (t_type.equals("RES_NTC")) {
+                if (t_type.equals("RES_NTC") || t_type.equals("RES_LINEAR")) {
                     id = (ii).substring( 11,  11 + (ii).length() - 11);
-                    temp_data_bin = _download(String.format(Locale.US, "extra.json?page=%s",id));
-                    if ((temp_data_bin).length == 0) {
-                        return temp_data_bin;
+                    if (id.equals("")) {
+                        id = "1";
                     }
-                    item = String.format(Locale.US, "%s{\"fid\":\"%s\", \"json\":%s}\n", sep, ii,new String(temp_data_bin));
-                    ext_settings = ext_settings + item;
-                    sep = ",";
+                    temp_data_bin = _download(String.format(Locale.US, "extra.json?page=%s",id));
+                    if ((temp_data_bin).length > 0) {
+                        item = String.format(Locale.US, "%s{\"fid\":\"%s\", \"json\":%s}\n", sep, ii,new String(temp_data_bin));
+                        ext_settings = ext_settings + item;
+                        sep = ",";
+                    }
                 }
             }
         }
@@ -1418,7 +1434,7 @@ public class YModule extends YFunction
         while (ofs + 1 < size) {
             curr = values.get(ofs);
             currTemp = values.get(ofs + 1);
-            url = String.format(Locale.US, "api/%s/.json?command=m%s:%s",  funcId, curr,currTemp);
+            url = String.format(Locale.US, "api/%s.json?command=m%s:%s", funcId, curr,currTemp);
             _download(url);
             ofs = ofs + 2;
         }

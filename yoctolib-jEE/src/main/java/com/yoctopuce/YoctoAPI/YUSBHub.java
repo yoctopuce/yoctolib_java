@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 33451 2018-11-29 13:32:59Z seb $
+ * $Id: YUSBHub.java 35436 2019-05-14 15:00:48Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -76,6 +76,12 @@ class YUSBHub extends YGenericHub
 
     @Override
     boolean isCallbackMode()
+    {
+        return false;
+    }
+
+    @Override
+    boolean isReadOnly()
     {
         return false;
     }

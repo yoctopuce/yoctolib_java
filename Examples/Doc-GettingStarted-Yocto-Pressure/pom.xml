@@ -9,9 +9,9 @@
         <version>1.10.35622-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>doc-gettingstarted-yocto-io</artifactId>
+    <artifactId>doc-gettingstarted-yocto-pressure</artifactId>
     <packaging>jar</packaging>
-    <name>Doc-GettingStarted-Yocto-IO</name>
+    <name>Doc-GettingStarted-Yocto-Pressure</name>
     <version>1.10.35622-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>

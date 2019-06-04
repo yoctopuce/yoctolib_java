@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 33903 2018-12-28 08:49:26Z seb $
+ * $Id: YFunction.java 35473 2019-05-16 16:31:39Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -43,7 +43,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-
 
 //--- (generated code: YFunction class start)
 /**
@@ -180,6 +179,18 @@ public class YFunction
     protected static void _UpdateTimedReportCallbackList(YFunction func, boolean add)
     {
         func._yapi._UpdateTimedReportCallbackList(func, add);
+    }
+
+    private boolean isReadOnly_internal()
+    {
+        try {
+            YDevice dev = getYDevice();
+            YGenericHub hub = dev.getHub();
+            return hub.isReadOnly();
+        } catch (YAPI_Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     //--- (generated code: YFunction implementation)
@@ -477,6 +488,19 @@ public class YFunction
         return new String(attrVal);
     }
 
+    /**
+     * Test if the function is readOnly. Return true if the function is write protected
+     * or that the function is not available.
+     *
+     * @return true if the function is readOnly or not online.
+     */
+    public boolean isReadOnly()
+    {
+        return isReadOnly_internal();
+    }
+
+    //cannot be generated for Java:
+    //public boolean isReadOnly_internal()
     /**
      * Returns the serial number of the module, as set by the factory.
      *
@@ -890,7 +914,7 @@ public class YFunction
         }
 
         ArrayList<Integer> encoded = YAPIContext._decodeWords(def);
-        if (encoded.size()<14) {
+        if (encoded.size() < 14) {
             _throw(YAPI.VERSION_MISMATCH, "device firmware is too old");
         }
         YDataStream newDataStream = new YDataStream(this, dataset, encoded);

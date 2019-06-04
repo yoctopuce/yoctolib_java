@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGenericSensor.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YGenericSensor.java 35360 2019-05-09 09:02:29Z mvuilleu $
  *
  *  Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -87,12 +87,19 @@ public class YGenericSensor extends YSensor
     public static final int SIGNALSAMPLING_LOW_NOISE_FILTERED = 3;
     public static final int SIGNALSAMPLING_HIGHEST_RATE = 4;
     public static final int SIGNALSAMPLING_INVALID = -1;
+    /**
+     * invalid enabled value
+     */
+    public static final int ENABLED_FALSE = 0;
+    public static final int ENABLED_TRUE = 1;
+    public static final int ENABLED_INVALID = -1;
     protected double _signalValue = SIGNALVALUE_INVALID;
     protected String _signalUnit = SIGNALUNIT_INVALID;
     protected String _signalRange = SIGNALRANGE_INVALID;
     protected String _valueRange = VALUERANGE_INVALID;
     protected double _signalBias = SIGNALBIAS_INVALID;
     protected int _signalSampling = SIGNALSAMPLING_INVALID;
+    protected int _enabled = ENABLED_INVALID;
     protected UpdateCallback _valueCallbackGenericSensor = null;
     protected TimedReportCallback _timedReportCallbackGenericSensor = null;
 
@@ -167,6 +174,9 @@ public class YGenericSensor extends YSensor
         }
         if (json_val.has("signalSampling")) {
             _signalSampling = json_val.getInt("signalSampling");
+        }
+        if (json_val.has("enabled")) {
+            _enabled = json_val.getInt("enabled") > 0 ? 1 : 0;
         }
         super._parseAttr(json_val);
     }
@@ -578,6 +588,78 @@ public class YGenericSensor extends YSensor
     public int setSignalSampling(int newval)  throws YAPI_Exception
     {
         return set_signalSampling(newval);
+    }
+
+    /**
+     * Returns the activation state of this input.
+     *
+     *  @return either YGenericSensor.ENABLED_FALSE or YGenericSensor.ENABLED_TRUE, according to the
+     * activation state of this input
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_enabled() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return ENABLED_INVALID;
+                }
+            }
+            res = _enabled;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the activation state of this input.
+     *
+     * @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation state of this input
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getEnabled() throws YAPI_Exception
+    {
+        return get_enabled();
+    }
+
+    /**
+     * Changes the activation state of this input. When an input is disabled,
+     * its value is no more updated. On some devices, disabling an input can
+     * improve the refresh rate of the other active inputs.
+     *
+     *  @param newval : either YGenericSensor.ENABLED_FALSE or YGenericSensor.ENABLED_TRUE, according to
+     * the activation state of this input
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_enabled(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("enabled",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the activation state of this input. When an input is disabled,
+     * its value is no more updated. On some devices, disabling an input can
+     * improve the refresh rate of the other active inputs.
+     *
+     * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation state of this input
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setEnabled(int newval)  throws YAPI_Exception
+    {
+        return set_enabled(newval);
     }
 
     /**

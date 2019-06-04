@@ -111,9 +111,9 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                 //e.printStackTrace();
                 if (e.errorType == YAPI.INVALID_ARGUMENT) {
                     _muststop = true;
-                    _session_errno = YAPI.IO_ERROR;
-                    _session_error = e.getLocalizedMessage();
                 }
+                _session_errno = YAPI.IO_ERROR;
+                _session_error = e.getLocalizedMessage();
             }
             _waitingForConnectionState = true;
             _notifRetryCount++;
@@ -163,7 +163,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                 }
                 WSRequest request = _pendingRequests.poll(wait, TimeUnit.MILLISECONDS);
                 if (request != null) {
-                    if (request.getState().equals(WSRequest.State.ERROR)) {
+                    if (request.getState().equals(WSRequest.State.FAKE_REQUEST)) {
                         // fake request to unlock thread and quit
                         break;
                     }
@@ -232,6 +232,10 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                     if (_connectionState != ConnectionState.CONNECTED && _connectionState != ConnectionState.CONNECTING) {
                         throw new YAPI_Exception(YAPI.IO_ERROR, "IO error with hub");
                     } else {
+                        if (_session_errno != YAPI.SUCCESS) {
+                            throw new YAPI_Exception(_session_errno,
+                                    "Unable to start the request in time (" + _session_error + ")");
+                        }
                         throw new YAPI_Exception(YAPI.TIMEOUT, "Unable to start the request in time");
                     }
                 }
@@ -240,12 +244,12 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                 throw new YAPI_Exception(_session_errno, _session_error);
             }
             if (async) {
-                request = new WSRequest(tcpchanel, _nextAsyncId++, full_request);
+                request = new WSRequest(tcpchanel, _nextAsyncId++, full_request, expiration);
                 if (_nextAsyncId >= 127) {
                     _nextAsyncId = 48;
                 }
             } else {
-                request = new WSRequest(tcpchanel, full_request, progress, context);
+                request = new WSRequest(tcpchanel, full_request, expiration, progress, context);
             }
         }
         _pendingRequests.put(request);
@@ -257,7 +261,6 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
         WSRequest.State state = wsRequest.waitProcessingEnd(expiration);
         if (!state.equals(WSRequest.State.CLOSED)) {
             wsRequest.checkError();
-            wsRequest.log("Timeout");
             throw new YAPI_Exception(YAPI.TIMEOUT, "request did not finished correctly");
 
         }
@@ -372,6 +375,16 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
         return _rwAccess;
     }
 
+    private void dumpRequestQueue(String message)
+    {
+
+        synchronized (_workingRequests) {
+            System.out.println(message + ": dump requests");
+            for (WSRequest req : _workingRequests.get(0)) {
+                req.log("");
+            }
+        }
+    }
 
     public void parseBinaryMessage(ByteBuffer raw_data)
     {
@@ -380,10 +393,10 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
 
         raw_data.order(ByteOrder.LITTLE_ENDIAN);
         byte first_byte = raw_data.get();
-        int tcpChanel = first_byte & 0x7;
+        int tcpchan = first_byte & 0x7;
         int ystream = (first_byte & 0xff) >> 3;
 
-        ArrayList<WSRequest> requestOfTCPChan = _workingRequests.get(tcpChanel);
+        ArrayList<WSRequest> requestOfTCPChan = _workingRequests.get(tcpchan);
         switch (ystream) {
             case YGenericHub.YSTREAM_TCP_NOTIF:
                 if (_waitingForConnectionState) {
@@ -405,46 +418,83 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
             case YGenericHub.YSTREAM_EMPTY:
                 return;
             case YGenericHub.YSTREAM_TCP_ASYNCCLOSE:
+                if (tcpchan > 3) {
+                    _hub._yctx._Log("WS: Unexpected frame for tcpChan " + tcpchan + " (" + ystream + ")");
+                    return;
+                }
+                //dumpRequestQueue("AS_close");
                 synchronized (_workingRequests) {
                     workingRequest = requestOfTCPChan.size() > 0 ? requestOfTCPChan.get(0) : null;
                 }
-                if (workingRequest != null && raw_data.remaining() >= 1) {
-                    stream = new WSStream(ystream, tcpChanel, raw_data.remaining() - 1, raw_data);
+                if (workingRequest == null) {
+                    _hub._yctx._Log("WS: Drop frame for closed tcpChan " + tcpchan + " (" + ystream + ")");
+                    return;
+                }
+
+                if (raw_data.remaining() >= 1) {
+                    stream = new WSStream(ystream, tcpchan, raw_data.remaining() - 1, raw_data);
                     int asyncId = raw_data.get();
-                    if (workingRequest.getAsyncId() != asyncId) {
-                        _hub._yctx._Log("WS: Incorrect async-close signature on tcpChan " + tcpChanel);
-                        return;
+                    if (workingRequest.getAsyncId() == 0) {
+                        _hub._yctx._Log("Asynchronous close received, sync reply request");
+                    } else if (workingRequest.getAsyncId() != asyncId) {
+                        _hub._yctx._Log("WS: Incorrect async-close signature on tcpChan " + tcpchan);
+                    } else {
+                        workingRequest.addStream(stream);
+                        workingRequest.setState(WSRequest.State.CLOSED);
                     }
-                    workingRequest.addStream(stream);
-                    workingRequest.setState(WSRequest.State.CLOSED);
                     synchronized (_workingRequests) {
                         requestOfTCPChan.remove(workingRequest);
                     }
+                } else {
+                    _hub._yctx._Log("WS: Incorrect async-close packet (too short message) on tcpChan " + tcpchan);
                 }
                 break;
             case YGenericHub.YSTREAM_TCP:
             case YGenericHub.YSTREAM_TCP_CLOSE:
-                synchronized (_workingRequests) {
-                    workingRequest = requestOfTCPChan.size() > 0 ? requestOfTCPChan.get(0) : null;
+                if (tcpchan > 3) {
+                    _hub._yctx._Log("WS: Unexpected frame for tcpChan " + tcpchan + " (" + ystream + ")");
+                    return;
                 }
-                if (workingRequest != null) {
-                    stream = new WSStream(ystream, tcpChanel, raw_data.remaining(), raw_data);
-                    workingRequest.addStream(stream);
-                    if (ystream == YGenericHub.YSTREAM_TCP_CLOSE) {
-                        WSStream outstream = new WSStream(YGenericHub.YSTREAM_TCP_CLOSE, tcpChanel, 0, null);
-                        try {
-                            synchronized (_sendLock) {
-                                _wsHandler.sendBinary(outstream.getContent(), true);
+                int ofs = 0;
+                synchronized (_workingRequests) {
+                    do {
+                        workingRequest = requestOfTCPChan.size() > ofs ? requestOfTCPChan.get(ofs) : null;
+                        ofs++;
+                    } while (workingRequest != null && workingRequest.getState() == WSRequest.State.CLOSED);
+                }
+                if (workingRequest == null) {
+                    _hub._yctx._Log(String.format(Locale.US,
+                            "WS: Drop frame for closed tcpChan %d (%s)\n", tcpchan,
+                            (ystream == YGenericHub.YSTREAM_TCP_CLOSE ? "TCP_CLOSE" : "TCP")));
+                    return;
+                }
+                WSRequest.State workingRequestState = workingRequest.getState();
+                stream = new WSStream(ystream, tcpchan, raw_data.remaining(), raw_data);
+                workingRequest.addStream(stream);
+                if (ystream == YGenericHub.YSTREAM_TCP_CLOSE) {
+                    if (workingRequest.isAsync()) {
+                        _hub._yctx._Log(String.format(Locale.US,
+                                "WS: Synchronous close received instead of async-%d close for tcpchan %d\n",
+                                workingRequest.getAsyncId(), tcpchan));
+                        workingRequest.setState(WSRequest.State.CLOSED);
+                    } else {
+                        if (workingRequestState == WSRequest.State.OPEN) {
+                            WSStream outstream = new WSStream(YGenericHub.YSTREAM_TCP_CLOSE, tcpchan, 0, null);
+                            try {
+                                synchronized (_sendLock) {
+                                    _wsHandler.sendBinary(outstream.getContent(), true);
+                                }
+                            } catch (YAPI_Exception e) {
+                                e.printStackTrace();
                             }
-                        } catch (YAPI_Exception e) {
-                            e.printStackTrace();
                         }
                         workingRequest.setState(WSRequest.State.CLOSED);
-                        synchronized (_workingRequests) {
-                            requestOfTCPChan.remove(workingRequest);
-                        }
+                    }
+                    synchronized (_workingRequests) {
+                        requestOfTCPChan.remove(workingRequest);
                     }
                 }
+
                 break;
             case YGenericHub.YSTREAM_META:
                 int metatype = raw_data.get() & 0xff;
@@ -540,7 +590,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                         }
                         break;
                     case YGenericHub.USB_META_ACK_UPLOAD:
-                        int tcpchan = raw_data.get();
+                        tcpchan = raw_data.get();
                         synchronized (_workingRequests) {
                             ArrayList<WSRequest> uploadChandRequests = _workingRequests.get(tcpchan);
                             workingRequest = uploadChandRequests.size() > 0 ? uploadChandRequests.get(0) : null;
@@ -607,96 +657,132 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
         for (tcpchan = 0; tcpchan < NB_TCP_CHANNEL; tcpchan++) {
             WSRequest req;
             ArrayList<WSRequest> requestOfTCPChan = _workingRequests.get(tcpchan);
-            long chan0 = System.currentTimeMillis();
             int reqIndex = 0;
             synchronized (_workingRequests) {
                 req = requestOfTCPChan.size() > reqIndex ? requestOfTCPChan.get(reqIndex) : null;
             }
             while (req != null) {
-                ByteBuffer requestBytes = req.getRequestBytes();
-                int throttle_start = requestBytes.position();
-                int throttle_end = requestBytes.limit();
-                if (throttle_end > 2108 && _remoteVersion >= YGenericHub.USB_META_WS_PROTO_V2 && tcpchan == 0) {
-                    // Perform throttling on large uploads
-                    if (requestBytes.position() == 0) {
-                        // First chunk is always first multiple of full window (124 bytes) above 2KB
-                        throttle_end = 2108;
-                        // Prepare to compute effective transfer rate
-                        _lastUploadAckBytes[tcpchan] = 0;
-                        _lastUploadAckTime[tcpchan] = 0;
-                        // Start with initial RTT based estimate
-                        _uploadRate = (int) (_tcpMaxWindowSize * 1000 / _tcpRoundTripTime);
-                    } else if (_lastUploadAckTime[tcpchan] == 0) {
-                        // first block not yet acked, wait more
-                        throttle_end = 0;
-                    } else {
-                        // adapt window frame to available bandwidth
-                        int bytesOnTheAir = requestBytes.position() - _lastUploadAckBytes[tcpchan];
-                        long timeOnTheAir = YAPI.GetTickCount() - _lastUploadAckTime[tcpchan];
-                        int uploadRate = _uploadRate;
-                        int toBeSent = (int) (2 * uploadRate + 1024 - bytesOnTheAir + (uploadRate * timeOnTheAir / 1000));
-                        if (toBeSent + bytesOnTheAir > DEFAULT_TCP_MAX_WINDOW_SIZE) {
-                            toBeSent = DEFAULT_TCP_MAX_WINDOW_SIZE - bytesOnTheAir;
+                WSRequest.State reqState = req.getState();
+                if (reqState.equals(WSRequest.State.CLOSED_BY_API)) {
+                    if (req.getExpiration() + 5000 < System.currentTimeMillis()) {
+                        // nobody has ack the close
+                        req.setState(WSRequest.State.FAKE_REQUEST);
+                        synchronized (_workingRequests) {
+                            requestOfTCPChan.remove(req);
                         }
-                        WSLOG(String.format(Locale.US, "throttling: %d bytes/s (%d + %d = %d)", _uploadRate, toBeSent, bytesOnTheAir, bytesOnTheAir + toBeSent));
-                        if (toBeSent < 64) {
-                            long waitTime = 1000 * (128 - toBeSent) / _uploadRate;
-                            if (waitTime < 2) waitTime = 2;
-                            _next_transmit_tm = YAPI.GetTickCount() + waitTime;
-                            WSLOG(String.format(Locale.US, "WS: %d sent %dms ago, waiting %dms...", bytesOnTheAir, timeOnTheAir, waitTime));
-                            throttle_end = 0;
-                        }
-                        if (throttle_end > requestBytes.position() + toBeSent) {
-                            // when sending partial content, round up to full frames
-                            if (toBeSent > 124) {
-                                toBeSent = (toBeSent / 124) * 124;
+                    }
+                } else if (reqState.equals(WSRequest.State.OPEN)) {
+                    if (req.getExpiration() < System.currentTimeMillis()) {
+                        // Abort a request and send close packet to peer
+                        if (req.isAsync()) {
+                            req.setState(WSRequest.State.FAKE_REQUEST);
+                            synchronized (_workingRequests) {
+                                requestOfTCPChan.remove(req);
                             }
-                            throttle_end = requestBytes.position() + toBeSent;
-                        }
-                    }
-                }
-                while (requestBytes.position() < throttle_end) {
-                    int datalen = throttle_end - requestBytes.position();
-                    if (datalen > WSStream.MAX_DATA_LEN) {
-                        datalen = WSStream.MAX_DATA_LEN;
-                    }
-                    WSStream wsstream;
-                    if (req.isAsync() && (requestBytes.position() + datalen == requestBytes.limit())) {
-                        if (datalen == WSStream.MAX_DATA_LEN) {
-                            // last frame is already full we must send the async close in another one
-                            wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, datalen, requestBytes);
-                            synchronized (_sendLock) {
-                                _wsHandler.sendBinary(wsstream.getContent(), true);
+                        } else {
+                            if (req.getRequestBytes().position() > 0) {
+                                // send a close to abort synchronous request
+                                WSStream wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, 0, null);
+                                synchronized (_sendLock) {
+                                    _wsHandler.sendBinary(wsstream.getContent(), true);
+                                }
+                                //_hub._yctx._Log("API close for Sync request\n");
+                                req.setState(WSRequest.State.CLOSED_BY_API);
+                            } else {
+                                req.setState(WSRequest.State.CLOSED);
+                                synchronized (_workingRequests) {
+                                    requestOfTCPChan.remove(req);
+                                }
                             }
-                            req.reportDataSent();
-                            //WSLOG(String.format("ws_req:%s: send %d bytes on chan%d (%d/%d)\n", req, datalen, tcpchan, requestBytes.position(), requestBytes.limit()));
-                            datalen = 0;
                         }
-                        wsstream = new WSStream(YGenericHub.YSTREAM_TCP_ASYNCCLOSE, tcpchan, datalen, requestBytes, req.getAsyncId());
-                        synchronized (_sendLock) {
-                            _wsHandler.sendBinary(wsstream.getContent(), true);
-                        }
-                        req.reportDataSent();
-                        //WSLOG(String.format("req(%s:%s) sent async close %d\n", _hub.getHost(), req, req.getAsyncId()));
                     } else {
-                        wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, datalen, requestBytes);
-                        synchronized (_sendLock) {
-                            _wsHandler.sendBinary(wsstream.getContent(), true);
+                        ByteBuffer requestBytes = req.getRequestBytes();
+                        int throttle_start = requestBytes.position();
+                        int throttle_end = requestBytes.limit();
+                        if (throttle_end > 2108 && _remoteVersion >= YGenericHub.USB_META_WS_PROTO_V2 && tcpchan == 0) {
+                            // Perform throttling on large uploads
+                            if (requestBytes.position() == 0) {
+                                // First chunk is always first multiple of full window (124 bytes) above 2KB
+                                throttle_end = 2108;
+                                // Prepare to compute effective transfer rate
+                                _lastUploadAckBytes[tcpchan] = 0;
+                                _lastUploadAckTime[tcpchan] = 0;
+                                // Start with initial RTT based estimate
+                                _uploadRate = (int) (_tcpMaxWindowSize * 1000 / _tcpRoundTripTime);
+                            } else if (_lastUploadAckTime[tcpchan] == 0) {
+                                // first block not yet acked, wait more
+                                throttle_end = 0;
+                            } else {
+                                // adapt window frame to available bandwidth
+                                int bytesOnTheAir = requestBytes.position() - _lastUploadAckBytes[tcpchan];
+                                long timeOnTheAir = YAPI.GetTickCount() - _lastUploadAckTime[tcpchan];
+                                int uploadRate = _uploadRate;
+                                int toBeSent = (int) (2 * uploadRate + 1024 - bytesOnTheAir + (uploadRate * timeOnTheAir / 1000));
+                                if (toBeSent + bytesOnTheAir > DEFAULT_TCP_MAX_WINDOW_SIZE) {
+                                    toBeSent = DEFAULT_TCP_MAX_WINDOW_SIZE - bytesOnTheAir;
+                                }
+                                WSLOG(String.format(Locale.US, "throttling: %d bytes/s (%d + %d = %d)", _uploadRate, toBeSent, bytesOnTheAir, bytesOnTheAir + toBeSent));
+                                if (toBeSent < 64) {
+                                    long waitTime = 1000 * (128 - toBeSent) / _uploadRate;
+                                    if (waitTime < 2) waitTime = 2;
+                                    _next_transmit_tm = YAPI.GetTickCount() + waitTime;
+                                    WSLOG(String.format(Locale.US, "WS: %d sent %dms ago, waiting %dms...", bytesOnTheAir, timeOnTheAir, waitTime));
+                                    throttle_end = 0;
+                                }
+                                if (throttle_end > requestBytes.position() + toBeSent) {
+                                    // when sending partial content, round up to full frames
+                                    if (toBeSent > 124) {
+                                        toBeSent = (toBeSent / 124) * 124;
+                                    }
+                                    throttle_end = requestBytes.position() + toBeSent;
+                                }
+                            }
                         }
-                        req.reportDataSent();
-                        //WSLOG("ws_req:%p: sent %d bytes on chan%d (%d/%d)\n", req, datalen, tcpchan, req->ws.requestpos, req->ws.requestsize);
-                    }
-                }
-                if (requestBytes.position() < requestBytes.limit()) {
-                    int sent = requestBytes.position() - throttle_start;
-                    // not completely sent, cannot do more for now
-                    if (sent > 0 && _uploadRate > 0) {
-                        long waitTime = 1000 * sent / _uploadRate;
-                        if (waitTime < 2) waitTime = 2;
-                        _next_transmit_tm = YAPI.GetTickCount() + waitTime;
-                        WSLOG(String.format(Locale.US, "Sent %dbytes, waiting %dms...", sent, waitTime));
-                    } else {
-                        _next_transmit_tm = YAPI.GetTickCount() + 100;
+                        while (requestBytes.position() < throttle_end) {
+                            int datalen = throttle_end - requestBytes.position();
+                            if (datalen > WSStream.MAX_DATA_LEN) {
+                                datalen = WSStream.MAX_DATA_LEN;
+                            }
+                            WSStream wsstream;
+                            if (req.isAsync() && (requestBytes.position() + datalen == requestBytes.limit())) {
+                                if (datalen == WSStream.MAX_DATA_LEN) {
+                                    // last frame is already full we must send the async close in another one
+                                    wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, datalen, requestBytes);
+                                    synchronized (_sendLock) {
+                                        _wsHandler.sendBinary(wsstream.getContent(), true);
+                                    }
+                                    req.reportDataSent();
+                                    //WSLOG(String.format("ws_req:%s: send %d bytes on chan%d (%d/%d)\n", req, datalen, tcpchan, requestBytes.position(), requestBytes.limit()));
+                                    datalen = 0;
+                                }
+                                wsstream = new WSStream(YGenericHub.YSTREAM_TCP_ASYNCCLOSE, tcpchan, datalen, requestBytes, req.getAsyncId());
+                                synchronized (_sendLock) {
+                                    _wsHandler.sendBinary(wsstream.getContent(), true);
+                                }
+                                req.reportDataSent();
+                                //req.setState(WSRequest.State.CLOSED_BY_API);
+                                //WSLOG(String.format("req(%s:%s) sent async close %d\n", _hub.getHost(), req, req.getAsyncId()));
+                            } else {
+                                wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, datalen, requestBytes);
+                                synchronized (_sendLock) {
+                                    _wsHandler.sendBinary(wsstream.getContent(), true);
+                                }
+                                req.reportDataSent();
+                                //WSLOG("ws_req:%p: sent %d bytes on chan%d (%d/%d)\n", req, datalen, tcpchan, req->ws.requestpos, req->ws.requestsize);
+                            }
+                        }
+                        if (requestBytes.position() < requestBytes.limit()) {
+                            int sent = requestBytes.position() - throttle_start;
+                            // not completely sent, cannot do more for now
+                            if (sent > 0 && _uploadRate > 0) {
+                                long waitTime = 1000 * sent / _uploadRate;
+                                if (waitTime < 2) waitTime = 2;
+                                _next_transmit_tm = YAPI.GetTickCount() + waitTime;
+                                WSLOG(String.format(Locale.US, "Sent %dbytes, waiting %dms...", sent, waitTime));
+                            } else {
+                                _next_transmit_tm = YAPI.GetTickCount() + 100;
+                            }
+                        }
                     }
                 }
                 synchronized (_workingRequests) {

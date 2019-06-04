@@ -16,6 +16,7 @@ class WSRequest
     private int _errorCode = YAPI.SUCCESS;
     private String _errorMsg = null;
     private Exception _errorEx = null;
+    private final long _expiration;
     private final long _tmOpen;
     private long _tmProcess;
     private long _tmIn;
@@ -45,7 +46,7 @@ class WSRequest
     {
         _errorCode = ioError;
         _errorMsg = reasonPhrase;
-        _state = State.ERROR;
+        _state = State.FAKE_REQUEST;
         //logProcess("error:" + reasonPhrase);
         this.notifyAll();
     }
@@ -56,14 +57,14 @@ class WSRequest
         long write = _tmOut - _tmProcess;
         long read = _tmIn - _tmOut;
         long end = _tmClose - _tmOpen;
-        System.out.println(String.format("%s:%s in %d+%d+%d =%d ms", this, msg, process, write, read, end));
+        System.out.println(String.format("%s:%s:%s in start:%d + write:%d + read+%d =%d ms", this, msg,_state, process, write, read, end));
     }
 
 
     State waitProcessingEnd(long expiration_timeout) throws InterruptedException
     {
         synchronized (this) {
-            while (!_state.equals(State.ERROR) && !_state.equals(State.CLOSED) && expiration_timeout > System.currentTimeMillis()) {
+            while (!_state.equals(State.FAKE_REQUEST) && !_state.equals(State.CLOSED) && expiration_timeout > System.currentTimeMillis()) {
                 this.wait(expiration_timeout - System.currentTimeMillis());
             }
             return _state;
@@ -90,9 +91,15 @@ class WSRequest
     }
 
 
+    long getExpiration()
+    {
+        return _expiration;
+    }
+
+
     enum State
     {
-        OPEN, CLOSED_BY_HUB, CLOSED_BY_API, CLOSED, ERROR
+        OPEN, CLOSED_BY_HUB, CLOSED_BY_API, CLOSED, FAKE_REQUEST
     }
 
     WSRequest(int ioError, String reasonPhrase)
@@ -108,12 +115,13 @@ class WSRequest
         _progressCtx = null;
         _errorCode = ioError;
         _errorMsg = reasonPhrase;
-        _state = State.ERROR;
+        _state = State.FAKE_REQUEST;
         _dbgLabel = "error:" + reasonPhrase;
+        _expiration = 0;
     }
 
 
-    WSRequest(int tcpchanel, byte asyncid, byte[] full_request)
+    WSRequest(int tcpchanel, byte asyncid, byte[] full_request, long expiration)
     {
         _async = true;
         _asyncId = asyncid;
@@ -125,9 +133,10 @@ class WSRequest
         _progressCb = null;
         _progressCtx = null;
         _dbgLabel = "";//getReqDbgString(full_request);
+        _expiration = expiration;
     }
 
-    WSRequest(int tcpchanel, byte[] full_request, YGenericHub.RequestProgress progress, Object context)
+    WSRequest(int tcpchanel, byte[] full_request, long expiration, YGenericHub.RequestProgress progress, Object context)
     {
         _async = false;
         _asyncId = 0;
@@ -139,6 +148,7 @@ class WSRequest
         _progressCb = progress;
         _progressCtx = context;
         _dbgLabel = "";//getReqDbgString(full_request);
+        _expiration = expiration;
     }
 
 

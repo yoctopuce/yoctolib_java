@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 31423 2018-08-07 11:52:08Z seb $
+ * $Id: YHTTPHub.java 35436 2019-05-14 15:00:48Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -537,6 +537,12 @@ class YHTTPHub extends YGenericHub
     boolean isCallbackMode()
     {
         return _callbackSession != null;
+    }
+
+    @Override
+    boolean isReadOnly()
+    {
+        return _writeProtected && !_notificationHandler.hasRwAccess();
     }
 
 }
