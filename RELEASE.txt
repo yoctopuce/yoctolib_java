@@ -1,4 +1,4 @@
-Java v1.10.35635
+Java v1.10.35652
 
 - Programming library use WebSocket by default
 - Add isReadOnly() method to all YFunctions
