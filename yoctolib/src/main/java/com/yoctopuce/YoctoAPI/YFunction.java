@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 35473 2019-05-16 16:31:39Z seb $
+ * $Id: YFunction.java 35671 2019-06-05 08:25:35Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -708,6 +708,12 @@ public class YFunction
     {
         YDevice dev = getYDevice();
         return dev.requestHTTPSync(req_first_line, req_head_and_body);
+    }
+
+    protected byte[] _uploadEx(String path, byte[] content) throws YAPI_Exception
+    {
+        YDevice dev = getYDevice();
+        return dev.requestHTTPUploadEx(path, content);
     }
 
     protected int _upload(String path, byte[] content) throws YAPI_Exception

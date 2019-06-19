@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 33883 2018-12-27 12:07:12Z seb $
+ * $Id: YDevice.java 35671 2019-06-05 08:25:35Z seb $
  *
  * Internal YDevice class
  *
@@ -431,5 +431,13 @@ class YDevice
         requestHTTPSync(request, head_body);
         return YAPI.SUCCESS;
     }
+
+    byte[] requestHTTPUploadEx(String path, byte[] content) throws YAPI_Exception
+    {
+        String request = "POST /upload.html";
+        byte[] head_body = YDevice.formatHTTPUpload(path, content);
+        return requestHTTPSync(request, head_body);
+    }
+
 
 }
