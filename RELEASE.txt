@@ -1,4 +1,4 @@
-Java v1.10.35838
+Java v1.10.35871
 
 (Java)- better error reporting when parsing invalid json data
 (Java)- Add isReadOnly method on YFunction class
@@ -51,3 +51,4 @@ Java v1.10.35838
 (Misc)- maximicrovolt:enable file uploads and strings in YFS memory
 (Misc)- bootloader:add support for alternate flash port pic24fj256da206_flash
 (Misc)- serial devices:add support for arithmetic expressions in job files
+(Misc)- datalogger:add recovery code in case of flash memory corruption (Fwerr)
