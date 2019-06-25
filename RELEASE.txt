@@ -1,4 +1,4 @@
-Java v1.10.35889
+Java v1.10.35900
 
 (Java)- better error reporting when parsing invalid json data
 (Java)- Add isReadOnly method on YFunction class
