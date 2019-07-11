@@ -1,3 +1,4 @@
-Java v1.10.35983
+Java v1.10.36218
 
-- Add YArithmeticSensor class
+- Add ConsolidatedDataSet class and Prog-ExportCSV
+- Add support for Yocto-I2c

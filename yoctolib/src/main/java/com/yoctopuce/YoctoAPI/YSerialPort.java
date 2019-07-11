@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 35468 2019-05-16 14:43:42Z seb $
+ * $Id: YSerialPort.java 36048 2019-06-28 17:43:51Z mvuilleu $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -987,6 +987,208 @@ public class YSerialPort extends YFunction
     }
 
     /**
+     * Reads a single line (or message) from the receive buffer, starting at current stream position.
+     * This function is intended to be used when the serial port is configured for a message protocol,
+     * such as 'Line' mode or frame protocols.
+     *
+     * If data at current stream position is not available anymore in the receive buffer,
+     * the function returns the oldest available line and moves the stream position just after.
+     * If no new full line is received, the function returns an empty line.
+     *
+     * @return a string with a single line of text
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String readLine() throws YAPI_Exception
+    {
+        String url;
+        byte[] msgbin;
+        ArrayList<String> msgarr = new ArrayList<>();
+        int msglen;
+        String res;
+
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&len=1&maxw=1",_rxptr);
+        msgbin = _download(url);
+        msgarr = _json_get_array(msgbin);
+        msglen = msgarr.size();
+        if (msglen == 0) {
+            return "";
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        if (msglen == 0) {
+            return "";
+        }
+        res = _json_get_string((msgarr.get(0)).getBytes());
+        return res;
+    }
+
+    /**
+     * Searches for incoming messages in the serial port receive buffer matching a given pattern,
+     * starting at current position. This function will only compare and return printable characters
+     * in the message strings. Binary protocols are handled as hexadecimal strings.
+     *
+     * The search returns all messages matching the expression provided as argument in the buffer.
+     * If no matching message is found, the search waits for one up to the specified maximum timeout
+     * (in milliseconds).
+     *
+     * @param pattern : a limited regular expression describing the expected message format,
+     *         or an empty string if all messages should be returned (no filtering).
+     *         When using binary protocols, the format applies to the hexadecimal
+     *         representation of the message.
+     * @param maxWait : the maximum number of milliseconds to wait for a message if none is found
+     *         in the receive buffer.
+     *
+     * @return an array of strings containing the messages found, if any.
+     *         Binary messages are converted to hexadecimal representation.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public ArrayList<String> readMessages(String pattern,int maxWait) throws YAPI_Exception
+    {
+        String url;
+        byte[] msgbin;
+        ArrayList<String> msgarr = new ArrayList<>();
+        int msglen;
+        ArrayList<String> res = new ArrayList<>();
+        int idx;
+
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&pat=%s", _rxptr, maxWait,pattern);
+        msgbin = _download(url);
+        msgarr = _json_get_array(msgbin);
+        msglen = msgarr.size();
+        if (msglen == 0) {
+            return res;
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        idx = 0;
+        while (idx < msglen) {
+            res.add(_json_get_string((msgarr.get(idx)).getBytes()));
+            idx = idx + 1;
+        }
+        return res;
+    }
+
+    /**
+     * Changes the current internal stream position to the specified value. This function
+     * does not affect the device, it only changes the value stored in the API object
+     * for the next read operations.
+     *
+     * @param absPos : the absolute position index for next read operations.
+     *
+     * @return nothing.
+     */
+    public int read_seek(int absPos)
+    {
+        _rxptr = absPos;
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Returns the current absolute stream position pointer of the API object.
+     *
+     * @return the absolute position index for next read operations.
+     */
+    public int read_tell()
+    {
+        return _rxptr;
+    }
+
+    /**
+     * Returns the number of bytes available to read in the input buffer starting from the
+     * current absolute stream position pointer of the API object.
+     *
+     * @return the number of bytes available to read
+     */
+    public int read_avail() throws YAPI_Exception
+    {
+        byte[] buff;
+        int bufflen;
+        int res;
+
+        buff = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
+        bufflen = (buff).length - 1;
+        while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
+            bufflen = bufflen - 1;
+        }
+        res = YAPIContext._atoi((new String(buff)).substring(0, bufflen));
+        return res;
+    }
+
+    /**
+     * Sends a text line query to the serial port, and reads the reply, if any.
+     * This function is intended to be used when the serial port is configured for 'Line' protocol.
+     *
+     * @param query : the line query to send (without CR/LF)
+     * @param maxWait : the maximum number of milliseconds to wait for a reply.
+     *
+     * @return the next text line received after sending the text query, as a string.
+     *         Additional lines can be obtained by calling readLine or readMessages.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String queryLine(String query,int maxWait) throws YAPI_Exception
+    {
+        String url;
+        byte[] msgbin;
+        ArrayList<String> msgarr = new ArrayList<>();
+        int msglen;
+        String res;
+
+        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
+        msgbin = _download(url);
+        msgarr = _json_get_array(msgbin);
+        msglen = msgarr.size();
+        if (msglen == 0) {
+            return "";
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        if (msglen == 0) {
+            return "";
+        }
+        res = _json_get_string((msgarr.get(0)).getBytes());
+        return res;
+    }
+
+    /**
+     * Saves the job definition string (JSON data) into a job file.
+     * The job file can be later enabled using selectJob().
+     *
+     * @param jobfile : name of the job file to save on the device filesystem
+     * @param jsonDef : a string containing a JSON definition of the job
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int uploadJob(String jobfile,String jsonDef) throws YAPI_Exception
+    {
+        _upload(jobfile, (jsonDef).getBytes());
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Load and start processing the specified job file. The file must have
+     * been previously created using the user interface or uploaded on the
+     * device filesystem using the uploadJob() function.
+     *
+     * @param jobfile : name of the job file (on the device filesystem)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int selectJob(String jobfile) throws YAPI_Exception
+    {
+        return set_currentJob(jobfile);
+    }
+
+    /**
      * Clears the serial port buffer and resets counters to zero.
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -1401,208 +1603,6 @@ public class YSerialPort extends YFunction
             ofs = ofs + 1;
         }
         return res;
-    }
-
-    /**
-     * Reads a single line (or message) from the receive buffer, starting at current stream position.
-     * This function is intended to be used when the serial port is configured for a message protocol,
-     * such as 'Line' mode or frame protocols.
-     *
-     * If data at current stream position is not available anymore in the receive buffer,
-     * the function returns the oldest available line and moves the stream position just after.
-     * If no new full line is received, the function returns an empty line.
-     *
-     * @return a string with a single line of text
-     *
-     * @throws YAPI_Exception on error
-     */
-    public String readLine() throws YAPI_Exception
-    {
-        String url;
-        byte[] msgbin;
-        ArrayList<String> msgarr = new ArrayList<>();
-        int msglen;
-        String res;
-
-        url = String.format(Locale.US, "rxmsg.json?pos=%d&len=1&maxw=1",_rxptr);
-        msgbin = _download(url);
-        msgarr = _json_get_array(msgbin);
-        msglen = msgarr.size();
-        if (msglen == 0) {
-            return "";
-        }
-        // last element of array is the new position
-        msglen = msglen - 1;
-        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
-        if (msglen == 0) {
-            return "";
-        }
-        res = _json_get_string((msgarr.get(0)).getBytes());
-        return res;
-    }
-
-    /**
-     * Searches for incoming messages in the serial port receive buffer matching a given pattern,
-     * starting at current position. This function will only compare and return printable characters
-     * in the message strings. Binary protocols are handled as hexadecimal strings.
-     *
-     * The search returns all messages matching the expression provided as argument in the buffer.
-     * If no matching message is found, the search waits for one up to the specified maximum timeout
-     * (in milliseconds).
-     *
-     * @param pattern : a limited regular expression describing the expected message format,
-     *         or an empty string if all messages should be returned (no filtering).
-     *         When using binary protocols, the format applies to the hexadecimal
-     *         representation of the message.
-     * @param maxWait : the maximum number of milliseconds to wait for a message if none is found
-     *         in the receive buffer.
-     *
-     * @return an array of strings containing the messages found, if any.
-     *         Binary messages are converted to hexadecimal representation.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public ArrayList<String> readMessages(String pattern,int maxWait) throws YAPI_Exception
-    {
-        String url;
-        byte[] msgbin;
-        ArrayList<String> msgarr = new ArrayList<>();
-        int msglen;
-        ArrayList<String> res = new ArrayList<>();
-        int idx;
-
-        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&pat=%s", _rxptr, maxWait,pattern);
-        msgbin = _download(url);
-        msgarr = _json_get_array(msgbin);
-        msglen = msgarr.size();
-        if (msglen == 0) {
-            return res;
-        }
-        // last element of array is the new position
-        msglen = msglen - 1;
-        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
-        idx = 0;
-        while (idx < msglen) {
-            res.add(_json_get_string((msgarr.get(idx)).getBytes()));
-            idx = idx + 1;
-        }
-        return res;
-    }
-
-    /**
-     * Changes the current internal stream position to the specified value. This function
-     * does not affect the device, it only changes the value stored in the API object
-     * for the next read operations.
-     *
-     * @param absPos : the absolute position index for next read operations.
-     *
-     * @return nothing.
-     */
-    public int read_seek(int absPos)
-    {
-        _rxptr = absPos;
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Returns the current absolute stream position pointer of the API object.
-     *
-     * @return the absolute position index for next read operations.
-     */
-    public int read_tell()
-    {
-        return _rxptr;
-    }
-
-    /**
-     * Returns the number of bytes available to read in the input buffer starting from the
-     * current absolute stream position pointer of the API object.
-     *
-     * @return the number of bytes available to read
-     */
-    public int read_avail() throws YAPI_Exception
-    {
-        byte[] buff;
-        int bufflen;
-        int res;
-
-        buff = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
-        bufflen = (buff).length - 1;
-        while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
-            bufflen = bufflen - 1;
-        }
-        res = YAPIContext._atoi((new String(buff)).substring(0, bufflen));
-        return res;
-    }
-
-    /**
-     * Sends a text line query to the serial port, and reads the reply, if any.
-     * This function is intended to be used when the serial port is configured for 'Line' protocol.
-     *
-     * @param query : the line query to send (without CR/LF)
-     * @param maxWait : the maximum number of milliseconds to wait for a reply.
-     *
-     * @return the next text line received after sending the text query, as a string.
-     *         Additional lines can be obtained by calling readLine or readMessages.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public String queryLine(String query,int maxWait) throws YAPI_Exception
-    {
-        String url;
-        byte[] msgbin;
-        ArrayList<String> msgarr = new ArrayList<>();
-        int msglen;
-        String res;
-
-        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
-        msgbin = _download(url);
-        msgarr = _json_get_array(msgbin);
-        msglen = msgarr.size();
-        if (msglen == 0) {
-            return "";
-        }
-        // last element of array is the new position
-        msglen = msglen - 1;
-        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
-        if (msglen == 0) {
-            return "";
-        }
-        res = _json_get_string((msgarr.get(0)).getBytes());
-        return res;
-    }
-
-    /**
-     * Saves the job definition string (JSON data) into a job file.
-     * The job file can be later enabled using selectJob().
-     *
-     * @param jobfile : name of the job file to save on the device filesystem
-     * @param jsonDef : a string containing a JSON definition of the job
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int uploadJob(String jobfile,String jsonDef) throws YAPI_Exception
-    {
-        _upload(jobfile, (jsonDef).getBytes());
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Load and start processing the specified job file. The file must have
-     * been previously created using the user interface or uploaded on the
-     * device filesystem using the uploadJob() function.
-     *
-     * @param jobfile : name of the job file (on the device filesystem)
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int selectJob(String jobfile) throws YAPI_Exception
-    {
-        return set_currentJob(jobfile);
     }
 
     /**

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 33853 2018-12-24 08:38:31Z seb $
+ * $Id: YSensor.java 36048 2019-06-28 17:43:51Z mvuilleu $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -561,11 +561,11 @@ public class YSensor extends YFunction
     }
 
     /**
-     *  Returns the uncalibrated, unrounded raw value returned by the sensor, in the specified unit, as a
-     * floating point number.
+     * Returns the uncalibrated, unrounded raw value returned by the
+     * sensor, in the specified unit, as a floating point number.
      *
-     *  @return a floating point number corresponding to the uncalibrated, unrounded raw value returned by
-     * the sensor, in the specified unit, as a floating point number
+     * @return a floating point number corresponding to the uncalibrated, unrounded raw value returned by the
+     *         sensor, in the specified unit, as a floating point number
      *
      * @throws YAPI_Exception on error
      */
@@ -584,11 +584,11 @@ public class YSensor extends YFunction
     }
 
     /**
-     *  Returns the uncalibrated, unrounded raw value returned by the sensor, in the specified unit, as a
-     * floating point number.
+     * Returns the uncalibrated, unrounded raw value returned by the
+     * sensor, in the specified unit, as a floating point number.
      *
-     *  @return a floating point number corresponding to the uncalibrated, unrounded raw value returned by
-     * the sensor, in the specified unit, as a floating point number
+     * @return a floating point number corresponding to the uncalibrated, unrounded raw value returned by the
+     *         sensor, in the specified unit, as a floating point number
      *
      * @throws YAPI_Exception on error
      */
