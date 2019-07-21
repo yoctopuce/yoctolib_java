@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 35436 2019-05-14 15:00:48Z seb $
+ * $Id: YHTTPHub.java 36374 2019-07-19 17:30:50Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -211,6 +211,7 @@ class YHTTPHub extends YGenericHub
             }
             _notificationHandler = null;
         }
+        removeAllDevices();
     }
 
     @Override

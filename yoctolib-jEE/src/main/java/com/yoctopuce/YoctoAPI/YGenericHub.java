@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 35436 2019-05-14 15:00:48Z seb $
+ * $Id: YGenericHub.java 36374 2019-07-19 17:30:50Z seb $
  *
  * Internal YGenericHub object
  *
@@ -220,6 +220,16 @@ abstract class YGenericHub
         return new String(funcval, ofs, len);
     }
 
+    void removeAllDevices()
+    {
+        HashMap<String, ArrayList<YPEntry>> yellowPages = new HashMap<>();
+        ArrayList<WPEntry> whitePages = new ArrayList<>();
+        try {
+            updateFromWpAndYp(whitePages, yellowPages);
+        } catch (YAPI_Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     void updateFromWpAndYp(ArrayList<WPEntry> whitePages, HashMap<String, ArrayList<YPEntry>> yellowPages) throws YAPI_Exception
     {

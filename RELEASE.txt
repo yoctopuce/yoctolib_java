@@ -1,4 +1,4 @@
-Java v1.10.36218
+Java v1.10.36380
 
-- Add ConsolidatedDataSet class and Prog-ExportCSV
-- Add support for Yocto-I2c
+- Fix Windows shell script that run the example
+- Fix DeviceRemovalCallback that was not called on YAPI.UnregisterHub

@@ -7,7 +7,7 @@
     <groupId>com.yoctopuce.java</groupId>
     <artifactId>javabundle</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.36218-SNAPSHOT</version>
+    <version>1.10.36380-SNAPSHOT</version>
     <name>Yoctopuce Java API (with examples)</name>
     <description>Official Yoctopuce Library for Java with examples</description>
     <url>http://www.yoctopuce.com</url>
@@ -30,6 +30,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-Demo</module>
         <module>Examples/Doc-GettingStarted-Yocto-Display</module>
         <module>Examples/Doc-GettingStarted-Yocto-GPS</module>
+        <module>Examples/Doc-GettingStarted-Yocto-I2C</module>
         <module>Examples/Doc-GettingStarted-Yocto-IO</module>
         <module>Examples/Doc-GettingStarted-Yocto-Knob</module>
         <module>Examples/Doc-GettingStarted-Yocto-LatchedRelay</module>
@@ -39,6 +40,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-MaxiCoupler</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiDisplay</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiPowerRelay</module>
+        <module>Examples/Doc-GettingStarted-Yocto-MaxiMicroVolt-Rx</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiThermistor</module>
         <module>Examples/Doc-GettingStarted-Yocto-Meteo</module>
         <module>Examples/Doc-GettingStarted-Yocto-milliVolt-Rx</module>
@@ -82,6 +84,7 @@
         <module>Examples/Prog-HubDiscovery-method2</module>
         <module>Examples/Prog-DevicesTree</module>
         <module>Examples/Prog-MODBUS</module>
+        <module>Examples/Prog-ExportCSV</module>
         <module>Examples/Prog-FirmwareUpdate</module>
         <module>Examples/Prog-YoctoHubSettings</module>
     </modules>

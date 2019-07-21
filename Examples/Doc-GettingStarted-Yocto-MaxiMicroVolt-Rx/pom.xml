@@ -9,9 +9,9 @@
         <version>1.10.36380-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>doc-gettingstarted-yocto-co2</artifactId>
+    <artifactId>doc-gettingstarted-yocto-maximicrovolt-rx</artifactId>
     <packaging>jar</packaging>
-    <name>Doc-GettingStarted-Yocto-CO2</name>
+    <name>Doc-GettingStarted-Yocto-MaxiMicroVolt-Rx</name>
     <version>1.10.36380-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>

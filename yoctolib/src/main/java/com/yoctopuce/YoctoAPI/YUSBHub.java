@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 35436 2019-05-14 15:00:48Z seb $
+ * $Id: YUSBHub.java 36374 2019-07-19 17:30:50Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -140,6 +140,7 @@ class YUSBHub extends YGenericHub
         _processNotifications = false;
         _thread.interrupt();
         YJniWrapper.stopNotifications();
+        removeAllDevices();
     }
 
     @Override

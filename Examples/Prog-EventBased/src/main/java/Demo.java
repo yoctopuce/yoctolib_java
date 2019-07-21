@@ -8,7 +8,7 @@ public class Demo
 {
 
     static class EventHandler implements YAPI.DeviceArrivalCallback, YAPI.DeviceRemovalCallback,
-            YAnButton.UpdateCallback, YSensor.UpdateCallback, YSensor.TimedReportCallback, YModule.ConfigChangeCallback, YModule.BeaconCallback
+            YAnButton.UpdateCallback, YSensor.UpdateCallback, YSensor.TimedReportCallback, YModule.ConfigChangeCallback, YModule.BeaconCallback, YAPI.LogCallback
     {
 
         @Override
@@ -25,7 +25,7 @@ public class Demo
         public void yNewValue(YSensor fct, String value)
         {
             try {
-                System.out.println(fct.get_hardwareId() + ": " + value + " (new value)");
+                System.out.println(fct.get_hardwareId() + ": " + value + " " + fct.get_userData() + " (new value)");
             } catch (YAPI_Exception ex) {
                 Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -35,7 +35,7 @@ public class Demo
         public void timedReportCallback(YSensor fct, YMeasure measure)
         {
             try {
-                System.out.println(fct.get_hardwareId() + ": " + measure.get_averageValue() + " " + fct.get_unit() + " (timed report)");
+                System.out.println(fct.get_hardwareId() + ": " + measure.get_averageValue() + " " + fct.get_userData() + " (timed report)");
             } catch (YAPI_Exception ex) {
                 Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -71,6 +71,8 @@ public class Demo
                     if (sensor.get_module().get_serialNumber().equals(serial)) {
                         String hardwareId = sensor.get_hardwareId();
                         System.out.println("- " + hardwareId);
+                        String unit = sensor.get_unit();
+                        sensor.set_userData(unit);
                         sensor.registerValueCallback(this);
                         sensor.registerTimedReportCallback(this);
                     }
@@ -98,11 +100,21 @@ public class Demo
         {
             System.out.println(String.format("Beacon changed to %d : %s", beacon, module));
         }
+
+        @Override
+        public void yLog(String line)
+        {
+            System.out.println("Log : " + line.trim());
+        }
     }
 
     public static void main(String[] args)
     {
         try {
+
+            EventHandler handlers = new EventHandler();
+            YAPI.RegisterLogFunction(handlers);
+
             try {
                 // setup the API to use local VirtualHub
                 YAPI.RegisterHub("127.0.0.1");
@@ -112,9 +124,9 @@ public class Demo
                 System.exit(1);
             }
 
-            EventHandler handlers = new EventHandler();
             YAPI.RegisterDeviceArrivalCallback(handlers);
             YAPI.RegisterDeviceRemovalCallback(handlers);
+
 
             System.out.println("Hit Ctrl-C to Stop ");
 
