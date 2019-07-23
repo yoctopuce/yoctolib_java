@@ -1,4 +1,3 @@
-Java v1.10.36380
+Java v1.10.36414
 
-- Fix Windows shell script that run the example
-- Fix DeviceRemovalCallback that was not called on YAPI.UnregisterHub
+- Fix invalid YModule object passed  to device removal callback during YAPI.UnregisterHub

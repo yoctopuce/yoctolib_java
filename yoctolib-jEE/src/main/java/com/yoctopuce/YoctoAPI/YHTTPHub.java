@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 36374 2019-07-19 17:30:50Z seb $
+ * $Id: YHTTPHub.java 36392 2019-07-22 10:05:54Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -267,9 +267,7 @@ class YHTTPHub extends YGenericHub
         ArrayList<WPEntry> whitePages = new ArrayList<>();
 
         YJSONObject loadval;
-        try
-
-        {
+        try {
             loadval = new YJSONObject(json_data);
             loadval.parse();
             if (!loadval.has("services") || !loadval.getYJSONObject("services").has("whitePages")) {
@@ -315,9 +313,9 @@ class YHTTPHub extends YGenericHub
 
         // reset device list cache timeout for this hub
         now = YAPI.GetTickCount();
-        if(_isNotifWorking){
+        if (_isNotifWorking) {
             _devListExpires = now + _yctx._deviceListValidityMs;
-        }else {
+        } else {
             _devListExpires = now + 500;
         }
     }

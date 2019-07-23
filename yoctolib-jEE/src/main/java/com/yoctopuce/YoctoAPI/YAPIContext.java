@@ -4,12 +4,7 @@ package com.yoctopuce.YoctoAPI;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 //--- (generated code: YAPIContext return codes)
 //--- (end of generated code: YAPIContext return codes)
@@ -1113,9 +1108,6 @@ public class YAPIContext
         for (YGenericHub h : _hubs) {
             if (h.isSameHub(url, request, response, session)) {
                 h.stopNotifications();
-                for (String serial : h._serialByYdx.values()) {
-                    _yHash.forgetDevice(serial);
-                }
                 h.release();
                 _hubs.remove(h);
                 return;
