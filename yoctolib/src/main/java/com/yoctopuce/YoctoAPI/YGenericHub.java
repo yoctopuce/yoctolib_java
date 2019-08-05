@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 36374 2019-07-19 17:30:50Z seb $
+ * $Id: YGenericHub.java 36640 2019-07-31 16:34:34Z seb $
  *
  * Internal YGenericHub object
  *
@@ -264,6 +264,7 @@ abstract class YGenericHub
             _yctx._pushPlugEvent(YAPIContext.PlugEvent.Event.UNPLUG, serial);
             _yctx._Log("HUB: device " + serial + " has been unplugged\n");
             _devices.remove(serial);
+            _yctx._yHash.forgetDevice(serial);
         }
 
         if (_hubSerialNumber == null) {

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 33293 2018-11-22 11:10:33Z seb $
+ * $Id: YDataStream.java 36629 2019-07-31 13:03:53Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -139,7 +139,15 @@ public class YDataStream
             val = 0;
         }
         _nRows = val;
-        _duration = _nRows * _dataSamplesInterval;
+        if (_nRows > 0) {
+            if (_firstMeasureDuration > 0) {
+                _duration = _firstMeasureDuration + (_nRows - 1) * _dataSamplesInterval;
+            } else {
+                _duration = _nRows * _dataSamplesInterval;
+            }
+        } else {
+            _duration = 0;
+        }
         // precompute decoding parameters
         iCalib = dataset._get_calibration();
         _caltyp = iCalib.get(0).intValue();

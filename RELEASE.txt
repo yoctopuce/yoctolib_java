@@ -1,3 +1,5 @@
-Java v1.10.36414
+Java v1.10.36692
 
-- Fix invalid YModule object passed  to device removal callback during YAPI.UnregisterHub
+- Add method to get product name and revision
+- Fix device inventory after UnregisterHub
+- Fix Invalid end time in datalogger preview.

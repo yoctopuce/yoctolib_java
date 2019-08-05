@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLed.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YLed.java 36554 2019-07-29 12:21:31Z mvuilleu $
  *
  *  Implements FindLed(), the high-level API for Led functions
  *
@@ -247,7 +247,8 @@ public class YLed extends YFunction
     }
 
     /**
-     * Changes the current LED intensity (in per cent).
+     * Changes the current LED intensity (in per cent). Remember to call the
+     * saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the current LED intensity (in per cent)
      *
@@ -266,7 +267,8 @@ public class YLed extends YFunction
     }
 
     /**
-     * Changes the current LED intensity (in per cent).
+     * Changes the current LED intensity (in per cent). Remember to call the
+     * saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the current LED intensity (in per cent)
      *

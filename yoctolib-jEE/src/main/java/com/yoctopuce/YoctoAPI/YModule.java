@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 35620 2019-06-04 08:29:58Z seb $
+ * $Id: YModule.java 36544 2019-07-29 05:34:16Z mvuilleu $
  *
  * YModule Class: Module control interface
  *
@@ -555,9 +555,10 @@ public class YModule extends YFunction
     }
 
     /**
-     * Returns the hardware release version of the module.
+     * Returns the release number of the module hardware, preprogrammed at the factory.
+     * The original hardware release returns value 1, revision B returns value 2, etc.
      *
-     * @return an integer corresponding to the hardware release version of the module
+     * @return an integer corresponding to the release number of the module hardware, preprogrammed at the factory
      *
      * @throws YAPI_Exception on error
      */
@@ -565,7 +566,7 @@ public class YModule extends YFunction
     {
         int res;
         synchronized (this) {
-            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (_cacheExpiration == 0) {
                 if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return PRODUCTRELEASE_INVALID;
                 }
@@ -576,9 +577,10 @@ public class YModule extends YFunction
     }
 
     /**
-     * Returns the hardware release version of the module.
+     * Returns the release number of the module hardware, preprogrammed at the factory.
+     * The original hardware release returns value 1, revision B returns value 2, etc.
      *
-     * @return an integer corresponding to the hardware release version of the module
+     * @return an integer corresponding to the release number of the module hardware, preprogrammed at the factory
      *
      * @throws YAPI_Exception on error
      */
@@ -1120,6 +1122,22 @@ public class YModule extends YFunction
             super._invokeValueCallback(value);
         }
         return 0;
+    }
+
+    public String get_productNameAndRevision() throws YAPI_Exception
+    {
+        String prodname;
+        int prodrel;
+        String fullname;
+
+        prodname = get_productName();
+        prodrel = get_productRelease();
+        if (prodrel > 1) {
+            fullname = String.format(Locale.US, "%s rev. %c", prodname,64+prodrel);
+        } else {
+            fullname = prodname;
+        }
+        return fullname;
     }
 
     /**

@@ -110,12 +110,12 @@ public class YAPIContext
         }
 
         Event ev;
-        public String serial;
+        public YModule module;
 
         PlugEvent(YAPIContext yctx, Event ev, String serial)
         {
             this.ev = ev;
-            this.serial = serial;
+            this.module = YModule.FindModule(serial+".module");
         }
     }
 
@@ -738,23 +738,19 @@ public class YAPIContext
                     switch (evt.ev) {
                         case PLUG:
                             if (_arrivalCallback != null) {
-                                YModule module = YModule.FindModuleInContext(this, evt.serial + ".module");
-                                _arrivalCallback.yDeviceArrival(module);
+                                _arrivalCallback.yDeviceArrival(evt.module);
                             }
 
                             break;
                         case CHANGE:
                             if (_namechgCallback != null) {
-                                YModule module = YModule.FindModuleInContext(this, evt.serial + ".module");
-                                _namechgCallback.yDeviceChange(module);
+                                _namechgCallback.yDeviceChange(evt.module);
                             }
                             break;
                         case UNPLUG:
                             if (_removalCallback != null) {
-                                YModule module = YModule.FindModuleInContext(this, evt.serial + ".module");
-                                _removalCallback.yDeviceRemoval(module);
+                                _removalCallback.yDeviceRemoval(evt.module);
                             }
-                            _yHash.forgetDevice(evt.serial);
                             break;
                     }
                 }
@@ -1110,6 +1106,11 @@ public class YAPIContext
                 h.stopNotifications();
                 h.release();
                 _hubs.remove(h);
+                /*for (String serial : h._serialByYdx.values()) {
+                    _yHash.forgetDevice(serial);
+                }
+                *
+                 */
                 return;
             }
         }
