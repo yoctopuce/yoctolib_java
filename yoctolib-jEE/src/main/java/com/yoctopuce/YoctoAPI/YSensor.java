@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 36048 2019-06-28 17:43:51Z mvuilleu $
+ * $Id: YSensor.java 37233 2019-09-20 09:25:00Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -642,6 +642,7 @@ public class YSensor extends YFunction
      * the value "OFF". Note that setting the  datalogger recording frequency
      * to a greater value than the sensor native sampling frequency is useless,
      * and even counterproductive: those two frequencies are not related.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the datalogger recording frequency for this function
      *
@@ -667,6 +668,7 @@ public class YSensor extends YFunction
      * the value "OFF". Note that setting the  datalogger recording frequency
      * to a greater value than the sensor native sampling frequency is useless,
      * and even counterproductive: those two frequencies are not related.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the datalogger recording frequency for this function
      *
@@ -725,6 +727,7 @@ public class YSensor extends YFunction
      * notification frequency to a greater value than the sensor native
      * sampling frequency is unless, and even counterproductive: those two
      * frequencies are not related.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the timed value notification frequency for this function
      *
@@ -751,6 +754,7 @@ public class YSensor extends YFunction
      * notification frequency to a greater value than the sensor native
      * sampling frequency is unless, and even counterproductive: those two
      * frequencies are not related.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the timed value notification frequency for this function
      *
@@ -801,6 +805,7 @@ public class YSensor extends YFunction
 
     /**
      * Changes the measuring mode used for the advertised value pushed to the parent hub.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : a value among YSensor.ADVMODE_IMMEDIATE, YSensor.ADVMODE_PERIOD_AVG,
      *  YSensor.ADVMODE_PERIOD_MIN and YSensor.ADVMODE_PERIOD_MAX corresponding to the measuring mode used
@@ -822,6 +827,7 @@ public class YSensor extends YFunction
 
     /**
      * Changes the measuring mode used for the advertised value pushed to the parent hub.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : a value among Y_ADVMODE_IMMEDIATE, Y_ADVMODE_PERIOD_AVG, Y_ADVMODE_PERIOD_MIN and
      * Y_ADVMODE_PERIOD_MAX corresponding to the measuring mode used for the advertised value pushed to the parent hub
@@ -863,6 +869,7 @@ public class YSensor extends YFunction
     /**
      * Changes the resolution of the measured physical values. The resolution corresponds to the numerical precision
      * when displaying value. It does not change the precision of the measure itself.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : a floating point number corresponding to the resolution of the measured physical values
      *
@@ -883,6 +890,7 @@ public class YSensor extends YFunction
     /**
      * Changes the resolution of the measured physical values. The resolution corresponds to the numerical precision
      * when displaying value. It does not change the precision of the measure itself.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : a floating point number corresponding to the resolution of the measured physical values
      *
@@ -898,6 +906,7 @@ public class YSensor extends YFunction
     /**
      * Returns the resolution of the measured values. The resolution corresponds to the numerical precision
      * of the measures, which is not always the same as the actual precision of the sensor.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @return a floating point number corresponding to the resolution of the measured values
      *
@@ -920,6 +929,7 @@ public class YSensor extends YFunction
     /**
      * Returns the resolution of the measured values. The resolution corresponds to the numerical precision
      * of the measures, which is not always the same as the actual precision of the sensor.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @return a floating point number corresponding to the resolution of the measured values
      *
@@ -999,7 +1009,8 @@ public class YSensor extends YFunction
     public static YSensor FindSensor(String func)
     {
         YSensor obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YSensor) YFunction._FindFromCache("Sensor", func);
             if (obj == null) {
                 obj = new YSensor(func);
@@ -1036,7 +1047,7 @@ public class YSensor extends YFunction
     public static YSensor FindSensorInContext(YAPIContext yctx,String func)
     {
         YSensor obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YSensor) YFunction._FindFromCacheInContext(yctx, "Sensor", func);
             if (obj == null) {
                 obj = new YSensor(yctx, func);

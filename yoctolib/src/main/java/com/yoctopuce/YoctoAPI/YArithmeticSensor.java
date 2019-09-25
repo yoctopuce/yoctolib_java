@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YArithmeticSensor.java 35698 2019-06-05 17:25:12Z mvuilleu $
+ *  $Id: YArithmeticSensor.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindArithmeticSensor(), the high-level API for ArithmeticSensor functions
  *
@@ -258,7 +258,8 @@ public class YArithmeticSensor extends YSensor
     public static YArithmeticSensor FindArithmeticSensor(String func)
     {
         YArithmeticSensor obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YArithmeticSensor) YFunction._FindFromCache("ArithmeticSensor", func);
             if (obj == null) {
                 obj = new YArithmeticSensor(func);
@@ -295,7 +296,7 @@ public class YArithmeticSensor extends YSensor
     public static YArithmeticSensor FindArithmeticSensorInContext(YAPIContext yctx,String func)
     {
         YArithmeticSensor obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YArithmeticSensor) YFunction._FindFromCacheInContext(yctx, "ArithmeticSensor", func);
             if (obj == null) {
                 obj = new YArithmeticSensor(yctx, func);

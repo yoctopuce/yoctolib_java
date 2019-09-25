@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 36544 2019-07-29 05:34:16Z mvuilleu $
+ * $Id: YModule.java 37236 2019-09-20 09:29:40Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -1024,12 +1024,13 @@ public class YModule extends YFunction
         YModule obj;
         String cleanHwId;
         int modpos;
-        synchronized (YAPI.class) {
-            cleanHwId = func;
-            modpos = (func).indexOf(".module");
-            if (modpos != ((func).length() - 7)) {
-                cleanHwId = func + ".module";
-            }
+        cleanHwId = func;
+        modpos = (func).indexOf(".module");
+        if (modpos != ((func).length() - 7)) {
+            cleanHwId = func + ".module";
+        }
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YModule) YFunction._FindFromCache("Module", cleanHwId);
             if (obj == null) {
                 obj = new YModule(cleanHwId);
@@ -1068,7 +1069,7 @@ public class YModule extends YFunction
         YModule obj;
         String cleanHwId;
         int modpos;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             cleanHwId = func;
             modpos = (func).indexOf(".module");
             if (modpos != ((func).length() - 7)) {
@@ -1527,8 +1528,7 @@ public class YModule extends YFunction
             }
         }
         // Apply settings a second time for file-dependent settings and dynamic sensor nodes
-        set_allSettings((json_api).getBytes());
-        return YAPI.SUCCESS;
+        return set_allSettings((json_api).getBytes());
     }
 
     /**
@@ -1815,6 +1815,30 @@ public class YModule extends YFunction
         return param;
     }
 
+    public int _tryExec(String url)
+    {
+        int res;
+        int done;
+        res = YAPI.SUCCESS;
+        done = 1;
+        try {
+            _download(url);
+        } catch (Exception ex) {
+            done = 0;
+        }
+        if (done == 0) {
+            // retry silently after a short wait
+            try {
+                YAPI.Sleep(500);
+                _download(url);
+            } catch (Exception ex) {
+                // second failure, return error code
+                res = get_errorType();
+            }
+        }
+        return res;
+    }
+
     /**
      * Restores all the settings of the device. Useful to restore all the logical names and calibrations parameters
      * of a module from a backup.Remember to call the saveToFlash() method of the module if the
@@ -1844,6 +1868,8 @@ public class YModule extends YFunction
         int leng;
         int i;
         int j;
+        int subres;
+        int res;
         String njpath;
         String jpath;
         String fun;
@@ -1860,6 +1886,7 @@ public class YModule extends YFunction
         String each_str;
         boolean do_update;
         boolean found;
+        res = YAPI.SUCCESS;
         tmp = new String(settings);
         tmp = _get_json_path(tmp, "api");
         if (!(tmp.equals(""))) {
@@ -1886,7 +1913,13 @@ public class YModule extends YFunction
             old_val_arr.add(value);
         }
 
-        actualSettings = _download("api.json");
+        try {
+            actualSettings = _download("api.json");
+        } catch (Exception ex) {
+            // retry silently after a short wait
+            YAPI.Sleep(500);
+            actualSettings = _download("api.json");
+        }
         actualSettings = _flattenJsonStruct(actualSettings);
         new_dslist = _json_get_array(actualSettings);
         for (String ii:new_dslist) {
@@ -1975,6 +2008,9 @@ public class YModule extends YFunction
             if ((do_update) && (attr.equals("message"))) {
                 do_update = false;
             }
+            if ((do_update) && (attr.equals("signalValue"))) {
+                do_update = false;
+            }
             if ((do_update) && (attr.equals("currentValue"))) {
                 do_update = false;
             }
@@ -2027,6 +2063,12 @@ public class YModule extends YFunction
                 do_update = false;
             }
             if ((do_update) && (attr.equals("msgCount"))) {
+                do_update = false;
+            }
+            if ((do_update) && (attr.equals("rxMsgCount"))) {
+                do_update = false;
+            }
+            if ((do_update) && (attr.equals("txMsgCount"))) {
                 do_update = false;
             }
             if (do_update) {
@@ -2082,23 +2124,32 @@ public class YModule extends YFunction
                     }
                     newval = calibConvert(old_calib, new_val_arr.get(i), unit_name, sensorType);
                     url = "api/" + fun + ".json?" + attr + "=" + _escapeAttr(newval);
-                    _download(url);
+                    subres = _tryExec(url);
+                    if ((res == YAPI.SUCCESS) && (subres != YAPI.SUCCESS)) {
+                        res = subres;
+                    }
                 } else {
                     url = "api/" + fun + ".json?" + attr + "=" + _escapeAttr(oldval);
                     if (attr.equals("resolution")) {
                         restoreLast.add(url);
                     } else {
-                        _download(url);
+                        subres = _tryExec(url);
+                        if ((res == YAPI.SUCCESS) && (subres != YAPI.SUCCESS)) {
+                            res = subres;
+                        }
                     }
                 }
             }
             i = i + 1;
         }
         for (String ii:restoreLast) {
-            _download(ii);
+            subres = _tryExec(ii);
+            if ((res == YAPI.SUCCESS) && (subres != YAPI.SUCCESS)) {
+                res = subres;
+            }
         }
         clearCache();
-        return YAPI.SUCCESS;
+        return res;
     }
 
     /**

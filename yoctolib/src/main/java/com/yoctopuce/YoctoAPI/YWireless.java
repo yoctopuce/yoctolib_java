@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 33713 2018-12-14 14:20:19Z seb $
+ * $Id: YWireless.java 37232 2019-09-20 09:22:10Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -463,7 +463,8 @@ public class YWireless extends YFunction
     public static YWireless FindWireless(String func)
     {
         YWireless obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YWireless) YFunction._FindFromCache("Wireless", func);
             if (obj == null) {
                 obj = new YWireless(func);
@@ -500,7 +501,7 @@ public class YWireless extends YFunction
     public static YWireless FindWirelessInContext(YAPIContext yctx,String func)
     {
         YWireless obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YWireless) YFunction._FindFromCacheInContext(yctx, "Wireless", func);
             if (obj == null) {
                 obj = new YWireless(yctx, func);

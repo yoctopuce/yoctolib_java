@@ -151,7 +151,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         String request = "GET ";
         String subDomain = hub._http_params.getSubDomain();
         request += subDomain;
-        _closed = false;
+        _closed = true;
         _closing = false;
         _fragments = null;
         String host = hub.getHost();
@@ -174,6 +174,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
                 _socket.connect(sockaddr, mstimeout);
             }
             _socket.setTcpNoDelay(true);
+            _socket.setSoTimeout(1000);
             _out = new BufferedOutputStream(_socket.getOutputStream());
             _in = new BufferedInputStream(_socket.getInputStream(), 2048);
         } catch (UnknownHostException e) {
@@ -195,6 +196,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
             _out.write(encodedBytes.getBytes());
             _out.write(WS_HEADER_END.getBytes());
             _out.flush();
+            _closed = false;
 
             StringBuilder header = new StringBuilder(2048);
             byte[] buffer = new byte[2048];
@@ -272,8 +274,12 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
 
         try {
             while (!isClosing() && !isClosed()) {
-
-                readBytes = _in.read(rawbuffer, ofs, max);
+                try {
+                    readBytes = _in.read(rawbuffer, ofs, max);
+                } catch (SocketTimeoutException ex){
+                    // read timeout check if we need to retry
+                    continue;
+                }
                 if (readBytes < 0) {
                     break;
                 }

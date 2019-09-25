@@ -22,12 +22,14 @@ abstract class NotificationHandler implements Runnable
     private final static char NOTIFY_NETPKT_NOT_SYNC = '@';
     private final static char NOTIFY_NETPKT_LOG = '7';
     private static final int NOTIFY_NETPKT_STOP = 10;
-    private static final int NET_HUB_NOT_CONNECTION_TIMEOUT = 6000;
+    static final int NET_HUB_NOT_CONNECTION_TIMEOUT = 6000;
 
 
     long _notifyPos = -1;
     int _notifRetryCount = 0;
     int _error_delay = 0;
+    boolean _sendPingNotification = false;
+    long _lastPing = 0;
 
 
     final YHTTPHub _hub;
@@ -87,7 +89,10 @@ abstract class NotificationHandler implements Runnable
     void handleNetNotification(String notification_line)
     {
         String ev = notification_line.trim();
+        _lastPing = System.currentTimeMillis();
         if ("".equals(ev)) {
+            //drop ping notification
+            _sendPingNotification = true;
             return;
         }
         if (ev.length() >= 3 && ev.charAt(0) >= NOTIFY_NETPKT_CONFCHGYDX && ev.charAt(0) <= NOTIFY_NETPKT_TIMEAVGYDX) {

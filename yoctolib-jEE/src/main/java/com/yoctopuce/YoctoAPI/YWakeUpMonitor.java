@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpMonitor.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YWakeUpMonitor.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -206,6 +206,8 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Changes the maximal wake up time (seconds) before automatically going to sleep.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : an integer corresponding to the maximal wake up time (seconds) before automatically
      * going to sleep
@@ -226,6 +228,8 @@ public class YWakeUpMonitor extends YFunction
 
     /**
      * Changes the maximal wake up time (seconds) before automatically going to sleep.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : an integer corresponding to the maximal wake up time (seconds) before automatically
      * going to sleep
@@ -498,7 +502,8 @@ public class YWakeUpMonitor extends YFunction
     public static YWakeUpMonitor FindWakeUpMonitor(String func)
     {
         YWakeUpMonitor obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YWakeUpMonitor) YFunction._FindFromCache("WakeUpMonitor", func);
             if (obj == null) {
                 obj = new YWakeUpMonitor(func);
@@ -535,7 +540,7 @@ public class YWakeUpMonitor extends YFunction
     public static YWakeUpMonitor FindWakeUpMonitorInContext(YAPIContext yctx,String func)
     {
         YWakeUpMonitor obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YWakeUpMonitor) YFunction._FindFromCacheInContext(yctx, "WakeUpMonitor", func);
             if (obj == null) {
                 obj = new YWakeUpMonitor(yctx, func);

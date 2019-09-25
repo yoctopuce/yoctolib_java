@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YBuzzer.java 36554 2019-07-29 12:21:31Z mvuilleu $
+ *  $Id: YBuzzer.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -458,7 +458,8 @@ public class YBuzzer extends YFunction
     public static YBuzzer FindBuzzer(String func)
     {
         YBuzzer obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YBuzzer) YFunction._FindFromCache("Buzzer", func);
             if (obj == null) {
                 obj = new YBuzzer(func);
@@ -495,7 +496,7 @@ public class YBuzzer extends YFunction
     public static YBuzzer FindBuzzerInContext(YAPIContext yctx,String func)
     {
         YBuzzer obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YBuzzer) YFunction._FindFromCacheInContext(yctx, "Buzzer", func);
             if (obj == null) {
                 obj = new YBuzzer(yctx, func);

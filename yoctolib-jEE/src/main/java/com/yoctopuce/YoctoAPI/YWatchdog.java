@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWatchdog.java 34976 2019-04-05 06:47:49Z seb $
+ *  $Id: YWatchdog.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -1070,7 +1070,8 @@ public class YWatchdog extends YFunction
     public static YWatchdog FindWatchdog(String func)
     {
         YWatchdog obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YWatchdog) YFunction._FindFromCache("Watchdog", func);
             if (obj == null) {
                 obj = new YWatchdog(func);
@@ -1107,7 +1108,7 @@ public class YWatchdog extends YFunction
     public static YWatchdog FindWatchdogInContext(YAPIContext yctx,String func)
     {
         YWatchdog obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YWatchdog) YFunction._FindFromCacheInContext(yctx, "Watchdog", func);
             if (obj == null) {
                 obj = new YWatchdog(yctx, func);

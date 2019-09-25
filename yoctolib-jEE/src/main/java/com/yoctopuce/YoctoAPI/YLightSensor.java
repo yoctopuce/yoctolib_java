@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLightSensor.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YLightSensor.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -277,7 +277,8 @@ public class YLightSensor extends YSensor
     public static YLightSensor FindLightSensor(String func)
     {
         YLightSensor obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YLightSensor) YFunction._FindFromCache("LightSensor", func);
             if (obj == null) {
                 obj = new YLightSensor(func);
@@ -314,7 +315,7 @@ public class YLightSensor extends YSensor
     public static YLightSensor FindLightSensorInContext(YAPIContext yctx,String func)
     {
         YLightSensor obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YLightSensor) YFunction._FindFromCacheInContext(yctx, "LightSensor", func);
             if (obj == null) {
                 obj = new YLightSensor(yctx, func);

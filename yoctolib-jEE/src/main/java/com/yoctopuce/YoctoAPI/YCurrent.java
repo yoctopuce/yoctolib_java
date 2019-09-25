@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCurrent.java 35360 2019-05-09 09:02:29Z mvuilleu $
+ *  $Id: YCurrent.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindCurrent(), the high-level API for Current functions
  *
@@ -227,7 +227,8 @@ public class YCurrent extends YSensor
     public static YCurrent FindCurrent(String func)
     {
         YCurrent obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YCurrent) YFunction._FindFromCache("Current", func);
             if (obj == null) {
                 obj = new YCurrent(func);
@@ -264,7 +265,7 @@ public class YCurrent extends YSensor
     public static YCurrent FindCurrentInContext(YAPIContext yctx,String func)
     {
         YCurrent obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YCurrent) YFunction._FindFromCacheInContext(yctx, "Current", func);
             if (obj == null) {
                 obj = new YCurrent(yctx, func);

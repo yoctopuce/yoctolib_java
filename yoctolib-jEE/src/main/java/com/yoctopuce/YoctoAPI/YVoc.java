@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YVoc.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YVoc.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindVoc(), the high-level API for Voc functions
  *
@@ -146,7 +146,8 @@ public class YVoc extends YSensor
     public static YVoc FindVoc(String func)
     {
         YVoc obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YVoc) YFunction._FindFromCache("Voc", func);
             if (obj == null) {
                 obj = new YVoc(func);
@@ -183,7 +184,7 @@ public class YVoc extends YSensor
     public static YVoc FindVocInContext(YAPIContext yctx,String func)
     {
         YVoc obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YVoc) YFunction._FindFromCacheInContext(yctx, "Voc", func);
             if (obj == null) {
                 obj = new YVoc(yctx, func);

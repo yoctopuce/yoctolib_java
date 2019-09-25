@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 36048 2019-06-28 17:43:51Z mvuilleu $
+ * $Id: YSerialPort.java 37232 2019-09-20 09:22:10Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -95,6 +95,10 @@ public class YSerialPort extends YFunction
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid protocol value
+     */
+    public static final String PROTOCOL_INVALID = YAPI.INVALID_STRING;
+    /**
      * invalid voltageLevel value
      */
     public static final int VOLTAGELEVEL_OFF = 0;
@@ -106,10 +110,6 @@ public class YSerialPort extends YFunction
     public static final int VOLTAGELEVEL_RS485 = 6;
     public static final int VOLTAGELEVEL_TTL1V8 = 7;
     public static final int VOLTAGELEVEL_INVALID = -1;
-    /**
-     * invalid protocol value
-     */
-    public static final String PROTOCOL_INVALID = YAPI.INVALID_STRING;
     /**
      * invalid serialMode value
      */
@@ -123,8 +123,8 @@ public class YSerialPort extends YFunction
     protected String _currentJob = CURRENTJOB_INVALID;
     protected String _startupJob = STARTUPJOB_INVALID;
     protected String _command = COMMAND_INVALID;
-    protected int _voltageLevel = VOLTAGELEVEL_INVALID;
     protected String _protocol = PROTOCOL_INVALID;
+    protected int _voltageLevel = VOLTAGELEVEL_INVALID;
     protected String _serialMode = SERIALMODE_INVALID;
     protected UpdateCallback _valueCallbackSerialPort = null;
     protected int _rxptr = 0;
@@ -212,11 +212,11 @@ public class YSerialPort extends YFunction
         if (json_val.has("command")) {
             _command = json_val.getString("command");
         }
-        if (json_val.has("voltageLevel")) {
-            _voltageLevel = json_val.getInt("voltageLevel");
-        }
         if (json_val.has("protocol")) {
             _protocol = json_val.getString("protocol");
+        }
+        if (json_val.has("voltageLevel")) {
+            _voltageLevel = json_val.getInt("voltageLevel");
         }
         if (json_val.has("serialMode")) {
             _serialMode = json_val.getString("serialMode");
@@ -456,11 +456,10 @@ public class YSerialPort extends YFunction
     }
 
     /**
-     * Changes the job to use when the device is powered on.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
+     * Selects a job file to run immediately. If an empty string is
+     * given as argument, stops running current job file.
      *
-     * @param newval : a string corresponding to the job to use when the device is powered on
+     * @param newval : a string
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -477,11 +476,10 @@ public class YSerialPort extends YFunction
     }
 
     /**
-     * Changes the job to use when the device is powered on.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
+     * Selects a job file to run immediately. If an empty string is
+     * given as argument, stops running current job file.
      *
-     * @param newval : a string corresponding to the job to use when the device is powered on
+     * @param newval : a string
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -588,90 +586,6 @@ public class YSerialPort extends YFunction
 
 
     /**
-     * Returns the voltage level used on the serial line.
-     *
-     *  @return a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
-     *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
-     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485 and YSerialPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage level used on the serial line
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int get_voltageLevel() throws YAPI_Exception
-    {
-        int res;
-        synchronized (this) {
-            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
-                    return VOLTAGELEVEL_INVALID;
-                }
-            }
-            res = _voltageLevel;
-        }
-        return res;
-    }
-
-    /**
-     * Returns the voltage level used on the serial line.
-     *
-     *  @return a value among Y_VOLTAGELEVEL_OFF, Y_VOLTAGELEVEL_TTL3V, Y_VOLTAGELEVEL_TTL3VR,
-     *  Y_VOLTAGELEVEL_TTL5V, Y_VOLTAGELEVEL_TTL5VR, Y_VOLTAGELEVEL_RS232, Y_VOLTAGELEVEL_RS485 and
-     * Y_VOLTAGELEVEL_TTL1V8 corresponding to the voltage level used on the serial line
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int getVoltageLevel() throws YAPI_Exception
-    {
-        return get_voltageLevel();
-    }
-
-    /**
-     * Changes the voltage type used on the serial line. Valid
-     * values  will depend on the Yoctopuce device model featuring
-     * the serial port feature.  Check your device documentation
-     * to find out which values are valid for that specific model.
-     * Trying to set an invalid value will have no effect.
-     *
-     *  @param newval : a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
-     *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
-     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485 and YSerialPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage type used on the serial line
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_voltageLevel(int  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        synchronized (this) {
-            rest_val = Integer.toString(newval);
-            _setAttr("voltageLevel",rest_val);
-        }
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the voltage type used on the serial line. Valid
-     * values  will depend on the Yoctopuce device model featuring
-     * the serial port feature.  Check your device documentation
-     * to find out which values are valid for that specific model.
-     * Trying to set an invalid value will have no effect.
-     *
-     *  @param newval : a value among Y_VOLTAGELEVEL_OFF, Y_VOLTAGELEVEL_TTL3V, Y_VOLTAGELEVEL_TTL3VR,
-     *  Y_VOLTAGELEVEL_TTL5V, Y_VOLTAGELEVEL_TTL5VR, Y_VOLTAGELEVEL_RS232, Y_VOLTAGELEVEL_RS485 and
-     * Y_VOLTAGELEVEL_TTL1V8 corresponding to the voltage type used on the serial line
-     *
-     * @return YAPI_SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int setVoltageLevel(int newval)  throws YAPI_Exception
-    {
-        return set_voltageLevel(newval);
-    }
-
-    /**
      * Returns the type of protocol used over the serial line, as a string.
      * Possible values are "Line" for ASCII messages separated by CR and/or LF,
      * "Frame:[timeout]ms" for binary messages separated by a delay time,
@@ -732,6 +646,8 @@ public class YSerialPort extends YFunction
      * "Byte" for a continuous binary stream.
      * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
      * is always at lest the specified number of milliseconds between each bytes sent.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a string corresponding to the type of protocol used over the serial line
      *
@@ -761,6 +677,8 @@ public class YSerialPort extends YFunction
      * "Byte" for a continuous binary stream.
      * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
      * is always at lest the specified number of milliseconds between each bytes sent.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a string corresponding to the type of protocol used over the serial line
      *
@@ -771,6 +689,94 @@ public class YSerialPort extends YFunction
     public int setProtocol(String newval)  throws YAPI_Exception
     {
         return set_protocol(newval);
+    }
+
+    /**
+     * Returns the voltage level used on the serial line.
+     *
+     *  @return a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
+     *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
+     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485 and YSerialPort.VOLTAGELEVEL_TTL1V8
+     * corresponding to the voltage level used on the serial line
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_voltageLevel() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return VOLTAGELEVEL_INVALID;
+                }
+            }
+            res = _voltageLevel;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the voltage level used on the serial line.
+     *
+     *  @return a value among Y_VOLTAGELEVEL_OFF, Y_VOLTAGELEVEL_TTL3V, Y_VOLTAGELEVEL_TTL3VR,
+     *  Y_VOLTAGELEVEL_TTL5V, Y_VOLTAGELEVEL_TTL5VR, Y_VOLTAGELEVEL_RS232, Y_VOLTAGELEVEL_RS485 and
+     * Y_VOLTAGELEVEL_TTL1V8 corresponding to the voltage level used on the serial line
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getVoltageLevel() throws YAPI_Exception
+    {
+        return get_voltageLevel();
+    }
+
+    /**
+     * Changes the voltage type used on the serial line. Valid
+     * values  will depend on the Yoctopuce device model featuring
+     * the serial port feature.  Check your device documentation
+     * to find out which values are valid for that specific model.
+     * Trying to set an invalid value will have no effect.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     *  @param newval : a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
+     *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
+     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485 and YSerialPort.VOLTAGELEVEL_TTL1V8
+     * corresponding to the voltage type used on the serial line
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_voltageLevel(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("voltageLevel",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the voltage type used on the serial line. Valid
+     * values  will depend on the Yoctopuce device model featuring
+     * the serial port feature.  Check your device documentation
+     * to find out which values are valid for that specific model.
+     * Trying to set an invalid value will have no effect.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     *  @param newval : a value among Y_VOLTAGELEVEL_OFF, Y_VOLTAGELEVEL_TTL3V, Y_VOLTAGELEVEL_TTL3VR,
+     *  Y_VOLTAGELEVEL_TTL5V, Y_VOLTAGELEVEL_TTL5VR, Y_VOLTAGELEVEL_RS232, Y_VOLTAGELEVEL_RS485 and
+     * Y_VOLTAGELEVEL_TTL1V8 corresponding to the voltage type used on the serial line
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setVoltageLevel(int newval)  throws YAPI_Exception
+    {
+        return set_voltageLevel(newval);
     }
 
     /**
@@ -825,6 +831,8 @@ public class YSerialPort extends YFunction
      * to enable flow control: "CtsRts" for hardware handshake, "XOnXOff"
      * for logical flow control and "Simplex" for acquiring a shared bus using
      * the RTS line (as used by some RS485 adapters for instance).
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a string corresponding to the serial port communication parameters, with a string such as
      *         "9600,8N1"
@@ -850,6 +858,8 @@ public class YSerialPort extends YFunction
      * to enable flow control: "CtsRts" for hardware handshake, "XOnXOff"
      * for logical flow control and "Simplex" for acquiring a shared bus using
      * the RTS line (as used by some RS485 adapters for instance).
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a string corresponding to the serial port communication parameters, with a string such as
      *         "9600,8N1"
@@ -893,7 +903,8 @@ public class YSerialPort extends YFunction
     public static YSerialPort FindSerialPort(String func)
     {
         YSerialPort obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YSerialPort) YFunction._FindFromCache("SerialPort", func);
             if (obj == null) {
                 obj = new YSerialPort(func);
@@ -930,7 +941,7 @@ public class YSerialPort extends YFunction
     public static YSerialPort FindSerialPortInContext(YAPIContext yctx,String func)
     {
         YSerialPort obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YSerialPort) YFunction._FindFromCacheInContext(yctx, "SerialPort", func);
             if (obj == null) {
                 obj = new YSerialPort(yctx, func);
@@ -1739,7 +1750,7 @@ public class YSerialPort extends YFunction
         msgs = _download(url);
         reps = _json_get_array(msgs);
         //noinspection DoubleNegation
-        if (!(reps.size() > 1)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "no reply from slave");}
+        if (!(reps.size() > 1)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "no reply from MODBUS slave");}
         if (reps.size() > 1) {
             rep = _json_get_string((reps.get(0)).getBytes());
             replen = (((rep).length() - 3) >> (1));

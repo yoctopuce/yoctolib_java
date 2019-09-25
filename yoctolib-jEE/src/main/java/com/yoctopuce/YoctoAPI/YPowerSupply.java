@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPowerSupply.java 34115 2019-01-23 14:23:54Z seb $
+ *  $Id: YPowerSupply.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -872,7 +872,8 @@ public class YPowerSupply extends YFunction
     public static YPowerSupply FindPowerSupply(String func)
     {
         YPowerSupply obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YPowerSupply) YFunction._FindFromCache("PowerSupply", func);
             if (obj == null) {
                 obj = new YPowerSupply(func);
@@ -909,7 +910,7 @@ public class YPowerSupply extends YFunction
     public static YPowerSupply FindPowerSupplyInContext(YAPIContext yctx,String func)
     {
         YPowerSupply obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YPowerSupply) YFunction._FindFromCacheInContext(yctx, "PowerSupply", func);
             if (obj == null) {
                 obj = new YPowerSupply(yctx, func);

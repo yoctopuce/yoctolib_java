@@ -5,8 +5,8 @@ import java.util.Locale;
 
 class TCPNotificationHandler extends NotificationHandler
 {
-    private volatile boolean _sendPingNotification = false;
     private volatile boolean _connected = false;
+    private volatile boolean _connecting = true;
     private HashMap<YDevice, yHTTPRequest> _httpReqByDev = new HashMap<>();
 
 
@@ -46,6 +46,7 @@ class TCPNotificationHandler extends NotificationHandler
                 }
                 yreq._requestStart(notUrl, null, 0, null, null);
                 _connected = true;
+                _connecting = false;
                 String fifo = "";
                 do {
                     byte[] partial;
@@ -65,14 +66,10 @@ class TCPNotificationHandler extends NotificationHandler
                     do {
                         pos = fifo.indexOf("\n");
                         if (pos < 0) break;
-                        if (pos == 0 && !_sendPingNotification) {
-                            _sendPingNotification = true;
-                        } else {
-                            String line = fifo.substring(0, pos + 1);
-                            if (line.indexOf(27) == -1) {
-                                // drop notification that contain esc char
-                                handleNetNotification(line);
-                            }
+                        String line = fifo.substring(0, pos + 1);
+                        if (line.indexOf(27) == -1) {
+                            // drop notification that contain esc char
+                            handleNetNotification(line);
                         }
                         fifo = fifo.substring(pos + 1);
                     } while (pos >= 0);
@@ -132,7 +129,11 @@ class TCPNotificationHandler extends NotificationHandler
 
     public boolean isConnected()
     {
-        return !_sendPingNotification || _connected;
+        if (_sendPingNotification) {
+            return (_lastPing + NET_HUB_NOT_CONNECTION_TIMEOUT) > System.currentTimeMillis();
+        } else {
+            return _connecting || _connected;
+        }
     }
 
     @Override

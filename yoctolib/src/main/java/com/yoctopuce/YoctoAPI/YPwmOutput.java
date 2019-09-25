@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmOutput.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YPwmOutput.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -252,7 +252,8 @@ public class YPwmOutput extends YFunction
      * Changes the PWM frequency. The duty cycle is kept unchanged thanks to an
      * automatic pulse width change, in other words, the change will not be applied
      * before the end of the current period. This can significantly affect reaction
-     * time at low frequencies.
+     * time at low frequencies. If you call the matching module saveToFlash()
+     * method, the frequency will be kept after a device power cycle.
      * To stop the PWM signal, do not set the frequency to zero, use the set_enabled()
      * method instead.
      *
@@ -276,7 +277,8 @@ public class YPwmOutput extends YFunction
      * Changes the PWM frequency. The duty cycle is kept unchanged thanks to an
      * automatic pulse width change, in other words, the change will not be applied
      * before the end of the current period. This can significantly affect reaction
-     * time at low frequencies.
+     * time at low frequencies. If you call the matching module saveToFlash()
+     * method, the frequency will be kept after a device power cycle.
      * To stop the PWM signal, do not set the frequency to zero, use the set_enabled()
      * method instead.
      *
@@ -729,7 +731,8 @@ public class YPwmOutput extends YFunction
     public static YPwmOutput FindPwmOutput(String func)
     {
         YPwmOutput obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YPwmOutput) YFunction._FindFromCache("PwmOutput", func);
             if (obj == null) {
                 obj = new YPwmOutput(func);
@@ -766,7 +769,7 @@ public class YPwmOutput extends YFunction
     public static YPwmOutput FindPwmOutputInContext(YAPIContext yctx,String func)
     {
         YPwmOutput obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YPwmOutput) YFunction._FindFromCacheInContext(yctx, "PwmOutput", func);
             if (obj == null) {
                 obj = new YPwmOutput(yctx, func);

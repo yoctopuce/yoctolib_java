@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YDigitalIO.java 33722 2018-12-14 15:04:43Z seb $
+ *  $Id: YDigitalIO.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -569,7 +569,7 @@ public class YDigitalIO extends YFunction
     {
         int res;
         synchronized (this) {
-            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (_cacheExpiration == 0) {
                 if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return PORTSIZE_INVALID;
                 }
@@ -718,7 +718,8 @@ public class YDigitalIO extends YFunction
     public static YDigitalIO FindDigitalIO(String func)
     {
         YDigitalIO obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YDigitalIO) YFunction._FindFromCache("DigitalIO", func);
             if (obj == null) {
                 obj = new YDigitalIO(func);
@@ -755,7 +756,7 @@ public class YDigitalIO extends YFunction
     public static YDigitalIO FindDigitalIOInContext(YAPIContext yctx,String func)
     {
         YDigitalIO obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YDigitalIO) YFunction._FindFromCacheInContext(yctx, "DigitalIO", func);
             if (obj == null) {
                 obj = new YDigitalIO(yctx, func);

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YDualPower.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YDualPower.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindDualPower(), the high-level API for DualPower functions
  *
@@ -320,7 +320,8 @@ public class YDualPower extends YFunction
     public static YDualPower FindDualPower(String func)
     {
         YDualPower obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YDualPower) YFunction._FindFromCache("DualPower", func);
             if (obj == null) {
                 obj = new YDualPower(func);
@@ -357,7 +358,7 @@ public class YDualPower extends YFunction
     public static YDualPower FindDualPowerInContext(YAPIContext yctx,String func)
     {
         YDualPower obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YDualPower) YFunction._FindFromCacheInContext(yctx, "DualPower", func);
             if (obj == null) {
                 obj = new YDualPower(yctx, func);

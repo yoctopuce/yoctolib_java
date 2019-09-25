@@ -227,8 +227,8 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
         }
         synchronized (_stateLock) {
             while ((_connectionState != ConnectionState.CONNECTED && _connectionState != ConnectionState.DEAD)) {
-                _stateLock.wait(1000);
-                if (expiration < System.currentTimeMillis()) {
+                long delay = expiration - System.currentTimeMillis();
+                if (delay <= 0) {
                     if (_connectionState != ConnectionState.CONNECTED && _connectionState != ConnectionState.CONNECTING) {
                         throw new YAPI_Exception(YAPI.IO_ERROR, "IO error with hub");
                     } else {
@@ -238,6 +238,8 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                         }
                         throw new YAPI_Exception(YAPI.TIMEOUT, "Unable to start the request in time");
                     }
+                } else {
+                    _stateLock.wait(delay);
                 }
             }
             if (_connectionState == ConnectionState.DEAD) {
@@ -362,10 +364,14 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
     @Override
     public boolean isConnected()
     {
-        synchronized (_stateLock) {
+        if (_sendPingNotification) {
+            return (_lastPing + NET_HUB_NOT_CONNECTION_TIMEOUT) > System.currentTimeMillis();
+        } else {
+            synchronized (_stateLock) {
             return _connectionState == ConnectionState.CONNECTED ||
                     _connectionState == ConnectionState.AUTHENTICATING ||
                     _connectionState == ConnectionState.CONNECTING;
+            }
         }
     }
 
@@ -852,13 +858,10 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
         while (true) {
             int pos = _notificationsFifo.indexOf("\n");
             if (pos < 0) break;
-            // discard ping notification (pos==0)
-            if (pos > 0) {
-                String line = _notificationsFifo.substring(0, pos + 1);
-                if (line.indexOf(27) == -1) {
-                    // drop notification that contain esc char
-                    handleNetNotification(line);
-                }
+            String line = _notificationsFifo.substring(0, pos + 1);
+            if (line.indexOf(27) == -1) {
+                // drop notification that contain esc char
+                handleNetNotification(line);
             }
             _notificationsFifo.delete(0, pos + 1);
         }

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAltitude.java 34115 2019-01-23 14:23:54Z seb $
+ *  $Id: YAltitude.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -314,7 +314,8 @@ public class YAltitude extends YSensor
     public static YAltitude FindAltitude(String func)
     {
         YAltitude obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YAltitude) YFunction._FindFromCache("Altitude", func);
             if (obj == null) {
                 obj = new YAltitude(func);
@@ -351,7 +352,7 @@ public class YAltitude extends YSensor
     public static YAltitude FindAltitudeInContext(YAPIContext yctx,String func)
     {
         YAltitude obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YAltitude) YFunction._FindFromCacheInContext(yctx, "Altitude", func);
             if (obj == null) {
                 obj = new YAltitude(yctx, func);

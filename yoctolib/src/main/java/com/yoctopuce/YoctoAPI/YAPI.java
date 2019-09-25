@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 33827 2018-12-21 15:09:19Z seb $
+ * $Id: YAPI.java 37231 2019-09-20 09:09:17Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -58,7 +58,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "36692";
+    public static final String YOCTO_API_BUILD_STR = "37304";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -285,7 +285,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".36692" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".37304" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -679,15 +679,15 @@ public class YAPI
 
 //--- (generated code: YAPIContext yapiwrapper)
     /**
-     * Change the time between each forced enumeration of the YoctoHub used.
-     * By default, the library performs a complete enumeration every 10 seconds.
-     * To reduce network traffic it is possible to increase this delay.
-     * This is particularly useful when a YoctoHub is connected to a GSM network
-     * where the traffic is charged. This setting does not affect modules connected by USB,
-     * nor the operation of arrival/removal callbacks.
-     * Note: This function must be called after yInitAPI.
+     * Modifies the delay between each forced enumeration of the used YoctoHubs.
+     * By default, the library performs a full enumeration every 10 seconds.
+     * To reduce network traffic, you can increase this delay.
+     * It's particularly useful when a YoctoHub is connected to the GSM network
+     * where traffic is billed. This parameter doesn't impact modules connected by USB,
+     * nor the working of module arrival/removal callbacks.
+     * Note: you must call this function after yInitAPI.
      *
-     * @param deviceListValidity : number of seconds between each enumeration.
+     * @param deviceListValidity : nubmer of seconds between each enumeration.
      *
      */
     public static void SetDeviceListValidity(int deviceListValidity)
@@ -695,14 +695,41 @@ public class YAPI
         GetYCtx(true).SetDeviceListValidity(deviceListValidity);
     }
     /**
-     * Returns the time between each forced enumeration of the YoctoHub used.
-     * Note: This function must be called after yInitAPI.
+     * Returns the delay between each forced enumeration of the used YoctoHubs.
+     * Note: you must call this function after yInitAPI.
      *
      * @return the number of seconds between each enumeration.
      */
     public static int GetDeviceListValidity()
     {
         return GetYCtx(true).GetDeviceListValidity();
+    }
+    /**
+     * Modifies the network connection delay for YAPI.RegisterHub() and
+     * YAPI.UpdateDeviceList(). This delay impacts only the YoctoHubs and VirtualHub
+     * which are accessible through the network. By default, this delay is of 20000 milliseconds,
+     * but depending or you network you may want to change this delay.
+     * For example if your network infrastructure uses a GSM connection.
+     *
+     * @param networkMsTimeout : the network connection delay in milliseconds.
+     *
+     */
+    public static void SetNetworkTimeout(int networkMsTimeout)
+    {
+        GetYCtx(true).SetNetworkTimeout(networkMsTimeout);
+    }
+    /**
+     * Returns the network connection delay for YAPI.RegisterHub() and
+     * YAPI.UpdateDeviceList(). This delay impacts only the YoctoHubs and VirtualHub
+     * which are accessible through the network. By default, this delay is of 20000 milliseconds,
+     * but depending or you network you may want to change this delay.
+     * For example if your network infrastructure uses a GSM connection.
+     *
+     * @return the network connection delay in milliseconds.
+     */
+    public static int GetNetworkTimeout()
+    {
+        return GetYCtx(true).GetNetworkTimeout();
     }
     /**
      * Change the validity period of the data loaded by the library.

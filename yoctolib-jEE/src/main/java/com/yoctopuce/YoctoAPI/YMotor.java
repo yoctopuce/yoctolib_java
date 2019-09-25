@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMotor.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YMotor.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindMotor(), the high-level API for Motor functions
  *
@@ -874,7 +874,8 @@ public class YMotor extends YFunction
     public static YMotor FindMotor(String func)
     {
         YMotor obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YMotor) YFunction._FindFromCache("Motor", func);
             if (obj == null) {
                 obj = new YMotor(func);
@@ -911,7 +912,7 @@ public class YMotor extends YFunction
     public static YMotor FindMotorInContext(YAPIContext yctx,String func)
     {
         YMotor obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YMotor) YFunction._FindFromCacheInContext(yctx, "Motor", func);
             if (obj == null) {
                 obj = new YMotor(yctx, func);

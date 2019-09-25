@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YHubPort.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YHubPort.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindHubPort(), the high-level API for HubPort functions
  *
@@ -320,7 +320,8 @@ public class YHubPort extends YFunction
     public static YHubPort FindHubPort(String func)
     {
         YHubPort obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YHubPort) YFunction._FindFromCache("HubPort", func);
             if (obj == null) {
                 obj = new YHubPort(func);
@@ -357,7 +358,7 @@ public class YHubPort extends YFunction
     public static YHubPort FindHubPortInContext(YAPIContext yctx,String func)
     {
         YHubPort obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YHubPort) YFunction._FindFromCacheInContext(yctx, "HubPort", func);
             if (obj == null) {
                 obj = new YHubPort(yctx, func);

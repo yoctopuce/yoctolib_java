@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLongitude.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YLongitude.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindLongitude(), the high-level API for Longitude functions
  *
@@ -147,7 +147,8 @@ public class YLongitude extends YSensor
     public static YLongitude FindLongitude(String func)
     {
         YLongitude obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YLongitude) YFunction._FindFromCache("Longitude", func);
             if (obj == null) {
                 obj = new YLongitude(func);
@@ -184,7 +185,7 @@ public class YLongitude extends YSensor
     public static YLongitude FindLongitudeInContext(YAPIContext yctx,String func)
     {
         YLongitude obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YLongitude) YFunction._FindFromCacheInContext(yctx, "Longitude", func);
             if (obj == null) {
                 obj = new YLongitude(yctx, func);

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRealTimeClock.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YRealTimeClock.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -287,6 +287,8 @@ public class YRealTimeClock extends YFunction
     /**
      * Changes the number of seconds between current time and UTC time (time zone).
      * The timezone is automatically rounded to the nearest multiple of 15 minutes.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the number of seconds between current time and UTC time (time zone)
      *
@@ -307,6 +309,8 @@ public class YRealTimeClock extends YFunction
     /**
      * Changes the number of seconds between current time and UTC time (time zone).
      * The timezone is automatically rounded to the nearest multiple of 15 minutes.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the number of seconds between current time and UTC time (time zone)
      *
@@ -384,7 +388,8 @@ public class YRealTimeClock extends YFunction
     public static YRealTimeClock FindRealTimeClock(String func)
     {
         YRealTimeClock obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YRealTimeClock) YFunction._FindFromCache("RealTimeClock", func);
             if (obj == null) {
                 obj = new YRealTimeClock(func);
@@ -421,7 +426,7 @@ public class YRealTimeClock extends YFunction
     public static YRealTimeClock FindRealTimeClockInContext(YAPIContext yctx,String func)
     {
         YRealTimeClock obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YRealTimeClock) YFunction._FindFromCacheInContext(yctx, "RealTimeClock", func);
             if (obj == null) {
                 obj = new YRealTimeClock(yctx, func);

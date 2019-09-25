@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTemperature.java 35468 2019-05-16 14:43:42Z seb $
+ *  $Id: YTemperature.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -439,7 +439,8 @@ public class YTemperature extends YSensor
     public static YTemperature FindTemperature(String func)
     {
         YTemperature obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YTemperature) YFunction._FindFromCache("Temperature", func);
             if (obj == null) {
                 obj = new YTemperature(func);
@@ -476,7 +477,7 @@ public class YTemperature extends YSensor
     public static YTemperature FindTemperatureInContext(YAPIContext yctx,String func)
     {
         YTemperature obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YTemperature) YFunction._FindFromCacheInContext(yctx, "Temperature", func);
             if (obj == null) {
                 obj = new YTemperature(yctx, func);

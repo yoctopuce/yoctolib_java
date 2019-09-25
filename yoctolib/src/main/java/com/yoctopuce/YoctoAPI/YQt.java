@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 32904 2018-11-02 10:15:00Z seb $
+ * $Id: YQt.java 37232 2019-09-20 09:22:10Z seb $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -140,7 +140,8 @@ public class YQt extends YSensor
     public static YQt FindQt(String func)
     {
         YQt obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YQt) YFunction._FindFromCache("Qt", func);
             if (obj == null) {
                 obj = new YQt(func);
@@ -177,7 +178,7 @@ public class YQt extends YSensor
     public static YQt FindQtInContext(YAPIContext yctx,String func)
     {
         YQt obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YQt) YFunction._FindFromCacheInContext(yctx, "Qt", func);
             if (obj == null) {
                 obj = new YQt(yctx, func);

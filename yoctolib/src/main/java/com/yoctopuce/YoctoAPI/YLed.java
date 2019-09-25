@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLed.java 36554 2019-07-29 12:21:31Z mvuilleu $
+ *  $Id: YLed.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindLed(), the high-level API for Led functions
  *
@@ -381,7 +381,8 @@ public class YLed extends YFunction
     public static YLed FindLed(String func)
     {
         YLed obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YLed) YFunction._FindFromCache("Led", func);
             if (obj == null) {
                 obj = new YLed(func);
@@ -418,7 +419,7 @@ public class YLed extends YFunction
     public static YLed FindLedInContext(YAPIContext yctx,String func)
     {
         YLed obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YLed) YFunction._FindFromCacheInContext(yctx, "Led", func);
             if (obj == null) {
                 obj = new YLed(yctx, func);

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiAxisController.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YMultiAxisController.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -304,7 +304,8 @@ public class YMultiAxisController extends YFunction
     public static YMultiAxisController FindMultiAxisController(String func)
     {
         YMultiAxisController obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YMultiAxisController) YFunction._FindFromCache("MultiAxisController", func);
             if (obj == null) {
                 obj = new YMultiAxisController(func);
@@ -341,7 +342,7 @@ public class YMultiAxisController extends YFunction
     public static YMultiAxisController FindMultiAxisControllerInContext(YAPIContext yctx,String func)
     {
         YMultiAxisController obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YMultiAxisController) YFunction._FindFromCacheInContext(yctx, "MultiAxisController", func);
             if (obj == null) {
                 obj = new YMultiAxisController(yctx, func);

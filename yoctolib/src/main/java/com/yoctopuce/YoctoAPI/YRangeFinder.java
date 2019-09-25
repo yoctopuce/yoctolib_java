@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRangeFinder.java 35185 2019-04-16 19:43:18Z mvuilleu $
+ *  $Id: YRangeFinder.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -253,6 +253,7 @@ public class YRangeFinder extends YSensor
     /**
      * Changes the rangefinder running mode, allowing you to put priority on
      * precision, speed or maximum range.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : a value among YRangeFinder.RANGEFINDERMODE_DEFAULT,
      *  YRangeFinder.RANGEFINDERMODE_LONG_RANGE, YRangeFinder.RANGEFINDERMODE_HIGH_ACCURACY and
@@ -277,6 +278,7 @@ public class YRangeFinder extends YSensor
     /**
      * Changes the rangefinder running mode, allowing you to put priority on
      * precision, speed or maximum range.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : a value among Y_RANGEFINDERMODE_DEFAULT, Y_RANGEFINDERMODE_LONG_RANGE,
      *  Y_RANGEFINDERMODE_HIGH_ACCURACY and Y_RANGEFINDERMODE_HIGH_SPEED corresponding to the rangefinder
@@ -334,6 +336,7 @@ public class YRangeFinder extends YSensor
      * reliability. The time frame is expressed in milliseconds. A larger timeframe
      * improves stability and reliability, at the cost of higher latency, but prevents
      * the detection of events shorter than the time frame.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the time frame used to measure the distance and estimate the measure
      *         reliability
@@ -357,6 +360,7 @@ public class YRangeFinder extends YSensor
      * reliability. The time frame is expressed in milliseconds. A larger timeframe
      * improves stability and reliability, at the cost of higher latency, but prevents
      * the detection of events shorter than the time frame.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the time frame used to measure the distance and estimate the measure
      *         reliability
@@ -516,7 +520,8 @@ public class YRangeFinder extends YSensor
     public static YRangeFinder FindRangeFinder(String func)
     {
         YRangeFinder obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YRangeFinder) YFunction._FindFromCache("RangeFinder", func);
             if (obj == null) {
                 obj = new YRangeFinder(func);
@@ -553,7 +558,7 @@ public class YRangeFinder extends YSensor
     public static YRangeFinder FindRangeFinderInContext(YAPIContext yctx,String func)
     {
         YRangeFinder obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YRangeFinder) YFunction._FindFromCacheInContext(yctx, "RangeFinder", func);
             if (obj == null) {
                 obj = new YRangeFinder(yctx, func);

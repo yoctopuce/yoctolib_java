@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRelay.java 34976 2019-04-05 06:47:49Z seb $
+ *  $Id: YRelay.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindRelay(), the high-level API for Relay functions
  *
@@ -744,7 +744,8 @@ public class YRelay extends YFunction
     public static YRelay FindRelay(String func)
     {
         YRelay obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YRelay) YFunction._FindFromCache("Relay", func);
             if (obj == null) {
                 obj = new YRelay(func);
@@ -781,7 +782,7 @@ public class YRelay extends YFunction
     public static YRelay FindRelayInContext(YAPIContext yctx,String func)
     {
         YRelay obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YRelay) YFunction._FindFromCacheInContext(yctx, "Relay", func);
             if (obj == null) {
                 obj = new YRelay(yctx, func);

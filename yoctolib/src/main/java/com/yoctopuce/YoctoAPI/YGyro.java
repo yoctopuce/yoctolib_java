@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java 32904 2018-11-02 10:15:00Z seb $
+ * $Id: YGyro.java 37232 2019-09-20 09:22:10Z seb $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -394,7 +394,8 @@ public class YGyro extends YSensor
     public static YGyro FindGyro(String func)
     {
         YGyro obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YGyro) YFunction._FindFromCache("Gyro", func);
             if (obj == null) {
                 obj = new YGyro(func);
@@ -431,7 +432,7 @@ public class YGyro extends YSensor
     public static YGyro FindGyroInContext(YAPIContext yctx,String func)
     {
         YGyro obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YGyro) YFunction._FindFromCacheInContext(yctx, "Gyro", func);
             if (obj == null) {
                 obj = new YGyro(yctx, func);

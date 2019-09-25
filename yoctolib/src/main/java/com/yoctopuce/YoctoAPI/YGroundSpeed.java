@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGroundSpeed.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YGroundSpeed.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindGroundSpeed(), the high-level API for GroundSpeed functions
  *
@@ -147,7 +147,8 @@ public class YGroundSpeed extends YSensor
     public static YGroundSpeed FindGroundSpeed(String func)
     {
         YGroundSpeed obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YGroundSpeed) YFunction._FindFromCache("GroundSpeed", func);
             if (obj == null) {
                 obj = new YGroundSpeed(func);
@@ -184,7 +185,7 @@ public class YGroundSpeed extends YSensor
     public static YGroundSpeed FindGroundSpeedInContext(YAPIContext yctx,String func)
     {
         YGroundSpeed obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YGroundSpeed) YFunction._FindFromCacheInContext(yctx, "GroundSpeed", func);
             if (obj == null) {
                 obj = new YGroundSpeed(yctx, func);

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 32904 2018-11-02 10:15:00Z seb $
+ * $Id: YMessageBox.java 37232 2019-09-20 09:22:10Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -437,7 +437,8 @@ public class YMessageBox extends YFunction
     public static YMessageBox FindMessageBox(String func)
     {
         YMessageBox obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YMessageBox) YFunction._FindFromCache("MessageBox", func);
             if (obj == null) {
                 obj = new YMessageBox(func);
@@ -474,7 +475,7 @@ public class YMessageBox extends YFunction
     public static YMessageBox FindMessageBoxInContext(YAPIContext yctx,String func)
     {
         YMessageBox obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YMessageBox) YFunction._FindFromCacheInContext(yctx, "MessageBox", func);
             if (obj == null) {
                 obj = new YMessageBox(yctx, func);

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLedCluster.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YColorLedCluster.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -207,6 +207,8 @@ public class YColorLedCluster extends YFunction
 
     /**
      * Changes the number of LEDs currently handled by the device.
+     * Remember to call the matching module
+     * saveToFlash() method to save the setting permanently.
      *
      * @param newval : an integer corresponding to the number of LEDs currently handled by the device
      *
@@ -226,6 +228,8 @@ public class YColorLedCluster extends YFunction
 
     /**
      * Changes the number of LEDs currently handled by the device.
+     * Remember to call the matching module
+     * saveToFlash() method to save the setting permanently.
      *
      * @param newval : an integer corresponding to the number of LEDs currently handled by the device
      *
@@ -274,6 +278,8 @@ public class YColorLedCluster extends YFunction
 
     /**
      * Changes the RGB LED type currently handled by the device.
+     * Remember to call the matching module
+     * saveToFlash() method to save the setting permanently.
      *
      *  @param newval : either YColorLedCluster.LEDTYPE_RGB or YColorLedCluster.LEDTYPE_RGBW, according to
      * the RGB LED type currently handled by the device
@@ -294,6 +300,8 @@ public class YColorLedCluster extends YFunction
 
     /**
      * Changes the RGB LED type currently handled by the device.
+     * Remember to call the matching module
+     * saveToFlash() method to save the setting permanently.
      *
      *  @param newval : either Y_LEDTYPE_RGB or Y_LEDTYPE_RGBW, according to the RGB LED type currently
      * handled by the device
@@ -461,7 +469,8 @@ public class YColorLedCluster extends YFunction
     public static YColorLedCluster FindColorLedCluster(String func)
     {
         YColorLedCluster obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YColorLedCluster) YFunction._FindFromCache("ColorLedCluster", func);
             if (obj == null) {
                 obj = new YColorLedCluster(func);
@@ -498,7 +507,7 @@ public class YColorLedCluster extends YFunction
     public static YColorLedCluster FindColorLedClusterInContext(YAPIContext yctx,String func)
     {
         YColorLedCluster obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YColorLedCluster) YFunction._FindFromCacheInContext(yctx, "ColorLedCluster", func);
             if (obj == null) {
                 obj = new YColorLedCluster(yctx, func);

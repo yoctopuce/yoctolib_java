@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGps.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YGps.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindGps(), the high-level API for Gps functions
  *
@@ -76,6 +76,17 @@ public class YGps extends YFunction
     public static final int COORDSYSTEM_GPS_D = 2;
     public static final int COORDSYSTEM_INVALID = -1;
     /**
+     * invalid constellation value
+     */
+    public static final int CONSTELLATION_GPS = 0;
+    public static final int CONSTELLATION_GLONASS = 1;
+    public static final int CONSTELLATION_GALLILEO = 2;
+    public static final int CONSTELLATION_GNSS = 3;
+    public static final int CONSTELLATION_GPS_GLONASS = 4;
+    public static final int CONSTELLATION_GPS_GALLILEO = 5;
+    public static final int CONSTELLATION_GLONASS_GALLELIO = 6;
+    public static final int CONSTELLATION_INVALID = -1;
+    /**
      * invalid latitude value
      */
     public static final String LATITUDE_INVALID = YAPI.INVALID_STRING;
@@ -118,6 +129,7 @@ public class YGps extends YFunction
     protected int _isFixed = ISFIXED_INVALID;
     protected long _satCount = SATCOUNT_INVALID;
     protected int _coordSystem = COORDSYSTEM_INVALID;
+    protected int _constellation = CONSTELLATION_INVALID;
     protected String _latitude = LATITUDE_INVALID;
     protected String _longitude = LONGITUDE_INVALID;
     protected double _dilution = DILUTION_INVALID;
@@ -192,6 +204,9 @@ public class YGps extends YFunction
         }
         if (json_val.has("coordSystem")) {
             _coordSystem = json_val.getInt("coordSystem");
+        }
+        if (json_val.has("constellation")) {
+            _constellation = json_val.getInt("constellation");
         }
         if (json_val.has("latitude")) {
             _latitude = json_val.getString("latitude");
@@ -331,6 +346,8 @@ public class YGps extends YFunction
 
     /**
      * Changes the representation system used for positioning data.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : a value among YGps.COORDSYSTEM_GPS_DMS, YGps.COORDSYSTEM_GPS_DM and
      * YGps.COORDSYSTEM_GPS_D corresponding to the representation system used for positioning data
@@ -351,6 +368,8 @@ public class YGps extends YFunction
 
     /**
      * Changes the representation system used for positioning data.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : a value among Y_COORDSYSTEM_GPS_DMS, Y_COORDSYSTEM_GPS_DM and Y_COORDSYSTEM_GPS_D
      * corresponding to the representation system used for positioning data
@@ -362,6 +381,93 @@ public class YGps extends YFunction
     public int setCoordSystem(int newval)  throws YAPI_Exception
     {
         return set_coordSystem(newval);
+    }
+
+    /**
+     * Returns the the satellites constellation used to compute
+     * positioning data.
+     *
+     *  @return a value among YGps.CONSTELLATION_GPS, YGps.CONSTELLATION_GLONASS,
+     *  YGps.CONSTELLATION_GALLILEO, YGps.CONSTELLATION_GNSS, YGps.CONSTELLATION_GPS_GLONASS,
+     *  YGps.CONSTELLATION_GPS_GALLILEO and YGps.CONSTELLATION_GLONASS_GALLELIO corresponding to the the
+     * satellites constellation used to compute
+     *         positioning data
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_constellation() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return CONSTELLATION_INVALID;
+                }
+            }
+            res = _constellation;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the the satellites constellation used to compute
+     * positioning data.
+     *
+     *  @return a value among Y_CONSTELLATION_GPS, Y_CONSTELLATION_GLONASS, Y_CONSTELLATION_GALLILEO,
+     *  Y_CONSTELLATION_GNSS, Y_CONSTELLATION_GPS_GLONASS, Y_CONSTELLATION_GPS_GALLILEO and
+     * Y_CONSTELLATION_GLONASS_GALLELIO corresponding to the the satellites constellation used to compute
+     *         positioning data
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getConstellation() throws YAPI_Exception
+    {
+        return get_constellation();
+    }
+
+    /**
+     * Changes the satellites constellation used to compute
+     * positioning data. Possible  constellations are GPS, Glonass, Galileo ,
+     * GNSS ( = GPS + Glonass + Galileo) and the 3 possible pairs. This seeting has effect on Yocto-GPS rev A.
+     *
+     *  @param newval : a value among YGps.CONSTELLATION_GPS, YGps.CONSTELLATION_GLONASS,
+     *  YGps.CONSTELLATION_GALLILEO, YGps.CONSTELLATION_GNSS, YGps.CONSTELLATION_GPS_GLONASS,
+     *  YGps.CONSTELLATION_GPS_GALLILEO and YGps.CONSTELLATION_GLONASS_GALLELIO corresponding to the
+     * satellites constellation used to compute
+     *         positioning data
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_constellation(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("constellation",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the satellites constellation used to compute
+     * positioning data. Possible  constellations are GPS, Glonass, Galileo ,
+     * GNSS ( = GPS + Glonass + Galileo) and the 3 possible pairs. This seeting has effect on Yocto-GPS rev A.
+     *
+     *  @param newval : a value among Y_CONSTELLATION_GPS, Y_CONSTELLATION_GLONASS,
+     *  Y_CONSTELLATION_GALLILEO, Y_CONSTELLATION_GNSS, Y_CONSTELLATION_GPS_GLONASS,
+     *  Y_CONSTELLATION_GPS_GALLILEO and Y_CONSTELLATION_GLONASS_GALLELIO corresponding to the satellites
+     * constellation used to compute
+     *         positioning data
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setConstellation(int newval)  throws YAPI_Exception
+    {
+        return set_constellation(newval);
     }
 
     /**
@@ -679,6 +785,8 @@ public class YGps extends YFunction
      * Changes the number of seconds between current time and UTC time (time zone).
      * The timezone is automatically rounded to the nearest multiple of 15 minutes.
      * If current UTC time is known, the current time is automatically be updated according to the selected time zone.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the number of seconds between current time and UTC time (time zone)
      *
@@ -700,6 +808,8 @@ public class YGps extends YFunction
      * Changes the number of seconds between current time and UTC time (time zone).
      * The timezone is automatically rounded to the nearest multiple of 15 minutes.
      * If current UTC time is known, the current time is automatically be updated according to the selected time zone.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the number of seconds between current time and UTC time (time zone)
      *
@@ -767,7 +877,8 @@ public class YGps extends YFunction
     public static YGps FindGps(String func)
     {
         YGps obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YGps) YFunction._FindFromCache("Gps", func);
             if (obj == null) {
                 obj = new YGps(func);
@@ -804,7 +915,7 @@ public class YGps extends YFunction
     public static YGps FindGpsInContext(YAPIContext yctx,String func)
     {
         YGps obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YGps) YFunction._FindFromCacheInContext(yctx, "Gps", func);
             if (obj == null) {
                 obj = new YGps(yctx, func);

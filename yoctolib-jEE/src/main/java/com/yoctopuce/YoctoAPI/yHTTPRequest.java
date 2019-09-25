@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 25742 2016-10-28 07:59:33Z seb $
+ * $Id: yHTTPRequest.java 37236 2019-09-20 09:29:40Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -407,7 +407,7 @@ class yHTTPRequest implements Runnable
     {
         _requestReserve();
         try {
-            _requestStart(req_first_line, req_head_and_body, YHTTPHub.YIO_DEFAULT_TCP_TIMEOUT, context, callback);
+            _requestStart(req_first_line, req_head_and_body, _hub._yctx._networkTimeoutMs, context, callback);
             Thread t = new Thread(this);
             t.setName(_dbglabel);
             t.start();

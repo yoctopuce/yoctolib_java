@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRefFrame.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YRefFrame.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -387,6 +387,15 @@ public class YRefFrame extends YFunction
     }
 
 
+    /**
+     * Returns the BNO055 fusion mode. Note this feature is only availabe on Yocto-3D-V2.
+     *
+     *  @return a value among YRefFrame.FUSIONMODE_NDOF, YRefFrame.FUSIONMODE_NDOF_FMC_OFF,
+     *  YRefFrame.FUSIONMODE_M4G, YRefFrame.FUSIONMODE_COMPASS and YRefFrame.FUSIONMODE_IMU corresponding
+     * to the BNO055 fusion mode
+     *
+     * @throws YAPI_Exception on error
+     */
     public int get_fusionMode() throws YAPI_Exception
     {
         int res;
@@ -401,6 +410,30 @@ public class YRefFrame extends YFunction
         return res;
     }
 
+    /**
+     * Returns the BNO055 fusion mode. Note this feature is only availabe on Yocto-3D-V2.
+     *
+     *  @return a value among Y_FUSIONMODE_NDOF, Y_FUSIONMODE_NDOF_FMC_OFF, Y_FUSIONMODE_M4G,
+     * Y_FUSIONMODE_COMPASS and Y_FUSIONMODE_IMU corresponding to the BNO055 fusion mode
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getFusionMode() throws YAPI_Exception
+    {
+        return get_fusionMode();
+    }
+
+    /**
+     * Change the BNO055 fusion mode. Note: this feature is only availabe on Yocto-3D-V2.
+     * Remember to call the matching module saveToFlash() method to save the setting permanently.
+     *
+     *  @param newval : a value among YRefFrame.FUSIONMODE_NDOF, YRefFrame.FUSIONMODE_NDOF_FMC_OFF,
+     * YRefFrame.FUSIONMODE_M4G, YRefFrame.FUSIONMODE_COMPASS and YRefFrame.FUSIONMODE_IMU
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
     public int set_fusionMode(int  newval)  throws YAPI_Exception
     {
         String rest_val;
@@ -411,6 +444,21 @@ public class YRefFrame extends YFunction
         return YAPI.SUCCESS;
     }
 
+    /**
+     * Change the BNO055 fusion mode. Note: this feature is only availabe on Yocto-3D-V2.
+     * Remember to call the matching module saveToFlash() method to save the setting permanently.
+     *
+     *  @param newval : a value among Y_FUSIONMODE_NDOF, Y_FUSIONMODE_NDOF_FMC_OFF, Y_FUSIONMODE_M4G,
+     * Y_FUSIONMODE_COMPASS and Y_FUSIONMODE_IMU
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setFusionMode(int newval)  throws YAPI_Exception
+    {
+        return set_fusionMode(newval);
+    }
 
     /**
      * Retrieves a reference frame for a given identifier.
@@ -442,7 +490,8 @@ public class YRefFrame extends YFunction
     public static YRefFrame FindRefFrame(String func)
     {
         YRefFrame obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YRefFrame) YFunction._FindFromCache("RefFrame", func);
             if (obj == null) {
                 obj = new YRefFrame(func);
@@ -479,7 +528,7 @@ public class YRefFrame extends YFunction
     public static YRefFrame FindRefFrameInContext(YAPIContext yctx,String func)
     {
         YRefFrame obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YRefFrame) YFunction._FindFromCacheInContext(yctx, "RefFrame", func);
             if (obj == null) {
                 obj = new YRefFrame(yctx, func);

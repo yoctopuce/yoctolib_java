@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSegmentedDisplay.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YSegmentedDisplay.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -254,7 +254,8 @@ public class YSegmentedDisplay extends YFunction
     public static YSegmentedDisplay FindSegmentedDisplay(String func)
     {
         YSegmentedDisplay obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YSegmentedDisplay) YFunction._FindFromCache("SegmentedDisplay", func);
             if (obj == null) {
                 obj = new YSegmentedDisplay(func);
@@ -291,7 +292,7 @@ public class YSegmentedDisplay extends YFunction
     public static YSegmentedDisplay FindSegmentedDisplayInContext(YAPIContext yctx,String func)
     {
         YSegmentedDisplay obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YSegmentedDisplay) YFunction._FindFromCacheInContext(yctx, "SegmentedDisplay", func);
             if (obj == null) {
                 obj = new YSegmentedDisplay(yctx, func);

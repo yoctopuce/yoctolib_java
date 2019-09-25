@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmPowerSource.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YPwmPowerSource.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -239,7 +239,8 @@ public class YPwmPowerSource extends YFunction
     public static YPwmPowerSource FindPwmPowerSource(String func)
     {
         YPwmPowerSource obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YPwmPowerSource) YFunction._FindFromCache("PwmPowerSource", func);
             if (obj == null) {
                 obj = new YPwmPowerSource(func);
@@ -276,7 +277,7 @@ public class YPwmPowerSource extends YFunction
     public static YPwmPowerSource FindPwmPowerSourceInContext(YAPIContext yctx,String func)
     {
         YPwmPowerSource obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YPwmPowerSource) YFunction._FindFromCacheInContext(yctx, "PwmPowerSource", func);
             if (obj == null) {
                 obj = new YPwmPowerSource(yctx, func);

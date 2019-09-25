@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 33713 2018-12-14 14:20:19Z seb $
+ * $Id: YDisplay.java 37232 2019-09-20 09:22:10Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -500,7 +500,7 @@ public class YDisplay extends YFunction
     {
         int res;
         synchronized (this) {
-            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (_cacheExpiration == 0) {
                 if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYWIDTH_INVALID;
                 }
@@ -533,7 +533,7 @@ public class YDisplay extends YFunction
     {
         int res;
         synchronized (this) {
-            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+            if (_cacheExpiration == 0) {
                 if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return DISPLAYHEIGHT_INVALID;
                 }
@@ -744,7 +744,8 @@ public class YDisplay extends YFunction
     public static YDisplay FindDisplay(String func)
     {
         YDisplay obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YDisplay) YFunction._FindFromCache("Display", func);
             if (obj == null) {
                 obj = new YDisplay(func);
@@ -781,7 +782,7 @@ public class YDisplay extends YFunction
     public static YDisplay FindDisplayInContext(YAPIContext yctx,String func)
     {
         YDisplay obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YDisplay) YFunction._FindFromCacheInContext(yctx, "Display", func);
             if (obj == null) {
                 obj = new YDisplay(yctx, func);

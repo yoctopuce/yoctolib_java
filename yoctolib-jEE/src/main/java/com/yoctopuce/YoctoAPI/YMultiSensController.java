@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiSensController.java 34975 2019-04-04 17:01:43Z seb $
+ *  $Id: YMultiSensController.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindMultiSensController(), the high-level API for MultiSensController functions
  *
@@ -386,7 +386,8 @@ public class YMultiSensController extends YFunction
     public static YMultiSensController FindMultiSensController(String func)
     {
         YMultiSensController obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YMultiSensController) YFunction._FindFromCache("MultiSensController", func);
             if (obj == null) {
                 obj = new YMultiSensController(func);
@@ -423,7 +424,7 @@ public class YMultiSensController extends YFunction
     public static YMultiSensController FindMultiSensControllerInContext(YAPIContext yctx,String func)
     {
         YMultiSensController obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YMultiSensController) YFunction._FindFromCacheInContext(yctx, "MultiSensController", func);
             if (obj == null) {
                 obj = new YMultiSensController(yctx, func);

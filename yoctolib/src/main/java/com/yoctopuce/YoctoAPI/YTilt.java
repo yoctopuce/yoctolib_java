@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTilt.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YTilt.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindTilt(), the high-level API for Tilt functions
  *
@@ -253,7 +253,8 @@ public class YTilt extends YSensor
     public static YTilt FindTilt(String func)
     {
         YTilt obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YTilt) YFunction._FindFromCache("Tilt", func);
             if (obj == null) {
                 obj = new YTilt(func);
@@ -290,7 +291,7 @@ public class YTilt extends YSensor
     public static YTilt FindTiltInContext(YAPIContext yctx,String func)
     {
         YTilt obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YTilt) YFunction._FindFromCacheInContext(yctx, "Tilt", func);
             if (obj == null) {
                 obj = new YTilt(yctx, func);

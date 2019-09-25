@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAccelerometer.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YAccelerometer.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -386,7 +386,8 @@ public class YAccelerometer extends YSensor
     public static YAccelerometer FindAccelerometer(String func)
     {
         YAccelerometer obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YAccelerometer) YFunction._FindFromCache("Accelerometer", func);
             if (obj == null) {
                 obj = new YAccelerometer(func);
@@ -423,7 +424,7 @@ public class YAccelerometer extends YSensor
     public static YAccelerometer FindAccelerometerInContext(YAPIContext yctx,String func)
     {
         YAccelerometer obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YAccelerometer) YFunction._FindFromCacheInContext(yctx, "Accelerometer", func);
             if (obj == null) {
                 obj = new YAccelerometer(yctx, func);

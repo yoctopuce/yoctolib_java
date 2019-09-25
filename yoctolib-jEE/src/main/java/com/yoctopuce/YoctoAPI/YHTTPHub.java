@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 36392 2019-07-22 10:05:54Z seb $
+ * $Id: YHTTPHub.java 37236 2019-09-20 09:29:40Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -249,17 +249,19 @@ class YHTTPHub extends YGenericHub
             if (_reportConnnectionLost) {
                 throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.getUrl() + " is not reachable");
             } else {
+                removeAllDevices();
                 return;
             }
         }
 
         String json_data;
         try {
-            json_data = new String(_notificationHandler.hubRequestSync("GET /api.json", null, YIO_DEFAULT_TCP_TIMEOUT), Charset.forName("ISO_8859_1"));
+            json_data = new String(_notificationHandler.hubRequestSync("GET /api.json", null, _yctx._networkTimeoutMs), Charset.forName("ISO_8859_1"));
         } catch (YAPI_Exception ex) {
             if (_reportConnnectionLost) {
                 throw ex;
             }
+            removeAllDevices();
             return;
         }
 
@@ -333,7 +335,7 @@ class YHTTPHub extends YGenericHub
         } else {
             // check if subdevice support self flashing
             try {
-                _notificationHandler.hubRequestSync("GET /bySerial/" + serial + "/flash.json?a=state", null, YIO_DEFAULT_TCP_TIMEOUT);
+                _notificationHandler.hubRequestSync("GET /bySerial/" + serial + "/flash.json?a=state", null, _yctx._networkTimeoutMs);
                 baseurl = "/bySerial/" + serial;
                 use_self_flash = true;
             } catch (YAPI_Exception ignored) {
@@ -356,7 +358,7 @@ class YHTTPHub extends YGenericHub
             throw new YAPI_Exception(YAPI.IO_ERROR, "Too many devices in update mode");
         }
         // ensure flash engine is not busy
-        byte[] bytes = _notificationHandler.hubRequestSync("GET " + baseurl + "/flash.json?a=state", null, YIO_DEFAULT_TCP_TIMEOUT);
+        byte[] bytes = _notificationHandler.hubRequestSync("GET " + baseurl + "/flash.json?a=state", null, _yctx._networkTimeoutMs);
         String uploadstate = new String(bytes);
         try {
             YJSONObject uploadres = new YJSONObject(uploadstate);
@@ -413,13 +415,13 @@ class YHTTPHub extends YGenericHub
         if (use_self_flash) {
             progress.firmware_progress(40, "Flash firmware");
             // the hub itself -> reboot in autoflash mode
-            _notificationHandler.hubRequestSync("GET " + baseurl + "/api/module/rebootCountdown?rebootCountdown=-1003", null, YIO_DEFAULT_TCP_TIMEOUT);
+            _notificationHandler.hubRequestSync("GET " + baseurl + "/api/module/rebootCountdown?rebootCountdown=-1003", null, _yctx._networkTimeoutMs);
             Thread.sleep(7000);
         } else {
             // reboot device to bootloader if needed
             if (need_reboot) {
                 // reboot subdevice
-                _notificationHandler.hubRequestSync("GET /bySerial/" + serial + "/api/module/rebootCountdown?rebootCountdown=-2", null, YIO_DEFAULT_TCP_TIMEOUT);
+                _notificationHandler.hubRequestSync("GET /bySerial/" + serial + "/api/module/rebootCountdown?rebootCountdown=-2", null, _yctx._networkTimeoutMs);
             }
             // verify that the device is in bootloader
             long timeout = YAPI.GetTickCount() + YPROG_BOOTLOADER_TIMEOUT;
@@ -479,7 +481,7 @@ class YHTTPHub extends YGenericHub
             throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.getUrl() + " is not reachable");
         }
         // Setup timeout counter
-        int tcpTimeout = YIO_DEFAULT_TCP_TIMEOUT;
+        int tcpTimeout = _yctx._networkTimeoutMs;
         if (req_first_line.contains("/testcb.txt") || req_first_line.contains("/rxmsg.json")
                 || req_first_line.contains("/files.json") || req_first_line.contains("/upload.html")) {
             tcpTimeout = YIO_1_MINUTE_TCP_TIMEOUT;
@@ -503,7 +505,7 @@ class YHTTPHub extends YGenericHub
     public synchronized ArrayList<String> getBootloaders() throws YAPI_Exception, InterruptedException
     {
         ArrayList<String> res = new ArrayList<>();
-        byte[] raw_data = _notificationHandler.hubRequestSync("GET /flash.json?a=list", null, YIO_DEFAULT_TCP_TIMEOUT);
+        byte[] raw_data = _notificationHandler.hubRequestSync("GET /flash.json?a=list", null, _yctx._networkTimeoutMs);
         String jsonstr = new String(raw_data);
         try {
             YJSONObject flashres = new YJSONObject(jsonstr);

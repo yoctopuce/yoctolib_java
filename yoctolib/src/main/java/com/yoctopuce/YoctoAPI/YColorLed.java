@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLed.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YColorLed.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -663,7 +663,8 @@ public class YColorLed extends YFunction
     public static YColorLed FindColorLed(String func)
     {
         YColorLed obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YColorLed) YFunction._FindFromCache("ColorLed", func);
             if (obj == null) {
                 obj = new YColorLed(func);
@@ -700,7 +701,7 @@ public class YColorLed extends YFunction
     public static YColorLed FindColorLedInContext(YAPIContext yctx,String func)
     {
         YColorLed obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YColorLed) YFunction._FindFromCacheInContext(yctx, "ColorLed", func);
             if (obj == null) {
                 obj = new YColorLed(yctx, func);

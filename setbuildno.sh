@@ -1,7 +1,7 @@
 #!/bin/bash
-echo "set build number to 1.10.36692-SNAPSHOT"
-mvn versions:set -DnewVersion=1.10.36692-SNAPSHOT -DgenerateBackupPoms=false
+echo "set build number to 1.10.37304-SNAPSHOT"
+mvn versions:set -DnewVersion=1.10.37304-SNAPSHOT -DgenerateBackupPoms=false
 cd yoctolib
-mvn versions:set -DnewVersion=1.10.36692-SNAPSHOT -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=1.10.37304-SNAPSHOT -DgenerateBackupPoms=false
 cd ../yoctolib-jEE
-mvn versions:set -DnewVersion=1.10.36692-SNAPSHOT -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=1.10.37304-SNAPSHOT -DgenerateBackupPoms=false

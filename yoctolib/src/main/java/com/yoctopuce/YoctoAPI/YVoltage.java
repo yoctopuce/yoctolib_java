@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YVoltage.java 35360 2019-05-09 09:02:29Z mvuilleu $
+ *  $Id: YVoltage.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindVoltage(), the high-level API for Voltage functions
  *
@@ -227,7 +227,8 @@ public class YVoltage extends YSensor
     public static YVoltage FindVoltage(String func)
     {
         YVoltage obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YVoltage) YFunction._FindFromCache("Voltage", func);
             if (obj == null) {
                 obj = new YVoltage(func);
@@ -264,7 +265,7 @@ public class YVoltage extends YSensor
     public static YVoltage FindVoltageInContext(YAPIContext yctx,String func)
     {
         YVoltage obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YVoltage) YFunction._FindFromCacheInContext(yctx, "Voltage", func);
             if (obj == null) {
                 obj = new YVoltage(yctx, func);

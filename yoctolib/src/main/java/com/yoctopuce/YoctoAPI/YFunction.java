@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 35671 2019-06-05 08:25:35Z seb $
+ * $Id: YFunction.java 37235 2019-09-20 09:27:57Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -352,7 +352,8 @@ public class YFunction
     public static YFunction FindFunction(String func)
     {
         YFunction obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YFunction) YFunction._FindFromCache("Function", func);
             if (obj == null) {
                 obj = new YFunction(func);
@@ -389,7 +390,7 @@ public class YFunction
     public static YFunction FindFunctionInContext(YAPIContext yctx,String func)
     {
         YFunction obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YFunction) YFunction._FindFromCacheInContext(yctx, "Function", func);
             if (obj == null) {
                 obj = new YFunction(yctx, func);

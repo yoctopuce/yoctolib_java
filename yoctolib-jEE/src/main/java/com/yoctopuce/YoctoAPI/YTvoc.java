@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTvoc.java 33270 2018-11-22 08:41:15Z seb $
+ *  $Id: YTvoc.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindTvoc(), the high-level API for Tvoc functions
  *
@@ -146,7 +146,8 @@ public class YTvoc extends YSensor
     public static YTvoc FindTvoc(String func)
     {
         YTvoc obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YTvoc) YFunction._FindFromCache("Tvoc", func);
             if (obj == null) {
                 obj = new YTvoc(func);
@@ -183,7 +184,7 @@ public class YTvoc extends YSensor
     public static YTvoc FindTvocInContext(YAPIContext yctx,String func)
     {
         YTvoc obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YTvoc) YFunction._FindFromCacheInContext(yctx, "Tvoc", func);
             if (obj == null) {
                 obj = new YTvoc(yctx, func);

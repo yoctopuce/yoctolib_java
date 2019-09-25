@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YStepperMotor.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YStepperMotor.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1079,7 +1079,8 @@ public class YStepperMotor extends YFunction
     public static YStepperMotor FindStepperMotor(String func)
     {
         YStepperMotor obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YStepperMotor) YFunction._FindFromCache("StepperMotor", func);
             if (obj == null) {
                 obj = new YStepperMotor(func);
@@ -1116,7 +1117,7 @@ public class YStepperMotor extends YFunction
     public static YStepperMotor FindStepperMotorInContext(YAPIContext yctx,String func)
     {
         YStepperMotor obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YStepperMotor) YFunction._FindFromCacheInContext(yctx, "StepperMotor", func);
             if (obj == null) {
                 obj = new YStepperMotor(yctx, func);

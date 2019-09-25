@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 36207 2019-07-10 20:46:18Z mvuilleu $
+ *  $Id: YI2cPort.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -97,21 +97,16 @@ public class YI2cPort extends YFunction
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     /**
-     * invalid voltageLevel value
-     */
-    public static final int VOLTAGELEVEL_OFF = 0;
-    public static final int VOLTAGELEVEL_TTL3V = 1;
-    public static final int VOLTAGELEVEL_TTL3VR = 2;
-    public static final int VOLTAGELEVEL_TTL5V = 3;
-    public static final int VOLTAGELEVEL_TTL5VR = 4;
-    public static final int VOLTAGELEVEL_RS232 = 5;
-    public static final int VOLTAGELEVEL_RS485 = 6;
-    public static final int VOLTAGELEVEL_TTL1V8 = 7;
-    public static final int VOLTAGELEVEL_INVALID = -1;
-    /**
      * invalid protocol value
      */
     public static final String PROTOCOL_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid i2cVoltageLevel value
+     */
+    public static final int I2CVOLTAGELEVEL_OFF = 0;
+    public static final int I2CVOLTAGELEVEL_3V3 = 1;
+    public static final int I2CVOLTAGELEVEL_1V8 = 2;
+    public static final int I2CVOLTAGELEVEL_INVALID = -1;
     /**
      * invalid i2cMode value
      */
@@ -125,8 +120,8 @@ public class YI2cPort extends YFunction
     protected String _currentJob = CURRENTJOB_INVALID;
     protected String _startupJob = STARTUPJOB_INVALID;
     protected String _command = COMMAND_INVALID;
-    protected int _voltageLevel = VOLTAGELEVEL_INVALID;
     protected String _protocol = PROTOCOL_INVALID;
+    protected int _i2cVoltageLevel = I2CVOLTAGELEVEL_INVALID;
     protected String _i2cMode = I2CMODE_INVALID;
     protected UpdateCallback _valueCallbackI2cPort = null;
     protected int _rxptr = 0;
@@ -214,11 +209,11 @@ public class YI2cPort extends YFunction
         if (json_val.has("command")) {
             _command = json_val.getString("command");
         }
-        if (json_val.has("voltageLevel")) {
-            _voltageLevel = json_val.getInt("voltageLevel");
-        }
         if (json_val.has("protocol")) {
             _protocol = json_val.getString("protocol");
+        }
+        if (json_val.has("i2cVoltageLevel")) {
+            _i2cVoltageLevel = json_val.getInt("i2cVoltageLevel");
         }
         if (json_val.has("i2cMode")) {
             _i2cMode = json_val.getString("i2cMode");
@@ -458,11 +453,10 @@ public class YI2cPort extends YFunction
     }
 
     /**
-     * Changes the job to use when the device is powered on.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
+     * Selects a job file to run immediately. If an empty string is
+     * given as argument, stops running current job file.
      *
-     * @param newval : a string corresponding to the job to use when the device is powered on
+     * @param newval : a string
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -479,11 +473,10 @@ public class YI2cPort extends YFunction
     }
 
     /**
-     * Changes the job to use when the device is powered on.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
+     * Selects a job file to run immediately. If an empty string is
+     * given as argument, stops running current job file.
      *
-     * @param newval : a string corresponding to the job to use when the device is powered on
+     * @param newval : a string
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -590,96 +583,12 @@ public class YI2cPort extends YFunction
 
 
     /**
-     * Returns the voltage level used on the serial line.
-     *
-     *  @return a value among YI2cPort.VOLTAGELEVEL_OFF, YI2cPort.VOLTAGELEVEL_TTL3V,
-     *  YI2cPort.VOLTAGELEVEL_TTL3VR, YI2cPort.VOLTAGELEVEL_TTL5V, YI2cPort.VOLTAGELEVEL_TTL5VR,
-     *  YI2cPort.VOLTAGELEVEL_RS232, YI2cPort.VOLTAGELEVEL_RS485 and YI2cPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage level used on the serial line
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int get_voltageLevel() throws YAPI_Exception
-    {
-        int res;
-        synchronized (this) {
-            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
-                    return VOLTAGELEVEL_INVALID;
-                }
-            }
-            res = _voltageLevel;
-        }
-        return res;
-    }
-
-    /**
-     * Returns the voltage level used on the serial line.
-     *
-     *  @return a value among Y_VOLTAGELEVEL_OFF, Y_VOLTAGELEVEL_TTL3V, Y_VOLTAGELEVEL_TTL3VR,
-     *  Y_VOLTAGELEVEL_TTL5V, Y_VOLTAGELEVEL_TTL5VR, Y_VOLTAGELEVEL_RS232, Y_VOLTAGELEVEL_RS485 and
-     * Y_VOLTAGELEVEL_TTL1V8 corresponding to the voltage level used on the serial line
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int getVoltageLevel() throws YAPI_Exception
-    {
-        return get_voltageLevel();
-    }
-
-    /**
-     * Changes the voltage type used on the serial line. Valid
-     * values  will depend on the Yoctopuce device model featuring
-     * the serial port feature.  Check your device documentation
-     * to find out which values are valid for that specific model.
-     * Trying to set an invalid value will have no effect.
-     *
-     *  @param newval : a value among YI2cPort.VOLTAGELEVEL_OFF, YI2cPort.VOLTAGELEVEL_TTL3V,
-     *  YI2cPort.VOLTAGELEVEL_TTL3VR, YI2cPort.VOLTAGELEVEL_TTL5V, YI2cPort.VOLTAGELEVEL_TTL5VR,
-     *  YI2cPort.VOLTAGELEVEL_RS232, YI2cPort.VOLTAGELEVEL_RS485 and YI2cPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage type used on the serial line
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_voltageLevel(int  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        synchronized (this) {
-            rest_val = Integer.toString(newval);
-            _setAttr("voltageLevel",rest_val);
-        }
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the voltage type used on the serial line. Valid
-     * values  will depend on the Yoctopuce device model featuring
-     * the serial port feature.  Check your device documentation
-     * to find out which values are valid for that specific model.
-     * Trying to set an invalid value will have no effect.
-     *
-     *  @param newval : a value among Y_VOLTAGELEVEL_OFF, Y_VOLTAGELEVEL_TTL3V, Y_VOLTAGELEVEL_TTL3VR,
-     *  Y_VOLTAGELEVEL_TTL5V, Y_VOLTAGELEVEL_TTL5VR, Y_VOLTAGELEVEL_RS232, Y_VOLTAGELEVEL_RS485 and
-     * Y_VOLTAGELEVEL_TTL1V8 corresponding to the voltage type used on the serial line
-     *
-     * @return YAPI_SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int setVoltageLevel(int newval)  throws YAPI_Exception
-    {
-        return set_voltageLevel(newval);
-    }
-
-    /**
-     * Returns the type of protocol used over the serial line, as a string.
+     * Returns the type of protocol used to send I2C messages, as a string.
      * Possible values are
      * "Line" for messages separated by LF or
      * "Char" for continuous stream of codes.
      *
-     * @return a string corresponding to the type of protocol used over the serial line, as a string
+     * @return a string corresponding to the type of protocol used to send I2C messages, as a string
      *
      * @throws YAPI_Exception on error
      */
@@ -698,12 +607,12 @@ public class YI2cPort extends YFunction
     }
 
     /**
-     * Returns the type of protocol used over the serial line, as a string.
+     * Returns the type of protocol used to send I2C messages, as a string.
      * Possible values are
      * "Line" for messages separated by LF or
      * "Char" for continuous stream of codes.
      *
-     * @return a string corresponding to the type of protocol used over the serial line, as a string
+     * @return a string corresponding to the type of protocol used to send I2C messages, as a string
      *
      * @throws YAPI_Exception on error
      */
@@ -713,14 +622,16 @@ public class YI2cPort extends YFunction
     }
 
     /**
-     * Changes the type of protocol used over the serial line.
+     * Changes the type of protocol used to send I2C messages.
      * Possible values are
      * "Line" for messages separated by LF or
      * "Char" for continuous stream of codes.
      * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
      * is always at lest the specified number of milliseconds between each message sent.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
-     * @param newval : a string corresponding to the type of protocol used over the serial line
+     * @param newval : a string corresponding to the type of protocol used to send I2C messages
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -737,14 +648,16 @@ public class YI2cPort extends YFunction
     }
 
     /**
-     * Changes the type of protocol used over the serial line.
+     * Changes the type of protocol used to send I2C messages.
      * Possible values are
      * "Line" for messages separated by LF or
      * "Char" for continuous stream of codes.
      * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
      * is always at lest the specified number of milliseconds between each message sent.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
-     * @param newval : a string corresponding to the type of protocol used over the serial line
+     * @param newval : a string corresponding to the type of protocol used to send I2C messages
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -756,12 +669,88 @@ public class YI2cPort extends YFunction
     }
 
     /**
+     * Returns the voltage level used on the I2C bus.
+     *
+     *  @return a value among YI2cPort.I2CVOLTAGELEVEL_OFF, YI2cPort.I2CVOLTAGELEVEL_3V3 and
+     * YI2cPort.I2CVOLTAGELEVEL_1V8 corresponding to the voltage level used on the I2C bus
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_i2cVoltageLevel() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return I2CVOLTAGELEVEL_INVALID;
+                }
+            }
+            res = _i2cVoltageLevel;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the voltage level used on the I2C bus.
+     *
+     *  @return a value among Y_I2CVOLTAGELEVEL_OFF, Y_I2CVOLTAGELEVEL_3V3 and Y_I2CVOLTAGELEVEL_1V8
+     * corresponding to the voltage level used on the I2C bus
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getI2cVoltageLevel() throws YAPI_Exception
+    {
+        return get_i2cVoltageLevel();
+    }
+
+    /**
+     * Changes the voltage level used on the I2C bus.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     *  @param newval : a value among YI2cPort.I2CVOLTAGELEVEL_OFF, YI2cPort.I2CVOLTAGELEVEL_3V3 and
+     * YI2cPort.I2CVOLTAGELEVEL_1V8 corresponding to the voltage level used on the I2C bus
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_i2cVoltageLevel(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("i2cVoltageLevel",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the voltage level used on the I2C bus.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     *  @param newval : a value among Y_I2CVOLTAGELEVEL_OFF, Y_I2CVOLTAGELEVEL_3V3 and
+     * Y_I2CVOLTAGELEVEL_1V8 corresponding to the voltage level used on the I2C bus
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setI2cVoltageLevel(int newval)  throws YAPI_Exception
+    {
+        return set_i2cVoltageLevel(newval);
+    }
+
+    /**
      * Returns the SPI port communication parameters, as a string such as
-     * "400kbps,2000ms". The string includes the baud rate and  th  e recovery delay
-     * after communications errors.
+     * "400kbps,2000ms,NoRestart". The string includes the baud rate, the
+     * recovery delay after communications errors, and if needed the option
+     * NoRestart to use a Stop/Start sequence instead of the
+     * Restart state when performing read on the I2C bus.
      *
      * @return a string corresponding to the SPI port communication parameters, as a string such as
-     *         "400kbps,2000ms"
+     *         "400kbps,2000ms,NoRestart"
      *
      * @throws YAPI_Exception on error
      */
@@ -781,11 +770,13 @@ public class YI2cPort extends YFunction
 
     /**
      * Returns the SPI port communication parameters, as a string such as
-     * "400kbps,2000ms". The string includes the baud rate and  th  e recovery delay
-     * after communications errors.
+     * "400kbps,2000ms,NoRestart". The string includes the baud rate, the
+     * recovery delay after communications errors, and if needed the option
+     * NoRestart to use a Stop/Start sequence instead of the
+     * Restart state when performing read on the I2C bus.
      *
      * @return a string corresponding to the SPI port communication parameters, as a string such as
-     *         "400kbps,2000ms"
+     *         "400kbps,2000ms,NoRestart"
      *
      * @throws YAPI_Exception on error
      */
@@ -796,8 +787,12 @@ public class YI2cPort extends YFunction
 
     /**
      * Changes the SPI port communication parameters, with a string such as
-     * "400kbps,2000ms". The string includes the baud rate and the recovery delay
-     * after communications errors.
+     * "400kbps,2000ms". The string includes the baud rate, the
+     * recovery delay after communications errors, and if needed the option
+     * NoRestart to use a Stop/Start sequence instead of the
+     * Restart state when performing read on the I2C bus.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a string corresponding to the SPI port communication parameters, with a string such as
      *         "400kbps,2000ms"
@@ -818,8 +813,12 @@ public class YI2cPort extends YFunction
 
     /**
      * Changes the SPI port communication parameters, with a string such as
-     * "400kbps,2000ms". The string includes the baud rate and the recovery delay
-     * after communications errors.
+     * "400kbps,2000ms". The string includes the baud rate, the
+     * recovery delay after communications errors, and if needed the option
+     * NoRestart to use a Stop/Start sequence instead of the
+     * Restart state when performing read on the I2C bus.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a string corresponding to the SPI port communication parameters, with a string such as
      *         "400kbps,2000ms"
@@ -863,7 +862,8 @@ public class YI2cPort extends YFunction
     public static YI2cPort FindI2cPort(String func)
     {
         YI2cPort obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YI2cPort) YFunction._FindFromCache("I2cPort", func);
             if (obj == null) {
                 obj = new YI2cPort(func);
@@ -900,7 +900,7 @@ public class YI2cPort extends YFunction
     public static YI2cPort FindI2cPortInContext(YAPIContext yctx,String func)
     {
         YI2cPort obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YI2cPort) YFunction._FindFromCacheInContext(yctx, "I2cPort", func);
             if (obj == null) {
                 obj = new YI2cPort(yctx, func);
@@ -1161,7 +1161,7 @@ public class YI2cPort extends YFunction
     /**
      * Clears the serial port buffer and resets counters to zero.
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1181,7 +1181,7 @@ public class YI2cPort extends YFunction
      * @param slaveAddr : the 7-bit address of the slave device (without the direction bit)
      * @param buff : the binary buffer to be sent
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1203,13 +1203,13 @@ public class YI2cPort extends YFunction
 
         reply = queryLine(msg,1000);
         //noinspection DoubleNegation
-        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "no response from device");}
+        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
         idx = (reply).indexOf("[N]!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No ACK received");}
+        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
         idx = (reply).indexOf("!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "Protocol error");}
+        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
         return YAPI.SUCCESS;
     }
 
@@ -1220,7 +1220,7 @@ public class YI2cPort extends YFunction
      * @param slaveAddr : the 7-bit address of the slave device (without the direction bit)
      * @param values : a list of data bytes to be sent
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1242,13 +1242,13 @@ public class YI2cPort extends YFunction
 
         reply = queryLine(msg,1000);
         //noinspection DoubleNegation
-        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "no response from device");}
+        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
         idx = (reply).indexOf("[N]!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No ACK received");}
+        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
         idx = (reply).indexOf("!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "Protocol error");}
+        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
         return YAPI.SUCCESS;
     }
 
@@ -1290,13 +1290,13 @@ public class YI2cPort extends YFunction
         reply = queryLine(msg,1000);
         rcvbytes = new byte[0];
         //noinspection DoubleNegation
-        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "no response from device");}
+        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
         idx = (reply).indexOf("[N]!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No ACK received");}
+        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
         idx = (reply).indexOf("!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "Protocol error");}
+        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
         reply = (reply).substring( (reply).length()-2*rcvCount,  (reply).length()-2*rcvCount + 2*rcvCount);
         rcvbytes = YAPIContext._hexStrToBin(reply);
         return rcvbytes;
@@ -1340,13 +1340,13 @@ public class YI2cPort extends YFunction
 
         reply = queryLine(msg,1000);
         //noinspection DoubleNegation
-        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "no response from device");}
+        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
         idx = (reply).indexOf("[N]!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No ACK received");}
+        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
         idx = (reply).indexOf("!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "Protocol error");}
+        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
         reply = (reply).substring( (reply).length()-2*rcvCount,  (reply).length()-2*rcvCount + 2*rcvCount);
         rcvbytes = YAPIContext._hexStrToBin(reply);
         res.clear();
@@ -1375,7 +1375,7 @@ public class YI2cPort extends YFunction
      *
      * @param codes : the code stream to send
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1423,7 +1423,7 @@ public class YI2cPort extends YFunction
      *
      * @param codes : the code stream to send
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1446,7 +1446,7 @@ public class YI2cPort extends YFunction
      *
      * @param code : the byte to send
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1462,7 +1462,7 @@ public class YI2cPort extends YFunction
      *
      * @param hexString : a string of hexadecimal byte codes
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1486,7 +1486,7 @@ public class YI2cPort extends YFunction
      *
      * @param buff : the binary buffer to send
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1515,7 +1515,7 @@ public class YI2cPort extends YFunction
      *
      * @param byteList : a list of byte codes
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

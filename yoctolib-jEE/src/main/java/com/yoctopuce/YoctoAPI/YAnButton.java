@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAnButton.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YAnButton.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindAnButton(), the high-level API for AnButton functions
  *
@@ -800,7 +800,8 @@ public class YAnButton extends YFunction
     public static YAnButton FindAnButton(String func)
     {
         YAnButton obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YAnButton) YFunction._FindFromCache("AnButton", func);
             if (obj == null) {
                 obj = new YAnButton(func);
@@ -837,7 +838,7 @@ public class YAnButton extends YFunction
     public static YAnButton FindAnButtonInContext(YAPIContext yctx,String func)
     {
         YAnButton obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YAnButton) YFunction._FindFromCacheInContext(yctx, "AnButton", func);
             if (obj == null) {
                 obj = new YAnButton(yctx, func);

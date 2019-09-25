@@ -40,12 +40,10 @@ public class Demo
             System.out.println("No module connected (check USB cable)");
             System.exit(1);
         }
-        int value = 12345678;
-
         try {
             // sample code reading MCP9804 temperature sensor
             i2cPort.set_i2cMode("400kbps");
-            i2cPort.set_voltageLevel(YI2cPort.VOLTAGELEVEL_TTL3V);
+            i2cPort.set_i2cVoltageLevel(YI2cPort.I2CVOLTAGELEVEL_3V3);
             i2cPort.reset();
             // do not forget to configure the powerOutput of the Yocto-I2C
             // (for MCP9804 powerOutput need to be set at 3.3V)
@@ -58,7 +56,7 @@ public class Demo
             ArrayList<Integer> received;
             toSend.add(0x05);
             received = i2cPort.i2cSendAndReceiveArray(0x1f, toSend, 2);
-            Integer tempReg = (received.get(0) << 8) + received.get(1);
+            int tempReg = (received.get(0) << 8) + received.get(1);
             if((tempReg & 0x1000) != 0) {
                 tempReg -= 0x2000;   // perform sign extension
             } else {

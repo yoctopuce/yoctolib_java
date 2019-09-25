@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWeighScale.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YWeighScale.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindWeighScale(), the high-level API for WeighScale functions
  *
@@ -261,6 +261,8 @@ public class YWeighScale extends YSensor
 
     /**
      * Changes the current load cell bridge excitation method.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : a value among YWeighScale.EXCITATION_OFF, YWeighScale.EXCITATION_DC and
      * YWeighScale.EXCITATION_AC corresponding to the current load cell bridge excitation method
@@ -281,6 +283,8 @@ public class YWeighScale extends YSensor
 
     /**
      * Changes the current load cell bridge excitation method.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : a value among Y_EXCITATION_OFF, Y_EXCITATION_DC and Y_EXCITATION_AC corresponding
      * to the current load cell bridge excitation method
@@ -300,6 +304,8 @@ public class YWeighScale extends YSensor
      * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current compensation
      * temperature. The standard rate is 0.2 per mille, and the maximal rate is 65 per mille.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the averaged temperature update rate, in per mille
      *
@@ -323,6 +329,8 @@ public class YWeighScale extends YSensor
      * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current compensation
      * temperature. The standard rate is 0.2 per mille, and the maximal rate is 65 per mille.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the averaged temperature update rate, in per mille
      *
@@ -380,7 +388,9 @@ public class YWeighScale extends YSensor
      * Changes the temperature change update rate, in per mille.
      * The temperature change is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current temperature used for
-     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 per mille.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the temperature change update rate, in per mille
      *
@@ -402,7 +412,9 @@ public class YWeighScale extends YSensor
      * Changes the temperature change update rate, in per mille.
      * The temperature change is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current temperature used for
-     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 per mille.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the temperature change update rate, in per mille
      *
@@ -419,7 +431,7 @@ public class YWeighScale extends YSensor
      * Returns the temperature change update rate, in per mille.
      * The temperature change is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current temperature used for
-     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 per mille.
      *
      * @return a floating point number corresponding to the temperature change update rate, in per mille
      *
@@ -443,7 +455,7 @@ public class YWeighScale extends YSensor
      * Returns the temperature change update rate, in per mille.
      * The temperature change is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current temperature used for
-     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 per mille.
      *
      * @return a floating point number corresponding to the temperature change update rate, in per mille
      *
@@ -559,6 +571,8 @@ public class YWeighScale extends YSensor
      * Changes the zero tracking threshold value. When this threshold is larger than
      * zero, any measure under the threshold will automatically be ignored and the
      * zero compensation will be updated.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the zero tracking threshold value
      *
@@ -580,6 +594,8 @@ public class YWeighScale extends YSensor
      * Changes the zero tracking threshold value. When this threshold is larger than
      * zero, any measure under the threshold will automatically be ignored and the
      * zero compensation will be updated.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the zero tracking threshold value
      *
@@ -684,7 +700,8 @@ public class YWeighScale extends YSensor
     public static YWeighScale FindWeighScale(String func)
     {
         YWeighScale obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YWeighScale) YFunction._FindFromCache("WeighScale", func);
             if (obj == null) {
                 obj = new YWeighScale(func);
@@ -721,7 +738,7 @@ public class YWeighScale extends YSensor
     public static YWeighScale FindWeighScaleInContext(YAPIContext yctx,String func)
     {
         YWeighScale obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YWeighScale) YFunction._FindFromCacheInContext(yctx, "WeighScale", func);
             if (obj == null) {
                 obj = new YWeighScale(yctx, func);

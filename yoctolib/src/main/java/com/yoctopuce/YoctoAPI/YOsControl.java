@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YOsControl.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YOsControl.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -201,7 +201,8 @@ public class YOsControl extends YFunction
     public static YOsControl FindOsControl(String func)
     {
         YOsControl obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YOsControl) YFunction._FindFromCache("OsControl", func);
             if (obj == null) {
                 obj = new YOsControl(func);
@@ -238,7 +239,7 @@ public class YOsControl extends YFunction
     public static YOsControl FindOsControlInContext(YAPIContext yctx,String func)
     {
         YOsControl obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YOsControl) YFunction._FindFromCacheInContext(yctx, "OsControl", func);
             if (obj == null) {
                 obj = new YOsControl(yctx, func);

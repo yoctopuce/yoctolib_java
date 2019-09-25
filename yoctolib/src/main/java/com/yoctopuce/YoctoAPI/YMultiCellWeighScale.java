@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiCellWeighScale.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YMultiCellWeighScale.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -265,7 +265,8 @@ public class YMultiCellWeighScale extends YSensor
     }
 
     /**
-     * Changes the number of load cells in use.
+     * Changes the number of load cells in use. Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the number of load cells in use
      *
@@ -284,7 +285,8 @@ public class YMultiCellWeighScale extends YSensor
     }
 
     /**
-     * Changes the number of load cells in use.
+     * Changes the number of load cells in use. Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the number of load cells in use
      *
@@ -334,6 +336,8 @@ public class YMultiCellWeighScale extends YSensor
 
     /**
      * Changes the current load cell bridge excitation method.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : a value among YMultiCellWeighScale.EXCITATION_OFF,
      *  YMultiCellWeighScale.EXCITATION_DC and YMultiCellWeighScale.EXCITATION_AC corresponding to the
@@ -355,6 +359,8 @@ public class YMultiCellWeighScale extends YSensor
 
     /**
      * Changes the current load cell bridge excitation method.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : a value among Y_EXCITATION_OFF, Y_EXCITATION_DC and Y_EXCITATION_AC corresponding
      * to the current load cell bridge excitation method
@@ -374,6 +380,8 @@ public class YMultiCellWeighScale extends YSensor
      * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current compensation
      * temperature. The standard rate is 0.2 per mille, and the maximal rate is 65 per mille.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the averaged temperature update rate, in per mille
      *
@@ -397,6 +405,8 @@ public class YMultiCellWeighScale extends YSensor
      * The averaged temperature is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current compensation
      * temperature. The standard rate is 0.2 per mille, and the maximal rate is 65 per mille.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the averaged temperature update rate, in per mille
      *
@@ -454,7 +464,9 @@ public class YMultiCellWeighScale extends YSensor
      * Changes the temperature change update rate, in per mille.
      * The temperature change is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current temperature used for
-     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 per mille.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the temperature change update rate, in per mille
      *
@@ -476,7 +488,9 @@ public class YMultiCellWeighScale extends YSensor
      * Changes the temperature change update rate, in per mille.
      * The temperature change is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current temperature used for
-     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 per mille.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the temperature change update rate, in per mille
      *
@@ -493,7 +507,7 @@ public class YMultiCellWeighScale extends YSensor
      * Returns the temperature change update rate, in per mille.
      * The temperature change is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current temperature used for
-     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 per mille.
      *
      * @return a floating point number corresponding to the temperature change update rate, in per mille
      *
@@ -517,7 +531,7 @@ public class YMultiCellWeighScale extends YSensor
      * Returns the temperature change update rate, in per mille.
      * The temperature change is updated every 10 seconds, by applying this adaptation rate
      * to the difference between the measures ambient temperature and the current temperature used for
-     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 pour mille.
+     * change compensation. The standard rate is 0.6 per mille, and the maximal rate is 65 per mille.
      *
      * @return a floating point number corresponding to the temperature change update rate, in per mille
      *
@@ -633,6 +647,8 @@ public class YMultiCellWeighScale extends YSensor
      * Changes the zero tracking threshold value. When this threshold is larger than
      * zero, any measure under the threshold will automatically be ignored and the
      * zero compensation will be updated.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the zero tracking threshold value
      *
@@ -654,6 +670,8 @@ public class YMultiCellWeighScale extends YSensor
      * Changes the zero tracking threshold value. When this threshold is larger than
      * zero, any measure under the threshold will automatically be ignored and the
      * zero compensation will be updated.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : a floating point number corresponding to the zero tracking threshold value
      *
@@ -758,7 +776,8 @@ public class YMultiCellWeighScale extends YSensor
     public static YMultiCellWeighScale FindMultiCellWeighScale(String func)
     {
         YMultiCellWeighScale obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YMultiCellWeighScale) YFunction._FindFromCache("MultiCellWeighScale", func);
             if (obj == null) {
                 obj = new YMultiCellWeighScale(func);
@@ -795,7 +814,7 @@ public class YMultiCellWeighScale extends YSensor
     public static YMultiCellWeighScale FindMultiCellWeighScaleInContext(YAPIContext yctx,String func)
     {
         YMultiCellWeighScale obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YMultiCellWeighScale) YFunction._FindFromCacheInContext(yctx, "MultiCellWeighScale", func);
             if (obj == null) {
                 obj = new YMultiCellWeighScale(yctx, func);

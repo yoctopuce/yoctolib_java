@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmInput.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YPwmInput.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -197,6 +197,7 @@ public class YPwmInput extends YSensor
      * is just a string which is automatically initialized each time
      * the measurement mode is changed. But is can be set to an
      * arbitrary value.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the measuring unit for the measured quantity
      *
@@ -219,6 +220,7 @@ public class YPwmInput extends YSensor
      * is just a string which is automatically initialized each time
      * the measurement mode is changed. But is can be set to an
      * arbitrary value.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the measuring unit for the measured quantity
      *
@@ -496,6 +498,7 @@ public class YPwmInput extends YSensor
      * get_currentValue function and callbacks.
      *  The edge count value is limited to the 6 lowest digits. For values greater than one million, use
      * get_pulseCounter().
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : a value among YPwmInput.PWMREPORTMODE_PWM_DUTYCYCLE,
      *  YPwmInput.PWMREPORTMODE_PWM_FREQUENCY, YPwmInput.PWMREPORTMODE_PWM_PULSEDURATION,
@@ -524,6 +527,7 @@ public class YPwmInput extends YSensor
      * get_currentValue function and callbacks.
      *  The edge count value is limited to the 6 lowest digits. For values greater than one million, use
      * get_pulseCounter().
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : a value among Y_PWMREPORTMODE_PWM_DUTYCYCLE, Y_PWMREPORTMODE_PWM_FREQUENCY,
      *  Y_PWMREPORTMODE_PWM_PULSEDURATION, Y_PWMREPORTMODE_PWM_EDGECOUNT, Y_PWMREPORTMODE_PWM_PULSECOUNT,
@@ -575,6 +579,7 @@ public class YPwmInput extends YSensor
 
     /**
      * Changes the shortest expected pulse duration, in ms. Any shorter pulse will be automatically ignored (debounce).
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the shortest expected pulse duration, in ms
      *
@@ -594,6 +599,7 @@ public class YPwmInput extends YSensor
 
     /**
      * Changes the shortest expected pulse duration, in ms. Any shorter pulse will be automatically ignored (debounce).
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the shortest expected pulse duration, in ms
      *
@@ -636,7 +642,8 @@ public class YPwmInput extends YSensor
     public static YPwmInput FindPwmInput(String func)
     {
         YPwmInput obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YPwmInput) YFunction._FindFromCache("PwmInput", func);
             if (obj == null) {
                 obj = new YPwmInput(func);
@@ -673,7 +680,7 @@ public class YPwmInput extends YSensor
     public static YPwmInput FindPwmInputInContext(YAPIContext yctx,String func)
     {
         YPwmInput obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YPwmInput) YFunction._FindFromCacheInContext(yctx, "PwmInput", func);
             if (obj == null) {
                 obj = new YPwmInput(yctx, func);

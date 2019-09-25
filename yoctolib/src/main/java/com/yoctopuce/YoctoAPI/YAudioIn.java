@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAudioIn.java 32904 2018-11-02 10:15:00Z seb $
+ *  $Id: YAudioIn.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindAudioIn(), the high-level API for AudioIn functions
  *
@@ -424,7 +424,8 @@ public class YAudioIn extends YFunction
     public static YAudioIn FindAudioIn(String func)
     {
         YAudioIn obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YAudioIn) YFunction._FindFromCache("AudioIn", func);
             if (obj == null) {
                 obj = new YAudioIn(func);
@@ -461,7 +462,7 @@ public class YAudioIn extends YFunction
     public static YAudioIn FindAudioInInContext(YAPIContext yctx,String func)
     {
         YAudioIn obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YAudioIn) YFunction._FindFromCacheInContext(yctx, "AudioIn", func);
             if (obj == null) {
                 obj = new YAudioIn(yctx, func);

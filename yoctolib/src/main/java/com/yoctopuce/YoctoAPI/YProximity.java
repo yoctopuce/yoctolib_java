@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YProximity.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YProximity.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindProximity(), the high-level API for Proximity functions
  *
@@ -286,6 +286,7 @@ public class YProximity extends YSensor
     /**
      * Changes the threshold used to determine the logical state of the proximity sensor, when considered
      * as a binary input (on/off).
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : an integer corresponding to the threshold used to determine the logical state of
      * the proximity sensor, when considered
@@ -308,6 +309,7 @@ public class YProximity extends YSensor
     /**
      * Changes the threshold used to determine the logical state of the proximity sensor, when considered
      * as a binary input (on/off).
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : an integer corresponding to the threshold used to determine the logical state of
      * the proximity sensor, when considered
@@ -364,6 +366,7 @@ public class YProximity extends YSensor
     /**
      * Changes the hysteresis used to determine the logical state of the proximity sensor, when considered
      * as a binary input (on/off).
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : an integer corresponding to the hysteresis used to determine the logical state of
      * the proximity sensor, when considered
@@ -386,6 +389,7 @@ public class YProximity extends YSensor
     /**
      * Changes the hysteresis used to determine the logical state of the proximity sensor, when considered
      * as a binary input (on/off).
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : an integer corresponding to the hysteresis used to determine the logical state of
      * the proximity sensor, when considered
@@ -438,6 +442,7 @@ public class YProximity extends YSensor
     /**
      * Changes the minimal detection duration before signalling a presence event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the minimal detection duration before signalling a presence event
      *
@@ -458,6 +463,7 @@ public class YProximity extends YSensor
     /**
      * Changes the minimal detection duration before signalling a presence event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the minimal detection duration before signalling a presence event
      *
@@ -508,6 +514,7 @@ public class YProximity extends YSensor
     /**
      * Changes the minimal detection duration before signalling a removal event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the minimal detection duration before signalling a removal event
      *
@@ -528,6 +535,7 @@ public class YProximity extends YSensor
     /**
      * Changes the minimal detection duration before signalling a removal event. Any shorter detection is
      * considered as noise or bounce (false positive) and filtered out.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the minimal detection duration before signalling a removal event
      *
@@ -781,6 +789,7 @@ public class YProximity extends YSensor
      * get_currentValue function and callbacks.
      *  The edge count value is limited to the 6 lowest digits. For values greater than one million, use
      * get_pulseCounter().
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : a value among YProximity.PROXIMITYREPORTMODE_NUMERIC,
      *  YProximity.PROXIMITYREPORTMODE_PRESENCE and YProximity.PROXIMITYREPORTMODE_PULSECOUNT corresponding
@@ -806,6 +815,7 @@ public class YProximity extends YSensor
      * get_currentValue function and callbacks.
      *  The edge count value is limited to the 6 lowest digits. For values greater than one million, use
      * get_pulseCounter().
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : a value among Y_PROXIMITYREPORTMODE_NUMERIC, Y_PROXIMITYREPORTMODE_PRESENCE and
      *  Y_PROXIMITYREPORTMODE_PULSECOUNT corresponding to the  parameter  type (sensor value, presence or
@@ -850,7 +860,8 @@ public class YProximity extends YSensor
     public static YProximity FindProximity(String func)
     {
         YProximity obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YProximity) YFunction._FindFromCache("Proximity", func);
             if (obj == null) {
                 obj = new YProximity(func);
@@ -887,7 +898,7 @@ public class YProximity extends YSensor
     public static YProximity FindProximityInContext(YAPIContext yctx,String func)
     {
         YProximity obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YProximity) YFunction._FindFromCacheInContext(yctx, "Proximity", func);
             if (obj == null) {
                 obj = new YProximity(yctx, func);

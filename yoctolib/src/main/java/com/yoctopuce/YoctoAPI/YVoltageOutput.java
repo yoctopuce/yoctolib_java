@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YVoltageOutput.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YVoltageOutput.java 37232 2019-09-20 09:22:10Z seb $
  *
  *  Implements FindVoltageOutput(), the high-level API for VoltageOutput functions
  *
@@ -327,7 +327,8 @@ public class YVoltageOutput extends YFunction
     public static YVoltageOutput FindVoltageOutput(String func)
     {
         YVoltageOutput obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YVoltageOutput) YFunction._FindFromCache("VoltageOutput", func);
             if (obj == null) {
                 obj = new YVoltageOutput(func);
@@ -364,7 +365,7 @@ public class YVoltageOutput extends YFunction
     public static YVoltageOutput FindVoltageOutputInContext(YAPIContext yctx,String func)
     {
         YVoltageOutput obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YVoltageOutput) YFunction._FindFromCacheInContext(yctx, "VoltageOutput", func);
             if (obj == null) {
                 obj = new YVoltageOutput(yctx, func);

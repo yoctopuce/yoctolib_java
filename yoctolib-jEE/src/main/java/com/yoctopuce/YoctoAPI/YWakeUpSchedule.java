@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpSchedule.java 33713 2018-12-14 14:20:19Z seb $
+ *  $Id: YWakeUpSchedule.java 37233 2019-09-20 09:25:00Z seb $
  *
  *  Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -206,6 +206,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the minutes in the 00-29 interval when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the minutes in the 00-29 interval when a wake up must take place
      *
@@ -225,6 +227,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the minutes in the 00-29 interval when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the minutes in the 00-29 interval when a wake up must take place
      *
@@ -272,6 +276,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the minutes in the 30-59 interval when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the minutes in the 30-59 interval when a wake up must take place
      *
@@ -291,6 +297,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the minutes in the 30-59 interval when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the minutes in the 30-59 interval when a wake up must take place
      *
@@ -338,6 +346,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the hours when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the hours when a wake up must take place
      *
@@ -357,6 +367,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the hours when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the hours when a wake up must take place
      *
@@ -404,6 +416,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the days of the week when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the days of the week when a wake up must take place
      *
@@ -423,6 +437,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the days of the week when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the days of the week when a wake up must take place
      *
@@ -470,6 +486,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the days of the month when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the days of the month when a wake up must take place
      *
@@ -489,6 +507,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the days of the month when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the days of the month when a wake up must take place
      *
@@ -536,6 +556,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the months when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the months when a wake up must take place
      *
@@ -555,6 +577,8 @@ public class YWakeUpSchedule extends YFunction
 
     /**
      * Changes the months when a wake up must take place.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : an integer corresponding to the months when a wake up must take place
      *
@@ -630,7 +654,8 @@ public class YWakeUpSchedule extends YFunction
     public static YWakeUpSchedule FindWakeUpSchedule(String func)
     {
         YWakeUpSchedule obj;
-        synchronized (YAPI.class) {
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
             obj = (YWakeUpSchedule) YFunction._FindFromCache("WakeUpSchedule", func);
             if (obj == null) {
                 obj = new YWakeUpSchedule(func);
@@ -667,7 +692,7 @@ public class YWakeUpSchedule extends YFunction
     public static YWakeUpSchedule FindWakeUpScheduleInContext(YAPIContext yctx,String func)
     {
         YWakeUpSchedule obj;
-        synchronized (yctx) {
+        synchronized (yctx._functionCacheLock) {
             obj = (YWakeUpSchedule) YFunction._FindFromCacheInContext(yctx, "WakeUpSchedule", func);
             if (obj == null) {
                 obj = new YWakeUpSchedule(yctx, func);
