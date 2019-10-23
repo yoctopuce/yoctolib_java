@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YNetwork.java 37619 2019-10-11 11:52:42Z mvuilleu $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -966,9 +966,9 @@ public class YNetwork extends YFunction
     }
 
     /**
-     * Returns the HTML page to serve for the URL "/"" of the hub.
+     * Returns the TCP port used to serve the hub web UI.
      *
-     * @return an integer corresponding to the HTML page to serve for the URL "/"" of the hub
+     * @return an integer corresponding to the TCP port used to serve the hub web UI
      *
      * @throws YAPI_Exception on error
      */
@@ -987,9 +987,9 @@ public class YNetwork extends YFunction
     }
 
     /**
-     * Returns the HTML page to serve for the URL "/"" of the hub.
+     * Returns the TCP port used to serve the hub web UI.
      *
-     * @return an integer corresponding to the HTML page to serve for the URL "/"" of the hub
+     * @return an integer corresponding to the TCP port used to serve the hub web UI
      *
      * @throws YAPI_Exception on error
      */
@@ -999,11 +999,13 @@ public class YNetwork extends YFunction
     }
 
     /**
-     * Changes the default HTML page returned by the hub. If not value are set the hub return
-     * "index.html" which is the web interface of the hub. It is possible to change this page
-     * for file that has been uploaded on the hub.
+     * Changes the the TCP port used to serve the hub web UI. The default value is port 80,
+     * which is the default for all Web servers. Regardless of the value set here,
+     * the hub will always reply on port 4444, which is used by default by Yoctopuce
+     * API library. When you change this parameter, remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
-     * @param newval : an integer corresponding to the default HTML page returned by the hub
+     * @param newval : an integer corresponding to the the TCP port used to serve the hub web UI
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -1020,11 +1022,13 @@ public class YNetwork extends YFunction
     }
 
     /**
-     * Changes the default HTML page returned by the hub. If not value are set the hub return
-     * "index.html" which is the web interface of the hub. It is possible to change this page
-     * for file that has been uploaded on the hub.
+     * Changes the the TCP port used to serve the hub web UI. The default value is port 80,
+     * which is the default for all Web servers. Regardless of the value set here,
+     * the hub will always reply on port 4444, which is used by default by Yoctopuce
+     * API library. When you change this parameter, remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
-     * @param newval : an integer corresponding to the default HTML page returned by the hub
+     * @param newval : an integer corresponding to the the TCP port used to serve the hub web UI
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -1071,7 +1075,9 @@ public class YNetwork extends YFunction
     /**
      * Changes the default HTML page returned by the hub. If not value are set the hub return
      * "index.html" which is the web interface of the hub. It is possible to change this page
-     * for file that has been uploaded on the hub.
+     * for file that has been uploaded on the hub. The maximum filename size is 15 characters.
+     * When you change this parameter, remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the default HTML page returned by the hub
      *
@@ -1092,7 +1098,9 @@ public class YNetwork extends YFunction
     /**
      * Changes the default HTML page returned by the hub. If not value are set the hub return
      * "index.html" which is the web interface of the hub. It is possible to change this page
-     * for file that has been uploaded on the hub.
+     * for file that has been uploaded on the hub. The maximum filename size is 15 characters.
+     * When you change this parameter, remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the default HTML page returned by the hub
      *
@@ -1147,6 +1155,8 @@ public class YNetwork extends YFunction
     /**
      * Changes the activation state of the multicast announce protocols to allow easy
      * discovery of the module in the network neighborhood (uPnP/Bonjour protocol).
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : either YNetwork.DISCOVERABLE_FALSE or YNetwork.DISCOVERABLE_TRUE, according to the
      * activation state of the multicast announce protocols to allow easy
@@ -1169,6 +1179,8 @@ public class YNetwork extends YFunction
     /**
      * Changes the activation state of the multicast announce protocols to allow easy
      * discovery of the module in the network neighborhood (uPnP/Bonjour protocol).
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : either Y_DISCOVERABLE_FALSE or Y_DISCOVERABLE_TRUE, according to the activation
      * state of the multicast announce protocols to allow easy
@@ -1228,7 +1240,8 @@ public class YNetwork extends YFunction
      * Changes the allowed downtime of the WWW link (in seconds) before triggering an automated
      * reboot to try to recover Internet connectivity. A zero value disables automated reboot
      * in case of Internet connectivity loss. The smallest valid non-zero timeout is
-     * 90 seconds.
+     * 90 seconds. Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : an integer corresponding to the allowed downtime of the WWW link (in seconds)
      * before triggering an automated
@@ -1252,7 +1265,8 @@ public class YNetwork extends YFunction
      * Changes the allowed downtime of the WWW link (in seconds) before triggering an automated
      * reboot to try to recover Internet connectivity. A zero value disables automated reboot
      * in case of Internet connectivity loss. The smallest valid non-zero timeout is
-     * 90 seconds.
+     * 90 seconds. Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : an integer corresponding to the allowed downtime of the WWW link (in seconds)
      * before triggering an automated
@@ -1373,6 +1387,8 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the HTTP method used to notify callbacks for significant state changes.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : a value among YNetwork.CALLBACKMETHOD_POST, YNetwork.CALLBACKMETHOD_GET and
      *  YNetwork.CALLBACKMETHOD_PUT corresponding to the HTTP method used to notify callbacks for
@@ -1394,6 +1410,8 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the HTTP method used to notify callbacks for significant state changes.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : a value among Y_CALLBACKMETHOD_POST, Y_CALLBACKMETHOD_GET and Y_CALLBACKMETHOD_PUT
      * corresponding to the HTTP method used to notify callbacks for significant state changes
@@ -1452,6 +1470,8 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the encoding standard to use for representing notification values.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : a value among YNetwork.CALLBACKENCODING_FORM, YNetwork.CALLBACKENCODING_JSON,
      *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV,
@@ -1477,6 +1497,8 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the encoding standard to use for representing notification values.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      *  @param newval : a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
      *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV, Y_CALLBACKENCODING_YOCTO_API,
@@ -1635,6 +1657,7 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the initial waiting time before first callback notifications, in seconds.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : an integer corresponding to the initial waiting time before first callback
      * notifications, in seconds
@@ -1655,6 +1678,7 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the initial waiting time before first callback notifications, in seconds.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : an integer corresponding to the initial waiting time before first callback
      * notifications, in seconds
@@ -1703,6 +1727,8 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the HTTP callback schedule strategy, as a text string.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the HTTP callback schedule strategy, as a text string
      *
@@ -1722,6 +1748,8 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the HTTP callback schedule strategy, as a text string.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the HTTP callback schedule strategy, as a text string
      *
@@ -1769,6 +1797,7 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the minimum waiting time between two HTTP callbacks, in seconds.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the minimum waiting time between two HTTP callbacks, in seconds
      *
@@ -1788,6 +1817,7 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the minimum waiting time between two HTTP callbacks, in seconds.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the minimum waiting time between two HTTP callbacks, in seconds
      *
@@ -1835,6 +1865,7 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the waiting time between two HTTP callbacks when there is nothing new.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : an integer corresponding to the waiting time between two HTTP callbacks when there
      * is nothing new
@@ -1855,6 +1886,7 @@ public class YNetwork extends YFunction
 
     /**
      * Changes the waiting time between two HTTP callbacks when there is nothing new.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : an integer corresponding to the waiting time between two HTTP callbacks when there
      * is nothing new

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAudioOut.java 37232 2019-09-20 09:22:10Z seb $
+ *  $Id: YAudioOut.java 37619 2019-10-11 11:52:42Z mvuilleu $
  *
  *  Implements FindAudioOut(), the high-level API for AudioOut functions
  *
@@ -190,6 +190,8 @@ public class YAudioOut extends YFunction
 
     /**
      * Changes audio output volume, in per cents.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to audio output volume, in per cents
      *
@@ -209,6 +211,8 @@ public class YAudioOut extends YFunction
 
     /**
      * Changes audio output volume, in per cents.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to audio output volume, in per cents
      *

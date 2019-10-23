@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAltitude.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YAltitude.java 37619 2019-10-11 11:52:42Z mvuilleu $
  *
  *  Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -137,6 +137,8 @@ public class YAltitude extends YSensor
     /**
      * Changes the current estimated altitude. This allows one to compensate for
      * ambient pressure variations and to work in relative mode.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a floating point number corresponding to the current estimated altitude
      *
@@ -157,6 +159,8 @@ public class YAltitude extends YSensor
     /**
      * Changes the current estimated altitude. This allows one to compensate for
      * ambient pressure variations and to work in relative mode.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a floating point number corresponding to the current estimated altitude
      *
@@ -173,6 +177,8 @@ public class YAltitude extends YSensor
      * Changes the barometric pressure adjusted to sea level used to compute
      * the altitude (QNH). This enables you to compensate for atmospheric pressure
      * changes due to weather conditions. Applicable to barometric altimeters only.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : a floating point number corresponding to the barometric pressure adjusted to sea
      * level used to compute
@@ -196,6 +202,8 @@ public class YAltitude extends YSensor
      * Changes the barometric pressure adjusted to sea level used to compute
      * the altitude (QNH). This enables you to compensate for atmospheric pressure
      * changes due to weather conditions. Applicable to barometric altimeters only.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : a floating point number corresponding to the barometric pressure adjusted to sea
      * level used to compute

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YDualPower.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YDualPower.java 37609 2019-10-09 16:59:35Z mvuilleu $
  *
  *  Implements FindDualPower(), the high-level API for DualPower functions
  *
@@ -222,6 +222,7 @@ public class YDualPower extends YFunction
 
     /**
      * Changes the selected power source for module functions that require lots of current.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : a value among YDualPower.POWERCONTROL_AUTO, YDualPower.POWERCONTROL_FROM_USB,
      *  YDualPower.POWERCONTROL_FROM_EXT and YDualPower.POWERCONTROL_OFF corresponding to the selected
@@ -243,6 +244,7 @@ public class YDualPower extends YFunction
 
     /**
      * Changes the selected power source for module functions that require lots of current.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : a value among Y_POWERCONTROL_AUTO, Y_POWERCONTROL_FROM_USB, Y_POWERCONTROL_FROM_EXT
      *  and Y_POWERCONTROL_OFF corresponding to the selected power source for module functions that require

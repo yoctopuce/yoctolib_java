@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWatchdog.java 37232 2019-09-20 09:22:10Z seb $
+ *  $Id: YWatchdog.java 37619 2019-10-11 11:52:42Z mvuilleu $
  *
  *  Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -354,12 +354,15 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Preset the state of the watchdog at device startup (A for the idle position,
-     * B for the active position, UNCHANGED for no modification). Remember to call the matching module saveToFlash()
+     * Changes the state of the watchdog at device startup (A for the idle position,
+     * B for the active position, UNCHANGED for no modification).
+     * Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
      *
      *  @param newval : a value among YWatchdog.STATEATPOWERON_UNCHANGED, YWatchdog.STATEATPOWERON_A and
-     * YWatchdog.STATEATPOWERON_B
+     *  YWatchdog.STATEATPOWERON_B corresponding to the state of the watchdog at device startup (A for the
+     * idle position,
+     *         B for the active position, UNCHANGED for no modification)
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -376,11 +379,14 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Preset the state of the watchdog at device startup (A for the idle position,
-     * B for the active position, UNCHANGED for no modification). Remember to call the matching module saveToFlash()
+     * Changes the state of the watchdog at device startup (A for the idle position,
+     * B for the active position, UNCHANGED for no modification).
+     * Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
      *
-     * @param newval : a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
+     *  @param newval : a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
+     * corresponding to the state of the watchdog at device startup (A for the idle position,
+     *         B for the active position, UNCHANGED for no modification)
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -392,10 +398,11 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
-     * switching back in to B state. Zero means no maximum time.
+     * Returns the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state
+     * A before automatically switching back in to B state. Zero means no time limit.
      *
-     * @return an integer
+     * @return an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state
+     *         A before automatically switching back in to B state
      *
      * @throws YAPI_Exception on error
      */
@@ -414,10 +421,11 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
-     * switching back in to B state. Zero means no maximum time.
+     * Returns the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state
+     * A before automatically switching back in to B state. Zero means no time limit.
      *
-     * @return an integer
+     * @return an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state
+     *         A before automatically switching back in to B state
      *
      * @throws YAPI_Exception on error
      */
@@ -427,10 +435,13 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
-     * switching back in to B state. Use zero for no maximum time.
+     * Changes the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A
+     * before automatically switching back in to B state. Use zero for no time limit.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
-     * @param newval : an integer
+     * @param newval : an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A
+     *         before automatically switching back in to B state
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -447,10 +458,13 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A before automatically
-     * switching back in to B state. Use zero for no maximum time.
+     * Changes the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A
+     * before automatically switching back in to B state. Use zero for no time limit.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
-     * @param newval : an integer
+     * @param newval : an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A
+     *         before automatically switching back in to B state
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -462,8 +476,8 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
-     * switching back in to A state. Zero means no maximum time.
+     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B
+     * before automatically switching back in to A state. Zero means no time limit.
      *
      * @return an integer
      *
@@ -484,8 +498,8 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     *  Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
-     * switching back in to A state. Zero means no maximum time.
+     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B
+     * before automatically switching back in to A state. Zero means no time limit.
      *
      * @return an integer
      *
@@ -497,10 +511,14 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
-     * switching back in to A state. Use zero for no maximum time.
+     * Changes the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before
+     * automatically switching back in to A state. Use zero for no time limit.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
-     * @param newval : an integer
+     *  @param newval : an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to
+     * stay in state B before
+     *         automatically switching back in to A state
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -517,10 +535,14 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     *  Sets the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before automatically
-     * switching back in to A state. Use zero for no maximum time.
+     * Changes the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before
+     * automatically switching back in to A state. Use zero for no time limit.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
-     * @param newval : an integer
+     *  @param newval : an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to
+     * stay in state B before
+     *         automatically switching back in to A state
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -940,10 +962,12 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Changes the waiting delay before a reset is triggered by the watchdog, in milliseconds.
+     * Changes the waiting delay before a reset is triggered by the watchdog,
+     * in milliseconds. Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
-     *  @param newval : an integer corresponding to the waiting delay before a reset is triggered by the
-     * watchdog, in milliseconds
+     * @param newval : an integer corresponding to the waiting delay before a reset is triggered by the watchdog,
+     *         in milliseconds
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -960,10 +984,12 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Changes the waiting delay before a reset is triggered by the watchdog, in milliseconds.
+     * Changes the waiting delay before a reset is triggered by the watchdog,
+     * in milliseconds. Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
-     *  @param newval : an integer corresponding to the waiting delay before a reset is triggered by the
-     * watchdog, in milliseconds
+     * @param newval : an integer corresponding to the waiting delay before a reset is triggered by the watchdog,
+     *         in milliseconds
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -1009,6 +1035,8 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the duration of resets caused by the watchdog, in milliseconds.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the duration of resets caused by the watchdog, in milliseconds
      *
@@ -1028,6 +1056,8 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the duration of resets caused by the watchdog, in milliseconds.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the duration of resets caused by the watchdog, in milliseconds
      *

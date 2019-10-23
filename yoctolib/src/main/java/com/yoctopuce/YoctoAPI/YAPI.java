@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 37231 2019-09-20 09:09:17Z seb $
+ * $Id: YAPI.java 37692 2019-10-14 14:58:03Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -58,7 +58,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "37304";
+    public static final String YOCTO_API_BUILD_STR = "37780";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -285,7 +285,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".37304" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".37780" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -705,8 +705,8 @@ public class YAPI
         return GetYCtx(true).GetDeviceListValidity();
     }
     /**
-     * Modifies the network connection delay for YAPI.RegisterHub() and
-     * YAPI.UpdateDeviceList(). This delay impacts only the YoctoHubs and VirtualHub
+     * Modifies the network connection delay for yRegisterHub() and yUpdateDeviceList().
+     * This delay impacts only the YoctoHubs and VirtualHub
      * which are accessible through the network. By default, this delay is of 20000 milliseconds,
      * but depending or you network you may want to change this delay.
      * For example if your network infrastructure uses a GSM connection.
@@ -719,8 +719,8 @@ public class YAPI
         GetYCtx(true).SetNetworkTimeout(networkMsTimeout);
     }
     /**
-     * Returns the network connection delay for YAPI.RegisterHub() and
-     * YAPI.UpdateDeviceList(). This delay impacts only the YoctoHubs and VirtualHub
+     * Returns the network connection delay for yRegisterHub() and yUpdateDeviceList().
+     * This delay impacts only the YoctoHubs and VirtualHub
      * which are accessible through the network. By default, this delay is of 20000 milliseconds,
      * but depending or you network you may want to change this delay.
      * For example if your network infrastructure uses a GSM connection.

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 37233 2019-09-20 09:25:00Z seb $
+ * $Id: YCellular.java 37619 2019-10-11 11:52:42Z mvuilleu $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -603,6 +603,8 @@ public class YCellular extends YFunction
      * Changes the name of the cell operator to be used. If the name is an empty
      * string, the choice will be made automatically based on the SIM card. Otherwise,
      * the selected operator is the only one that will be used.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the name of the cell operator to be used
      *
@@ -624,6 +626,8 @@ public class YCellular extends YFunction
      * Changes the name of the cell operator to be used. If the name is an empty
      * string, the choice will be made automatically based on the SIM card. Otherwise,
      * the selected operator is the only one that will be used.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the name of the cell operator to be used
      *
@@ -751,6 +755,8 @@ public class YCellular extends YFunction
      * on roaming networks may cause prohibitive communication costs !
      *
      * When data services are disabled, SMS are the only mean of communication.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : a value among YCellular.ENABLEDATA_HOMENETWORK, YCellular.ENABLEDATA_ROAMING,
      *  YCellular.ENABLEDATA_NEVER and YCellular.ENABLEDATA_NEUTRALITY corresponding to the condition for
@@ -777,6 +783,8 @@ public class YCellular extends YFunction
      * on roaming networks may cause prohibitive communication costs !
      *
      * When data services are disabled, SMS are the only mean of communication.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : a value among Y_ENABLEDATA_HOMENETWORK, Y_ENABLEDATA_ROAMING, Y_ENABLEDATA_NEVER
      * and Y_ENABLEDATA_NEUTRALITY corresponding to the condition for enabling IP data services (GPRS)
@@ -828,6 +836,8 @@ public class YCellular extends YFunction
     /**
      * Returns the Access Point Name (APN) to be used, if needed.
      * When left blank, the APN suggested by the cell operator will be used.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a string
      *
@@ -848,6 +858,8 @@ public class YCellular extends YFunction
     /**
      * Returns the Access Point Name (APN) to be used, if needed.
      * When left blank, the APN suggested by the cell operator will be used.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a string
      *
@@ -945,6 +957,8 @@ public class YCellular extends YFunction
 
     /**
      * Changes the automated connectivity check interval, in seconds.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the automated connectivity check interval, in seconds
      *
@@ -964,6 +978,8 @@ public class YCellular extends YFunction
 
     /**
      * Changes the automated connectivity check interval, in seconds.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the automated connectivity check interval, in seconds
      *

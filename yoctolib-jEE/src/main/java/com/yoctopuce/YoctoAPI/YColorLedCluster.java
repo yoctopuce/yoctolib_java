@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLedCluster.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YColorLedCluster.java 37619 2019-10-11 11:52:42Z mvuilleu $
  *
  *  Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -581,10 +581,9 @@ public class YColorLedCluster extends YFunction
     }
 
     /**
-     *  Changes the  color at device startup of consecutive LEDs in the cluster, using a RGB color.
-     * Encoding is done as follows: 0xRRGGBB.
-     *  Don't forget to call saveLedsConfigAtPowerOn() to make sure the modification is saved in the device
-     * flash memory.
+     * Changes the  color at device startup of consecutive LEDs in the cluster, using a RGB color.
+     * Encoding is done as follows: 0xRRGGBB. Don't forget to call saveLedsConfigAtPowerOn()
+     * to make sure the modification is saved in the device flash memory.
      *
      * @param ledIndex :  index of the first affected LED.
      * @param count    :  affected LED count.
@@ -600,10 +599,9 @@ public class YColorLedCluster extends YFunction
     }
 
     /**
-     *  Changes the  color at device startup of consecutive LEDs in the cluster, using a HSL color.
-     * Encoding is done as follows: 0xHHSSLL.
-     *  Don't forget to call saveLedsConfigAtPowerOn() to make sure the modification is saved in the device
-     * flash memory.
+     * Changes the  color at device startup of consecutive LEDs in the cluster, using a HSL color.
+     * Encoding is done as follows: 0xHHSSLL. Don't forget to call saveLedsConfigAtPowerOn()
+     * to make sure the modification is saved in the device flash memory.
      *
      * @param ledIndex :  index of the first affected LED.
      * @param count    :  affected LED count.

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGenericSensor.java 37232 2019-09-20 09:22:10Z seb $
+ *  $Id: YGenericSensor.java 37619 2019-10-11 11:52:42Z mvuilleu $
  *
  *  Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -287,9 +287,9 @@ public class YGenericSensor extends YSensor
     }
 
     /**
-     * Returns the electric signal range used by the sensor.
+     * Returns the input signal range used by the sensor.
      *
-     * @return a string corresponding to the electric signal range used by the sensor
+     * @return a string corresponding to the input signal range used by the sensor
      *
      * @throws YAPI_Exception on error
      */
@@ -308,9 +308,9 @@ public class YGenericSensor extends YSensor
     }
 
     /**
-     * Returns the electric signal range used by the sensor.
+     * Returns the input signal range used by the sensor.
      *
-     * @return a string corresponding to the electric signal range used by the sensor
+     * @return a string corresponding to the input signal range used by the sensor
      *
      * @throws YAPI_Exception on error
      */
@@ -320,9 +320,20 @@ public class YGenericSensor extends YSensor
     }
 
     /**
-     * Changes the electric signal range used by the sensor. Default value is "-999999.999...999999.999".
+     * Changes the input signal range used by the sensor.
+     * When the input signal gets out of the planned range, the output value
+     * will be set to an arbitrary large value, whose sign indicates the direction
+     * of the range overrun.
      *
-     * @param newval : a string corresponding to the electric signal range used by the sensor
+     * For a 4-20mA sensor, the default input signal range is "4...20".
+     * For a 0-10V sensor, the default input signal range is "0.1...10".
+     * For numeric communication interfaces, the default input signal range is
+     * "-999999.999...999999.999".
+     *
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : a string corresponding to the input signal range used by the sensor
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -339,9 +350,20 @@ public class YGenericSensor extends YSensor
     }
 
     /**
-     * Changes the electric signal range used by the sensor. Default value is "-999999.999...999999.999".
+     * Changes the input signal range used by the sensor.
+     * When the input signal gets out of the planned range, the output value
+     * will be set to an arbitrary large value, whose sign indicates the direction
+     * of the range overrun.
      *
-     * @param newval : a string corresponding to the electric signal range used by the sensor
+     * For a 4-20mA sensor, the default input signal range is "4...20".
+     * For a 0-10V sensor, the default input signal range is "0.1...10".
+     * For numeric communication interfaces, the default input signal range is
+     * "-999999.999...999999.999".
+     *
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : a string corresponding to the input signal range used by the sensor
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -386,10 +408,17 @@ public class YGenericSensor extends YSensor
     }
 
     /**
-     * Changes the physical value range measured by the sensor. As a side effect, the range modification may
-     * automatically modify the display resolution. Default value is "-999999.999...999999.999".
+     * Changes the output value range, corresponding to the physical value measured
+     * by the sensor. The default output value range is the same as the input signal
+     * range (1:1 mapping), but you can change it so that the function automatically
+     * computes the physical value encoded by the input signal. Be aware that, as a
+     * side effect, the range modification may automatically modify the display resolution.
      *
-     * @param newval : a string corresponding to the physical value range measured by the sensor
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : a string corresponding to the output value range, corresponding to the physical value measured
+     *         by the sensor
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -406,10 +435,17 @@ public class YGenericSensor extends YSensor
     }
 
     /**
-     * Changes the physical value range measured by the sensor. As a side effect, the range modification may
-     * automatically modify the display resolution. Default value is "-999999.999...999999.999".
+     * Changes the output value range, corresponding to the physical value measured
+     * by the sensor. The default output value range is the same as the input signal
+     * range (1:1 mapping), but you can change it so that the function automatically
+     * computes the physical value encoded by the input signal. Be aware that, as a
+     * side effect, the range modification may automatically modify the display resolution.
      *
-     * @param newval : a string corresponding to the physical value range measured by the sensor
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : a string corresponding to the output value range, corresponding to the physical value measured
+     *         by the sensor
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -424,6 +460,8 @@ public class YGenericSensor extends YSensor
      * Changes the electric signal bias for zero shift adjustment.
      * If your electric signal reads positive when it should be zero, setup
      * a positive signalBias of the same value to fix the zero shift.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a floating point number corresponding to the electric signal bias for zero shift adjustment
      *
@@ -445,6 +483,8 @@ public class YGenericSensor extends YSensor
      * Changes the electric signal bias for zero shift adjustment.
      * If your electric signal reads positive when it should be zero, setup
      * a positive signalBias of the same value to fix the zero shift.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : a floating point number corresponding to the electric signal bias for zero shift adjustment
      *
@@ -549,6 +589,8 @@ public class YGenericSensor extends YSensor
      * The LOW_NOISE method uses a reduced acquisition frequency to reduce noise.
      * The LOW_NOISE_FILTERED method combines a reduced frequency with the median filter
      * to get measures as stable as possible when working on a noisy signal.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : a value among YGenericSensor.SIGNALSAMPLING_HIGH_RATE,
      *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE,
@@ -576,6 +618,8 @@ public class YGenericSensor extends YSensor
      * The LOW_NOISE method uses a reduced acquisition frequency to reduce noise.
      * The LOW_NOISE_FILTERED method combines a reduced frequency with the median filter
      * to get measures as stable as possible when working on a noisy signal.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : a value among Y_SIGNALSAMPLING_HIGH_RATE, Y_SIGNALSAMPLING_HIGH_RATE_FILTERED,
      *  Y_SIGNALSAMPLING_LOW_NOISE, Y_SIGNALSAMPLING_LOW_NOISE_FILTERED and Y_SIGNALSAMPLING_HIGHEST_RATE
@@ -628,6 +672,8 @@ public class YGenericSensor extends YSensor
      * Changes the activation state of this input. When an input is disabled,
      * its value is no more updated. On some devices, disabling an input can
      * improve the refresh rate of the other active inputs.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : either YGenericSensor.ENABLED_FALSE or YGenericSensor.ENABLED_TRUE, according to
      * the activation state of this input
@@ -650,6 +696,8 @@ public class YGenericSensor extends YSensor
      * Changes the activation state of this input. When an input is disabled,
      * its value is no more updated. On some devices, disabling an input can
      * improve the refresh rate of the other active inputs.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation state of this input
      *
@@ -818,7 +866,8 @@ public class YGenericSensor extends YSensor
 
     /**
      * Adjusts the signal bias so that the current signal value is need
-     * precisely as zero.
+     * precisely as zero. Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

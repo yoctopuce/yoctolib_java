@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTilt.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YTilt.java 37619 2019-10-11 11:52:42Z mvuilleu $
  *
  *  Implements FindTilt(), the high-level API for Tilt functions
  *
@@ -177,6 +177,8 @@ public class YTilt extends YSensor
     /**
      * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
      * frequency is lower, the device performs averaging.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
      *
@@ -197,6 +199,8 @@ public class YTilt extends YSensor
     /**
      * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
      * frequency is lower, the device performs averaging.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
      *

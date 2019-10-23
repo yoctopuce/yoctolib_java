@@ -817,8 +817,8 @@ public class YAPIContext
     //cannot be generated for Java:
     //public int GetDeviceListValidity_internal()
     /**
-     * Modifies the network connection delay for YAPI.RegisterHub() and
-     * YAPI.UpdateDeviceList(). This delay impacts only the YoctoHubs and VirtualHub
+     * Modifies the network connection delay for yRegisterHub() and yUpdateDeviceList().
+     * This delay impacts only the YoctoHubs and VirtualHub
      * which are accessible through the network. By default, this delay is of 20000 milliseconds,
      * but depending or you network you may want to change this delay.
      * For example if your network infrastructure uses a GSM connection.
@@ -834,8 +834,8 @@ public class YAPIContext
     //cannot be generated for Java:
     //public void SetNetworkTimeout_internal(int networkMsTimeout)
     /**
-     * Returns the network connection delay for YAPI.RegisterHub() and
-     * YAPI.UpdateDeviceList(). This delay impacts only the YoctoHubs and VirtualHub
+     * Returns the network connection delay for yRegisterHub() and yUpdateDeviceList().
+     * This delay impacts only the YoctoHubs and VirtualHub
      * which are accessible through the network. By default, this delay is of 20000 milliseconds,
      * but depending or you network you may want to change this delay.
      * For example if your network infrastructure uses a GSM connection.

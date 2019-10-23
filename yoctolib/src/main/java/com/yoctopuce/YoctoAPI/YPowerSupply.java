@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPowerSupply.java 37232 2019-09-20 09:22:10Z seb $
+ *  $Id: YPowerSupply.java 37653 2019-10-11 17:37:17Z mvuilleu $
  *
  *  Implements FindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -969,7 +969,7 @@ public class YPowerSupply extends YFunction
      *         (floating-point number, representing the end voltage in V)
      * @param ms_duration : total duration of the transition, in milliseconds
      *
-     * @return YAPI_SUCCESS when the call succeeds.
+     * @return YAPI.SUCCESS when the call succeeds.
      */
     public int voltageMove(double V_target,int ms_duration) throws YAPI_Exception
     {

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCurrent.java 37232 2019-09-20 09:22:10Z seb $
+ *  $Id: YCurrent.java 37619 2019-10-11 11:52:42Z mvuilleu $
  *
  *  Implements FindCurrent(), the high-level API for Current functions
  *
@@ -160,12 +160,15 @@ public class YCurrent extends YSensor
     }
 
     /**
-     * Changes the activation state of this input. When an input is disabled,
-     * its value is no more updated. On some devices, disabling an input can
-     * improve the refresh rate of the other active inputs.
+     * Changes the activation state of this voltage input. When AC measurements are disabled,
+     * the device will always assume a DC signal, and vice-versa. When both AC and DC measurements
+     * are active, the device switches between AC and DC mode based on the relative amplitude
+     * of variations compared to the average value.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      *  @param newval : either YCurrent.ENABLED_FALSE or YCurrent.ENABLED_TRUE, according to the activation
-     * state of this input
+     * state of this voltage input
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -182,11 +185,15 @@ public class YCurrent extends YSensor
     }
 
     /**
-     * Changes the activation state of this input. When an input is disabled,
-     * its value is no more updated. On some devices, disabling an input can
-     * improve the refresh rate of the other active inputs.
+     * Changes the activation state of this voltage input. When AC measurements are disabled,
+     * the device will always assume a DC signal, and vice-versa. When both AC and DC measurements
+     * are active, the device switches between AC and DC mode based on the relative amplitude
+     * of variations compared to the average value.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
-     * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation state of this input
+     *  @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation state of this
+     * voltage input
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

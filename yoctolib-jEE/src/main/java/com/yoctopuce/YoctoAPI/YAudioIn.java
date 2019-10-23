@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAudioIn.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YAudioIn.java 37619 2019-10-11 11:52:42Z mvuilleu $
  *
  *  Implements FindAudioIn(), the high-level API for AudioIn functions
  *
@@ -190,6 +190,8 @@ public class YAudioIn extends YFunction
 
     /**
      * Changes audio input gain, in per cents.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to audio input gain, in per cents
      *
@@ -209,6 +211,8 @@ public class YAudioIn extends YFunction
 
     /**
      * Changes audio input gain, in per cents.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to audio input gain, in per cents
      *

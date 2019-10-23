@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmOutput.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YPwmOutput.java 37619 2019-10-11 11:52:42Z mvuilleu $
  *
  *  Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -330,7 +330,8 @@ public class YPwmOutput extends YFunction
      * Changes the PWM period in milliseconds. Caution: in order to avoid  random truncation of
      * the current pulse, the change will not be applied
      * before the end of the current period. This can significantly affect reaction
-     * time at low frequencies.
+     * time at low frequencies. If you call the matching module saveToFlash()
+     * method, the frequency will be kept after a device power cycle.
      *
      * @param newval : a floating point number corresponding to the PWM period in milliseconds
      *
@@ -352,7 +353,8 @@ public class YPwmOutput extends YFunction
      * Changes the PWM period in milliseconds. Caution: in order to avoid  random truncation of
      * the current pulse, the change will not be applied
      * before the end of the current period. This can significantly affect reaction
-     * time at low frequencies.
+     * time at low frequencies. If you call the matching module saveToFlash()
+     * method, the frequency will be kept after a device power cycle.
      *
      * @param newval : a floating point number corresponding to the PWM period in milliseconds
      *
