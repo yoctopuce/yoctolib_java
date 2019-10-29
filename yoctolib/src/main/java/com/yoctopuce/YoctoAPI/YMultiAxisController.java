@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiAxisController.java 37232 2019-09-20 09:22:10Z seb $
+ *  $Id: YMultiAxisController.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -49,7 +49,8 @@ import java.util.ArrayList;
 /**
  * YMultiAxisController Class: MultiAxisController function interface
  *
- * The Yoctopuce application programming interface allows you to drive a stepper motor.
+ * The YMultiAxisController class allows you to drive multiple stepper motors
+ * synchronously.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YMultiAxisController extends YFunction
@@ -297,7 +298,8 @@ public class YMultiAxisController extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the multi-axis controller
+     * @param func : a string that uniquely characterizes the multi-axis controller, for instance
+     *         MyDevice.multiAxisController.
      *
      * @return a YMultiAxisController object allowing you to drive the multi-axis controller.
      */
@@ -335,7 +337,8 @@ public class YMultiAxisController extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the multi-axis controller
+     * @param func : a string that uniquely characterizes the multi-axis controller, for instance
+     *         MyDevice.multiAxisController.
      *
      * @return a YMultiAxisController object allowing you to drive the multi-axis controller.
      */

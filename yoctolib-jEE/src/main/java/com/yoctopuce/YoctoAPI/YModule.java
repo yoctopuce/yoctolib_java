@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 37233 2019-09-20 09:25:00Z seb $
+ * $Id: YModule.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  * YModule Class: Module control interface
  *
@@ -45,7 +45,7 @@ import java.util.*;
 /**
  * YModule Class: Module control interface
  *
- * This interface is identical for all Yoctopuce USB modules.
+ * The YModule class can be used with all Yoctopuce USB devices.
  * It can be used to control the module global parameters, and
  * to enumerate the functions provided by each module.
  */
@@ -1060,7 +1060,8 @@ public class YModule extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the module
+     * @param func : a string that uniquely characterizes the module, for instance
+     *         MyDevice.module.
      *
      * @return a YModule object allowing you to drive the module.
      */

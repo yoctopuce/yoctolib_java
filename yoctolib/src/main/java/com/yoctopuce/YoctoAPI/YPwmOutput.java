@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmOutput.java 37619 2019-10-11 11:52:42Z mvuilleu $
+ *  $Id: YPwmOutput.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -48,7 +48,9 @@ import java.util.Locale;
 /**
  * YPwmOutput Class: PwmOutput function interface
  *
- * The Yoctopuce application programming interface allows you to configure, start, and stop the PWM.
+ * The YPwmOutput class allows you to drive a PWM output, for instance using a Yocto-PWM-Tx.
+ * You can configure the frequency as well as the duty cycle, and setup progressive
+ * transitions.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPwmOutput extends YFunction
@@ -726,7 +728,8 @@ public class YPwmOutput extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the PWM
+     * @param func : a string that uniquely characterizes the PWM, for instance
+     *         YPWMTX01.pwmOutput1.
      *
      * @return a YPwmOutput object allowing you to drive the PWM.
      */
@@ -764,7 +767,8 @@ public class YPwmOutput extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the PWM
+     * @param func : a string that uniquely characterizes the PWM, for instance
+     *         YPWMTX01.pwmOutput1.
      *
      * @return a YPwmOutput object allowing you to drive the PWM.
      */

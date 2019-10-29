@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmPowerSource.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YPwmPowerSource.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *
@@ -47,8 +47,8 @@ package com.yoctopuce.YoctoAPI;
 /**
  * YPwmPowerSource Class: PwmPowerSource function interface
  *
- * The Yoctopuce application programming interface allows you to configure
- * the voltage source used by all PWM on the same device.
+ * The YPwmPowerSource class allows you to configure
+ * the voltage source used by all PWM outputs on the same device, for instance using a Yocto-PWM-Tx.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPwmPowerSource extends YFunction
@@ -232,7 +232,8 @@ public class YPwmPowerSource extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the voltage source
+     * @param func : a string that uniquely characterizes the voltage source, for instance
+     *         YPWMTX01.pwmPowerSource.
      *
      * @return a YPwmPowerSource object allowing you to drive the voltage source.
      */
@@ -270,7 +271,8 @@ public class YPwmPowerSource extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the voltage source
+     * @param func : a string that uniquely characterizes the voltage source, for instance
+     *         YPWMTX01.pwmPowerSource.
      *
      * @return a YPwmPowerSource object allowing you to drive the voltage source.
      */

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YHubPort.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YHubPort.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindHubPort(), the high-level API for HubPort functions
  *
@@ -47,8 +47,9 @@ package com.yoctopuce.YoctoAPI;
 /**
  * YHubPort Class: Yocto-hub port interface
  *
- * YHubPort objects provide control over the power supply for every
- * YoctoHub port and provide information about the device connected to it.
+ * The YHubPort class provides control over the power supply for every port
+ *  on a YoctoHub, for instance using a YoctoHub-Ethernet, a YoctoHub-Wireless-g, a YoctoHub-Shield or
+ * a YoctoHub-GSM-3G-NA. It provide information about the device connected to it.
  * The logical name of a YHubPort is always automatically set to the
  * unique serial number of the Yoctopuce device connected to it.
  */
@@ -313,7 +314,8 @@ public class YHubPort extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the Yocto-hub port
+     * @param func : a string that uniquely characterizes the Yocto-hub port, for instance
+     *         YHUBETH1.hubPort1.
      *
      * @return a YHubPort object allowing you to drive the Yocto-hub port.
      */
@@ -351,7 +353,8 @@ public class YHubPort extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the Yocto-hub port
+     * @param func : a string that uniquely characterizes the Yocto-hub port, for instance
+     *         YHUBETH1.hubPort1.
      *
      * @return a YHubPort object allowing you to drive the Yocto-hub port.
      */

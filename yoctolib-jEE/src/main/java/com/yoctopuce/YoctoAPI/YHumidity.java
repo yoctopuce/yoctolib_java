@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YHumidity.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YHumidity.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindHumidity(), the high-level API for Humidity functions
  *
@@ -47,8 +47,9 @@ package com.yoctopuce.YoctoAPI;
 /**
  * YHumidity Class: Humidity function interface
  *
- * The Yoctopuce class YHumidity allows you to read and configure Yoctopuce humidity
- * sensors. It inherits from YSensor class the core functions to read measurements,
+ * The YHumidity class allows you to read and configure Yoctopuce humidity
+ *  sensors, for instance using a Yocto-Meteo-V2, a Yocto-VOC-V3 or a Yocto-CO2-V2. It inherits from
+ * YSensor class the core functions to read measurements,
  * to register callback functions, to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -266,7 +267,8 @@ public class YHumidity extends YSensor
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the humidity sensor
+     * @param func : a string that uniquely characterizes the humidity sensor, for instance
+     *         METEOMK2.humidity.
      *
      * @return a YHumidity object allowing you to drive the humidity sensor.
      */
@@ -304,7 +306,8 @@ public class YHumidity extends YSensor
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the humidity sensor
+     * @param func : a string that uniquely characterizes the humidity sensor, for instance
+     *         METEOMK2.humidity.
      *
      * @return a YHumidity object allowing you to drive the humidity sensor.
      */

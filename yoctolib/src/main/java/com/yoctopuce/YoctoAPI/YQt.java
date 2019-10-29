@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 37232 2019-09-20 09:22:10Z seb $
+ * $Id: YQt.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -45,8 +45,11 @@ package com.yoctopuce.YoctoAPI;
 /**
  * YQt Class: Quaternion interface
  *
- * The Yoctopuce API YQt class provides direct access to the Yocto3D attitude estimation
- * using a quaternion. It is usually not needed to use the YQt class directly, as the
+ * The YQt class provides direct access to the 3D attitude estimation provided by Yoctopuce
+ *  inertial sensors, for instance using a Yocto-3D-V2. The four instances of YQt provide direct access
+ * to the individual
+ * quaternion components representing the orientation.
+ * It is usually not needed to use the YQt class directly, as the
  * YGyro class provides a more convenient higher-level interface.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -133,7 +136,8 @@ public class YQt extends YSensor
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the quaternion component
+     * @param func : a string that uniquely characterizes the quaternion component, for instance
+     *         Y3DMK002.qt1.
      *
      * @return a YQt object allowing you to drive the quaternion component.
      */
@@ -171,7 +175,8 @@ public class YQt extends YSensor
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the quaternion component
+     * @param func : a string that uniquely characterizes the quaternion component, for instance
+     *         Y3DMK002.qt1.
      *
      * @return a YQt object allowing you to drive the quaternion component.
      */

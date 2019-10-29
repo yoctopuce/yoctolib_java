@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 37232 2019-09-20 09:22:10Z seb $
+ *  $Id: YI2cPort.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -49,8 +49,8 @@ import java.util.Locale;
 /**
  * YI2cPort Class: I2C Port function interface
  *
- * The I2cPort function interface allows you to fully drive a Yoctopuce
- * I2C port, to send and receive data, and to configure communication
+ * The YI2cPort classe allows you to fully drive a Yoctopuce I2C port, for instance using a Yocto-I2C.
+ * It can be used to send and receive data, and to configure communication
  * parameters (baud rate, etc).
  * Note that Yoctopuce I2C ports are not exposed as virtual COM ports.
  * They are meant to be used in the same way as all Yoctopuce devices.
@@ -855,7 +855,8 @@ public class YI2cPort extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the I2C port
+     * @param func : a string that uniquely characterizes the I2C port, for instance
+     *         YI2CMK01.i2cPort.
      *
      * @return a YI2cPort object allowing you to drive the I2C port.
      */
@@ -893,7 +894,8 @@ public class YI2cPort extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the I2C port
+     * @param func : a string that uniquely characterizes the I2C port, for instance
+     *         YI2CMK01.i2cPort.
      *
      * @return a YI2cPort object allowing you to drive the I2C port.
      */

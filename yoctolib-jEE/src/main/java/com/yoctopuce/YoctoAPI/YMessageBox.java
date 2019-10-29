@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 37233 2019-09-20 09:25:00Z seb $
+ * $Id: YMessageBox.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -48,8 +48,9 @@ import java.util.Locale;
 /**
  * YMessageBox Class: MessageBox function interface
  *
- * YMessageBox functions provides SMS sending and receiving capability to
- * GSM-enabled Yoctopuce devices.
+ * The YMessageBox class provides SMS sending and receiving capability to
+ *  GSM-enabled Yoctopuce devices, for instance using a YoctoHub-GSM-3G-NA, a YoctoHub-GSM-3G-EU or a
+ * YoctoHub-GSM-2G.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YMessageBox extends YFunction
@@ -430,7 +431,8 @@ public class YMessageBox extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the MessageBox interface
+     * @param func : a string that uniquely characterizes the MessageBox interface, for instance
+     *         YHUBGSM4.messageBox.
      *
      * @return a YMessageBox object allowing you to drive the MessageBox interface.
      */
@@ -468,7 +470,8 @@ public class YMessageBox extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the MessageBox interface
+     * @param func : a string that uniquely characterizes the MessageBox interface, for instance
+     *         YHUBGSM4.messageBox.
      *
      * @return a YMessageBox object allowing you to drive the MessageBox interface.
      */

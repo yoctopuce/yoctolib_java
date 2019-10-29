@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YStepperMotor.java 37232 2019-09-20 09:22:10Z seb $
+ *  $Id: YStepperMotor.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -48,7 +48,7 @@ import java.util.Locale;
 /**
  * YStepperMotor Class: StepperMotor function interface
  *
- * The Yoctopuce application programming interface allows you to drive a stepper motor.
+ * The YStepperMotor class allows you to drive a stepper motor.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YStepperMotor extends YFunction
@@ -1072,7 +1072,8 @@ public class YStepperMotor extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the stepper motor
+     * @param func : a string that uniquely characterizes the stepper motor, for instance
+     *         MyDevice.stepperMotor1.
      *
      * @return a YStepperMotor object allowing you to drive the stepper motor.
      */
@@ -1110,7 +1111,8 @@ public class YStepperMotor extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the stepper motor
+     * @param func : a string that uniquely characterizes the stepper motor, for instance
+     *         MyDevice.stepperMotor1.
      *
      * @return a YStepperMotor object allowing you to drive the stepper motor.
      */

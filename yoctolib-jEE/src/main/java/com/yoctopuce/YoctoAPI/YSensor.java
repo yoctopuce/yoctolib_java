@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 37233 2019-09-20 09:25:00Z seb $
+ * $Id: YSensor.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -46,7 +46,7 @@ import java.util.Locale;
 /**
  * YSensor Class: Sensor function interface
  *
- * The YSensor class is the parent class for all Yoctopuce sensors. It can be
+ * The YSensor class is the parent class for all Yoctopuce sensor types. It can be
  * used to read the current value and unit of any sensor, read the min/max
  * value, configure autonomous recording frequency and access recorded data.
  * It also provide a function to register a callback invoked each time the
@@ -1002,7 +1002,8 @@ public class YSensor extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the sensor
+     * @param func : a string that uniquely characterizes the sensor, for instance
+     *         MyDevice..
      *
      * @return a YSensor object allowing you to drive the sensor.
      */
@@ -1040,7 +1041,8 @@ public class YSensor extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the sensor
+     * @param func : a string that uniquely characterizes the sensor, for instance
+     *         MyDevice..
      *
      * @return a YSensor object allowing you to drive the sensor.
      */

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 37233 2019-09-20 09:25:00Z seb $
+ * $Id: YWireless.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -47,8 +47,9 @@ import java.util.Locale;
 /**
  * YWireless Class: Wireless function interface
  *
- * YWireless functions provides control over wireless network parameters
- * and status for devices that are wireless-enabled.
+ * The YWireless class provides control over wireless network parameters
+ *  and status for devices that are wireless-enabled, for instance using a YoctoHub-Wireless-g, a
+ * YoctoHub-Wireless-SR or a YoctoHub-Wireless.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YWireless extends YFunction
@@ -456,7 +457,8 @@ public class YWireless extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the wireless lan interface
+     * @param func : a string that uniquely characterizes the wireless lan interface, for instance
+     *         YHUBWLN3.wireless.
      *
      * @return a YWireless object allowing you to drive the wireless lan interface.
      */
@@ -494,7 +496,8 @@ public class YWireless extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the wireless lan interface
+     * @param func : a string that uniquely characterizes the wireless lan interface, for instance
+     *         YHUBWLN3.wireless.
      *
      * @return a YWireless object allowing you to drive the wireless lan interface.
      */

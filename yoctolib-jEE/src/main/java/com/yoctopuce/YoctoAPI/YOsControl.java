@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YOsControl.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YOsControl.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -47,8 +47,8 @@ package com.yoctopuce.YoctoAPI;
 /**
  * YOsControl Class: OS control
  *
- * The OScontrol object allows some control over the operating system running a VirtualHub.
- * OsControl is available on the VirtualHub software only. This feature must be activated at the VirtualHub
+ * The YOScontrol class provides some control over the operating system running a VirtualHub.
+ * YOsControl is available on VirtualHub software only. This feature must be activated at the VirtualHub
  * start up with -o option.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -194,7 +194,8 @@ public class YOsControl extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the OS control
+     * @param func : a string that uniquely characterizes the OS control, for instance
+     *         MyDevice.osControl.
      *
      * @return a YOsControl object allowing you to drive the OS control.
      */
@@ -232,7 +233,8 @@ public class YOsControl extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the OS control
+     * @param func : a string that uniquely characterizes the OS control, for instance
+     *         MyDevice.osControl.
      *
      * @return a YOsControl object allowing you to drive the OS control.
      */

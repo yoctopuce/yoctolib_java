@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiSensController.java 37232 2019-09-20 09:22:10Z seb $
+ *  $Id: YMultiSensController.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindMultiSensController(), the high-level API for MultiSensController functions
  *
@@ -48,8 +48,8 @@ import java.util.Locale;
 /**
  * YMultiSensController Class: MultiSensController function interface
  *
- * The Yoctopuce application programming interface allows you to setup a customized
- * sensor chain.
+ * The YMultiSensController class allows you to setup a customized
+ * sensor chain on devices featuring that functionality, for instance using a Yocto-Temperature-IR.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YMultiSensController extends YFunction
@@ -379,7 +379,8 @@ public class YMultiSensController extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the multi-sensor controller
+     * @param func : a string that uniquely characterizes the multi-sensor controller, for instance
+     *         YTEMPIR1.multiSensController.
      *
      * @return a YMultiSensController object allowing you to drive the multi-sensor controller.
      */
@@ -417,7 +418,8 @@ public class YMultiSensController extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the multi-sensor controller
+     * @param func : a string that uniquely characterizes the multi-sensor controller, for instance
+     *         YTEMPIR1.multiSensController.
      *
      * @return a YMultiSensController object allowing you to drive the multi-sensor controller.
      */

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCurrentLoopOutput.java 37232 2019-09-20 09:22:10Z seb $
+ *  $Id: YCurrentLoopOutput.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -48,8 +48,8 @@ import java.util.Locale;
 /**
  * YCurrentLoopOutput Class: CurrentLoopOutput function interface
  *
- * The Yoctopuce application programming interface allows you to change the value of the 4-20mA
- * output as well as to know the current loop state.
+ * The YCurrentLoopOutput class allows you to drive a 4-20mA output, for instance using a Yocto-4-20mA-Tx.
+ * It can also provide information about the power state of the current loop.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YCurrentLoopOutput extends YFunction
@@ -375,7 +375,8 @@ public class YCurrentLoopOutput extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the 4-20mA output
+     * @param func : a string that uniquely characterizes the 4-20mA output, for instance
+     *         TX420MA1.currentLoopOutput.
      *
      * @return a YCurrentLoopOutput object allowing you to drive the 4-20mA output.
      */
@@ -413,7 +414,8 @@ public class YCurrentLoopOutput extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the 4-20mA output
+     * @param func : a string that uniquely characterizes the 4-20mA output, for instance
+     *         TX420MA1.currentLoopOutput.
      *
      * @return a YCurrentLoopOutput object allowing you to drive the 4-20mA output.
      */

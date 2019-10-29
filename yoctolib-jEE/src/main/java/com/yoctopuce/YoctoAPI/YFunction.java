@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 37233 2019-09-20 09:25:00Z seb $
+ * $Id: YFunction.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -345,7 +345,8 @@ public class YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the function
+     * @param func : a string that uniquely characterizes the function, for instance
+     *         MyDevice..
      *
      * @return a YFunction object allowing you to drive the function.
      */
@@ -383,7 +384,8 @@ public class YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the function
+     * @param func : a string that uniquely characterizes the function, for instance
+     *         MyDevice..
      *
      * @return a YFunction object allowing you to drive the function.
      */

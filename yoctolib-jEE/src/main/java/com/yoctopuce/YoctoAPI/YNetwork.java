@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 37619 2019-10-11 11:52:42Z mvuilleu $
+ *  $Id: YNetwork.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -49,7 +49,8 @@ import java.util.Locale;
  * YNetwork Class: Network function interface
  *
  * YNetwork objects provide access to TCP/IP parameters of Yoctopuce
- * modules that include a built-in network interface.
+ *  devices that include a built-in network interface, for instance using a YoctoHub-Ethernet, a
+ * YoctoHub-Wireless-g, a YoctoHub-GSM-3G-NA or a YoctoHub-GSM-3G-EU.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YNetwork extends YFunction
@@ -1962,7 +1963,8 @@ public class YNetwork extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the network interface
+     * @param func : a string that uniquely characterizes the network interface, for instance
+     *         YHUBETH1.network.
      *
      * @return a YNetwork object allowing you to drive the network interface.
      */
@@ -2000,7 +2002,8 @@ public class YNetwork extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the network interface
+     * @param func : a string that uniquely characterizes the network interface, for instance
+     *         YHUBETH1.network.
      *
      * @return a YNetwork object allowing you to drive the network interface.
      */

@@ -115,7 +115,7 @@ public class YAPIContext
         PlugEvent(YAPIContext yctx, Event ev, String serial)
         {
             this.ev = ev;
-            this.module = YModule.FindModule(serial + ".module");
+            this.module = YModule.FindModuleInContext(yctx,serial + ".module");
         }
     }
 

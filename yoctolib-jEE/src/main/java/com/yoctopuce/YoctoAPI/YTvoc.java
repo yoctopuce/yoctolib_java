@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTvoc.java 37233 2019-09-20 09:25:00Z seb $
+ *  $Id: YTvoc.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindTvoc(), the high-level API for Tvoc functions
  *
@@ -47,8 +47,9 @@ package com.yoctopuce.YoctoAPI;
 /**
  * YTvoc Class: Tvoc function interface
  *
- * The Yoctopuce class YTvoc allows you to read and configure Yoctopuce Total Volatile Organic
- * Compound sensors. It inherits from YSensor class the core functions to read measurements,
+ * The YTvoc class allows you to read and configure Yoctopuce Total Volatile Organic
+ *  Compound sensors, for instance using a Yocto-VOC-V3. It inherits from YSensor class the core
+ * functions to read measurements,
  * to register callback functions, to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -139,7 +140,8 @@ public class YTvoc extends YSensor
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the Total  Volatile Organic Compound sensor
+     * @param func : a string that uniquely characterizes the Total  Volatile Organic Compound sensor, for instance
+     *         YVOCMK03.tvoc.
      *
      * @return a YTvoc object allowing you to drive the Total  Volatile Organic Compound sensor.
      */
@@ -177,7 +179,8 @@ public class YTvoc extends YSensor
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the Total  Volatile Organic Compound sensor
+     * @param func : a string that uniquely characterizes the Total  Volatile Organic Compound sensor, for instance
+     *         YVOCMK03.tvoc.
      *
      * @return a YTvoc object allowing you to drive the Total  Volatile Organic Compound sensor.
      */

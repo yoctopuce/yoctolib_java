@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMotor.java 37619 2019-10-11 11:52:42Z mvuilleu $
+ *  $Id: YMotor.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  *  Implements FindMotor(), the high-level API for Motor functions
  *
@@ -48,7 +48,8 @@ import java.util.Locale;
 /**
  * YMotor Class: Motor function interface
  *
- * Yoctopuce application programming interface allows you to drive the
+ *  The YMotor class allows you to drive a DC motor, for instance using a Yocto-Motor-DC. It can be
+ * used to configure the
  * power sent to the motor to make it turn both ways, but also to drive accelerations
  * and decelerations. The motor will then accelerate automatically: you will not
  * have to monitor it. The API also allows to slow down the motor by shortening
@@ -507,6 +508,15 @@ public class YMotor extends YFunction
         return get_cutOffVoltage();
     }
 
+    /**
+     * Returns the current threshold (in mA) above which the controller automatically
+     * switches to error state. A zero value means that there is no limit.
+     *
+     * @return an integer corresponding to the current threshold (in mA) above which the controller automatically
+     *         switches to error state
+     *
+     * @throws YAPI_Exception on error
+     */
     public int get_overCurrentLimit() throws YAPI_Exception
     {
         int res;
@@ -519,6 +529,20 @@ public class YMotor extends YFunction
             res = _overCurrentLimit;
         }
         return res;
+    }
+
+    /**
+     * Returns the current threshold (in mA) above which the controller automatically
+     * switches to error state. A zero value means that there is no limit.
+     *
+     * @return an integer corresponding to the current threshold (in mA) above which the controller automatically
+     *         switches to error state
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getOverCurrentLimit() throws YAPI_Exception
+    {
+        return get_overCurrentLimit();
     }
 
     /**
@@ -858,7 +882,8 @@ public class YMotor extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the motor
+     * @param func : a string that uniquely characterizes the motor, for instance
+     *         MOTORCTL.motor.
      *
      * @return a YMotor object allowing you to drive the motor.
      */
@@ -896,7 +921,8 @@ public class YMotor extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the motor
+     * @param func : a string that uniquely characterizes the motor, for instance
+     *         MOTORCTL.motor.
      *
      * @return a YMotor object allowing you to drive the motor.
      */

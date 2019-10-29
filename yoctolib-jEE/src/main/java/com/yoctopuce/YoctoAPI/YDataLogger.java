@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 37233 2019-09-20 09:25:00Z seb $
+ * $Id: YDataLogger.java 37827 2019-10-25 13:07:48Z mvuilleu $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -46,9 +46,11 @@ import java.util.Locale;
 /**
  * YDataLogger Class: DataLogger function interface
  *
- * Yoctopuce sensors include a non-volatile memory capable of storing ongoing measured
- * data automatically, without requiring a permanent connection to a computer.
- * The DataLogger function controls the global parameters of the internal data
+ * A non-volatile memory for storing ongoing measured data is available on most Yoctopuce
+ *  sensors, for instance using a Yocto-Light-V3, a Yocto-Meteo-V2, a Yocto-Watt or a Yocto-3D-V2.
+ * Recording can happen automatically, without requiring a permanent
+ * connection to a computer.
+ * The YDataLogger class controls the global parameters of the internal data
  * logger. Recording control (start/stop) as well as data retreival is done at
  * sensor objects level.
  */
@@ -605,7 +607,8 @@ public class YDataLogger extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the data logger
+     * @param func : a string that uniquely characterizes the data logger, for instance
+     *         LIGHTMK3.dataLogger.
      *
      * @return a YDataLogger object allowing you to drive the data logger.
      */
@@ -643,7 +646,8 @@ public class YDataLogger extends YFunction
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the data logger
+     * @param func : a string that uniquely characterizes the data logger, for instance
+     *         LIGHTMK3.dataLogger.
      *
      * @return a YDataLogger object allowing you to drive the data logger.
      */
