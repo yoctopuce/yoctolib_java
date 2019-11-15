@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMotor.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YMotor.java 38030 2019-11-04 17:56:01Z mvuilleu $
  *
  *  Implements FindMotor(), the high-level API for Motor functions
  *
@@ -87,7 +87,7 @@ public class YMotor extends YFunction
     /**
      * invalid overCurrentLimit value
      */
-    public static final int OVERCURRENTLIMIT_INVALID = YAPI.INVALID_INT;
+    public static final int OVERCURRENTLIMIT_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid frequency value
      */
@@ -95,7 +95,7 @@ public class YMotor extends YFunction
     /**
      * invalid starterTime value
      */
-    public static final int STARTERTIME_INVALID = YAPI.INVALID_INT;
+    public static final int STARTERTIME_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid failSafeTimeout value
      */

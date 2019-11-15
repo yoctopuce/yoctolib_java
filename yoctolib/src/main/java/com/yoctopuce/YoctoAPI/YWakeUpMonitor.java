@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpMonitor.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YWakeUpMonitor.java 38030 2019-11-04 17:56:01Z mvuilleu $
  *
  *  Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -59,11 +59,11 @@ public class YWakeUpMonitor extends YFunction
     /**
      * invalid powerDuration value
      */
-    public static final int POWERDURATION_INVALID = YAPI.INVALID_INT;
+    public static final int POWERDURATION_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid sleepCountdown value
      */
-    public static final int SLEEPCOUNTDOWN_INVALID = YAPI.INVALID_INT;
+    public static final int SLEEPCOUNTDOWN_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid nextWakeUp value
      */

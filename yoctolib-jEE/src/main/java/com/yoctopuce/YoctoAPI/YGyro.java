@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ * $Id: YGyro.java 38030 2019-11-04 17:56:01Z mvuilleu $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -86,7 +86,7 @@ public class YGyro extends YSensor
     /**
      * invalid bandwidth value
      */
-    public static final int BANDWIDTH_INVALID = YAPI.INVALID_INT;
+    public static final int BANDWIDTH_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid xValue value
      */

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCompass.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YCompass.java 38030 2019-11-04 17:56:01Z mvuilleu $
  *
  *  Implements FindCompass(), the high-level API for Compass functions
  *
@@ -60,7 +60,7 @@ public class YCompass extends YSensor
     /**
      * invalid bandwidth value
      */
-    public static final int BANDWIDTH_INVALID = YAPI.INVALID_INT;
+    public static final int BANDWIDTH_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid axis value
      */

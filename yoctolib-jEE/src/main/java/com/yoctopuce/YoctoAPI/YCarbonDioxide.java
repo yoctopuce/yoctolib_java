@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCarbonDioxide.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YCarbonDioxide.java 38030 2019-11-04 17:56:01Z mvuilleu $
  *
  *  Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -61,7 +61,7 @@ public class YCarbonDioxide extends YSensor
     /**
      * invalid abcPeriod value
      */
-    public static final int ABCPERIOD_INVALID = YAPI.INVALID_INT;
+    public static final int ABCPERIOD_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid command value
      */

@@ -69,13 +69,13 @@ public class YConsolidatedDataSet
     // YConsolidatedDataSet constructor, when instantiated directly by a function
     public YConsolidatedDataSet(double startTime, double endTime, ArrayList<YSensor> sensorList)
     {
-        _init(startTime, endTime, sensorList);
+        imm_init(startTime, endTime, sensorList);
     }
 
 
     //--- (generated code: YConsolidatedDataSet implementation)
 
-    public int _init(double startt,double endt,ArrayList<YSensor> sensorList)
+    public int imm_init(double startt,double endt,ArrayList<YSensor> sensorList)
     {
         _start = startt;
         _end = endt;
