@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YNetwork.java 38510 2019-11-26 15:36:38Z mvuilleu $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -50,7 +50,7 @@ import java.util.Locale;
  *
  * YNetwork objects provide access to TCP/IP parameters of Yoctopuce
  *  devices that include a built-in network interface, for instance using a YoctoHub-Ethernet, a
- * YoctoHub-Wireless-g, a YoctoHub-GSM-3G-NA or a YoctoHub-GSM-3G-EU.
+ * YoctoHub-GSM-3G-EU, a YoctoHub-GSM-3G-NA or a YoctoHub-Wireless-g.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YNetwork extends YFunction

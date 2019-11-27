@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ * $Id: YCellular.java 38510 2019-11-26 15:36:38Z mvuilleu $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -51,8 +51,8 @@ import java.util.Locale;
  * YCellular Class: Cellular function interface
  *
  * The YCellular class provides control over cellular network parameters
- *  and status for devices that are GSM-enabled, for instance using a YoctoHub-GSM-3G-NA, a
- * YoctoHub-GSM-3G-EU or a YoctoHub-GSM-2G.
+ *  and status for devices that are GSM-enabled, for instance using a YoctoHub-GSM-2G, a
+ * YoctoHub-GSM-3G-EU or a YoctoHub-GSM-3G-NA.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YCellular extends YFunction
@@ -1174,7 +1174,7 @@ public class YCellular extends YFunction
      * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the cellular interface, for instance
-     *         YHUBGSM4.cellular.
+     *         YHUBGSM1.cellular.
      *
      * @return a YCellular object allowing you to drive the cellular interface.
      */
@@ -1213,7 +1213,7 @@ public class YCellular extends YFunction
      *
      * @param yctx : a YAPI context
      * @param func : a string that uniquely characterizes the cellular interface, for instance
-     *         YHUBGSM4.cellular.
+     *         YHUBGSM1.cellular.
      *
      * @return a YCellular object allowing you to drive the cellular interface.
      */

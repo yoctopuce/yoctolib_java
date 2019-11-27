@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRealTimeClock.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YRealTimeClock.java 38510 2019-11-26 15:36:38Z mvuilleu $
  *
  *  Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -48,8 +48,8 @@ package com.yoctopuce.YoctoAPI;
  * YRealTimeClock Class: Real Time Clock function interface
  *
  * The YRealTimeClock class provide access to the embedded real-time clock available on some Yoctopuce
- *  devices, for instance using a YoctoHub-Wireless-g, a YoctoHub-GSM-3G-NA, a YoctoHub-GSM-3G-EU or a
- * YoctoHub-Wireless-SR. It can provide current date and time, even after a power outage
+ *  devices, for instance using a YoctoHub-GSM-3G-EU, a YoctoHub-GSM-3G-NA, a YoctoHub-Wireless-SR or a
+ * YoctoHub-Wireless-g. It can provide current date and time, even after a power outage
  * lasting several days. It is the base for automated wake-up functions provided by the WakeUpScheduler.
  * The current time may represent a local time as well as an UTC time, but no automatic time change
  * will occur to account for daylight saving time.
@@ -384,7 +384,7 @@ public class YRealTimeClock extends YFunction
      * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the clock, for instance
-     *         YHUBWLN3.realTimeClock.
+     *         YHUBGSM3.realTimeClock.
      *
      * @return a YRealTimeClock object allowing you to drive the clock.
      */
@@ -423,7 +423,7 @@ public class YRealTimeClock extends YFunction
      *
      * @param yctx : a YAPI context
      * @param func : a string that uniquely characterizes the clock, for instance
-     *         YHUBWLN3.realTimeClock.
+     *         YHUBGSM3.realTimeClock.
      *
      * @return a YRealTimeClock object allowing you to drive the clock.
      */

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ * $Id: YSerialPort.java 38510 2019-11-26 15:36:38Z mvuilleu $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -48,7 +48,7 @@ import java.util.ArrayList;
  * YSerialPort Class: SerialPort function interface
  *
  *  The YSerialPort class allows you to fully drive a Yoctopuce serial port, for instance using a
- * Yocto-RS232, a Yocto-RS485 or a Yocto-Serial.
+ * Yocto-RS232, a Yocto-RS485-V2 or a Yocto-Serial.
  * It can be used to send and receive data, and to configure communication
  * parameters (baud rate, bit count, parity, flow control and protocol).
  * Note that Yoctopuce serial ports are not exposed as virtual COM ports.

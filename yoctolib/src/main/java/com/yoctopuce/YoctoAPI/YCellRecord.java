@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellRecord.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YCellRecord.java 38239 2019-11-20 11:36:26Z seb $
  *
  * Implements FindCellRecord(), the high-level API for CellRecord functions
  *
@@ -76,36 +76,71 @@ public class YCellRecord
 
     //--- (generated code: YCellRecord implementation)
 
+    /**
+     * Returns the name of the the cell operator.
+     *
+     * @return a string with the name of the the cell operator.
+     */
     public String get_cellOperator()
     {
         return _oper;
     }
 
+    /**
+     * Returns the Mobile Country Code (MCC).
+     *
+     * @return the Mobile Country Code (MCC).
+     */
     public int get_mobileCountryCode()
     {
         return _mcc;
     }
 
+    /**
+     * Returns the Mobile Network Code (MNC).
+     *
+     * @return the Mobile Network Code (MNC).
+     */
     public int get_mobileNetworkCode()
     {
         return _mnc;
     }
 
+    /**
+     * Returns the Location Area Code (LAC).
+     *
+     * @return the Location Area Code (LAC).
+     */
     public int get_locationAreaCode()
     {
         return _lac;
     }
 
+    /**
+     * Returns the Cell Id.
+     *
+     * @return the Cell Id.
+     */
     public int get_cellId()
     {
         return _cid;
     }
 
+    /**
+     * Returns the signal strength.
+     *
+     * @return the signal strength.
+     */
     public int get_signalStrength()
     {
         return _dbm;
     }
 
+    /**
+     * Returns the Timing Advance (TA).
+     *
+     * @return the Timing Advance (TA).
+     */
     public int get_timingAdvance()
     {
         return _tad;

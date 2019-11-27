@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPowerOutput.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YPowerOutput.java 38510 2019-11-26 15:36:38Z mvuilleu $
  *
  *  Implements FindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -229,7 +229,7 @@ public class YPowerOutput extends YFunction
      * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the power output control, for instance
-     *         YSPIMK01.powerOutput.
+     *         YI2CMK01.powerOutput.
      *
      * @return a YPowerOutput object allowing you to drive the power output control.
      */
@@ -268,7 +268,7 @@ public class YPowerOutput extends YFunction
      *
      * @param yctx : a YAPI context
      * @param func : a string that uniquely characterizes the power output control, for instance
-     *         YSPIMK01.powerOutput.
+     *         YI2CMK01.powerOutput.
      *
      * @return a YPowerOutput object allowing you to drive the power output control.
      */

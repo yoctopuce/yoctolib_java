@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTemperature.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YTemperature.java 38510 2019-11-26 15:36:38Z mvuilleu $
  *
  *  Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -50,8 +50,8 @@ import java.util.Locale;
  * YTemperature Class: Temperature function interface
  *
  * The YTemperature class allows you to read and configure Yoctopuce temperature
- *  sensors, for instance using a Yocto-Meteo-V2, a Yocto-Thermocouple, a Yocto-PT100 or a
- * Yocto-Temperature. It inherits from YSensor class the core functions to read measurements, to
+ *  sensors, for instance using a Yocto-Meteo-V2, a Yocto-PT100, a Yocto-Temperature or a
+ * Yocto-Thermocouple. It inherits from YSensor class the core functions to read measurements, to
  * register callback functions, to access the autonomous datalogger.
  * This class adds the ability to configure some specific parameters for some
  * sensors (connection type, temperature mapping table).
