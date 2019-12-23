@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPowerOutput.java 38510 2019-11-26 15:36:38Z mvuilleu $
+ *  $Id: YPowerOutput.java 38913 2019-12-20 18:59:49Z mvuilleu $
  *
  *  Implements FindPowerOutput(), the high-level API for PowerOutput functions
  *
@@ -45,10 +45,11 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YPowerOutput yapiwrapper)
 //--- (YPowerOutput class start)
 /**
- * YPowerOutput Class: External power supply control interface
+ *  YPowerOutput Class: power output control interface, available for instance in the Yocto-I2C, the
+ * Yocto-MaxiMicroVolt-Rx, the Yocto-SPI or the Yocto-Serial
  *
- * Yoctopuce application programming interface allows you to control
- * the power output featured on some devices such as the Yocto-Serial.
+ * The YPowerOutput class allows you to control
+ * the power output featured on some Yoctopuce devices.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPowerOutput extends YFunction
@@ -206,7 +207,7 @@ public class YPowerOutput extends YFunction
     }
 
     /**
-     * Retrieves a dual power  output control for a given identifier.
+     * Retrieves a power output for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -216,11 +217,11 @@ public class YPowerOutput extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the power output control is online at the time
+     * This function does not require that the power output is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YPowerOutput.isOnline() to test if the power output control is
+     * Use the method YPowerOutput.isOnline() to test if the power output is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a dual power  output control by logical name, no error is notified: the first instance
+     * a power output by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
@@ -228,10 +229,10 @@ public class YPowerOutput extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the power output control, for instance
+     * @param func : a string that uniquely characterizes the power output, for instance
      *         YI2CMK01.powerOutput.
      *
-     * @return a YPowerOutput object allowing you to drive the power output control.
+     * @return a YPowerOutput object allowing you to drive the power output.
      */
     public static YPowerOutput FindPowerOutput(String func)
     {
@@ -248,7 +249,7 @@ public class YPowerOutput extends YFunction
     }
 
     /**
-     * Retrieves a dual power  output control for a given identifier in a YAPI context.
+     * Retrieves a power output for a given identifier in a YAPI context.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -258,19 +259,19 @@ public class YPowerOutput extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the power output control is online at the time
+     * This function does not require that the power output is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YPowerOutput.isOnline() to test if the power output control is
+     * Use the method YPowerOutput.isOnline() to test if the power output is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a dual power  output control by logical name, no error is notified: the first instance
+     * a power output by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the power output control, for instance
+     * @param func : a string that uniquely characterizes the power output, for instance
      *         YI2CMK01.powerOutput.
      *
-     * @return a YPowerOutput object allowing you to drive the power output control.
+     * @return a YPowerOutput object allowing you to drive the power output.
      */
     public static YPowerOutput FindPowerOutputInContext(YAPIContext yctx,String func)
     {
@@ -327,14 +328,14 @@ public class YPowerOutput extends YFunction
     }
 
     /**
-     * Continues the enumeration of dual power output controls started using yFirstPowerOutput().
-     * Caution: You can't make any assumption about the returned dual power output controls order.
-     * If you want to find a specific a dual power  output control, use PowerOutput.findPowerOutput()
+     * Continues the enumeration of power output started using yFirstPowerOutput().
+     * Caution: You can't make any assumption about the returned power output order.
+     * If you want to find a specific a power output, use PowerOutput.findPowerOutput()
      * and a hardwareID or a logical name.
      *
      * @return a pointer to a YPowerOutput object, corresponding to
-     *         a dual power  output control currently online, or a null pointer
-     *         if there are no more dual power output controls to enumerate.
+     *         a power output currently online, or a null pointer
+     *         if there are no more power output to enumerate.
      */
     public YPowerOutput nextPowerOutput()
     {
@@ -350,12 +351,12 @@ public class YPowerOutput extends YFunction
     }
 
     /**
-     * Starts the enumeration of dual power output controls currently accessible.
+     * Starts the enumeration of power output currently accessible.
      * Use the method YPowerOutput.nextPowerOutput() to iterate on
-     * next dual power output controls.
+     * next power output.
      *
      * @return a pointer to a YPowerOutput object, corresponding to
-     *         the first dual power output control currently online, or a null pointer
+     *         the first power output currently online, or a null pointer
      *         if there are none.
      */
     public static YPowerOutput FirstPowerOutput()
@@ -368,14 +369,14 @@ public class YPowerOutput extends YFunction
     }
 
     /**
-     * Starts the enumeration of dual power output controls currently accessible.
+     * Starts the enumeration of power output currently accessible.
      * Use the method YPowerOutput.nextPowerOutput() to iterate on
-     * next dual power output controls.
+     * next power output.
      *
      * @param yctx : a YAPI context.
      *
      * @return a pointer to a YPowerOutput object, corresponding to
-     *         the first dual power output control currently online, or a null pointer
+     *         the first power output currently online, or a null pointer
      *         if there are none.
      */
     public static YPowerOutput FirstPowerOutputInContext(YAPIContext yctx)

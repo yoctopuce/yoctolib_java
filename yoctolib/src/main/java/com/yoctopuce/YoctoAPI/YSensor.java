@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ * $Id: YSensor.java 38913 2019-12-20 18:59:49Z mvuilleu $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -44,7 +44,7 @@ import java.util.Locale;
 
 //--- (generated code: YSensor class start)
 /**
- * YSensor Class: Sensor function interface
+ * YSensor Class: Sensor function interface.
  *
  * The YSensor class is the parent class for all Yoctopuce sensor types. It can be
  * used to read the current value and unit of any sensor, read the min/max
@@ -1241,11 +1241,11 @@ public class YSensor extends YFunction
     }
 
     /**
-     * Returns the YDatalogger object of the device hosting the sensor. This method returns an object of
-     * class YDatalogger that can control global parameters of the data logger. The returned object
+     * Returns the YDatalogger object of the device hosting the sensor. This method returns an object
+     * that can control global parameters of the data logger. The returned object
      * should not be freed.
      *
-     * @return an YDataLogger object or null on error.
+     * @return an YDatalogger object, or null on error.
      */
     public YDataLogger get_dataLogger() throws YAPI_Exception
     {
@@ -1297,16 +1297,16 @@ public class YSensor extends YFunction
     }
 
     /**
-     * Retrieves a DataSet object holding historical data for this
+     * Retrieves a YDataSet object holding historical data for this
      * sensor, for a specified time interval. The measures will be
      * retrieved from the data logger, which must have been turned
-     * on at the desired time. See the documentation of the DataSet
+     * on at the desired time. See the documentation of the YDataSet
      * class for information on how to get an overview of the
      * recorded data, and how to load progressively a large set
      * of measures from the data logger.
      *
      * This function only works if the device uses a recent firmware,
-     * as DataSet objects are not supported by firmwares older than
+     * as YDataSet objects are not supported by firmwares older than
      * version 13000.
      *
      * @param startTime : the start of the desired measure time interval,

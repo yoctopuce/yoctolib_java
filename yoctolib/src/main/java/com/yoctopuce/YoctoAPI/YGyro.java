@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java 38030 2019-11-04 17:56:01Z mvuilleu $
+ * $Id: YGyro.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -44,12 +44,14 @@ import java.util.Locale;
 //--- (end of generated code: YGyro return codes)
 //--- (generated code: YGyro class start)
 /**
- * YGyro Class: Gyroscope function interface
+ * YGyro Class: gyroscope control interface, available for instance in the Yocto-3D-V2
  *
- * The YGyro class allows you to read and configure Yoctopuce angular velocity
- *  sensors, for instance using a Yocto-3D-V2. It inherits from YSensor class the core functions to
- * read measurements,
- * to register callback functions, to access the autonomous datalogger.
+ * The YGyro class allows you to read and configure Yoctopuce gyroscopes.
+ * It inherits from YSensor class the core functions to read measurements,
+ * to register callback functions, and to access the autonomous datalogger.
+ * This class adds the possibility to access x, y and z components of the rotation
+ * vector separately, as well as the possibility to deal with quaternion-based
+ * orientation estimates.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YGyro extends YSensor

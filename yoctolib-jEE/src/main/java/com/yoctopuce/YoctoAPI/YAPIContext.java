@@ -10,7 +10,7 @@ import java.util.*;
 //--- (end of generated code: YAPIContext return codes)
 //--- (generated code: YAPIContext class start)
 /**
- * YAPIContext Class: Control interface for the firmware update process
+ * YAPIContext Class: Yoctopuce I/O context configuration.
  *
  *
  */
@@ -820,8 +820,8 @@ public class YAPIContext
      * Modifies the network connection delay for yRegisterHub() and yUpdateDeviceList().
      * This delay impacts only the YoctoHubs and VirtualHub
      * which are accessible through the network. By default, this delay is of 20000 milliseconds,
-     * but depending or you network you may want to change this delay.
-     * For example if your network infrastructure uses a GSM connection.
+     * but depending or you network you may want to change this delay,
+     * gor example if your network infrastructure is based on a GSM connection.
      *
      * @param networkMsTimeout : the network connection delay in milliseconds.
      *
@@ -837,8 +837,8 @@ public class YAPIContext
      * Returns the network connection delay for yRegisterHub() and yUpdateDeviceList().
      * This delay impacts only the YoctoHubs and VirtualHub
      * which are accessible through the network. By default, this delay is of 20000 milliseconds,
-     * but depending or you network you may want to change this delay.
-     * For example if your network infrastructure uses a GSM connection.
+     * but depending or you network you may want to change this delay,
+     * for example if your network infrastructure is based on a GSM connection.
      *
      * @return the network connection delay in milliseconds.
      */
@@ -1110,8 +1110,8 @@ public class YAPIContext
     }
 
     /**
-     * Fault-tolerant alternative to RegisterHub(). This function has the same
-     * purpose and same arguments as RegisterHub(), but does not trigger
+     * Fault-tolerant alternative to yRegisterHub(). This function has the same
+     * purpose and same arguments as yRegisterHub(), but does not trigger
      * an error when the selected hub is not available at the time of the function call.
      * This makes it possible to register a network hub independently of the current
      * connectivity, and to try to contact it only when a device is actively needed.
@@ -1165,7 +1165,7 @@ public class YAPIContext
 
     /**
      * Test if the hub is reachable. This method do not register the hub, it only test if the
-     * hub is usable. The url parameter follow the same convention as the RegisterHub
+     * hub is usable. The url parameter follow the same convention as the yRegisterHub
      * method. This method is useful to verify the authentication parameters for a hub. It
      * is possible to force this method to return after mstimeout milliseconds.
      *

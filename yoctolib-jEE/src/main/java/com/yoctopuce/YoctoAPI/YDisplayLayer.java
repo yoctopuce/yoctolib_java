@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 33877 2018-12-26 12:19:48Z seb $
+ * $Id: YDisplayLayer.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *
@@ -43,10 +43,10 @@ import java.util.Locale;
 
 //--- (generated code: YDisplayLayer class start)
 /**
- * YDisplayLayer Class: DisplayLayer object interface
+ * YDisplayLayer Class: Interface for drawing into display layers, obtained by calling display.get_displayLayer.
  *
- * A DisplayLayer is an image layer containing objects to display
- * (bitmaps, text, etc.). The content is displayed only when
+ * Each DisplayLayer represents an image layer containing objects
+ * to display (bitmaps, text, etc.). The content is displayed only when
  * the layer is active on the screen (and not masked by other
  * overlapping layers).
  */

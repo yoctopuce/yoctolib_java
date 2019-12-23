@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpMonitor.java 38510 2019-11-26 15:36:38Z mvuilleu $
+ *  $Id: YWakeUpMonitor.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -45,11 +45,11 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YWakeUpMonitor yapiwrapper)
 //--- (YWakeUpMonitor class start)
 /**
- * YWakeUpMonitor Class: WakeUpMonitor function interface
+ *  YWakeUpMonitor Class: wake-up monitor control interface, available for instance in the
+ * YoctoHub-GSM-3G-EU, the YoctoHub-GSM-3G-NA, the YoctoHub-Wireless-SR or the YoctoHub-Wireless-g
  *
  * The YWakeUpMonitor class handles globally all wake-up sources, as well
- *  as automated sleep mode, for instance using a YoctoHub-GSM-3G-EU, a YoctoHub-GSM-3G-NA, a
- * YoctoHub-Wireless-SR or a YoctoHub-Wireless-g.
+ * as automated sleep mode.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YWakeUpMonitor extends YFunction
@@ -474,7 +474,7 @@ public class YWakeUpMonitor extends YFunction
     }
 
     /**
-     * Retrieves a monitor for a given identifier.
+     * Retrieves a wake-up monitor for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -484,11 +484,11 @@ public class YWakeUpMonitor extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the monitor is online at the time
+     * This function does not require that the wake-up monitor is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YWakeUpMonitor.isOnline() to test if the monitor is
+     * Use the method YWakeUpMonitor.isOnline() to test if the wake-up monitor is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a monitor by logical name, no error is notified: the first instance
+     * a wake-up monitor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
@@ -496,10 +496,10 @@ public class YWakeUpMonitor extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the monitor, for instance
+     * @param func : a string that uniquely characterizes the wake-up monitor, for instance
      *         YHUBGSM3.wakeUpMonitor.
      *
-     * @return a YWakeUpMonitor object allowing you to drive the monitor.
+     * @return a YWakeUpMonitor object allowing you to drive the wake-up monitor.
      */
     public static YWakeUpMonitor FindWakeUpMonitor(String func)
     {
@@ -516,7 +516,7 @@ public class YWakeUpMonitor extends YFunction
     }
 
     /**
-     * Retrieves a monitor for a given identifier in a YAPI context.
+     * Retrieves a wake-up monitor for a given identifier in a YAPI context.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -526,19 +526,19 @@ public class YWakeUpMonitor extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the monitor is online at the time
+     * This function does not require that the wake-up monitor is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YWakeUpMonitor.isOnline() to test if the monitor is
+     * Use the method YWakeUpMonitor.isOnline() to test if the wake-up monitor is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a monitor by logical name, no error is notified: the first instance
+     * a wake-up monitor by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the monitor, for instance
+     * @param func : a string that uniquely characterizes the wake-up monitor, for instance
      *         YHUBGSM3.wakeUpMonitor.
      *
-     * @return a YWakeUpMonitor object allowing you to drive the monitor.
+     * @return a YWakeUpMonitor object allowing you to drive the wake-up monitor.
      */
     public static YWakeUpMonitor FindWakeUpMonitorInContext(YAPIContext yctx,String func)
     {
@@ -683,14 +683,14 @@ public class YWakeUpMonitor extends YFunction
     }
 
     /**
-     * Continues the enumeration of monitors started using yFirstWakeUpMonitor().
-     * Caution: You can't make any assumption about the returned monitors order.
-     * If you want to find a specific a monitor, use WakeUpMonitor.findWakeUpMonitor()
+     * Continues the enumeration of wake-up monitors started using yFirstWakeUpMonitor().
+     * Caution: You can't make any assumption about the returned wake-up monitors order.
+     * If you want to find a specific a wake-up monitor, use WakeUpMonitor.findWakeUpMonitor()
      * and a hardwareID or a logical name.
      *
      * @return a pointer to a YWakeUpMonitor object, corresponding to
-     *         a monitor currently online, or a null pointer
-     *         if there are no more monitors to enumerate.
+     *         a wake-up monitor currently online, or a null pointer
+     *         if there are no more wake-up monitors to enumerate.
      */
     public YWakeUpMonitor nextWakeUpMonitor()
     {
@@ -706,12 +706,12 @@ public class YWakeUpMonitor extends YFunction
     }
 
     /**
-     * Starts the enumeration of monitors currently accessible.
+     * Starts the enumeration of wake-up monitors currently accessible.
      * Use the method YWakeUpMonitor.nextWakeUpMonitor() to iterate on
-     * next monitors.
+     * next wake-up monitors.
      *
      * @return a pointer to a YWakeUpMonitor object, corresponding to
-     *         the first monitor currently online, or a null pointer
+     *         the first wake-up monitor currently online, or a null pointer
      *         if there are none.
      */
     public static YWakeUpMonitor FirstWakeUpMonitor()
@@ -724,14 +724,14 @@ public class YWakeUpMonitor extends YFunction
     }
 
     /**
-     * Starts the enumeration of monitors currently accessible.
+     * Starts the enumeration of wake-up monitors currently accessible.
      * Use the method YWakeUpMonitor.nextWakeUpMonitor() to iterate on
-     * next monitors.
+     * next wake-up monitors.
      *
      * @param yctx : a YAPI context.
      *
      * @return a pointer to a YWakeUpMonitor object, corresponding to
-     *         the first monitor currently online, or a null pointer
+     *         the first wake-up monitor currently online, or a null pointer
      *         if there are none.
      */
     public static YWakeUpMonitor FirstWakeUpMonitorInContext(YAPIContext yctx)

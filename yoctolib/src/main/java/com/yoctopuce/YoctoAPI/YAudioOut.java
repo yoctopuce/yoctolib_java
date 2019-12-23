@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAudioOut.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YAudioOut.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindAudioOut(), the high-level API for AudioOut functions
  *
@@ -45,9 +45,9 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YAudioOut yapiwrapper)
 //--- (YAudioOut class start)
 /**
- * YAudioOut Class: AudioOut function interface
+ * YAudioOut Class: audio output control interface
  *
- * The YAudioOut class allows you to configure the volume of an audio outout.
+ * The YAudioOut class allows you to configure the volume of an audio output.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YAudioOut extends YFunction

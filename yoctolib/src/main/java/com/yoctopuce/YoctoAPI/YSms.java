@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YSms.java 34658 2019-03-18 09:39:54Z seb $
+ * $Id: YSms.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * Implements FindSms(), the high-level API for Sms functions
  *
@@ -43,9 +43,9 @@ import java.util.Locale;
 //--- (end of generated code: YSms return codes)
 //--- (generated code: YSms class start)
 /**
- * YSms Class: SMS message sent or received
+ * YSms Class: SMS message sent or received, returned by messageBox.get_messages or messageBox.newMessage
  *
- * YSms objects are used to describe a SMS.
+ * YSms objects are used to describe an SMS message, received or to be sent.
  * These objects are used in particular in conjunction with the YMessageBox class.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})

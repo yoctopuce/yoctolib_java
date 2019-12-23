@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 38510 2019-11-26 15:36:38Z mvuilleu $
+ * $Id: YDisplay.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -44,15 +44,20 @@ import java.util.Locale;
 
 //--- (generated code: YDisplay class start)
 /**
- * YDisplay Class: Display function interface
+ *  YDisplay Class: display control interface, available for instance in the Yocto-Display, the
+ * Yocto-MaxiDisplay, the Yocto-MaxiDisplay-G or the Yocto-MiniDisplay
  *
- *  The YDisplay class allows to drive Yoctopuce displays, for instance using a Yocto-Display, a
- * Yocto-MaxiDisplay, a Yocto-MaxiDisplay-G or a Yocto-MiniDisplay.
+ * The YDisplay class allows to drive Yoctopuce displays.
  * Yoctopuce display interface has been designed to easily
  * show information and images. The device provides built-in
  * multi-layer rendering. Layers can be drawn offline, individually,
  * and freely moved on the display. It can also replay recorded
  * sequences (animations).
+ *
+ * In order to draw on the screen, you should use the
+ * display.get_displayLayer method to retrieve the layer(s) on
+ * which you want to draw, and then use methods defined in
+ * YDisplayLayer to draw on the layers.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YDisplay extends YFunction

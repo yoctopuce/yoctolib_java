@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 32328 2018-09-25 08:33:35Z seb $
+ * $Id: YFirmwareUpdate.java 38913 2019-12-20 18:59:49Z mvuilleu $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -56,11 +56,11 @@ import java.util.ArrayList;
 //--- (end of generated code: YFirmwareUpdate return codes)
 //--- (generated code: YFirmwareUpdate class start)
 /**
- * YFirmwareUpdate Class: Control interface for the firmware update process
+ * YFirmwareUpdate Class: Firmware update process control interface, returned by module.updateFirmware method.
  *
  * The YFirmwareUpdate class let you control the firmware update of a Yoctopuce
- * module. This class should not be instantiate directly, instead the method
- * updateFirmware should be called to get an instance of YFirmwareUpdate.
+ * module. This class should not be instantiate directly, but instances should be retrieved
+ * using the YModule method module.updateFirmware.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YFirmwareUpdate

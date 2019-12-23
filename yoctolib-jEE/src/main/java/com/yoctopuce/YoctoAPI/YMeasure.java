@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMeasure.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YMeasure.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * Implements yFindMeasure(), the high-level API for Measure functions
  *
@@ -44,11 +44,13 @@ import java.util.Date;
 
 //--- (generated code: YMeasure class start)
 /**
- * YMeasure Class: Measured value
+ * YMeasure Class: Measured value, returned in particular by the methods of the YDataSet class.
  *
  * YMeasure objects are used within the API to represent
  * a value measured at a specified time. These objects are
- * used in particular in conjunction with the YDataSet class.
+ * used in particular in conjunction with the YDataSet class,
+ * but also for sensors periodic timed reports
+ * (see sensor.registerTimedReportCallback).
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YMeasure
@@ -91,7 +93,7 @@ public class YMeasure
      * (Unix timestamp). When the recording rate is higher then 1 sample
      * per second, the timestamp may have a fractional part.
      *
-     * @return an floating point number corresponding to the number of seconds
+     * @return a floating point number corresponding to the number of seconds
      *         between the Jan 1, 1970 UTC and the beginning of this measure.
      */
     public double get_startTimeUTC()
@@ -104,7 +106,7 @@ public class YMeasure
      * (Unix timestamp). When the recording rate is higher than 1 sample
      * per second, the timestamp may have a fractional part.
      *
-     * @return an floating point number corresponding to the number of seconds
+     * @return a floating point number corresponding to the number of seconds
      *         between the Jan 1, 1970 UTC and the end of this measure.
      */
     public double get_endTimeUTC()

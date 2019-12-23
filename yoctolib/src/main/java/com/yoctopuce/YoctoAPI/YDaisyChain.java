@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YDaisyChain.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YDaisyChain.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindDaisyChain(), the high-level API for DaisyChain functions
  *
@@ -45,9 +45,9 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YDaisyChain yapiwrapper)
 //--- (YDaisyChain class start)
 /**
- * YDaisyChain Class: DaisyChain function interface
+ * YDaisyChain Class: Module chain configuration interface
  *
- * The YDaisyChain interface can be used to verify that devices that
+ * The YDaisyChain class can be used to verify that devices that
  * are daisy-chained directly from device to device, without a hub,
  * are detected properly.
  */

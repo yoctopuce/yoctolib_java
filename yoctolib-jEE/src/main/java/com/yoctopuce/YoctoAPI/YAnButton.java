@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAnButton.java 38510 2019-11-26 15:36:38Z mvuilleu $
+ *  $Id: YAnButton.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindAnButton(), the high-level API for AnButton functions
  *
@@ -45,10 +45,10 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YAnButton yapiwrapper)
 //--- (YAnButton class start)
 /**
- * YAnButton Class: AnButton function interface
+ *  YAnButton Class: analog input control interface, available for instance in the Yocto-Buzzer, the
+ * Yocto-Display, the Yocto-Knob or the Yocto-MaxiDisplay
  *
- * The YAnButton class allows you to access simple resistive inputs on Yoctopuce
- *  devices, for instance using a Yocto-Buzzer, a Yocto-Display, a Yocto-Knob or a Yocto-MaxiDisplay.
+ * The YAnButton class provide access to basic resistive inputs.
  * Such inputs can be used to measure the state
  * of a simple button as well as to read an analog potentiometer (variable resistance).
  * This can be use for instance with a continuous rotating knob, a throttle grip

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YQt.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ * $Id: YQt.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * Implements yFindQt(), the high-level API for Qt functions
  *
@@ -43,14 +43,14 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of generated code: YQt return codes)
 //--- (generated code: YQt class start)
 /**
- * YQt Class: Quaternion interface
+ * YQt Class: Base interface to access quaternion components, available for instance in the Yocto-3D-V2
  *
- * The YQt class provides direct access to the 3D attitude estimation provided by Yoctopuce
- *  inertial sensors, for instance using a Yocto-3D-V2. The four instances of YQt provide direct access
- * to the individual
- * quaternion components representing the orientation.
- * It is usually not needed to use the YQt class directly, as the
- * YGyro class provides a more convenient higher-level interface.
+ * The YQt class provides direct access to the 3D attitude estimation
+ * provided by Yoctopuce inertial sensors. The four instances of YQt
+ * provide direct access to the individual quaternion components representing the
+ * orientation. It is usually not needed to use the YQt class
+ * directly, as the YGyro class provides a more convenient higher-level
+ * interface.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YQt extends YSensor

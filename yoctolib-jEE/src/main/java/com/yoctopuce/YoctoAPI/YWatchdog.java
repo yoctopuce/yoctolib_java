@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWatchdog.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YWatchdog.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -46,15 +46,15 @@ import java.util.Locale;
 //--- (end of YWatchdog yapiwrapper)
 //--- (YWatchdog class start)
 /**
- * YWatchdog Class: Watchdog function interface
+ * YWatchdog Class: watchdog control interface, available for instance in the Yocto-WatchdogDC
  *
- * The YWatchdog class allows you to drive a Yoctopuce watchdog, for instance using a Yocto-WatchdogDC.
+ * The YWatchdog class allows you to drive a Yoctopuce watchdog.
  * A watchdog works like a relay, with an extra timer that can automatically
  * trigger a brief power cycle to an appliance after a preset delay, to force this
  * appliance to reset if a problem occurs. During normal use, the watchdog timer
  * is reset periodically by the application to prevent the automated power cycle.
  * Whenever the application dies, the watchdog will automatically trigger the power cycle.
- * The watchdog can also be driven directly with <i>pulse</i> and <i>delayedPulse</i>
+ * The watchdog can also be driven directly with pulse and delayedPulse
  * methods to switch off an appliance for a given duration.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -317,12 +317,13 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     *  Returns the state of the watchdog at device startup (A for the idle position, B for the active
-     * position, UNCHANGED for no change).
+     * Returns the state of the watchdog at device startup (A for the idle position,
+     * B for the active position, UNCHANGED to leave the relay state as is).
      *
      *  @return a value among YWatchdog.STATEATPOWERON_UNCHANGED, YWatchdog.STATEATPOWERON_A and
      *  YWatchdog.STATEATPOWERON_B corresponding to the state of the watchdog at device startup (A for the
-     * idle position, B for the active position, UNCHANGED for no change)
+     * idle position,
+     *         B for the active position, UNCHANGED to leave the relay state as is)
      *
      * @throws YAPI_Exception on error
      */
@@ -341,12 +342,12 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     *  Returns the state of the watchdog at device startup (A for the idle position, B for the active
-     * position, UNCHANGED for no change).
+     * Returns the state of the watchdog at device startup (A for the idle position,
+     * B for the active position, UNCHANGED to leave the relay state as is).
      *
      *  @return a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
-     *  corresponding to the state of the watchdog at device startup (A for the idle position, B for the
-     * active position, UNCHANGED for no change)
+     * corresponding to the state of the watchdog at device startup (A for the idle position,
+     *         B for the active position, UNCHANGED to leave the relay state as is)
      *
      * @throws YAPI_Exception on error
      */
@@ -357,14 +358,14 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the state of the watchdog at device startup (A for the idle position,
-     * B for the active position, UNCHANGED for no modification).
+     * B for the active position, UNCHANGED to leave the relay state as is).
      * Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
      *
      *  @param newval : a value among YWatchdog.STATEATPOWERON_UNCHANGED, YWatchdog.STATEATPOWERON_A and
      *  YWatchdog.STATEATPOWERON_B corresponding to the state of the watchdog at device startup (A for the
      * idle position,
-     *         B for the active position, UNCHANGED for no modification)
+     *         B for the active position, UNCHANGED to leave the relay state as is)
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -382,13 +383,13 @@ public class YWatchdog extends YFunction
 
     /**
      * Changes the state of the watchdog at device startup (A for the idle position,
-     * B for the active position, UNCHANGED for no modification).
+     * B for the active position, UNCHANGED to leave the relay state as is).
      * Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
      *
      *  @param newval : a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
      * corresponding to the state of the watchdog at device startup (A for the idle position,
-     *         B for the active position, UNCHANGED for no modification)
+     *         B for the active position, UNCHANGED to leave the relay state as is)
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -400,10 +401,10 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Returns the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state
+     * Returns the maximum time (ms) allowed for the watchdog to stay in state
      * A before automatically switching back in to B state. Zero means no time limit.
      *
-     * @return an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state
+     * @return an integer corresponding to the maximum time (ms) allowed for the watchdog to stay in state
      *         A before automatically switching back in to B state
      *
      * @throws YAPI_Exception on error
@@ -423,10 +424,10 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Returns the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state
+     * Returns the maximum time (ms) allowed for the watchdog to stay in state
      * A before automatically switching back in to B state. Zero means no time limit.
      *
-     * @return an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state
+     * @return an integer corresponding to the maximum time (ms) allowed for the watchdog to stay in state
      *         A before automatically switching back in to B state
      *
      * @throws YAPI_Exception on error
@@ -437,12 +438,12 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Changes the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A
+     * Changes the maximum time (ms) allowed for the watchdog to stay in state A
      * before automatically switching back in to B state. Use zero for no time limit.
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     * @param newval : an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A
+     * @param newval : an integer corresponding to the maximum time (ms) allowed for the watchdog to stay in state A
      *         before automatically switching back in to B state
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -460,12 +461,12 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Changes the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A
+     * Changes the maximum time (ms) allowed for the watchdog to stay in state A
      * before automatically switching back in to B state. Use zero for no time limit.
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     * @param newval : an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state A
+     * @param newval : an integer corresponding to the maximum time (ms) allowed for the watchdog to stay in state A
      *         before automatically switching back in to B state
      *
      * @return YAPI_SUCCESS if the call succeeds.
@@ -478,7 +479,7 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B
+     * Retourne the maximum time (ms) allowed for the watchdog to stay in state B
      * before automatically switching back in to A state. Zero means no time limit.
      *
      * @return an integer
@@ -500,7 +501,7 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Retourne the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B
+     * Retourne the maximum time (ms) allowed for the watchdog to stay in state B
      * before automatically switching back in to A state. Zero means no time limit.
      *
      * @return an integer
@@ -513,13 +514,13 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Changes the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before
+     * Changes the maximum time (ms) allowed for the watchdog to stay in state B before
      * automatically switching back in to A state. Use zero for no time limit.
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to
-     * stay in state B before
+     *  @param newval : an integer corresponding to the maximum time (ms) allowed for the watchdog to stay
+     * in state B before
      *         automatically switching back in to A state
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -537,13 +538,13 @@ public class YWatchdog extends YFunction
     }
 
     /**
-     * Changes the maximum time (ms) allowed for $THEFUNCTIONS$ to stay in state B before
+     * Changes the maximum time (ms) allowed for the watchdog to stay in state B before
      * automatically switching back in to A state. Use zero for no time limit.
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : an integer corresponding to the maximum time (ms) allowed for $THEFUNCTIONS$ to
-     * stay in state B before
+     *  @param newval : an integer corresponding to the maximum time (ms) allowed for the watchdog to stay
+     * in state B before
      *         automatically switching back in to A state
      *
      * @return YAPI_SUCCESS if the call succeeds.

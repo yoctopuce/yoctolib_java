@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YStepperMotor.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YStepperMotor.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -46,7 +46,7 @@ import java.util.Locale;
 //--- (end of YStepperMotor yapiwrapper)
 //--- (YStepperMotor class start)
 /**
- * YStepperMotor Class: StepperMotor function interface
+ * YStepperMotor Class: stepper motor control interface
  *
  * The YStepperMotor class allows you to drive a stepper motor.
  */

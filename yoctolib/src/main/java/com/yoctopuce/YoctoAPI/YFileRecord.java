@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFileRecord.java 34651 2019-03-15 17:21:54Z seb $
+ * $Id: YFileRecord.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * YFileRecord Class: Description of a file on the device filesystem
  *
@@ -42,7 +42,7 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (generated code: YFileRecord class start)
 /**
- * YFileRecord Class: Description of a file on the device filesystem
+ * YFileRecord Class: Description of a file on the device filesystem, returned by files.get_list
  *
  * YFileRecord objects are used to describe a file that is stored on a Yoctopuce device.
  * These objects are used in particular in conjunction with the YFiles class.

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGenericSensor.java 38510 2019-11-26 15:36:38Z mvuilleu $
+ *  $Id: YGenericSensor.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -45,11 +45,11 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YGenericSensor yapiwrapper)
 //--- (YGenericSensor class start)
 /**
- * YGenericSensor Class: GenericSensor function interface
+ *  YGenericSensor Class: GenericSensor control interface, available for instance in the
+ * Yocto-0-10V-Rx, the Yocto-4-20mA-Rx, the Yocto-RS232 or the Yocto-milliVolt-Rx
  *
  * The YGenericSensor class allows you to read and configure Yoctopuce signal
- *  transducers, for instance using a Yocto-0-10V-Rx, a Yocto-4-20mA-Rx, a Yocto-RS232 or a
- * Yocto-milliVolt-Rx. It inherits from YSensor class the core functions to read measurements,
+ * transducers. It inherits from YSensor class the core functions to read measurements,
  * to register callback functions, to access the autonomous datalogger.
  * This class adds the ability to configure the automatic conversion between the
  * measured signal and the corresponding engineering unit.

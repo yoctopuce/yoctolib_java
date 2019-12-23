@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTvoc.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YTvoc.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindTvoc(), the high-level API for Tvoc functions
  *
@@ -45,12 +45,12 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YTvoc yapiwrapper)
 //--- (YTvoc class start)
 /**
- * YTvoc Class: Tvoc function interface
+ *  YTvoc Class: Total Volatile Organic Compound sensor control interface, available for instance in
+ * the Yocto-VOC-V3
  *
- * The YTvoc class allows you to read and configure Yoctopuce Total Volatile Organic
- *  Compound sensors, for instance using a Yocto-VOC-V3. It inherits from YSensor class the core
- * functions to read measurements,
- * to register callback functions, to access the autonomous datalogger.
+ * The YTvoc class allows you to read and configure Yoctopuce Total Volatile Organic Compound sensors.
+ * It inherits from YSensor class the core functions to read measurements,
+ * to register callback functions, and to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YTvoc extends YSensor

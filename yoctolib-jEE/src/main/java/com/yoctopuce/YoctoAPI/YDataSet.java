@@ -1,5 +1,5 @@
 /*
- * $Id: YDataSet.java 33713 2018-12-14 14:20:19Z seb $
+ * $Id: YDataSet.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -42,12 +42,12 @@ import java.util.Locale;
 
 //--- (generated code: YDataSet class start)
 /**
- * YDataSet Class: Recorded data sequence
+ * YDataSet Class: Recorded data sequence, as returned by sensor.get_recordedData()
  *
  * YDataSet objects make it possible to retrieve a set of recorded measures
  * for a given sensor and a specified time interval. They can be used
  * to load data points with a progress report. When the YDataSet object is
- * instantiated by the get_recordedData()  function, no data is
+ * instantiated by the sensor.get_recordedData()  function, no data is
  * yet loaded from the module. It is only when the loadMore()
  * method is called over and over than data will be effectively loaded
  * from the dataLogger.
@@ -57,7 +57,7 @@ import java.util.Locale;
  * once. Measures themselves are available using function get_measures()
  * when loaded by subsequent calls to loadMore().
  *
- * This class can only be used on devices that use a recent firmware,
+ * This class can only be used on devices that use a relatively recent firmware,
  * as YDataSet objects are not supported by firmwares older than version 13000.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -442,14 +442,14 @@ public class YDataSet
 
     /**
      * Returns the start time of the dataset, relative to the Jan 1, 1970.
-     * When the YDataSet is created, the start time is the value passed
+     * When the YDataSet object is created, the start time is the value passed
      * in parameter to the get_dataSet() function. After the
      * very first call to loadMore(), the start time is updated
      * to reflect the timestamp of the first measure actually found in the
      * dataLogger within the specified range.
      *
      * <b>DEPRECATED</b>: This method has been replaced by get_summary()
-     * which contain more precise informations on the YDataSet.
+     * which contain more precise informations.
      *
      * @return an unsigned number corresponding to the number of seconds
      *         between the Jan 1, 1970 and the beginning of this data
@@ -467,15 +467,14 @@ public class YDataSet
 
     /**
      * Returns the end time of the dataset, relative to the Jan 1, 1970.
-     * When the YDataSet is created, the end time is the value passed
+     * When the YDataSet object is created, the end time is the value passed
      * in parameter to the get_dataSet() function. After the
      * very first call to loadMore(), the end time is updated
      * to reflect the timestamp of the last measure actually found in the
      * dataLogger within the specified range.
      *
      * <b>DEPRECATED</b>: This method has been replaced by get_summary()
-     * which contain more precise informations on the YDataSet.
-     *
+     * which contain more precise informations.
      *
      * @return an unsigned number corresponding to the number of seconds
      *         between the Jan 1, 1970 and the end of this data
@@ -549,7 +548,7 @@ public class YDataSet
 
     /**
      * Returns an YMeasure object which summarizes the whole
-     * DataSet. In includes the following information:
+     * YDataSet. In includes the following information:
      * - the start of a time interval
      * - the end of a time interval
      * - the minimal value observed during the time interval

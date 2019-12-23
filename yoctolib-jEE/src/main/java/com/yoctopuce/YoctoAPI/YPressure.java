@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPressure.java 38510 2019-11-26 15:36:38Z mvuilleu $
+ *  $Id: YPressure.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindPressure(), the high-level API for Pressure functions
  *
@@ -45,12 +45,12 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YPressure yapiwrapper)
 //--- (YPressure class start)
 /**
- * YPressure Class: Pressure function interface
+ *  YPressure Class: pressure sensor control interface, available for instance in the
+ * Yocto-Altimeter-V2, the Yocto-CO2-V2, the Yocto-Meteo-V2 or the Yocto-Pressure
  *
- * The YPressure class allows you to read and configure Yoctopuce pressure
- *  sensors, for instance using a Yocto-Altimeter-V2, a Yocto-CO2-V2, a Yocto-Meteo-V2 or a
- * Yocto-Pressure. It inherits from YSensor class the core functions to read measurements,
- * to register callback functions, to access the autonomous datalogger.
+ * The YPressure class allows you to read and configure Yoctopuce pressure sensors.
+ * It inherits from YSensor class the core functions to read measurements,
+ * to register callback functions, and to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPressure extends YSensor

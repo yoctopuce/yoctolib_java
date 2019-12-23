@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 36629 2019-07-31 13:03:53Z seb $
+ * $Id: YDataStream.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -46,12 +46,12 @@ import java.util.Locale;
 /**
  * YDataStream Class: Unformatted data sequence
  *
- * YDataStream objects represent bare recorded measure sequences,
+ * DataStream objects represent bare recorded measure sequences,
  * exactly as found within the data logger present on Yoctopuce
  * sensors.
  *
- * In most cases, it is not necessary to use YDataStream objects
- * directly, as the YDataSet objects (returned by the
+ * In most cases, it is not necessary to use DataStream objects
+ * directly, as the DataSet objects (returned by the
  * get_recordedData() method from sensors and the
  * get_dataSets() method from the data logger) provide
  * a more convenient interface.

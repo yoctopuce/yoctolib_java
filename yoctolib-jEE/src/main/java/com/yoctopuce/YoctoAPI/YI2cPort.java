@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YI2cPort.java 38913 2019-12-20 18:59:49Z mvuilleu $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -47,9 +47,9 @@ import java.util.Locale;
 //--- (end of YI2cPort yapiwrapper)
 //--- (YI2cPort class start)
 /**
- * YI2cPort Class: I2C Port function interface
+ * YI2cPort Class: I2C port control interface, available for instance in the Yocto-I2C
  *
- * The YI2cPort classe allows you to fully drive a Yoctopuce I2C port, for instance using a Yocto-I2C.
+ * The YI2cPort classe allows you to fully drive a Yoctopuce I2C port.
  * It can be used to send and receive data, and to configure communication
  * parameters (baud rate, etc).
  * Note that Yoctopuce I2C ports are not exposed as virtual COM ports.
@@ -93,6 +93,14 @@ public class YI2cPort extends YFunction
      */
     public static final String STARTUPJOB_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid jobMaxTask value
+     */
+    public static final int JOBMAXTASK_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid jobMaxSize value
+     */
+    public static final int JOBMAXSIZE_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
@@ -119,6 +127,8 @@ public class YI2cPort extends YFunction
     protected String _lastMsg = LASTMSG_INVALID;
     protected String _currentJob = CURRENTJOB_INVALID;
     protected String _startupJob = STARTUPJOB_INVALID;
+    protected int _jobMaxTask = JOBMAXTASK_INVALID;
+    protected int _jobMaxSize = JOBMAXSIZE_INVALID;
     protected String _command = COMMAND_INVALID;
     protected String _protocol = PROTOCOL_INVALID;
     protected int _i2cVoltageLevel = I2CVOLTAGELEVEL_INVALID;
@@ -205,6 +215,12 @@ public class YI2cPort extends YFunction
         }
         if (json_val.has("startupJob")) {
             _startupJob = json_val.getString("startupJob");
+        }
+        if (json_val.has("jobMaxTask")) {
+            _jobMaxTask = json_val.getInt("jobMaxTask");
+        }
+        if (json_val.has("jobMaxSize")) {
+            _jobMaxSize = json_val.getInt("jobMaxSize");
         }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
@@ -555,6 +571,72 @@ public class YI2cPort extends YFunction
     public int setStartupJob(String newval)  throws YAPI_Exception
     {
         return set_startupJob(newval);
+    }
+
+    /**
+     * Returns the maximum number of tasks in a job that the device can handle.
+     *
+     * @return an integer corresponding to the maximum number of tasks in a job that the device can handle
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_jobMaxTask() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return JOBMAXTASK_INVALID;
+                }
+            }
+            res = _jobMaxTask;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the maximum number of tasks in a job that the device can handle.
+     *
+     * @return an integer corresponding to the maximum number of tasks in a job that the device can handle
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getJobMaxTask() throws YAPI_Exception
+    {
+        return get_jobMaxTask();
+    }
+
+    /**
+     * Returns maximum size allowed for job files.
+     *
+     * @return an integer corresponding to maximum size allowed for job files
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_jobMaxSize() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return JOBMAXSIZE_INVALID;
+                }
+            }
+            res = _jobMaxSize;
+        }
+        return res;
+    }
+
+    /**
+     * Returns maximum size allowed for job files.
+     *
+     * @return an integer corresponding to maximum size allowed for job files
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getJobMaxSize() throws YAPI_Exception
+    {
+        return get_jobMaxSize();
     }
 
     public String get_command() throws YAPI_Exception
@@ -1134,7 +1216,7 @@ public class YI2cPort extends YFunction
      * @param jobfile : name of the job file to save on the device filesystem
      * @param jsonDef : a string containing a JSON definition of the job
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1151,7 +1233,7 @@ public class YI2cPort extends YFunction
      *
      * @param jobfile : name of the job file (on the device filesystem)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

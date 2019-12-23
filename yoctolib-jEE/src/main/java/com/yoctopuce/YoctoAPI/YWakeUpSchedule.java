@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpSchedule.java 38510 2019-11-26 15:36:38Z mvuilleu $
+ *  $Id: YWakeUpSchedule.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -45,10 +45,10 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YWakeUpSchedule yapiwrapper)
 //--- (YWakeUpSchedule class start)
 /**
- * YWakeUpSchedule Class: WakeUpSchedule function interface
+ *  YWakeUpSchedule Class: wake up schedule control interface, available for instance in the
+ * YoctoHub-GSM-3G-EU, the YoctoHub-GSM-3G-NA, the YoctoHub-Wireless-SR or the YoctoHub-Wireless-g
  *
- *  The YWakeUpSchedule class implements a wake up condition, for instance using a YoctoHub-GSM-3G-EU,
- * a YoctoHub-GSM-3G-NA, a YoctoHub-Wireless-SR or a YoctoHub-Wireless-g. The wake up time is
+ * The YWakeUpSchedule class implements a wake up condition. The wake up time is
  * specified as a set of months and/or days and/or hours and/or minutes when the
  * wake up should happen.
  */

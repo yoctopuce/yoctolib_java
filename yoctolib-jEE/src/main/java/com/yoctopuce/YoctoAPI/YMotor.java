@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMotor.java 38030 2019-11-04 17:56:01Z mvuilleu $
+ *  $Id: YMotor.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindMotor(), the high-level API for Motor functions
  *
@@ -46,10 +46,9 @@ import java.util.Locale;
 //--- (end of YMotor yapiwrapper)
 //--- (YMotor class start)
 /**
- * YMotor Class: Motor function interface
+ * YMotor Class: motor control interface, available for instance in the Yocto-Motor-DC
  *
- *  The YMotor class allows you to drive a DC motor, for instance using a Yocto-Motor-DC. It can be
- * used to configure the
+ * The YMotor class allows you to drive a DC motor. It can be used to configure the
  * power sent to the motor to make it turn both ways, but also to drive accelerations
  * and decelerations. The motor will then accelerate automatically: you will not
  * have to monitor it. The API also allows to slow down the motor by shortening

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmInput.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YPwmInput.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -45,12 +45,11 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YPwmInput yapiwrapper)
 //--- (YPwmInput class start)
 /**
- * YPwmInput Class: PwmInput function interface
+ * YPwmInput Class: PWM input control interface, available for instance in the Yocto-PWM-Rx
  *
- * The YPwmInput class allows you to read and configure Yoctopuce PWM
- *  sensors, for instance using a Yocto-PWM-Rx. It inherits from YSensor class the core functions to
- * read measurements,
- * to register callback functions, to access the autonomous datalogger.
+ * The YPwmInput class allows you to read and configure Yoctopuce PWM inputs.
+ * It inherits from YSensor class the core functions to read measurements,
+ * to register callback functions, and to access the autonomous datalogger.
  * This class adds the ability to configure the signal parameter used to transmit
  * information: the duty cycle, the frequency or the pulse width.
  */

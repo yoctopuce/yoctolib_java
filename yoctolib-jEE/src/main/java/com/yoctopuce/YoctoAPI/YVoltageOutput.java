@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YVoltageOutput.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YVoltageOutput.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindVoltageOutput(), the high-level API for VoltageOutput functions
  *
@@ -46,9 +46,9 @@ import java.util.Locale;
 //--- (end of YVoltageOutput yapiwrapper)
 //--- (YVoltageOutput class start)
 /**
- * YVoltageOutput Class: VoltageOutput function interface
+ * YVoltageOutput Class: voltage output control interface, available for instance in the Yocto-0-10V-Tx
  *
- * The YVoltageOutput class allows you to drive a voltage output, for instance using a Yocto-0-10V-Tx.
+ * The YVoltageOutput class allows you to drive a voltage output.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YVoltageOutput extends YFunction

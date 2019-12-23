@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSnoopingRecord.java 38239 2019-11-20 11:36:26Z seb $
+ * $Id: YSnoopingRecord.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * Implements FindSnoopingRecord(), the high-level API for SnoopingRecord functions
  *
@@ -43,7 +43,7 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of generated code: YSnoopingRecord return codes)
 //--- (generated code: YSnoopingRecord class start)
 /**
- * YSnoopingRecord Class: Description of a message intercepted
+ * YSnoopingRecord Class: Intercepted message description, returned by serialPort.snoopMessages method
  *
  *
  */

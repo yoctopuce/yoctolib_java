@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLatitude.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YLatitude.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindLatitude(), the high-level API for Latitude functions
  *
@@ -45,12 +45,11 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YLatitude yapiwrapper)
 //--- (YLatitude class start)
 /**
- * YLatitude Class: Latitude function interface
+ * YLatitude Class: latitude sensor control interface, available for instance in the Yocto-GPS
  *
- * The YLatitude class allows you to read the latitude from Yoctopuce
- * geolocation sensors, for instance using a Yocto-GPS. It inherits from the YSensor class the core functions to
- * read measurements, to register callback functions, to access the autonomous
- * datalogger.
+ * The YLatitude class allows you to read and configure Yoctopuce latitude sensors.
+ * It inherits from YSensor class the core functions to read measurements,
+ * to register callback functions, and to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YLatitude extends YSensor

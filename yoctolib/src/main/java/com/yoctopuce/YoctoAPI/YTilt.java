@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTilt.java 38030 2019-11-04 17:56:01Z mvuilleu $
+ *  $Id: YTilt.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindTilt(), the high-level API for Tilt functions
  *
@@ -45,7 +45,7 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YTilt yapiwrapper)
 //--- (YTilt class start)
 /**
- * YTilt Class: Tilt function interface
+ * YTilt Class: tilt sensor control interface, available for instance in the Yocto-3D-V2
  *
  * The YSensor class is the parent class for all Yoctopuce sensor types. It can be
  * used to read the current value and unit of any sensor, read the min/max

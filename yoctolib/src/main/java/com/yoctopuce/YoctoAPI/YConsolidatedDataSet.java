@@ -42,7 +42,7 @@ import java.util.Locale;
 
 //--- (generated code: YConsolidatedDataSet class start)
 /**
- * YConsolidatedDataSet Class: Cross-sensor consolidated data sequence
+ * YConsolidatedDataSet Class: Cross-sensor consolidated data sequence.
  *
  * YConsolidatedDataSet objects make it possible to retrieve a set of
  * recorded measures from multiple sensors, for a specified time interval.
@@ -85,7 +85,51 @@ public class YConsolidatedDataSet
     }
 
     /**
-     * Extracts the next data record from the dataLogger of all sensors linked to this
+     * Returns an object holding historical data for multiple
+     * sensors, for a specified time interval.
+     * The measures will be retrieved from the data logger, which must have been turned
+     * on at the desired time. The resulting object makes it possible to load progressively
+     * a large set of measures from multiple sensors, consolidating data on the fly
+     * to align records based on measurement timestamps.
+     *
+     * @param sensorNames : array of logical names or hardware identifiers of the sensors
+     *         for which data must be loaded from their data logger.
+     * @param startTime : the start of the desired measure time interval,
+     *         as a Unix timestamp, i.e. the number of seconds since
+     *         January 1, 1970 UTC. The special value 0 can be used
+     *         to include any measure, without initial limit.
+     * @param endTime : the end of the desired measure time interval,
+     *         as a Unix timestamp, i.e. the number of seconds since
+     *         January 1, 1970 UTC. The special value 0 can be used
+     *         to include any measure, without ending limit.
+     *
+     * @return an instance of YConsolidatedDataSet, providing access to
+     *         consolidated historical data. Records can be loaded progressively
+     *         using the YConsolidatedDataSet.nextRecord() method.
+     */
+    public static YConsolidatedDataSet Init(ArrayList<String> sensorNames,double startTime,double endTime) throws YAPI_Exception
+    {
+        int nSensors;
+        ArrayList<YSensor> sensorList = new ArrayList<>();
+        int idx;
+        String sensorName;
+        YSensor s;
+        YConsolidatedDataSet obj;
+        nSensors = sensorNames.size();
+        sensorList.clear();
+        idx = 0;
+        while (idx < nSensors) {
+            sensorName = sensorNames.get(idx);
+            s = YSensor.FindSensor(sensorName);
+            sensorList.add(s);
+            idx = idx + 1;
+        }
+        obj = new YConsolidatedDataSet(startTime, endTime, sensorList);
+        return obj;
+    }
+
+    /**
+     * Extracts the next data record from the data logger of all sensors linked to this
      * object.
      *
      * @param datarec : array of floating point numbers, that will be filled by the

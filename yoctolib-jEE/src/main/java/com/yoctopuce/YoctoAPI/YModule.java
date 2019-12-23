@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ * $Id: YModule.java 38913 2019-12-20 18:59:49Z mvuilleu $
  *
  * YModule Class: Module control interface
  *
@@ -43,7 +43,7 @@ import java.util.*;
 
 //--- (generated code: YModule class start)
 /**
- * YModule Class: Module control interface
+ * YModule Class: Global parameters control interface for all Yoctopuce devices
  *
  * The YModule class can be used with all Yoctopuce USB devices.
  * It can be used to control the module global parameters, and

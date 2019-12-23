@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 38510 2019-11-26 15:36:38Z mvuilleu $
+ * $Id: YMessageBox.java 38913 2019-12-20 18:59:49Z mvuilleu $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -46,11 +46,11 @@ import java.util.Locale;
 //--- (end of generated code: YMessageBox return codes)
 //--- (generated code: YMessageBox class start)
 /**
- * YMessageBox Class: MessageBox function interface
+ *  YMessageBox Class: SMS message box interface control interface, available for instance in the
+ * YoctoHub-GSM-2G, the YoctoHub-GSM-3G-EU or the YoctoHub-GSM-3G-NA
  *
- * The YMessageBox class provides SMS sending and receiving capability to
- *  GSM-enabled Yoctopuce devices, for instance using a YoctoHub-GSM-2G, a YoctoHub-GSM-3G-EU or a
- * YoctoHub-GSM-3G-NA.
+ * The YMessageBox class provides SMS sending and receiving capability for
+ * GSM-enabled Yoctopuce devices.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YMessageBox extends YFunction
@@ -409,7 +409,7 @@ public class YMessageBox extends YFunction
 
 
     /**
-     * Retrieves a MessageBox interface for a given identifier.
+     * Retrieves a SMS message box interface for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -419,11 +419,11 @@ public class YMessageBox extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the MessageBox interface is online at the time
+     * This function does not require that the SMS message box interface is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YMessageBox.isOnline() to test if the MessageBox interface is
+     * Use the method YMessageBox.isOnline() to test if the SMS message box interface is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a MessageBox interface by logical name, no error is notified: the first instance
+     * a SMS message box interface by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
@@ -431,10 +431,10 @@ public class YMessageBox extends YFunction
      * you are certain that the matching device is plugged, make sure that you did
      * call registerHub() at application initialization time.
      *
-     * @param func : a string that uniquely characterizes the MessageBox interface, for instance
+     * @param func : a string that uniquely characterizes the SMS message box interface, for instance
      *         YHUBGSM1.messageBox.
      *
-     * @return a YMessageBox object allowing you to drive the MessageBox interface.
+     * @return a YMessageBox object allowing you to drive the SMS message box interface.
      */
     public static YMessageBox FindMessageBox(String func)
     {
@@ -451,7 +451,7 @@ public class YMessageBox extends YFunction
     }
 
     /**
-     * Retrieves a MessageBox interface for a given identifier in a YAPI context.
+     * Retrieves a SMS message box interface for a given identifier in a YAPI context.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -461,19 +461,19 @@ public class YMessageBox extends YFunction
      * <li>ModuleLogicalName.FunctionLogicalName</li>
      * </ul>
      *
-     * This function does not require that the MessageBox interface is online at the time
+     * This function does not require that the SMS message box interface is online at the time
      * it is invoked. The returned object is nevertheless valid.
-     * Use the method YMessageBox.isOnline() to test if the MessageBox interface is
+     * Use the method YMessageBox.isOnline() to test if the SMS message box interface is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a MessageBox interface by logical name, no error is notified: the first instance
+     * a SMS message box interface by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
      * @param yctx : a YAPI context
-     * @param func : a string that uniquely characterizes the MessageBox interface, for instance
+     * @param func : a string that uniquely characterizes the SMS message box interface, for instance
      *         YHUBGSM1.messageBox.
      *
-     * @return a YMessageBox object allowing you to drive the MessageBox interface.
+     * @return a YMessageBox object allowing you to drive the SMS message box interface.
      */
     public static YMessageBox FindMessageBoxInContext(YAPIContext yctx,String func)
     {
@@ -1129,14 +1129,14 @@ public class YMessageBox extends YFunction
     }
 
     /**
-     * Continues the enumeration of MessageBox interfaces started using yFirstMessageBox().
-     * Caution: You can't make any assumption about the returned MessageBox interfaces order.
-     * If you want to find a specific a MessageBox interface, use MessageBox.findMessageBox()
+     * Continues the enumeration of SMS message box interfaces started using yFirstMessageBox().
+     * Caution: You can't make any assumption about the returned SMS message box interfaces order.
+     * If you want to find a specific a SMS message box interface, use MessageBox.findMessageBox()
      * and a hardwareID or a logical name.
      *
      * @return a pointer to a YMessageBox object, corresponding to
-     *         a MessageBox interface currently online, or a null pointer
-     *         if there are no more MessageBox interfaces to enumerate.
+     *         a SMS message box interface currently online, or a null pointer
+     *         if there are no more SMS message box interfaces to enumerate.
      */
     public YMessageBox nextMessageBox()
     {
@@ -1152,12 +1152,12 @@ public class YMessageBox extends YFunction
     }
 
     /**
-     * Starts the enumeration of MessageBox interfaces currently accessible.
+     * Starts the enumeration of SMS message box interfaces currently accessible.
      * Use the method YMessageBox.nextMessageBox() to iterate on
-     * next MessageBox interfaces.
+     * next SMS message box interfaces.
      *
      * @return a pointer to a YMessageBox object, corresponding to
-     *         the first MessageBox interface currently online, or a null pointer
+     *         the first SMS message box interface currently online, or a null pointer
      *         if there are none.
      */
     public static YMessageBox FirstMessageBox()
@@ -1170,14 +1170,14 @@ public class YMessageBox extends YFunction
     }
 
     /**
-     * Starts the enumeration of MessageBox interfaces currently accessible.
+     * Starts the enumeration of SMS message box interfaces currently accessible.
      * Use the method YMessageBox.nextMessageBox() to iterate on
-     * next MessageBox interfaces.
+     * next SMS message box interfaces.
      *
      * @param yctx : a YAPI context.
      *
      * @return a pointer to a YMessageBox object, corresponding to
-     *         the first MessageBox interface currently online, or a null pointer
+     *         the first SMS message box interface currently online, or a null pointer
      *         if there are none.
      */
     public static YMessageBox FirstMessageBoxInContext(YAPIContext yctx)

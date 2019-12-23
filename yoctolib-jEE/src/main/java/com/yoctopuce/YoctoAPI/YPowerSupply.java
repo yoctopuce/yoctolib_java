@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPowerSupply.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YPowerSupply.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -46,9 +46,9 @@ import java.util.Locale;
 //--- (end of YPowerSupply yapiwrapper)
 //--- (YPowerSupply class start)
 /**
- * YPowerSupply Class: PowerSupply function interface
+ * YPowerSupply Class: regulated power supply control interface
  *
- * The YPowerSupply class allows you to drive a Yoctopuce power supply$DEV_ENà.
+ * The YPowerSupply class allows you to drive a Yoctopuce power supply.
  * It can be use to change the voltage set point,
  * the current limit and the enable/disable the output.
  */

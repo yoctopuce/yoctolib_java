@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWlanRecord.java 34651 2019-03-15 17:21:54Z seb $
+ * $Id: YWlanRecord.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * YWlanRecord Class: Description of a wireless network detected
  *
@@ -41,7 +41,7 @@ package com.yoctopuce.YoctoAPI;
 
 //--- (generated code: YWlanRecord class start)
 /**
- * YWlanRecord Class: Description of a wireless network
+ * YWlanRecord Class: Wireless network description, returned by wireless.get_detectedWlans method
  *
  * YWlanRecord objects are used to describe a wireless network.
  * These objects are  used in particular in conjunction with the
@@ -86,9 +86,9 @@ public class YWlanRecord
     }
 
     /**
-     * Returns the 802.11 channel.
+     * Returns the 802.11 b/g/n channel number used by this network.
      *
-     * @return the 802.11 channel.
+     * @return an integer corresponding to the channel.
      */
     public int get_channel()
     {
@@ -97,6 +97,7 @@ public class YWlanRecord
 
     /**
      * Returns the security algorithm used by the wireless network.
+     * If the network implements to security, the value is "OPEN".
      *
      * @return a string with the security algorithm.
      */
@@ -108,7 +109,7 @@ public class YWlanRecord
     /**
      * Returns the quality of the wireless network link, in per cents.
      *
-     * @return the quality of the wireless network link, in per cents.
+     * @return an integer between 0 and 100 corresponding to the signal quality.
      */
     public int get_linkQuality()
     {

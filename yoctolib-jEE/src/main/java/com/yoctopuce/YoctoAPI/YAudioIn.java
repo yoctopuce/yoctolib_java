@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAudioIn.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YAudioIn.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindAudioIn(), the high-level API for AudioIn functions
  *
@@ -45,7 +45,7 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YAudioIn yapiwrapper)
 //--- (YAudioIn class start)
 /**
- * YAudioIn Class: AudioIn function interface
+ * YAudioIn Class: audio input control interface
  *
  * The YAudioIn class allows you to configure the volume of an audio input.
  */

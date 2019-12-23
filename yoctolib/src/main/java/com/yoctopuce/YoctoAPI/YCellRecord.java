@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellRecord.java 38239 2019-11-20 11:36:26Z seb $
+ * $Id: YCellRecord.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * Implements FindCellRecord(), the high-level API for CellRecord functions
  *
@@ -42,9 +42,11 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of generated code: YCellRecord return codes)
 //--- (generated code: YCellRecord class start)
 /**
- * YCellRecord Class: Description of a cellular antenna
+ * YCellRecord Class: Cellular antenna description, returned by cellular.quickCellSurvey method
  *
- *
+ * YCellRecord objects are used to describe a wireless network.
+ * These objects are used in particular in conjunction with the
+ * YCellular class.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YCellRecord
@@ -77,7 +79,7 @@ public class YCellRecord
     //--- (generated code: YCellRecord implementation)
 
     /**
-     * Returns the name of the the cell operator.
+     * Returns the name of the the cell operator, as received from the network.
      *
      * @return a string with the name of the the cell operator.
      */
@@ -87,9 +89,9 @@ public class YCellRecord
     }
 
     /**
-     * Returns the Mobile Country Code (MCC).
+     * Returns the Mobile Country Code (MCC). The MCC is a unique identifier for each country.
      *
-     * @return the Mobile Country Code (MCC).
+     * @return an integer corresponding to the Mobile Country Code (MCC).
      */
     public int get_mobileCountryCode()
     {
@@ -97,9 +99,10 @@ public class YCellRecord
     }
 
     /**
-     * Returns the Mobile Network Code (MNC).
+     * Returns the Mobile Network Code (MNC). The MNC is a unique identifier for each phone
+     * operator within a country.
      *
-     * @return the Mobile Network Code (MNC).
+     * @return an integer corresponding to the Mobile Network Code (MNC).
      */
     public int get_mobileNetworkCode()
     {
@@ -107,9 +110,10 @@ public class YCellRecord
     }
 
     /**
-     * Returns the Location Area Code (LAC).
+     * Returns the Location Area Code (LAC). The LAC is a unique identifier for each
+     * place within a country.
      *
-     * @return the Location Area Code (LAC).
+     * @return an integer corresponding to the Location Area Code (LAC).
      */
     public int get_locationAreaCode()
     {
@@ -117,9 +121,10 @@ public class YCellRecord
     }
 
     /**
-     * Returns the Cell Id.
+     * Returns the Cell ID. The Cell ID is a unique identifier for each
+     * base transmission station within a LAC.
      *
-     * @return the Cell Id.
+     * @return an integer corresponding to the Cell Id.
      */
     public int get_cellId()
     {
@@ -127,9 +132,9 @@ public class YCellRecord
     }
 
     /**
-     * Returns the signal strength.
+     * Returns the signal strength, measured in dBm.
      *
-     * @return the signal strength.
+     * @return an integer corresponding to the signal strength.
      */
     public int get_signalStrength()
     {
@@ -137,9 +142,11 @@ public class YCellRecord
     }
 
     /**
-     * Returns the Timing Advance (TA).
+     * Returns the Timing Advance (TA). The TA corresponds to the time necessary
+     * for the signal to reach the base station from the device.
+     * Each increment corresponds about to 550m of distance.
      *
-     * @return the Timing Advance (TA).
+     * @return an integer corresponding to the Timing Advance (TA).
      */
     public int get_timingAdvance()
     {

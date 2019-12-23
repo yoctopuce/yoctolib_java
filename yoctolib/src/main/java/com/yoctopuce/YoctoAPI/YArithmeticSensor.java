@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YArithmeticSensor.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YArithmeticSensor.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  *  Implements FindArithmeticSensor(), the high-level API for ArithmeticSensor functions
  *
@@ -47,12 +47,13 @@ import java.util.ArrayList;
 //--- (end of YArithmeticSensor yapiwrapper)
 //--- (YArithmeticSensor class start)
 /**
- * YArithmeticSensor Class: ArithmeticSensor function interface
+ *  YArithmeticSensor Class: arithmetic sensor control interface, available for instance in the
+ * Yocto-MaxiMicroVolt-Rx
  *
  * The YArithmeticSensor class allows some Yoctopuce devices to compute in real-time
  * values based on an arithmetic formula involving one or more measured signals as
- * well as the temperature. This functionality is only available on specific
- * Yoctopuce devices, for instance using a Yocto-MaxiMicroVolt-Rx.
+ * well as the temperature. As for any physical sensor, the computed values can be
+ * read by callback and stored in the built-in datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YArithmeticSensor extends YSensor
