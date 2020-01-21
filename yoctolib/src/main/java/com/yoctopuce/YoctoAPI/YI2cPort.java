@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 38913 2019-12-20 18:59:49Z mvuilleu $
+ *  $Id: YI2cPort.java 38934 2019-12-23 09:29:53Z seb $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -825,13 +825,13 @@ public class YI2cPort extends YFunction
     }
 
     /**
-     * Returns the SPI port communication parameters, as a string such as
+     * Returns the I2C port communication parameters, as a string such as
      * "400kbps,2000ms,NoRestart". The string includes the baud rate, the
      * recovery delay after communications errors, and if needed the option
      * NoRestart to use a Stop/Start sequence instead of the
      * Restart state when performing read on the I2C bus.
      *
-     * @return a string corresponding to the SPI port communication parameters, as a string such as
+     * @return a string corresponding to the I2C port communication parameters, as a string such as
      *         "400kbps,2000ms,NoRestart"
      *
      * @throws YAPI_Exception on error
@@ -851,13 +851,13 @@ public class YI2cPort extends YFunction
     }
 
     /**
-     * Returns the SPI port communication parameters, as a string such as
+     * Returns the I2C port communication parameters, as a string such as
      * "400kbps,2000ms,NoRestart". The string includes the baud rate, the
      * recovery delay after communications errors, and if needed the option
      * NoRestart to use a Stop/Start sequence instead of the
      * Restart state when performing read on the I2C bus.
      *
-     * @return a string corresponding to the SPI port communication parameters, as a string such as
+     * @return a string corresponding to the I2C port communication parameters, as a string such as
      *         "400kbps,2000ms,NoRestart"
      *
      * @throws YAPI_Exception on error
@@ -868,7 +868,7 @@ public class YI2cPort extends YFunction
     }
 
     /**
-     * Changes the SPI port communication parameters, with a string such as
+     * Changes the I2C port communication parameters, with a string such as
      * "400kbps,2000ms". The string includes the baud rate, the
      * recovery delay after communications errors, and if needed the option
      * NoRestart to use a Stop/Start sequence instead of the
@@ -876,7 +876,7 @@ public class YI2cPort extends YFunction
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     * @param newval : a string corresponding to the SPI port communication parameters, with a string such as
+     * @param newval : a string corresponding to the I2C port communication parameters, with a string such as
      *         "400kbps,2000ms"
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -894,7 +894,7 @@ public class YI2cPort extends YFunction
     }
 
     /**
-     * Changes the SPI port communication parameters, with a string such as
+     * Changes the I2C port communication parameters, with a string such as
      * "400kbps,2000ms". The string includes the baud rate, the
      * recovery delay after communications errors, and if needed the option
      * NoRestart to use a Stop/Start sequence instead of the
@@ -902,7 +902,7 @@ public class YI2cPort extends YFunction
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     * @param newval : a string corresponding to the SPI port communication parameters, with a string such as
+     * @param newval : a string corresponding to the I2C port communication parameters, with a string such as
      *         "400kbps,2000ms"
      *
      * @return YAPI_SUCCESS if the call succeeds.
