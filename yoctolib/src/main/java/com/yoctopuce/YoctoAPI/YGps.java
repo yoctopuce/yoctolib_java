@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGps.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YGps.java 39658 2020-03-12 15:36:29Z seb $
  *
  *  Implements FindGps(), the high-level API for Gps functions
  *
@@ -45,7 +45,7 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YGps yapiwrapper)
 //--- (YGps class start)
 /**
- * YGps Class: Geolocalization control interface (GPS, GNSS, ...), available for instance in the Yocto-GPS
+ * YGps Class: Geolocalization control interface (GPS, GNSS, ...), available for instance in the Yocto-GPS-V2
  *
  * The YGps class allows you to retrieve positioning
  * data from a GPS/GNSS sensor. This class can provides
@@ -960,7 +960,7 @@ public class YGps extends YFunction
      * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the geolocalization module, for instance
-     *         YGNSSMK1.gps.
+     *         YGNSSMK2.gps.
      *
      * @return a YGps object allowing you to drive the geolocalization module.
      */
@@ -999,7 +999,7 @@ public class YGps extends YFunction
      *
      * @param yctx : a YAPI context
      * @param func : a string that uniquely characterizes the geolocalization module, for instance
-     *         YGNSSMK1.gps.
+     *         YGNSSMK2.gps.
      *
      * @return a YGps object allowing you to drive the geolocalization module.
      */

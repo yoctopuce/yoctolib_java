@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGroundSpeed.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YGroundSpeed.java 39658 2020-03-12 15:36:29Z seb $
  *
  *  Implements FindGroundSpeed(), the high-level API for GroundSpeed functions
  *
@@ -45,7 +45,7 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YGroundSpeed yapiwrapper)
 //--- (YGroundSpeed class start)
 /**
- * YGroundSpeed Class: ground speed sensor control interface, available for instance in the Yocto-GPS
+ * YGroundSpeed Class: ground speed sensor control interface, available for instance in the Yocto-GPS-V2
  *
  * The YGroundSpeed class allows you to read and configure Yoctopuce ground speed sensors.
  * It inherits from YSensor class the core functions to read measurements,
@@ -140,7 +140,7 @@ public class YGroundSpeed extends YSensor
      * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the ground speed sensor, for instance
-     *         YGNSSMK1.groundSpeed.
+     *         YGNSSMK2.groundSpeed.
      *
      * @return a YGroundSpeed object allowing you to drive the ground speed sensor.
      */
@@ -179,7 +179,7 @@ public class YGroundSpeed extends YSensor
      *
      * @param yctx : a YAPI context
      * @param func : a string that uniquely characterizes the ground speed sensor, for instance
-     *         YGNSSMK1.groundSpeed.
+     *         YGNSSMK2.groundSpeed.
      *
      * @return a YGroundSpeed object allowing you to drive the ground speed sensor.
      */

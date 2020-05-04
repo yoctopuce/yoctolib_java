@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YNetwork.java 39573 2020-03-10 17:20:22Z seb $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -150,6 +150,7 @@ public class YNetwork extends YFunction
     public static final int CALLBACKENCODING_MQTT = 9;
     public static final int CALLBACKENCODING_YOCTO_API_JZON = 10;
     public static final int CALLBACKENCODING_PRTG = 11;
+    public static final int CALLBACKENCODING_INFLUXDB_V2 = 12;
     public static final int CALLBACKENCODING_INVALID = -1;
     /**
      * invalid callbackCredentials value
@@ -1434,8 +1435,9 @@ public class YNetwork extends YFunction
      *  YNetwork.CALLBACKENCODING_YOCTO_API, YNetwork.CALLBACKENCODING_JSON_NUM,
      *  YNetwork.CALLBACKENCODING_EMONCMS, YNetwork.CALLBACKENCODING_AZURE,
      *  YNetwork.CALLBACKENCODING_INFLUXDB, YNetwork.CALLBACKENCODING_MQTT,
-     *  YNetwork.CALLBACKENCODING_YOCTO_API_JZON and YNetwork.CALLBACKENCODING_PRTG corresponding to the
-     * encoding standard to use for representing notification values
+     *  YNetwork.CALLBACKENCODING_YOCTO_API_JZON, YNetwork.CALLBACKENCODING_PRTG and
+     *  YNetwork.CALLBACKENCODING_INFLUXDB_V2 corresponding to the encoding standard to use for
+     * representing notification values
      *
      * @throws YAPI_Exception on error
      */
@@ -1459,8 +1461,9 @@ public class YNetwork extends YFunction
      *  @return a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
      *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV, Y_CALLBACKENCODING_YOCTO_API,
      *  Y_CALLBACKENCODING_JSON_NUM, Y_CALLBACKENCODING_EMONCMS, Y_CALLBACKENCODING_AZURE,
-     *  Y_CALLBACKENCODING_INFLUXDB, Y_CALLBACKENCODING_MQTT, Y_CALLBACKENCODING_YOCTO_API_JZON and
-     * Y_CALLBACKENCODING_PRTG corresponding to the encoding standard to use for representing notification values
+     *  Y_CALLBACKENCODING_INFLUXDB, Y_CALLBACKENCODING_MQTT, Y_CALLBACKENCODING_YOCTO_API_JZON,
+     *  Y_CALLBACKENCODING_PRTG and Y_CALLBACKENCODING_INFLUXDB_V2 corresponding to the encoding standard
+     * to use for representing notification values
      *
      * @throws YAPI_Exception on error
      */
@@ -1479,8 +1482,9 @@ public class YNetwork extends YFunction
      *  YNetwork.CALLBACKENCODING_YOCTO_API, YNetwork.CALLBACKENCODING_JSON_NUM,
      *  YNetwork.CALLBACKENCODING_EMONCMS, YNetwork.CALLBACKENCODING_AZURE,
      *  YNetwork.CALLBACKENCODING_INFLUXDB, YNetwork.CALLBACKENCODING_MQTT,
-     *  YNetwork.CALLBACKENCODING_YOCTO_API_JZON and YNetwork.CALLBACKENCODING_PRTG corresponding to the
-     * encoding standard to use for representing notification values
+     *  YNetwork.CALLBACKENCODING_YOCTO_API_JZON, YNetwork.CALLBACKENCODING_PRTG and
+     *  YNetwork.CALLBACKENCODING_INFLUXDB_V2 corresponding to the encoding standard to use for
+     * representing notification values
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -1504,8 +1508,9 @@ public class YNetwork extends YFunction
      *  @param newval : a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
      *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV, Y_CALLBACKENCODING_YOCTO_API,
      *  Y_CALLBACKENCODING_JSON_NUM, Y_CALLBACKENCODING_EMONCMS, Y_CALLBACKENCODING_AZURE,
-     *  Y_CALLBACKENCODING_INFLUXDB, Y_CALLBACKENCODING_MQTT, Y_CALLBACKENCODING_YOCTO_API_JZON and
-     * Y_CALLBACKENCODING_PRTG corresponding to the encoding standard to use for representing notification values
+     *  Y_CALLBACKENCODING_INFLUXDB, Y_CALLBACKENCODING_MQTT, Y_CALLBACKENCODING_YOCTO_API_JZON,
+     *  Y_CALLBACKENCODING_PRTG and Y_CALLBACKENCODING_INFLUXDB_V2 corresponding to the encoding standard
+     * to use for representing notification values
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

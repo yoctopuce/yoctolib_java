@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 38934 2019-12-23 09:29:53Z seb $
+ *  $Id: YI2cPort.java 39333 2020-01-30 10:05:40Z mvuilleu $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -1193,6 +1193,44 @@ public class YI2cPort extends YFunction
         String res;
 
         url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
+        msgbin = _download(url);
+        msgarr = _json_get_array(msgbin);
+        msglen = msgarr.size();
+        if (msglen == 0) {
+            return "";
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        if (msglen == 0) {
+            return "";
+        }
+        res = _json_get_string((msgarr.get(0)).getBytes());
+        return res;
+    }
+
+    /**
+     * Sends a binary message to the serial port, and reads the reply, if any.
+     * This function is intended to be used when the serial port is configured for
+     * Frame-based protocol.
+     *
+     * @param hexString : the message to send, coded in hexadecimal
+     * @param maxWait : the maximum number of milliseconds to wait for a reply.
+     *
+     * @return the next frame received after sending the message, as a hex string.
+     *         Additional frames can be obtained by calling readHex or readMessages.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String queryHex(String hexString,int maxWait) throws YAPI_Exception
+    {
+        String url;
+        byte[] msgbin;
+        ArrayList<String> msgarr = new ArrayList<>();
+        int msglen;
+        String res;
+
+        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=$%s", maxWait,hexString);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();

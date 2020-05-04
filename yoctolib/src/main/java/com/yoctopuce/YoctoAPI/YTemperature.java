@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTemperature.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YTemperature.java 39648 2020-03-12 13:56:10Z mvuilleu $
  *
  *  Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -81,6 +81,7 @@ public class YTemperature extends YSensor
     public static final int SENSORTYPE_RES_INTERNAL = 14;
     public static final int SENSORTYPE_IR = 15;
     public static final int SENSORTYPE_RES_PT1000 = 16;
+    public static final int SENSORTYPE_CHANNEL_OFF = 17;
     public static final int SENSORTYPE_INVALID = -1;
     /**
      * invalid signalValue value
@@ -228,8 +229,9 @@ public class YTemperature extends YSensor
      *  YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES,
      *  YTemperature.SENSORTYPE_PT100_2WIRES, YTemperature.SENSORTYPE_RES_OHM,
      *  YTemperature.SENSORTYPE_RES_NTC, YTemperature.SENSORTYPE_RES_LINEAR,
-     *  YTemperature.SENSORTYPE_RES_INTERNAL, YTemperature.SENSORTYPE_IR and
-     * YTemperature.SENSORTYPE_RES_PT1000 corresponding to the temperature sensor type
+     *  YTemperature.SENSORTYPE_RES_INTERNAL, YTemperature.SENSORTYPE_IR,
+     *  YTemperature.SENSORTYPE_RES_PT1000 and YTemperature.SENSORTYPE_CHANNEL_OFF corresponding to the
+     * temperature sensor type
      *
      * @throws YAPI_Exception on error
      */
@@ -254,8 +256,8 @@ public class YTemperature extends YSensor
      *  Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
      *  Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES,
      *  Y_SENSORTYPE_PT100_2WIRES, Y_SENSORTYPE_RES_OHM, Y_SENSORTYPE_RES_NTC, Y_SENSORTYPE_RES_LINEAR,
-     *  Y_SENSORTYPE_RES_INTERNAL, Y_SENSORTYPE_IR and Y_SENSORTYPE_RES_PT1000 corresponding to the
-     * temperature sensor type
+     *  Y_SENSORTYPE_RES_INTERNAL, Y_SENSORTYPE_IR, Y_SENSORTYPE_RES_PT1000 and Y_SENSORTYPE_CHANNEL_OFF
+     * corresponding to the temperature sensor type
      *
      * @throws YAPI_Exception on error
      */
@@ -277,8 +279,9 @@ public class YTemperature extends YSensor
      *  YTemperature.SENSORTYPE_PT100_4WIRES, YTemperature.SENSORTYPE_PT100_3WIRES,
      *  YTemperature.SENSORTYPE_PT100_2WIRES, YTemperature.SENSORTYPE_RES_OHM,
      *  YTemperature.SENSORTYPE_RES_NTC, YTemperature.SENSORTYPE_RES_LINEAR,
-     *  YTemperature.SENSORTYPE_RES_INTERNAL, YTemperature.SENSORTYPE_IR and
-     * YTemperature.SENSORTYPE_RES_PT1000 corresponding to the temperature sensor type
+     *  YTemperature.SENSORTYPE_RES_INTERNAL, YTemperature.SENSORTYPE_IR,
+     *  YTemperature.SENSORTYPE_RES_PT1000 and YTemperature.SENSORTYPE_CHANNEL_OFF corresponding to the
+     * temperature sensor type
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -305,8 +308,8 @@ public class YTemperature extends YSensor
      *  Y_SENSORTYPE_TYPE_J, Y_SENSORTYPE_TYPE_N, Y_SENSORTYPE_TYPE_R, Y_SENSORTYPE_TYPE_S,
      *  Y_SENSORTYPE_TYPE_T, Y_SENSORTYPE_PT100_4WIRES, Y_SENSORTYPE_PT100_3WIRES,
      *  Y_SENSORTYPE_PT100_2WIRES, Y_SENSORTYPE_RES_OHM, Y_SENSORTYPE_RES_NTC, Y_SENSORTYPE_RES_LINEAR,
-     *  Y_SENSORTYPE_RES_INTERNAL, Y_SENSORTYPE_IR and Y_SENSORTYPE_RES_PT1000 corresponding to the
-     * temperature sensor type
+     *  Y_SENSORTYPE_RES_INTERNAL, Y_SENSORTYPE_IR, Y_SENSORTYPE_RES_PT1000 and Y_SENSORTYPE_CHANNEL_OFF
+     * corresponding to the temperature sensor type
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
