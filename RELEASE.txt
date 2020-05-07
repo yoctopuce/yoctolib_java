@@ -1,3 +1,5 @@
-Java v1.10.40261
+Java v1.10.40411
 
-- Fix error "java.lang.UnsatisfiedLinkError: com.yoctopuce.YoctoAPI.YJniWrapper.reserveUSBAccess()" when using USB native access on ARM.
+- Add definitions for temperature type "CHANNEL_OFF" and callback encoding "INFLUXDB_V2"
+- Add example for Yocto-MaxiBuzzer
+- Fix doc for queryHex method

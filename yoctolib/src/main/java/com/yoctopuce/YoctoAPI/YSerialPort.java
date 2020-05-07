@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 39333 2020-01-30 10:05:40Z mvuilleu $
+ * $Id: YSerialPort.java 40296 2020-05-05 07:56:00Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *

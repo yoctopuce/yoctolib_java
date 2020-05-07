@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ * $Id: YCellular.java 40296 2020-05-05 07:56:00Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -81,6 +81,9 @@ public class YCellular extends YFunction
     public static final int CELLTYPE_HSDPA = 3;
     public static final int CELLTYPE_NONE = 4;
     public static final int CELLTYPE_CDMA = 5;
+    public static final int CELLTYPE_LTE_M = 6;
+    public static final int CELLTYPE_NB_IOT = 7;
+    public static final int CELLTYPE_EC_GSM_IOT = 8;
     public static final int CELLTYPE_INVALID = -1;
     /**
      * invalid imsi value
@@ -94,6 +97,10 @@ public class YCellular extends YFunction
      * invalid pin value
      */
     public static final String PIN_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid radioConfig value
+     */
+    public static final String RADIOCONFIG_INVALID = YAPI.INVALID_STRING;
     /**
      * invalid lockedOperator value
      */
@@ -143,6 +150,7 @@ public class YCellular extends YFunction
     protected String _imsi = IMSI_INVALID;
     protected String _message = MESSAGE_INVALID;
     protected String _pin = PIN_INVALID;
+    protected String _radioConfig = RADIOCONFIG_INVALID;
     protected String _lockedOperator = LOCKEDOPERATOR_INVALID;
     protected int _airplaneMode = AIRPLANEMODE_INVALID;
     protected int _enableData = ENABLEDATA_INVALID;
@@ -225,6 +233,9 @@ public class YCellular extends YFunction
         }
         if (json_val.has("pin")) {
             _pin = json_val.getString("pin");
+        }
+        if (json_val.has("radioConfig")) {
+            _radioConfig = json_val.getString("radioConfig");
         }
         if (json_val.has("lockedOperator")) {
             _lockedOperator = json_val.getString("lockedOperator");
@@ -361,7 +372,8 @@ public class YCellular extends YFunction
      * Active cellular connection type.
      *
      *  @return a value among YCellular.CELLTYPE_GPRS, YCellular.CELLTYPE_EGPRS, YCellular.CELLTYPE_WCDMA,
-     * YCellular.CELLTYPE_HSDPA, YCellular.CELLTYPE_NONE and YCellular.CELLTYPE_CDMA
+     *  YCellular.CELLTYPE_HSDPA, YCellular.CELLTYPE_NONE, YCellular.CELLTYPE_CDMA,
+     * YCellular.CELLTYPE_LTE_M, YCellular.CELLTYPE_NB_IOT and YCellular.CELLTYPE_EC_GSM_IOT
      *
      * @throws YAPI_Exception on error
      */
@@ -383,7 +395,7 @@ public class YCellular extends YFunction
      * Active cellular connection type.
      *
      *  @return a value among Y_CELLTYPE_GPRS, Y_CELLTYPE_EGPRS, Y_CELLTYPE_WCDMA, Y_CELLTYPE_HSDPA,
-     * Y_CELLTYPE_NONE and Y_CELLTYPE_CDMA
+     * Y_CELLTYPE_NONE, Y_CELLTYPE_CDMA, Y_CELLTYPE_LTE_M, Y_CELLTYPE_NB_IOT and Y_CELLTYPE_EC_GSM_IOT
      *
      * @throws YAPI_Exception on error
      */
@@ -393,13 +405,13 @@ public class YCellular extends YFunction
     }
 
     /**
-     * Returns an opaque string if a PIN code has been configured in the device to access
-     * the SIM card, or an empty string if none has been configured or if the code provided
-     * was rejected by the SIM card.
+     * Returns the International Mobile Subscriber Identity (MSI) that uniquely identifies
+     * the SIM card. The first 3 digits represent the mobile country code (MCC), which
+     * is followed by the mobile network code (MNC), either 2-digit (European standard)
+     * or 3-digit (North American standard)
      *
-     * @return a string corresponding to an opaque string if a PIN code has been configured in the device to access
-     *         the SIM card, or an empty string if none has been configured or if the code provided
-     *         was rejected by the SIM card
+     * @return a string corresponding to the International Mobile Subscriber Identity (MSI) that uniquely identifies
+     *         the SIM card
      *
      * @throws YAPI_Exception on error
      */
@@ -418,13 +430,13 @@ public class YCellular extends YFunction
     }
 
     /**
-     * Returns an opaque string if a PIN code has been configured in the device to access
-     * the SIM card, or an empty string if none has been configured or if the code provided
-     * was rejected by the SIM card.
+     * Returns the International Mobile Subscriber Identity (MSI) that uniquely identifies
+     * the SIM card. The first 3 digits represent the mobile country code (MCC), which
+     * is followed by the mobile network code (MNC), either 2-digit (European standard)
+     * or 3-digit (North American standard)
      *
-     * @return a string corresponding to an opaque string if a PIN code has been configured in the device to access
-     *         the SIM card, or an empty string if none has been configured or if the code provided
-     *         was rejected by the SIM card
+     * @return a string corresponding to the International Mobile Subscriber Identity (MSI) that uniquely identifies
+     *         the SIM card
      *
      * @throws YAPI_Exception on error
      */
@@ -558,6 +570,96 @@ public class YCellular extends YFunction
     public int setPin(String newval)  throws YAPI_Exception
     {
         return set_pin(newval);
+    }
+
+    /**
+     * Returns the type of protocol used over the serial line, as a string.
+     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "Frame:[timeout]ms" for binary messages separated by a delay time,
+     * "Char" for a continuous ASCII stream or
+     * "Byte" for a continuous binary stream.
+     *
+     * @return a string corresponding to the type of protocol used over the serial line, as a string
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_radioConfig() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return RADIOCONFIG_INVALID;
+                }
+            }
+            res = _radioConfig;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the type of protocol used over the serial line, as a string.
+     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "Frame:[timeout]ms" for binary messages separated by a delay time,
+     * "Char" for a continuous ASCII stream or
+     * "Byte" for a continuous binary stream.
+     *
+     * @return a string corresponding to the type of protocol used over the serial line, as a string
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getRadioConfig() throws YAPI_Exception
+    {
+        return get_radioConfig();
+    }
+
+    /**
+     * Changes the type of protocol used over the serial line.
+     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "Frame:[timeout]ms" for binary messages separated by a delay time,
+     * "Char" for a continuous ASCII stream or
+     * "Byte" for a continuous binary stream.
+     * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
+     * is always at lest the specified number of milliseconds between each bytes sent.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : a string corresponding to the type of protocol used over the serial line
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_radioConfig(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("radioConfig",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the type of protocol used over the serial line.
+     * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "Frame:[timeout]ms" for binary messages separated by a delay time,
+     * "Char" for a continuous ASCII stream or
+     * "Byte" for a continuous binary stream.
+     * The suffix "/[wait]ms" can be added to reduce the transmit rate so that there
+     * is always at lest the specified number of milliseconds between each bytes sent.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : a string corresponding to the type of protocol used over the serial line
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setRadioConfig(String newval)  throws YAPI_Exception
+    {
+        return set_radioConfig(newval);
     }
 
     /**

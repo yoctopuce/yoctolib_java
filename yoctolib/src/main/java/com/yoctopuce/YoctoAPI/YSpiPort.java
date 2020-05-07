@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSpiPort.java 39333 2020-01-30 10:05:40Z mvuilleu $
+ *  $Id: YSpiPort.java 40296 2020-05-05 07:56:00Z seb $
  *
  *  Implements FindSpiPort(), the high-level API for SpiPort functions
  *

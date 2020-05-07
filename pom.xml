@@ -36,6 +36,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-LatchedRelay</module>
         <module>Examples/Doc-GettingStarted-Yocto-Light</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiBridge</module>
+        <module>Examples/Doc-GettingStarted-Yocto-MaxiBuzzer</module>
         <module>Examples/Doc-GettingStarted-Yocto-Maxi-IO</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiCoupler</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiDisplay</module>
