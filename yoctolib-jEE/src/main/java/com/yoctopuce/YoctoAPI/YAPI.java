@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 38810 2019-12-17 22:00:46Z mvuilleu $
+ * $Id: YAPI.java 40549 2020-05-14 15:54:55Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -58,7 +58,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "40411";
+    public static final String YOCTO_API_BUILD_STR = "40924";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -285,7 +285,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".40411" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".40924" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -314,10 +314,22 @@ public class YAPI
     }
 
     /**
-     * Frees dynamically allocated memory blocks used by the Yoctopuce library.
-     * It is generally not required to call this function, unless you
-     * want to free all dynamically allocated memory blocks in order to
-     * track a memory leak for instance.
+     * Waits for all pending communications with Yoctopuce devices to be
+     * completed then frees dynamically allocated resources used by
+     * the Yoctopuce library.
+     *
+     * From an operating system standpoint, it is generally not required to call
+     * this function since the OS will automatically free allocated resources
+     * once your program is completed. However there are two situations when
+     * you may really want to use that function:
+     *
+     * - Free all dynamically allocated memory blocks in order to
+     * track a memory leak.
+     *
+     * - Send commands to devices right before the end
+     * of the program. Since commands are sent in an asynchronous way
+     * the program could exit before all commands are effectively sent.
+     *
      * You should not call any other library function after calling
      * yFreeAPI(), or your program will crash.
      */

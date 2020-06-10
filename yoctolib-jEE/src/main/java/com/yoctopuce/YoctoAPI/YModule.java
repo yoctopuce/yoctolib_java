@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 38913 2019-12-20 18:59:49Z mvuilleu $
+ * $Id: YModule.java 40884 2020-06-09 16:07:33Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -1498,6 +1498,9 @@ public class YModule extends YFunction
         String json_api;
         String json_files;
         String json_extra;
+        int fuperror;
+        int globalres;
+        fuperror = 0;
         json = new String(settings);
         json_api = _get_json_path(json, "api");
         if (json_api.equals("")) {
@@ -1525,11 +1528,18 @@ public class YModule extends YFunction
                 name = _decode_json_string(name);
                 data = _get_json_path(ii, "data");
                 data = _decode_json_string(data);
-                _upload(name, YAPIContext._hexStrToBin(data));
+                if (name.equals("")) {
+                    fuperror = fuperror + 1;
+                } else {
+                    _upload(name, YAPIContext._hexStrToBin(data));
+                }
             }
         }
         // Apply settings a second time for file-dependent settings and dynamic sensor nodes
-        return set_allSettings((json_api).getBytes());
+        globalres = set_allSettings((json_api).getBytes());
+        //noinspection DoubleNegation
+        if (!(fuperror == 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "Error during file upload");}
+        return globalres;
     }
 
     /**

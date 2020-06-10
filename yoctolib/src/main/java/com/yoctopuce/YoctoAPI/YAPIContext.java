@@ -968,10 +968,22 @@ public class YAPIContext
     }
 
     /**
-     * Frees dynamically allocated memory blocks used by the Yoctopuce library.
-     * It is generally not required to call this function, unless you
-     * want to free all dynamically allocated memory blocks in order to
-     * track a memory leak for instance.
+     * Waits for all pending communications with Yoctopuce devices to be
+     * completed then frees dynamically allocated resources used by
+     * the Yoctopuce library.
+     *
+     * From an operating system standpoint, it is generally not required to call
+     * this function since the OS will automatically free allocated resources
+     * once your program is completed. However there are two situations when
+     * you may really want to use that function:
+     *
+     * - Free all dynamically allocated memory blocks in order to
+     * track a memory leak.
+     *
+     * - Send commands to devices right before the end
+     * of the program. Since commands are sent in an asynchronous way
+     * the program could exit before all commands are effectively sent.
+     *
      * You should not call any other library function after calling
      * yFreeAPI(), or your program will crash.
      */
