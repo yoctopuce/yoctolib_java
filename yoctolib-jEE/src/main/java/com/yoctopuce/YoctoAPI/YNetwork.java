@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 39573 2020-03-10 17:20:22Z seb $
+ *  $Id: YNetwork.java 41109 2020-06-29 12:40:42Z seb $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -47,7 +47,7 @@ import java.util.Locale;
 //--- (YNetwork class start)
 /**
  *  YNetwork Class: network interface control interface, available for instance in the
- * YoctoHub-Ethernet, the YoctoHub-GSM-3G-EU, the YoctoHub-GSM-3G-NA or the YoctoHub-Wireless-g
+ * YoctoHub-Ethernet, the YoctoHub-GSM-3G-EU, the YoctoHub-Wireless-g or the YoctoHub-Wireless-n
  *
  * YNetwork objects provide access to TCP/IP parameters of Yoctopuce
  * devices that include a built-in network interface.

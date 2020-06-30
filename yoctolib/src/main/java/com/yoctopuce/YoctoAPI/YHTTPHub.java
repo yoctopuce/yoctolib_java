@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 37231 2019-09-20 09:09:17Z seb $
+ * $Id: YHTTPHub.java 41062 2020-06-25 10:16:20Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -482,10 +482,11 @@ class YHTTPHub extends YGenericHub
         }
         // Setup timeout counter
         int tcpTimeout = _yctx._networkTimeoutMs;
-        if (req_first_line.contains("/testcb.txt") || req_first_line.contains("/rxmsg.json")
-                || req_first_line.contains("/files.json") || req_first_line.contains("/upload.html")) {
+        if (req_first_line.contains("/testcb.txt") || req_first_line.contains("/logger.json")
+                || req_first_line.contains("/rxmsg.json") || req_first_line.contains("/rxdata.bin")
+                || req_first_line.contains("/at.txt") || req_first_line.contains("/files.json")) {
             tcpTimeout = YIO_1_MINUTE_TCP_TIMEOUT;
-        } else if (req_first_line.contains("/flash.json")) {
+        } else if (req_first_line.contains("/flash.json") || req_first_line.contains("/upload.html")) {
             tcpTimeout = YIO_10_MINUTES_TCP_TIMEOUT;
         }
         return _notificationHandler.devRequestSync(device, req_first_line, req_head_and_body, tcpTimeout, progress, context);

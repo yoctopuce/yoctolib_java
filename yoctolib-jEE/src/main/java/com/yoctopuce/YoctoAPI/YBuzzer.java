@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YBuzzer.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YBuzzer.java 41109 2020-06-29 12:40:42Z seb $
  *
  *  Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -46,7 +46,7 @@ import java.util.Locale;
 //--- (end of YBuzzer yapiwrapper)
 //--- (YBuzzer class start)
 /**
- * YBuzzer Class: buzzer control interface, available for instance in the Yocto-Buzzer
+ * YBuzzer Class: buzzer control interface, available for instance in the Yocto-Buzzer or the Yocto-MaxiBuzzer
  *
  * The YBuzzer class allows you to drive a buzzer. You can
  * choose the frequency and the volume at which the buzzer must sound.

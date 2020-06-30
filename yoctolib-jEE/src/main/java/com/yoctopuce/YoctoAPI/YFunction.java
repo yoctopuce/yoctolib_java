@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ * $Id: YFunction.java 41055 2020-06-25 08:15:29Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -866,7 +866,7 @@ public class YFunction
     // identifier, possibly applying changes
     // Device cache will be preloaded when loading function "module" and
     // leveraged for other modules
-    protected YJSONObject _devRequest(String extra) throws YAPI_Exception
+     YJSONObject _devRequest(String extra) throws YAPI_Exception
     {
         YDevice dev = getYDevice();
         _hwId = _yapi._yHash.resolveHwID(_className, _func);

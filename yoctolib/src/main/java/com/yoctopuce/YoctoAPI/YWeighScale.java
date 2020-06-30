@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWeighScale.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YWeighScale.java 41112 2020-06-29 13:21:58Z seb $
  *
  *  Implements FindWeighScale(), the high-level API for WeighScale functions
  *
@@ -829,7 +829,8 @@ public class YWeighScale extends YSensor
 
     /**
      * Adapts the load cell signal bias (stored in the corresponding genericSensor)
-     * so that the current signal corresponds to a zero weight.
+     * so that the current signal corresponds to a zero weight. Remember to call the
+     * saveToFlash() method of the module if the modification must be kept.
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

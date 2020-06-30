@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 40884 2020-06-09 16:07:33Z seb $
+ * $Id: YModule.java 41055 2020-06-25 08:15:29Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -189,7 +189,7 @@ public class YModule extends YFunction
 
 
     // Return the internal device object hosting the function
-    protected YDevice _getDev() throws YAPI_Exception
+    YDevice _getDev() throws YAPI_Exception
     {
         String devid = _func;
         int dotidx = devid.indexOf('.');

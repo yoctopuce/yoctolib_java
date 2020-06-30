@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRelay.java 39434 2020-02-25 08:53:55Z seb $
+ *  $Id: YRelay.java 41109 2020-06-29 12:40:42Z seb $
  *
  *  Implements FindRelay(), the high-level API for Relay functions
  *
@@ -46,7 +46,7 @@ import java.util.Locale;
 //--- (end of YRelay yapiwrapper)
 //--- (YRelay class start)
 /**
- *  YRelay Class: relay control interface, available for instance in the Yocto-MaxiCoupler-V2, the
+ *  YRelay Class: relay control interface, available for instance in the Yocto-LatchedRelay, the
  * Yocto-MaxiPowerRelay, the Yocto-PowerRelay-V3 or the Yocto-Relay
  *
  * The YRelay class allows you to drive a Yoctopuce relay or optocoupled output.
@@ -759,7 +759,7 @@ public class YRelay extends YFunction
      * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the relay, for instance
-     *         MXCOUPL2.relay1.
+     *         YLTCHRL1.relay1.
      *
      * @return a YRelay object allowing you to drive the relay.
      */
@@ -798,7 +798,7 @@ public class YRelay extends YFunction
      *
      * @param yctx : a YAPI context
      * @param func : a string that uniquely characterizes the relay, for instance
-     *         MXCOUPL2.relay1.
+     *         YLTCHRL1.relay1.
      *
      * @return a YRelay object allowing you to drive the relay.
      */
