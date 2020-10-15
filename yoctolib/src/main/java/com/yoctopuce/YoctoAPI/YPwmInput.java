@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmInput.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YPwmInput.java 41348 2020-08-10 15:12:57Z seb $
  *
  *  Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -95,11 +95,20 @@ public class YPwmInput extends YSensor
     public static final int PWMREPORTMODE_PWM_STATE = 7;
     public static final int PWMREPORTMODE_PWM_FREQ_CPS = 8;
     public static final int PWMREPORTMODE_PWM_FREQ_CPM = 9;
+    public static final int PWMREPORTMODE_PWM_PERIODCOUNT = 10;
     public static final int PWMREPORTMODE_INVALID = -1;
     /**
      * invalid debouncePeriod value
      */
     public static final int DEBOUNCEPERIOD_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid bandwidth value
+     */
+    public static final int BANDWIDTH_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid edgesPerPeriod value
+     */
+    public static final int EDGESPERPERIOD_INVALID = YAPI.INVALID_UINT;
     protected double _dutyCycle = DUTYCYCLE_INVALID;
     protected double _pulseDuration = PULSEDURATION_INVALID;
     protected double _frequency = FREQUENCY_INVALID;
@@ -108,6 +117,8 @@ public class YPwmInput extends YSensor
     protected long _pulseTimer = PULSETIMER_INVALID;
     protected int _pwmReportMode = PWMREPORTMODE_INVALID;
     protected int _debouncePeriod = DEBOUNCEPERIOD_INVALID;
+    protected int _bandwidth = BANDWIDTH_INVALID;
+    protected int _edgesPerPeriod = EDGESPERPERIOD_INVALID;
     protected UpdateCallback _valueCallbackPwmInput = null;
     protected TimedReportCallback _timedReportCallbackPwmInput = null;
 
@@ -188,6 +199,12 @@ public class YPwmInput extends YSensor
         }
         if (json_val.has("debouncePeriod")) {
             _debouncePeriod = json_val.getInt("debouncePeriod");
+        }
+        if (json_val.has("bandwidth")) {
+            _bandwidth = json_val.getInt("bandwidth");
+        }
+        if (json_val.has("edgesPerPeriod")) {
+            _edgesPerPeriod = json_val.getInt("edgesPerPeriod");
         }
         super._parseAttr(json_val);
     }
@@ -456,9 +473,9 @@ public class YPwmInput extends YSensor
      *  YPwmInput.PWMREPORTMODE_PWM_PULSEDURATION, YPwmInput.PWMREPORTMODE_PWM_EDGECOUNT,
      *  YPwmInput.PWMREPORTMODE_PWM_PULSECOUNT, YPwmInput.PWMREPORTMODE_PWM_CPS,
      *  YPwmInput.PWMREPORTMODE_PWM_CPM, YPwmInput.PWMREPORTMODE_PWM_STATE,
-     *  YPwmInput.PWMREPORTMODE_PWM_FREQ_CPS and YPwmInput.PWMREPORTMODE_PWM_FREQ_CPM corresponding to the
-     *  parameter (frequency/duty cycle, pulse width, edges count) returned by the get_currentValue
-     * function and callbacks
+     *  YPwmInput.PWMREPORTMODE_PWM_FREQ_CPS, YPwmInput.PWMREPORTMODE_PWM_FREQ_CPM and
+     *  YPwmInput.PWMREPORTMODE_PWM_PERIODCOUNT corresponding to the parameter (frequency/duty cycle, pulse
+     * width, edges count) returned by the get_currentValue function and callbacks
      *
      * @throws YAPI_Exception on error
      */
@@ -483,8 +500,9 @@ public class YPwmInput extends YSensor
      *  @return a value among Y_PWMREPORTMODE_PWM_DUTYCYCLE, Y_PWMREPORTMODE_PWM_FREQUENCY,
      *  Y_PWMREPORTMODE_PWM_PULSEDURATION, Y_PWMREPORTMODE_PWM_EDGECOUNT, Y_PWMREPORTMODE_PWM_PULSECOUNT,
      *  Y_PWMREPORTMODE_PWM_CPS, Y_PWMREPORTMODE_PWM_CPM, Y_PWMREPORTMODE_PWM_STATE,
-     *  Y_PWMREPORTMODE_PWM_FREQ_CPS and Y_PWMREPORTMODE_PWM_FREQ_CPM corresponding to the parameter
-     * (frequency/duty cycle, pulse width, edges count) returned by the get_currentValue function and callbacks
+     *  Y_PWMREPORTMODE_PWM_FREQ_CPS, Y_PWMREPORTMODE_PWM_FREQ_CPM and Y_PWMREPORTMODE_PWM_PERIODCOUNT
+     *  corresponding to the parameter (frequency/duty cycle, pulse width, edges count) returned by the
+     * get_currentValue function and callbacks
      *
      * @throws YAPI_Exception on error
      */
@@ -504,9 +522,10 @@ public class YPwmInput extends YSensor
      *  YPwmInput.PWMREPORTMODE_PWM_FREQUENCY, YPwmInput.PWMREPORTMODE_PWM_PULSEDURATION,
      *  YPwmInput.PWMREPORTMODE_PWM_EDGECOUNT, YPwmInput.PWMREPORTMODE_PWM_PULSECOUNT,
      *  YPwmInput.PWMREPORTMODE_PWM_CPS, YPwmInput.PWMREPORTMODE_PWM_CPM,
-     *  YPwmInput.PWMREPORTMODE_PWM_STATE, YPwmInput.PWMREPORTMODE_PWM_FREQ_CPS and
-     *  YPwmInput.PWMREPORTMODE_PWM_FREQ_CPM corresponding to the  parameter  type (frequency/duty cycle,
-     * pulse width, or edge count) returned by the get_currentValue function and callbacks
+     *  YPwmInput.PWMREPORTMODE_PWM_STATE, YPwmInput.PWMREPORTMODE_PWM_FREQ_CPS,
+     *  YPwmInput.PWMREPORTMODE_PWM_FREQ_CPM and YPwmInput.PWMREPORTMODE_PWM_PERIODCOUNT corresponding to
+     *  the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned by the
+     * get_currentValue function and callbacks
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -532,8 +551,9 @@ public class YPwmInput extends YSensor
      *  @param newval : a value among Y_PWMREPORTMODE_PWM_DUTYCYCLE, Y_PWMREPORTMODE_PWM_FREQUENCY,
      *  Y_PWMREPORTMODE_PWM_PULSEDURATION, Y_PWMREPORTMODE_PWM_EDGECOUNT, Y_PWMREPORTMODE_PWM_PULSECOUNT,
      *  Y_PWMREPORTMODE_PWM_CPS, Y_PWMREPORTMODE_PWM_CPM, Y_PWMREPORTMODE_PWM_STATE,
-     *  Y_PWMREPORTMODE_PWM_FREQ_CPS and Y_PWMREPORTMODE_PWM_FREQ_CPM corresponding to the  parameter  type
-     * (frequency/duty cycle, pulse width, or edge count) returned by the get_currentValue function and callbacks
+     *  Y_PWMREPORTMODE_PWM_FREQ_CPS, Y_PWMREPORTMODE_PWM_FREQ_CPM and Y_PWMREPORTMODE_PWM_PERIODCOUNT
+     *  corresponding to the  parameter  type (frequency/duty cycle, pulse width, or edge count) returned
+     * by the get_currentValue function and callbacks
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -610,6 +630,115 @@ public class YPwmInput extends YSensor
     public int setDebouncePeriod(int newval)  throws YAPI_Exception
     {
         return set_debouncePeriod(newval);
+    }
+
+    /**
+     * Returns the input signal sampling rate, in kHz.
+     *
+     * @return an integer corresponding to the input signal sampling rate, in kHz
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_bandwidth() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return BANDWIDTH_INVALID;
+                }
+            }
+            res = _bandwidth;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the input signal sampling rate, in kHz.
+     *
+     * @return an integer corresponding to the input signal sampling rate, in kHz
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getBandwidth() throws YAPI_Exception
+    {
+        return get_bandwidth();
+    }
+
+    /**
+     * Changes the input signal sampling rate, measured in kHz.
+     * A lower sampling frequency can be used to hide hide-frequency bounce effects,
+     * for instance on electromechanical contacts, but limits the measure resolution.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : an integer corresponding to the input signal sampling rate, measured in kHz
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_bandwidth(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("bandwidth",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the input signal sampling rate, measured in kHz.
+     * A lower sampling frequency can be used to hide hide-frequency bounce effects,
+     * for instance on electromechanical contacts, but limits the measure resolution.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : an integer corresponding to the input signal sampling rate, measured in kHz
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setBandwidth(int newval)  throws YAPI_Exception
+    {
+        return set_bandwidth(newval);
+    }
+
+    /**
+     * Returns the number of edges detected per preiod. For a clean PWM signal, this should be exactly two,
+     * but in cas the signal is created by a mechanical contact with bounces, it can get higher.
+     *
+     * @return an integer corresponding to the number of edges detected per preiod
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_edgesPerPeriod() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return EDGESPERPERIOD_INVALID;
+                }
+            }
+            res = _edgesPerPeriod;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the number of edges detected per preiod. For a clean PWM signal, this should be exactly two,
+     * but in cas the signal is created by a mechanical contact with bounces, it can get higher.
+     *
+     * @return an integer corresponding to the number of edges detected per preiod
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getEdgesPerPeriod() throws YAPI_Exception
+    {
+        return get_edgesPerPeriod();
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTemperature.java 39648 2020-03-12 13:56:10Z mvuilleu $
+ *  $Id: YTemperature.java 42054 2020-10-14 09:46:38Z seb $
  *
  *  Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -589,8 +589,8 @@ public class YTemperature extends YSensor
         double res100;
         ArrayList<Double> tempValues = new ArrayList<>();
         ArrayList<Double> resValues = new ArrayList<>();
-        t0 = 25.0+275.15;
-        t1 = 100.0+275.15;
+        t0 = 25.0+273.15;
+        t1 = 100.0+273.15;
         res100 = res25 * java.lang.Math.exp(beta*(1.0/t1 - 1.0/t0));
         tempValues.clear();
         resValues.clear();

@@ -1,8 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSnoopingRecord.java 41171 2020-07-02 17:49:00Z mvuilleu $
- *
- * Implements FindSnoopingRecord(), the high-level API for SnoopingRecord functions
+ * $Id: YI2cSnoopingRecord.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
@@ -39,43 +37,43 @@
 
 package com.yoctopuce.YoctoAPI;
 
-//--- (generated code: YSnoopingRecord return codes)
-//--- (end of generated code: YSnoopingRecord return codes)
-//--- (generated code: YSnoopingRecord class start)
+//--- (generated code: YI2cSnoopingRecord return codes)
+//--- (end of generated code: YI2cSnoopingRecord return codes)
+//--- (generated code: YI2cSnoopingRecord class start)
 /**
- * YSnoopingRecord Class: Intercepted serial message description, returned by serialPort.snoopMessages method
+ * YI2cSnoopingRecord Class: Intercepted I2C message description, returned by i2cPort.snoopMessages method
  *
  *
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
-public class YSnoopingRecord
+public class YI2cSnoopingRecord
 {
-//--- (end of generated code: YSnoopingRecord class start)
-//--- (generated code: YSnoopingRecord definitions)
+//--- (end of generated code: YI2cSnoopingRecord class start)
+//--- (generated code: YI2cSnoopingRecord definitions)
     protected int _tim = 0;
     protected int _dir = 0;
     protected String _msg;
 
-    //--- (end of generated code: YSnoopingRecord definitions)
+    //--- (end of generated code: YI2cSnoopingRecord definitions)
 
-    YSnoopingRecord(String json_str) throws YAPI_Exception
+    YI2cSnoopingRecord(String json_str) throws YAPI_Exception
     {
         try {
             YJSONObject json = new YJSONObject(json_str);
             json.parse();
-            //--- (generated code: YSnoopingRecord attributes initialization)
-        //--- (end of generated code: YSnoopingRecord attributes initialization)
+            //--- (generated code: YI2cSnoopingRecord attributes initialization)
+        //--- (end of generated code: YI2cSnoopingRecord attributes initialization)
             _tim = json.getInt("t");
             final String m = json.getString("m");
             _dir = (m.charAt(0) == '<' ? 1 : 0);
             _msg = m.substring(1);
         } catch (Exception e) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json struct for YSnoopingRecord");
+            throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json struct for YI2cSnoopingRecord");
         }
 
     }
 
-    //--- (generated code: YSnoopingRecord implementation)
+    //--- (generated code: YI2cSnoopingRecord implementation)
 
     /**
      * Returns the elapsed time, in ms, since the beginning of the preceding message.
@@ -107,6 +105,6 @@ public class YSnoopingRecord
         return _msg;
     }
 
-    //--- (end of generated code: YSnoopingRecord implementation)
+    //--- (end of generated code: YI2cSnoopingRecord implementation)
 }
 

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSpiPort.java 40296 2020-05-05 07:56:00Z seb $
+ *  $Id: YSpiPort.java 41171 2020-07-02 17:49:00Z mvuilleu $
  *
  *  Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -41,11 +41,9 @@ package com.yoctopuce.YoctoAPI;
 import java.util.ArrayList;
 import java.util.Locale;
 
-//--- (YSpiPort return codes)
-//--- (end of YSpiPort return codes)
-//--- (YSpiPort yapiwrapper)
-//--- (end of YSpiPort yapiwrapper)
-//--- (YSpiPort class start)
+//--- (generated code: YSpiPort return codes)
+//--- (end of generated code: YSpiPort return codes)
+//--- (generated code: YSpiPort class start)
 /**
  * YSpiPort Class: SPI port control interface, available for instance in the Yocto-SPI
  *
@@ -58,8 +56,8 @@ import java.util.Locale;
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YSpiPort extends YFunction
 {
-//--- (end of YSpiPort class start)
-//--- (YSpiPort definitions)
+//--- (end of generated code: YSpiPort class start)
+//--- (generated code: YSpiPort definitions)
     /**
      * invalid rxCount value
      */
@@ -182,7 +180,7 @@ public class YSpiPort extends YFunction
          */
         void timedReportCallback(YSpiPort  function, YMeasure measure);
     }
-    //--- (end of YSpiPort definitions)
+    //--- (end of generated code: YSpiPort definitions)
 
 
     /**
@@ -193,8 +191,8 @@ public class YSpiPort extends YFunction
     {
         super(ctx, func);
         _className = "SpiPort";
-        //--- (YSpiPort attributes initialization)
-        //--- (end of YSpiPort attributes initialization)
+        //--- (generated code: YSpiPort attributes initialization)
+        //--- (end of generated code: YSpiPort attributes initialization)
     }
 
     /**
@@ -206,7 +204,7 @@ public class YSpiPort extends YFunction
         this(YAPI.GetYCtx(true), func);
     }
 
-    //--- (YSpiPort implementation)
+    //--- (generated code: YSpiPort implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(YJSONObject json_val) throws Exception
@@ -1897,6 +1895,46 @@ public class YSpiPort extends YFunction
     }
 
     /**
+     * Retrieves messages (both direction) in the SPI port buffer, starting at current position.
+     *
+     * If no message is found, the search waits for one up to the specified maximum timeout
+     * (in milliseconds).
+     *
+     * @param maxWait : the maximum number of milliseconds to wait for a message if none is found
+     *         in the receive buffer.
+     *
+     * @return an array of YSpiSnoopingRecord objects containing the messages found, if any.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public ArrayList<YSpiSnoopingRecord> snoopMessages(int maxWait) throws YAPI_Exception
+    {
+        String url;
+        byte[] msgbin;
+        ArrayList<String> msgarr = new ArrayList<>();
+        int msglen;
+        ArrayList<YSpiSnoopingRecord> res = new ArrayList<>();
+        int idx;
+
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&t=0", _rxptr,maxWait);
+        msgbin = _download(url);
+        msgarr = _json_get_array(msgbin);
+        msglen = msgarr.size();
+        if (msglen == 0) {
+            return res;
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        idx = 0;
+        while (idx < msglen) {
+            res.add(new YSpiSnoopingRecord(msgarr.get(idx)));
+            idx = idx + 1;
+        }
+        return res;
+    }
+
+    /**
      * Continues the enumeration of SPI ports started using yFirstSpiPort().
      * Caution: You can't make any assumption about the returned SPI ports order.
      * If you want to find a specific a SPI port, use SpiPort.findSpiPort()
@@ -1955,6 +1993,6 @@ public class YSpiPort extends YFunction
         return FindSpiPortInContext(yctx, next_hwid);
     }
 
-    //--- (end of YSpiPort implementation)
+    //--- (end of generated code: YSpiPort implementation)
 }
 

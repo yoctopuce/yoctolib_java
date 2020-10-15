@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAnButton.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YAnButton.java 42060 2020-10-14 10:02:12Z seb $
  *
  *  Implements FindAnButton(), the high-level API for AnButton functions
  *
@@ -46,7 +46,7 @@ package com.yoctopuce.YoctoAPI;
 //--- (YAnButton class start)
 /**
  *  YAnButton Class: analog input control interface, available for instance in the Yocto-Buzzer, the
- * Yocto-Display, the Yocto-Knob or the Yocto-MaxiDisplay
+ * Yocto-Knob, the Yocto-MaxiBuzzer or the Yocto-MaxiDisplay
  *
  * The YAnButton class provide access to basic resistive inputs.
  * Such inputs can be used to measure the state
@@ -109,6 +109,12 @@ public class YAnButton extends YFunction
      * invalid pulseTimer value
      */
     public static final long PULSETIMER_INVALID = YAPI.INVALID_LONG;
+    /**
+     * invalid inputType value
+     */
+    public static final int INPUTTYPE_ANALOG = 0;
+    public static final int INPUTTYPE_DIGITAL4 = 1;
+    public static final int INPUTTYPE_INVALID = -1;
     protected int _calibratedValue = CALIBRATEDVALUE_INVALID;
     protected int _rawValue = RAWVALUE_INVALID;
     protected int _analogCalibration = ANALOGCALIBRATION_INVALID;
@@ -120,6 +126,7 @@ public class YAnButton extends YFunction
     protected long _lastTimeReleased = LASTTIMERELEASED_INVALID;
     protected long _pulseCounter = PULSECOUNTER_INVALID;
     protected long _pulseTimer = PULSETIMER_INVALID;
+    protected int _inputType = INPUTTYPE_INVALID;
     protected UpdateCallback _valueCallbackAnButton = null;
 
     /**
@@ -208,6 +215,9 @@ public class YAnButton extends YFunction
         }
         if (json_val.has("pulseTimer")) {
             _pulseTimer = json_val.getLong("pulseTimer");
+        }
+        if (json_val.has("inputType")) {
+            _inputType = json_val.getInt("inputType");
         }
         super._parseAttr(json_val);
     }
@@ -770,6 +780,78 @@ public class YAnButton extends YFunction
     public long getPulseTimer() throws YAPI_Exception
     {
         return get_pulseTimer();
+    }
+
+    /**
+     * Returns the decoding method applied to the input (analog or multiplexed binary switches).
+     *
+     *  @return either YAnButton.INPUTTYPE_ANALOG or YAnButton.INPUTTYPE_DIGITAL4, according to the
+     * decoding method applied to the input (analog or multiplexed binary switches)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_inputType() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return INPUTTYPE_INVALID;
+                }
+            }
+            res = _inputType;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the decoding method applied to the input (analog or multiplexed binary switches).
+     *
+     *  @return either Y_INPUTTYPE_ANALOG or Y_INPUTTYPE_DIGITAL4, according to the decoding method applied
+     * to the input (analog or multiplexed binary switches)
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getInputType() throws YAPI_Exception
+    {
+        return get_inputType();
+    }
+
+    /**
+     * Changes the decoding method applied to the input (analog or multiplexed binary switches).
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     *  @param newval : either YAnButton.INPUTTYPE_ANALOG or YAnButton.INPUTTYPE_DIGITAL4, according to the
+     * decoding method applied to the input (analog or multiplexed binary switches)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_inputType(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("inputType",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the decoding method applied to the input (analog or multiplexed binary switches).
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     *  @param newval : either Y_INPUTTYPE_ANALOG or Y_INPUTTYPE_DIGITAL4, according to the decoding method
+     * applied to the input (analog or multiplexed binary switches)
+     *
+     * @return YAPI_SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setInputType(int newval)  throws YAPI_Exception
+    {
+        return set_inputType(newval);
     }
 
     /**

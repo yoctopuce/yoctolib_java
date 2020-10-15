@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 39333 2020-01-30 10:05:40Z mvuilleu $
+ *  $Id: YI2cPort.java 41171 2020-07-02 17:49:00Z mvuilleu $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -41,11 +41,9 @@ package com.yoctopuce.YoctoAPI;
 import java.util.ArrayList;
 import java.util.Locale;
 
-//--- (YI2cPort return codes)
-//--- (end of YI2cPort return codes)
-//--- (YI2cPort yapiwrapper)
-//--- (end of YI2cPort yapiwrapper)
-//--- (YI2cPort class start)
+//--- (generated code: YI2cPort return codes)
+//--- (end of generated code: YI2cPort return codes)
+//--- (generated code: YI2cPort class start)
 /**
  * YI2cPort Class: I2C port control interface, available for instance in the Yocto-I2C
  *
@@ -58,8 +56,8 @@ import java.util.Locale;
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YI2cPort extends YFunction
 {
-//--- (end of YI2cPort class start)
-//--- (YI2cPort definitions)
+//--- (end of generated code: YI2cPort class start)
+//--- (generated code: YI2cPort definitions)
     /**
      * invalid rxCount value
      */
@@ -163,7 +161,7 @@ public class YI2cPort extends YFunction
          */
         void timedReportCallback(YI2cPort  function, YMeasure measure);
     }
-    //--- (end of YI2cPort definitions)
+    //--- (end of generated code: YI2cPort definitions)
 
 
     /**
@@ -174,8 +172,8 @@ public class YI2cPort extends YFunction
     {
         super(ctx, func);
         _className = "I2cPort";
-        //--- (YI2cPort attributes initialization)
-        //--- (end of YI2cPort attributes initialization)
+        //--- (generated code: YI2cPort attributes initialization)
+        //--- (end of generated code: YI2cPort attributes initialization)
     }
 
     /**
@@ -187,7 +185,7 @@ public class YI2cPort extends YFunction
         this(YAPI.GetYCtx(true), func);
     }
 
-    //--- (YI2cPort implementation)
+    //--- (generated code: YI2cPort implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(YJSONObject json_val) throws Exception
@@ -1660,6 +1658,46 @@ public class YI2cPort extends YFunction
     }
 
     /**
+     * Retrieves messages (both direction) in the I2C port buffer, starting at current position.
+     *
+     * If no message is found, the search waits for one up to the specified maximum timeout
+     * (in milliseconds).
+     *
+     * @param maxWait : the maximum number of milliseconds to wait for a message if none is found
+     *         in the receive buffer.
+     *
+     * @return an array of YI2cSnoopingRecord objects containing the messages found, if any.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public ArrayList<YI2cSnoopingRecord> snoopMessages(int maxWait) throws YAPI_Exception
+    {
+        String url;
+        byte[] msgbin;
+        ArrayList<String> msgarr = new ArrayList<>();
+        int msglen;
+        ArrayList<YI2cSnoopingRecord> res = new ArrayList<>();
+        int idx;
+
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&t=0", _rxptr,maxWait);
+        msgbin = _download(url);
+        msgarr = _json_get_array(msgbin);
+        msglen = msgarr.size();
+        if (msglen == 0) {
+            return res;
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        idx = 0;
+        while (idx < msglen) {
+            res.add(new YI2cSnoopingRecord(msgarr.get(idx)));
+            idx = idx + 1;
+        }
+        return res;
+    }
+
+    /**
      * Continues the enumeration of I2C ports started using yFirstI2cPort().
      * Caution: You can't make any assumption about the returned I2C ports order.
      * If you want to find a specific an I2C port, use I2cPort.findI2cPort()
@@ -1718,6 +1756,6 @@ public class YI2cPort extends YFunction
         return FindI2cPortInContext(yctx, next_hwid);
     }
 
-    //--- (end of YI2cPort implementation)
+    //--- (end of generated code: YI2cPort implementation)
 }
 

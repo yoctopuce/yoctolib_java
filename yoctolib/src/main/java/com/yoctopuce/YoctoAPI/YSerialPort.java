@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 40296 2020-05-05 07:56:00Z seb $
+ * $Id: YSerialPort.java 41171 2020-07-02 17:49:00Z mvuilleu $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -671,6 +671,7 @@ public class YSerialPort extends YFunction
     /**
      * Returns the type of protocol used over the serial line, as a string.
      * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "StxEtx" for ASCII messages delimited by STX/ETX codes,
      * "Frame:[timeout]ms" for binary messages separated by a delay time,
      * "Modbus-ASCII" for MODBUS messages in ASCII mode,
      * "Modbus-RTU" for MODBUS messages in RTU mode,
@@ -700,6 +701,7 @@ public class YSerialPort extends YFunction
     /**
      * Returns the type of protocol used over the serial line, as a string.
      * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "StxEtx" for ASCII messages delimited by STX/ETX codes,
      * "Frame:[timeout]ms" for binary messages separated by a delay time,
      * "Modbus-ASCII" for MODBUS messages in ASCII mode,
      * "Modbus-RTU" for MODBUS messages in RTU mode,
@@ -720,6 +722,7 @@ public class YSerialPort extends YFunction
     /**
      * Changes the type of protocol used over the serial line.
      * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "StxEtx" for ASCII messages delimited by STX/ETX codes,
      * "Frame:[timeout]ms" for binary messages separated by a delay time,
      * "Modbus-ASCII" for MODBUS messages in ASCII mode,
      * "Modbus-RTU" for MODBUS messages in RTU mode,
@@ -751,6 +754,7 @@ public class YSerialPort extends YFunction
     /**
      * Changes the type of protocol used over the serial line.
      * Possible values are "Line" for ASCII messages separated by CR and/or LF,
+     * "StxEtx" for ASCII messages delimited by STX/ETX codes,
      * "Frame:[timeout]ms" for binary messages separated by a delay time,
      * "Modbus-ASCII" for MODBUS messages in ASCII mode,
      * "Modbus-RTU" for MODBUS messages in RTU mode,
@@ -1815,6 +1819,24 @@ public class YSerialPort extends YFunction
             idx = idx + 1;
         }
         return res;
+    }
+
+    /**
+     * Sends an ASCII string to the serial port, preceeded with an STX code and
+     * followed by an ETX code.
+     *
+     * @param text : the text string to send
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int writeStxEtx(String text) throws YAPI_Exception
+    {
+        byte[] buff;
+        buff = (String.format(Locale.US, "%c%s%c", 2, text,3)).getBytes();
+        // send string using file upload
+        return _upload("txdata", buff);
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPower.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YPower.java 41290 2020-07-24 10:02:23Z mvuilleu $
  *
  *  Implements FindPower(), the high-level API for Power functions
  *
@@ -66,11 +66,21 @@ public class YPower extends YSensor
      */
     public static final double METER_INVALID = YAPI.INVALID_DOUBLE;
     /**
+     * invalid deliveredEnergyMeter value
+     */
+    public static final double DELIVEREDENERGYMETER_INVALID = YAPI.INVALID_DOUBLE;
+    /**
+     * invalid receivedEnergyMeter value
+     */
+    public static final double RECEIVEDENERGYMETER_INVALID = YAPI.INVALID_DOUBLE;
+    /**
      * invalid meterTimer value
      */
     public static final int METERTIMER_INVALID = YAPI.INVALID_UINT;
     protected double _cosPhi = COSPHI_INVALID;
     protected double _meter = METER_INVALID;
+    protected double _deliveredEnergyMeter = DELIVEREDENERGYMETER_INVALID;
+    protected double _receivedEnergyMeter = RECEIVEDENERGYMETER_INVALID;
     protected int _meterTimer = METERTIMER_INVALID;
     protected UpdateCallback _valueCallbackPower = null;
     protected TimedReportCallback _timedReportCallbackPower = null;
@@ -135,6 +145,12 @@ public class YPower extends YSensor
         if (json_val.has("meter")) {
             _meter = Math.round(json_val.getDouble("meter") * 1000.0 / 65536.0) / 1000.0;
         }
+        if (json_val.has("deliveredEnergyMeter")) {
+            _deliveredEnergyMeter = Math.round(json_val.getDouble("deliveredEnergyMeter") * 1000.0 / 65536.0) / 1000.0;
+        }
+        if (json_val.has("receivedEnergyMeter")) {
+            _receivedEnergyMeter = Math.round(json_val.getDouble("receivedEnergyMeter") * 1000.0 / 65536.0) / 1000.0;
+        }
         if (json_val.has("meterTimer")) {
             _meterTimer = json_val.getInt("meterTimer");
         }
@@ -190,11 +206,12 @@ public class YPower extends YSensor
 
 
     /**
-     * Returns the energy counter, maintained by the wattmeter by integrating the power consumption over time.
-     * Note that this counter is reset at each start of the device.
+     * Returns the energy counter, maintained by the wattmeter by integrating the power consumption over time,
+     * but only when positive. Note that this counter is reset at each start of the device.
      *
      *  @return a floating point number corresponding to the energy counter, maintained by the wattmeter by
-     * integrating the power consumption over time
+     * integrating the power consumption over time,
+     *         but only when positive
      *
      * @throws YAPI_Exception on error
      */
@@ -213,17 +230,96 @@ public class YPower extends YSensor
     }
 
     /**
-     * Returns the energy counter, maintained by the wattmeter by integrating the power consumption over time.
-     * Note that this counter is reset at each start of the device.
+     * Returns the energy counter, maintained by the wattmeter by integrating the power consumption over time,
+     * but only when positive. Note that this counter is reset at each start of the device.
      *
      *  @return a floating point number corresponding to the energy counter, maintained by the wattmeter by
-     * integrating the power consumption over time
+     * integrating the power consumption over time,
+     *         but only when positive
      *
      * @throws YAPI_Exception on error
      */
     public double getMeter() throws YAPI_Exception
     {
         return get_meter();
+    }
+
+    /**
+     * Returns the energy counter, maintained by the wattmeter by integrating the power consumption over time,
+     * but only when positive. Note that this counter is reset at each start of the device.
+     *
+     *  @return a floating point number corresponding to the energy counter, maintained by the wattmeter by
+     * integrating the power consumption over time,
+     *         but only when positive
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_deliveredEnergyMeter() throws YAPI_Exception
+    {
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return DELIVEREDENERGYMETER_INVALID;
+                }
+            }
+            res = _deliveredEnergyMeter;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the energy counter, maintained by the wattmeter by integrating the power consumption over time,
+     * but only when positive. Note that this counter is reset at each start of the device.
+     *
+     *  @return a floating point number corresponding to the energy counter, maintained by the wattmeter by
+     * integrating the power consumption over time,
+     *         but only when positive
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getDeliveredEnergyMeter() throws YAPI_Exception
+    {
+        return get_deliveredEnergyMeter();
+    }
+
+    /**
+     * Returns the energy counter, maintained by the wattmeter by integrating the power consumption over time,
+     * but only when negative. Note that this counter is reset at each start of the device.
+     *
+     *  @return a floating point number corresponding to the energy counter, maintained by the wattmeter by
+     * integrating the power consumption over time,
+     *         but only when negative
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_receivedEnergyMeter() throws YAPI_Exception
+    {
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return RECEIVEDENERGYMETER_INVALID;
+                }
+            }
+            res = _receivedEnergyMeter;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the energy counter, maintained by the wattmeter by integrating the power consumption over time,
+     * but only when negative. Note that this counter is reset at each start of the device.
+     *
+     *  @return a floating point number corresponding to the energy counter, maintained by the wattmeter by
+     * integrating the power consumption over time,
+     *         but only when negative
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getReceivedEnergyMeter() throws YAPI_Exception
+    {
+        return get_receivedEnergyMeter();
     }
 
     /**
@@ -416,7 +512,7 @@ public class YPower extends YSensor
     }
 
     /**
-     * Resets the energy counter.
+     * Resets the energy counters.
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

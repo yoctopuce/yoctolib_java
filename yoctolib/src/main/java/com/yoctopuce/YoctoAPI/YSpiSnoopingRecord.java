@@ -1,8 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSnoopingRecord.java 41171 2020-07-02 17:49:00Z mvuilleu $
- *
- * Implements FindSnoopingRecord(), the high-level API for SnoopingRecord functions
+ * $Id: YSpiSnoopingRecord.java 38899 2019-12-20 17:21:03Z mvuilleu $
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
@@ -39,43 +37,43 @@
 
 package com.yoctopuce.YoctoAPI;
 
-//--- (generated code: YSnoopingRecord return codes)
-//--- (end of generated code: YSnoopingRecord return codes)
-//--- (generated code: YSnoopingRecord class start)
+//--- (generated code: YSpiSnoopingRecord return codes)
+//--- (end of generated code: YSpiSnoopingRecord return codes)
+//--- (generated code: YSpiSnoopingRecord class start)
 /**
- * YSnoopingRecord Class: Intercepted serial message description, returned by serialPort.snoopMessages method
+ * YSpiSnoopingRecord Class: Intercepted SPI message description, returned by spiPort.snoopMessages method
  *
  *
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
-public class YSnoopingRecord
+public class YSpiSnoopingRecord
 {
-//--- (end of generated code: YSnoopingRecord class start)
-//--- (generated code: YSnoopingRecord definitions)
+//--- (end of generated code: YSpiSnoopingRecord class start)
+//--- (generated code: YSpiSnoopingRecord definitions)
     protected int _tim = 0;
     protected int _dir = 0;
     protected String _msg;
 
-    //--- (end of generated code: YSnoopingRecord definitions)
+    //--- (end of generated code: YSpiSnoopingRecord definitions)
 
-    YSnoopingRecord(String json_str) throws YAPI_Exception
+    YSpiSnoopingRecord(String json_str) throws YAPI_Exception
     {
         try {
             YJSONObject json = new YJSONObject(json_str);
             json.parse();
-            //--- (generated code: YSnoopingRecord attributes initialization)
-        //--- (end of generated code: YSnoopingRecord attributes initialization)
+            //--- (generated code: YSpiSnoopingRecord attributes initialization)
+        //--- (end of generated code: YSpiSnoopingRecord attributes initialization)
             _tim = json.getInt("t");
             final String m = json.getString("m");
             _dir = (m.charAt(0) == '<' ? 1 : 0);
             _msg = m.substring(1);
         } catch (Exception e) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json struct for YSnoopingRecord");
+            throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json struct for YSpiSnoopingRecord");
         }
 
     }
 
-    //--- (generated code: YSnoopingRecord implementation)
+    //--- (generated code: YSpiSnoopingRecord implementation)
 
     /**
      * Returns the elapsed time, in ms, since the beginning of the preceding message.
@@ -107,6 +105,6 @@ public class YSnoopingRecord
         return _msg;
     }
 
-    //--- (end of generated code: YSnoopingRecord implementation)
+    //--- (end of generated code: YSpiSnoopingRecord implementation)
 }
 

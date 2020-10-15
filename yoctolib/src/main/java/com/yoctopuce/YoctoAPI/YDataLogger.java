@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ * $Id: YDataLogger.java 41171 2020-07-02 17:49:00Z mvuilleu $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -607,7 +607,7 @@ public class YDataLogger extends YFunction
      * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the data logger, for instance
-     *         Y3DMK002.dataLogger.
+     *         LIGHTMK3.dataLogger.
      *
      * @return a YDataLogger object allowing you to drive the data logger.
      */
@@ -646,7 +646,7 @@ public class YDataLogger extends YFunction
      *
      * @param yctx : a YAPI context
      * @param func : a string that uniquely characterizes the data logger, for instance
-     *         Y3DMK002.dataLogger.
+     *         LIGHTMK3.dataLogger.
      *
      * @return a YDataLogger object allowing you to drive the data logger.
      */

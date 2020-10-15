@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 41109 2020-06-29 12:40:42Z seb $
+ * $Id: YFiles.java 42060 2020-10-14 10:02:12Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -46,7 +46,7 @@ import java.util.Locale;
 //--- (generated code: YFiles class start)
 /**
  *  YFiles Class: filesystem control interface, available for instance in the Yocto-Buzzer, the
- * Yocto-Color-V2, the Yocto-RS485-V2 or the YoctoHub-Ethernet
+ * Yocto-Color-V2, the YoctoHub-Ethernet or the YoctoHub-Wireless-n
  *
  * The YFiles class is used to access the filesystem embedded on
  * some Yoctopuce devices. This filesystem makes it
