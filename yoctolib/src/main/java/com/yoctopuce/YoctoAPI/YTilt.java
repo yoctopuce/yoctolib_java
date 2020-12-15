@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTilt.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YTilt.java 42951 2020-12-14 09:43:29Z seb $
  *
  *  Implements FindTilt(), the high-level API for Tilt functions
  *
@@ -38,6 +38,7 @@
  */
 
 package com.yoctopuce.YoctoAPI;
+import java.util.ArrayList;
 
 //--- (YTilt return codes)
 //--- (end of YTilt return codes)
@@ -142,9 +143,9 @@ public class YTilt extends YSensor
     }
 
     /**
-     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     * Returns the measure update frequency, measured in Hz.
      *
-     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * @return an integer corresponding to the measure update frequency, measured in Hz
      *
      * @throws YAPI_Exception on error
      */
@@ -163,9 +164,9 @@ public class YTilt extends YSensor
     }
 
     /**
-     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     * Returns the measure update frequency, measured in Hz.
      *
-     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * @return an integer corresponding to the measure update frequency, measured in Hz
      *
      * @throws YAPI_Exception on error
      */
@@ -175,12 +176,12 @@ public class YTilt extends YSensor
     }
 
     /**
-     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * Changes the measure update frequency, measured in Hz. When the
      * frequency is lower, the device performs averaging.
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -197,12 +198,12 @@ public class YTilt extends YSensor
     }
 
     /**
-     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * Changes the measure update frequency, measured in Hz. When the
      * frequency is lower, the device performs averaging.
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
@@ -381,6 +382,42 @@ public class YTilt extends YSensor
             super._invokeTimedReportCallback(value);
         }
         return 0;
+    }
+
+    /**
+     * Performs a zero calibration for the tilt measurement (Yocto-Inclinometer only).
+     * When this method is invoked, a simple shift (translation)
+     * is applied so that the current position is reported as a zero angle.
+     * Be aware that this shift will also affect the measurement boundaries.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int calibrateToZero() throws YAPI_Exception
+    {
+        double currentRawVal;
+        ArrayList<Double> rawVals = new ArrayList<>();
+        ArrayList<Double> refVals = new ArrayList<>();
+        currentRawVal = get_currentRawValue();
+        rawVals.clear();
+        refVals.clear();
+        rawVals.add(currentRawVal);
+        refVals.add(0.0);
+        return calibrateFromPoints(rawVals, refVals);
+    }
+
+    /**
+     * Cancels any previous zero calibration for the tilt measurement (Yocto-Inclinometer only).
+     * This function restores the factory zero calibration.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int restoreZeroCalibration() throws YAPI_Exception
+    {
+        return _setAttr("calibrationParam", "0");
     }
 
     /**

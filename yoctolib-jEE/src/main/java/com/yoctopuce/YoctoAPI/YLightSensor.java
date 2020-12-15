@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLightSensor.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YLightSensor.java 42951 2020-12-14 09:43:29Z seb $
  *
  *  Implements FindLightSensor(), the high-level API for LightSensor functions
  *
@@ -69,6 +69,7 @@ public class YLightSensor extends YSensor
     public static final int MEASURETYPE_INFRARED = 2;
     public static final int MEASURETYPE_HIGH_RATE = 3;
     public static final int MEASURETYPE_HIGH_ENERGY = 4;
+    public static final int MEASURETYPE_HIGH_RESOLUTION = 5;
     public static final int MEASURETYPE_INVALID = -1;
     protected int _measureType = MEASURETYPE_INVALID;
     protected UpdateCallback _valueCallbackLightSensor = null;
@@ -170,8 +171,9 @@ public class YLightSensor extends YSensor
      * Returns the type of light measure.
      *
      *  @return a value among YLightSensor.MEASURETYPE_HUMAN_EYE, YLightSensor.MEASURETYPE_WIDE_SPECTRUM,
-     *  YLightSensor.MEASURETYPE_INFRARED, YLightSensor.MEASURETYPE_HIGH_RATE and
-     * YLightSensor.MEASURETYPE_HIGH_ENERGY corresponding to the type of light measure
+     *  YLightSensor.MEASURETYPE_INFRARED, YLightSensor.MEASURETYPE_HIGH_RATE,
+     *  YLightSensor.MEASURETYPE_HIGH_ENERGY and YLightSensor.MEASURETYPE_HIGH_RESOLUTION corresponding to
+     * the type of light measure
      *
      * @throws YAPI_Exception on error
      */
@@ -193,7 +195,8 @@ public class YLightSensor extends YSensor
      * Returns the type of light measure.
      *
      *  @return a value among Y_MEASURETYPE_HUMAN_EYE, Y_MEASURETYPE_WIDE_SPECTRUM, Y_MEASURETYPE_INFRARED,
-     * Y_MEASURETYPE_HIGH_RATE and Y_MEASURETYPE_HIGH_ENERGY corresponding to the type of light measure
+     *  Y_MEASURETYPE_HIGH_RATE, Y_MEASURETYPE_HIGH_ENERGY and Y_MEASURETYPE_HIGH_RESOLUTION corresponding
+     * to the type of light measure
      *
      * @throws YAPI_Exception on error
      */
@@ -211,8 +214,8 @@ public class YLightSensor extends YSensor
      *
      *  @param newval : a value among YLightSensor.MEASURETYPE_HUMAN_EYE,
      *  YLightSensor.MEASURETYPE_WIDE_SPECTRUM, YLightSensor.MEASURETYPE_INFRARED,
-     *  YLightSensor.MEASURETYPE_HIGH_RATE and YLightSensor.MEASURETYPE_HIGH_ENERGY corresponding to the
-     * light sensor type used in the device
+     *  YLightSensor.MEASURETYPE_HIGH_RATE, YLightSensor.MEASURETYPE_HIGH_ENERGY and
+     * YLightSensor.MEASURETYPE_HIGH_RESOLUTION corresponding to the light sensor type used in the device
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -236,8 +239,8 @@ public class YLightSensor extends YSensor
      * modification must be kept.
      *
      *  @param newval : a value among Y_MEASURETYPE_HUMAN_EYE, Y_MEASURETYPE_WIDE_SPECTRUM,
-     *  Y_MEASURETYPE_INFRARED, Y_MEASURETYPE_HIGH_RATE and Y_MEASURETYPE_HIGH_ENERGY corresponding to the
-     * light sensor type used in the device
+     *  Y_MEASURETYPE_INFRARED, Y_MEASURETYPE_HIGH_RATE, Y_MEASURETYPE_HIGH_ENERGY and
+     * Y_MEASURETYPE_HIGH_RESOLUTION corresponding to the light sensor type used in the device
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

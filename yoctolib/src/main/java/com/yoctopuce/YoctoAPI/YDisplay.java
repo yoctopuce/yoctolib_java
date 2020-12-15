@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ * $Id: YDisplay.java 42110 2020-10-22 07:18:31Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -40,6 +40,7 @@
 package com.yoctopuce.YoctoAPI;
 
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 //--- (generated code: YDisplay class start)
@@ -129,6 +130,7 @@ public class YDisplay extends YFunction
     protected int _layerCount = LAYERCOUNT_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackDisplay = null;
+    protected ArrayList<YDisplayLayer> _allDisplayLayers = new ArrayList<>();
 
     /**
      * Deprecated UpdateCallback for Display
@@ -1022,6 +1024,34 @@ public class YDisplay extends YFunction
     }
 
     /**
+     * Returns a YDisplayLayer object that can be used to draw on the specified
+     * layer. The content is displayed only when the layer is active on the
+     * screen (and not masked by other overlapping layers).
+     *
+     * @param layerId : the identifier of the layer (a number in range 0..layerCount-1)
+     *
+     * @return an YDisplayLayer object
+     *
+     * @throws YAPI_Exception on error
+     */
+    public YDisplayLayer get_displayLayer(int layerId) throws YAPI_Exception
+    {
+        int layercount;
+        int idx;
+        layercount = get_layerCount();
+        //noinspection DoubleNegation
+        if (!((layerId >= 0) && (layerId < layercount))) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "invalid DisplayLayer index");}
+        if (_allDisplayLayers.size() == 0) {
+            idx = 0;
+            while (idx < layercount) {
+                _allDisplayLayers.add(new YDisplayLayer(this, idx));
+                idx = idx + 1;
+            }
+        }
+        return _allDisplayLayers.get(layerId);
+    }
+
+    /**
      * Continues the enumeration of displays started using yFirstDisplay().
      * Caution: You can't make any assumption about the returned displays order.
      * If you want to find a specific a display, use Display.findDisplay()
@@ -1081,39 +1111,12 @@ public class YDisplay extends YFunction
     }
 
     //--- (end of generated code: YDisplay implementation)
-    private YDisplayLayer[] _allDisplayLayers = null;
     private Boolean _recording = false;
     private String _sequence;
 
-    /**
-     * Returns a YDisplayLayer object that can be used to draw on the specified
-     * layer. The content is displayed only when the layer is active on the
-     * screen (and not masked by other overlapping layers).
-     *
-     * @param layerId : the identifier of the layer (a number in range 0..layerCount-1)
-     *
-     * @return an YDisplayLayer object
-     *
-     * @throws YAPI_Exception on error
-     */
-    public synchronized YDisplayLayer get_displayLayer(int layerId) throws YAPI_Exception
-    {
-        if (_allDisplayLayers == null) {
-            int nb_display_layer = this.get_layerCount();
-            _allDisplayLayers = new YDisplayLayer[nb_display_layer];
-            for (int i = 0; i < nb_display_layer; i++) {
-                _allDisplayLayers[i] = new YDisplayLayer(this, i);
-            }
-        }
-        if (layerId < 0 || layerId >= _allDisplayLayers.length) {
-            throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid layerId");
-        }
-        return _allDisplayLayers[layerId];
-    }
-
     public synchronized int flushLayers() throws YAPI_Exception
     {
-        if (_allDisplayLayers != null) {
+        if (_allDisplayLayers.size() > 0) {
             for (YDisplayLayer _allDisplayLayer : _allDisplayLayers) {
                 _allDisplayLayer.flush_now();
             }
@@ -1123,7 +1126,7 @@ public class YDisplay extends YFunction
 
     public synchronized void resetHiddenLayerFlags()
     {
-        if (_allDisplayLayers != null) {
+        if (_allDisplayLayers.size() > 0) {
             for (YDisplayLayer _allDisplayLayer : _allDisplayLayers) {
                 _allDisplayLayer.resetHiddenFlag();
             }

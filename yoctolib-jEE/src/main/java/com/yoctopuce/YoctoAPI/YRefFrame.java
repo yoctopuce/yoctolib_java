@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRefFrame.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YRefFrame.java 42951 2020-12-14 09:43:29Z seb $
  *
  *  Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -51,8 +51,8 @@ import java.util.Locale;
  *
  * The YRefFrame class is used to setup the base orientation of the Yoctopuce inertial
  * sensors. Thanks to this, orientation functions relative to the earth surface plane
- * can use the proper reference frame. The class also implements a tridimensional
- * sensor calibration process, which can compensate for local variations
+ * can use the proper reference frame. For some devices, the class also implements a
+ * tridimensional sensor calibration process, which can compensate for local variations
  * of standard gravity and improve the precision of the tilt sensors.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -80,6 +80,9 @@ public class YRefFrame extends YFunction
     public static final int FUSIONMODE_M4G = 2;
     public static final int FUSIONMODE_COMPASS = 3;
     public static final int FUSIONMODE_IMU = 4;
+    public static final int FUSIONMODE_INCLIN_90DEG_1G8 = 5;
+    public static final int FUSIONMODE_INCLIN_90DEG_3G6 = 6;
+    public static final int FUSIONMODE_INCLIN_10DEG = 7;
     public static final int FUSIONMODE_INVALID = -1;
     public enum MOUNTPOSITION {
         BOTTOM(0),
@@ -388,11 +391,12 @@ public class YRefFrame extends YFunction
 
 
     /**
-     * Returns the BNO055 fusion mode. Note this feature is only availabe on Yocto-3D-V2.
+     * Returns the sensor fusion mode. Note that available sensor fusion modes depend on the sensor type.
      *
      *  @return a value among YRefFrame.FUSIONMODE_NDOF, YRefFrame.FUSIONMODE_NDOF_FMC_OFF,
-     *  YRefFrame.FUSIONMODE_M4G, YRefFrame.FUSIONMODE_COMPASS and YRefFrame.FUSIONMODE_IMU corresponding
-     * to the BNO055 fusion mode
+     *  YRefFrame.FUSIONMODE_M4G, YRefFrame.FUSIONMODE_COMPASS, YRefFrame.FUSIONMODE_IMU,
+     *  YRefFrame.FUSIONMODE_INCLIN_90DEG_1G8, YRefFrame.FUSIONMODE_INCLIN_90DEG_3G6 and
+     * YRefFrame.FUSIONMODE_INCLIN_10DEG corresponding to the sensor fusion mode
      *
      * @throws YAPI_Exception on error
      */
@@ -411,10 +415,11 @@ public class YRefFrame extends YFunction
     }
 
     /**
-     * Returns the BNO055 fusion mode. Note this feature is only availabe on Yocto-3D-V2.
+     * Returns the sensor fusion mode. Note that available sensor fusion modes depend on the sensor type.
      *
      *  @return a value among Y_FUSIONMODE_NDOF, Y_FUSIONMODE_NDOF_FMC_OFF, Y_FUSIONMODE_M4G,
-     * Y_FUSIONMODE_COMPASS and Y_FUSIONMODE_IMU corresponding to the BNO055 fusion mode
+     *  Y_FUSIONMODE_COMPASS, Y_FUSIONMODE_IMU, Y_FUSIONMODE_INCLIN_90DEG_1G8,
+     * Y_FUSIONMODE_INCLIN_90DEG_3G6 and Y_FUSIONMODE_INCLIN_10DEG corresponding to the sensor fusion mode
      *
      * @throws YAPI_Exception on error
      */
@@ -424,11 +429,13 @@ public class YRefFrame extends YFunction
     }
 
     /**
-     * Change the BNO055 fusion mode. Note: this feature is only availabe on Yocto-3D-V2.
+     * Change the sensor fusion mode. Note that available sensor fusion modes depend on the sensor type.
      * Remember to call the matching module saveToFlash() method to save the setting permanently.
      *
      *  @param newval : a value among YRefFrame.FUSIONMODE_NDOF, YRefFrame.FUSIONMODE_NDOF_FMC_OFF,
-     * YRefFrame.FUSIONMODE_M4G, YRefFrame.FUSIONMODE_COMPASS and YRefFrame.FUSIONMODE_IMU
+     *  YRefFrame.FUSIONMODE_M4G, YRefFrame.FUSIONMODE_COMPASS, YRefFrame.FUSIONMODE_IMU,
+     *  YRefFrame.FUSIONMODE_INCLIN_90DEG_1G8, YRefFrame.FUSIONMODE_INCLIN_90DEG_3G6 and
+     * YRefFrame.FUSIONMODE_INCLIN_10DEG
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -445,11 +452,12 @@ public class YRefFrame extends YFunction
     }
 
     /**
-     * Change the BNO055 fusion mode. Note: this feature is only availabe on Yocto-3D-V2.
+     * Change the sensor fusion mode. Note that available sensor fusion modes depend on the sensor type.
      * Remember to call the matching module saveToFlash() method to save the setting permanently.
      *
      *  @param newval : a value among Y_FUSIONMODE_NDOF, Y_FUSIONMODE_NDOF_FMC_OFF, Y_FUSIONMODE_M4G,
-     * Y_FUSIONMODE_COMPASS and Y_FUSIONMODE_IMU
+     *  Y_FUSIONMODE_COMPASS, Y_FUSIONMODE_IMU, Y_FUSIONMODE_INCLIN_90DEG_1G8,
+     * Y_FUSIONMODE_INCLIN_90DEG_3G6 and Y_FUSIONMODE_INCLIN_10DEG
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *

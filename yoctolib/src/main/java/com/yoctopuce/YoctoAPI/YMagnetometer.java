@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMagnetometer.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YMagnetometer.java 42951 2020-12-14 09:43:29Z seb $
  *
  *  Implements FindMagnetometer(), the high-level API for Magnetometer functions
  *
@@ -155,9 +155,9 @@ public class YMagnetometer extends YSensor
     }
 
     /**
-     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     * Returns the measure update frequency, measured in Hz.
      *
-     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * @return an integer corresponding to the measure update frequency, measured in Hz
      *
      * @throws YAPI_Exception on error
      */
@@ -176,9 +176,9 @@ public class YMagnetometer extends YSensor
     }
 
     /**
-     * Returns the measure update frequency, measured in Hz (Yocto-3D-V2 only).
+     * Returns the measure update frequency, measured in Hz.
      *
-     * @return an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * @return an integer corresponding to the measure update frequency, measured in Hz
      *
      * @throws YAPI_Exception on error
      */
@@ -188,12 +188,12 @@ public class YMagnetometer extends YSensor
     }
 
     /**
-     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * Changes the measure update frequency, measured in Hz. When the
      * frequency is lower, the device performs averaging.
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -210,12 +210,12 @@ public class YMagnetometer extends YSensor
     }
 
     /**
-     * Changes the measure update frequency, measured in Hz (Yocto-3D-V2 only). When the
+     * Changes the measure update frequency, measured in Hz. When the
      * frequency is lower, the device performs averaging.
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     * @param newval : an integer corresponding to the measure update frequency, measured in Hz (Yocto-3D-V2 only)
+     * @param newval : an integer corresponding to the measure update frequency, measured in Hz
      *
      * @return YAPI_SUCCESS if the call succeeds.
      *
