@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSegmentedDisplay.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YSegmentedDisplay.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *
@@ -190,7 +190,7 @@ public class YSegmentedDisplay extends YFunction
      *
      * @param newval : a string corresponding to the text currently displayed on the screen
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

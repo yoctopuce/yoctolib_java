@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmOutput.java 38913 2019-12-20 18:59:49Z mvuilleu $
+ *  $Id: YPwmOutput.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -208,7 +208,7 @@ public class YPwmOutput extends YFunction
     /**
      * Returns the state of the PWM generators.
      *
-     * @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the state of the PWM generators
+     * @return either YPwmOutput.ENABLED_FALSE or YPwmOutput.ENABLED_TRUE, according to the state of the PWM generators
      *
      * @throws YAPI_Exception on error
      */
@@ -239,9 +239,9 @@ public class YPwmOutput extends YFunction
     /**
      * Stops or starts the PWM.
      *
-     * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE
+     * @param newval : either YPwmOutput.ENABLED_FALSE or YPwmOutput.ENABLED_TRUE
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -286,7 +286,7 @@ public class YPwmOutput extends YFunction
      *
      * @param newval : a floating point number corresponding to the PWM frequency
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -360,7 +360,7 @@ public class YPwmOutput extends YFunction
      *
      * @param newval : a floating point number corresponding to the PWM period in milliseconds
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -426,7 +426,7 @@ public class YPwmOutput extends YFunction
      *
      * @param newval : a floating point number corresponding to the PWM duty cycle, in per cents
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -494,7 +494,7 @@ public class YPwmOutput extends YFunction
      *
      * @param newval : a floating point number corresponding to the PWM pulse length, in milliseconds
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -588,8 +588,8 @@ public class YPwmOutput extends YFunction
     /**
      * Returns the state of the PWM at device power on.
      *
-     *  @return either Y_ENABLEDATPOWERON_FALSE or Y_ENABLEDATPOWERON_TRUE, according to the state of the
-     * PWM at device power on
+     *  @return either YPwmOutput.ENABLEDATPOWERON_FALSE or YPwmOutput.ENABLEDATPOWERON_TRUE, according to
+     * the state of the PWM at device power on
      *
      * @throws YAPI_Exception on error
      */
@@ -623,10 +623,10 @@ public class YPwmOutput extends YFunction
      * Changes the state of the PWM at device power on. Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
      *
-     *  @param newval : either Y_ENABLEDATPOWERON_FALSE or Y_ENABLEDATPOWERON_TRUE, according to the state
-     * of the PWM at device power on
+     *  @param newval : either YPwmOutput.ENABLEDATPOWERON_FALSE or YPwmOutput.ENABLEDATPOWERON_TRUE,
+     * according to the state of the PWM at device power on
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -661,7 +661,7 @@ public class YPwmOutput extends YFunction
      *
      * @param newval : a floating point number corresponding to the PWM duty cycle at device power on
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

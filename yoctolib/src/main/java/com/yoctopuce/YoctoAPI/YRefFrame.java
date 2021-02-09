@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRefFrame.java 42951 2020-12-14 09:43:29Z seb $
+ *  $Id: YRefFrame.java 43619 2021-01-29 09:14:45Z mvuilleu $
  *
  *  Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -47,7 +47,8 @@ import java.util.Locale;
 //--- (end of YRefFrame yapiwrapper)
 //--- (YRefFrame class start)
 /**
- * YRefFrame Class: 3D reference frame configuration interface, available for instance in the Yocto-3D-V2
+ *  YRefFrame Class: 3D reference frame configuration interface, available for instance in the
+ * Yocto-3D-V2 or the Yocto-Inclinometer
  *
  * The YRefFrame class is used to setup the base orientation of the Yoctopuce inertial
  * sensors. Thanks to this, orientation functions relative to the earth surface plane
@@ -319,7 +320,7 @@ public class YRefFrame extends YFunction
      *
      * @param newval : a floating point number corresponding to the reference bearing used by the compass
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -417,9 +418,10 @@ public class YRefFrame extends YFunction
     /**
      * Returns the sensor fusion mode. Note that available sensor fusion modes depend on the sensor type.
      *
-     *  @return a value among Y_FUSIONMODE_NDOF, Y_FUSIONMODE_NDOF_FMC_OFF, Y_FUSIONMODE_M4G,
-     *  Y_FUSIONMODE_COMPASS, Y_FUSIONMODE_IMU, Y_FUSIONMODE_INCLIN_90DEG_1G8,
-     * Y_FUSIONMODE_INCLIN_90DEG_3G6 and Y_FUSIONMODE_INCLIN_10DEG corresponding to the sensor fusion mode
+     *  @return a value among YRefFrame.FUSIONMODE_NDOF, YRefFrame.FUSIONMODE_NDOF_FMC_OFF,
+     *  YRefFrame.FUSIONMODE_M4G, YRefFrame.FUSIONMODE_COMPASS, YRefFrame.FUSIONMODE_IMU,
+     *  YRefFrame.FUSIONMODE_INCLIN_90DEG_1G8, YRefFrame.FUSIONMODE_INCLIN_90DEG_3G6 and
+     * YRefFrame.FUSIONMODE_INCLIN_10DEG corresponding to the sensor fusion mode
      *
      * @throws YAPI_Exception on error
      */
@@ -455,11 +457,12 @@ public class YRefFrame extends YFunction
      * Change the sensor fusion mode. Note that available sensor fusion modes depend on the sensor type.
      * Remember to call the matching module saveToFlash() method to save the setting permanently.
      *
-     *  @param newval : a value among Y_FUSIONMODE_NDOF, Y_FUSIONMODE_NDOF_FMC_OFF, Y_FUSIONMODE_M4G,
-     *  Y_FUSIONMODE_COMPASS, Y_FUSIONMODE_IMU, Y_FUSIONMODE_INCLIN_90DEG_1G8,
-     * Y_FUSIONMODE_INCLIN_90DEG_3G6 and Y_FUSIONMODE_INCLIN_10DEG
+     *  @param newval : a value among YRefFrame.FUSIONMODE_NDOF, YRefFrame.FUSIONMODE_NDOF_FMC_OFF,
+     *  YRefFrame.FUSIONMODE_M4G, YRefFrame.FUSIONMODE_COMPASS, YRefFrame.FUSIONMODE_IMU,
+     *  YRefFrame.FUSIONMODE_INCLIN_90DEG_1G8, YRefFrame.FUSIONMODE_INCLIN_90DEG_3G6 and
+     * YRefFrame.FUSIONMODE_INCLIN_10DEG
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -595,7 +598,7 @@ public class YRefFrame extends YFunction
      * pitch/roll tilt sensors.
      *
      * @return a value among the YRefFrame.MOUNTPOSITION enumeration
-     *         (YRefFrame.MOUNTPOSITION.BOTTOM,   YRefFrame.MOUNTPOSITION.TOP,
+     *         (YRefFrame.MOUNTPOSITION.BOTTOM,  YRefFrame.MOUNTPOSITION.TOP,
      *         YRefFrame.MOUNTPOSITION.FRONT,    YRefFrame.MOUNTPOSITION.RIGHT,
      *         YRefFrame.MOUNTPOSITION.REAR,     YRefFrame.MOUNTPOSITION.LEFT),
      *         corresponding to the installation in a box, on one of the six faces.
@@ -645,7 +648,7 @@ public class YRefFrame extends YFunction
      * the earth surface) so that the measures are made relative to this position.
      *
      * @param position : a value among the YRefFrame.MOUNTPOSITION enumeration
-     *         (YRefFrame.MOUNTPOSITION.BOTTOM,   YRefFrame.MOUNTPOSITION.TOP,
+     *         (YRefFrame.MOUNTPOSITION.BOTTOM,  YRefFrame.MOUNTPOSITION.TOP,
      *         YRefFrame.MOUNTPOSITION.FRONT,    YRefFrame.MOUNTPOSITION.RIGHT,
      *         YRefFrame.MOUNTPOSITION.REAR,     YRefFrame.MOUNTPOSITION.LEFT),
      *         corresponding to the installation in a box, on one of the six faces.

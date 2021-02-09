@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAudioIn.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YAudioIn.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindAudioIn(), the high-level API for AudioIn functions
  *
@@ -216,7 +216,7 @@ public class YAudioIn extends YFunction
      *
      * @param newval : an integer corresponding to audio input gain, in per cents
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -249,7 +249,7 @@ public class YAudioIn extends YFunction
     /**
      * Returns the state of the mute function.
      *
-     * @return either Y_MUTE_FALSE or Y_MUTE_TRUE, according to the state of the mute function
+     * @return either YAudioIn.MUTE_FALSE or YAudioIn.MUTE_TRUE, according to the state of the mute function
      *
      * @throws YAPI_Exception on error
      */
@@ -282,9 +282,9 @@ public class YAudioIn extends YFunction
      * Changes the state of the mute function. Remember to call the matching module
      * saveToFlash() method to save the setting permanently.
      *
-     * @param newval : either Y_MUTE_FALSE or Y_MUTE_TRUE, according to the state of the mute function
+     * @param newval : either YAudioIn.MUTE_FALSE or YAudioIn.MUTE_TRUE, according to the state of the mute function
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

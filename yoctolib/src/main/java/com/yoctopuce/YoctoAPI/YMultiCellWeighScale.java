@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiCellWeighScale.java 41108 2020-06-29 12:29:07Z seb $
+ *  $Id: YMultiCellWeighScale.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -65,6 +65,12 @@ public class YMultiCellWeighScale extends YSensor
      */
     public static final int CELLCOUNT_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid externalSense value
+     */
+    public static final int EXTERNALSENSE_FALSE = 0;
+    public static final int EXTERNALSENSE_TRUE = 1;
+    public static final int EXTERNALSENSE_INVALID = -1;
+    /**
      * invalid excitation value
      */
     public static final int EXCITATION_OFF = 0;
@@ -100,6 +106,7 @@ public class YMultiCellWeighScale extends YSensor
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _cellCount = CELLCOUNT_INVALID;
+    protected int _externalSense = EXTERNALSENSE_INVALID;
     protected int _excitation = EXCITATION_INVALID;
     protected double _tempAvgAdaptRatio = TEMPAVGADAPTRATIO_INVALID;
     protected double _tempChgAdaptRatio = TEMPCHGADAPTRATIO_INVALID;
@@ -168,6 +175,9 @@ public class YMultiCellWeighScale extends YSensor
         if (json_val.has("cellCount")) {
             _cellCount = json_val.getInt("cellCount");
         }
+        if (json_val.has("externalSense")) {
+            _externalSense = json_val.getInt("externalSense") > 0 ? 1 : 0;
+        }
         if (json_val.has("excitation")) {
             _excitation = json_val.getInt("excitation");
         }
@@ -223,7 +233,7 @@ public class YMultiCellWeighScale extends YSensor
      *
      * @param newval : a string corresponding to the measuring unit for the weight
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -291,13 +301,91 @@ public class YMultiCellWeighScale extends YSensor
      *
      * @param newval : an integer corresponding to the number of load cells in use
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
     public int setCellCount(int newval)  throws YAPI_Exception
     {
         return set_cellCount(newval);
+    }
+
+    /**
+     * Returns true if entry 4 is used as external sense for 6-wires load cells.
+     *
+     *  @return either YMultiCellWeighScale.EXTERNALSENSE_FALSE or YMultiCellWeighScale.EXTERNALSENSE_TRUE,
+     * according to true if entry 4 is used as external sense for 6-wires load cells
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_externalSense() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return EXTERNALSENSE_INVALID;
+                }
+            }
+            res = _externalSense;
+        }
+        return res;
+    }
+
+    /**
+     * Returns true if entry 4 is used as external sense for 6-wires load cells.
+     *
+     *  @return either YMultiCellWeighScale.EXTERNALSENSE_FALSE or YMultiCellWeighScale.EXTERNALSENSE_TRUE,
+     * according to true if entry 4 is used as external sense for 6-wires load cells
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getExternalSense() throws YAPI_Exception
+    {
+        return get_externalSense();
+    }
+
+    /**
+     * Changes the configuration to tell if entry 4 is used as external sense for
+     * 6-wires load cells. Remember to call the saveToFlash() method of the
+     * module if the modification must be kept.
+     *
+     *  @param newval : either YMultiCellWeighScale.EXTERNALSENSE_FALSE or
+     *  YMultiCellWeighScale.EXTERNALSENSE_TRUE, according to the configuration to tell if entry 4 is used
+     * as external sense for
+     *         6-wires load cells
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_externalSense(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("externalSense",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the configuration to tell if entry 4 is used as external sense for
+     * 6-wires load cells. Remember to call the saveToFlash() method of the
+     * module if the modification must be kept.
+     *
+     *  @param newval : either YMultiCellWeighScale.EXTERNALSENSE_FALSE or
+     *  YMultiCellWeighScale.EXTERNALSENSE_TRUE, according to the configuration to tell if entry 4 is used
+     * as external sense for
+     *         6-wires load cells
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setExternalSense(int newval)  throws YAPI_Exception
+    {
+        return set_externalSense(newval);
     }
 
     /**
@@ -325,8 +413,8 @@ public class YMultiCellWeighScale extends YSensor
     /**
      * Returns the current load cell bridge excitation method.
      *
-     *  @return a value among Y_EXCITATION_OFF, Y_EXCITATION_DC and Y_EXCITATION_AC corresponding to the
-     * current load cell bridge excitation method
+     *  @return a value among YMultiCellWeighScale.EXCITATION_OFF, YMultiCellWeighScale.EXCITATION_DC and
+     * YMultiCellWeighScale.EXCITATION_AC corresponding to the current load cell bridge excitation method
      *
      * @throws YAPI_Exception on error
      */
@@ -363,10 +451,11 @@ public class YMultiCellWeighScale extends YSensor
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     *  @param newval : a value among Y_EXCITATION_OFF, Y_EXCITATION_DC and Y_EXCITATION_AC corresponding
-     * to the current load cell bridge excitation method
+     *  @param newval : a value among YMultiCellWeighScale.EXCITATION_OFF,
+     *  YMultiCellWeighScale.EXCITATION_DC and YMultiCellWeighScale.EXCITATION_AC corresponding to the
+     * current load cell bridge excitation method
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -411,7 +500,7 @@ public class YMultiCellWeighScale extends YSensor
      *
      * @param newval : a floating point number corresponding to the averaged temperature update rate, in per mille
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -495,7 +584,7 @@ public class YMultiCellWeighScale extends YSensor
      *
      * @param newval : a floating point number corresponding to the temperature change update rate, in per mille
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -676,7 +765,7 @@ public class YMultiCellWeighScale extends YSensor
      *
      * @param newval : a floating point number corresponding to the zero tracking threshold value
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

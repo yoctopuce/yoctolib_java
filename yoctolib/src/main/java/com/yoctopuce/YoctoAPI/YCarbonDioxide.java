@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCarbonDioxide.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YCarbonDioxide.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -200,7 +200,7 @@ public class YCarbonDioxide extends YSensor
      *
      * @param newval : an integer corresponding to Automatic Baseline Calibration period, in hours
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

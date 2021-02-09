@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YProximity.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YProximity.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindProximity(), the high-level API for Proximity functions
  *
@@ -315,7 +315,7 @@ public class YProximity extends YSensor
      * the proximity sensor, when considered
      *         as a binary input (on/off)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -395,7 +395,7 @@ public class YProximity extends YSensor
      * the proximity sensor, when considered
      *         as a binary input (on/off)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -467,7 +467,7 @@ public class YProximity extends YSensor
      *
      * @param newval : an integer corresponding to the minimal detection duration before signalling a presence event
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -539,7 +539,7 @@ public class YProximity extends YSensor
      *
      * @param newval : an integer corresponding to the minimal detection duration before signalling a removal event
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -576,8 +576,9 @@ public class YProximity extends YSensor
      *  Returns true if the input (considered as binary) is active (detection value is smaller than the
      * specified threshold), and false otherwise.
      *
-     *  @return either Y_ISPRESENT_FALSE or Y_ISPRESENT_TRUE, according to true if the input (considered as
-     * binary) is active (detection value is smaller than the specified threshold), and false otherwise
+     *  @return either YProximity.ISPRESENT_FALSE or YProximity.ISPRESENT_TRUE, according to true if the
+     *  input (considered as binary) is active (detection value is smaller than the specified threshold),
+     * and false otherwise
      *
      * @throws YAPI_Exception on error
      */
@@ -773,9 +774,9 @@ public class YProximity extends YSensor
      *  Returns the parameter (sensor value, presence or pulse count) returned by the get_currentValue
      * function and callbacks.
      *
-     *  @return a value among Y_PROXIMITYREPORTMODE_NUMERIC, Y_PROXIMITYREPORTMODE_PRESENCE and
-     *  Y_PROXIMITYREPORTMODE_PULSECOUNT corresponding to the parameter (sensor value, presence or pulse
-     * count) returned by the get_currentValue function and callbacks
+     *  @return a value among YProximity.PROXIMITYREPORTMODE_NUMERIC,
+     *  YProximity.PROXIMITYREPORTMODE_PRESENCE and YProximity.PROXIMITYREPORTMODE_PULSECOUNT corresponding
+     * to the parameter (sensor value, presence or pulse count) returned by the get_currentValue function and callbacks
      *
      * @throws YAPI_Exception on error
      */
@@ -817,11 +818,12 @@ public class YProximity extends YSensor
      * get_pulseCounter().
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     *  @param newval : a value among Y_PROXIMITYREPORTMODE_NUMERIC, Y_PROXIMITYREPORTMODE_PRESENCE and
-     *  Y_PROXIMITYREPORTMODE_PULSECOUNT corresponding to the  parameter  type (sensor value, presence or
-     * pulse count) returned by the get_currentValue function and callbacks
+     *  @param newval : a value among YProximity.PROXIMITYREPORTMODE_NUMERIC,
+     *  YProximity.PROXIMITYREPORTMODE_PRESENCE and YProximity.PROXIMITYREPORTMODE_PULSECOUNT corresponding
+     *  to the  parameter  type (sensor value, presence or pulse count) returned by the get_currentValue
+     * function and callbacks
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

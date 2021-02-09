@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YHumidity.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YHumidity.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindHumidity(), the high-level API for Humidity functions
  *
@@ -169,7 +169,7 @@ public class YHumidity extends YSensor
      *
      * @param newval : a string corresponding to the primary unit for measuring humidity
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

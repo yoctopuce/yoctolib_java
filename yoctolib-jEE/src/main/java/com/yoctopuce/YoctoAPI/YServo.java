@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YServo.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YServo.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindServo(), the high-level API for Servo functions
  *
@@ -252,7 +252,7 @@ public class YServo extends YFunction
      *
      * @param newval : an integer corresponding to immediately the servo driving position
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -285,7 +285,7 @@ public class YServo extends YFunction
     /**
      * Returns the state of the RC servo motors.
      *
-     * @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the state of the RC servo motors
+     * @return either YServo.ENABLED_FALSE or YServo.ENABLED_TRUE, according to the state of the RC servo motors
      *
      * @throws YAPI_Exception on error
      */
@@ -316,9 +316,9 @@ public class YServo extends YFunction
     /**
      * Stops or starts the RC servo motor.
      *
-     * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE
+     * @param newval : either YServo.ENABLED_FALSE or YServo.ENABLED_TRUE
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -396,7 +396,7 @@ public class YServo extends YFunction
      *
      * @param newval : an integer corresponding to the range of use of the servo, specified in per cents
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -474,7 +474,7 @@ public class YServo extends YFunction
      *  @param newval : an integer corresponding to the duration of the pulse corresponding to the neutral
      * position of the servo
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -585,7 +585,7 @@ public class YServo extends YFunction
      *
      * @param newval : an integer
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -619,8 +619,8 @@ public class YServo extends YFunction
     /**
      * Returns the servo signal generator state at power up.
      *
-     *  @return either Y_ENABLEDATPOWERON_FALSE or Y_ENABLEDATPOWERON_TRUE, according to the servo signal
-     * generator state at power up
+     *  @return either YServo.ENABLEDATPOWERON_FALSE or YServo.ENABLEDATPOWERON_TRUE, according to the
+     * servo signal generator state at power up
      *
      * @throws YAPI_Exception on error
      */
@@ -653,9 +653,9 @@ public class YServo extends YFunction
      * Configure the servo signal generator state at power up. Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
      *
-     * @param newval : either Y_ENABLEDATPOWERON_FALSE or Y_ENABLEDATPOWERON_TRUE
+     * @param newval : either YServo.ENABLEDATPOWERON_FALSE or YServo.ENABLEDATPOWERON_TRUE
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

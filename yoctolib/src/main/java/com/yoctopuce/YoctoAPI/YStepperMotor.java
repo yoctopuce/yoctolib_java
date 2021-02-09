@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YStepperMotor.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YStepperMotor.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -271,8 +271,9 @@ public class YStepperMotor extends YFunction
     /**
      * Returns the motor working state.
      *
-     *  @return a value among Y_MOTORSTATE_ABSENT, Y_MOTORSTATE_ALERT, Y_MOTORSTATE_HI_Z,
-     * Y_MOTORSTATE_STOP, Y_MOTORSTATE_RUN and Y_MOTORSTATE_BATCH corresponding to the motor working state
+     *  @return a value among YStepperMotor.MOTORSTATE_ABSENT, YStepperMotor.MOTORSTATE_ALERT,
+     *  YStepperMotor.MOTORSTATE_HI_Z, YStepperMotor.MOTORSTATE_STOP, YStepperMotor.MOTORSTATE_RUN and
+     * YStepperMotor.MOTORSTATE_BATCH corresponding to the motor working state
      *
      * @throws YAPI_Exception on error
      */
@@ -348,7 +349,7 @@ public class YStepperMotor extends YFunction
      *
      * @param newval : a floating point number corresponding to the current logical motor position, measured in steps
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -453,7 +454,7 @@ public class YStepperMotor extends YFunction
      *  @param newval : a floating point number corresponding to the motor speed immediately reachable from
      * stop state, measured in steps per second
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -523,7 +524,7 @@ public class YStepperMotor extends YFunction
      *  @param newval : a floating point number corresponding to the maximal motor acceleration, measured
      * in steps per second^2
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -589,7 +590,7 @@ public class YStepperMotor extends YFunction
      *
      * @param newval : a floating point number corresponding to the maximal motor speed, measured in steps per second
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -657,8 +658,9 @@ public class YStepperMotor extends YFunction
     /**
      * Returns the stepping mode used to drive the motor.
      *
-     *  @return a value among Y_STEPPING_MICROSTEP16, Y_STEPPING_MICROSTEP8, Y_STEPPING_MICROSTEP4,
-     * Y_STEPPING_HALFSTEP and Y_STEPPING_FULLSTEP corresponding to the stepping mode used to drive the motor
+     *  @return a value among YStepperMotor.STEPPING_MICROSTEP16, YStepperMotor.STEPPING_MICROSTEP8,
+     *  YStepperMotor.STEPPING_MICROSTEP4, YStepperMotor.STEPPING_HALFSTEP and
+     * YStepperMotor.STEPPING_FULLSTEP corresponding to the stepping mode used to drive the motor
      *
      * @throws YAPI_Exception on error
      */
@@ -692,10 +694,12 @@ public class YStepperMotor extends YFunction
     /**
      * Changes the stepping mode used to drive the motor.
      *
-     *  @param newval : a value among Y_STEPPING_MICROSTEP16, Y_STEPPING_MICROSTEP8, Y_STEPPING_MICROSTEP4,
-     * Y_STEPPING_HALFSTEP and Y_STEPPING_FULLSTEP corresponding to the stepping mode used to drive the motor
+     *  @param newval : a value among YStepperMotor.STEPPING_MICROSTEP16,
+     *  YStepperMotor.STEPPING_MICROSTEP8, YStepperMotor.STEPPING_MICROSTEP4,
+     *  YStepperMotor.STEPPING_HALFSTEP and YStepperMotor.STEPPING_FULLSTEP corresponding to the stepping
+     * mode used to drive the motor
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -761,7 +765,7 @@ public class YStepperMotor extends YFunction
      *
      * @param newval : an integer corresponding to the overcurrent alert and emergency stop threshold, measured in mA
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -829,7 +833,7 @@ public class YStepperMotor extends YFunction
      *  @param newval : an integer corresponding to the torque regulation current when the motor is
      * stopped, measured in mA
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -897,7 +901,7 @@ public class YStepperMotor extends YFunction
      *  @param newval : an integer corresponding to the torque regulation current when the motor is
      * running, measured in mA
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1015,7 +1019,7 @@ public class YStepperMotor extends YFunction
      *
      * @param newval : an integer corresponding to the value of the signal generated on the auxiliary output
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1182,7 +1186,7 @@ public class YStepperMotor extends YFunction
         //may throw an exception
         retBin = _download(url);
         res = (retBin[0] & 0xff);
-        if (res == 49) {
+        if (res < 58) {
             //noinspection DoubleNegation
             if (!(res == 48)) { throw new YAPI_Exception( YAPI.DEVICE_BUSY,  "Motor command pipeline is full, try again later");}
         } else {

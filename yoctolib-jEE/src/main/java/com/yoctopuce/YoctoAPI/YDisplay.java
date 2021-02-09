@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 42110 2020-10-22 07:18:31Z seb $
+ * $Id: YDisplay.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -242,7 +242,8 @@ public class YDisplay extends YFunction
     /**
      * Returns true if the screen is powered, false otherwise.
      *
-     * @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to true if the screen is powered, false otherwise
+     *  @return either YDisplay.ENABLED_FALSE or YDisplay.ENABLED_TRUE, according to true if the screen is
+     * powered, false otherwise
      *
      * @throws YAPI_Exception on error
      */
@@ -274,9 +275,10 @@ public class YDisplay extends YFunction
     /**
      * Changes the power state of the display.
      *
-     * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the power state of the display
+     *  @param newval : either YDisplay.ENABLED_FALSE or YDisplay.ENABLED_TRUE, according to the power
+     * state of the display
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -346,7 +348,7 @@ public class YDisplay extends YFunction
      *
      * @param newval : a string corresponding to the name of the sequence to play when the displayed is powered on
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -416,7 +418,7 @@ public class YDisplay extends YFunction
      *
      * @param newval : an integer corresponding to the brightness of the display
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -451,8 +453,9 @@ public class YDisplay extends YFunction
     /**
      * Returns the currently selected display orientation.
      *
-     *  @return a value among Y_ORIENTATION_LEFT, Y_ORIENTATION_UP, Y_ORIENTATION_RIGHT and
-     * Y_ORIENTATION_DOWN corresponding to the currently selected display orientation
+     *  @return a value among YDisplay.ORIENTATION_LEFT, YDisplay.ORIENTATION_UP,
+     *  YDisplay.ORIENTATION_RIGHT and YDisplay.ORIENTATION_DOWN corresponding to the currently selected
+     * display orientation
      *
      * @throws YAPI_Exception on error
      */
@@ -486,10 +489,10 @@ public class YDisplay extends YFunction
      * Changes the display orientation. Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : a value among Y_ORIENTATION_LEFT, Y_ORIENTATION_UP, Y_ORIENTATION_RIGHT and
-     * Y_ORIENTATION_DOWN corresponding to the display orientation
+     *  @param newval : a value among YDisplay.ORIENTATION_LEFT, YDisplay.ORIENTATION_UP,
+     * YDisplay.ORIENTATION_RIGHT and YDisplay.ORIENTATION_DOWN corresponding to the display orientation
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -589,8 +592,8 @@ public class YDisplay extends YFunction
     /**
      * Returns the display type: monochrome, gray levels or full color.
      *
-     *  @return a value among Y_DISPLAYTYPE_MONO, Y_DISPLAYTYPE_GRAY and Y_DISPLAYTYPE_RGB corresponding to
-     * the display type: monochrome, gray levels or full color
+     *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_GRAY and
+     * YDisplay.DISPLAYTYPE_RGB corresponding to the display type: monochrome, gray levels or full color
      *
      * @throws YAPI_Exception on error
      */

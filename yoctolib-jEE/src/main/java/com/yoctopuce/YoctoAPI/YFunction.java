@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 41055 2020-06-25 08:15:29Z seb $
+ * $Id: YFunction.java 43619 2021-01-29 09:14:45Z mvuilleu $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -269,7 +269,7 @@ public class YFunction
      *
      * @param newval : a string corresponding to the logical name of the function
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1114,7 +1114,7 @@ public class YFunction
      *
      * @return an identifier of type YFUN_DESCR.
      *
-     * If the function has never been contacted, the returned value is YFunction.FUNCTIONDESCRIPTOR_INVALID.
+     * If the function has never been contacted, the returned value is Y$CLASSNAME$.FUNCTIONDESCRIPTOR_INVALID.
      */
     public synchronized String get_functionDescriptor()
     {

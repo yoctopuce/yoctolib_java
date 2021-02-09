@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPowerSupply.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YPowerSupply.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -248,7 +248,7 @@ public class YPowerSupply extends YFunction
      *
      * @param newval : a floating point number corresponding to the voltage set point, in V
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -314,7 +314,7 @@ public class YPowerSupply extends YFunction
      *
      * @param newval : a floating point number corresponding to the current limit, in mA
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -381,7 +381,8 @@ public class YPowerSupply extends YFunction
     /**
      * Returns the power supply output switch state.
      *
-     * @return either Y_POWEROUTPUT_OFF or Y_POWEROUTPUT_ON, according to the power supply output switch state
+     *  @return either YPowerSupply.POWEROUTPUT_OFF or YPowerSupply.POWEROUTPUT_ON, according to the power
+     * supply output switch state
      *
      * @throws YAPI_Exception on error
      */
@@ -413,9 +414,10 @@ public class YPowerSupply extends YFunction
     /**
      * Changes the power supply output switch state.
      *
-     * @param newval : either Y_POWEROUTPUT_OFF or Y_POWEROUTPUT_ON, according to the power supply output switch state
+     *  @param newval : either YPowerSupply.POWEROUTPUT_OFF or YPowerSupply.POWEROUTPUT_ON, according to
+     * the power supply output switch state
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -449,7 +451,8 @@ public class YPowerSupply extends YFunction
     /**
      * Returns the output voltage control point.
      *
-     * @return either Y_VOLTAGESENSE_INT or Y_VOLTAGESENSE_EXT, according to the output voltage control point
+     *  @return either YPowerSupply.VOLTAGESENSE_INT or YPowerSupply.VOLTAGESENSE_EXT, according to the
+     * output voltage control point
      *
      * @throws YAPI_Exception on error
      */
@@ -481,9 +484,10 @@ public class YPowerSupply extends YFunction
     /**
      * Changes the voltage control point.
      *
-     * @param newval : either Y_VOLTAGESENSE_INT or Y_VOLTAGESENSE_EXT, according to the voltage control point
+     *  @param newval : either YPowerSupply.VOLTAGESENSE_INT or YPowerSupply.VOLTAGESENSE_EXT, according to
+     * the voltage control point
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -708,7 +712,7 @@ public class YPowerSupply extends YFunction
      *
      * @param newval : a floating point number corresponding to the voltage set point at device start up
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -776,7 +780,7 @@ public class YPowerSupply extends YFunction
      *
      * @param newval : a floating point number corresponding to the current limit at device start up
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

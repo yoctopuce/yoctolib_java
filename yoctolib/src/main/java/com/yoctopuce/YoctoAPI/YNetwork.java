@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 42060 2020-10-14 10:02:12Z seb $
+ *  $Id: YNetwork.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -47,7 +47,7 @@ import java.util.Locale;
 //--- (YNetwork class start)
 /**
  *  YNetwork Class: network interface control interface, available for instance in the
- * YoctoHub-Ethernet, the YoctoHub-GSM-3G-EU, the YoctoHub-GSM-3G-NA or the YoctoHub-Wireless-n
+ * YoctoHub-Ethernet, the YoctoHub-GSM-3G-NA, the YoctoHub-GSM-4G or the YoctoHub-Wireless-n
  *
  * YNetwork objects provide access to TCP/IP parameters of Yoctopuce
  * devices that include a built-in network interface.
@@ -383,8 +383,9 @@ public class YNetwork extends YFunction
      * Level 5 (WWW_5) is reached when global connectivity is demonstrated by properly loading the
      * current time from an NTP server.
      *
-     *  @return a value among Y_READINESS_DOWN, Y_READINESS_EXISTS, Y_READINESS_LINKED, Y_READINESS_LAN_OK
-     * and Y_READINESS_WWW_OK corresponding to the current established working mode of the network interface
+     *  @return a value among YNetwork.READINESS_DOWN, YNetwork.READINESS_EXISTS,
+     *  YNetwork.READINESS_LINKED, YNetwork.READINESS_LAN_OK and YNetwork.READINESS_WWW_OK corresponding to
+     * the current established working mode of the network interface
      *
      * @throws YAPI_Exception on error
      */
@@ -658,7 +659,7 @@ public class YNetwork extends YFunction
      *
      * @param newval : a string corresponding to the IP address of the primary name server to be used by the module
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -728,7 +729,7 @@ public class YNetwork extends YFunction
      *
      * @param newval : a string corresponding to the IP address of the secondary name server to be used by the module
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -798,7 +799,7 @@ public class YNetwork extends YFunction
      *
      * @param newval : a string corresponding to the IP address of the NTP server to be used by the module
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -878,7 +879,7 @@ public class YNetwork extends YFunction
      *
      * @param newval : a string corresponding to the password for the "user" user
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -958,7 +959,7 @@ public class YNetwork extends YFunction
      *
      * @param newval : a string corresponding to the password for the "admin" user
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1032,7 +1033,7 @@ public class YNetwork extends YFunction
      *
      * @param newval : an integer corresponding to the the TCP port used to serve the hub web UI
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1106,7 +1107,7 @@ public class YNetwork extends YFunction
      *
      * @param newval : a string corresponding to the default HTML page returned by the hub
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1143,8 +1144,8 @@ public class YNetwork extends YFunction
      * Returns the activation state of the multicast announce protocols to allow easy
      * discovery of the module in the network neighborhood (uPnP/Bonjour protocol).
      *
-     *  @return either Y_DISCOVERABLE_FALSE or Y_DISCOVERABLE_TRUE, according to the activation state of
-     * the multicast announce protocols to allow easy
+     *  @return either YNetwork.DISCOVERABLE_FALSE or YNetwork.DISCOVERABLE_TRUE, according to the
+     * activation state of the multicast announce protocols to allow easy
      *         discovery of the module in the network neighborhood (uPnP/Bonjour protocol)
      *
      * @throws YAPI_Exception on error
@@ -1184,11 +1185,11 @@ public class YNetwork extends YFunction
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : either Y_DISCOVERABLE_FALSE or Y_DISCOVERABLE_TRUE, according to the activation
-     * state of the multicast announce protocols to allow easy
+     *  @param newval : either YNetwork.DISCOVERABLE_FALSE or YNetwork.DISCOVERABLE_TRUE, according to the
+     * activation state of the multicast announce protocols to allow easy
      *         discovery of the module in the network neighborhood (uPnP/Bonjour protocol)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1274,7 +1275,7 @@ public class YNetwork extends YFunction
      * before triggering an automated
      *         reboot to try to recover Internet connectivity
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1342,7 +1343,7 @@ public class YNetwork extends YFunction
      *
      * @param newval : a string corresponding to the callback URL to notify significant state changes
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1377,8 +1378,9 @@ public class YNetwork extends YFunction
     /**
      * Returns the HTTP method used to notify callbacks for significant state changes.
      *
-     *  @return a value among Y_CALLBACKMETHOD_POST, Y_CALLBACKMETHOD_GET and Y_CALLBACKMETHOD_PUT
-     * corresponding to the HTTP method used to notify callbacks for significant state changes
+     *  @return a value among YNetwork.CALLBACKMETHOD_POST, YNetwork.CALLBACKMETHOD_GET and
+     *  YNetwork.CALLBACKMETHOD_PUT corresponding to the HTTP method used to notify callbacks for
+     * significant state changes
      *
      * @throws YAPI_Exception on error
      */
@@ -1415,10 +1417,11 @@ public class YNetwork extends YFunction
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     *  @param newval : a value among Y_CALLBACKMETHOD_POST, Y_CALLBACKMETHOD_GET and Y_CALLBACKMETHOD_PUT
-     * corresponding to the HTTP method used to notify callbacks for significant state changes
+     *  @param newval : a value among YNetwork.CALLBACKMETHOD_POST, YNetwork.CALLBACKMETHOD_GET and
+     *  YNetwork.CALLBACKMETHOD_PUT corresponding to the HTTP method used to notify callbacks for
+     * significant state changes
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1458,12 +1461,14 @@ public class YNetwork extends YFunction
     /**
      * Returns the encoding standard to use for representing notification values.
      *
-     *  @return a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
-     *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV, Y_CALLBACKENCODING_YOCTO_API,
-     *  Y_CALLBACKENCODING_JSON_NUM, Y_CALLBACKENCODING_EMONCMS, Y_CALLBACKENCODING_AZURE,
-     *  Y_CALLBACKENCODING_INFLUXDB, Y_CALLBACKENCODING_MQTT, Y_CALLBACKENCODING_YOCTO_API_JZON,
-     *  Y_CALLBACKENCODING_PRTG and Y_CALLBACKENCODING_INFLUXDB_V2 corresponding to the encoding standard
-     * to use for representing notification values
+     *  @return a value among YNetwork.CALLBACKENCODING_FORM, YNetwork.CALLBACKENCODING_JSON,
+     *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV,
+     *  YNetwork.CALLBACKENCODING_YOCTO_API, YNetwork.CALLBACKENCODING_JSON_NUM,
+     *  YNetwork.CALLBACKENCODING_EMONCMS, YNetwork.CALLBACKENCODING_AZURE,
+     *  YNetwork.CALLBACKENCODING_INFLUXDB, YNetwork.CALLBACKENCODING_MQTT,
+     *  YNetwork.CALLBACKENCODING_YOCTO_API_JZON, YNetwork.CALLBACKENCODING_PRTG and
+     *  YNetwork.CALLBACKENCODING_INFLUXDB_V2 corresponding to the encoding standard to use for
+     * representing notification values
      *
      * @throws YAPI_Exception on error
      */
@@ -1505,14 +1510,16 @@ public class YNetwork extends YFunction
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     *  @param newval : a value among Y_CALLBACKENCODING_FORM, Y_CALLBACKENCODING_JSON,
-     *  Y_CALLBACKENCODING_JSON_ARRAY, Y_CALLBACKENCODING_CSV, Y_CALLBACKENCODING_YOCTO_API,
-     *  Y_CALLBACKENCODING_JSON_NUM, Y_CALLBACKENCODING_EMONCMS, Y_CALLBACKENCODING_AZURE,
-     *  Y_CALLBACKENCODING_INFLUXDB, Y_CALLBACKENCODING_MQTT, Y_CALLBACKENCODING_YOCTO_API_JZON,
-     *  Y_CALLBACKENCODING_PRTG and Y_CALLBACKENCODING_INFLUXDB_V2 corresponding to the encoding standard
-     * to use for representing notification values
+     *  @param newval : a value among YNetwork.CALLBACKENCODING_FORM, YNetwork.CALLBACKENCODING_JSON,
+     *  YNetwork.CALLBACKENCODING_JSON_ARRAY, YNetwork.CALLBACKENCODING_CSV,
+     *  YNetwork.CALLBACKENCODING_YOCTO_API, YNetwork.CALLBACKENCODING_JSON_NUM,
+     *  YNetwork.CALLBACKENCODING_EMONCMS, YNetwork.CALLBACKENCODING_AZURE,
+     *  YNetwork.CALLBACKENCODING_INFLUXDB, YNetwork.CALLBACKENCODING_MQTT,
+     *  YNetwork.CALLBACKENCODING_YOCTO_API_JZON, YNetwork.CALLBACKENCODING_PRTG and
+     *  YNetwork.CALLBACKENCODING_INFLUXDB_V2 corresponding to the encoding standard to use for
+     * representing notification values
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1598,7 +1605,7 @@ public class YNetwork extends YFunction
      *
      * @param newval : a string corresponding to the credentials required to connect to the callback address
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1689,7 +1696,7 @@ public class YNetwork extends YFunction
      *  @param newval : an integer corresponding to the initial waiting time before first callback
      * notifications, in seconds
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1759,7 +1766,7 @@ public class YNetwork extends YFunction
      *
      * @param newval : a string corresponding to the HTTP callback schedule strategy, as a text string
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1827,7 +1834,7 @@ public class YNetwork extends YFunction
      *
      * @param newval : an integer corresponding to the minimum waiting time between two HTTP callbacks, in seconds
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1897,7 +1904,7 @@ public class YNetwork extends YFunction
      *  @param newval : an integer corresponding to the waiting time between two HTTP callbacks when there
      * is nothing new
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

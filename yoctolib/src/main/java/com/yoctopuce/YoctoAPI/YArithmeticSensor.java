@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YArithmeticSensor.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YArithmeticSensor.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindArithmeticSensor(), the high-level API for ArithmeticSensor functions
  *
@@ -164,7 +164,7 @@ public class YArithmeticSensor extends YSensor
      *
      * @param newval : a string corresponding to the measuring unit for the arithmetic sensor
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

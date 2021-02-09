@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 41171 2020-07-02 17:49:00Z mvuilleu $
+ * $Id: YDataLogger.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -293,7 +293,7 @@ public class YDataLogger extends YFunction
      *
      * @param newval : an integer corresponding to the current UTC time reference used for recorded data
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -327,8 +327,8 @@ public class YDataLogger extends YFunction
     /**
      * Returns the current activation state of the data logger.
      *
-     *  @return a value among Y_RECORDING_OFF, Y_RECORDING_ON and Y_RECORDING_PENDING corresponding to the
-     * current activation state of the data logger
+     *  @return a value among YDataLogger.RECORDING_OFF, YDataLogger.RECORDING_ON and
+     * YDataLogger.RECORDING_PENDING corresponding to the current activation state of the data logger
      *
      * @throws YAPI_Exception on error
      */
@@ -361,10 +361,11 @@ public class YDataLogger extends YFunction
     /**
      * Changes the activation state of the data logger to start/stop recording data.
      *
-     *  @param newval : a value among Y_RECORDING_OFF, Y_RECORDING_ON and Y_RECORDING_PENDING corresponding
-     * to the activation state of the data logger to start/stop recording data
+     *  @param newval : a value among YDataLogger.RECORDING_OFF, YDataLogger.RECORDING_ON and
+     *  YDataLogger.RECORDING_PENDING corresponding to the activation state of the data logger to
+     * start/stop recording data
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -398,8 +399,8 @@ public class YDataLogger extends YFunction
     /**
      * Returns the default activation state of the data logger on power up.
      *
-     *  @return either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the default activation state of the
-     * data logger on power up
+     *  @return either YDataLogger.AUTOSTART_OFF or YDataLogger.AUTOSTART_ON, according to the default
+     * activation state of the data logger on power up
      *
      * @throws YAPI_Exception on error
      */
@@ -439,10 +440,10 @@ public class YDataLogger extends YFunction
      * starting up, it will wait for ~8 seconds before automatically starting to record  with
      * an arbitrary timestamp
      *
-     *  @param newval : either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the default activation state
-     * of the data logger on power up
+     *  @param newval : either YDataLogger.AUTOSTART_OFF or YDataLogger.AUTOSTART_ON, according to the
+     * default activation state of the data logger on power up
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -476,8 +477,8 @@ public class YDataLogger extends YFunction
     /**
      * Returns true if the data logger is synchronised with the localization beacon.
      *
-     *  @return either Y_BEACONDRIVEN_OFF or Y_BEACONDRIVEN_ON, according to true if the data logger is
-     * synchronised with the localization beacon
+     *  @return either YDataLogger.BEACONDRIVEN_OFF or YDataLogger.BEACONDRIVEN_ON, according to true if
+     * the data logger is synchronised with the localization beacon
      *
      * @throws YAPI_Exception on error
      */
@@ -513,10 +514,10 @@ public class YDataLogger extends YFunction
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     *  @param newval : either Y_BEACONDRIVEN_OFF or Y_BEACONDRIVEN_ON, according to the type of
-     * synchronisation of the data logger
+     *  @param newval : either YDataLogger.BEACONDRIVEN_OFF or YDataLogger.BEACONDRIVEN_ON, according to
+     * the type of synchronisation of the data logger
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -607,7 +608,7 @@ public class YDataLogger extends YFunction
      * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the data logger, for instance
-     *         LIGHTMK3.dataLogger.
+     *         RX420MA1.dataLogger.
      *
      * @return a YDataLogger object allowing you to drive the data logger.
      */
@@ -646,7 +647,7 @@ public class YDataLogger extends YFunction
      *
      * @param yctx : a YAPI context
      * @param func : a string that uniquely characterizes the data logger, for instance
-     *         LIGHTMK3.dataLogger.
+     *         RX420MA1.dataLogger.
      *
      * @return a YDataLogger object allowing you to drive the data logger.
      */

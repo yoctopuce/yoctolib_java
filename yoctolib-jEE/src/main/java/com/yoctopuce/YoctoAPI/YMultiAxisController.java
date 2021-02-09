@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiAxisController.java 37827 2019-10-25 13:07:48Z mvuilleu $
+ *  $Id: YMultiAxisController.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -203,7 +203,7 @@ public class YMultiAxisController extends YFunction
      *
      * @param newval : an integer corresponding to the number of synchronized controllers
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -239,9 +239,10 @@ public class YMultiAxisController extends YFunction
     /**
      * Returns the stepper motor set overall state.
      *
-     *  @return a value among Y_GLOBALSTATE_ABSENT, Y_GLOBALSTATE_ALERT, Y_GLOBALSTATE_HI_Z,
-     *  Y_GLOBALSTATE_STOP, Y_GLOBALSTATE_RUN and Y_GLOBALSTATE_BATCH corresponding to the stepper motor
-     * set overall state
+     *  @return a value among YMultiAxisController.GLOBALSTATE_ABSENT,
+     *  YMultiAxisController.GLOBALSTATE_ALERT, YMultiAxisController.GLOBALSTATE_HI_Z,
+     *  YMultiAxisController.GLOBALSTATE_STOP, YMultiAxisController.GLOBALSTATE_RUN and
+     * YMultiAxisController.GLOBALSTATE_BATCH corresponding to the stepper motor set overall state
      *
      * @throws YAPI_Exception on error
      */
@@ -405,7 +406,7 @@ public class YMultiAxisController extends YFunction
         //may throw an exception
         retBin = _download(url);
         res = (retBin[0] & 0xff);
-        if (res == 49) {
+        if (res < 58) {
             //noinspection DoubleNegation
             if (!(res == 48)) { throw new YAPI_Exception( YAPI.DEVICE_BUSY,  "Motor command pipeline is full, try again later");}
         } else {

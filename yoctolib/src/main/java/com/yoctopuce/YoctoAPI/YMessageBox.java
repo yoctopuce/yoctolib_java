@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 42060 2020-10-14 10:02:12Z seb $
+ * $Id: YMessageBox.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -308,7 +308,7 @@ public class YMessageBox extends YFunction
      *
      * @param newval : an integer corresponding to the value of the outgoing SMS units counter
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -374,7 +374,7 @@ public class YMessageBox extends YFunction
      *
      * @param newval : an integer corresponding to the value of the incoming SMS units counter
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

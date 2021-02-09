@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YBluetoothLink.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YBluetoothLink.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindBluetoothLink(), the high-level API for BluetoothLink functions
  *
@@ -306,7 +306,7 @@ public class YBluetoothLink extends YFunction
      *
      * @param newval : a string corresponding to the PIN code used by the module for bluetooth pairing
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -376,7 +376,7 @@ public class YBluetoothLink extends YFunction
      *
      * @param newval : a string corresponding to the MAC-48 address defining which remote device to connect to
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -443,7 +443,8 @@ public class YBluetoothLink extends YFunction
     /**
      * Returns the state of the mute function.
      *
-     * @return either Y_MUTE_FALSE or Y_MUTE_TRUE, according to the state of the mute function
+     *  @return either YBluetoothLink.MUTE_FALSE or YBluetoothLink.MUTE_TRUE, according to the state of the
+     * mute function
      *
      * @throws YAPI_Exception on error
      */
@@ -477,9 +478,10 @@ public class YBluetoothLink extends YFunction
      * Changes the state of the mute function. Remember to call the matching module
      * saveToFlash() method to save the setting permanently.
      *
-     * @param newval : either Y_MUTE_FALSE or Y_MUTE_TRUE, according to the state of the mute function
+     *  @param newval : either YBluetoothLink.MUTE_FALSE or YBluetoothLink.MUTE_TRUE, according to the
+     * state of the mute function
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -549,7 +551,7 @@ public class YBluetoothLink extends YFunction
      *
      * @param newval : an integer corresponding to the audio pre-amplifier volume, in per cents
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -615,7 +617,7 @@ public class YBluetoothLink extends YFunction
      *
      * @param newval : an integer corresponding to the connected headset volume, in per cents
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -650,8 +652,9 @@ public class YBluetoothLink extends YFunction
     /**
      * Returns the bluetooth link state.
      *
-     *  @return a value among Y_LINKSTATE_DOWN, Y_LINKSTATE_FREE, Y_LINKSTATE_SEARCH, Y_LINKSTATE_EXISTS,
-     * Y_LINKSTATE_LINKED and Y_LINKSTATE_PLAY corresponding to the bluetooth link state
+     *  @return a value among YBluetoothLink.LINKSTATE_DOWN, YBluetoothLink.LINKSTATE_FREE,
+     *  YBluetoothLink.LINKSTATE_SEARCH, YBluetoothLink.LINKSTATE_EXISTS, YBluetoothLink.LINKSTATE_LINKED
+     * and YBluetoothLink.LINKSTATE_PLAY corresponding to the bluetooth link state
      *
      * @throws YAPI_Exception on error
      */

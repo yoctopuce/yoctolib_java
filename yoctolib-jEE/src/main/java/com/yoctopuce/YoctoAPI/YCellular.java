@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 42060 2020-10-14 10:02:12Z seb $
+ * $Id: YCellular.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -394,8 +394,9 @@ public class YCellular extends YFunction
     /**
      * Active cellular connection type.
      *
-     *  @return a value among Y_CELLTYPE_GPRS, Y_CELLTYPE_EGPRS, Y_CELLTYPE_WCDMA, Y_CELLTYPE_HSDPA,
-     * Y_CELLTYPE_NONE, Y_CELLTYPE_CDMA, Y_CELLTYPE_LTE_M, Y_CELLTYPE_NB_IOT and Y_CELLTYPE_EC_GSM_IOT
+     *  @return a value among YCellular.CELLTYPE_GPRS, YCellular.CELLTYPE_EGPRS, YCellular.CELLTYPE_WCDMA,
+     *  YCellular.CELLTYPE_HSDPA, YCellular.CELLTYPE_NONE, YCellular.CELLTYPE_CDMA,
+     * YCellular.CELLTYPE_LTE_M, YCellular.CELLTYPE_NB_IOT and YCellular.CELLTYPE_EC_GSM_IOT
      *
      * @throws YAPI_Exception on error
      */
@@ -563,7 +564,7 @@ public class YCellular extends YFunction
      *
      * @param newval : a string corresponding to the PIN code used by the module to access the SIM card
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -653,7 +654,7 @@ public class YCellular extends YFunction
      *
      * @param newval : a string corresponding to the type of protocol used over the serial line
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -735,7 +736,7 @@ public class YCellular extends YFunction
      *
      * @param newval : a string corresponding to the name of the cell operator to be used
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -769,8 +770,8 @@ public class YCellular extends YFunction
     /**
      * Returns true if the airplane mode is active (radio turned off).
      *
-     *  @return either Y_AIRPLANEMODE_OFF or Y_AIRPLANEMODE_ON, according to true if the airplane mode is
-     * active (radio turned off)
+     *  @return either YCellular.AIRPLANEMODE_OFF or YCellular.AIRPLANEMODE_ON, according to true if the
+     * airplane mode is active (radio turned off)
      *
      * @throws YAPI_Exception on error
      */
@@ -802,10 +803,10 @@ public class YCellular extends YFunction
     /**
      * Changes the activation state of airplane mode (radio turned off).
      *
-     *  @param newval : either Y_AIRPLANEMODE_OFF or Y_AIRPLANEMODE_ON, according to the activation state
-     * of airplane mode (radio turned off)
+     *  @param newval : either YCellular.AIRPLANEMODE_OFF or YCellular.AIRPLANEMODE_ON, according to the
+     * activation state of airplane mode (radio turned off)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -842,8 +843,9 @@ public class YCellular extends YFunction
      * Returns the condition for enabling IP data services (GPRS).
      * When data services are disabled, SMS are the only mean of communication.
      *
-     *  @return a value among Y_ENABLEDATA_HOMENETWORK, Y_ENABLEDATA_ROAMING, Y_ENABLEDATA_NEVER and
-     * Y_ENABLEDATA_NEUTRALITY corresponding to the condition for enabling IP data services (GPRS)
+     *  @return a value among YCellular.ENABLEDATA_HOMENETWORK, YCellular.ENABLEDATA_ROAMING,
+     *  YCellular.ENABLEDATA_NEVER and YCellular.ENABLEDATA_NEUTRALITY corresponding to the condition for
+     * enabling IP data services (GPRS)
      *
      * @throws YAPI_Exception on error
      */
@@ -890,10 +892,11 @@ public class YCellular extends YFunction
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : a value among Y_ENABLEDATA_HOMENETWORK, Y_ENABLEDATA_ROAMING, Y_ENABLEDATA_NEVER
-     * and Y_ENABLEDATA_NEUTRALITY corresponding to the condition for enabling IP data services (GPRS)
+     *  @param newval : a value among YCellular.ENABLEDATA_HOMENETWORK, YCellular.ENABLEDATA_ROAMING,
+     *  YCellular.ENABLEDATA_NEVER and YCellular.ENABLEDATA_NEUTRALITY corresponding to the condition for
+     * enabling IP data services (GPRS)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -967,7 +970,7 @@ public class YCellular extends YFunction
      *
      * @param newval : a string
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1087,7 +1090,7 @@ public class YCellular extends YFunction
      *
      * @param newval : an integer corresponding to the automated connectivity check interval, in seconds
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1153,7 +1156,7 @@ public class YCellular extends YFunction
      *
      * @param newval : an integer corresponding to the value of the outgoing data counter
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1219,7 +1222,7 @@ public class YCellular extends YFunction
      *
      * @param newval : an integer corresponding to the value of the incoming data counter
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

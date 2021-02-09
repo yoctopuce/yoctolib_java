@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGenericSensor.java 41109 2020-06-29 12:40:42Z seb $
+ *  $Id: YGenericSensor.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -46,7 +46,7 @@ package com.yoctopuce.YoctoAPI;
 //--- (YGenericSensor class start)
 /**
  *  YGenericSensor Class: GenericSensor control interface, available for instance in the
- * Yocto-0-10V-Rx, the Yocto-4-20mA-Rx, the Yocto-RS485-V2 or the Yocto-milliVolt-Rx
+ * Yocto-0-10V-Rx, the Yocto-4-20mA-Rx, the Yocto-Serial or the Yocto-milliVolt-Rx
  *
  * The YGenericSensor class allows you to read and configure Yoctopuce signal
  * transducers. It inherits from YSensor class the core functions to read measurements,
@@ -210,7 +210,7 @@ public class YGenericSensor extends YSensor
      *
      * @param newval : a string corresponding to the measuring unit for the measured value
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -366,7 +366,7 @@ public class YGenericSensor extends YSensor
      *
      * @param newval : a string corresponding to the input signal range used by the sensor
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -448,7 +448,7 @@ public class YGenericSensor extends YSensor
      * @param newval : a string corresponding to the output value range, corresponding to the physical value measured
      *         by the sensor
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -489,7 +489,7 @@ public class YGenericSensor extends YSensor
      *
      * @param newval : a floating point number corresponding to the electric signal bias for zero shift adjustment
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -572,8 +572,9 @@ public class YGenericSensor extends YSensor
      * The LOW_NOISE_FILTERED method combines a reduced frequency with the median filter
      * to get measures as stable as possible when working on a noisy signal.
      *
-     *  @return a value among Y_SIGNALSAMPLING_HIGH_RATE, Y_SIGNALSAMPLING_HIGH_RATE_FILTERED,
-     *  Y_SIGNALSAMPLING_LOW_NOISE, Y_SIGNALSAMPLING_LOW_NOISE_FILTERED and Y_SIGNALSAMPLING_HIGHEST_RATE
+     *  @return a value among YGenericSensor.SIGNALSAMPLING_HIGH_RATE,
+     *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE,
+     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED and YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE
      * corresponding to the electric signal sampling method to use
      *
      * @throws YAPI_Exception on error
@@ -622,11 +623,12 @@ public class YGenericSensor extends YSensor
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : a value among Y_SIGNALSAMPLING_HIGH_RATE, Y_SIGNALSAMPLING_HIGH_RATE_FILTERED,
-     *  Y_SIGNALSAMPLING_LOW_NOISE, Y_SIGNALSAMPLING_LOW_NOISE_FILTERED and Y_SIGNALSAMPLING_HIGHEST_RATE
+     *  @param newval : a value among YGenericSensor.SIGNALSAMPLING_HIGH_RATE,
+     *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE,
+     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED and YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE
      * corresponding to the electric signal sampling method to use
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -660,7 +662,8 @@ public class YGenericSensor extends YSensor
     /**
      * Returns the activation state of this input.
      *
-     * @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation state of this input
+     *  @return either YGenericSensor.ENABLED_FALSE or YGenericSensor.ENABLED_TRUE, according to the
+     * activation state of this input
      *
      * @throws YAPI_Exception on error
      */
@@ -700,9 +703,10 @@ public class YGenericSensor extends YSensor
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     * @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation state of this input
+     *  @param newval : either YGenericSensor.ENABLED_FALSE or YGenericSensor.ENABLED_TRUE, according to
+     * the activation state of this input
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

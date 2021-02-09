@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YDaisyChain.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YDaisyChain.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindDaisyChain(), the high-level API for DaisyChain functions
  *
@@ -170,9 +170,9 @@ public class YDaisyChain extends YFunction
     /**
      * Returns the state of the daisy-link between modules.
      *
-     *  @return a value among Y_DAISYSTATE_READY, Y_DAISYSTATE_IS_CHILD, Y_DAISYSTATE_FIRMWARE_MISMATCH,
-     *  Y_DAISYSTATE_CHILD_MISSING and Y_DAISYSTATE_CHILD_LOST corresponding to the state of the daisy-link
-     * between modules
+     *  @return a value among YDaisyChain.DAISYSTATE_READY, YDaisyChain.DAISYSTATE_IS_CHILD,
+     *  YDaisyChain.DAISYSTATE_FIRMWARE_MISMATCH, YDaisyChain.DAISYSTATE_CHILD_MISSING and
+     * YDaisyChain.DAISYSTATE_CHILD_LOST corresponding to the state of the daisy-link between modules
      *
      * @throws YAPI_Exception on error
      */
@@ -279,7 +279,7 @@ public class YDaisyChain extends YFunction
      *
      * @param newval : an integer corresponding to the number of child nodes expected in normal conditions
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

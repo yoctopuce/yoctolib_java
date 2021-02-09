@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpSchedule.java 39434 2020-02-25 08:53:55Z seb $
+ *  $Id: YWakeUpSchedule.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -46,7 +46,7 @@ package com.yoctopuce.YoctoAPI;
 //--- (YWakeUpSchedule class start)
 /**
  *  YWakeUpSchedule Class: wake up schedule control interface, available for instance in the
- * YoctoHub-GSM-3G-EU, the YoctoHub-GSM-3G-NA, the YoctoHub-Wireless-g or the YoctoHub-Wireless-n
+ * YoctoHub-GSM-3G-EU, the YoctoHub-GSM-3G-NA, the YoctoHub-GSM-4G or the YoctoHub-Wireless-n
  *
  * The YWakeUpSchedule class implements a wake up condition. The wake up time is
  * specified as a set of months and/or days and/or hours and/or minutes when the
@@ -233,7 +233,7 @@ public class YWakeUpSchedule extends YFunction
      *
      * @param newval : an integer corresponding to the minutes in the 00-29 interval when a wake up must take place
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -303,7 +303,7 @@ public class YWakeUpSchedule extends YFunction
      *
      * @param newval : an integer corresponding to the minutes in the 30-59 interval when a wake up must take place
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -373,7 +373,7 @@ public class YWakeUpSchedule extends YFunction
      *
      * @param newval : an integer corresponding to the hours when a wake up must take place
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -443,7 +443,7 @@ public class YWakeUpSchedule extends YFunction
      *
      * @param newval : an integer corresponding to the days of the week when a wake up must take place
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -513,7 +513,7 @@ public class YWakeUpSchedule extends YFunction
      *
      * @param newval : an integer corresponding to the days of the month when a wake up must take place
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -583,7 +583,7 @@ public class YWakeUpSchedule extends YFunction
      *
      * @param newval : an integer corresponding to the months when a wake up must take place
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

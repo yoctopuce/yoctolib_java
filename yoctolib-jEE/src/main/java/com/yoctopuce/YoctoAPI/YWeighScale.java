@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWeighScale.java 41112 2020-06-29 13:21:58Z seb $
+ *  $Id: YWeighScale.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindWeighScale(), the high-level API for WeighScale functions
  *
@@ -216,7 +216,7 @@ public class YWeighScale extends YSensor
      *
      * @param newval : a string corresponding to the measuring unit for the weight
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -250,8 +250,8 @@ public class YWeighScale extends YSensor
     /**
      * Returns the current load cell bridge excitation method.
      *
-     *  @return a value among Y_EXCITATION_OFF, Y_EXCITATION_DC and Y_EXCITATION_AC corresponding to the
-     * current load cell bridge excitation method
+     *  @return a value among YWeighScale.EXCITATION_OFF, YWeighScale.EXCITATION_DC and
+     * YWeighScale.EXCITATION_AC corresponding to the current load cell bridge excitation method
      *
      * @throws YAPI_Exception on error
      */
@@ -287,10 +287,10 @@ public class YWeighScale extends YSensor
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     *  @param newval : a value among Y_EXCITATION_OFF, Y_EXCITATION_DC and Y_EXCITATION_AC corresponding
-     * to the current load cell bridge excitation method
+     *  @param newval : a value among YWeighScale.EXCITATION_OFF, YWeighScale.EXCITATION_DC and
+     * YWeighScale.EXCITATION_AC corresponding to the current load cell bridge excitation method
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -335,7 +335,7 @@ public class YWeighScale extends YSensor
      *
      * @param newval : a floating point number corresponding to the averaged temperature update rate, in per mille
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -419,7 +419,7 @@ public class YWeighScale extends YSensor
      *
      * @param newval : a floating point number corresponding to the temperature change update rate, in per mille
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -600,7 +600,7 @@ public class YWeighScale extends YSensor
      *
      * @param newval : a floating point number corresponding to the zero tracking threshold value
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

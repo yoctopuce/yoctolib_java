@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAudioOut.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YAudioOut.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindAudioOut(), the high-level API for AudioOut functions
  *
@@ -216,7 +216,7 @@ public class YAudioOut extends YFunction
      *
      * @param newval : an integer corresponding to audio output volume, in per cents
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -249,7 +249,7 @@ public class YAudioOut extends YFunction
     /**
      * Returns the state of the mute function.
      *
-     * @return either Y_MUTE_FALSE or Y_MUTE_TRUE, according to the state of the mute function
+     * @return either YAudioOut.MUTE_FALSE or YAudioOut.MUTE_TRUE, according to the state of the mute function
      *
      * @throws YAPI_Exception on error
      */
@@ -282,9 +282,9 @@ public class YAudioOut extends YFunction
      * Changes the state of the mute function. Remember to call the matching module
      * saveToFlash() method to save the setting permanently.
      *
-     * @param newval : either Y_MUTE_FALSE or Y_MUTE_TRUE, according to the state of the mute function
+     * @param newval : either YAudioOut.MUTE_FALSE or YAudioOut.MUTE_TRUE, according to the state of the mute function
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

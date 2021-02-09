@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLed.java 41109 2020-06-29 12:40:42Z seb $
+ *  $Id: YColorLed.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -275,7 +275,7 @@ public class YColorLed extends YFunction
      *
      * @param newval : an integer corresponding to the current color of the LED, using an RGB color
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -341,7 +341,7 @@ public class YColorLed extends YFunction
      *
      * @param newval : an integer corresponding to the current color of the LED, using a color HSL
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -499,7 +499,7 @@ public class YColorLed extends YFunction
      *  @param newval : an integer corresponding to the color that the LED displays by default when the
      * module is turned on
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

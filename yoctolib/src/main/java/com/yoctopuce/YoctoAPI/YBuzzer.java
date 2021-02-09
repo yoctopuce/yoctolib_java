@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YBuzzer.java 41109 2020-06-29 12:40:42Z seb $
+ *  $Id: YBuzzer.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -188,7 +188,7 @@ public class YBuzzer extends YFunction
      *
      * @param newval : a floating point number corresponding to the frequency of the signal sent to the buzzer
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -289,7 +289,7 @@ public class YBuzzer extends YFunction
      *
      * @param newval : an integer corresponding to the volume of the signal sent to the buzzer/speaker
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

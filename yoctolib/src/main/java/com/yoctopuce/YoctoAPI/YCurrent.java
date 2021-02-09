@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCurrent.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YCurrent.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindCurrent(), the high-level API for Current functions
  *
@@ -151,7 +151,7 @@ public class YCurrent extends YSensor
     /**
      * Returns the activation state of this input.
      *
-     * @return either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation state of this input
+     * @return either YCurrent.ENABLED_FALSE or YCurrent.ENABLED_TRUE, according to the activation state of this input
      *
      * @throws YAPI_Exception on error
      */
@@ -193,10 +193,10 @@ public class YCurrent extends YSensor
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : either Y_ENABLED_FALSE or Y_ENABLED_TRUE, according to the activation state of this
-     * voltage input
+     *  @param newval : either YCurrent.ENABLED_FALSE or YCurrent.ENABLED_TRUE, according to the activation
+     * state of this voltage input
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

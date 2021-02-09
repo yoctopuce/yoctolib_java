@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAnButton.java 42060 2020-10-14 10:02:12Z seb $
+ *  $Id: YAnButton.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindAnButton(), the high-level API for AnButton functions
  *
@@ -112,8 +112,9 @@ public class YAnButton extends YFunction
     /**
      * invalid inputType value
      */
-    public static final int INPUTTYPE_ANALOG = 0;
+    public static final int INPUTTYPE_ANALOG_FAST = 0;
     public static final int INPUTTYPE_DIGITAL4 = 1;
+    public static final int INPUTTYPE_ANALOG_SMOOTH = 2;
     public static final int INPUTTYPE_INVALID = -1;
     protected int _calibratedValue = CALIBRATEDVALUE_INVALID;
     protected int _rawValue = RAWVALUE_INVALID;
@@ -312,7 +313,7 @@ public class YAnButton extends YFunction
     /**
      * Tells if a calibration process is currently ongoing.
      *
-     * @return either Y_ANALOGCALIBRATION_OFF or Y_ANALOGCALIBRATION_ON
+     * @return either YAnButton.ANALOGCALIBRATION_OFF or YAnButton.ANALOGCALIBRATION_ON
      *
      * @throws YAPI_Exception on error
      */
@@ -345,9 +346,9 @@ public class YAnButton extends YFunction
      * Starts or stops the calibration process. Remember to call the saveToFlash()
      * method of the module at the end of the calibration if the modification must be kept.
      *
-     * @param newval : either Y_ANALOGCALIBRATION_OFF or Y_ANALOGCALIBRATION_ON
+     * @param newval : either YAnButton.ANALOGCALIBRATION_OFF or YAnButton.ANALOGCALIBRATION_ON
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -423,7 +424,7 @@ public class YAnButton extends YFunction
      * and 4095, included), without actually
      *         starting the automated calibration
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -499,7 +500,7 @@ public class YAnButton extends YFunction
      * and 4095, included), without actually
      *         starting the automated calibration
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -579,7 +580,7 @@ public class YAnButton extends YFunction
      *  @param newval : an integer corresponding to the sensibility for the input (between 1 and 1000) for
      * triggering user callbacks
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -613,8 +614,8 @@ public class YAnButton extends YFunction
     /**
      * Returns true if the input (considered as binary) is active (closed contact), and false otherwise.
      *
-     *  @return either Y_ISPRESSED_FALSE or Y_ISPRESSED_TRUE, according to true if the input (considered as
-     * binary) is active (closed contact), and false otherwise
+     *  @return either YAnButton.ISPRESSED_FALSE or YAnButton.ISPRESSED_TRUE, according to true if the
+     * input (considered as binary) is active (closed contact), and false otherwise
      *
      * @throws YAPI_Exception on error
      */
@@ -785,8 +786,9 @@ public class YAnButton extends YFunction
     /**
      * Returns the decoding method applied to the input (analog or multiplexed binary switches).
      *
-     *  @return either YAnButton.INPUTTYPE_ANALOG or YAnButton.INPUTTYPE_DIGITAL4, according to the
-     * decoding method applied to the input (analog or multiplexed binary switches)
+     *  @return a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4 and
+     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH corresponding to the decoding method applied to the input (analog
+     * or multiplexed binary switches)
      *
      * @throws YAPI_Exception on error
      */
@@ -807,8 +809,9 @@ public class YAnButton extends YFunction
     /**
      * Returns the decoding method applied to the input (analog or multiplexed binary switches).
      *
-     *  @return either Y_INPUTTYPE_ANALOG or Y_INPUTTYPE_DIGITAL4, according to the decoding method applied
-     * to the input (analog or multiplexed binary switches)
+     *  @return a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4 and
+     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH corresponding to the decoding method applied to the input (analog
+     * or multiplexed binary switches)
      *
      * @throws YAPI_Exception on error
      */
@@ -821,8 +824,9 @@ public class YAnButton extends YFunction
      * Changes the decoding method applied to the input (analog or multiplexed binary switches).
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     *  @param newval : either YAnButton.INPUTTYPE_ANALOG or YAnButton.INPUTTYPE_DIGITAL4, according to the
-     * decoding method applied to the input (analog or multiplexed binary switches)
+     *  @param newval : a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4 and
+     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH corresponding to the decoding method applied to the input (analog
+     * or multiplexed binary switches)
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -842,10 +846,11 @@ public class YAnButton extends YFunction
      * Changes the decoding method applied to the input (analog or multiplexed binary switches).
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     *  @param newval : either Y_INPUTTYPE_ANALOG or Y_INPUTTYPE_DIGITAL4, according to the decoding method
-     * applied to the input (analog or multiplexed binary switches)
+     *  @param newval : a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4 and
+     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH corresponding to the decoding method applied to the input (analog
+     * or multiplexed binary switches)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

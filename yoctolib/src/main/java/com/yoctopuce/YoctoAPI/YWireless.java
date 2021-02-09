@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ * $Id: YWireless.java 43619 2021-01-29 09:14:45Z mvuilleu $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -305,8 +305,9 @@ public class YWireless extends YFunction
     /**
      * Returns the security algorithm used by the selected wireless network.
      *
-     *  @return a value among Y_SECURITY_UNKNOWN, Y_SECURITY_OPEN, Y_SECURITY_WEP, Y_SECURITY_WPA and
-     * Y_SECURITY_WPA2 corresponding to the security algorithm used by the selected wireless network
+     *  @return a value among YWireless.SECURITY_UNKNOWN, YWireless.SECURITY_OPEN, YWireless.SECURITY_WEP,
+     *  YWireless.SECURITY_WPA and YWireless.SECURITY_WPA2 corresponding to the security algorithm used by
+     * the selected wireless network
      *
      * @throws YAPI_Exception on error
      */
@@ -410,23 +411,24 @@ public class YWireless extends YFunction
     }
 
     /**
-     *  Returns the current state of the wireless interface. The state Y_WLANSTATE_DOWN means that the
-     * network interface is
-     *  not connected to a network. The state Y_WLANSTATE_SCANNING means that the network interface is
-     * scanning available
+     *  Returns the current state of the wireless interface. The state YWireless.WLANSTATE_DOWN means that
+     * the network interface is
+     *  not connected to a network. The state YWireless.WLANSTATE_SCANNING means that the network interface
+     * is scanning available
      *  frequencies. During this stage, the device is not reachable, and the network settings are not yet
      * applied. The state
-     *  Y_WLANSTATE_CONNECTED means that the network settings have been successfully applied ant that the
-     * device is reachable
+     *  YWireless.WLANSTATE_CONNECTED means that the network settings have been successfully applied ant
+     * that the device is reachable
      *  from the wireless network. If the device is configured to use ad-hoc or Soft AP mode, it means that
      * the wireless network
-     *  is up and that other devices can join the network. The state Y_WLANSTATE_REJECTED means that the
-     * network interface has
+     *  is up and that other devices can join the network. The state YWireless.WLANSTATE_REJECTED means
+     * that the network interface has
      *  not been able to join the requested network. The description of the error can be obtain with the
      * get_message() method.
      *
-     *  @return a value among Y_WLANSTATE_DOWN, Y_WLANSTATE_SCANNING, Y_WLANSTATE_CONNECTED and
-     * Y_WLANSTATE_REJECTED corresponding to the current state of the wireless interface
+     *  @return a value among YWireless.WLANSTATE_DOWN, YWireless.WLANSTATE_SCANNING,
+     *  YWireless.WLANSTATE_CONNECTED and YWireless.WLANSTATE_REJECTED corresponding to the current state
+     * of the wireless interface
      *
      * @throws YAPI_Exception on error
      */

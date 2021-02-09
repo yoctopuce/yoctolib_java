@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRelay.java 41109 2020-06-29 12:40:42Z seb $
+ *  $Id: YRelay.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindRelay(), the high-level API for Relay functions
  *
@@ -234,8 +234,8 @@ public class YRelay extends YFunction
     /**
      * Returns the state of the relays (A for the idle position, B for the active position).
      *
-     *  @return either Y_STATE_A or Y_STATE_B, according to the state of the relays (A for the idle
-     * position, B for the active position)
+     *  @return either YRelay.STATE_A or YRelay.STATE_B, according to the state of the relays (A for the
+     * idle position, B for the active position)
      *
      * @throws YAPI_Exception on error
      */
@@ -267,10 +267,10 @@ public class YRelay extends YFunction
     /**
      * Changes the state of the relays (A for the idle position, B for the active position).
      *
-     *  @param newval : either Y_STATE_A or Y_STATE_B, according to the state of the relays (A for the idle
-     * position, B for the active position)
+     *  @param newval : either YRelay.STATE_A or YRelay.STATE_B, according to the state of the relays (A
+     * for the idle position, B for the active position)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -307,8 +307,8 @@ public class YRelay extends YFunction
      * Returns the state of the relays at device startup (A for the idle position,
      * B for the active position, UNCHANGED to leave the relay state as is).
      *
-     *  @return a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
-     * corresponding to the state of the relays at device startup (A for the idle position,
+     *  @return a value among YRelay.STATEATPOWERON_UNCHANGED, YRelay.STATEATPOWERON_A and
+     * YRelay.STATEATPOWERON_B corresponding to the state of the relays at device startup (A for the idle position,
      *         B for the active position, UNCHANGED to leave the relay state as is)
      *
      * @throws YAPI_Exception on error
@@ -348,11 +348,11 @@ public class YRelay extends YFunction
      * Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
      *
-     *  @param newval : a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
-     * corresponding to the state of the relays at device startup (A for the idle position,
+     *  @param newval : a value among YRelay.STATEATPOWERON_UNCHANGED, YRelay.STATEATPOWERON_A and
+     * YRelay.STATEATPOWERON_B corresponding to the state of the relays at device startup (A for the idle position,
      *         B for the active position, UNCHANGED to leave the relay state as is)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -430,7 +430,7 @@ public class YRelay extends YFunction
      * @param newval : an integer corresponding to the maximum time (ms) allowed for the relay to stay in state A
      *         before automatically switching back in to B state
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -508,7 +508,7 @@ public class YRelay extends YFunction
      * state B before
      *         automatically switching back in to A state
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -542,8 +542,8 @@ public class YRelay extends YFunction
     /**
      * Returns the output state of the relays, when used as a simple switch (single throw).
      *
-     *  @return either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the relays, when used
-     * as a simple switch (single throw)
+     *  @return either YRelay.OUTPUT_OFF or YRelay.OUTPUT_ON, according to the output state of the relays,
+     * when used as a simple switch (single throw)
      *
      * @throws YAPI_Exception on error
      */
@@ -575,10 +575,10 @@ public class YRelay extends YFunction
     /**
      * Changes the output state of the relays, when used as a simple switch (single throw).
      *
-     *  @param newval : either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the relays,
-     * when used as a simple switch (single throw)
+     *  @param newval : either YRelay.OUTPUT_OFF or YRelay.OUTPUT_ON, according to the output state of the
+     * relays, when used as a simple switch (single throw)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

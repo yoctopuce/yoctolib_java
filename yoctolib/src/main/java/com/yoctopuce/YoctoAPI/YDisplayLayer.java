@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ * $Id: YDisplayLayer.java 43619 2021-01-29 09:14:45Z mvuilleu $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *
@@ -384,13 +384,13 @@ public class YDisplayLayer
      * @param x : the distance from left of layer to the text anchor point, in pixels
      * @param y : the distance from top of layer to the text anchor point, in pixels
      * @param anchor : the text anchor point, chosen among the YDisplayLayer.ALIGN enumeration:
-     *          YDisplayLayer.ALIGN.TOP_LEFT,    YDisplayLayer.ALIGN.CENTER_LEFT,
+     *         YDisplayLayer.ALIGN.TOP_LEFT,         YDisplayLayer.ALIGN.CENTER_LEFT,
      *         YDisplayLayer.ALIGN.BASELINE_LEFT,    YDisplayLayer.ALIGN.BOTTOM_LEFT,
-     *          YDisplayLayer.ALIGN.TOP_CENTER,  YDisplayLayer.ALIGN.CENTER,
+     *         YDisplayLayer.ALIGN.TOP_CENTER,       YDisplayLayer.ALIGN.CENTER,
      *         YDisplayLayer.ALIGN.BASELINE_CENTER,  YDisplayLayer.ALIGN.BOTTOM_CENTER,
-     *          YDisplayLayer.ALIGN.TOP_DECIMAL, YDisplayLayer.ALIGN.CENTER_DECIMAL,
+     *         YDisplayLayer.ALIGN.TOP_DECIMAL,      YDisplayLayer.ALIGN.CENTER_DECIMAL,
      *         YDisplayLayer.ALIGN.BASELINE_DECIMAL, YDisplayLayer.ALIGN.BOTTOM_DECIMAL,
-     *          YDisplayLayer.ALIGN.TOP_RIGHT,   YDisplayLayer.ALIGN.CENTER_RIGHT,
+     *         YDisplayLayer.ALIGN.TOP_RIGHT,        YDisplayLayer.ALIGN.CENTER_RIGHT,
      *         YDisplayLayer.ALIGN.BASELINE_RIGHT,   YDisplayLayer.ALIGN.BOTTOM_RIGHT.
      * @param text : the text string to draw
      *

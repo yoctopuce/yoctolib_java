@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YDigitalIO.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YDigitalIO.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -283,7 +283,7 @@ public class YDigitalIO extends YFunction
      * @param newval : an integer corresponding to the state of all digital IO port's channels at once: the parameter
      *         is an integer where each bit represents a channel, with bit 0 matching channel #0
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -355,7 +355,7 @@ public class YDigitalIO extends YFunction
      *  @param newval : an integer corresponding to the I/O direction of all channels of the port (bitmap):
      * 0 makes a bit an input, 1 makes it an output
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -429,7 +429,7 @@ public class YDigitalIO extends YFunction
      *
      * @param newval : an integer corresponding to the electrical interface for each bit of the port
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -505,7 +505,7 @@ public class YDigitalIO extends YFunction
      * set to 0, the matching I/O works the regular,
      *         intuitive way; for each bit set to 1, the I/O works in reverse mode
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -609,8 +609,8 @@ public class YDigitalIO extends YFunction
     /**
      * Returns the voltage source used to drive output bits.
      *
-     *  @return a value among Y_OUTPUTVOLTAGE_USB_5V, Y_OUTPUTVOLTAGE_USB_3V and Y_OUTPUTVOLTAGE_EXT_V
-     * corresponding to the voltage source used to drive output bits
+     *  @return a value among YDigitalIO.OUTPUTVOLTAGE_USB_5V, YDigitalIO.OUTPUTVOLTAGE_USB_3V and
+     * YDigitalIO.OUTPUTVOLTAGE_EXT_V corresponding to the voltage source used to drive output bits
      *
      * @throws YAPI_Exception on error
      */
@@ -644,10 +644,10 @@ public class YDigitalIO extends YFunction
      * Changes the voltage source used to drive output bits.
      * Remember to call the saveToFlash() method  to make sure the setting is kept after a reboot.
      *
-     *  @param newval : a value among Y_OUTPUTVOLTAGE_USB_5V, Y_OUTPUTVOLTAGE_USB_3V and
-     * Y_OUTPUTVOLTAGE_EXT_V corresponding to the voltage source used to drive output bits
+     *  @param newval : a value among YDigitalIO.OUTPUTVOLTAGE_USB_5V, YDigitalIO.OUTPUTVOLTAGE_USB_3V and
+     * YDigitalIO.OUTPUTVOLTAGE_EXT_V corresponding to the voltage source used to drive output bits
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

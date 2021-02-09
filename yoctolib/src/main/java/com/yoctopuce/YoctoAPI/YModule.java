@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 41055 2020-06-25 08:15:29Z seb $
+ * $Id: YModule.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  * YModule Class: Module control interface
  *
@@ -647,8 +647,8 @@ public class YModule extends YFunction
     /**
      * Returns the current state of persistent module settings.
      *
-     *  @return a value among Y_PERSISTENTSETTINGS_LOADED, Y_PERSISTENTSETTINGS_SAVED and
-     * Y_PERSISTENTSETTINGS_MODIFIED corresponding to the current state of persistent module settings
+     *  @return a value among YModule.PERSISTENTSETTINGS_LOADED, YModule.PERSISTENTSETTINGS_SAVED and
+     * YModule.PERSISTENTSETTINGS_MODIFIED corresponding to the current state of persistent module settings
      *
      * @throws YAPI_Exception on error
      */
@@ -731,7 +731,7 @@ public class YModule extends YFunction
      *
      * @param newval : an integer corresponding to the luminosity of the module informative leds
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -769,7 +769,7 @@ public class YModule extends YFunction
     /**
      * Returns the state of the localization beacon.
      *
-     * @return either Y_BEACON_OFF or Y_BEACON_ON, according to the state of the localization beacon
+     * @return either YModule.BEACON_OFF or YModule.BEACON_ON, according to the state of the localization beacon
      *
      * @throws YAPI_Exception on error
      */
@@ -800,9 +800,9 @@ public class YModule extends YFunction
     /**
      * Turns on or off the module localization beacon.
      *
-     * @param newval : either Y_BEACON_OFF or Y_BEACON_ON
+     * @param newval : either YModule.BEACON_OFF or YModule.BEACON_ON
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -988,7 +988,7 @@ public class YModule extends YFunction
      *
      * @param newval : an integer
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

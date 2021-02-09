@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLedCluster.java 41109 2020-06-29 12:40:42Z seb $
+ *  $Id: YColorLedCluster.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -234,7 +234,7 @@ public class YColorLedCluster extends YFunction
      *
      * @param newval : an integer corresponding to the number of LEDs currently handled by the device
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -268,7 +268,8 @@ public class YColorLedCluster extends YFunction
     /**
      * Returns the RGB LED type currently handled by the device.
      *
-     * @return either Y_LEDTYPE_RGB or Y_LEDTYPE_RGBW, according to the RGB LED type currently handled by the device
+     *  @return either YColorLedCluster.LEDTYPE_RGB or YColorLedCluster.LEDTYPE_RGBW, according to the RGB
+     * LED type currently handled by the device
      *
      * @throws YAPI_Exception on error
      */
@@ -304,10 +305,10 @@ public class YColorLedCluster extends YFunction
      * Remember to call the matching module
      * saveToFlash() method to save the setting permanently.
      *
-     *  @param newval : either Y_LEDTYPE_RGB or Y_LEDTYPE_RGBW, according to the RGB LED type currently
-     * handled by the device
+     *  @param newval : either YColorLedCluster.LEDTYPE_RGB or YColorLedCluster.LEDTYPE_RGBW, according to
+     * the RGB LED type currently handled by the device
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

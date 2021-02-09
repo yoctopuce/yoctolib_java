@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGps.java 39658 2020-03-12 15:36:29Z seb $
+ *  $Id: YGps.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindGps(), the high-level API for Gps functions
  *
@@ -283,7 +283,7 @@ public class YGps extends YFunction
     /**
      * Returns TRUE if the receiver has found enough satellites to work.
      *
-     *  @return either Y_ISFIXED_FALSE or Y_ISFIXED_TRUE, according to TRUE if the receiver has found
+     *  @return either YGps.ISFIXED_FALSE or YGps.ISFIXED_TRUE, according to TRUE if the receiver has found
      * enough satellites to work
      *
      * @throws YAPI_Exception on error
@@ -425,7 +425,7 @@ public class YGps extends YFunction
     /**
      * Returns the representation system used for positioning data.
      *
-     *  @return a value among Y_COORDSYSTEM_GPS_DMS, Y_COORDSYSTEM_GPS_DM and Y_COORDSYSTEM_GPS_D
+     *  @return a value among YGps.COORDSYSTEM_GPS_DMS, YGps.COORDSYSTEM_GPS_DM and YGps.COORDSYSTEM_GPS_D
      * corresponding to the representation system used for positioning data
      *
      * @throws YAPI_Exception on error
@@ -462,10 +462,10 @@ public class YGps extends YFunction
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     *  @param newval : a value among Y_COORDSYSTEM_GPS_DMS, Y_COORDSYSTEM_GPS_DM and Y_COORDSYSTEM_GPS_D
-     * corresponding to the representation system used for positioning data
+     *  @param newval : a value among YGps.COORDSYSTEM_GPS_DMS, YGps.COORDSYSTEM_GPS_DM and
+     * YGps.COORDSYSTEM_GPS_D corresponding to the representation system used for positioning data
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -503,9 +503,9 @@ public class YGps extends YFunction
      * Returns the the satellites constellation used to compute
      * positioning data.
      *
-     *  @return a value among Y_CONSTELLATION_GNSS, Y_CONSTELLATION_GPS, Y_CONSTELLATION_GLONASS,
-     *  Y_CONSTELLATION_GALILEO, Y_CONSTELLATION_GPS_GLONASS, Y_CONSTELLATION_GPS_GALILEO and
-     * Y_CONSTELLATION_GLONASS_GALILEO corresponding to the the satellites constellation used to compute
+     *  @return a value among YGps.CONSTELLATION_GNSS, YGps.CONSTELLATION_GPS, YGps.CONSTELLATION_GLONASS,
+     *  YGps.CONSTELLATION_GALILEO, YGps.CONSTELLATION_GPS_GLONASS, YGps.CONSTELLATION_GPS_GALILEO and
+     * YGps.CONSTELLATION_GLONASS_GALILEO corresponding to the the satellites constellation used to compute
      *         positioning data
      *
      * @throws YAPI_Exception on error
@@ -545,12 +545,13 @@ public class YGps extends YFunction
      * positioning data. Possible  constellations are GNSS ( = all supported constellations),
      * GPS, Glonass, Galileo , and the 3 possible pairs. This setting has  no effect on Yocto-GPS (V1).
      *
-     *  @param newval : a value among Y_CONSTELLATION_GNSS, Y_CONSTELLATION_GPS, Y_CONSTELLATION_GLONASS,
-     *  Y_CONSTELLATION_GALILEO, Y_CONSTELLATION_GPS_GLONASS, Y_CONSTELLATION_GPS_GALILEO and
-     * Y_CONSTELLATION_GLONASS_GALILEO corresponding to the satellites constellation used to compute
+     *  @param newval : a value among YGps.CONSTELLATION_GNSS, YGps.CONSTELLATION_GPS,
+     *  YGps.CONSTELLATION_GLONASS, YGps.CONSTELLATION_GALILEO, YGps.CONSTELLATION_GPS_GLONASS,
+     *  YGps.CONSTELLATION_GPS_GALILEO and YGps.CONSTELLATION_GLONASS_GALILEO corresponding to the
+     * satellites constellation used to compute
      *         positioning data
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -902,7 +903,7 @@ public class YGps extends YFunction
      *
      * @param newval : an integer corresponding to the number of seconds between current time and UTC time (time zone)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

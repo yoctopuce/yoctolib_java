@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRealTimeClock.java 39434 2020-02-25 08:53:55Z seb $
+ *  $Id: YRealTimeClock.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -46,7 +46,7 @@ package com.yoctopuce.YoctoAPI;
 //--- (YRealTimeClock class start)
 /**
  *  YRealTimeClock Class: real-time clock control interface, available for instance in the
- * YoctoHub-GSM-3G-EU, the YoctoHub-GSM-3G-NA, the YoctoHub-Wireless-g or the YoctoHub-Wireless-n
+ * YoctoHub-GSM-3G-EU, the YoctoHub-GSM-3G-NA, the YoctoHub-GSM-4G or the YoctoHub-Wireless-n
  *
  * The YRealTimeClock class provide access to the embedded real-time clock available on some Yoctopuce
  * devices. It can provide current date and time, even after a power outage
@@ -211,7 +211,7 @@ public class YRealTimeClock extends YFunction
      *
      * @param newval : an integer corresponding to the current time
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -316,7 +316,7 @@ public class YRealTimeClock extends YFunction
      *
      * @param newval : an integer corresponding to the number of seconds between current time and UTC time (time zone)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -350,8 +350,8 @@ public class YRealTimeClock extends YFunction
     /**
      * Returns true if the clock has been set, and false otherwise.
      *
-     *  @return either Y_TIMESET_FALSE or Y_TIMESET_TRUE, according to true if the clock has been set, and
-     * false otherwise
+     *  @return either YRealTimeClock.TIMESET_FALSE or YRealTimeClock.TIMESET_TRUE, according to true if
+     * the clock has been set, and false otherwise
      *
      * @throws YAPI_Exception on error
      */

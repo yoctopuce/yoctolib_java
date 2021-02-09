@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRangeFinder.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YRangeFinder.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -203,7 +203,7 @@ public class YRangeFinder extends YSensor
      *
      * @param newval : a string corresponding to the measuring unit for the measured range
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -240,8 +240,9 @@ public class YRangeFinder extends YSensor
      * Returns the range finder running mode. The rangefinder running mode
      * allows you to put priority on precision, speed or maximum range.
      *
-     *  @return a value among Y_RANGEFINDERMODE_DEFAULT, Y_RANGEFINDERMODE_LONG_RANGE,
-     * Y_RANGEFINDERMODE_HIGH_ACCURACY and Y_RANGEFINDERMODE_HIGH_SPEED corresponding to the range finder running mode
+     *  @return a value among YRangeFinder.RANGEFINDERMODE_DEFAULT, YRangeFinder.RANGEFINDERMODE_LONG_RANGE,
+     *  YRangeFinder.RANGEFINDERMODE_HIGH_ACCURACY and YRangeFinder.RANGEFINDERMODE_HIGH_SPEED
+     * corresponding to the range finder running mode
      *
      * @throws YAPI_Exception on error
      */
@@ -280,12 +281,13 @@ public class YRangeFinder extends YSensor
      * precision, speed or maximum range.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     *  @param newval : a value among Y_RANGEFINDERMODE_DEFAULT, Y_RANGEFINDERMODE_LONG_RANGE,
-     *  Y_RANGEFINDERMODE_HIGH_ACCURACY and Y_RANGEFINDERMODE_HIGH_SPEED corresponding to the rangefinder
-     * running mode, allowing you to put priority on
+     *  @param newval : a value among YRangeFinder.RANGEFINDERMODE_DEFAULT,
+     *  YRangeFinder.RANGEFINDERMODE_LONG_RANGE, YRangeFinder.RANGEFINDERMODE_HIGH_ACCURACY and
+     *  YRangeFinder.RANGEFINDERMODE_HIGH_SPEED corresponding to the rangefinder running mode, allowing you
+     * to put priority on
      *         precision, speed or maximum range
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -365,7 +367,7 @@ public class YRangeFinder extends YSensor
      * @param newval : an integer corresponding to the time frame used to measure the distance and estimate the measure
      *         reliability
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

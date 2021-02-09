@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YQuadratureDecoder.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YQuadratureDecoder.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -160,7 +160,7 @@ public class YQuadratureDecoder extends YSensor
      *
      * @param newval : a floating point number corresponding to the current expected position of the quadrature decoder
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -227,8 +227,8 @@ public class YQuadratureDecoder extends YSensor
     /**
      * Returns the current activation state of the quadrature decoder.
      *
-     *  @return either Y_DECODING_OFF or Y_DECODING_ON, according to the current activation state of the
-     * quadrature decoder
+     *  @return either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according to the
+     * current activation state of the quadrature decoder
      *
      * @throws YAPI_Exception on error
      */
@@ -264,10 +264,10 @@ public class YQuadratureDecoder extends YSensor
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : either Y_DECODING_OFF or Y_DECODING_ON, according to the activation state of the
-     * quadrature decoder
+     *  @param newval : either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according
+     * to the activation state of the quadrature decoder
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

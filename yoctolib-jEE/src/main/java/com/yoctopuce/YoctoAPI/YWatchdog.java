@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWatchdog.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YWatchdog.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -271,8 +271,8 @@ public class YWatchdog extends YFunction
     /**
      * Returns the state of the watchdog (A for the idle position, B for the active position).
      *
-     *  @return either Y_STATE_A or Y_STATE_B, according to the state of the watchdog (A for the idle
-     * position, B for the active position)
+     *  @return either YWatchdog.STATE_A or YWatchdog.STATE_B, according to the state of the watchdog (A
+     * for the idle position, B for the active position)
      *
      * @throws YAPI_Exception on error
      */
@@ -304,10 +304,10 @@ public class YWatchdog extends YFunction
     /**
      * Changes the state of the watchdog (A for the idle position, B for the active position).
      *
-     *  @param newval : either Y_STATE_A or Y_STATE_B, according to the state of the watchdog (A for the
-     * idle position, B for the active position)
+     *  @param newval : either YWatchdog.STATE_A or YWatchdog.STATE_B, according to the state of the
+     * watchdog (A for the idle position, B for the active position)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -345,8 +345,9 @@ public class YWatchdog extends YFunction
      * Returns the state of the watchdog at device startup (A for the idle position,
      * B for the active position, UNCHANGED to leave the relay state as is).
      *
-     *  @return a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
-     * corresponding to the state of the watchdog at device startup (A for the idle position,
+     *  @return a value among YWatchdog.STATEATPOWERON_UNCHANGED, YWatchdog.STATEATPOWERON_A and
+     *  YWatchdog.STATEATPOWERON_B corresponding to the state of the watchdog at device startup (A for the
+     * idle position,
      *         B for the active position, UNCHANGED to leave the relay state as is)
      *
      * @throws YAPI_Exception on error
@@ -387,11 +388,12 @@ public class YWatchdog extends YFunction
      * Remember to call the matching module saveToFlash()
      * method, otherwise this call will have no effect.
      *
-     *  @param newval : a value among Y_STATEATPOWERON_UNCHANGED, Y_STATEATPOWERON_A and Y_STATEATPOWERON_B
-     * corresponding to the state of the watchdog at device startup (A for the idle position,
+     *  @param newval : a value among YWatchdog.STATEATPOWERON_UNCHANGED, YWatchdog.STATEATPOWERON_A and
+     *  YWatchdog.STATEATPOWERON_B corresponding to the state of the watchdog at device startup (A for the
+     * idle position,
      *         B for the active position, UNCHANGED to leave the relay state as is)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -469,7 +471,7 @@ public class YWatchdog extends YFunction
      * @param newval : an integer corresponding to the maximum time (ms) allowed for the watchdog to stay in state A
      *         before automatically switching back in to B state
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -547,7 +549,7 @@ public class YWatchdog extends YFunction
      * in state B before
      *         automatically switching back in to A state
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -581,8 +583,8 @@ public class YWatchdog extends YFunction
     /**
      * Returns the output state of the watchdog, when used as a simple switch (single throw).
      *
-     *  @return either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the watchdog, when
-     * used as a simple switch (single throw)
+     *  @return either YWatchdog.OUTPUT_OFF or YWatchdog.OUTPUT_ON, according to the output state of the
+     * watchdog, when used as a simple switch (single throw)
      *
      * @throws YAPI_Exception on error
      */
@@ -614,10 +616,10 @@ public class YWatchdog extends YFunction
     /**
      * Changes the output state of the watchdog, when used as a simple switch (single throw).
      *
-     *  @param newval : either Y_OUTPUT_OFF or Y_OUTPUT_ON, according to the output state of the watchdog,
-     * when used as a simple switch (single throw)
+     *  @param newval : either YWatchdog.OUTPUT_OFF or YWatchdog.OUTPUT_ON, according to the output state
+     * of the watchdog, when used as a simple switch (single throw)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -799,7 +801,8 @@ public class YWatchdog extends YFunction
     /**
      * Returns the watchdog running state at module power on.
      *
-     * @return either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the watchdog running state at module power on
+     *  @return either YWatchdog.AUTOSTART_OFF or YWatchdog.AUTOSTART_ON, according to the watchdog running
+     * state at module power on
      *
      * @throws YAPI_Exception on error
      */
@@ -833,10 +836,10 @@ public class YWatchdog extends YFunction
      * Changes the watchdog running state at module power on. Remember to call the
      * saveToFlash() method and then to reboot the module to apply this setting.
      *
-     *  @param newval : either Y_AUTOSTART_OFF or Y_AUTOSTART_ON, according to the watchdog running state
-     * at module power on
+     *  @param newval : either YWatchdog.AUTOSTART_OFF or YWatchdog.AUTOSTART_ON, according to the watchdog
+     * running state at module power on
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -869,7 +872,7 @@ public class YWatchdog extends YFunction
     /**
      * Returns the watchdog running state.
      *
-     * @return either Y_RUNNING_OFF or Y_RUNNING_ON, according to the watchdog running state
+     * @return either YWatchdog.RUNNING_OFF or YWatchdog.RUNNING_ON, according to the watchdog running state
      *
      * @throws YAPI_Exception on error
      */
@@ -901,9 +904,10 @@ public class YWatchdog extends YFunction
     /**
      * Changes the running state of the watchdog.
      *
-     * @param newval : either Y_RUNNING_OFF or Y_RUNNING_ON, according to the running state of the watchdog
+     *  @param newval : either YWatchdog.RUNNING_OFF or YWatchdog.RUNNING_ON, according to the running
+     * state of the watchdog
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -994,7 +998,7 @@ public class YWatchdog extends YFunction
      * @param newval : an integer corresponding to the waiting delay before a reset is triggered by the watchdog,
      *         in milliseconds
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -1064,7 +1068,7 @@ public class YWatchdog extends YFunction
      *
      * @param newval : an integer corresponding to the duration of resets caused by the watchdog, in milliseconds
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiSensController.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YMultiSensController.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindMultiSensController(), the high-level API for MultiSensController functions
  *
@@ -215,7 +215,7 @@ public class YMultiSensController extends YFunction
      *
      * @param newval : an integer corresponding to the number of sensors to poll
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -282,8 +282,8 @@ public class YMultiSensController extends YFunction
     /**
      * Returns true when the device is in maintenance mode.
      *
-     *  @return either Y_MAINTENANCEMODE_FALSE or Y_MAINTENANCEMODE_TRUE, according to true when the device
-     * is in maintenance mode
+     *  @return either YMultiSensController.MAINTENANCEMODE_FALSE or
+     * YMultiSensController.MAINTENANCEMODE_TRUE, according to true when the device is in maintenance mode
      *
      * @throws YAPI_Exception on error
      */
@@ -320,10 +320,11 @@ public class YMultiSensController extends YFunction
      * This way, the device does not automatically restart when it cannot
      * communicate with one of the sensors.
      *
-     *  @param newval : either Y_MAINTENANCEMODE_FALSE or Y_MAINTENANCEMODE_TRUE, according to the device
-     * mode to enable maintenance and to stop sensor polling
+     *  @param newval : either YMultiSensController.MAINTENANCEMODE_FALSE or
+     *  YMultiSensController.MAINTENANCEMODE_TRUE, according to the device mode to enable maintenance and
+     * to stop sensor polling
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

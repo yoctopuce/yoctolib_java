@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLed.java 42060 2020-10-14 10:02:12Z seb $
+ *  $Id: YLed.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindLed(), the high-level API for Led functions
  *
@@ -172,7 +172,7 @@ public class YLed extends YFunction
     /**
      * Returns the current LED state.
      *
-     * @return either Y_POWER_OFF or Y_POWER_ON, according to the current LED state
+     * @return either YLed.POWER_OFF or YLed.POWER_ON, according to the current LED state
      *
      * @throws YAPI_Exception on error
      */
@@ -203,9 +203,9 @@ public class YLed extends YFunction
     /**
      * Changes the state of the LED.
      *
-     * @param newval : either Y_POWER_OFF or Y_POWER_ON, according to the state of the LED
+     * @param newval : either YLed.POWER_OFF or YLed.POWER_ON, according to the state of the LED
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -273,7 +273,7 @@ public class YLed extends YFunction
      *
      * @param newval : an integer corresponding to the current LED intensity (in per cent)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -307,8 +307,8 @@ public class YLed extends YFunction
     /**
      * Returns the current LED signaling mode.
      *
-     *  @return a value among Y_BLINKING_STILL, Y_BLINKING_RELAX, Y_BLINKING_AWARE, Y_BLINKING_RUN,
-     * Y_BLINKING_CALL and Y_BLINKING_PANIC corresponding to the current LED signaling mode
+     *  @return a value among YLed.BLINKING_STILL, YLed.BLINKING_RELAX, YLed.BLINKING_AWARE,
+     * YLed.BLINKING_RUN, YLed.BLINKING_CALL and YLed.BLINKING_PANIC corresponding to the current LED signaling mode
      *
      * @throws YAPI_Exception on error
      */
@@ -340,10 +340,10 @@ public class YLed extends YFunction
     /**
      * Changes the current LED signaling mode.
      *
-     *  @param newval : a value among Y_BLINKING_STILL, Y_BLINKING_RELAX, Y_BLINKING_AWARE, Y_BLINKING_RUN,
-     * Y_BLINKING_CALL and Y_BLINKING_PANIC corresponding to the current LED signaling mode
+     *  @param newval : a value among YLed.BLINKING_STILL, YLed.BLINKING_RELAX, YLed.BLINKING_AWARE,
+     * YLed.BLINKING_RUN, YLed.BLINKING_CALL and YLed.BLINKING_PANIC corresponding to the current LED signaling mode
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

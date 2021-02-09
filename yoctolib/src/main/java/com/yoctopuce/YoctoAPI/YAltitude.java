@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAltitude.java 39658 2020-03-12 15:36:29Z seb $
+ *  $Id: YAltitude.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -165,7 +165,7 @@ public class YAltitude extends YSensor
      *
      * @param newval : a floating point number corresponding to the current estimated altitude
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -210,7 +210,7 @@ public class YAltitude extends YSensor
      * level used to compute
      *         the altitude (QNH)
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

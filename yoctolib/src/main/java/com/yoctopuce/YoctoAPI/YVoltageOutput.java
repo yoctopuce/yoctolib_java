@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YVoltageOutput.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YVoltageOutput.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindVoltageOutput(), the high-level API for VoltageOutput functions
  *
@@ -162,7 +162,7 @@ public class YVoltageOutput extends YFunction
      *
      * @param newval : a floating point number corresponding to the output voltage, in V
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -255,7 +255,7 @@ public class YVoltageOutput extends YFunction
      *
      * @param newval : a floating point number corresponding to the output voltage at device start up
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

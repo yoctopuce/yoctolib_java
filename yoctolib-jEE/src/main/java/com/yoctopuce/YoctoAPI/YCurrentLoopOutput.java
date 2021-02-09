@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCurrentLoopOutput.java 38913 2019-12-20 18:59:49Z mvuilleu $
+ *  $Id: YCurrentLoopOutput.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -179,7 +179,7 @@ public class YCurrentLoopOutput extends YFunction
      *
      * @param newval : a floating point number corresponding to the current loop, the valid range is from 3 to 21mA
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -272,7 +272,7 @@ public class YCurrentLoopOutput extends YFunction
      *
      * @param newval : a floating point number corresponding to the loop current at device start up
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
@@ -343,8 +343,8 @@ public class YCurrentLoopOutput extends YFunction
      * is powered. NOPWR: the loop in not powered. LOWPWR: the loop is not
      * powered enough to maintain the current required (insufficient voltage).
      *
-     *  @return a value among Y_LOOPPOWER_NOPWR, Y_LOOPPOWER_LOWPWR and Y_LOOPPOWER_POWEROK corresponding
-     * to the loop powerstate
+     *  @return a value among YCurrentLoopOutput.LOOPPOWER_NOPWR, YCurrentLoopOutput.LOOPPOWER_LOWPWR and
+     * YCurrentLoopOutput.LOOPPOWER_POWEROK corresponding to the loop powerstate
      *
      * @throws YAPI_Exception on error
      */

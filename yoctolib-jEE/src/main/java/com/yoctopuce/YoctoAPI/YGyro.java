@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java 42951 2020-12-14 09:43:29Z seb $
+ * $Id: YGyro.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -251,7 +251,7 @@ public class YGyro extends YSensor
      *
      * @param newval : an integer corresponding to the measure update frequency, measured in Hz
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */

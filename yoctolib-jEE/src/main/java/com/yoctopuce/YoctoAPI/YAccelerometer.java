@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAccelerometer.java 42951 2020-12-14 09:43:29Z seb $
+ *  $Id: YAccelerometer.java 43580 2021-01-26 17:46:01Z mvuilleu $
  *
  *  Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -45,7 +45,8 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YAccelerometer yapiwrapper)
 //--- (YAccelerometer class start)
 /**
- * YAccelerometer Class: accelerometer control interface, available for instance in the Yocto-3D-V2
+ *  YAccelerometer Class: accelerometer control interface, available for instance in the Yocto-3D-V2 or
+ * the Yocto-Inclinometer
  *
  * The YAccelerometer class allows you to read and configure Yoctopuce accelerometers.
  * It inherits from YSensor class the core functions to read measurements,
@@ -223,7 +224,7 @@ public class YAccelerometer extends YSensor
      *
      * @param newval : an integer corresponding to the measure update frequency, measured in Hz
      *
-     * @return YAPI_SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
