@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 40549 2020-05-14 15:54:55Z mvuilleu $
+ * $Id: YAPI.java 44024 2021-02-25 09:37:25Z web $
  *
  * High-level programming interface, common to all modules
  *
@@ -58,7 +58,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "43781";
+    public static final String YOCTO_API_BUILD_STR = "44029";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -285,7 +285,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".43781" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".44029" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -715,6 +715,21 @@ public class YAPI
     public static int GetDeviceListValidity()
     {
         return GetYCtx(true).GetDeviceListValidity();
+    }
+    /**
+     * Adds a UDEV rule which authorizes all users to access Yoctopuce modules
+     * connected to the USB ports. This function works only under Linux. The process that
+     * calls this method must have root privileges because this method changes the Linux configuration.
+     *
+     * @param force : if true, overwrites any existing rule.
+     *
+     * @return an empty string if the rule has been added.
+     *
+     * On failure, returns a string that starts with "error:".
+     */
+    public static String AddUdevRule(boolean force)
+    {
+        return GetYCtx(true).AddUdevRule(force);
     }
     /**
      * Modifies the network connection delay for yRegisterHub() and yUpdateDeviceList().

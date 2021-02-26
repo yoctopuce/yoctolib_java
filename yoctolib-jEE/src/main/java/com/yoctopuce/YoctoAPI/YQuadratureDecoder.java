@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YQuadratureDecoder.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YQuadratureDecoder.java 44023 2021-02-25 09:23:38Z web $
  *
  *  Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -65,6 +65,8 @@ public class YQuadratureDecoder extends YSensor
      */
     public static final int DECODING_OFF = 0;
     public static final int DECODING_ON = 1;
+    public static final int DECODING_DIV2 = 2;
+    public static final int DECODING_DIV4 = 3;
     public static final int DECODING_INVALID = -1;
     protected double _speed = SPEED_INVALID;
     protected int _decoding = DECODING_INVALID;
@@ -129,7 +131,7 @@ public class YQuadratureDecoder extends YSensor
             _speed = Math.round(json_val.getDouble("speed") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("decoding")) {
-            _decoding = json_val.getInt("decoding") > 0 ? 1 : 0;
+            _decoding = json_val.getInt("decoding");
         }
         super._parseAttr(json_val);
     }
@@ -205,8 +207,9 @@ public class YQuadratureDecoder extends YSensor
     /**
      * Returns the current activation state of the quadrature decoder.
      *
-     *  @return either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according to the
-     * current activation state of the quadrature decoder
+     *  @return a value among YQuadratureDecoder.DECODING_OFF, YQuadratureDecoder.DECODING_ON,
+     *  YQuadratureDecoder.DECODING_DIV2 and YQuadratureDecoder.DECODING_DIV4 corresponding to the current
+     * activation state of the quadrature decoder
      *
      * @throws YAPI_Exception on error
      */
@@ -227,8 +230,9 @@ public class YQuadratureDecoder extends YSensor
     /**
      * Returns the current activation state of the quadrature decoder.
      *
-     *  @return either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according to the
-     * current activation state of the quadrature decoder
+     *  @return a value among YQuadratureDecoder.DECODING_OFF, YQuadratureDecoder.DECODING_ON,
+     *  YQuadratureDecoder.DECODING_DIV2 and YQuadratureDecoder.DECODING_DIV4 corresponding to the current
+     * activation state of the quadrature decoder
      *
      * @throws YAPI_Exception on error
      */
@@ -242,8 +246,9 @@ public class YQuadratureDecoder extends YSensor
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according
-     * to the activation state of the quadrature decoder
+     *  @param newval : a value among YQuadratureDecoder.DECODING_OFF, YQuadratureDecoder.DECODING_ON,
+     *  YQuadratureDecoder.DECODING_DIV2 and YQuadratureDecoder.DECODING_DIV4 corresponding to the
+     * activation state of the quadrature decoder
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -253,7 +258,7 @@ public class YQuadratureDecoder extends YSensor
     {
         String rest_val;
         synchronized (this) {
-            rest_val = (newval > 0 ? "1" : "0");
+            rest_val = Integer.toString(newval);
             _setAttr("decoding",rest_val);
         }
         return YAPI.SUCCESS;
@@ -264,8 +269,9 @@ public class YQuadratureDecoder extends YSensor
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according
-     * to the activation state of the quadrature decoder
+     *  @param newval : a value among YQuadratureDecoder.DECODING_OFF, YQuadratureDecoder.DECODING_ON,
+     *  YQuadratureDecoder.DECODING_DIV2 and YQuadratureDecoder.DECODING_DIV4 corresponding to the
+     * activation state of the quadrature decoder
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

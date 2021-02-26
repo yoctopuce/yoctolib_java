@@ -671,6 +671,11 @@ public class YAPIContext
         return null;
     }
 
+
+    public String AddUdevRule_internal(boolean force) {
+        return YUSBHub.addUdevRule(force);
+    }
+
     private synchronized int _AddNewHub(String url, boolean reportConnnectionLost, InputStream request, OutputStream response, Object session) throws YAPI_Exception
     {
         for (YGenericHub h : _hubs) {
@@ -816,6 +821,24 @@ public class YAPIContext
 
     //cannot be generated for Java:
     //public int GetDeviceListValidity_internal()
+    /**
+     * Adds a UDEV rule which authorizes all users to access Yoctopuce modules
+     * connected to the USB ports. This function works only under Linux. The process that
+     * calls this method must have root privileges because this method changes the Linux configuration.
+     *
+     * @param force : if true, overwrites any existing rule.
+     *
+     * @return an empty string if the rule has been added.
+     *
+     * On failure, returns a string that starts with "error:".
+     */
+    public String AddUdevRule(boolean force)
+    {
+        return AddUdevRule_internal(force);
+    }
+
+    //cannot be generated for Java:
+    //public String AddUdevRule_internal(boolean force)
     /**
      * Modifies the network connection delay for yRegisterHub() and yUpdateDeviceList().
      * This delay impacts only the YoctoHubs and VirtualHub

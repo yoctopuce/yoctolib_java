@@ -87,6 +87,8 @@ public class YJniWrapper
 
     public static native String getAPIVersion();
 
+    public static native String addUdevRule(int force);
+
     public native static void reserveUSBAccess();
 
     public native static void releaseUSBAccess();

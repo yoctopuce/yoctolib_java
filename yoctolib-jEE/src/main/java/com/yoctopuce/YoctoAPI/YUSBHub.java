@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 36374 2019-07-19 17:30:50Z seb $
+ * $Id: YUSBHub.java 44027 2021-02-25 10:06:43Z web $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -41,24 +41,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-class YUSBHub extends YGenericHub
-{
+class YUSBHub extends YGenericHub {
 
     private Thread _thread;
     private boolean _processNotifications = false;
 
-    static void SetContextType(Object ctx) throws YAPI_Exception
-    {
+    static void SetContextType(Object ctx) throws YAPI_Exception {
         YJniWrapper.Check();
     }
 
-    static void CheckUSBAcces() throws YAPI_Exception
-    {
+    static void CheckUSBAcces() throws YAPI_Exception {
         YJniWrapper.Check();
     }
 
-    public static String getAPIVersion()
-    {
+    public static String getAPIVersion() {
         try {
             YJniWrapper.Check();
             return " (" + YJniWrapper.getAPIVersion() + ")";
@@ -66,6 +62,17 @@ class YUSBHub extends YGenericHub
             return "";
         }
     }
+
+    public static String addUdevRule(boolean force) {
+        try {
+            YJniWrapper.Check();
+            String res = YJniWrapper.addUdevRule(force ? 1 : 0);
+            return res.length() > 0 ? "error: " + res : res;
+        } catch (YAPI_Exception e) {
+            return "error" + e.getLocalizedMessage();
+        }
+    }
+
 
     /*
      * Config change callback are not supported on purpose, because it does
@@ -75,51 +82,42 @@ class YUSBHub extends YGenericHub
 
 
     @Override
-    boolean isCallbackMode()
-    {
+    boolean isCallbackMode() {
         return false;
     }
 
     @Override
-    boolean isReadOnly()
-    {
+    boolean isReadOnly() {
         return false;
     }
 
     @Override
-    String getSerialNumber()
-    {
+    String getSerialNumber() {
         return "";
     }
 
     @Override
-    public String get_urlOf(String serialNumber)
-    {
+    public String get_urlOf(String serialNumber) {
         return "usb";
     }
 
     @Override
-    public ArrayList<String> get_subDeviceOf(String serialNumber)
-    {
+    public ArrayList<String> get_subDeviceOf(String serialNumber) {
         return new ArrayList<>();
     }
 
-    YUSBHub(YAPIContext yctx, int idx, boolean requestPermission, int pktAckDelay) throws YAPI_Exception
-    {
+    YUSBHub(YAPIContext yctx, int idx, boolean requestPermission, int pktAckDelay) throws YAPI_Exception {
         super(yctx, new HTTPParams("usb://"), idx, true);
         YJniWrapper.reserveUSBAccess();
     }
 
     @Override
-    public void startNotifications()
-    {
+    public void startNotifications() {
         YJniWrapper.startNotifications(this);
         _processNotifications = true;
-        _thread = new Thread(new Runnable()
-        {
+        _thread = new Thread(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 while (_processNotifications) {
                     YJniWrapper.usbProcess(YUSBHub.this);
                     try {
@@ -135,8 +133,7 @@ class YUSBHub extends YGenericHub
     }
 
     @Override
-    public void stopNotifications()
-    {
+    public void stopNotifications() {
         _processNotifications = false;
         _thread.interrupt();
         YJniWrapper.stopNotifications();
@@ -144,14 +141,12 @@ class YUSBHub extends YGenericHub
     }
 
     @Override
-    void release()
-    {
+    void release() {
         YJniWrapper.releaseUSBAccess();
     }
 
     @Override
-    void updateDeviceList(boolean forceupdate) throws YAPI_Exception
-    {
+    void updateDeviceList(boolean forceupdate) throws YAPI_Exception {
 
         long now = YAPI.GetTickCount();
         if (forceupdate) {
@@ -183,33 +178,28 @@ class YUSBHub extends YGenericHub
     }
 
     @Override
-    public ArrayList<String> getBootloaders() throws YAPI_Exception
-    {
+    public ArrayList<String> getBootloaders() throws YAPI_Exception {
         return YJniWrapper.getBootloaders();
     }
 
     @Override
-    public int ping(int mstimeout) throws YAPI_Exception
-    {
+    public int ping(int mstimeout) throws YAPI_Exception {
         return 0;
     }
 
     @Override
-    java.util.ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception
-    {
+    java.util.ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception {
         throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Firmware update on USB with JAVA is not yet available");
     }
 
     @Override
-    void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception
-    {
+    void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception {
         byte[] currentRequest = prepareRequest(req_first_line, req_head_and_body);
         YJniWrapper.devRequestAsync(device.getSerialNumber(), currentRequest, asyncResult, asyncContext);
     }
 
     @Override
-    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestProgress progress, Object context) throws YAPI_Exception
-    {
+    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestProgress progress, Object context) throws YAPI_Exception {
         byte[] currentRequest = prepareRequest(req_first_line, req_head_and_body);
         byte[] result = YJniWrapper.devRequestSync(device.getSerialNumber(), currentRequest);
         int hpos = YAPIContext._find_in_bytes(result, "\r\n\r\n".getBytes());
@@ -220,8 +210,7 @@ class YUSBHub extends YGenericHub
     }
 
 
-    private byte[] prepareRequest(String firstLine, byte[] rest_of_request)
-    {
+    private byte[] prepareRequest(String firstLine, byte[] rest_of_request) {
         byte[] currentRequest;
         if (rest_of_request == null) {
             currentRequest = (firstLine + "\r\n\r\n").getBytes();
@@ -237,20 +226,17 @@ class YUSBHub extends YGenericHub
 
 
     @Override
-    public String getRootUrl()
-    {
+    public String getRootUrl() {
         return "usb";
     }
 
     @Override
-    boolean isSameHub(String url, Object request, Object response, Object session)
-    {
+    boolean isSameHub(String url, Object request, Object response, Object session) {
         return url.equals("usb");
     }
 
 
-    public static boolean RegisterLocalhost()
-    {
+    public static boolean RegisterLocalhost() {
         return true;
     }
 
