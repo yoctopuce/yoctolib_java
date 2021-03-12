@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCarbonDioxide.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YCarbonDioxide.java 44175 2021-03-11 11:27:12Z mvuilleu $
  *
  *  Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
@@ -38,6 +38,7 @@
  */
 
 package com.yoctopuce.YoctoAPI;
+import java.util.Locale;
 
 //--- (YCarbonDioxide return codes)
 //--- (end of YCarbonDioxide return codes)
@@ -172,7 +173,8 @@ public class YCarbonDioxide extends YSensor
      * Changes Automatic Baseline Calibration period, in hours. If you need
      * to disable automatic baseline calibration (for instance when using the
      * sensor in an environment that is constantly above 400 ppm CO2), set the
-     * period to -1. Remember to call the saveToFlash() method of the
+     * period to -1. For the Yocto-CO2-V2, the only possible values are 24 and -1.
+     * Remember to call the saveToFlash() method of the
      * module if the modification must be kept.
      *
      * @param newval : an integer corresponding to Automatic Baseline Calibration period, in hours
@@ -195,7 +197,8 @@ public class YCarbonDioxide extends YSensor
      * Changes Automatic Baseline Calibration period, in hours. If you need
      * to disable automatic baseline calibration (for instance when using the
      * sensor in an environment that is constantly above 400 ppm CO2), set the
-     * period to -1. Remember to call the saveToFlash() method of the
+     * period to -1. For the Yocto-CO2-V2, the only possible values are 24 and -1.
+     * Remember to call the saveToFlash() method of the
      * module if the modification must be kept.
      *
      * @param newval : an integer corresponding to Automatic Baseline Calibration period, in hours
@@ -391,14 +394,32 @@ public class YCarbonDioxide extends YSensor
     }
 
     /**
+     * Triggers a forced calibration of the sensor at a given CO2 level, specified
+     * between 400ppm and 2000ppm. Before invoking this command, the sensor must
+     * have been maintained within the specified CO2 density during at least two
+     * minutes.
+     *
+     * @param refVal : reference CO2 density for the calibration
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int triggerForcedCalibration(double refVal) throws YAPI_Exception
+    {
+        return set_command(String.format(Locale.US, "F%dC",(int) (double)Math.round(1000*refVal)));
+    }
+
+    /**
      * Triggers a baseline calibration at standard CO2 ambiant level (400ppm).
      * It is normally not necessary to manually calibrate the sensor, because
      * the built-in automatic baseline calibration procedure will automatically
      * fix any long-term drift based on the lowest level of CO2 observed over the
-     * automatic calibration period. However, if you disable automatic baseline
-     * calibration, you may want to manually trigger a calibration from time to
+     * automatic calibration period. However, if automatic baseline calibration
+     * is disabled, you may want to manually trigger a calibration from time to
      * time. Before starting a baseline calibration, make sure to put the sensor
-     * in a standard environment (e.g. outside in fresh air) at around 400 ppm.
+     * in a standard environment (e.g. outside in fresh air) at around 400 ppm
+     * for at least two minutes.
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -415,7 +436,8 @@ public class YCarbonDioxide extends YSensor
     }
 
     /**
-     * Triggers a zero calibration of the sensor on carbon dioxide-free air.
+     * Triggers a zero calibration of the sensor on carbon dioxide-free air -
+     * for use with first generation Yocto-CO2 only.
      * It is normally not necessary to manually calibrate the sensor, because
      * the built-in automatic baseline calibration procedure will automatically
      * fix any long-term drift based on the lowest level of CO2 observed over the
