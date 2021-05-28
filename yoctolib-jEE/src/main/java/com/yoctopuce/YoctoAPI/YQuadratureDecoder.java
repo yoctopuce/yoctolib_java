@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YQuadratureDecoder.java 44023 2021-02-25 09:23:38Z web $
+ *  $Id: YQuadratureDecoder.java 45292 2021-05-25 23:27:54Z mvuilleu $
  *
  *  Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -65,11 +65,14 @@ public class YQuadratureDecoder extends YSensor
      */
     public static final int DECODING_OFF = 0;
     public static final int DECODING_ON = 1;
-    public static final int DECODING_DIV2 = 2;
-    public static final int DECODING_DIV4 = 3;
     public static final int DECODING_INVALID = -1;
+    /**
+     * invalid edgesPerCycle value
+     */
+    public static final int EDGESPERCYCLE_INVALID = YAPI.INVALID_UINT;
     protected double _speed = SPEED_INVALID;
     protected int _decoding = DECODING_INVALID;
+    protected int _edgesPerCycle = EDGESPERCYCLE_INVALID;
     protected UpdateCallback _valueCallbackQuadratureDecoder = null;
     protected TimedReportCallback _timedReportCallbackQuadratureDecoder = null;
 
@@ -131,7 +134,10 @@ public class YQuadratureDecoder extends YSensor
             _speed = Math.round(json_val.getDouble("speed") * 1000.0 / 65536.0) / 1000.0;
         }
         if (json_val.has("decoding")) {
-            _decoding = json_val.getInt("decoding");
+            _decoding = json_val.getInt("decoding") > 0 ? 1 : 0;
+        }
+        if (json_val.has("edgesPerCycle")) {
+            _edgesPerCycle = json_val.getInt("edgesPerCycle");
         }
         super._parseAttr(json_val);
     }
@@ -172,9 +178,9 @@ public class YQuadratureDecoder extends YSensor
     }
 
     /**
-     * Returns the increments frequency, in Hz.
+     * Returns the cycle frequency, in Hz.
      *
-     * @return a floating point number corresponding to the increments frequency, in Hz
+     * @return a floating point number corresponding to the cycle frequency, in Hz
      *
      * @throws YAPI_Exception on error
      */
@@ -193,9 +199,9 @@ public class YQuadratureDecoder extends YSensor
     }
 
     /**
-     * Returns the increments frequency, in Hz.
+     * Returns the cycle frequency, in Hz.
      *
-     * @return a floating point number corresponding to the increments frequency, in Hz
+     * @return a floating point number corresponding to the cycle frequency, in Hz
      *
      * @throws YAPI_Exception on error
      */
@@ -207,9 +213,8 @@ public class YQuadratureDecoder extends YSensor
     /**
      * Returns the current activation state of the quadrature decoder.
      *
-     *  @return a value among YQuadratureDecoder.DECODING_OFF, YQuadratureDecoder.DECODING_ON,
-     *  YQuadratureDecoder.DECODING_DIV2 and YQuadratureDecoder.DECODING_DIV4 corresponding to the current
-     * activation state of the quadrature decoder
+     *  @return either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according to the
+     * current activation state of the quadrature decoder
      *
      * @throws YAPI_Exception on error
      */
@@ -230,9 +235,8 @@ public class YQuadratureDecoder extends YSensor
     /**
      * Returns the current activation state of the quadrature decoder.
      *
-     *  @return a value among YQuadratureDecoder.DECODING_OFF, YQuadratureDecoder.DECODING_ON,
-     *  YQuadratureDecoder.DECODING_DIV2 and YQuadratureDecoder.DECODING_DIV4 corresponding to the current
-     * activation state of the quadrature decoder
+     *  @return either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according to the
+     * current activation state of the quadrature decoder
      *
      * @throws YAPI_Exception on error
      */
@@ -246,9 +250,8 @@ public class YQuadratureDecoder extends YSensor
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : a value among YQuadratureDecoder.DECODING_OFF, YQuadratureDecoder.DECODING_ON,
-     *  YQuadratureDecoder.DECODING_DIV2 and YQuadratureDecoder.DECODING_DIV4 corresponding to the
-     * activation state of the quadrature decoder
+     *  @param newval : either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according
+     * to the activation state of the quadrature decoder
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -258,7 +261,7 @@ public class YQuadratureDecoder extends YSensor
     {
         String rest_val;
         synchronized (this) {
-            rest_val = Integer.toString(newval);
+            rest_val = (newval > 0 ? "1" : "0");
             _setAttr("decoding",rest_val);
         }
         return YAPI.SUCCESS;
@@ -269,9 +272,8 @@ public class YQuadratureDecoder extends YSensor
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
-     *  @param newval : a value among YQuadratureDecoder.DECODING_OFF, YQuadratureDecoder.DECODING_ON,
-     *  YQuadratureDecoder.DECODING_DIV2 and YQuadratureDecoder.DECODING_DIV4 corresponding to the
-     * activation state of the quadrature decoder
+     *  @param newval : either YQuadratureDecoder.DECODING_OFF or YQuadratureDecoder.DECODING_ON, according
+     * to the activation state of the quadrature decoder
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -280,6 +282,76 @@ public class YQuadratureDecoder extends YSensor
     public int setDecoding(int newval)  throws YAPI_Exception
     {
         return set_decoding(newval);
+    }
+
+    /**
+     * Returns the edge count per full cycle configuration setting.
+     *
+     * @return an integer corresponding to the edge count per full cycle configuration setting
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_edgesPerCycle() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return EDGESPERCYCLE_INVALID;
+                }
+            }
+            res = _edgesPerCycle;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the edge count per full cycle configuration setting.
+     *
+     * @return an integer corresponding to the edge count per full cycle configuration setting
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getEdgesPerCycle() throws YAPI_Exception
+    {
+        return get_edgesPerCycle();
+    }
+
+    /**
+     * Changes the edge count per full cycle configuration setting.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : an integer corresponding to the edge count per full cycle configuration setting
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_edgesPerCycle(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("edgesPerCycle",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the edge count per full cycle configuration setting.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : an integer corresponding to the edge count per full cycle configuration setting
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setEdgesPerCycle(int newval)  throws YAPI_Exception
+    {
+        return set_edgesPerCycle(newval);
     }
 
     /**

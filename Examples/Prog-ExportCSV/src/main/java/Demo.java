@@ -8,10 +8,9 @@ import java.util.logging.Logger;
 
 public class Demo {
 
-    public static void main(String[] args)
-    {
-        SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        
+    public static void main(String[] args) {
+        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+
         try {
             try {
                 // setup the API to use local VirtualHub
@@ -30,7 +29,7 @@ public class Demo {
                 sensorList.add(sensor);
                 sensor = sensor.nextSensor();
             }
-            if(sensorList.size() == 0) {
+            if (sensorList.size() == 0) {
                 System.out.println("No Yoctopuce sensor connected (check USB cable)");
                 System.exit(1);
             }
@@ -38,10 +37,10 @@ public class Demo {
             // Generate consolidated CSV output for all sensors
             YConsolidatedDataSet data = new YConsolidatedDataSet(0, 0, sensorList);
             ArrayList<Double> record = new ArrayList<Double>();
-            while(data.nextRecord(record) < 100) {
-                String line = ft.format(new Date((long)(record.get(0)*1000)));
-                for(int idx = 1; idx < record.size(); idx++) {
-                    line = String.format("%s;%.3f", line, record.get(idx));            
+            while (data.nextRecord(record) < 100) {
+                String line = ft.format(new Date((long) (record.get(0) * 1000)));
+                for (int idx = 1; idx < record.size(); idx++) {
+                    line = String.format("%s;%.3f", line, record.get(idx));
                 }
                 System.out.println(line);
             }

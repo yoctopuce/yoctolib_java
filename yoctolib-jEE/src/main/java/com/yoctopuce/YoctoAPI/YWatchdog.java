@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWatchdog.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YWatchdog.java 44548 2021-04-13 09:56:42Z mvuilleu $
  *
  *  Implements FindWatchdog(), the high-level API for Watchdog functions
  *
@@ -125,6 +125,10 @@ public class YWatchdog extends YFunction
      * invalid triggerDuration value
      */
     public static final long TRIGGERDURATION_INVALID = YAPI.INVALID_LONG;
+    /**
+     * invalid lastTrigger value
+     */
+    public static final int LASTTRIGGER_INVALID = YAPI.INVALID_UINT;
     public static final YDelayedPulse DELAYEDPULSETIMER_INVALID = null;
     protected int _state = STATE_INVALID;
     protected int _stateAtPowerOn = STATEATPOWERON_INVALID;
@@ -138,6 +142,7 @@ public class YWatchdog extends YFunction
     protected int _running = RUNNING_INVALID;
     protected long _triggerDelay = TRIGGERDELAY_INVALID;
     protected long _triggerDuration = TRIGGERDURATION_INVALID;
+    protected int _lastTrigger = LASTTRIGGER_INVALID;
     protected UpdateCallback _valueCallbackWatchdog = null;
     protected int _firm = 0;
 
@@ -239,6 +244,9 @@ public class YWatchdog extends YFunction
         }
         if (json_val.has("triggerDuration")) {
             _triggerDuration = json_val.getLong("triggerDuration");
+        }
+        if (json_val.has("lastTrigger")) {
+            _lastTrigger = json_val.getInt("lastTrigger");
         }
         super._parseAttr(json_val);
     }
@@ -1075,6 +1083,39 @@ public class YWatchdog extends YFunction
     public int setTriggerDuration(long newval)  throws YAPI_Exception
     {
         return set_triggerDuration(newval);
+    }
+
+    /**
+     * Returns the number of seconds spent since the last output power-up event.
+     *
+     * @return an integer corresponding to the number of seconds spent since the last output power-up event
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_lastTrigger() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return LASTTRIGGER_INVALID;
+                }
+            }
+            res = _lastTrigger;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the number of seconds spent since the last output power-up event.
+     *
+     * @return an integer corresponding to the number of seconds spent since the last output power-up event
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getLastTrigger() throws YAPI_Exception
+    {
+        return get_lastTrigger();
     }
 
     /**

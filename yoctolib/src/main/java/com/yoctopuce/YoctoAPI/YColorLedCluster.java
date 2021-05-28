@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLedCluster.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YColorLedCluster.java 44921 2021-05-06 08:03:05Z mvuilleu $
  *
  *  Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -73,6 +73,7 @@ public class YColorLedCluster extends YFunction
      */
     public static final int LEDTYPE_RGB = 0;
     public static final int LEDTYPE_RGBW = 1;
+    public static final int LEDTYPE_WS2811 = 2;
     public static final int LEDTYPE_INVALID = -1;
     /**
      * invalid maxLedCount value
@@ -246,8 +247,8 @@ public class YColorLedCluster extends YFunction
     /**
      * Returns the RGB LED type currently handled by the device.
      *
-     *  @return either YColorLedCluster.LEDTYPE_RGB or YColorLedCluster.LEDTYPE_RGBW, according to the RGB
-     * LED type currently handled by the device
+     *  @return a value among YColorLedCluster.LEDTYPE_RGB, YColorLedCluster.LEDTYPE_RGBW and
+     * YColorLedCluster.LEDTYPE_WS2811 corresponding to the RGB LED type currently handled by the device
      *
      * @throws YAPI_Exception on error
      */
@@ -268,8 +269,8 @@ public class YColorLedCluster extends YFunction
     /**
      * Returns the RGB LED type currently handled by the device.
      *
-     *  @return either YColorLedCluster.LEDTYPE_RGB or YColorLedCluster.LEDTYPE_RGBW, according to the RGB
-     * LED type currently handled by the device
+     *  @return a value among YColorLedCluster.LEDTYPE_RGB, YColorLedCluster.LEDTYPE_RGBW and
+     * YColorLedCluster.LEDTYPE_WS2811 corresponding to the RGB LED type currently handled by the device
      *
      * @throws YAPI_Exception on error
      */
@@ -283,8 +284,8 @@ public class YColorLedCluster extends YFunction
      * Remember to call the matching module
      * saveToFlash() method to save the setting permanently.
      *
-     *  @param newval : either YColorLedCluster.LEDTYPE_RGB or YColorLedCluster.LEDTYPE_RGBW, according to
-     * the RGB LED type currently handled by the device
+     *  @param newval : a value among YColorLedCluster.LEDTYPE_RGB, YColorLedCluster.LEDTYPE_RGBW and
+     * YColorLedCluster.LEDTYPE_WS2811 corresponding to the RGB LED type currently handled by the device
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -305,8 +306,8 @@ public class YColorLedCluster extends YFunction
      * Remember to call the matching module
      * saveToFlash() method to save the setting permanently.
      *
-     *  @param newval : either YColorLedCluster.LEDTYPE_RGB or YColorLedCluster.LEDTYPE_RGBW, according to
-     * the RGB LED type currently handled by the device
+     *  @param newval : a value among YColorLedCluster.LEDTYPE_RGB, YColorLedCluster.LEDTYPE_RGBW and
+     * YColorLedCluster.LEDTYPE_WS2811 corresponding to the RGB LED type currently handled by the device
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

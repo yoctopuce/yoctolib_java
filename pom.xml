@@ -31,6 +31,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-Display</module>
         <module>Examples/Doc-GettingStarted-Yocto-GPS</module>
         <module>Examples/Doc-GettingStarted-Yocto-I2C</module>
+        <module>Examples/Doc-GettingStarted-Yocto-Inclinometer</module>
         <module>Examples/Doc-GettingStarted-Yocto-IO</module>
         <module>Examples/Doc-GettingStarted-Yocto-Knob</module>
         <module>Examples/Doc-GettingStarted-Yocto-LatchedRelay</module>
@@ -40,6 +41,7 @@
         <module>Examples/Doc-GettingStarted-Yocto-Maxi-IO</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiCoupler</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiDisplay</module>
+        <module>Examples/Doc-GettingStarted-Yocto-MaxiKnob</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiPowerRelay</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiMicroVolt-Rx</module>
         <module>Examples/Doc-GettingStarted-Yocto-MaxiThermistor</module>
