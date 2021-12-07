@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 38913 2019-12-20 18:59:49Z mvuilleu $
+ * $Id: YFirmwareUpdate.java 45549 2021-06-14 13:43:10Z web $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -82,40 +82,7 @@ public class YFirmwareUpdate
 
     static byte[] _downloadfile(String url) throws YAPI_Exception
     {
-        ByteArrayOutputStream result = new ByteArrayOutputStream(1024);
-        URL u;
-        try {
-            u = new URL(url);
-        } catch (MalformedURLException e) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
-        }
-        BufferedInputStream in = null;
-        try {
-            URLConnection connection = u.openConnection();
-            in = new BufferedInputStream(connection.getInputStream());
-            byte[] buffer = new byte[1024];
-            int readed = 0;
-            while (readed >= 0) {
-                readed = in.read(buffer, 0, buffer.length);
-                if (readed < 0) {
-                    // end of connection
-                    break;
-                } else {
-                    result.write(buffer, 0, readed);
-                }
-            }
-
-        } catch (IOException e) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, "unable to contact www.yoctopuce.com :" + e.getLocalizedMessage());
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ignore) {
-                }
-            }
-        }
-        return result.toByteArray();
+        return YAPIContext.BasicHTTPRequest(url);
     }
 
 

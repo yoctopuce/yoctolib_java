@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 36640 2019-07-31 16:34:34Z seb $
+ * $Id: YGenericHub.java 45550 2021-06-14 13:49:42Z seb $
  *
  * Internal YGenericHub object
  *
@@ -108,7 +108,7 @@ abstract class YGenericHub
 
     static final long YPROG_BOOTLOADER_TIMEOUT = 20000;
     final YAPIContext _yctx;
-    final HTTPParams _http_params;
+    final HTTPParams _URL_params;
     int _hubidx;
     protected long _notifyTrigger = 0;
     protected Object _notifyHandle = null;
@@ -125,7 +125,7 @@ abstract class YGenericHub
         _yctx = yctx;
         _hubidx = idx;
         _reportConnnectionLost = reportConnnectionLost;
-        _http_params = httpParams;
+        _URL_params = httpParams;
     }
 
     abstract void release();
@@ -288,10 +288,10 @@ abstract class YGenericHub
         for (YDevice dev : _devices.values()) {
             String devSerialNumber = dev.getSerialNumber();
             if (devSerialNumber.equals(serialNumber)) {
-                return _http_params.getUrl(true, false) + dev.getNetworkUrl();
+                return _URL_params.getUrl(true, false) + dev.getNetworkUrl();
             }
         }
-        return _http_params.getUrl(true, false);
+        return _URL_params.getUrl(true, false);
     }
 
     public ArrayList<String> get_subDeviceOf(String serialNumber)
@@ -440,13 +440,27 @@ abstract class YGenericHub
 
         public HTTPParams(String url)
         {
+            int defaultPort = YAPI.YOCTO_DEFAULT_PORT;
+
             int pos = 0;
-            if (url.startsWith("http://")) {
+            if (url.startsWith("auto://")) {
+                pos = 7;
+                _proto = "auto";
+            } else if (url.startsWith("secure://")) {
+                pos = 9;
+                _proto = "secure";
+                defaultPort = YAPI.YOCTO_DEFAULT_HTTPS_PORT;
+            } else if (url.startsWith("http://")) {
                 pos = 7;
                 _proto = "http";
+            } else if (url.startsWith("https://")) {
+                pos = 8;
+                _proto = "https";
+                defaultPort = YAPI.YOCTO_DEFAULT_HTTPS_PORT;
             } else if (url.startsWith("wss://")) {
                 pos = 6;
                 _proto = "wss";
+                defaultPort = YAPI.YOCTO_DEFAULT_HTTPS_PORT;
             } else if (url.startsWith("usb://")) {
                 pos = 6;
                 _proto = "usb";
@@ -488,12 +502,22 @@ abstract class YGenericHub
                     _port = Integer.parseInt(url.substring(portpos + 1, end_url));
                 } else {
                     _host = url.substring(pos, portpos);
-                    _port = 4444;
+                    _port = defaultPort;
                 }
             } else {
                 _host = url.substring(pos, end_url);
-                _port = 4444;
+                _port = defaultPort;
             }
+        }
+
+        public HTTPParams(HTTPParams http_params_org, String proto, int port)
+        {
+            _host = http_params_org._host;
+            _port = port;
+            _user = http_params_org._user;
+            _pass = http_params_org._pass;
+            _proto = proto;
+            _subDomain = http_params_org._subDomain;
         }
 
         String getHost()
@@ -542,7 +566,7 @@ abstract class YGenericHub
             return url.toString();
         }
 
-        boolean isWebSocket()
+        boolean useWebSocket()
         {
             return _proto.startsWith("ws");
         }
@@ -562,13 +586,18 @@ abstract class YGenericHub
 
         boolean useSecureSocket()
         {
-            return "wss".equals(_proto);
+            return "wss".equals(_proto) || "https".equals(_proto) || "secure".equals(_proto);
         }
 
         @Override
         public String toString()
         {
             return _proto + "/" + _host + ':' + _port + _subDomain;
+        }
+
+        public boolean isDynamicURL()
+        {
+            return _proto.equals("auto") || _proto.equals("secure");
         }
     }
 }

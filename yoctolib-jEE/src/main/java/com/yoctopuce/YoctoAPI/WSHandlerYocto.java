@@ -1,15 +1,17 @@
 package com.yoctopuce.YoctoAPI;
 
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
@@ -155,7 +157,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         _closing = false;
         _fragments = null;
         String host = hub.getHost();
-        _nhandler.WSLOG(String.format(Locale.US, "hub(%s) try to open WS connection at %d", host, notifAbsPos));
+        _nhandler.WSLOG(String.format(Locale.US, "hub(%s%s:%d) try to open WS connection at %d",  hub._http_params.useSecureSocket()?"secure/":"",host, hub._http_params.getPort(), notifAbsPos));
         if (first_notification_connection) {
             request += "/not.byn";
         } else {
@@ -163,16 +165,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         }
         try {
             InetAddress addr = InetAddress.getByName(host);
-            int port = hub.getPort();
-            SocketAddress sockaddr = new InetSocketAddress(addr, port);
-            if (hub._http_params.useSecureSocket()) {
-                // Creates an unconnected socket
-                SSLSocketFactory sslsocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-                _socket = sslsocketFactory.createSocket(addr, port);
-            } else {
-                _socket = new Socket();
-                _socket.connect(sockaddr, mstimeout);
-            }
+            _socket = hub.OpenConnectedSocket(addr,mstimeout);
             _socket.setTcpNoDelay(true);
             _socket.setSoTimeout(1000);
             _out = new BufferedOutputStream(_socket.getOutputStream());
@@ -180,10 +173,8 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         } catch (UnknownHostException e) {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Unknown host(" + host + ")");
         } catch (IOException e) {
-            //e.printStackTrace();
             throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
         }
-
         // write request
         try {
             _out.write(request.getBytes());
@@ -244,7 +235,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
                 throw new YAPI_Exception(YAPI.IO_ERROR, "hub does not support WebSocket");
             }
         } catch (SSLException e) {
-            throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, e.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.SSL_ERROR, e.getLocalizedMessage());
         } catch (IOException e) {
             throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
         }

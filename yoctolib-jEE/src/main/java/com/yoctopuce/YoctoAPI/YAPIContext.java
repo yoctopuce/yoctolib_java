@@ -1,9 +1,14 @@
 package com.yoctopuce.YoctoAPI;
 
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import javax.net.ssl.*;
+import java.io.*;
+import java.net.*;
 import java.nio.charset.Charset;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 //--- (generated code: YAPIContext return codes)
@@ -115,7 +120,7 @@ public class YAPIContext
         PlugEvent(YAPIContext yctx, Event ev, String serial)
         {
             this.ev = ev;
-            this.module = YModule.FindModuleInContext(yctx,serial + ".module");
+            this.module = YModule.FindModuleInContext(yctx, serial + ".module");
         }
     }
 
@@ -399,6 +404,7 @@ public class YAPIContext
     private final ArrayList<YFunction> _ValueCallbackList = new ArrayList<>();
     private final ArrayList<YFunction> _TimedReportCallbackList = new ArrayList<>();
     private final Map<YModule, Integer> _moduleCallbackList = new HashMap<>();
+    private final SSLContext _sslContext;
 
     private int _pktAckDelay = 0;
 
@@ -489,9 +495,29 @@ public class YAPIContext
         _ssdp = new YSSDP(this);
         _functionCacheLock = new Object();
         resetContext();
+
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, _trustAllCertificates, new SecureRandom());
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            sslContext = null;
+        }
+        _sslContext = sslContext;
+        if (_sslContext != null) {
+            HttpsURLConnection.setDefaultSSLSocketFactory(_sslContext.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(_allHostsValid);
+        }
+
         //--- (generated code: YAPIContext attributes initialization)
         //--- (end of generated code: YAPIContext attributes initialization)
 
+    }
+
+    Socket CreateSSLSocket(InetAddress addr, int port) throws IOException
+    {
+        SSLSocketFactory sslsocketFactory = _sslContext.getSocketFactory();
+        return sslsocketFactory.createSocket(addr, port);
     }
 
     private void resetContext()
@@ -672,7 +698,8 @@ public class YAPIContext
     }
 
 
-    public String AddUdevRule_internal(boolean force) {
+    public String AddUdevRule_internal(boolean force)
+    {
         return YUSBHub.addUdevRule(force);
     }
 
@@ -775,6 +802,77 @@ public class YAPIContext
             }
         }
     }
+
+    static byte[] BasicHTTPRequest(String url) throws YAPI_Exception
+    {
+        ByteArrayOutputStream result = new ByteArrayOutputStream(1024);
+        URL u;
+        try {
+            u = new URL(url);
+        } catch (MalformedURLException e) {
+            throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
+        }
+
+
+        BufferedInputStream in = null;
+        try {
+            URLConnection connection = u.openConnection();
+            in = new BufferedInputStream(connection.getInputStream());
+            byte[] buffer = new byte[1024];
+            int readed = 0;
+            while (readed >= 0) {
+                readed = in.read(buffer, 0, buffer.length);
+                if (readed < 0) {
+                    // end of connection
+                    break;
+                } else {
+                    result.write(buffer, 0, readed);
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new YAPI_Exception(YAPI.IO_ERROR, "unable to contact " + url + " :" + e.getLocalizedMessage());
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ignore) {
+                }
+            }
+        }
+        return result.toByteArray();
+    }
+
+    private final TrustManager[] _trustAllCertificates = new TrustManager[]{
+            new X509TrustManager()
+            {
+                @Override
+                public X509Certificate[] getAcceptedIssuers()
+                {
+                    return new X509Certificate[0];
+                }
+
+                @Override
+                public void checkClientTrusted(X509Certificate[] certs, String authType)
+                {
+                    // Do nothing. Just allow them all.
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] certs, String authType)
+                {
+                    // Do nothing. Just allow them all.
+                }
+            }
+    };
+
+
+    private final HostnameVerifier _allHostsValid = new HostnameVerifier() {
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
+        }
+    };
 
     public void SetNetworkTimeout_internal(int networkMsTimeout)
     {
@@ -1024,7 +1122,8 @@ public class YAPIContext
 
 
     /**
-     * Setup the Yoctopuce library to use modules connected on a given machine. The
+     * Setup the Yoctopuce library to use modules connected on a given machine. Idealy this
+     * call will be made once at the begining of your application.  The
      * parameter will determine how the API will work. Use the following values:
      *
      * <b>usb</b>: When the usb keyword is used, the API will work with
@@ -1057,7 +1156,9 @@ public class YAPIContext
      *
      * http://username:password@address:port
      *
-     * You can call <i>RegisterHub</i> several times to connect to several machines.
+     * You can call <i>RegisterHub</i> several times to connect to several machines. On
+     * the other hand, it is useless and even counterproductive to call <i>RegisterHub</i>
+     * with to same address multiple times during the life of the application.
      *
      * @param url : a string containing either "usb","callback" or the
      *         root URL of the hub to monitor

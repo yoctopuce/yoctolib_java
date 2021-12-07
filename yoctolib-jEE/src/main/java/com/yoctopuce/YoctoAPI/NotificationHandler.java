@@ -158,7 +158,8 @@ abstract class NotificationHandler implements Runnable
                         case NOTIFY_NETPKT_FUNCV2YDX:
                             funcid = ydev.getYPEntry(funydx).getFuncId();
                             if (!funcid.equals("")) {
-                                byte[] rawval = decodeNetFuncValV2(value.getBytes());
+                                byte[] valueBytes = value.getBytes(this._hub._yctx._deviceCharset);
+                                byte[] rawval = decodeNetFuncValV2(valueBytes);
                                 if (rawval != null) {
                                     String decodedval = YGenericHub.decodePubVal(rawval[0], rawval, 1, 6);
                                     // function value ydx (tiny notification)

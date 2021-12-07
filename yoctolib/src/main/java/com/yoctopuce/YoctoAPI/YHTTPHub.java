@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 41062 2020-06-25 10:16:20Z seb $
+ * $Id: YHTTPHub.java 46990 2021-11-01 16:59:41Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -37,6 +37,11 @@
 package com.yoctopuce.YoctoAPI;
 
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -66,6 +71,7 @@ class YHTTPHub extends YGenericHub
     private boolean _writeProtected = false;
 
     private final Object _authLock = new Object();
+    HTTPParams _http_params = null;
 
 
     boolean needRetryWithAuth()
@@ -138,7 +144,7 @@ class YHTTPHub extends YGenericHub
     String getAuthorization(String request)
     {
         synchronized (_authLock) {
-            if (_http_params.getUser().length() == 0 || _http_realm.length() == 0)
+            if (_http_params.getUser().length() == 0 || _http_params.getPass().length() == 0)
                 return "";
             _nounce_count++;
             int pos = request.indexOf(' ');
@@ -186,11 +192,60 @@ class YHTTPHub extends YGenericHub
         if (_notificationHandler != null) {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "notification already started");
         }
-        if (_http_params.isWebSocket()) {
+        if (_URL_params.isDynamicURL()) {
+            boolean https_req= _URL_params.useSecureSocket();
+            if (_URL_params.getPort() == YAPI.YOCTO_DEFAULT_HTTPS_PORT){
+                https_req = true;
+            }
+            String url = String.format("%s://%s:%d/info.json",https_req?"https":"http", _URL_params.getHost(), _URL_params.getPort());
+            try {
+                byte[] raw = YAPIContext.BasicHTTPRequest(url);
+                String json_str = new String(raw, _yctx._deviceCharset);
+                YJSONObject json = new YJSONObject(json_str);
+                json.parse();
+                if (json.has("port")) {
+                    YJSONArray ports = json.getYJSONArray("port");
+                    boolean done = false;
+                    int i = 0;
+                    while (!done && i < ports.length()) {
+                        String proto_port = ports.getString(i++);
+                        String[] split = proto_port.split(":");
+                        String proto = split[0];
+                        int port = Integer.parseInt(split[1]);
+                        switch (proto) {
+                            case "ws":
+                            case "http":
+                                if (_URL_params.useSecureSocket()) {
+                                    break;
+                                }
+                                //no break on purpose
+                            case "wss":
+                            case "https":
+                                _http_params = new HTTPParams(_URL_params, proto, port);
+                                done = true;
+                            default:
+                                _yctx._Log(String.format("Skip unknown protocol \"%s\" form info. Please consider upgrading Yoctolib.", proto));
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                if (!_URL_params.useSecureSocket()) {
+                    _http_params = _URL_params;
+                }
+            }
+            if (_http_params == null) {
+                throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "No compatible protocol in info.json. Upgrade VirtualHub or Hub Firmware");
+            }
+        } else {
+            _http_params = _URL_params;
+        }
+        if (_http_params.useWebSocket()) {
             _notificationHandler = new WSNotificationHandler(this, _callbackSession);
         } else {
             _notificationHandler = new TCPNotificationHandler(this);
         }
+
         _thread = new Thread(_notificationHandler, _notificationHandler.getThreadLabel());
         _thread.start();
     }
@@ -274,7 +329,7 @@ class YHTTPHub extends YGenericHub
             loadval.parse();
             if (!loadval.has("services") || !loadval.getYJSONObject("services").has("whitePages")) {
                 throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Device "
-                        + _http_params.getHost() + " is not a hub");
+                        + _URL_params.getHost() + " is not a hub");
             }
             _serial = loadval.getYJSONObject("module").getString("serialNumber");
             YJSONArray whitePages_json = loadval.getYJSONObject("services").getYJSONArray("whitePages");
@@ -308,7 +363,7 @@ class YHTTPHub extends YGenericHub
         } catch (Exception e) {
             throw new YAPI_Exception(YAPI.IO_ERROR,
                     "Request failed, could not parse API result for "
-                            + _http_params.getHost(), e);
+                            + _URL_params.getHost(), e);
         }
 
         updateFromWpAndYp(whitePages, yellowPages);
@@ -465,7 +520,7 @@ class YHTTPHub extends YGenericHub
     synchronized void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception, InterruptedException
     {
         if (_notificationHandler == null || !_notificationHandler.isConnected()) {
-            throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.getUrl() + " is not reachable");
+            throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._URL_params.getUrl() + " is not reachable");
         }
         if (_writeProtected && !_notificationHandler.hasRwAccess()) {
             throw new YAPI_Exception(YAPI.UNAUTHORIZED, "Access denied: admin credentials required");
@@ -478,7 +533,7 @@ class YHTTPHub extends YGenericHub
     synchronized byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestProgress progress, Object context) throws YAPI_Exception, InterruptedException
     {
         if (_notificationHandler == null || !_notificationHandler.isConnected()) {
-            throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.getUrl() + " is not reachable");
+            throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._URL_params.getUrl() + " is not reachable");
         }
         // Setup timeout counter
         int tcpTimeout = _yctx._networkTimeoutMs;
@@ -495,11 +550,6 @@ class YHTTPHub extends YGenericHub
     String getHost()
     {
         return _http_params.getHost();
-    }
-
-    int getPort()
-    {
-        return _http_params.getPort();
     }
 
     @Override
@@ -547,4 +597,25 @@ class YHTTPHub extends YGenericHub
         return _writeProtected && !_notificationHandler.hasRwAccess();
     }
 
+    public Socket OpenConnectedSocket(InetAddress addr, int mstimeout) throws YAPI_Exception
+    {
+        Socket socket;
+        if (_http_params.useSecureSocket()) {
+            try {
+                socket = _yctx.CreateSSLSocket(addr, _http_params.getPort());
+            } catch (IOException e) {
+                throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
+            }
+
+        } else {
+            SocketAddress sockaddr = new InetSocketAddress(addr, _http_params.getPort());
+            socket = new Socket();
+            try {
+                socket.connect(sockaddr, mstimeout);
+            } catch (IOException e) {
+                throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
+            }
+        }
+        return socket;
+    }
 }

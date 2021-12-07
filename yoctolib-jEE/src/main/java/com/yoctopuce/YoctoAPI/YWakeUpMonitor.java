@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpMonitor.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YWakeUpMonitor.java 45843 2021-08-04 07:51:59Z mvuilleu $
  *
  *  Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -46,7 +46,7 @@ package com.yoctopuce.YoctoAPI;
 //--- (YWakeUpMonitor class start)
 /**
  *  YWakeUpMonitor Class: wake-up monitor control interface, available for instance in the
- * YoctoHub-GSM-3G-EU, the YoctoHub-GSM-3G-NA, the YoctoHub-GSM-4G or the YoctoHub-Wireless-n
+ * YoctoHub-GSM-2G, the YoctoHub-GSM-3G-EU, the YoctoHub-GSM-4G or the YoctoHub-Wireless-n
  *
  * The YWakeUpMonitor class handles globally all wake-up sources, as well
  * as automated sleep mode.
@@ -499,7 +499,7 @@ public class YWakeUpMonitor extends YFunction
      * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the wake-up monitor, for instance
-     *         YHUBGSM3.wakeUpMonitor.
+     *         YHUBGSM1.wakeUpMonitor.
      *
      * @return a YWakeUpMonitor object allowing you to drive the wake-up monitor.
      */
@@ -538,7 +538,7 @@ public class YWakeUpMonitor extends YFunction
      *
      * @param yctx : a YAPI context
      * @param func : a string that uniquely characterizes the wake-up monitor, for instance
-     *         YHUBGSM3.wakeUpMonitor.
+     *         YHUBGSM1.wakeUpMonitor.
      *
      * @return a YWakeUpMonitor object allowing you to drive the wake-up monitor.
      */

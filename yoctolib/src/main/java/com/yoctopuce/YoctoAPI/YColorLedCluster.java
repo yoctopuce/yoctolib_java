@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLedCluster.java 44921 2021-05-06 08:03:05Z mvuilleu $
+ *  $Id: YColorLedCluster.java 45843 2021-08-04 07:51:59Z mvuilleu $
  *
  *  Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -48,7 +48,7 @@ import java.util.ArrayList;
 //--- (YColorLedCluster class start)
 /**
  *  YColorLedCluster Class: RGB LED cluster control interface, available for instance in the
- * Yocto-Color-V2 or the Yocto-MaxiBuzzer
+ * Yocto-Color-V2, the Yocto-MaxiBuzzer or the Yocto-MaxiKnob
  *
  * The YColorLedCluster class allows you to drive a
  * color LED cluster. Unlike the ColorLed class, the YColorLedCluster

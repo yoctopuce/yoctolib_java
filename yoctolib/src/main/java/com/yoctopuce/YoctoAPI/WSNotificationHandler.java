@@ -9,7 +9,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 class WSNotificationHandler extends NotificationHandler implements WSHandlerInterface.WSHandlerResponseInterface
 {
@@ -368,9 +372,9 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
             return (_lastPing + NET_HUB_NOT_CONNECTION_TIMEOUT) > System.currentTimeMillis();
         } else {
             synchronized (_stateLock) {
-            return _connectionState == ConnectionState.CONNECTED ||
-                    _connectionState == ConnectionState.AUTHENTICATING ||
-                    _connectionState == ConnectionState.CONNECTING;
+                return _connectionState == ConnectionState.CONNECTED ||
+                        _connectionState == ConnectionState.AUTHENTICATING ||
+                        _connectionState == ConnectionState.CONNECTING;
             }
         }
     }
@@ -418,7 +422,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                 }
                 byte[] chars = new byte[raw_data.remaining()];
                 raw_data.get(chars);
-                String tcpNotif = new String(chars, Charset.forName("ISO-8859-1"));
+                String tcpNotif = new String(chars, this._hub._yctx._deviceCharset);
                 decodeTCPNotif(tcpNotif);
                 break;
             case YGenericHub.YSTREAM_EMPTY:

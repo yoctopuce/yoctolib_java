@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YQuadratureDecoder.java 45292 2021-05-25 23:27:54Z mvuilleu $
+ *  $Id: YQuadratureDecoder.java 45843 2021-08-04 07:51:59Z mvuilleu $
  *
  *  Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -45,7 +45,8 @@ package com.yoctopuce.YoctoAPI;
 //--- (end of YQuadratureDecoder yapiwrapper)
 //--- (YQuadratureDecoder class start)
 /**
- * YQuadratureDecoder Class: quadrature decoder control interface, available for instance in the Yocto-PWM-Rx
+ *  YQuadratureDecoder Class: quadrature decoder control interface, available for instance in the
+ * Yocto-MaxiKnob or the Yocto-PWM-Rx
  *
  * The YQuadratureDecoder class allows you to read and configure Yoctopuce quadrature decoders.
  * It inherits from YSensor class the core functions to read measurements,
@@ -378,7 +379,7 @@ public class YQuadratureDecoder extends YSensor
      * call registerHub() at application initialization time.
      *
      * @param func : a string that uniquely characterizes the quadrature decoder, for instance
-     *         YPWMRX01.quadratureDecoder.
+     *         YMXBTN01.quadratureDecoder1.
      *
      * @return a YQuadratureDecoder object allowing you to drive the quadrature decoder.
      */
@@ -417,7 +418,7 @@ public class YQuadratureDecoder extends YSensor
      *
      * @param yctx : a YAPI context
      * @param func : a string that uniquely characterizes the quadrature decoder, for instance
-     *         YPWMRX01.quadratureDecoder.
+     *         YMXBTN01.quadratureDecoder1.
      *
      * @return a YQuadratureDecoder object allowing you to drive the quadrature decoder.
      */

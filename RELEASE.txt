@@ -1,5 +1,7 @@
-Java v1.10.45343
+Java v1.10.47582
 
-- Add edgePerCycle attribute to the QuadratureDecoder
-- Add Example for Yocto-MaxiKnob
-- Fix missing documentation for isReadOnly() method.
+- Add support for auto:// and secure:// url
+- Fix value notifications that where missing due to encoding
+- Add support for missing measures in DataStream (returned as NaN) and skipping them in DataSet
+- Add support for YInputChain class
+- Improve documentation of YAPI.RegisterHub

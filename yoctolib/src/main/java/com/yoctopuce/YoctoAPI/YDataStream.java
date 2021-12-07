@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ * $Id: YDataStream.java 45893 2021-08-09 13:53:21Z web $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -211,16 +211,26 @@ public class YDataStream
         if (_isAvg) {
             while (idx + 3 < udat.size()) {
                 dat.clear();
-                dat.add(_decodeVal(udat.get(idx + 2).intValue() + (((udat.get(idx + 3).intValue()) << (16)))));
-                dat.add(_decodeAvg(udat.get(idx).intValue() + (((((udat.get(idx + 1).intValue()) ^ (0x8000))) << (16))), 1));
-                dat.add(_decodeVal(udat.get(idx + 4).intValue() + (((udat.get(idx + 5).intValue()) << (16)))));
+                if ((udat.get(idx).intValue() == 65535) && (udat.get(idx + 1).intValue() == 65535)) {
+                    dat.add(Double.NaN);
+                    dat.add(Double.NaN);
+                    dat.add(Double.NaN);
+                } else {
+                    dat.add(_decodeVal(udat.get(idx + 2).intValue() + (((udat.get(idx + 3).intValue()) << (16)))));
+                    dat.add(_decodeAvg(udat.get(idx).intValue() + (((((udat.get(idx + 1).intValue()) ^ (0x8000))) << (16))), 1));
+                    dat.add(_decodeVal(udat.get(idx + 4).intValue() + (((udat.get(idx + 5).intValue()) << (16)))));
+                }
                 idx = idx + 6;
                 _values.add(new ArrayList<Double>(dat));
             }
         } else {
             while (idx + 1 < udat.size()) {
                 dat.clear();
-                dat.add(_decodeAvg(udat.get(idx).intValue() + (((((udat.get(idx + 1).intValue()) ^ (0x8000))) << (16))), 1));
+                if ((udat.get(idx).intValue() == 65535) && (udat.get(idx + 1).intValue() == 65535)) {
+                    dat.add(Double.NaN);
+                } else {
+                    dat.add(_decodeAvg(udat.get(idx).intValue() + (((((udat.get(idx + 1).intValue()) ^ (0x8000))) << (16))), 1));
+                }
                 _values.add(new ArrayList<Double>(dat));
                 idx = idx + 2;
             }

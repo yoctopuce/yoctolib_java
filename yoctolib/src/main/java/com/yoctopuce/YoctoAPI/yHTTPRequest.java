@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 37231 2019-09-20 09:09:17Z seb $
+ * $Id: yHTTPRequest.java 45549 2021-06-14 13:43:10Z web $
  *
  * internal yHTTPRequest object
  *
@@ -142,10 +142,8 @@ class yHTTPRequest implements Runnable
             try {
                 if (!_reuse_socket) {
                     InetAddress addr = InetAddress.getByName(_hub.getHost());
-                    SocketAddress sockaddr = new InetSocketAddress(addr, _hub.getPort());
-                    // Creates an unconnected socket
-                    _socket = new Socket();
-                    _socket.connect(sockaddr, (int) mstimeout);
+                    // Creates an connected socket
+                    _socket = _hub.OpenConnectedSocket(addr,(int) mstimeout);
                     _socket.setTcpNoDelay(true);
                     _out = _socket.getOutputStream();
                     _in = _socket.getInputStream();

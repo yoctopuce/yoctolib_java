@@ -50,7 +50,6 @@ public class WSHandlerJEE implements WSHandlerInterface, MessageHandler
 
             try {
                 _session = webSocketContainer.connectToServer(this, uri);
-
             } catch (DeploymentException | IOException e) {
                 e.printStackTrace();
                 throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());

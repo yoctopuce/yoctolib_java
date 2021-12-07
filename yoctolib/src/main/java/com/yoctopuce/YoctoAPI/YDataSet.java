@@ -1,5 +1,5 @@
 /*
- * $Id: YDataSet.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ * $Id: YDataSet.java 45849 2021-08-04 08:35:13Z web $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -333,6 +333,7 @@ public class YDataSet
         double tim;
         double itv;
         double fitv;
+        double avgv;
         double end_;
         int nCols;
         int minCol;
@@ -383,8 +384,9 @@ public class YDataSet
             } else {
                 end_ = tim + itv;
             }
-            if ((end_ > _startTimeMs) && ((_endTimeMs == 0) || (tim < _endTimeMs))) {
-                _measures.add(new YMeasure(tim / 1000, end_ / 1000, ii.get(minCol).doubleValue(), ii.get(avgCol).doubleValue(), ii.get(maxCol).doubleValue()));
+            avgv = ii.get(avgCol).doubleValue();
+            if ((end_ > _startTimeMs) && ((_endTimeMs == 0) || (tim < _endTimeMs)) && !(Double.isNaN(avgv))) {
+                _measures.add(new YMeasure(tim / 1000, end_ / 1000, ii.get(minCol).doubleValue(), avgv, ii.get(maxCol).doubleValue()));
             }
             tim = end_;
         }
