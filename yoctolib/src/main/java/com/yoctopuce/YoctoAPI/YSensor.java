@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ * $Id: YSensor.java 48017 2022-01-12 08:17:52Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -1275,7 +1275,7 @@ public class YSensor extends YFunction
      */
     public int startDataLogger() throws YAPI_Exception
     {
-        byte[] res;
+        byte[] res = new byte[0];
 
         res = _download("api/dataLogger/recording?recording=1");
         //noinspection DoubleNegation
@@ -1290,7 +1290,7 @@ public class YSensor extends YFunction
      */
     public int stopDataLogger() throws YAPI_Exception
     {
-        byte[] res;
+        byte[] res = new byte[0];
 
         res = _download("api/dataLogger/recording?recording=0");
         //noinspection DoubleNegation

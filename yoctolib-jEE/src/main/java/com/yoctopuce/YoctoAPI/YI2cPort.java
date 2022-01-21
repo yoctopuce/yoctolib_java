@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YI2cPort.java 48017 2022-01-12 08:17:52Z seb $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -133,7 +133,7 @@ public class YI2cPort extends YFunction
     protected String _i2cMode = I2CMODE_INVALID;
     protected UpdateCallback _valueCallbackI2cPort = null;
     protected int _rxptr = 0;
-    protected byte[] _rxbuff;
+    protected byte[] _rxbuff = new byte[0];
     protected int _rxbuffptr = 0;
 
     /**
@@ -1054,7 +1054,7 @@ public class YI2cPort extends YFunction
     public String readLine() throws YAPI_Exception
     {
         String url;
-        byte[] msgbin;
+        byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1100,7 +1100,7 @@ public class YI2cPort extends YFunction
     public ArrayList<String> readMessages(String pattern,int maxWait) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin;
+        byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         ArrayList<String> res = new ArrayList<>();
@@ -1157,7 +1157,7 @@ public class YI2cPort extends YFunction
      */
     public int read_avail() throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         int res;
 
@@ -1185,7 +1185,7 @@ public class YI2cPort extends YFunction
     public String queryLine(String query,int maxWait) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin;
+        byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1223,7 +1223,7 @@ public class YI2cPort extends YFunction
     public String queryHex(String hexString,int maxWait) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin;
+        byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1392,7 +1392,7 @@ public class YI2cPort extends YFunction
         int val;
         String msg;
         String reply;
-        byte[] rcvbytes;
+        byte[] rcvbytes = new byte[0];
         msg = String.format(Locale.US, "@%02x:",slaveAddr);
         nBytes = (buff).length;
         idx = 0;
@@ -1442,7 +1442,7 @@ public class YI2cPort extends YFunction
         int val;
         String msg;
         String reply;
-        byte[] rcvbytes;
+        byte[] rcvbytes = new byte[0];
         ArrayList<Integer> res = new ArrayList<>();
         msg = String.format(Locale.US, "@%02x:",slaveAddr);
         nBytes = values.size();
@@ -1502,7 +1502,7 @@ public class YI2cPort extends YFunction
     public int writeStr(String codes) throws YAPI_Exception
     {
         int bufflen;
-        byte[] buff;
+        byte[] buff = new byte[0];
         int idx;
         int ch;
         buff = (codes).getBytes();
@@ -1550,7 +1550,7 @@ public class YI2cPort extends YFunction
     public int writeLine(String codes) throws YAPI_Exception
     {
         int bufflen;
-        byte[] buff;
+        byte[] buff = new byte[0];
         bufflen = (codes).length();
         if (bufflen < 100) {
             return sendCommand(String.format(Locale.US, "!%s",codes));
@@ -1589,7 +1589,7 @@ public class YI2cPort extends YFunction
     public int writeHex(String hexString) throws YAPI_Exception
     {
         int bufflen;
-        byte[] buff;
+        byte[] buff = new byte[0];
         bufflen = (hexString).length();
         if (bufflen < 100) {
             return sendCommand(String.format(Locale.US, "+%s",hexString));
@@ -1673,7 +1673,7 @@ public class YI2cPort extends YFunction
     public ArrayList<YI2cSnoopingRecord> snoopMessages(int maxWait) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin;
+        byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         ArrayList<YI2cSnoopingRecord> res = new ArrayList<>();

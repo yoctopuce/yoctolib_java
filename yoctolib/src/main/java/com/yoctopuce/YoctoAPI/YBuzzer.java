@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YBuzzer.java 45843 2021-08-04 07:51:59Z mvuilleu $
+ *  $Id: YBuzzer.java 48017 2022-01-12 08:17:52Z seb $
  *
  *  Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -620,7 +620,7 @@ public class YBuzzer extends YFunction
         int note;
         int num;
         int typ;
-        byte[] ascNotes;
+        byte[] ascNotes = new byte[0];
         int notesLen;
         int i;
         int ch;

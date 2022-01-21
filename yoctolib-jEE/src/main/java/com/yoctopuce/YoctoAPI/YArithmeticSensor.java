@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YArithmeticSensor.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YArithmeticSensor.java 48017 2022-01-12 08:17:52Z seb $
  *
  *  Implements FindArithmeticSensor(), the high-level API for ArithmeticSensor functions
  *
@@ -404,7 +404,7 @@ public class YArithmeticSensor extends YSensor
         String id;
         String fname;
         String content;
-        byte[] data;
+        byte[] data = new byte[0];
         String diags;
         double resval;
         id = get_functionId();
@@ -506,7 +506,7 @@ public class YArithmeticSensor extends YSensor
     public int loadAuxiliaryFunction(String name,ArrayList<Double> inputValues,ArrayList<Double> outputValues) throws YAPI_Exception
     {
         String fname;
-        byte[] defbin;
+        byte[] defbin = new byte[0];
         int siz;
 
         fname = String.format(Locale.US, "userMap%s.txt",name);

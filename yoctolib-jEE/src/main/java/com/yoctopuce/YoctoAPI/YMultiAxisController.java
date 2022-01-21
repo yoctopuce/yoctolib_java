@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiAxisController.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YMultiAxisController.java 48017 2022-01-12 08:17:52Z seb $
  *
  *  Implements FindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -400,7 +400,7 @@ public class YMultiAxisController extends YFunction
     public int sendCommand(String command) throws YAPI_Exception
     {
         String url;
-        byte[] retBin;
+        byte[] retBin = new byte[0];
         int res;
         url = String.format(Locale.US, "cmd.txt?X=%s",command);
         //may throw an exception

@@ -1,7 +1,4 @@
-Java v1.10.47582
+Java v1.10.48220
 
-- Add support for auto:// and secure:// url
-- Fix value notifications that where missing due to encoding
-- Add support for missing measures in DataStream (returned as NaN) and skipping them in DataSet
-- Add support for YInputChain class
-- Improve documentation of YAPI.RegisterHub
+- Fix YSMS addText method
+- Fix search feature in HTML documentation

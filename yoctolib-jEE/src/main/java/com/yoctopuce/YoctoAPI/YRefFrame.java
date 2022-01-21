@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRefFrame.java 43619 2021-01-29 09:14:45Z mvuilleu $
+ *  $Id: YRefFrame.java 48017 2022-01-12 08:17:52Z seb $
  *
  *  Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -837,7 +837,7 @@ public class YRefFrame extends YFunction
     public int more3DCalibrationV1() throws YAPI_Exception
     {
         int currTick;
-        byte[] jsonData;
+        byte[] jsonData = new byte[0];
         double xVal;
         double yVal;
         double zVal;
@@ -1038,7 +1038,7 @@ public class YRefFrame extends YFunction
     public int more3DCalibrationV2() throws YAPI_Exception
     {
         int currTick;
-        byte[] calibParam;
+        byte[] calibParam = new byte[0];
         ArrayList<Integer> iCalib = new ArrayList<>();
         int cal3;
         int calAcc;

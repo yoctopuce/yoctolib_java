@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ * $Id: YModule.java 48017 2022-01-12 08:17:52Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -1338,7 +1338,7 @@ public class YModule extends YFunction
     public YFirmwareUpdate updateFirmwareEx(String path,boolean force) throws YAPI_Exception
     {
         String serial;
-        byte[] settings;
+        byte[] settings = new byte[0];
 
         serial = get_serialNumber();
         settings = get_allSettings();
@@ -1372,9 +1372,9 @@ public class YModule extends YFunction
      */
     public byte[] get_allSettings() throws YAPI_Exception
     {
-        byte[] settings;
-        byte[] json;
-        byte[] res;
+        byte[] settings = new byte[0];
+        byte[] json = new byte[0];
+        byte[] res = new byte[0];
         String sep;
         String name;
         String item;
@@ -1382,8 +1382,8 @@ public class YModule extends YFunction
         String id;
         String url;
         String file_data;
-        byte[] file_data_bin;
-        byte[] temp_data_bin;
+        byte[] file_data_bin = new byte[0];
+        byte[] temp_data_bin = new byte[0];
         String ext_settings;
         ArrayList<String> filelist = new ArrayList<>();
         ArrayList<String> templist = new ArrayList<>();
@@ -1493,7 +1493,7 @@ public class YModule extends YFunction
      */
     public int set_allSettingsAndFiles(byte[] settings) throws YAPI_Exception
     {
-        byte[] down;
+        byte[] down = new byte[0];
         String json;
         String json_api;
         String json_files;
@@ -1864,12 +1864,12 @@ public class YModule extends YFunction
     public int set_allSettings(byte[] settings) throws YAPI_Exception
     {
         ArrayList<String> restoreLast = new ArrayList<>();
-        byte[] old_json_flat;
+        byte[] old_json_flat = new byte[0];
         ArrayList<String> old_dslist = new ArrayList<>();
         ArrayList<String> old_jpath = new ArrayList<>();
         ArrayList<Integer> old_jpath_len = new ArrayList<>();
         ArrayList<String> old_val_arr = new ArrayList<>();
-        byte[] actualSettings;
+        byte[] actualSettings = new byte[0];
         ArrayList<String> new_dslist = new ArrayList<>();
         ArrayList<String> new_jpath = new ArrayList<>();
         ArrayList<Integer> new_jpath_len = new ArrayList<>();
@@ -2214,7 +2214,7 @@ public class YModule extends YFunction
      */
     public String get_lastLogs() throws YAPI_Exception
     {
-        byte[] content;
+        byte[] content = new byte[0];
 
         content = _download("logs.txt");
         return new String(content);

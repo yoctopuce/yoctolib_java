@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ * $Id: YMessageBox.java 48014 2022-01-12 08:06:41Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -94,7 +94,7 @@ public class YMessageBox extends YFunction
     protected ArrayList<YSms> _messages = new ArrayList<>();
     protected boolean _gsm2unicodeReady;
     protected ArrayList<Integer> _gsm2unicode = new ArrayList<>();
-    protected byte[] _iso2gsm;
+    protected byte[] _iso2gsm = new byte[0];
 
     /**
      * Deprecated UpdateCallback for MessageBox
@@ -543,7 +543,7 @@ public class YMessageBox extends YFunction
 
     public YSms fetchPdu(int slot) throws YAPI_Exception
     {
-        byte[] binPdu;
+        byte[] binPdu = new byte[0];
         ArrayList<String> arrPdu = new ArrayList<>();
         String hexPdu;
         YSms sms;
@@ -730,7 +730,7 @@ public class YMessageBox extends YFunction
         int i;
         int gsmlen;
         int reslen;
-        byte[] resbin;
+        byte[] resbin = new byte[0];
         String resstr;
         int uni;
         if (!(_gsm2unicodeReady)) {
@@ -818,13 +818,13 @@ public class YMessageBox extends YFunction
 
     public byte[] str2gsm(String msg)
     {
-        byte[] asc;
+        byte[] asc = new byte[0];
         int asclen;
         int i;
         int ch;
         int gsm7;
         int extra;
-        byte[] res;
+        byte[] res = new byte[0];
         int wpos;
         if (!(_gsm2unicodeReady)) {
             initGsm2Unicode();
@@ -895,8 +895,8 @@ public class YMessageBox extends YFunction
     public int checkNewMessages() throws YAPI_Exception
     {
         String bitmapStr;
-        byte[] prevBitmap;
-        byte[] newBitmap;
+        byte[] prevBitmap = new byte[0];
+        byte[] newBitmap = new byte[0];
         int slot;
         int nslots;
         int pduIdx;

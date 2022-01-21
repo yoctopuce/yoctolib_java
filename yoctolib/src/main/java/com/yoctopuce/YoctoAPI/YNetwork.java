@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 45843 2021-08-04 07:51:59Z mvuilleu $
+ *  $Id: YNetwork.java 48183 2022-01-20 10:26:11Z mvuilleu $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -47,7 +47,7 @@ import java.util.Locale;
 //--- (YNetwork class start)
 /**
  *  YNetwork Class: network interface control interface, available for instance in the
- * YoctoHub-Ethernet, the YoctoHub-GSM-3G-EU, the YoctoHub-GSM-4G or the YoctoHub-Wireless-n
+ * YoctoHub-Ethernet, the YoctoHub-GSM-4G, the YoctoHub-Wireless-g or the YoctoHub-Wireless-n
  *
  * YNetwork objects provide access to TCP/IP parameters of Yoctopuce
  * devices that include a built-in network interface.
@@ -2136,7 +2136,7 @@ public class YNetwork extends YFunction
      */
     public String ping(String host) throws YAPI_Exception
     {
-        byte[] content;
+        byte[] content = new byte[0];
 
         content = _download(String.format(Locale.US, "ping.txt?host=%s",host));
         return new String(content);

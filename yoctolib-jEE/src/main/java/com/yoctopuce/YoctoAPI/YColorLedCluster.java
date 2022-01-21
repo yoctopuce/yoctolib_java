@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLedCluster.java 45843 2021-08-04 07:51:59Z mvuilleu $
+ *  $Id: YColorLedCluster.java 48017 2022-01-12 08:17:52Z seb $
  *
  *  Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -989,7 +989,7 @@ public class YColorLedCluster extends YFunction
     public int set_rgbColorArray(int ledIndex,ArrayList<Integer> rgbList) throws YAPI_Exception
     {
         int listlen;
-        byte[] buff;
+        byte[] buff = new byte[0];
         int idx;
         int rgb;
         int res;
@@ -1024,7 +1024,7 @@ public class YColorLedCluster extends YFunction
     public int rgbArrayOfs_move(int ledIndex,ArrayList<Integer> rgbList,int delay) throws YAPI_Exception
     {
         int listlen;
-        byte[] buff;
+        byte[] buff = new byte[0];
         int idx;
         int rgb;
         int res;
@@ -1095,7 +1095,7 @@ public class YColorLedCluster extends YFunction
     public int set_hslColorArray(int ledIndex,ArrayList<Integer> hslList) throws YAPI_Exception
     {
         int listlen;
-        byte[] buff;
+        byte[] buff = new byte[0];
         int idx;
         int hsl;
         int res;
@@ -1150,7 +1150,7 @@ public class YColorLedCluster extends YFunction
     public int hslArrayOfs_move(int ledIndex,ArrayList<Integer> hslList,int delay) throws YAPI_Exception
     {
         int listlen;
-        byte[] buff;
+        byte[] buff = new byte[0];
         int idx;
         int hsl;
         int res;
@@ -1200,7 +1200,7 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_rgbColorArray(int ledIndex,int count) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int r;
@@ -1234,7 +1234,7 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_rgbColorArrayAtPowerOn(int ledIndex,int count) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int r;
@@ -1268,7 +1268,7 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_linkedSeqArray(int ledIndex,int count) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int seq;
@@ -1298,7 +1298,7 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_blinkSeqSignatures(int seqIndex,int count) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int hh;
@@ -1332,7 +1332,7 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_blinkSeqStateSpeed(int seqIndex,int count) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int lh;
@@ -1362,7 +1362,7 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_blinkSeqStateAtPowerOn(int seqIndex,int count) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int started;
@@ -1390,7 +1390,7 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_blinkSeqState(int seqIndex,int count) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int started;

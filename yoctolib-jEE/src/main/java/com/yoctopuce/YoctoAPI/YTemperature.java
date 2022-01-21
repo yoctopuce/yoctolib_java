@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTemperature.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YTemperature.java 48017 2022-01-12 08:17:52Z seb $
  *
  *  Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -688,7 +688,7 @@ public class YTemperature extends YSensor
     public int loadThermistorResponseTable(ArrayList<Double> tempValues,ArrayList<Double> resValues) throws YAPI_Exception
     {
         String id;
-        byte[] bin_json;
+        byte[] bin_json = new byte[0];
         ArrayList<String> paramlist = new ArrayList<>();
         ArrayList<Double> templist = new ArrayList<>();
         int siz;

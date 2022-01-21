@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 45292 2021-05-25 23:27:54Z mvuilleu $
+ * $Id: YFiles.java 48017 2022-01-12 08:17:52Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -334,7 +334,7 @@ public class YFiles extends YFunction
      */
     public int format_fs() throws YAPI_Exception
     {
-        byte[] json;
+        byte[] json = new byte[0];
         String res;
         json = sendCommand("format");
         res = _json_get_key(json, "res");
@@ -358,7 +358,7 @@ public class YFiles extends YFunction
      */
     public ArrayList<YFileRecord> get_list(String pattern) throws YAPI_Exception
     {
-        byte[] json;
+        byte[] json = new byte[0];
         ArrayList<String> filelist = new ArrayList<>();
         ArrayList<YFileRecord> res = new ArrayList<>();
         json = sendCommand(String.format(Locale.US, "dir&f=%s",pattern));
@@ -381,7 +381,7 @@ public class YFiles extends YFunction
      */
     public boolean fileExist(String filename) throws YAPI_Exception
     {
-        byte[] json;
+        byte[] json = new byte[0];
         ArrayList<String> filelist = new ArrayList<>();
         if ((filename).length() == 0) {
             return false;
@@ -440,7 +440,7 @@ public class YFiles extends YFunction
      */
     public int remove(String pathname) throws YAPI_Exception
     {
-        byte[] json;
+        byte[] json = new byte[0];
         String res;
         json = sendCommand(String.format(Locale.US, "del&f=%s",pathname));
         res  = _json_get_key(json, "res");

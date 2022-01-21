@@ -952,7 +952,7 @@ public class YInputChain extends YFunction
      */
     public String get_lastEvents() throws YAPI_Exception
     {
-        byte[] content;
+        byte[] content = new byte[0];
 
         content = _download("events.txt");
         return new String(content);
@@ -986,7 +986,7 @@ public class YInputChain extends YFunction
     {
         int newPos;
         String url;
-        byte[] content;
+        byte[] content = new byte[0];
         String contentStr;
         ArrayList<String> eventArr = new ArrayList<>();
         int arrLen;

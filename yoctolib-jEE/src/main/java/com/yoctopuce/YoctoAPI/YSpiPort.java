@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSpiPort.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YSpiPort.java 48017 2022-01-12 08:17:52Z seb $
  *
  *  Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -152,7 +152,7 @@ public class YSpiPort extends YFunction
     protected int _shiftSampling = SHIFTSAMPLING_INVALID;
     protected UpdateCallback _valueCallbackSpiPort = null;
     protected int _rxptr = 0;
-    protected byte[] _rxbuff;
+    protected byte[] _rxbuff = new byte[0];
     protected int _rxbuffptr = 0;
 
     /**
@@ -1243,7 +1243,7 @@ public class YSpiPort extends YFunction
     public String readLine() throws YAPI_Exception
     {
         String url;
-        byte[] msgbin;
+        byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1289,7 +1289,7 @@ public class YSpiPort extends YFunction
     public ArrayList<String> readMessages(String pattern,int maxWait) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin;
+        byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         ArrayList<String> res = new ArrayList<>();
@@ -1346,7 +1346,7 @@ public class YSpiPort extends YFunction
      */
     public int read_avail() throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         int res;
 
@@ -1374,7 +1374,7 @@ public class YSpiPort extends YFunction
     public String queryLine(String query,int maxWait) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin;
+        byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1412,7 +1412,7 @@ public class YSpiPort extends YFunction
     public String queryHex(String hexString,int maxWait) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin;
+        byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1508,7 +1508,7 @@ public class YSpiPort extends YFunction
      */
     public int writeStr(String text) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         int idx;
         int ch;
@@ -1559,7 +1559,7 @@ public class YSpiPort extends YFunction
      */
     public int writeArray(ArrayList<Integer> byteList) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         int idx;
         int hexb;
@@ -1588,7 +1588,7 @@ public class YSpiPort extends YFunction
      */
     public int writeHex(String hexString) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         int idx;
         int hexb;
@@ -1621,7 +1621,7 @@ public class YSpiPort extends YFunction
      */
     public int writeLine(String text) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         int idx;
         int ch;
@@ -1660,7 +1660,7 @@ public class YSpiPort extends YFunction
     {
         int currpos;
         int reqlen;
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         int mult;
         int endpos;
@@ -1729,7 +1729,7 @@ public class YSpiPort extends YFunction
      */
     public String readStr(int nChars) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         int mult;
         int endpos;
@@ -1765,12 +1765,12 @@ public class YSpiPort extends YFunction
      */
     public byte[] readBin(int nChars) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         int mult;
         int endpos;
         int idx;
-        byte[] res;
+        byte[] res = new byte[0];
         if (nChars > 65535) {
             nChars = 65535;
         }
@@ -1807,7 +1807,7 @@ public class YSpiPort extends YFunction
      */
     public ArrayList<Integer> readArray(int nChars) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         int mult;
         int endpos;
@@ -1851,7 +1851,7 @@ public class YSpiPort extends YFunction
      */
     public String readHex(int nBytes) throws YAPI_Exception
     {
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         int mult;
         int endpos;
@@ -1915,7 +1915,7 @@ public class YSpiPort extends YFunction
     public ArrayList<YSpiSnoopingRecord> snoopMessages(int maxWait) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin;
+        byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         ArrayList<YSpiSnoopingRecord> res = new ArrayList<>();

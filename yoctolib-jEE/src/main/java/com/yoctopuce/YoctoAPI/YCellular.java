@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ * $Id: YCellular.java 48017 2022-01-12 08:17:52Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -1455,7 +1455,7 @@ public class YCellular extends YFunction
         int cmdLen;
         int waitMore;
         String res;
-        byte[] buff;
+        byte[] buff = new byte[0];
         int bufflen;
         String buffstr;
         int buffstrlen;

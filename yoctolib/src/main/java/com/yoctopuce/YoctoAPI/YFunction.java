@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 43619 2021-01-29 09:14:45Z mvuilleu $
+ * $Id: YFunction.java 48017 2022-01-12 08:17:52Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -485,7 +485,7 @@ public class YFunction
     public String loadAttribute(String attrName) throws YAPI_Exception
     {
         String url;
-        byte[] attrVal;
+        byte[] attrVal = new byte[0];
         url = String.format(Locale.US, "api/%s/%s", get_functionId(),attrName);
         attrVal = _download(url);
         return new String(attrVal);

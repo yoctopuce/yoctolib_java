@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YStepperMotor.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YStepperMotor.java 48017 2022-01-12 08:17:52Z seb $
  *
  *  Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1178,7 +1178,7 @@ public class YStepperMotor extends YFunction
     {
         String id;
         String url;
-        byte[] retBin;
+        byte[] retBin = new byte[0];
         int res;
         id = get_functionId();
         id = (id).substring( 12,  12 + 1);

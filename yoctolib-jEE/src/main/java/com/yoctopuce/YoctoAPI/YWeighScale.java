@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWeighScale.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YWeighScale.java 48017 2022-01-12 08:17:52Z seb $
  *
  *  Implements FindWeighScale(), the high-level API for WeighScale functions
  *
@@ -906,7 +906,7 @@ public class YWeighScale extends YSensor
     public int loadCompensationTable(int tableIndex,ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
     {
         String id;
-        byte[] bin_json;
+        byte[] bin_json = new byte[0];
         ArrayList<String> paramlist = new ArrayList<>();
         int siz;
         int idx;
