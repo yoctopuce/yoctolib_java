@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 48017 2022-01-12 08:17:52Z seb $
+ * $Id: YSerialPort.java 48954 2022-03-14 09:55:13Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -1743,6 +1743,23 @@ public class YSerialPort extends YFunction
             ofs = ofs + 1;
         }
         return res;
+    }
+
+    /**
+     * Emits a BREAK condition on the serial interface. When the specified
+     * duration is 0, the BREAK signal will be exactly one character wide.
+     * When the duration is between 1 and 100, the BREAK condition will
+     * be hold for the specified number of milliseconds.
+     *
+     * @param duration : 0 for a standard BREAK, or duration between 1 and 100 ms
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int sendBreak(int duration) throws YAPI_Exception
+    {
+        return sendCommand(String.format(Locale.US, "B%d",duration));
     }
 
     /**

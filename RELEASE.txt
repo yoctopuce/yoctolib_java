@@ -1,4 +1,4 @@
-Java v1.10.48220
+Java v1.10.49349
 
-- Fix YSMS addText method
-- Fix search feature in HTML documentation
+- Add support for Apple Silicon
+- Add sendBreak method in SerialPort

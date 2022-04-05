@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 48183 2022-01-20 10:26:11Z mvuilleu $
+ *  $Id: YNetwork.java 48692 2022-02-24 22:30:52Z mvuilleu $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -82,6 +82,10 @@ public class YNetwork extends YFunction
      * invalid router value
      */
     public static final String ROUTER_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid currentDNS value
+     */
+    public static final String CURRENTDNS_INVALID = YAPI.INVALID_STRING;
     /**
      * invalid ipConfig value
      */
@@ -181,6 +185,7 @@ public class YNetwork extends YFunction
     protected String _ipAddress = IPADDRESS_INVALID;
     protected String _subnetMask = SUBNETMASK_INVALID;
     protected String _router = ROUTER_INVALID;
+    protected String _currentDNS = CURRENTDNS_INVALID;
     protected String _ipConfig = IPCONFIG_INVALID;
     protected String _primaryDNS = PRIMARYDNS_INVALID;
     protected String _secondaryDNS = SECONDARYDNS_INVALID;
@@ -270,6 +275,9 @@ public class YNetwork extends YFunction
         }
         if (json_val.has("router")) {
             _router = json_val.getString("router");
+        }
+        if (json_val.has("currentDNS")) {
+            _currentDNS = json_val.getString("currentDNS");
         }
         if (json_val.has("ipConfig")) {
             _ipConfig = json_val.getString("ipConfig");
@@ -528,6 +536,39 @@ public class YNetwork extends YFunction
     public String getRouter() throws YAPI_Exception
     {
         return get_router();
+    }
+
+    /**
+     * Returns the IP address of the DNS server currently used by the device.
+     *
+     * @return a string corresponding to the IP address of the DNS server currently used by the device
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_currentDNS() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return CURRENTDNS_INVALID;
+                }
+            }
+            res = _currentDNS;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the IP address of the DNS server currently used by the device.
+     *
+     * @return a string corresponding to the IP address of the DNS server currently used by the device
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getCurrentDNS() throws YAPI_Exception
+    {
+        return get_currentDNS();
     }
 
     /**

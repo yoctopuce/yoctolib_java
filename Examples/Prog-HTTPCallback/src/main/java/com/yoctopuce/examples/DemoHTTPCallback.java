@@ -31,7 +31,7 @@ public class DemoHTTPCallback extends HttpServlet
     @Override
     public void init() throws ServletException
     {
-        System.out.println("Setup Yoctpuce API to use thread specific cache");
+        System.out.println("Setup Yoctopuce API to use thread specific cache");
         try {
             YAPI.SetThreadSpecificMode();
         } catch (YAPI_Exception ex) {
