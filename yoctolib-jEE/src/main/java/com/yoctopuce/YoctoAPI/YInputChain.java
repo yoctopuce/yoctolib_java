@@ -67,6 +67,12 @@ public class YInputChain extends YFunction
      */
     public static final int DETECTEDNODES_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid loopbackTest value
+     */
+    public static final int LOOPBACKTEST_OFF = 0;
+    public static final int LOOPBACKTEST_ON = 1;
+    public static final int LOOPBACKTEST_INVALID = -1;
+    /**
      * invalid refreshRate value
      */
     public static final int REFRESHRATE_INVALID = YAPI.INVALID_UINT;
@@ -108,6 +114,7 @@ public class YInputChain extends YFunction
     public static final int CHAINDIAGS_INVALID = YAPI.INVALID_UINT;
     protected int _expectedNodes = EXPECTEDNODES_INVALID;
     protected int _detectedNodes = DETECTEDNODES_INVALID;
+    protected int _loopbackTest = LOOPBACKTEST_INVALID;
     protected int _refreshRate = REFRESHRATE_INVALID;
     protected String _bitChain1 = BITCHAIN1_INVALID;
     protected String _bitChain2 = BITCHAIN2_INVALID;
@@ -205,6 +212,9 @@ public class YInputChain extends YFunction
         }
         if (json_val.has("detectedNodes")) {
             _detectedNodes = json_val.getInt("detectedNodes");
+        }
+        if (json_val.has("loopbackTest")) {
+            _loopbackTest = json_val.getInt("loopbackTest") > 0 ? 1 : 0;
         }
         if (json_val.has("refreshRate")) {
             _refreshRate = json_val.getInt("refreshRate");
@@ -340,6 +350,84 @@ public class YInputChain extends YFunction
     public int getDetectedNodes() throws YAPI_Exception
     {
         return get_detectedNodes();
+    }
+
+    /**
+     * Returns the activation state of the exhaustive chain connectivity test.
+     * The connectivity test requires a cable connecting the end of the chain
+     * to the loopback test connector.
+     *
+     *  @return either YInputChain.LOOPBACKTEST_OFF or YInputChain.LOOPBACKTEST_ON, according to the
+     * activation state of the exhaustive chain connectivity test
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_loopbackTest() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return LOOPBACKTEST_INVALID;
+                }
+            }
+            res = _loopbackTest;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the activation state of the exhaustive chain connectivity test.
+     * The connectivity test requires a cable connecting the end of the chain
+     * to the loopback test connector.
+     *
+     *  @return either YInputChain.LOOPBACKTEST_OFF or YInputChain.LOOPBACKTEST_ON, according to the
+     * activation state of the exhaustive chain connectivity test
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getLoopbackTest() throws YAPI_Exception
+    {
+        return get_loopbackTest();
+    }
+
+    /**
+     * Changes the activation state of the exhaustive chain connectivity test.
+     * The connectivity test requires a cable connecting the end of the chain
+     * to the loopback test connector.
+     *
+     *  @param newval : either YInputChain.LOOPBACKTEST_OFF or YInputChain.LOOPBACKTEST_ON, according to
+     * the activation state of the exhaustive chain connectivity test
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_loopbackTest(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("loopbackTest",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the activation state of the exhaustive chain connectivity test.
+     * The connectivity test requires a cable connecting the end of the chain
+     * to the loopback test connector.
+     *
+     *  @param newval : either YInputChain.LOOPBACKTEST_OFF or YInputChain.LOOPBACKTEST_ON, according to
+     * the activation state of the exhaustive chain connectivity test
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setLoopbackTest(int newval)  throws YAPI_Exception
+    {
+        return set_loopbackTest(newval);
     }
 
     /**

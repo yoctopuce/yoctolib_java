@@ -1,4 +1,3 @@
-Java v1.10.49349
+Java v1.10.49416
 
 - Add support for Apple Silicon
-- Add sendBreak method in SerialPort
