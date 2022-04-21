@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiSensController.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YMultiSensController.java 49501 2022-04-21 07:09:25Z mvuilleu $
  *
  *  Implements FindMultiSensController(), the high-level API for MultiSensController functions
  *
@@ -72,12 +72,17 @@ public class YMultiSensController extends YFunction
     public static final int MAINTENANCEMODE_TRUE = 1;
     public static final int MAINTENANCEMODE_INVALID = -1;
     /**
+     * invalid lastAddressDetected value
+     */
+    public static final int LASTADDRESSDETECTED_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected int _nSensors = NSENSORS_INVALID;
     protected int _maxSensors = MAXSENSORS_INVALID;
     protected int _maintenanceMode = MAINTENANCEMODE_INVALID;
+    protected int _lastAddressDetected = LASTADDRESSDETECTED_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackMultiSensController = null;
 
@@ -144,6 +149,9 @@ public class YMultiSensController extends YFunction
         if (json_val.has("maintenanceMode")) {
             _maintenanceMode = json_val.getInt("maintenanceMode") > 0 ? 1 : 0;
         }
+        if (json_val.has("lastAddressDetected")) {
+            _lastAddressDetected = json_val.getInt("lastAddressDetected");
+        }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
         }
@@ -188,7 +196,7 @@ public class YMultiSensController extends YFunction
      * saveToFlash() method of the module if the
      * modification must be kept. It is recommended to restart the
      * device with  module->reboot() after modifying
-     * (and saving) this settings
+     * (and saving) this settings.
      *
      * @param newval : an integer corresponding to the number of sensors to poll
      *
@@ -211,7 +219,7 @@ public class YMultiSensController extends YFunction
      * saveToFlash() method of the module if the
      * modification must be kept. It is recommended to restart the
      * device with  module->reboot() after modifying
-     * (and saving) this settings
+     * (and saving) this settings.
      *
      * @param newval : an integer corresponding to the number of sensors to poll
      *
@@ -331,6 +339,45 @@ public class YMultiSensController extends YFunction
     public int setMaintenanceMode(int newval)  throws YAPI_Exception
     {
         return set_maintenanceMode(newval);
+    }
+
+    /**
+     * Returns the I2C address of the most recently detected sensor. This method can
+     * be used to in case of I2C communication error to determine what is the
+     * last sensor that can be reached, or after a call to setupAddress
+     * to make sure that the address change was properly processed.
+     *
+     * @return an integer corresponding to the I2C address of the most recently detected sensor
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_lastAddressDetected() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return LASTADDRESSDETECTED_INVALID;
+                }
+            }
+            res = _lastAddressDetected;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the I2C address of the most recently detected sensor. This method can
+     * be used to in case of I2C communication error to determine what is the
+     * last sensor that can be reached, or after a call to setupAddress
+     * to make sure that the address change was properly processed.
+     *
+     * @return an integer corresponding to the I2C address of the most recently detected sensor
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getLastAddressDetected() throws YAPI_Exception
+    {
+        return get_lastAddressDetected();
     }
 
     public String get_command() throws YAPI_Exception
@@ -483,9 +530,10 @@ public class YMultiSensController extends YFunction
      * Configures the I2C address of the only sensor connected to the device.
      * It is recommended to put the the device in maintenance mode before
      * changing sensor addresses.  This method is only intended to work with a single
-     * sensor connected to the device, if several sensors are connected, the result
+     * sensor connected to the device. If several sensors are connected, the result
      * is unpredictable.
-     * Note that the device is probably expecting to find a string of sensors with specific
+     *
+     * Note that the device is expecting to find a sensor or a string of sensors with specific
      * addresses. Check the device documentation to find out which addresses should be used.
      *
      * @param addr : new address of the connected sensor
@@ -496,8 +544,38 @@ public class YMultiSensController extends YFunction
     public int setupAddress(int addr) throws YAPI_Exception
     {
         String cmd;
+        int res;
         cmd = String.format(Locale.US, "A%d",addr);
-        return set_command(cmd);
+        res = set_command(cmd);
+        //noinspection DoubleNegation
+        if (!(res == YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to trigger address change");}
+        YAPI.Sleep(1500);
+        res = get_lastAddressDetected();
+        //noinspection DoubleNegation
+        if (!(res > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "IR sensor not found");}
+        //noinspection DoubleNegation
+        if (!(res == addr)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "address change failed");}
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Triggers the I2C address detection procedure for the only sensor connected to the device.
+     * This method is only intended to work with a single sensor connected to the device.
+     * If several sensors are connected, the result is unpredictable.
+     *
+     * @return the I2C address of the detected sensor, or 0 if none is found
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_sensorAddress() throws YAPI_Exception
+    {
+        int res;
+        res = set_command("a");
+        //noinspection DoubleNegation
+        if (!(res == YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to trigger address detection");}
+        YAPI.Sleep(1000);
+        res = get_lastAddressDetected();
+        return res;
     }
 
     /**
