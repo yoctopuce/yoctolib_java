@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSpiPort.java 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: YSpiPort.java 49744 2022-05-11 15:13:45Z mvuilleu $
  *
  *  Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -117,6 +117,7 @@ public class YSpiPort extends YFunction
     public static final int VOLTAGELEVEL_RS232 = 5;
     public static final int VOLTAGELEVEL_RS485 = 6;
     public static final int VOLTAGELEVEL_TTL1V8 = 7;
+    public static final int VOLTAGELEVEL_SDI12 = 8;
     public static final int VOLTAGELEVEL_INVALID = -1;
     /**
      * invalid spiMode value
@@ -782,8 +783,8 @@ public class YSpiPort extends YFunction
      *
      *  @return a value among YSpiPort.VOLTAGELEVEL_OFF, YSpiPort.VOLTAGELEVEL_TTL3V,
      *  YSpiPort.VOLTAGELEVEL_TTL3VR, YSpiPort.VOLTAGELEVEL_TTL5V, YSpiPort.VOLTAGELEVEL_TTL5VR,
-     *  YSpiPort.VOLTAGELEVEL_RS232, YSpiPort.VOLTAGELEVEL_RS485 and YSpiPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage level used on the serial line
+     *  YSpiPort.VOLTAGELEVEL_RS232, YSpiPort.VOLTAGELEVEL_RS485, YSpiPort.VOLTAGELEVEL_TTL1V8 and
+     * YSpiPort.VOLTAGELEVEL_SDI12 corresponding to the voltage level used on the serial line
      *
      * @throws YAPI_Exception on error
      */
@@ -806,8 +807,8 @@ public class YSpiPort extends YFunction
      *
      *  @return a value among YSpiPort.VOLTAGELEVEL_OFF, YSpiPort.VOLTAGELEVEL_TTL3V,
      *  YSpiPort.VOLTAGELEVEL_TTL3VR, YSpiPort.VOLTAGELEVEL_TTL5V, YSpiPort.VOLTAGELEVEL_TTL5VR,
-     *  YSpiPort.VOLTAGELEVEL_RS232, YSpiPort.VOLTAGELEVEL_RS485 and YSpiPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage level used on the serial line
+     *  YSpiPort.VOLTAGELEVEL_RS232, YSpiPort.VOLTAGELEVEL_RS485, YSpiPort.VOLTAGELEVEL_TTL1V8 and
+     * YSpiPort.VOLTAGELEVEL_SDI12 corresponding to the voltage level used on the serial line
      *
      * @throws YAPI_Exception on error
      */
@@ -827,8 +828,8 @@ public class YSpiPort extends YFunction
      *
      *  @param newval : a value among YSpiPort.VOLTAGELEVEL_OFF, YSpiPort.VOLTAGELEVEL_TTL3V,
      *  YSpiPort.VOLTAGELEVEL_TTL3VR, YSpiPort.VOLTAGELEVEL_TTL5V, YSpiPort.VOLTAGELEVEL_TTL5VR,
-     *  YSpiPort.VOLTAGELEVEL_RS232, YSpiPort.VOLTAGELEVEL_RS485 and YSpiPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage type used on the serial line
+     *  YSpiPort.VOLTAGELEVEL_RS232, YSpiPort.VOLTAGELEVEL_RS485, YSpiPort.VOLTAGELEVEL_TTL1V8 and
+     * YSpiPort.VOLTAGELEVEL_SDI12 corresponding to the voltage type used on the serial line
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -855,8 +856,8 @@ public class YSpiPort extends YFunction
      *
      *  @param newval : a value among YSpiPort.VOLTAGELEVEL_OFF, YSpiPort.VOLTAGELEVEL_TTL3V,
      *  YSpiPort.VOLTAGELEVEL_TTL3VR, YSpiPort.VOLTAGELEVEL_TTL5V, YSpiPort.VOLTAGELEVEL_TTL5VR,
-     *  YSpiPort.VOLTAGELEVEL_RS232, YSpiPort.VOLTAGELEVEL_RS485 and YSpiPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage type used on the serial line
+     *  YSpiPort.VOLTAGELEVEL_RS232, YSpiPort.VOLTAGELEVEL_RS485, YSpiPort.VOLTAGELEVEL_TTL1V8 and
+     * YSpiPort.VOLTAGELEVEL_SDI12 corresponding to the voltage type used on the serial line
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

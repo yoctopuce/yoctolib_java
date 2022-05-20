@@ -158,7 +158,7 @@ public class YInputChain extends YFunction
         void timedReportCallback(YInputChain  function, YMeasure measure);
     }
     /**
-     * YEventCallback for InputChain
+     * Specialized event Callback for InputChain
      */
     public interface YEventCallback
     {
@@ -168,10 +168,10 @@ public class YInputChain extends YFunction
     private UpdateCallback yInternalEventCallback = new UpdateCallback()
     {
         @Override
-        public void yNewValue(YInputChain inputChain, String value)
+        public void yNewValue(YInputChain obj, String value)
         {
             try {
-                inputChain._internalEventHandler(value);
+                obj._internalEventHandler(value);
             } catch (YAPI_Exception e) {
                 e.printStackTrace();
             }

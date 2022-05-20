@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 48017 2022-01-12 08:17:52Z seb $
+ * $Id: YFirmwareUpdate.java 49750 2022-05-13 07:10:42Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -362,9 +362,7 @@ public class YFirmwareUpdate
     //cannot be generated for Java:
     //public int _processMore_internal(int newupdate)
     /**
-     * Returns a list of all the modules in "firmware update" mode. Only devices
-     * connected over USB are listed. For devices connected to a YoctoHub, you
-     * must connect yourself to the YoctoHub web interface.
+     * Returns a list of all the modules in "firmware update" mode.
      *
      * @return an array of strings containing the serial numbers of devices in "firmware update" mode.
      */
@@ -376,9 +374,7 @@ public class YFirmwareUpdate
     //cannot be generated for Java:
     //public static ArrayList<String> GetAllBootLoaders_internal()
     /**
-     * Returns a list of all the modules in "firmware update" mode. Only devices
-     * connected over USB are listed. For devices connected to a YoctoHub, you
-     * must connect to the YoctoHub web interface.
+     * Returns a list of all the modules in "firmware update" mode.
      *
      * @param yctx : a YAPI context.
      *

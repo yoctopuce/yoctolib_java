@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 48954 2022-03-14 09:55:13Z seb $
+ * $Id: YSerialPort.java 49818 2022-05-19 09:57:42Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -118,6 +118,7 @@ public class YSerialPort extends YFunction
     public static final int VOLTAGELEVEL_RS232 = 5;
     public static final int VOLTAGELEVEL_RS485 = 6;
     public static final int VOLTAGELEVEL_TTL1V8 = 7;
+    public static final int VOLTAGELEVEL_SDI12 = 8;
     public static final int VOLTAGELEVEL_INVALID = -1;
     /**
      * invalid serialMode value
@@ -141,6 +142,8 @@ public class YSerialPort extends YFunction
     protected int _rxptr = 0;
     protected byte[] _rxbuff = new byte[0];
     protected int _rxbuffptr = 0;
+    protected YSnoopingCallback _eventCallback;
+    protected int _eventPos = 0;
 
     /**
      * Deprecated UpdateCallback for SerialPort
@@ -167,6 +170,27 @@ public class YSerialPort extends YFunction
          */
         void timedReportCallback(YSerialPort  function, YMeasure measure);
     }
+    /**
+     * Specialized event Callback for SerialPort
+     */
+    public interface YSnoopingCallback
+    {
+        void snoopingCallback(YSerialPort serialPort, YSnoopingRecord rec);
+    }
+
+    private UpdateCallback yInternalEventCallback = new UpdateCallback()
+    {
+        @Override
+        public void yNewValue(YSerialPort obj, String value)
+        {
+            try {
+                obj._internalEventHandler(value);
+            } catch (YAPI_Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
     //--- (end of generated code: YSerialPort definitions)
 
 
@@ -783,8 +807,8 @@ public class YSerialPort extends YFunction
      *
      *  @return a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
      *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
-     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485 and YSerialPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage level used on the serial line
+     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485, YSerialPort.VOLTAGELEVEL_TTL1V8 and
+     * YSerialPort.VOLTAGELEVEL_SDI12 corresponding to the voltage level used on the serial line
      *
      * @throws YAPI_Exception on error
      */
@@ -807,8 +831,8 @@ public class YSerialPort extends YFunction
      *
      *  @return a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
      *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
-     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485 and YSerialPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage level used on the serial line
+     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485, YSerialPort.VOLTAGELEVEL_TTL1V8 and
+     * YSerialPort.VOLTAGELEVEL_SDI12 corresponding to the voltage level used on the serial line
      *
      * @throws YAPI_Exception on error
      */
@@ -828,8 +852,8 @@ public class YSerialPort extends YFunction
      *
      *  @param newval : a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
      *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
-     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485 and YSerialPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage type used on the serial line
+     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485, YSerialPort.VOLTAGELEVEL_TTL1V8 and
+     * YSerialPort.VOLTAGELEVEL_SDI12 corresponding to the voltage type used on the serial line
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -856,8 +880,8 @@ public class YSerialPort extends YFunction
      *
      *  @param newval : a value among YSerialPort.VOLTAGELEVEL_OFF, YSerialPort.VOLTAGELEVEL_TTL3V,
      *  YSerialPort.VOLTAGELEVEL_TTL3VR, YSerialPort.VOLTAGELEVEL_TTL5V, YSerialPort.VOLTAGELEVEL_TTL5VR,
-     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485 and YSerialPort.VOLTAGELEVEL_TTL1V8
-     * corresponding to the voltage type used on the serial line
+     *  YSerialPort.VOLTAGELEVEL_RS232, YSerialPort.VOLTAGELEVEL_RS485, YSerialPort.VOLTAGELEVEL_TTL1V8 and
+     * YSerialPort.VOLTAGELEVEL_SDI12 corresponding to the voltage type used on the serial line
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -1838,6 +1862,65 @@ public class YSerialPort extends YFunction
             idx = idx + 1;
         }
         return res;
+    }
+
+    /**
+     * Registers a callback function to be called each time that a message is sent or
+     * received by the serial port.
+     *
+     * @param callback : the callback function to call, or a null pointer.
+     *         The callback function should take four arguments:
+     *         the YSerialPort object that emitted the event, and
+     *         the SnoopingRecord object that describes the message
+     *         sent or received.
+     * @throws YAPI_Exception on error
+     */
+    public int registerSnoopingCallback(YSnoopingCallback callback) throws YAPI_Exception
+    {
+        if (callback != null) {
+            registerValueCallback(yInternalEventCallback);
+        } else {
+            registerValueCallback((UpdateCallback) null);
+        }
+        // register user callback AFTER the internal pseudo-event,
+        // to make sure we start with future events only
+        _eventCallback = callback;
+        return 0;
+    }
+
+    public int _internalEventHandler(String advstr) throws YAPI_Exception
+    {
+        String url;
+        byte[] msgbin = new byte[0];
+        ArrayList<String> msgarr = new ArrayList<>();
+        int msglen;
+        int idx;
+        if (!(_eventCallback != null)) {
+            // first simulated event, use it only to initialize reference values
+            _eventPos = 0;
+        }
+
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=0&t=0",_eventPos);
+        msgbin = _download(url);
+        msgarr = _json_get_array(msgbin);
+        msglen = msgarr.size();
+        if (msglen == 0) {
+            return YAPI.SUCCESS;
+        }
+        // last element of array is the new position
+        msglen = msglen - 1;
+        if (!(_eventCallback != null)) {
+            // first simulated event, use it only to initialize reference values
+            _eventPos = YAPIContext._atoi(msgarr.get(msglen));
+            return YAPI.SUCCESS;
+        }
+        _eventPos = YAPIContext._atoi(msgarr.get(msglen));
+        idx = 0;
+        while (idx < msglen) {
+            _eventCallback.snoopingCallback(this, new YSnoopingRecord(msgarr.get(idx)));
+            idx = idx + 1;
+        }
+        return YAPI.SUCCESS;
     }
 
     /**
