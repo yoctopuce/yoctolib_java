@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 49818 2022-05-19 09:57:42Z seb $
+ * $Id: YSerialPort.java 49903 2022-05-25 14:18:36Z mvuilleu $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -142,8 +142,8 @@ public class YSerialPort extends YFunction
     protected int _rxptr = 0;
     protected byte[] _rxbuff = new byte[0];
     protected int _rxbuffptr = 0;
-    protected YSnoopingCallback _eventCallback;
     protected int _eventPos = 0;
+    protected YSnoopingCallback _eventCallback;
 
     /**
      * Deprecated UpdateCallback for SerialPort
@@ -1361,6 +1361,7 @@ public class YSerialPort extends YFunction
      */
     public int reset() throws YAPI_Exception
     {
+        _eventPos = 0;
         _rxptr = 0;
         _rxbuffptr = 0;
         _rxbuff = new byte[0];
@@ -1866,12 +1867,15 @@ public class YSerialPort extends YFunction
 
     /**
      * Registers a callback function to be called each time that a message is sent or
-     * received by the serial port.
+     * received by the serial port. The callback is invoked only during the execution of
+     * ySleep or yHandleEvents. This provides control over the time when
+     * the callback is triggered. For good responsiveness, remember to call one of these
+     * two functions periodically. To unregister a callback, pass a null pointer as argument.
      *
      * @param callback : the callback function to call, or a null pointer.
      *         The callback function should take four arguments:
      *         the YSerialPort object that emitted the event, and
-     *         the SnoopingRecord object that describes the message
+     *         the YSnoopingRecord object that describes the message
      *         sent or received.
      * @throws YAPI_Exception on error
      */

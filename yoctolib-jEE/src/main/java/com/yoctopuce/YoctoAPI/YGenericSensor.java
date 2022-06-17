@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGenericSensor.java 49385 2022-04-06 00:49:27Z mvuilleu $
+ *  $Id: YGenericSensor.java 49903 2022-05-25 14:18:36Z mvuilleu $
  *
  *  Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -87,6 +87,7 @@ public class YGenericSensor extends YSensor
     public static final int SIGNALSAMPLING_LOW_NOISE = 2;
     public static final int SIGNALSAMPLING_LOW_NOISE_FILTERED = 3;
     public static final int SIGNALSAMPLING_HIGHEST_RATE = 4;
+    public static final int SIGNALSAMPLING_AC = 5;
     public static final int SIGNALSAMPLING_INVALID = -1;
     /**
      * invalid enabled value
@@ -545,8 +546,8 @@ public class YGenericSensor extends YSensor
      *
      *  @return a value among YGenericSensor.SIGNALSAMPLING_HIGH_RATE,
      *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE,
-     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED and YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE
-     * corresponding to the electric signal sampling method to use
+     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED, YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE and
+     * YGenericSensor.SIGNALSAMPLING_AC corresponding to the electric signal sampling method to use
      *
      * @throws YAPI_Exception on error
      */
@@ -574,8 +575,8 @@ public class YGenericSensor extends YSensor
      *
      *  @return a value among YGenericSensor.SIGNALSAMPLING_HIGH_RATE,
      *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE,
-     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED and YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE
-     * corresponding to the electric signal sampling method to use
+     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED, YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE and
+     * YGenericSensor.SIGNALSAMPLING_AC corresponding to the electric signal sampling method to use
      *
      * @throws YAPI_Exception on error
      */
@@ -596,8 +597,8 @@ public class YGenericSensor extends YSensor
      *
      *  @param newval : a value among YGenericSensor.SIGNALSAMPLING_HIGH_RATE,
      *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE,
-     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED and YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE
-     * corresponding to the electric signal sampling method to use
+     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED, YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE and
+     * YGenericSensor.SIGNALSAMPLING_AC corresponding to the electric signal sampling method to use
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -625,8 +626,8 @@ public class YGenericSensor extends YSensor
      *
      *  @param newval : a value among YGenericSensor.SIGNALSAMPLING_HIGH_RATE,
      *  YGenericSensor.SIGNALSAMPLING_HIGH_RATE_FILTERED, YGenericSensor.SIGNALSAMPLING_LOW_NOISE,
-     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED and YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE
-     * corresponding to the electric signal sampling method to use
+     *  YGenericSensor.SIGNALSAMPLING_LOW_NOISE_FILTERED, YGenericSensor.SIGNALSAMPLING_HIGHEST_RATE and
+     * YGenericSensor.SIGNALSAMPLING_AC corresponding to the electric signal sampling method to use
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

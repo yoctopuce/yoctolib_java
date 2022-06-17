@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YSms.java 48014 2022-01-12 08:06:41Z seb $
+ * $Id: YSms.java 50140 2022-06-16 10:26:30Z seb $
  *
  * Implements FindSms(), the high-level API for Sms functions
  *
@@ -56,20 +56,20 @@ public class YSms
     protected YMessageBox _mbox;
     protected int _slot = 0;
     protected boolean _deliv;
-    protected String _smsc;
+    protected String _smsc = "";
     protected int _mref = 0;
-    protected String _orig;
-    protected String _dest;
+    protected String _orig = "";
+    protected String _dest = "";
     protected int _pid = 0;
     protected int _alphab = 0;
     protected int _mclass = 0;
-    protected String _stamp;
+    protected String _stamp = "";
     protected byte[] _udh = new byte[0];
     protected byte[] _udata = new byte[0];
     protected int _npdu = 0;
     protected byte[] _pdu = new byte[0];
     protected ArrayList<YSms> _parts = new ArrayList<>();
-    protected String _aggSig;
+    protected String _aggSig = "";
     protected int _aggIdx = 0;
     protected int _aggCnt = 0;
 
@@ -557,13 +557,13 @@ public class YSms
             }
         }
         _parts = sorted;
-        _npdu = sorted.size();
         // inherit header fields from first part
         subsms = _parts.get(0);
         retcode = parsePdu(subsms.get_pdu());
         if (retcode != YAPI.SUCCESS) {
             return retcode;
         }
+        _npdu = sorted.size();
         // concatenate user data from all parts
         totsize = 0;
         partno = 0;
@@ -1292,7 +1292,7 @@ public class YSms
         int retcode;
         YSms pdu;
 
-        if (_slot > 0) {
+        if (_npdu < 2) {
             return _mbox.clearSIMSlot(_slot);
         }
         retcode = YAPI.SUCCESS;

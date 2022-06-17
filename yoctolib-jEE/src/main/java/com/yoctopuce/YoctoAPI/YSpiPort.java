@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSpiPort.java 49744 2022-05-11 15:13:45Z mvuilleu $
+ *  $Id: YSpiPort.java 49903 2022-05-25 14:18:36Z mvuilleu $
  *
  *  Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -155,6 +155,7 @@ public class YSpiPort extends YFunction
     protected int _rxptr = 0;
     protected byte[] _rxbuff = new byte[0];
     protected int _rxbuffptr = 0;
+    protected int _eventPos = 0;
 
     /**
      * Deprecated UpdateCallback for SpiPort
@@ -1477,6 +1478,7 @@ public class YSpiPort extends YFunction
      */
     public int reset() throws YAPI_Exception
     {
+        _eventPos = 0;
         _rxptr = 0;
         _rxbuffptr = 0;
         _rxbuff = new byte[0];

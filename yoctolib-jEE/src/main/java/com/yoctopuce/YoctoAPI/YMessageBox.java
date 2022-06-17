@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 48014 2022-01-12 08:06:41Z seb $
+ * $Id: YMessageBox.java 50144 2022-06-17 06:59:52Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -89,7 +89,7 @@ public class YMessageBox extends YFunction
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackMessageBox = null;
     protected int _nextMsgRef = 0;
-    protected String _prevBitmapStr;
+    protected String _prevBitmapStr = "";
     protected ArrayList<YSms> _pdus = new ArrayList<>();
     protected ArrayList<YSms> _messages = new ArrayList<>();
     protected boolean _gsm2unicodeReady;
@@ -537,8 +537,99 @@ public class YMessageBox extends YFunction
 
     public int clearSIMSlot(int slot) throws YAPI_Exception
     {
-        _prevBitmapStr = "";
-        return set_command(String.format(Locale.US, "DS%d",slot));
+        int retry;
+        int idx;
+        String res;
+        String bitmapStr;
+        int int_res;
+        byte[] newBitmap = new byte[0];
+        int bitVal;
+
+        retry = 5;
+        while (retry > 0) {
+            clearCache();
+            bitmapStr = get_slotsBitmap();
+            newBitmap = YAPIContext._hexStrToBin(bitmapStr);
+            idx = ((slot) >> (3));
+            if (idx < (newBitmap).length) {
+                bitVal = ((1) << ((((slot) & (7)))));
+                if (((((newBitmap[idx] & 0xff)) & (bitVal))) != 0) {
+                    _prevBitmapStr = "";
+                    int_res = set_command(String.format(Locale.US, "DS%d",slot));
+                    if (int_res < 0) {
+                        return int_res;
+                    }
+                } else {
+                    return YAPI.SUCCESS;
+                }
+            } else {
+                return YAPI.INVALID_ARGUMENT;
+            }
+            res = _AT("");
+            retry = retry - 1;
+        }
+        return YAPI.IO_ERROR;
+    }
+
+    public String _AT(String cmd) throws YAPI_Exception
+    {
+        int chrPos;
+        int cmdLen;
+        int waitMore;
+        String res;
+        byte[] buff = new byte[0];
+        int bufflen;
+        String buffstr;
+        int buffstrlen;
+        int idx;
+        int suffixlen;
+        // copied form the YCellular class
+        // quote dangerous characters used in AT commands
+        cmdLen = (cmd).length();
+        chrPos = (cmd).indexOf("#");
+        while (chrPos >= 0) {
+            cmd = String.format(Locale.US, "%s%c23%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmdLen = cmdLen + 2;
+            chrPos = (cmd).indexOf("#");
+        }
+        chrPos = (cmd).indexOf("+");
+        while (chrPos >= 0) {
+            cmd = String.format(Locale.US, "%s%c2B%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmdLen = cmdLen + 2;
+            chrPos = (cmd).indexOf("+");
+        }
+        chrPos = (cmd).indexOf("=");
+        while (chrPos >= 0) {
+            cmd = String.format(Locale.US, "%s%c3D%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmdLen = cmdLen + 2;
+            chrPos = (cmd).indexOf("=");
+        }
+        cmd = String.format(Locale.US, "at.txt?cmd=%s",cmd);
+        res = "";
+        // max 2 minutes (each iteration may take up to 5 seconds if waiting)
+        waitMore = 24;
+        while (waitMore > 0) {
+            buff = _download(cmd);
+            bufflen = (buff).length;
+            buffstr = new String(buff);
+            buffstrlen = (buffstr).length();
+            idx = bufflen - 1;
+            while ((idx > 0) && ((buff[idx] & 0xff) != 64) && ((buff[idx] & 0xff) != 10) && ((buff[idx] & 0xff) != 13)) {
+                idx = idx - 1;
+            }
+            if ((buff[idx] & 0xff) == 64) {
+                // continuation detected
+                suffixlen = bufflen - idx;
+                cmd = String.format(Locale.US, "at.txt?cmd=%s",(buffstr).substring( buffstrlen - suffixlen,  buffstrlen - suffixlen + suffixlen));
+                buffstr = (buffstr).substring(0, buffstrlen - suffixlen);
+                waitMore = waitMore - 1;
+            } else {
+                // request complete
+                waitMore = 0;
+            }
+            res = String.format(Locale.US, "%s%s", res,buffstr);
+        }
+        return res;
     }
 
     public YSms fetchPdu(int slot) throws YAPI_Exception
