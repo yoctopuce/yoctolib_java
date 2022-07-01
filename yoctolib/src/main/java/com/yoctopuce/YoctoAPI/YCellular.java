@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 48017 2022-01-12 08:17:52Z seb $
+ * $Id: YCellular.java 50281 2022-06-30 07:21:14Z mvuilleu $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -6074,6 +6074,46 @@ public class YCellular extends YFunction
     public String decodePLMN(String mccmnc)
     {
         return imm_decodePLMN(mccmnc);
+    }
+
+    /**
+     * Returns the list available radio communication profiles, as a string array
+     * (YoctoHub-GSM-4G only).
+     * Each string is a made of a numerical ID, followed by a colon,
+     * followed by the profile description.
+     *
+     * @return a list of string describing available radio communication profiles.
+     */
+    public ArrayList<String> get_communicationProfiles() throws YAPI_Exception
+    {
+        String profiles;
+        ArrayList<String> lines = new ArrayList<>();
+        int nlines;
+        int idx;
+        String line;
+        int cpos;
+        int profno;
+        ArrayList<String> res = new ArrayList<>();
+
+        profiles = _AT("+UMNOPROF=?");
+        lines = new ArrayList<>(Arrays.asList(profiles.split("\n")));
+        nlines = lines.size();
+        //noinspection DoubleNegation
+        if (!(nlines > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "fail to retrieve profile list");}
+        res.clear();
+        idx = 0;
+        while (idx < nlines) {
+            line = lines.get(idx);
+            cpos = (line).indexOf(":");
+            if (cpos > 0) {
+                profno = YAPIContext._atoi((line).substring(0, cpos));
+                if (profno > 0) {
+                    res.add(line);
+                }
+            }
+            idx = idx + 1;
+        }
+        return res;
     }
 
     /**

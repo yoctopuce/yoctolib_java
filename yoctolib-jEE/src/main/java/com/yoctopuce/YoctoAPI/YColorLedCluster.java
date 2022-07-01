@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLedCluster.java 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: YColorLedCluster.java 50281 2022-06-30 07:21:14Z mvuilleu $
  *
  *  Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *
@@ -80,6 +80,10 @@ public class YColorLedCluster extends YFunction
      */
     public static final int MAXLEDCOUNT_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid dynamicLedCount value
+     */
+    public static final int DYNAMICLEDCOUNT_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid blinkSeqMaxCount value
      */
     public static final int BLINKSEQMAXCOUNT_INVALID = YAPI.INVALID_UINT;
@@ -94,6 +98,7 @@ public class YColorLedCluster extends YFunction
     protected int _activeLedCount = ACTIVELEDCOUNT_INVALID;
     protected int _ledType = LEDTYPE_INVALID;
     protected int _maxLedCount = MAXLEDCOUNT_INVALID;
+    protected int _dynamicLedCount = DYNAMICLEDCOUNT_INVALID;
     protected int _blinkSeqMaxCount = BLINKSEQMAXCOUNT_INVALID;
     protected int _blinkSeqMaxSize = BLINKSEQMAXSIZE_INVALID;
     protected String _command = COMMAND_INVALID;
@@ -161,6 +166,9 @@ public class YColorLedCluster extends YFunction
         }
         if (json_val.has("maxLedCount")) {
             _maxLedCount = json_val.getInt("maxLedCount");
+        }
+        if (json_val.has("dynamicLedCount")) {
+            _dynamicLedCount = json_val.getInt("dynamicLedCount");
         }
         if (json_val.has("blinkSeqMaxCount")) {
             _blinkSeqMaxCount = json_val.getInt("blinkSeqMaxCount");
@@ -349,6 +357,41 @@ public class YColorLedCluster extends YFunction
     public int getMaxLedCount() throws YAPI_Exception
     {
         return get_maxLedCount();
+    }
+
+    /**
+     * Returns the maximum number of LEDs that can perform autonomous transitions and sequences.
+     *
+     *  @return an integer corresponding to the maximum number of LEDs that can perform autonomous
+     * transitions and sequences
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_dynamicLedCount() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration == 0) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return DYNAMICLEDCOUNT_INVALID;
+                }
+            }
+            res = _dynamicLedCount;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the maximum number of LEDs that can perform autonomous transitions and sequences.
+     *
+     *  @return an integer corresponding to the maximum number of LEDs that can perform autonomous
+     * transitions and sequences
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getDynamicLedCount() throws YAPI_Exception
+    {
+        return get_dynamicLedCount();
     }
 
     /**
