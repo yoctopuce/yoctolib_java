@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 48017 2022-01-12 08:17:52Z seb $
+ * $Id: YSensor.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -295,16 +295,16 @@ public class YSensor extends YFunction
             _unit = json_val.getString("unit");
         }
         if (json_val.has("currentValue")) {
-            _currentValue = Math.round(json_val.getDouble("currentValue") * 1000.0 / 65536.0) / 1000.0;
+            _currentValue = Math.round(json_val.getDouble("currentValue") / 65.536) / 1000.0;
         }
         if (json_val.has("lowestValue")) {
-            _lowestValue = Math.round(json_val.getDouble("lowestValue") * 1000.0 / 65536.0) / 1000.0;
+            _lowestValue = Math.round(json_val.getDouble("lowestValue") / 65.536) / 1000.0;
         }
         if (json_val.has("highestValue")) {
-            _highestValue = Math.round(json_val.getDouble("highestValue") * 1000.0 / 65536.0) / 1000.0;
+            _highestValue = Math.round(json_val.getDouble("highestValue") / 65.536) / 1000.0;
         }
         if (json_val.has("currentRawValue")) {
-            _currentRawValue = Math.round(json_val.getDouble("currentRawValue") * 1000.0 / 65536.0) / 1000.0;
+            _currentRawValue = Math.round(json_val.getDouble("currentRawValue") / 65.536) / 1000.0;
         }
         if (json_val.has("logFrequency")) {
             _logFrequency = json_val.getString("logFrequency");
@@ -319,7 +319,7 @@ public class YSensor extends YFunction
             _calibrationParam = json_val.getString("calibrationParam");
         }
         if (json_val.has("resolution")) {
-            _resolution = Math.round(json_val.getDouble("resolution") * 1000.0 / 65536.0) / 1000.0;
+            _resolution = Math.round(json_val.getDouble("resolution") / 65.536) / 1000.0;
         }
         if (json_val.has("sensorState")) {
             _sensorState = json_val.getInt("sensorState");

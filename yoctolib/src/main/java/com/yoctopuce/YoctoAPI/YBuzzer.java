@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YBuzzer.java 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: YBuzzer.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindBuzzer(), the high-level API for Buzzer functions
  *
@@ -145,7 +145,7 @@ public class YBuzzer extends YFunction
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("frequency")) {
-            _frequency = Math.round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+            _frequency = Math.round(json_val.getDouble("frequency") / 65.536) / 1000.0;
         }
         if (json_val.has("volume")) {
             _volume = json_val.getInt("volume");

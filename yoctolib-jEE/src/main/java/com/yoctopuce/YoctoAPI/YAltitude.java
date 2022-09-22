@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAltitude.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YAltitude.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindAltitude(), the high-level API for Altitude functions
  *
@@ -127,7 +127,7 @@ public class YAltitude extends YSensor
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("qnh")) {
-            _qnh = Math.round(json_val.getDouble("qnh") * 1000.0 / 65536.0) / 1000.0;
+            _qnh = Math.round(json_val.getDouble("qnh") / 65.536) / 1000.0;
         }
         if (json_val.has("technology")) {
             _technology = json_val.getString("technology");

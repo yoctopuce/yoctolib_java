@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCurrentLoopOutput.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YCurrentLoopOutput.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -137,13 +137,13 @@ public class YCurrentLoopOutput extends YFunction
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("current")) {
-            _current = Math.round(json_val.getDouble("current") * 1000.0 / 65536.0) / 1000.0;
+            _current = Math.round(json_val.getDouble("current") / 65.536) / 1000.0;
         }
         if (json_val.has("currentTransition")) {
             _currentTransition = json_val.getString("currentTransition");
         }
         if (json_val.has("currentAtStartUp")) {
-            _currentAtStartUp = Math.round(json_val.getDouble("currentAtStartUp") * 1000.0 / 65536.0) / 1000.0;
+            _currentAtStartUp = Math.round(json_val.getDouble("currentAtStartUp") / 65.536) / 1000.0;
         }
         if (json_val.has("loopPower")) {
             _loopPower = json_val.getInt("loopPower");

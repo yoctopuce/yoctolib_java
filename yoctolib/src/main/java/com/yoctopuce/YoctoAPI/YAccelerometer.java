@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAccelerometer.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YAccelerometer.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *
@@ -147,13 +147,13 @@ public class YAccelerometer extends YSensor
             _bandwidth = json_val.getInt("bandwidth");
         }
         if (json_val.has("xValue")) {
-            _xValue = Math.round(json_val.getDouble("xValue") * 1000.0 / 65536.0) / 1000.0;
+            _xValue = Math.round(json_val.getDouble("xValue") / 65.536) / 1000.0;
         }
         if (json_val.has("yValue")) {
-            _yValue = Math.round(json_val.getDouble("yValue") * 1000.0 / 65536.0) / 1000.0;
+            _yValue = Math.round(json_val.getDouble("yValue") / 65.536) / 1000.0;
         }
         if (json_val.has("zValue")) {
-            _zValue = Math.round(json_val.getDouble("zValue") * 1000.0 / 65536.0) / 1000.0;
+            _zValue = Math.round(json_val.getDouble("zValue") / 65.536) / 1000.0;
         }
         if (json_val.has("gravityCancellation")) {
             _gravityCancellation = json_val.getInt("gravityCancellation") > 0 ? 1 : 0;

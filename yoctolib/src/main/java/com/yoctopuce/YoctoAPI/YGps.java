@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGps.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YGps.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindGps(), the high-level API for Gps functions
  *
@@ -217,7 +217,7 @@ public class YGps extends YFunction
             _satPerConst = json_val.getLong("satPerConst");
         }
         if (json_val.has("gpsRefreshRate")) {
-            _gpsRefreshRate = Math.round(json_val.getDouble("gpsRefreshRate") * 1000.0 / 65536.0) / 1000.0;
+            _gpsRefreshRate = Math.round(json_val.getDouble("gpsRefreshRate") / 65.536) / 1000.0;
         }
         if (json_val.has("coordSystem")) {
             _coordSystem = json_val.getInt("coordSystem");
@@ -232,16 +232,16 @@ public class YGps extends YFunction
             _longitude = json_val.getString("longitude");
         }
         if (json_val.has("dilution")) {
-            _dilution = Math.round(json_val.getDouble("dilution") * 1000.0 / 65536.0) / 1000.0;
+            _dilution = Math.round(json_val.getDouble("dilution") / 65.536) / 1000.0;
         }
         if (json_val.has("altitude")) {
-            _altitude = Math.round(json_val.getDouble("altitude") * 1000.0 / 65536.0) / 1000.0;
+            _altitude = Math.round(json_val.getDouble("altitude") / 65.536) / 1000.0;
         }
         if (json_val.has("groundSpeed")) {
-            _groundSpeed = Math.round(json_val.getDouble("groundSpeed") * 1000.0 / 65536.0) / 1000.0;
+            _groundSpeed = Math.round(json_val.getDouble("groundSpeed") / 65.536) / 1000.0;
         }
         if (json_val.has("direction")) {
-            _direction = Math.round(json_val.getDouble("direction") * 1000.0 / 65536.0) / 1000.0;
+            _direction = Math.round(json_val.getDouble("direction") / 65.536) / 1000.0;
         }
         if (json_val.has("unixTime")) {
             _unixTime = json_val.getLong("unixTime");

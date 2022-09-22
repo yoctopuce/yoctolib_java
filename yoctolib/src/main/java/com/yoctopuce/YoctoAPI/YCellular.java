@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 50281 2022-06-30 07:21:14Z mvuilleu $
+ * $Id: YCellular.java 50494 2022-07-19 16:08:56Z mvuilleu $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -6107,7 +6107,7 @@ public class YCellular extends YFunction
             cpos = (line).indexOf(":");
             if (cpos > 0) {
                 profno = YAPIContext._atoi((line).substring(0, cpos));
-                if (profno > 0) {
+                if (profno > 1) {
                     res.add(line);
                 }
             }

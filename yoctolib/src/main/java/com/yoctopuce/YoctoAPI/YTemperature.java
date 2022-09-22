@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTemperature.java 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: YTemperature.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -160,7 +160,7 @@ public class YTemperature extends YSensor
             _sensorType = json_val.getInt("sensorType");
         }
         if (json_val.has("signalValue")) {
-            _signalValue = Math.round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
+            _signalValue = Math.round(json_val.getDouble("signalValue") / 65.536) / 1000.0;
         }
         if (json_val.has("signalUnit")) {
             _signalUnit = json_val.getString("signalUnit");

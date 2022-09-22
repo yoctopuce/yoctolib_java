@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YProximity.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YProximity.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindProximity(), the high-level API for Proximity functions
  *
@@ -176,7 +176,7 @@ public class YProximity extends YSensor
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("signalValue")) {
-            _signalValue = Math.round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
+            _signalValue = Math.round(json_val.getDouble("signalValue") / 65.536) / 1000.0;
         }
         if (json_val.has("detectionThreshold")) {
             _detectionThreshold = json_val.getInt("detectionThreshold");

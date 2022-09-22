@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YQuadratureDecoder.java 45843 2021-08-04 07:51:59Z mvuilleu $
+ *  $Id: YQuadratureDecoder.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *
@@ -132,7 +132,7 @@ public class YQuadratureDecoder extends YSensor
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("speed")) {
-            _speed = Math.round(json_val.getDouble("speed") * 1000.0 / 65536.0) / 1000.0;
+            _speed = Math.round(json_val.getDouble("speed") / 65.536) / 1000.0;
         }
         if (json_val.has("decoding")) {
             _decoding = json_val.getInt("decoding") > 0 ? 1 : 0;

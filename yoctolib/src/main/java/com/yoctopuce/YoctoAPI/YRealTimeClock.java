@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRealTimeClock.java 48183 2022-01-20 10:26:11Z mvuilleu $
+ *  $Id: YRealTimeClock.java 50595 2022-07-28 07:54:15Z mvuilleu $
  *
  *  Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -77,10 +77,17 @@ public class YRealTimeClock extends YFunction
     public static final int TIMESET_FALSE = 0;
     public static final int TIMESET_TRUE = 1;
     public static final int TIMESET_INVALID = -1;
+    /**
+     * invalid disableHostSync value
+     */
+    public static final int DISABLEHOSTSYNC_FALSE = 0;
+    public static final int DISABLEHOSTSYNC_TRUE = 1;
+    public static final int DISABLEHOSTSYNC_INVALID = -1;
     protected long _unixTime = UNIXTIME_INVALID;
     protected String _dateTime = DATETIME_INVALID;
     protected int _utcOffset = UTCOFFSET_INVALID;
     protected int _timeSet = TIMESET_INVALID;
+    protected int _disableHostSync = DISABLEHOSTSYNC_INVALID;
     protected UpdateCallback _valueCallbackRealTimeClock = null;
 
     /**
@@ -148,6 +155,9 @@ public class YRealTimeClock extends YFunction
         }
         if (json_val.has("timeSet")) {
             _timeSet = json_val.getInt("timeSet") > 0 ? 1 : 0;
+        }
+        if (json_val.has("disableHostSync")) {
+            _disableHostSync = json_val.getInt("disableHostSync") > 0 ? 1 : 0;
         }
         super._parseAttr(json_val);
     }
@@ -358,6 +368,84 @@ public class YRealTimeClock extends YFunction
     public int getTimeSet() throws YAPI_Exception
     {
         return get_timeSet();
+    }
+
+    /**
+     * Returns true if the automatic clock synchronization with host has been disabled,
+     * and false otherwise.
+     *
+     *  @return either YRealTimeClock.DISABLEHOSTSYNC_FALSE or YRealTimeClock.DISABLEHOSTSYNC_TRUE,
+     * according to true if the automatic clock synchronization with host has been disabled,
+     *         and false otherwise
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_disableHostSync() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISABLEHOSTSYNC_INVALID;
+                }
+            }
+            res = _disableHostSync;
+        }
+        return res;
+    }
+
+    /**
+     * Returns true if the automatic clock synchronization with host has been disabled,
+     * and false otherwise.
+     *
+     *  @return either YRealTimeClock.DISABLEHOSTSYNC_FALSE or YRealTimeClock.DISABLEHOSTSYNC_TRUE,
+     * according to true if the automatic clock synchronization with host has been disabled,
+     *         and false otherwise
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getDisableHostSync() throws YAPI_Exception
+    {
+        return get_disableHostSync();
+    }
+
+    /**
+     * Changes the automatic clock synchronization with host working state.
+     * To disable automatic synchronization, set the value to true.
+     * To enable automatic synchronization (default), set the value to false.
+     *
+     *  @param newval : either YRealTimeClock.DISABLEHOSTSYNC_FALSE or YRealTimeClock.DISABLEHOSTSYNC_TRUE,
+     * according to the automatic clock synchronization with host working state
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_disableHostSync(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("disableHostSync",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the automatic clock synchronization with host working state.
+     * To disable automatic synchronization, set the value to true.
+     * To enable automatic synchronization (default), set the value to false.
+     *
+     *  @param newval : either YRealTimeClock.DISABLEHOSTSYNC_FALSE or YRealTimeClock.DISABLEHOSTSYNC_TRUE,
+     * according to the automatic clock synchronization with host working state
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setDisableHostSync(int newval)  throws YAPI_Exception
+    {
+        return set_disableHostSync(newval);
     }
 
     /**

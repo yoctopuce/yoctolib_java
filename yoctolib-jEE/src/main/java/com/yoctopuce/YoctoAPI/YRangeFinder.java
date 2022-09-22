@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRangeFinder.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YRangeFinder.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -163,7 +163,7 @@ public class YRangeFinder extends YSensor
             _hardwareCalibration = json_val.getString("hardwareCalibration");
         }
         if (json_val.has("currentTemperature")) {
-            _currentTemperature = Math.round(json_val.getDouble("currentTemperature") * 1000.0 / 65536.0) / 1000.0;
+            _currentTemperature = Math.round(json_val.getDouble("currentTemperature") / 65.536) / 1000.0;
         }
         if (json_val.has("command")) {
             _command = json_val.getString("command");

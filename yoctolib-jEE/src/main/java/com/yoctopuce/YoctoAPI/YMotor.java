@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMotor.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YMotor.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindMotor(), the high-level API for Motor functions
  *
@@ -172,19 +172,19 @@ public class YMotor extends YFunction
             _motorStatus = json_val.getInt("motorStatus");
         }
         if (json_val.has("drivingForce")) {
-            _drivingForce = Math.round(json_val.getDouble("drivingForce") * 1000.0 / 65536.0) / 1000.0;
+            _drivingForce = Math.round(json_val.getDouble("drivingForce") / 65.536) / 1000.0;
         }
         if (json_val.has("brakingForce")) {
-            _brakingForce = Math.round(json_val.getDouble("brakingForce") * 1000.0 / 65536.0) / 1000.0;
+            _brakingForce = Math.round(json_val.getDouble("brakingForce") / 65.536) / 1000.0;
         }
         if (json_val.has("cutOffVoltage")) {
-            _cutOffVoltage = Math.round(json_val.getDouble("cutOffVoltage") * 1000.0 / 65536.0) / 1000.0;
+            _cutOffVoltage = Math.round(json_val.getDouble("cutOffVoltage") / 65.536) / 1000.0;
         }
         if (json_val.has("overCurrentLimit")) {
             _overCurrentLimit = json_val.getInt("overCurrentLimit");
         }
         if (json_val.has("frequency")) {
-            _frequency = Math.round(json_val.getDouble("frequency") * 1000.0 / 65536.0) / 1000.0;
+            _frequency = Math.round(json_val.getDouble("frequency") / 65.536) / 1000.0;
         }
         if (json_val.has("starterTime")) {
             _starterTime = json_val.getInt("starterTime");

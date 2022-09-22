@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGenericSensor.java 49903 2022-05-25 14:18:36Z mvuilleu $
+ *  $Id: YGenericSensor.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindGenericSensor(), the high-level API for GenericSensor functions
  *
@@ -160,7 +160,7 @@ public class YGenericSensor extends YSensor
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
         if (json_val.has("signalValue")) {
-            _signalValue = Math.round(json_val.getDouble("signalValue") * 1000.0 / 65536.0) / 1000.0;
+            _signalValue = Math.round(json_val.getDouble("signalValue") / 65.536) / 1000.0;
         }
         if (json_val.has("signalUnit")) {
             _signalUnit = json_val.getString("signalUnit");
@@ -172,7 +172,7 @@ public class YGenericSensor extends YSensor
             _valueRange = json_val.getString("valueRange");
         }
         if (json_val.has("signalBias")) {
-            _signalBias = Math.round(json_val.getDouble("signalBias") * 1000.0 / 65536.0) / 1000.0;
+            _signalBias = Math.round(json_val.getDouble("signalBias") / 65.536) / 1000.0;
         }
         if (json_val.has("signalSampling")) {
             _signalSampling = json_val.getInt("signalSampling");

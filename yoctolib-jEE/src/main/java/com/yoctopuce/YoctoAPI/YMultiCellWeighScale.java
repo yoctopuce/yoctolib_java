@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiCellWeighScale.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YMultiCellWeighScale.java 50689 2022-08-17 14:37:15Z mvuilleu $
  *
  *  Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -182,22 +182,22 @@ public class YMultiCellWeighScale extends YSensor
             _excitation = json_val.getInt("excitation");
         }
         if (json_val.has("tempAvgAdaptRatio")) {
-            _tempAvgAdaptRatio = Math.round(json_val.getDouble("tempAvgAdaptRatio") * 1000.0 / 65536.0) / 1000.0;
+            _tempAvgAdaptRatio = Math.round(json_val.getDouble("tempAvgAdaptRatio") / 65.536) / 1000.0;
         }
         if (json_val.has("tempChgAdaptRatio")) {
-            _tempChgAdaptRatio = Math.round(json_val.getDouble("tempChgAdaptRatio") * 1000.0 / 65536.0) / 1000.0;
+            _tempChgAdaptRatio = Math.round(json_val.getDouble("tempChgAdaptRatio") / 65.536) / 1000.0;
         }
         if (json_val.has("compTempAvg")) {
-            _compTempAvg = Math.round(json_val.getDouble("compTempAvg") * 1000.0 / 65536.0) / 1000.0;
+            _compTempAvg = Math.round(json_val.getDouble("compTempAvg") / 65.536) / 1000.0;
         }
         if (json_val.has("compTempChg")) {
-            _compTempChg = Math.round(json_val.getDouble("compTempChg") * 1000.0 / 65536.0) / 1000.0;
+            _compTempChg = Math.round(json_val.getDouble("compTempChg") / 65.536) / 1000.0;
         }
         if (json_val.has("compensation")) {
-            _compensation = Math.round(json_val.getDouble("compensation") * 1000.0 / 65536.0) / 1000.0;
+            _compensation = Math.round(json_val.getDouble("compensation") / 65.536) / 1000.0;
         }
         if (json_val.has("zeroTracking")) {
-            _zeroTracking = Math.round(json_val.getDouble("zeroTracking") * 1000.0 / 65536.0) / 1000.0;
+            _zeroTracking = Math.round(json_val.getDouble("zeroTracking") / 65.536) / 1000.0;
         }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
