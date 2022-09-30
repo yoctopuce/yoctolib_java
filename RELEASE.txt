@@ -1,4 +1,3 @@
-Java v1.10.51050
+Java v1.10.51152
 
-- Remove "SIM ICCID select" profile from list returned by get_communicationProfiles
-- Fix potential socket leak on Linux
+- Fix old Maven dependency
