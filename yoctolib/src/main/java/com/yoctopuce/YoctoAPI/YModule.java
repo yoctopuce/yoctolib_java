@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 48017 2022-01-12 08:17:52Z seb $
+ * $Id: YModule.java 51266 2022-10-10 09:18:25Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -2161,6 +2161,26 @@ public class YModule extends YFunction
         }
         clearCache();
         return res;
+    }
+
+    /**
+     * Adds a file to the uploaded data at the next HTTP callback.
+     * This function only affects the next HTTP callback and only works in
+     * HTTP callback mode.
+     *
+     * @param filename : the name of the file to upload at the next HTTP callback
+     *
+     * @return nothing.
+     */
+    public int addFileToHTTPCallback(String filename) throws YAPI_Exception
+    {
+        byte[] content = new byte[0];
+
+        content = _download("@YCB+" + filename);
+        if ((content).length == 0) {
+            return YAPI.NOT_SUPPORTED;
+        }
+        return YAPI.SUCCESS;
     }
 
     /**

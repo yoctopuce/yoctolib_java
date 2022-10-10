@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 46990 2021-11-01 16:59:41Z seb $
+ * $Id: YHTTPHub.java 51256 2022-10-07 09:16:02Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -193,11 +193,11 @@ class YHTTPHub extends YGenericHub
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "notification already started");
         }
         if (_URL_params.isDynamicURL()) {
-            boolean https_req= _URL_params.useSecureSocket();
-            if (_URL_params.getPort() == YAPI.YOCTO_DEFAULT_HTTPS_PORT){
+            boolean https_req = _URL_params.useSecureSocket();
+            if (_URL_params.getPort() == YAPI.YOCTO_DEFAULT_HTTPS_PORT) {
                 https_req = true;
             }
-            String url = String.format("%s://%s:%d/info.json",https_req?"https":"http", _URL_params.getHost(), _URL_params.getPort());
+            String url = String.format("%s://%s:%d/info.json", https_req ? "https" : "http", _URL_params.getHost(), _URL_params.getPort());
             try {
                 byte[] raw = YAPIContext.BasicHTTPRequest(url);
                 String json_str = new String(raw, _yctx._deviceCharset);
@@ -537,6 +537,9 @@ class YHTTPHub extends YGenericHub
         }
         // Setup timeout counter
         int tcpTimeout = _yctx._networkTimeoutMs;
+        if (req_first_line.contains("/@YCB")) {
+            throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Preloading of URL is only supported for HTTP callback.");
+        }
         if (req_first_line.contains("/testcb.txt") || req_first_line.contains("/logger.json")
                 || req_first_line.contains("/rxmsg.json") || req_first_line.contains("/rxdata.bin")
                 || req_first_line.contains("/at.txt") || req_first_line.contains("/files.json")) {
