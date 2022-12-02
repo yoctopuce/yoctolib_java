@@ -771,23 +771,25 @@ public class YAPIContext
                     evt = _pendingCallbacks.poll();
                 }
                 synchronized (_regCbLock) {
-                    switch (evt.ev) {
-                        case PLUG:
-                            if (_arrivalCallback != null) {
-                                _arrivalCallback.yDeviceArrival(evt.module);
-                            }
+                    if (evt != null) {
+                        switch (evt.ev) {
+                            case PLUG:
+                                if (_arrivalCallback != null) {
+                                    _arrivalCallback.yDeviceArrival(evt.module);
+                                }
 
-                            break;
-                        case CHANGE:
-                            if (_namechgCallback != null) {
-                                _namechgCallback.yDeviceChange(evt.module);
-                            }
-                            break;
-                        case UNPLUG:
-                            if (_removalCallback != null) {
-                                _removalCallback.yDeviceRemoval(evt.module);
-                            }
-                            break;
+                                break;
+                            case CHANGE:
+                                if (_namechgCallback != null) {
+                                    _namechgCallback.yDeviceChange(evt.module);
+                                }
+                                break;
+                            case UNPLUG:
+                                if (_removalCallback != null) {
+                                    _removalCallback.yDeviceRemoval(evt.module);
+                                }
+                                break;
+                        }
                     }
                 }
             }
@@ -831,7 +833,6 @@ public class YAPIContext
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
             throw new YAPI_Exception(YAPI.IO_ERROR, "unable to contact " + url + " :" + e.getLocalizedMessage());
         } finally {
             if (in != null) {

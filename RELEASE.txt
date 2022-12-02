@@ -1,3 +1,4 @@
-Java v1.10.51266
+Java v1.10.52094
 
-- Add addFileToHTTPCallback methode to YModule
+- Fix WebSocket callback support
+- Add support for connecting to VirtualHub-4web

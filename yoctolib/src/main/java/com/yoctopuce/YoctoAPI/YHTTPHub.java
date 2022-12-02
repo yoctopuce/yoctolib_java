@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 51256 2022-10-07 09:16:02Z seb $
+ * $Id: YHTTPHub.java 51984 2022-12-01 07:46:13Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -72,6 +72,7 @@ class YHTTPHub extends YGenericHub
 
     private final Object _authLock = new Object();
     HTTPParams _http_params = null;
+    boolean _usePureHTTP = false;
 
 
     boolean needRetryWithAuth()
@@ -192,17 +193,26 @@ class YHTTPHub extends YGenericHub
         if (_notificationHandler != null) {
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "notification already started");
         }
-        if (_URL_params.isDynamicURL()) {
+        this._usePureHTTP = false;
+        if (_URL_params.testInfoJson()) {
             boolean https_req = _URL_params.useSecureSocket();
             if (_URL_params.getPort() == YAPI.YOCTO_DEFAULT_HTTPS_PORT) {
                 https_req = true;
             }
-            String url = String.format("%s://%s:%d/info.json", https_req ? "https" : "http", _URL_params.getHost(), _URL_params.getPort());
+            String url = String.format("%s://%s:%d%s/info.json", https_req ? "https" : "http", _URL_params.getHost(), _URL_params.getPort(),_URL_params.getSubDomain());
+            byte[] raw;
             try {
-                byte[] raw = YAPIContext.BasicHTTPRequest(url);
+                raw = YAPIContext.BasicHTTPRequest(url);
+            } catch (Exception ex) {
+                throw new YAPI_Exception(YAPI.IO_ERROR, ex.getMessage(),ex);
+            }
+            try {
                 String json_str = new String(raw, _yctx._deviceCharset);
                 YJSONObject json = new YJSONObject(json_str);
                 json.parse();
+                if (json.has("protocol") && json.getString("protocol").equals("HTTP/1.1")) {
+                    this._usePureHTTP = true;
+                }
                 if (json.has("port")) {
                     YJSONArray ports = json.getYJSONArray("port");
                     boolean done = false;
@@ -229,7 +239,6 @@ class YHTTPHub extends YGenericHub
                     }
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
                 if (!_URL_params.useSecureSocket()) {
                     _http_params = _URL_params;
                 }
@@ -581,7 +590,6 @@ class YHTTPHub extends YGenericHub
         try {
             _notificationHandler.hubRequestSync("GET /api/module/firmwareRelease.json", null, mstimeout);
         } catch (InterruptedException e) {
-            e.printStackTrace();
         } finally {
             stopNotifications();
         }

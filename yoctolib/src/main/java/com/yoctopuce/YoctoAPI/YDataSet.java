@@ -1,5 +1,5 @@
 /*
- * $Id: YDataSet.java 45849 2021-08-04 08:35:13Z web $
+ * $Id: YDataSet.java 51903 2022-11-29 17:25:59Z mvuilleu $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -70,6 +70,7 @@ public class YDataSet
     protected String _hardwareId;
     protected String _functionId;
     protected String _unit;
+    protected int _bulkLoad = 0;
     protected double _startTimeMs = 0;
     protected double _endTimeMs = 0;
     protected int _progress = 0;
@@ -121,6 +122,9 @@ public class YDataSet
             json.parse();
             _functionId = json.getString("id");
             _unit = json.getString("unit");
+            if (json.has("bulk")) {
+                _bulkLoad = YAPIContext._atoi(json.getString("bulk"));
+            }
             if (json.has("calib")) {
                 _calib = YAPIContext._decodeFloats(json.getString("calib"));
                 _calib.set(0, _calib.get(0) / 1000);
@@ -229,9 +233,11 @@ public class YDataSet
             } else {
                 // stream that are partially in the dataset
                 // we need to parse data to filter value outside the dataset
-                url = ii._get_url();
-                data = _parent._download(url);
-                ii._parseStream(data);
+                if (!(ii._wasLoaded())) {
+                    url = ii._get_url();
+                    data = _parent._download(url);
+                    ii._parseStream(data);
+                }
                 dataRows = ii.get_dataRows();
                 if (dataRows.size() == 0) {
                     return get_progress();
@@ -282,8 +288,10 @@ public class YDataSet
                         if (previewMaxVal < maxVal) {
                             previewMaxVal = maxVal;
                         }
-                        previewTotalAvg = previewTotalAvg + (avgVal * mitv);
-                        previewTotalTime = previewTotalTime + mitv;
+                        if (!(Double.isNaN(avgVal))) {
+                            previewTotalAvg = previewTotalAvg + (avgVal * mitv);
+                            previewTotalTime = previewTotalTime + mitv;
+                        }
                     }
                     tim = end_;
                     m_pos = m_pos + 1;
@@ -340,6 +348,15 @@ public class YDataSet
         int avgCol;
         int maxCol;
         boolean firstMeasure;
+        String baseurl;
+        String url;
+        String suffix;
+        ArrayList<String> suffixes = new ArrayList<>();
+        int idx;
+        byte[] bulkFile = new byte[0];
+        ArrayList<String> streamStr = new ArrayList<>();
+        int urlIdx;
+        byte[] streamBin = new byte[0];
 
         if (progress != _progress) {
             return _progress;
@@ -348,7 +365,9 @@ public class YDataSet
             return loadSummary(data);
         }
         stream = _streams.get(_progress);
-        stream._parseStream(data);
+        if (!(stream._wasLoaded())) {
+            stream._parseStream(data);
+        }
         dataRows = stream.get_dataRows();
         _progress = _progress + 1;
         if (dataRows.size() == 0) {
@@ -389,6 +408,40 @@ public class YDataSet
                 _measures.add(new YMeasure(tim / 1000, end_ / 1000, ii.get(minCol).doubleValue(), avgv, ii.get(maxCol).doubleValue()));
             }
             tim = end_;
+        }
+        // Perform bulk preload to speed-up network transfer
+        if ((_bulkLoad > 0) && (_progress < _streams.size())) {
+            stream = _streams.get(_progress);
+            if (stream._wasLoaded()) {
+                return get_progress();
+            }
+            baseurl = stream._get_baseurl();
+            url = stream._get_url();
+            suffix = stream._get_urlsuffix();
+            suffixes.add(suffix);
+            idx = _progress+1;
+            while ((idx < _streams.size()) && (suffixes.size() < _bulkLoad)) {
+                stream = _streams.get(idx);
+                if (!(stream._wasLoaded()) && (stream._get_baseurl().equals(baseurl))) {
+                    suffix = stream._get_urlsuffix();
+                    suffixes.add(suffix);
+                    url = url + "," + suffix;
+                }
+                idx = idx + 1;
+            }
+            bulkFile = _parent._download(url);
+            streamStr = _parent._json_get_array(bulkFile);
+            urlIdx = 0;
+            idx = _progress;
+            while ((idx < _streams.size()) && (urlIdx < suffixes.size()) && (urlIdx < streamStr.size())) {
+                stream = _streams.get(idx);
+                if ((stream._get_baseurl().equals(baseurl)) && (stream._get_urlsuffix().equals(suffixes.get(urlIdx)))) {
+                    streamBin = (streamStr.get(urlIdx)).getBytes();
+                    stream._parseStream(streamBin);
+                    urlIdx = urlIdx + 1;
+                }
+                idx = idx + 1;
+            }
         }
         return get_progress();
     }
@@ -538,6 +591,10 @@ public class YDataSet
                 return 100;
             } else {
                 stream = _streams.get(_progress);
+                if (stream._wasLoaded()) {
+                    // Do not reload stream if it was already loaded
+                    return processMore(_progress, ("").getBytes());
+                }
                 url = stream._get_url();
             }
         }

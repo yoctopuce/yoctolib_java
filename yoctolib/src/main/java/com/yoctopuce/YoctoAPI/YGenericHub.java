@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 45549 2021-06-14 13:43:10Z web $
+ * $Id: YGenericHub.java 51870 2022-11-29 10:46:15Z seb $
  *
  * Internal YGenericHub object
  *
@@ -473,7 +473,7 @@ abstract class YGenericHub
             }
             int end_auth = url.indexOf('@', pos);
             int end_user = url.indexOf(':', pos);
-            if (end_auth >= 0 && end_user >= 0 && end_user < end_auth) {
+            if (end_user >= 0 && end_user < end_auth) {
                 _user = url.substring(pos, end_user);
                 _pass = url.substring(end_user + 1, end_auth);
                 pos = end_auth + 1;
@@ -484,28 +484,24 @@ abstract class YGenericHub
             if (url.length() > pos && url.charAt(pos) == '@') {
                 pos++;
             }
-            int end_url = url.indexOf('/', pos);
-            if (end_url < 0) {
-                end_url = url.length();
+            int end_host = url.indexOf('/', pos);
+            if (end_host < 0) {
+                end_host = url.length();
                 _subDomain = "";
             } else {
-                int next_slash = url.indexOf("/", end_url + 1);
-                if (next_slash < 0) {
-                    next_slash = url.length();
-                }
-                _subDomain = url.substring(end_url, next_slash);
+                _subDomain = url.substring(end_host);
             }
             int portpos = url.indexOf(':', pos);
             if (portpos > 0) {
-                if (portpos + 1 < end_url) {
+                if (portpos + 1 < end_host) {
                     _host = url.substring(pos, portpos);
-                    _port = Integer.parseInt(url.substring(portpos + 1, end_url));
+                    _port = Integer.parseInt(url.substring(portpos + 1, end_host));
                 } else {
                     _host = url.substring(pos, portpos);
                     _port = defaultPort;
                 }
             } else {
-                _host = url.substring(pos, end_url);
+                _host = url.substring(pos, end_host);
                 _port = defaultPort;
             }
         }
@@ -516,7 +512,11 @@ abstract class YGenericHub
             _port = port;
             _user = http_params_org._user;
             _pass = http_params_org._pass;
-            _proto = proto;
+            if (!http_params_org.getProto().equals("http") && !http_params_org.getProto().equals("https")) {
+                _proto = proto;
+            }else{
+                _proto = http_params_org.getProto();
+            }
             _subDomain = http_params_org._subDomain;
         }
 
@@ -566,6 +566,11 @@ abstract class YGenericHub
             return url.toString();
         }
 
+        public String getProto()
+        {
+            return _proto;
+        }
+
         boolean useWebSocket()
         {
             return _proto.startsWith("ws");
@@ -595,9 +600,9 @@ abstract class YGenericHub
             return _proto + "/" + _host + ':' + _port + _subDomain;
         }
 
-        public boolean isDynamicURL()
+        public boolean testInfoJson()
         {
-            return _proto.equals("auto") || _proto.equals("secure");
+            return _proto.equals("auto") || _proto.equals("secure") || _proto.equals("http") || _proto.equals("https");
         }
     }
 }

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 45549 2021-06-14 13:43:10Z web $
+ * $Id: yHTTPRequest.java 51736 2022-11-23 11:27:27Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -37,10 +37,7 @@
 
 package com.yoctopuce.YoctoAPI;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.*;
 import java.util.Locale;
 
@@ -53,6 +50,7 @@ class yHTTPRequest implements Runnable
     private Object _context;
 
     private YGenericHub.RequestAsyncResult _resultCallback;
+    private boolean _isChuckEncoded;
 
     public void kill()
     {
@@ -76,7 +74,7 @@ class yHTTPRequest implements Runnable
     private final String _dbglabel;
     private final StringBuilder _header = new StringBuilder(1024);
     private Boolean _header_found;
-    private final ByteArrayOutputStream _result = new ByteArrayOutputStream(1024);
+    private final ByteArrayOutputStream _result = new ByteArrayOutputStream(4096);
     private long _startRequestTime;
     private long _lastReceiveTime;
     private long _requestTimeout;
@@ -120,20 +118,41 @@ class yHTTPRequest implements Runnable
         _startRequestTime = System.currentTimeMillis();
         _requestTimeout = mstimeout;
         _resultCallback = resultCallback;
-        String persistent_tag = firstLine.substring(firstLine.length() - 2);
-        if (persistent_tag.equals("&.")) {
-            firstLine += " \r\n";
+        boolean persistent = "&.".equals(firstLine.substring(firstLine.length() - 2));
+        String header = "";
+
+        int cur = 0;
+        int ofs = firstLine.indexOf(" ");
+        header += firstLine.substring(0, ofs + 1);
+        cur = ofs + 1;
+        header += _hub._http_params.getSubDomain();
+        ofs = firstLine.indexOf(" ", cur);
+        if (ofs < 0) {
+            ofs = firstLine.indexOf("\r", cur);
+            if (ofs < 0) {
+                ofs = firstLine.length();
+            }
+        }
+        header += firstLine.substring(cur, ofs);
+        if (_hub._usePureHTTP) {
+            header += " HTTP/1.1\r\n";
         } else {
-            firstLine += " \r\nConnection: close\r\n";
+            header += " \r\n";
+        }
+        header += _hub.getAuthorization(header);
+        if (_hub._usePureHTTP) {
+            header += "Host: " + _hub.getHost() + "\r\n";
+        }
+        if (persistent || _hub._usePureHTTP) {
+            header += "Connection: close\r\n";
         }
         if (rest_of_request == null) {
-            String str_request = firstLine + _hub.getAuthorization(firstLine) + "\r\n";
-            full_request = str_request.getBytes();
+            header += "\r\n";
+            full_request = header.getBytes();
         } else {
-            String str_request = firstLine + _hub.getAuthorization(firstLine);
-            int len = str_request.length();
+            int len = header.length();
             full_request = new byte[len + rest_of_request.length];
-            System.arraycopy(str_request.getBytes(), 0, full_request, 0, len);
+            System.arraycopy(header.getBytes(), 0, full_request, 0, len);
             System.arraycopy(rest_of_request, 0, full_request, len, rest_of_request.length);
         }
         boolean retry;
@@ -143,7 +162,7 @@ class yHTTPRequest implements Runnable
                 if (!_reuse_socket) {
                     InetAddress addr = InetAddress.getByName(_hub.getHost());
                     // Creates an connected socket
-                    _socket = _hub.OpenConnectedSocket(addr,(int) mstimeout);
+                    _socket = _hub.OpenConnectedSocket(addr, (int) mstimeout);
                     _socket.setTcpNoDelay(true);
                     _out = _socket.getOutputStream();
                     _in = _socket.getInputStream();
@@ -151,6 +170,7 @@ class yHTTPRequest implements Runnable
                 _result.reset();
                 _header.setLength(0);
                 _header_found = false;
+                _isChuckEncoded = false;
                 _eof = false;
 
             } catch (UnknownHostException e) {
@@ -311,6 +331,16 @@ class yHTTPRequest implements Runnable
                                 }
                                 if (!parts[0].equals("200") && !parts[0].equals("304")) {
                                     throw new YAPI_Exception(YAPI.IO_ERROR, "Received HTTP status " + parts[0] + " (" + parts[1] + ")");
+                                } else {
+                                    int t_ofs = _header.indexOf("Transfer-Encoding");
+                                    if (t_ofs > 0) {
+                                        t_ofs += 17;
+                                        int t_endl = _header.indexOf("\r\n", t_ofs);
+                                        int t_chunk = _header.indexOf("chunked", t_ofs);
+                                        if (t_chunk > 0 && t_chunk < t_endl) {
+                                            _isChuckEncoded = true;
+                                        }
+                                    }
                                 }
                             }
                             _hub.authSucceded();
@@ -361,6 +391,9 @@ class yHTTPRequest implements Runnable
             synchronized (_result) {
                 res = _result.toByteArray();
                 _result.reset();
+                if (_isChuckEncoded) {
+                    res = unpackHTTPRequest(res);
+                }
             }
         } catch (YAPI_Exception ex) {
             _requestStop();
@@ -371,6 +404,38 @@ class yHTTPRequest implements Runnable
         _requestStop();
         _requestRelease();
         return res;
+    }
+
+    private byte[] unpackHTTPRequest(byte[] data)
+    {
+        ByteArrayOutputStream res = new ByteArrayOutputStream(data.length);
+        int ofs = 0;
+        do {
+            StringBuilder hex_str = new StringBuilder();
+            char c;
+            while (ofs < data.length && (c = (char) data[ofs]) != '\n') {
+                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')) {
+                    hex_str.append(c);
+                }
+                ofs++;
+            }
+            if (ofs < data.length) {
+                int len;
+                try {
+                    len = Integer.parseInt(hex_str.toString(), 16);
+                } catch (NumberFormatException ex) {
+                    len = 0;
+                }
+                if (ofs + 3 + len < data.length) {
+                    ofs++;
+                    res.write(data, ofs, len);
+                    ofs += 2;// skip last \r\n
+                } else {
+                    ofs++;
+                }
+            }
+        } while (ofs < data.length);
+        return res.toByteArray();
     }
 
     public void run()

@@ -17,6 +17,7 @@ public class WSHandlerJEE implements WSHandlerInterface, MessageHandler
     {
         _isHttpCallback = session != null;
         _nhandler = nhandler;
+        _session= (Session) session;
         if (_isHttpCallback) {
             // server mode
             MessageHandler.Whole<ByteBuffer> messageHandler = new MessageHandler.Whole<ByteBuffer>()

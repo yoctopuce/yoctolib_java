@@ -833,7 +833,6 @@ public class YAPIContext
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
             throw new YAPI_Exception(YAPI.IO_ERROR, "unable to contact " + url + " :" + e.getLocalizedMessage());
         } finally {
             if (in != null) {

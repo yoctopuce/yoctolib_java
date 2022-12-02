@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 45893 2021-08-09 13:53:21Z web $
+ * $Id: YDataStream.java 51748 2022-11-24 08:49:14Z mvuilleu $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -84,6 +84,7 @@ public class YDataStream
     protected ArrayList<Double> _calraw = new ArrayList<>();
     protected ArrayList<Double> _calref = new ArrayList<>();
     protected ArrayList<ArrayList<Double>> _values = new ArrayList<>();
+    protected boolean _isLoaded;
 
     //--- (end of generated code: YDataStream definitions)
     protected YAPI.CalibrationHandlerCallback _calhdl = null;
@@ -200,6 +201,9 @@ public class YDataStream
         int idx;
         ArrayList<Integer> udat = new ArrayList<>();
         ArrayList<Double> dat = new ArrayList<>();
+        if (_isLoaded && !(_isClosed)) {
+            return YAPI.SUCCESS;
+        }
         if ((sdata).length == 0) {
             _nRows = 0;
             return YAPI.SUCCESS;
@@ -237,7 +241,13 @@ public class YDataStream
         }
 
         _nRows = _values.size();
+        _isLoaded = true;
         return YAPI.SUCCESS;
+    }
+
+    public boolean _wasLoaded()
+    {
+        return _isLoaded;
     }
 
     public String _get_url()
@@ -245,6 +255,21 @@ public class YDataStream
         String url;
         url = String.format(Locale.US, "logger.json?id=%s&run=%d&utc=%d",
         _functionId,_runNo,_utcStamp);
+        return url;
+    }
+
+    public String _get_baseurl()
+    {
+        String url;
+        url = String.format(Locale.US, "logger.json?id=%s&run=%d&utc=",
+        _functionId,_runNo);
+        return url;
+    }
+
+    public String _get_urlsuffix()
+    {
+        String url;
+        url = String.format(Locale.US, "%d",_utcStamp);
         return url;
     }
 
