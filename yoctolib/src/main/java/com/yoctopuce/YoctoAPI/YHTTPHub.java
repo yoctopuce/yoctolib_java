@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 51984 2022-12-01 07:46:13Z seb $
+ * $Id: YHTTPHub.java 52250 2022-12-08 10:35:02Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -106,18 +106,22 @@ class YHTTPHub extends YGenericHub
             _opaque = "";
             _nounce_count = 0;
 
-            String tags[] = header.split(" ");
+            header = header.trim();
+            if (!header.startsWith("Digest ")) {
+                return;
+            }
+            header = header.substring(7).trim();
+
+            String[] tags = header.split(",");
             for (String tag : tags) {
-                String parts[] = tag.split("[=\",]");
-                String name, value;
-                if (parts.length == 2) {
-                    name = parts[0];
-                    value = parts[1];
-                } else if (parts.length == 3) {
-                    name = parts[0];
-                    value = parts[2];
-                } else {
+                int eq = tag.indexOf("=");
+                if (eq < 0) {
                     continue;
+                }
+                String name = tag.substring(0, eq).trim();
+                String value = tag.substring(eq + 1).trim();
+                if (value.startsWith("\"") && value.endsWith("\"")) {
+                    value = value.substring(1, value.length() - 1);
                 }
                 switch (name) {
                     case "realm":
@@ -199,17 +203,18 @@ class YHTTPHub extends YGenericHub
             if (_URL_params.getPort() == YAPI.YOCTO_DEFAULT_HTTPS_PORT) {
                 https_req = true;
             }
-            String url = String.format("%s://%s:%d%s/info.json", https_req ? "https" : "http", _URL_params.getHost(), _URL_params.getPort(),_URL_params.getSubDomain());
+            String url = String.format("%s://%s:%d%s/info.json", https_req ? "https" : "http", _URL_params.getHost(), _URL_params.getPort(), _URL_params.getSubDomain());
             byte[] raw;
             try {
                 raw = YAPIContext.BasicHTTPRequest(url);
-            } catch (Exception ex) {
-                throw new YAPI_Exception(YAPI.IO_ERROR, ex.getMessage(),ex);
-            }
-            try {
+
                 String json_str = new String(raw, _yctx._deviceCharset);
                 YJSONObject json = new YJSONObject(json_str);
-                json.parse();
+                try {
+                    json.parse();
+                } catch (Exception e) {
+                    throw new YAPI_Exception(YAPI.IO_ERROR, "Invalid info.json file", e);
+                }
                 if (json.has("protocol") && json.getString("protocol").equals("HTTP/1.1")) {
                     this._usePureHTTP = true;
                 }
@@ -238,13 +243,15 @@ class YHTTPHub extends YGenericHub
                         }
                     }
                 }
-            } catch (Exception ex) {
-                if (!_URL_params.useSecureSocket()) {
+            } catch (YAPI_Exception ex) {
+                if (ex.errorType == YAPI.SSL_ERROR) {
+                    throw ex;
+                }
+                if (_URL_params.useSecureSocket()) {
+                    throw ex;
+                } else {
                     _http_params = _URL_params;
                 }
-            }
-            if (_http_params == null) {
-                throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "No compatible protocol in info.json. Upgrade VirtualHub or Hub Firmware");
             }
         } else {
             _http_params = _URL_params;
@@ -293,7 +300,13 @@ class YHTTPHub extends YGenericHub
     boolean isSameHub(String url, Object request, Object response, Object session)
     {
         HTTPParams params = new HTTPParams(url);
-        boolean url_equals = params.getUrl(false, false).equals(_http_params.getUrl(false, false));
+        boolean url_equals;
+        String paramsUrl = params.getUrl(false, false);
+        if (_http_params != null) {
+            url_equals = paramsUrl.equals(_http_params.getUrl(false, false));
+        } else {
+            url_equals = paramsUrl.equals(_URL_params.getUrl(false, false));
+        }
         return url_equals && (_callbackSession == null || _callbackSession.equals(session));
     }
 

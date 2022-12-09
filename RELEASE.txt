@@ -1,4 +1,5 @@
-Java v1.10.52094
+Java v1.10.52255
 
-- Fix WebSocket callback support
-- Add support for connecting to VirtualHub-4web
+- Fix WebSocket callback implementation in Java
+- Fix authentication for VirtualHub-4web
+- Add AddTrustedCertificates method

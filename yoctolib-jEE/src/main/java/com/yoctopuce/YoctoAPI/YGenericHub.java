@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 51870 2022-11-29 10:46:15Z seb $
+ * $Id: YGenericHub.java 52251 2022-12-08 10:37:03Z seb $
  *
  * Internal YGenericHub object
  *
@@ -464,12 +464,21 @@ abstract class YGenericHub
             } else if (url.startsWith("usb://")) {
                 pos = 6;
                 _proto = "usb";
+                _user = "";
+                _pass = "";
+                _subDomain = "";
+                _host = "";
+                _port = -1;
+                return;
             } else {
 
                 if (url.startsWith("ws://")) {
                     pos = 5;
                 }
                 _proto = "ws";
+            }
+            if (url.endsWith("/")) {
+                url = url.substring(0, url.length() - 1);
             }
             int end_auth = url.indexOf('@', pos);
             int end_user = url.indexOf(':', pos);
@@ -514,7 +523,7 @@ abstract class YGenericHub
             _pass = http_params_org._pass;
             if (!http_params_org.getProto().equals("http") && !http_params_org.getProto().equals("https")) {
                 _proto = proto;
-            }else{
+            } else {
                 _proto = http_params_org.getProto();
             }
             _subDomain = http_params_org._subDomain;

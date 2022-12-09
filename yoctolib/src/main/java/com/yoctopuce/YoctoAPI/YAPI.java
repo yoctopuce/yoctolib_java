@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 46595 2021-09-24 16:42:28Z mvuilleu $
+ * $Id: YAPI.java 52209 2022-12-07 08:35:02Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -58,7 +58,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "52094";
+    public static final String YOCTO_API_BUILD_STR = "52255";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -289,7 +289,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".52094" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".52255" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -412,6 +412,11 @@ public class YAPI
     public static int RegisterHub(String url, InputStream request, OutputStream response) throws YAPI_Exception
     {
         return GetYCtx(true).RegisterHub(url, request, response);
+    }
+
+    public static String AddTrustedCertificates(String pem_cert)
+    {
+        return GetYCtx(true).AddTrustedCertificates(pem_cert);
     }
 
     /**

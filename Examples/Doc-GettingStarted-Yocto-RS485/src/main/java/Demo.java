@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: Demo.java 32627 2018-10-10 13:37:29Z seb $
+ *  $Id: Demo.java 52208 2022-12-07 08:17:21Z mvuilleu $
  *
  *  An example that show how to use a  Yocto-RS485
  *
@@ -51,8 +51,8 @@ public class Demo {
                 slave = Integer.parseInt(console.readLine());
             } while(slave < 1 || slave > 255);
             do {
-                System.out.println("Please select a Coil No (>=1), Input Bit No (>=10001+),");
-                System.out.println("       Input Register No (>=30001) or Register No (>=40001)");
+                System.out.println("Please select a Coil No (>=1), Input Bit No (>=10001),");
+                System.out.println("Input Register No (>=30001) or Holding Register No (>=40001)");
                 System.out.print("No: ");
                 reg = Integer.parseInt(console.readLine());
             } while(reg < 1 || reg >= 50000 || (reg % 10000) == 0);
@@ -68,16 +68,16 @@ public class Demo {
                 }
                 System.out.println("Current value: "+Integer.toString(val));
                 System.out.print("Press ENTER to read again, Q to quit");
-                if((reg % 30000) < 10000) {
+                if((reg % 40000) < 10000) {
                     System.out.print(" or enter a new value");
                 }
                 System.out.print(": ");
                 cmd = console.readLine();
                 if(cmd.equals("q") || cmd.equals("Q")) break;
-                if(!cmd.equals("") && (reg % 30000) < 10000) {
+                if(!cmd.equals("") && (reg % 40000) < 10000) {
                     val = Integer.parseInt(cmd);
-                    if(reg >= 30001) {
-                        serialPort.modbusWriteRegister(slave, reg-30001, val);
+                    if(reg >= 40001) {
+                        serialPort.modbusWriteRegister(slave, reg-40001, val);
                     } else {
                         serialPort.modbusWriteBit(slave, reg-1, val);
                     }
