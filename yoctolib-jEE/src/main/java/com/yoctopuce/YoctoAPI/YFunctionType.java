@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunctionType.java 26571 2017-02-07 17:16:17Z seb $
+ * $Id: YFunctionType.java 52311 2022-12-12 17:22:28Z seb $
  *
  * Internal YFunctionType object
  *
@@ -235,6 +235,9 @@ class YFunctionType
 
         } catch (YAPI_Exception ex) {
             // the function is still abstract
+            if (_connectedFns.containsKey(func)) {
+                return _connectedFns.get(func);
+            }
             if (_requestedFns.containsKey(func)) {
                 return _requestedFns.get(func);
             }

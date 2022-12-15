@@ -1,5 +1,3 @@
-Java v1.10.52255
+Java v1.10.52382
 
-- Fix WebSocket callback implementation in Java
-- Fix authentication for VirtualHub-4web
-- Add AddTrustedCertificates method
+- Fix get_module() method that was not working during removal callbackFix IO error with HTTP protocol

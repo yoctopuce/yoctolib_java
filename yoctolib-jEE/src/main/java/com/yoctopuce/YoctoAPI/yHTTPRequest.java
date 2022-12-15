@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 51737 2022-11-23 11:30:18Z seb $
+ * $Id: yHTTPRequest.java 52311 2022-12-12 17:22:28Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -143,7 +143,7 @@ class yHTTPRequest implements Runnable
         if (_hub._usePureHTTP) {
             header += "Host: " + _hub.getHost() + "\r\n";
         }
-        if (persistent || _hub._usePureHTTP) {
+        if (!persistent || _hub._usePureHTTP) {
             header += "Connection: close\r\n";
         }
         if (rest_of_request == null) {

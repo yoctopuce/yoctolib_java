@@ -574,10 +574,23 @@ public class YAPIContext
         _calibHandlers.put(YAPI.YOCTO_CALIB_TYPE_OFS, linearCalibrationHandler);
     }
 
-    void _pushPlugEvent(PlugEvent.Event ev, String serial)
+    void _pushPlugEvent(String serial, String productName, int productId)
     {
         synchronized (_pendingCallbacks) {
-            _pendingCallbacks.add(new PlugEvent(this, ev, serial));
+            _pendingCallbacks.add(new PlugEvent(this, PlugEvent.Event.PLUG, serial));
+        }
+    }
+    void _pushChangeEvent(String serial)
+    {
+        synchronized (_pendingCallbacks) {
+            _pendingCallbacks.add(new PlugEvent(this, YAPIContext.PlugEvent.Event.CHANGE, serial));
+        }
+    }
+
+    void _pushUnPlugEvent(String serial)
+    {
+        synchronized (_pendingCallbacks) {
+            _pendingCallbacks.add(new PlugEvent(this, PlugEvent.Event.UNPLUG, serial));
         }
     }
 
