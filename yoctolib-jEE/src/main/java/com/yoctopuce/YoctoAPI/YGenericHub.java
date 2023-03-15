@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 52311 2022-12-12 17:22:28Z seb $
+ * $Id: YGenericHub.java 53427 2023-03-06 11:26:37Z seb $
  *
  * Internal YGenericHub object
  *
@@ -288,10 +288,10 @@ abstract class YGenericHub
         for (YDevice dev : _devices.values()) {
             String devSerialNumber = dev.getSerialNumber();
             if (devSerialNumber.equals(serialNumber)) {
-                return _URL_params.getUrl(true, false) + dev.getNetworkUrl();
+                return _URL_params.getUrl(true, false) + dev.getNetworkUrl() + '/';
             }
         }
-        return _URL_params.getUrl(true, false);
+        return _URL_params.getUrl(true, false) + '/';
     }
 
     public ArrayList<String> get_subDeviceOf(String serialNumber)
@@ -304,6 +304,8 @@ abstract class YGenericHub
                     //
                     res.clear();
                     return res;
+                } else {
+                    continue;
                 }
             }
             res.add(devSerialNumber);

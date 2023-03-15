@@ -1,5 +1,5 @@
 /*
- * $Id: YDataSet.java 51903 2022-11-29 17:25:59Z mvuilleu $
+ * $Id: YDataSet.java 52848 2023-01-20 15:49:48Z mvuilleu $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -566,7 +566,7 @@ public class YDataSet
     }
 
     /**
-     * Loads the the next block of measures from the dataLogger, and updates
+     * Loads the next block of measures from the dataLogger, and updates
      * the progress indicator.
      *
      * @return an integer in the range 0 to 100 (percentage of completion),

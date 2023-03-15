@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPower.java 52318 2022-12-13 10:58:18Z seb $
+ *  $Id: YPower.java 53420 2023-03-06 10:38:51Z mvuilleu $
  *
  *  Implements FindPower(), the high-level API for Power functions
  *
@@ -58,6 +58,10 @@ public class YPower extends YSensor
 //--- (end of YPower class start)
 //--- (YPower definitions)
     /**
+     * invalid powerFactor value
+     */
+    public static final double POWERFACTOR_INVALID = YAPI.INVALID_DOUBLE;
+    /**
      * invalid cosPhi value
      */
     public static final double COSPHI_INVALID = YAPI.INVALID_DOUBLE;
@@ -77,6 +81,7 @@ public class YPower extends YSensor
      * invalid meterTimer value
      */
     public static final int METERTIMER_INVALID = YAPI.INVALID_UINT;
+    protected double _powerFactor = POWERFACTOR_INVALID;
     protected double _cosPhi = COSPHI_INVALID;
     protected double _meter = METER_INVALID;
     protected double _deliveredEnergyMeter = DELIVEREDENERGYMETER_INVALID;
@@ -139,6 +144,9 @@ public class YPower extends YSensor
     @Override
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
+        if (json_val.has("powerFactor")) {
+            _powerFactor = Math.round(json_val.getDouble("powerFactor") / 65.536) / 1000.0;
+        }
         if (json_val.has("cosPhi")) {
             _cosPhi = Math.round(json_val.getDouble("cosPhi") / 65.536) / 1000.0;
         }
@@ -158,11 +166,51 @@ public class YPower extends YSensor
     }
 
     /**
-     * Returns the power factor (the ratio between the real power consumed,
-     * measured in W, and the apparent power provided, measured in VA).
+     * Returns the power factor (PF), i.e. ratio between the active power consumed (in W)
+     * and the apparent power provided (VA).
      *
-     * @return a floating point number corresponding to the power factor (the ratio between the real power consumed,
-     *         measured in W, and the apparent power provided, measured in VA)
+     * @return a floating point number corresponding to the power factor (PF), i.e
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_powerFactor() throws YAPI_Exception
+    {
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return POWERFACTOR_INVALID;
+                }
+            }
+            res = _powerFactor;
+            if (res == POWERFACTOR_INVALID) {
+                res = _cosPhi;
+            }
+            res = (double)Math.round(res * 1000) / 1000;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the power factor (PF), i.e. ratio between the active power consumed (in W)
+     * and the apparent power provided (VA).
+     *
+     * @return a floating point number corresponding to the power factor (PF), i.e
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getPowerFactor() throws YAPI_Exception
+    {
+        return get_powerFactor();
+    }
+
+    /**
+     * Returns the Displacement Power factor (DPF), i.e. cosine of the phase shift between
+     * the voltage and current fundamentals.
+     * On the Yocto-Watt (V1), the value returned by this method correponds to the
+     * power factor as this device is cannot estimate the true DPF.
+     *
+     * @return a floating point number corresponding to the Displacement Power factor (DPF), i.e
      *
      * @throws YAPI_Exception on error
      */
@@ -181,11 +229,12 @@ public class YPower extends YSensor
     }
 
     /**
-     * Returns the power factor (the ratio between the real power consumed,
-     * measured in W, and the apparent power provided, measured in VA).
+     * Returns the Displacement Power factor (DPF), i.e. cosine of the phase shift between
+     * the voltage and current fundamentals.
+     * On the Yocto-Watt (V1), the value returned by this method correponds to the
+     * power factor as this device is cannot estimate the true DPF.
      *
-     * @return a floating point number corresponding to the power factor (the ratio between the real power consumed,
-     *         measured in W, and the apparent power provided, measured in VA)
+     * @return a floating point number corresponding to the Displacement Power factor (DPF), i.e
      *
      * @throws YAPI_Exception on error
      */

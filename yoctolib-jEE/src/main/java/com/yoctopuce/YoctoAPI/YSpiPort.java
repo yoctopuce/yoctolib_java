@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSpiPort.java 49903 2022-05-25 14:18:36Z mvuilleu $
+ *  $Id: YSpiPort.java 52892 2023-01-25 10:13:30Z seb $
  *
  *  Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -1348,16 +1348,29 @@ public class YSpiPort extends YFunction
      */
     public int read_avail() throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
-        int bufflen;
+        String availPosStr;
+        int atPos;
         int res;
+        byte[] databin = new byte[0];
 
-        buff = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
-        bufflen = (buff).length - 1;
-        while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
-            bufflen = bufflen - 1;
-        }
-        res = YAPIContext._atoi((new String(buff)).substring(0, bufflen));
+        databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
+        availPosStr = new String(databin);
+        atPos = (availPosStr).indexOf("@");
+        res = YAPIContext._atoi((availPosStr).substring(0, atPos));
+        return res;
+    }
+
+    public int end_tell() throws YAPI_Exception
+    {
+        String availPosStr;
+        int atPos;
+        int res;
+        byte[] databin = new byte[0];
+
+        databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
+        availPosStr = new String(databin);
+        atPos = (availPosStr).indexOf("@");
+        res = YAPIContext._atoi((availPosStr).substring( atPos+1,  atPos+1 + (availPosStr).length()-atPos-1));
         return res;
     }
 
@@ -1375,13 +1388,22 @@ public class YSpiPort extends YFunction
      */
     public String queryLine(String query,int maxWait) throws YAPI_Exception
     {
+        int prevpos;
         String url;
         byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
+        if ((query).length() <= 80) {
+            // fast query
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
+        } else {
+            // long query
+            prevpos = end_tell();
+            _upload("txdata", (query + "\r\n").getBytes());
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&pos=%d", maxWait,prevpos);
+        }
 
-        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
@@ -1413,13 +1435,22 @@ public class YSpiPort extends YFunction
      */
     public String queryHex(String hexString,int maxWait) throws YAPI_Exception
     {
+        int prevpos;
         String url;
         byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
+        if ((hexString).length() <= 80) {
+            // fast query
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=$%s", maxWait,hexString);
+        } else {
+            // long query
+            prevpos = end_tell();
+            _upload("txdata", YAPIContext._hexStrToBin(hexString));
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&pos=%d", maxWait,prevpos);
+        }
 
-        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=$%s", maxWait,hexString);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();

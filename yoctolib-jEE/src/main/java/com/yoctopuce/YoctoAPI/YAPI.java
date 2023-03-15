@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 52210 2022-12-07 08:57:15Z seb $
+ * $Id: YAPI.java 53432 2023-03-06 14:23:08Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -37,6 +37,7 @@
 
 package com.yoctopuce.YoctoAPI;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "52382";
+    public static final String YOCTO_API_BUILD_STR = "53532";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -249,6 +250,56 @@ public class YAPI
         }
         return res.toString();
     }
+
+    static byte[] Base64Decode(String source)
+    {
+        ByteArrayOutputStream res = new ByteArrayOutputStream(source.length() * 3 / 4);
+        int ofs = 0;
+        int i = 0;
+        int sourceLen = source.length();
+        int byteNum = 0;
+        int acc = 0;
+        while (i < sourceLen) {
+            // Fetch a Base64 byte and decode it to the original 6 bits
+            char c = source.charAt(i++);
+            int val;
+            if (c >= 'A' && c <= 'Z')    // Regular data
+                val = c - 'A';
+            else if (c >= 'a' && c <= 'z')
+                val = c - 'a' + 26;
+            else if (c >= '0' && c <= '9')
+                val = c - '0' + 52;
+            else if (c == '+' || c == '-')
+                val = 62;
+            else if (c == '/' || c == '_')
+                val = 63;
+            else
+                continue;
+            if (byteNum == 0) {
+                acc = (val << 2) & 0xff;
+                byteNum++;
+            } else if (byteNum == 1) {
+                acc |= (val & 0xff) >> 4;
+                res.write(acc & 0xff);
+                acc = (val << 4) & 0xff;
+                byteNum++;
+            } else if (byteNum == 2) {
+                acc |= (val & 0xff) >> 2;
+                res.write(acc & 0xff);
+                acc = (val << 6) & 0xff;
+                byteNum++;
+            } else {
+                acc |= (val & 0x3f);
+                res.write(acc & 0xff);
+                acc = 0;
+                byteNum = 0;
+            }
+        }
+        if (byteNum > 0) {
+            res.write(acc & 0xff);
+        }
+        return res.toByteArray();
+    }
     //PUBLIC STATIC METHOD:
 
 
@@ -289,7 +340,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".52382" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".53532" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -369,9 +420,15 @@ public class YAPI
      *
      * <b><i>x.x.x.x</i></b> or <b><i>hostname</i></b>: The API will use the devices connected to the
      * host with the given IP address or hostname. That host can be a regular computer
-     * running a VirtualHub, or a networked YoctoHub such as YoctoHub-Ethernet or
+     * running a <i>native VirtualHub</i>, a <i>VirtualHub for web</i> hosted on a server,
+     * or a networked YoctoHub such as YoctoHub-Ethernet or
      * YoctoHub-Wireless. If you want to use the VirtualHub running on you local
-     * computer, use the IP address 127.0.0.1.
+     * computer, use the IP address 127.0.0.1. If the given IP is unresponsive, yRegisterHub
+     * will not return until a time-out defined by ySetNetworkTimeout has elapsed.
+     * However, it is possible to preventively test a connection  with yTestHub.
+     * If you cannot afford a network time-out, you can use the non blocking yPregisterHub
+     * function that will establish the connection as soon as it is available.
+     *
      *
      * <b>callback</b>: that keyword make the API run in "<i>HTTP Callback</i>" mode.
      * This a special mode allowing to take control of Yoctopuce devices
@@ -466,7 +523,8 @@ public class YAPI
      * Fault-tolerant alternative to yRegisterHub(). This function has the same
      * purpose and same arguments as yRegisterHub(), but does not trigger
      * an error when the selected hub is not available at the time of the function call.
-     * This makes it possible to register a network hub independently of the current
+     * If the connexion cannot be established immediately, a background task will automatically
+     * perform periodic retries. This makes it possible to register a network hub independently of the current
      * connectivity, and to try to contact it only when a device is actively needed.
      *
      * @param url : a string containing either "usb","callback" or the
@@ -698,6 +756,36 @@ public class YAPI
     public static void RegisterLogFunction(YAPI.LogCallback logfun)
     {
         GetYCtx(true).RegisterLogFunction(logfun);
+    }
+
+    /**
+     * Enables the HTTP callback cache. When enabled, this cache reduces the quantity of data sent to the
+     * PHP script by 50% to 70%. To enable this cache, the method ySetHTTPCallbackCacheDir()
+     * must be called before any call to yRegisterHub(). This method takes in parameter the path
+     * of the directory used for saving data between each callback. This folder must exist and the
+     * PHP script needs to have write access to it. It is recommended to use a folder that is not published
+     * on the Web server since the library will save some data of Yoctopuce devices into this folder.
+     *
+     * Note: This feature is supported by YoctoHub and VirtualHub since version 27750.
+     *
+     * @param directory : the path of the folder that will be used as cache.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public void SetHTTPCallbackCacheDir(String directory) throws YAPI_Exception
+    {
+        GetYCtx(true).SetHTTPCallbackCacheDir(directory);
+    }
+
+    /**
+     * Disables the HTTP callback cache. This method disables the HTTP callback cache, and
+     * can additionally cleanup the cache directory.
+     *
+     * @param removeFiles : True to clear the content of the cache.
+     */
+    public void ClearHTTPCallbackCacheDir(boolean removeFiles)
+    {
+        GetYCtx(true).ClearHTTPCallbackCacheDir(removeFiles);
     }
 
 

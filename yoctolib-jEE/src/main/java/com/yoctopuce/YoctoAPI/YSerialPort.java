@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 49903 2022-05-25 14:18:36Z mvuilleu $
+ * $Id: YSerialPort.java 52892 2023-01-25 10:13:30Z seb $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -1231,16 +1231,29 @@ public class YSerialPort extends YFunction
      */
     public int read_avail() throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
-        int bufflen;
+        String availPosStr;
+        int atPos;
         int res;
+        byte[] databin = new byte[0];
 
-        buff = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
-        bufflen = (buff).length - 1;
-        while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
-            bufflen = bufflen - 1;
-        }
-        res = YAPIContext._atoi((new String(buff)).substring(0, bufflen));
+        databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
+        availPosStr = new String(databin);
+        atPos = (availPosStr).indexOf("@");
+        res = YAPIContext._atoi((availPosStr).substring(0, atPos));
+        return res;
+    }
+
+    public int end_tell() throws YAPI_Exception
+    {
+        String availPosStr;
+        int atPos;
+        int res;
+        byte[] databin = new byte[0];
+
+        databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
+        availPosStr = new String(databin);
+        atPos = (availPosStr).indexOf("@");
+        res = YAPIContext._atoi((availPosStr).substring( atPos+1,  atPos+1 + (availPosStr).length()-atPos-1));
         return res;
     }
 
@@ -1258,13 +1271,22 @@ public class YSerialPort extends YFunction
      */
     public String queryLine(String query,int maxWait) throws YAPI_Exception
     {
+        int prevpos;
         String url;
         byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
+        if ((query).length() <= 80) {
+            // fast query
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
+        } else {
+            // long query
+            prevpos = end_tell();
+            _upload("txdata", (query + "\r\n").getBytes());
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&pos=%d", maxWait,prevpos);
+        }
 
-        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
@@ -1296,13 +1318,22 @@ public class YSerialPort extends YFunction
      */
     public String queryHex(String hexString,int maxWait) throws YAPI_Exception
     {
+        int prevpos;
         String url;
         byte[] msgbin = new byte[0];
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
+        if ((hexString).length() <= 80) {
+            // fast query
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=$%s", maxWait,hexString);
+        } else {
+            // long query
+            prevpos = end_tell();
+            _upload("txdata", YAPIContext._hexStrToBin(hexString));
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&pos=%d", maxWait,prevpos);
+        }
 
-        url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=$%s", maxWait,hexString);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
@@ -1979,6 +2010,7 @@ public class YSerialPort extends YFunction
         int nib;
         int i;
         String cmd;
+        int prevpos;
         String url;
         String pat;
         byte[] msgs = new byte[0];
@@ -1996,8 +2028,16 @@ public class YSerialPort extends YFunction
             cmd = String.format(Locale.US, "%s%02X", cmd,((pduBytes.get(i).intValue()) & (0xff)));
             i = i + 1;
         }
+        if ((cmd).length() <= 80) {
+            // fast query
+            url = String.format(Locale.US, "rxmsg.json?cmd=:%s&pat=:%s", cmd,pat);
+        } else {
+            // long query
+            prevpos = end_tell();
+            _upload("txdata:", YAPIContext._hexStrToBin(cmd));
+            url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=2000&pat=:%s", prevpos,pat);
+        }
 
-        url = String.format(Locale.US, "rxmsg.json?cmd=:%s&pat=:%s", cmd,pat);
         msgs = _download(url);
         reps = _json_get_array(msgs);
         //noinspection DoubleNegation
@@ -2158,6 +2198,8 @@ public class YSerialPort extends YFunction
         int regpos;
         int idx;
         int val;
+        //noinspection DoubleNegation
+        if (!(nWords<=256)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Cannot read more than 256 words");}
         pdu.add(0x03);
         pdu.add(((pduAddr) >> (8)));
         pdu.add(((pduAddr) & (0xff)));

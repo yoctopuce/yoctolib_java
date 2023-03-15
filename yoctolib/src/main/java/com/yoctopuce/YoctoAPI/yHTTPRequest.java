@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 52311 2022-12-12 17:22:28Z seb $
+ * $Id: yHTTPRequest.java 52483 2022-12-22 09:36:34Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -56,6 +56,7 @@ class yHTTPRequest implements Runnable
     {
         _requestStop();
     }
+
     private enum State
     {
         AVAIL, IN_REQUEST, STOPPED
@@ -429,7 +430,7 @@ class yHTTPRequest implements Runnable
                 if (ofs + 3 + len < data.length) {
                     ofs++;
                     res.write(data, ofs, len);
-                    ofs += 2;// skip last \r\n
+                    ofs += len + 2;// skip last \r\n
                 } else {
                     ofs++;
                 }

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 51266 2022-10-10 09:18:25Z seb $
+ * $Id: YModule.java 53427 2023-03-06 11:26:37Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -364,7 +364,7 @@ public class YModule extends YFunction
     {
         YDevice dev = _getDev();
         YGenericHub hub = dev.getHub();
-        return hub.get_subDeviceOf(_serialNumber);
+        return hub.get_subDeviceOf(this.get_serialNumber());
     }
 
 
@@ -373,7 +373,7 @@ public class YModule extends YFunction
         YDevice dev = _getDev();
         YGenericHub hub = dev.getHub();
         String hubSerial = hub.getSerialNumber();
-        if (hubSerial.equals(_serialNumber))
+        if (hubSerial.equals(getSerialNumber()))
             return "";
         return hubSerial;
     }
@@ -383,7 +383,7 @@ public class YModule extends YFunction
     {
         YDevice dev = _getDev();
         YGenericHub hub = dev.getHub();
-        return hub.get_urlOf(_serialNumber);
+        return hub.get_urlOf(getSerialNumber());
     }
 
     public void _startStopDevLog_internal(String serial, boolean start) throws YAPI_Exception

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 49385 2022-04-06 00:49:27Z mvuilleu $
+ *  $Id: YNetwork.java 53420 2023-03-06 10:38:51Z mvuilleu $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -157,6 +157,12 @@ public class YNetwork extends YFunction
     public static final int CALLBACKENCODING_INFLUXDB_V2 = 12;
     public static final int CALLBACKENCODING_INVALID = -1;
     /**
+     * invalid callbackTemplate value
+     */
+    public static final int CALLBACKTEMPLATE_OFF = 0;
+    public static final int CALLBACKTEMPLATE_ON = 1;
+    public static final int CALLBACKTEMPLATE_INVALID = -1;
+    /**
      * invalid callbackCredentials value
      */
     public static final String CALLBACKCREDENTIALS_INVALID = YAPI.INVALID_STRING;
@@ -199,6 +205,7 @@ public class YNetwork extends YFunction
     protected String _callbackUrl = CALLBACKURL_INVALID;
     protected int _callbackMethod = CALLBACKMETHOD_INVALID;
     protected int _callbackEncoding = CALLBACKENCODING_INVALID;
+    protected int _callbackTemplate = CALLBACKTEMPLATE_INVALID;
     protected String _callbackCredentials = CALLBACKCREDENTIALS_INVALID;
     protected int _callbackInitialDelay = CALLBACKINITIALDELAY_INVALID;
     protected String _callbackSchedule = CALLBACKSCHEDULE_INVALID;
@@ -317,6 +324,9 @@ public class YNetwork extends YFunction
         }
         if (json_val.has("callbackEncoding")) {
             _callbackEncoding = json_val.getInt("callbackEncoding");
+        }
+        if (json_val.has("callbackTemplate")) {
+            _callbackTemplate = json_val.getInt("callbackTemplate") > 0 ? 1 : 0;
         }
         if (json_val.has("callbackCredentials")) {
             _callbackCredentials = json_val.getString("callbackCredentials");
@@ -1567,6 +1577,88 @@ public class YNetwork extends YFunction
     public int setCallbackEncoding(int newval)  throws YAPI_Exception
     {
         return set_callbackEncoding(newval);
+    }
+
+    /**
+     * Returns the activation state of the custom template file to customize callback
+     * format. If the custom callback template is disabled, it will be ignored even
+     * if present on the YoctoHub.
+     *
+     *  @return either YNetwork.CALLBACKTEMPLATE_OFF or YNetwork.CALLBACKTEMPLATE_ON, according to the
+     * activation state of the custom template file to customize callback
+     *         format
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_callbackTemplate() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return CALLBACKTEMPLATE_INVALID;
+                }
+            }
+            res = _callbackTemplate;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the activation state of the custom template file to customize callback
+     * format. If the custom callback template is disabled, it will be ignored even
+     * if present on the YoctoHub.
+     *
+     *  @return either YNetwork.CALLBACKTEMPLATE_OFF or YNetwork.CALLBACKTEMPLATE_ON, according to the
+     * activation state of the custom template file to customize callback
+     *         format
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getCallbackTemplate() throws YAPI_Exception
+    {
+        return get_callbackTemplate();
+    }
+
+    /**
+     * Enable the use of a template file to customize callbacks format.
+     * When the custom callback template file is enabled, the template file
+     * will be loaded for each callback in order to build the data to post to the
+     * server. If template file does not exist on the YoctoHub, the callback will
+     * fail with an error message indicating the name of the expected template file.
+     *
+     * @param newval : either YNetwork.CALLBACKTEMPLATE_OFF or YNetwork.CALLBACKTEMPLATE_ON
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_callbackTemplate(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("callbackTemplate",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Enable the use of a template file to customize callbacks format.
+     * When the custom callback template file is enabled, the template file
+     * will be loaded for each callback in order to build the data to post to the
+     * server. If template file does not exist on the YoctoHub, the callback will
+     * fail with an error message indicating the name of the expected template file.
+     *
+     * @param newval : either YNetwork.CALLBACKTEMPLATE_OFF or YNetwork.CALLBACKTEMPLATE_ON
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setCallbackTemplate(int newval)  throws YAPI_Exception
+    {
+        return set_callbackTemplate(newval);
     }
 
     /**

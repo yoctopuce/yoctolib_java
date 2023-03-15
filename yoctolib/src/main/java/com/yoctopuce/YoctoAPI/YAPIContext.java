@@ -16,7 +16,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 //--- (generated code: YAPIContext return codes)
@@ -580,6 +579,7 @@ public class YAPIContext
             _pendingCallbacks.add(new PlugEvent(this, PlugEvent.Event.PLUG, serial));
         }
     }
+
     void _pushChangeEvent(String serial)
     {
         synchronized (_pendingCallbacks) {
@@ -965,7 +965,7 @@ public class YAPIContext
             ArrayList<X509Certificate> certificates = new ArrayList<>();
             int start = 0;
             while (matcher.find(start)) {
-                byte[] buffer = Base64.getMimeDecoder().decode(matcher.group(1).getBytes(US_ASCII));
+                byte[] buffer = YAPI.Base64Decode(matcher.group(1));
                 certificates.add((X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(buffer)));
                 start = matcher.end();
             }
@@ -1133,6 +1133,35 @@ public class YAPIContext
 
     //--- (end of generated code: YAPIContext implementation)
 
+    /**
+     * Enables the HTTP callback cache. When enabled, this cache reduces the quantity of data sent to the
+     * PHP script by 50% to 70%. To enable this cache, the method ySetHTTPCallbackCacheDir()
+     * must be called before any call to yRegisterHub(). This method takes in parameter the path
+     * of the directory used for saving data between each callback. This folder must exist and the
+     * PHP script needs to have write access to it. It is recommended to use a folder that is not published
+     * on the Web server since the library will save some data of Yoctopuce devices into this folder.
+     *
+     * Note: This feature is supported by YoctoHub and VirtualHub since version 27750.
+     *
+     * @param directory : the path of the folder that will be used as cache.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public void SetHTTPCallbackCacheDir(String directory) throws YAPI_Exception
+    {
+        throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "SetHTTPCallbackCacheDir is not supported by Java lib");
+    }
+
+    /**
+     * Disables the HTTP callback cache. This method disables the HTTP callback cache, and
+     * can additionally cleanup the cache directory.
+     *
+     * @param removeFiles : True to clear the content of the cache.
+     */
+    public void ClearHTTPCallbackCacheDir(boolean removeFiles)
+    {
+    }
+
 
     private void SetDeviceListValidity_internal(long deviceListValidity)
     {
@@ -1262,9 +1291,15 @@ public class YAPIContext
      *
      * <b><i>x.x.x.x</i></b> or <b><i>hostname</i></b>: The API will use the devices connected to the
      * host with the given IP address or hostname. That host can be a regular computer
-     * running a VirtualHub, or a networked YoctoHub such as YoctoHub-Ethernet or
+     * running a <i>native VirtualHub</i>, a <i>VirtualHub for web</i> hosted on a server,
+     * or a networked YoctoHub such as YoctoHub-Ethernet or
      * YoctoHub-Wireless. If you want to use the VirtualHub running on you local
-     * computer, use the IP address 127.0.0.1.
+     * computer, use the IP address 127.0.0.1. If the given IP is unresponsive, yRegisterHub
+     * will not return until a time-out defined by ySetNetworkTimeout has elapsed.
+     * However, it is possible to preventively test a connection  with yTestHub.
+     * If you cannot afford a network time-out, you can use the non blocking yPregisterHub
+     * function that will establish the connection as soon as it is available.
+     *
      *
      * <b>callback</b>: that keyword make the API run in "<i>HTTP Callback</i>" mode.
      * This a special mode allowing to take control of Yoctopuce devices
@@ -1378,7 +1413,8 @@ public class YAPIContext
      * Fault-tolerant alternative to yRegisterHub(). This function has the same
      * purpose and same arguments as yRegisterHub(), but does not trigger
      * an error when the selected hub is not available at the time of the function call.
-     * This makes it possible to register a network hub independently of the current
+     * If the connexion cannot be established immediately, a background task will automatically
+     * perform periodic retries. This makes it possible to register a network hub independently of the current
      * connectivity, and to try to contact it only when a device is actively needed.
      *
      * @param url : a string containing either "usb","callback" or the

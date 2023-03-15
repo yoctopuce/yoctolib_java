@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 35671 2019-06-05 08:25:35Z seb $
+ * $Id: YDevice.java 52478 2022-12-21 10:33:33Z seb $
  *
  * Internal YDevice class
  *
@@ -157,7 +157,7 @@ class YDevice
                 _hub.updateDeviceList(true);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                throw new YAPI_Exception(YAPI.IO_ERROR,"Thread interrupted",e);
+                throw new YAPI_Exception(YAPI.IO_ERROR, "Thread interrupted", e);
             }
             yreq = requestHTTPSyncAsString(request, null);
         }
@@ -405,22 +405,30 @@ class YDevice
             boundary = String.format("Zz%06xzZ", randomGenerator.nextInt(0x1000000));
         }
         while (mp_header.contains(boundary) && YAPIContext._find_in_bytes(content, boundary.getBytes()) >= 0);
-        //construct header parts
-        String header_start = "Content-Type: multipart/form-data; boundary=" + boundary + "\r\n\r\n--" + boundary + "\r\n" + mp_header;
-        String header_stop = "\r\n--" + boundary + "--\r\n";
-        byte[] head_body = new byte[header_start.length() + content.length + header_stop.length()];
+        // VirtualHub-4web quirk: we have to switch from "multipart/form-data" to "x-upload"
+        // to bypass PHP own processing of uploads. The exact value has anyway always be
+        // ignored by VirtualHub and YoctoHubs, as long as a boundary is defined.
+        String header_mp_start = "--" + boundary + "\r\n" + mp_header;
+        String header_mp_stop = "\r\n--" + boundary + "--\r\n";
+        int body_size = header_mp_start.length() + content.length + header_mp_stop.length();
+        String header = "Content-Type: x-upload; boundary=" + boundary + "\r\n";
+        header += String.format("Content-Length: %d\r\n\r\n", body_size);
+        byte[] head_body = new byte[header.length() + body_size];
         int pos = 0;
-        int len = header_start.length();
-        System.arraycopy(header_start.getBytes(), 0, head_body, pos, len);
-
-        pos += len;
-        len = content.length;
-        System.arraycopy(content, 0, head_body, pos, len);
-
-        pos += len;
-        len = header_stop.length();
-        System.arraycopy(header_stop.getBytes(), 0, head_body, pos, len);
-        System.arraycopy(header_stop.getBytes(), 0, head_body, pos, len);
+        // copy http header
+        byte[] headerBytes = header.getBytes();
+        System.arraycopy(headerBytes, 0, head_body, pos, headerBytes.length);
+        pos += headerBytes.length;
+        // copy multipart header
+        byte[] header_mp_startBytes = header_mp_start.getBytes();
+        System.arraycopy(header_mp_startBytes, 0, head_body, pos, header_mp_startBytes.length);
+        pos += header_mp_startBytes.length;
+        // copy content
+        System.arraycopy(content, 0, head_body, pos, content.length);
+        pos += content.length;
+        // copy multipart footer
+        byte[] header_mp_stopBytes = header_mp_stop.getBytes();
+        System.arraycopy(header_mp_stopBytes, 0, head_body, pos, header_mp_stopBytes.length);
         return head_body;
     }
 
