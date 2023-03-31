@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 51903 2022-11-29 17:25:59Z mvuilleu $
+ * $Id: YFiles.java 53783 2023-03-31 07:05:18Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -364,8 +364,8 @@ public class YFiles extends YFunction
         json = sendCommand(String.format(Locale.US, "dir&f=%s",pattern));
         filelist = _json_get_array(json);
         res.clear();
-        for (String ii:filelist) {
-            res.add(new YFileRecord(ii));
+        for (String ii18:filelist) {
+            res.add(new YFileRecord(ii18));
         }
         return res;
     }

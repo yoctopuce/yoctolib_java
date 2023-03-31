@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 35436 2019-05-14 15:00:48Z seb $
+ * $Id: YCallbackHub.java 53767 2023-03-30 08:53:07Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -72,6 +72,7 @@ class YCallbackHub extends YGenericHub
     @Override
     void release()
     {
+        getYHub().setInUse(false);
     }
 
     @Override
@@ -263,6 +264,8 @@ class YCallbackHub extends YGenericHub
             }
             yreq = new String(data);
         } catch (IOException ex) {
+            this._lastErrorType = YAPI.IO_ERROR;
+            this._lastErrorMessage = ex.getLocalizedMessage();
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         HashMap<String, ArrayList<YPEntry>> yellowPages = new HashMap<>();
@@ -272,8 +275,9 @@ class YCallbackHub extends YGenericHub
             loadval = new YJSONObject(yreq);
             loadval.parse();
             if (!loadval.has("services") || !loadval.getYJSONObject("services").has("whitePages")) {
-                throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Device "
-                        + _http_params.getHost() + " is not a hub");
+                this._lastErrorType = YAPI.INVALID_ARGUMENT;
+                this._lastErrorMessage = "Device " + _http_params.getHost() + " is not a hub";
+                throw new YAPI_Exception(this._lastErrorType, this._lastErrorMessage);
             }
 
             YJSONArray whitePages_json = loadval.getYJSONObject("services").getYJSONArray("whitePages");
@@ -282,7 +286,7 @@ class YCallbackHub extends YGenericHub
             // Reindex all functions from yellow pages
             //HashMap<String, Boolean> refresh = new HashMap<String, Boolean>();
             Set<String> keys = yellowPages_json.getKeys();
-            for(String classname : keys){
+            for (String classname : keys) {
                 YJSONArray yprecs_json = yellowPages_json.getYJSONArray(classname);
                 ArrayList<YPEntry> yprecs_arr = new ArrayList<>(
                         yprecs_json.length());
@@ -302,13 +306,15 @@ class YCallbackHub extends YGenericHub
                 whitePages.add(devinfo);
             }
         } catch (Exception e) {
-            throw new YAPI_Exception(YAPI.IO_ERROR,
-                    "Request failed, could not parse API result for "
-                            + _http_params.getHost(), e);
+            this._lastErrorType = YAPI.IO_ERROR;
+            this._lastErrorMessage = "Request failed, could not parse API result for " + _http_params.getHost();
+            throw new YAPI_Exception(this._lastErrorType, this._lastErrorMessage, e);
         }
         updateFromWpAndYp(whitePages, yellowPages);
 
         // reset device list cache timeout for this hub
+        this._lastErrorType = YAPI.SUCCESS;
+        this._lastErrorMessage = "";
         now = YAPI.GetTickCount();
         _devListExpires = now + 500;
     }
@@ -335,6 +341,12 @@ class YCallbackHub extends YGenericHub
     boolean isReadOnly()
     {
         return false;
+    }
+
+    @Override
+    public boolean isOnline()
+    {
+        return true;
     }
 
     @Override

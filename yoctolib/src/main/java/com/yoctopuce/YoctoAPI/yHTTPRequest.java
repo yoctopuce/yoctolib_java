@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 52483 2022-12-22 09:36:34Z seb $
+ * $Id: yHTTPRequest.java 53767 2023-03-30 08:53:07Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -471,7 +471,7 @@ class yHTTPRequest implements Runnable
     {
         _requestReserve();
         try {
-            _requestStart(req_first_line, req_head_and_body, _hub._yctx._networkTimeoutMs, context, callback);
+            _requestStart(req_first_line, req_head_and_body, _hub._networkTimeoutMs, context, callback);
             Thread t = new Thread(this);
             t.setName(_dbglabel);
             t.start();

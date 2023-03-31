@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 51257 2022-10-07 09:33:39Z seb $
+ * $Id: YUSBHub.java 53767 2023-03-30 08:53:07Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -41,20 +41,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-class YUSBHub extends YGenericHub {
+class YUSBHub extends YGenericHub
+{
 
     private Thread _thread;
     private boolean _processNotifications = false;
 
-    static void SetContextType(Object ctx) throws YAPI_Exception {
+    static void SetContextType(Object ctx) throws YAPI_Exception
+    {
         YJniWrapper.Check();
     }
 
-    static void CheckUSBAcces() throws YAPI_Exception {
+    static void CheckUSBAcces() throws YAPI_Exception
+    {
         YJniWrapper.Check();
     }
 
-    public static String getAPIVersion() {
+    public static String getAPIVersion()
+    {
         try {
             YJniWrapper.Check();
             return " (" + YJniWrapper.getAPIVersion() + ")";
@@ -63,7 +67,8 @@ class YUSBHub extends YGenericHub {
         }
     }
 
-    public static String addUdevRule(boolean force) {
+    public static String addUdevRule(boolean force)
+    {
         try {
             YJniWrapper.Check();
             String res = YJniWrapper.addUdevRule(force ? 1 : 0);
@@ -82,42 +87,57 @@ class YUSBHub extends YGenericHub {
 
 
     @Override
-    boolean isCallbackMode() {
+    boolean isCallbackMode()
+    {
         return false;
     }
 
     @Override
-    boolean isReadOnly() {
+    boolean isReadOnly()
+    {
         return false;
     }
 
     @Override
-    String getSerialNumber() {
+    public boolean isOnline()
+    {
+        return this._processNotifications;
+    }
+
+    @Override
+    String getSerialNumber()
+    {
         return "";
     }
 
     @Override
-    public String get_urlOf(String serialNumber) {
+    public String get_urlOf(String serialNumber)
+    {
         return "usb";
     }
 
     @Override
-    public ArrayList<String> get_subDeviceOf(String serialNumber) {
+    public ArrayList<String> get_subDeviceOf(String serialNumber)
+    {
         return new ArrayList<>();
     }
 
-    YUSBHub(YAPIContext yctx, int idx, boolean requestPermission, int pktAckDelay) throws YAPI_Exception {
-        super(yctx, new HTTPParams("usb://"), idx, true);
+    YUSBHub(YAPIContext yctx, int idx, boolean requestPermission, int pktAckDelay) throws YAPI_Exception
+    {
+        super(yctx, new HTTPParams("usb"), idx, true);
         YJniWrapper.reserveUSBAccess();
     }
 
     @Override
-    public void startNotifications() {
+    public void startNotifications()
+    {
         YJniWrapper.startNotifications(this);
         _processNotifications = true;
-        _thread = new Thread(new Runnable() {
+        _thread = new Thread(new Runnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 while (_processNotifications) {
                     YJniWrapper.usbProcess(YUSBHub.this);
                     try {
@@ -133,7 +153,8 @@ class YUSBHub extends YGenericHub {
     }
 
     @Override
-    public void stopNotifications() {
+    public void stopNotifications()
+    {
         _processNotifications = false;
         _thread.interrupt();
         YJniWrapper.stopNotifications();
@@ -141,12 +162,15 @@ class YUSBHub extends YGenericHub {
     }
 
     @Override
-    void release() {
+    void release()
+    {
         YJniWrapper.releaseUSBAccess();
+        getYHub().setInUse(false);
     }
 
     @Override
-    void updateDeviceList(boolean forceupdate) throws YAPI_Exception {
+    void updateDeviceList(boolean forceupdate) throws YAPI_Exception
+    {
 
         long now = YAPI.GetTickCount();
         if (forceupdate) {
@@ -155,51 +179,63 @@ class YUSBHub extends YGenericHub {
         if (_devListExpires > now) {
             return;
         }
-        ArrayList<YPEntry> functions = new ArrayList<YPEntry>();
-        ArrayList<WPEntry> whitePages = new ArrayList<WPEntry>();
-        HashMap<String, ArrayList<YPEntry>> yellowPages = new HashMap<String, ArrayList<YPEntry>>();
-        //whitePages.a
-        YJniWrapper.updateDeviceList(whitePages, functions);
-        for (YPEntry yp : functions) {
-            String classname = yp.getClassname();
-            if (!yellowPages.containsKey(classname))
-                yellowPages.put(classname, new ArrayList<YPEntry>());
-            yellowPages.get(classname).add(yp);
+        try {
+            ArrayList<YPEntry> functions = new ArrayList<YPEntry>();
+            ArrayList<WPEntry> whitePages = new ArrayList<WPEntry>();
+            HashMap<String, ArrayList<YPEntry>> yellowPages = new HashMap<String, ArrayList<YPEntry>>();
+            //whitePages.a
+            YJniWrapper.updateDeviceList(whitePages, functions);
+            for (YPEntry yp : functions) {
+                String classname = yp.getClassname();
+                if (!yellowPages.containsKey(classname))
+                    yellowPages.put(classname, new ArrayList<YPEntry>());
+                yellowPages.get(classname).add(yp);
+            }
+            // Reindex all devices from white pages
+            for (int i = 0; i < whitePages.size(); i++) {
+                _serialByYdx.put(i, whitePages.get(i).getSerialNumber());
+            }
+            updateFromWpAndYp(whitePages, yellowPages);
+        } catch (YAPI_Exception ex) {
+            this._lastErrorMessage = ex.getLocalizedMessage();
+            this._lastErrorType = ex.errorType;
+            throw ex;
         }
-        // Reindex all devices from white pages
-        for (int i = 0; i < whitePages.size(); i++) {
-            _serialByYdx.put(i, whitePages.get(i).getSerialNumber());
-        }
-        updateFromWpAndYp(whitePages, yellowPages);
-
         // reset device list cache timeout for this hub
+        this._lastErrorType = YAPI.SUCCESS;
+        this._lastErrorMessage = "";
         now = YAPI.GetTickCount();
         _devListExpires = now + 500;
     }
 
     @Override
-    public ArrayList<String> getBootloaders() throws YAPI_Exception {
+    public ArrayList<String> getBootloaders() throws YAPI_Exception
+    {
         return YJniWrapper.getBootloaders();
     }
 
     @Override
-    public int ping(int mstimeout) throws YAPI_Exception {
+    public int ping(int mstimeout) throws YAPI_Exception
+    {
         return 0;
     }
 
     @Override
-    java.util.ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception {
+    java.util.ArrayList<String> firmwareUpdate(String serial, YFirmwareFile firmware, byte[] settings, UpdateProgress progress) throws YAPI_Exception
+    {
         throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Firmware update on USB with JAVA is not yet available");
     }
 
     @Override
-    void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception {
+    void devRequestAsync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestAsyncResult asyncResult, Object asyncContext) throws YAPI_Exception
+    {
         byte[] currentRequest = prepareRequest(req_first_line, req_head_and_body);
         YJniWrapper.devRequestAsync(device.getSerialNumber(), currentRequest, asyncResult, asyncContext);
     }
 
     @Override
-    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestProgress progress, Object context) throws YAPI_Exception {
+    byte[] devRequestSync(YDevice device, String req_first_line, byte[] req_head_and_body, RequestProgress progress, Object context) throws YAPI_Exception
+    {
         if (req_first_line.contains("/@YCB")) {
             throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Preloading of URL is only supported for HTTP callback.");
         }
@@ -213,7 +249,8 @@ class YUSBHub extends YGenericHub {
     }
 
 
-    private byte[] prepareRequest(String firstLine, byte[] rest_of_request) {
+    private byte[] prepareRequest(String firstLine, byte[] rest_of_request)
+    {
         byte[] currentRequest;
         if (rest_of_request == null) {
             currentRequest = (firstLine + "\r\n\r\n").getBytes();
@@ -229,17 +266,20 @@ class YUSBHub extends YGenericHub {
 
 
     @Override
-    public String getRootUrl() {
+    public String getRootUrl()
+    {
         return "usb";
     }
 
     @Override
-    boolean isSameHub(String url, Object request, Object response, Object session) {
+    boolean isSameHub(String url, Object request, Object response, Object session)
+    {
         return url.equals("usb");
     }
 
 
-    public static boolean RegisterLocalhost() {
+    public static boolean RegisterLocalhost()
+    {
         return true;
     }
 

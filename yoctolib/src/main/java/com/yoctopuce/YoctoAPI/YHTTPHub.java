@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 52250 2022-12-08 10:35:02Z seb $
+ * $Id: YHTTPHub.java 53767 2023-03-30 08:53:07Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -288,6 +288,7 @@ class YHTTPHub extends YGenericHub
     @Override
     synchronized void release()
     {
+        getYHub().setInUse(false);
     }
 
     @Override
@@ -301,11 +302,11 @@ class YHTTPHub extends YGenericHub
     {
         HTTPParams params = new HTTPParams(url);
         boolean url_equals;
-        String paramsUrl = params.getUrl(false, false);
+        String paramsUrl = params.getUrl(false, false, false);
         if (_http_params != null) {
-            url_equals = paramsUrl.equals(_http_params.getUrl(false, false));
+            url_equals = paramsUrl.equals(_http_params.getUrl(false, false, false));
         } else {
-            url_equals = paramsUrl.equals(_URL_params.getUrl(false, false));
+            url_equals = paramsUrl.equals(_URL_params.getUrl(false, false, false));
         }
         return url_equals && (_callbackSession == null || _callbackSession.equals(session));
     }
@@ -323,8 +324,10 @@ class YHTTPHub extends YGenericHub
             return;
         }
         if (_notificationHandler == null || !_notificationHandler.isConnected()) {
+            this._lastErrorMessage = "hub " + this._http_params.getUrl() + " is not reachable";
+            this._lastErrorType = YAPI.TIMEOUT;
             if (_reportConnnectionLost) {
-                throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._http_params.getUrl() + " is not reachable");
+                throw new YAPI_Exception(this._lastErrorType, this._lastErrorMessage);
             } else {
                 removeAllDevices();
                 return;
@@ -333,8 +336,10 @@ class YHTTPHub extends YGenericHub
 
         String json_data;
         try {
-            json_data = new String(_notificationHandler.hubRequestSync("GET /api.json", null, _yctx._networkTimeoutMs), Charset.forName("ISO_8859_1"));
+            json_data = new String(_notificationHandler.hubRequestSync("GET /api.json", null, _networkTimeoutMs), Charset.forName("ISO_8859_1"));
         } catch (YAPI_Exception ex) {
+            this._lastErrorMessage = ex.getLocalizedMessage();
+            this._lastErrorType = ex.errorType;
             if (_reportConnnectionLost) {
                 throw ex;
             }
@@ -383,9 +388,9 @@ class YHTTPHub extends YGenericHub
                 whitePages.add(devinfo);
             }
         } catch (Exception e) {
-            throw new YAPI_Exception(YAPI.IO_ERROR,
-                    "Request failed, could not parse API result for "
-                            + _URL_params.getHost(), e);
+            this._lastErrorMessage = "Request failed, could not parse API result for " + _URL_params.getHost();
+            this._lastErrorType = YAPI.IO_ERROR;
+            throw new YAPI_Exception(this._lastErrorType, this._lastErrorMessage, e);
         }
 
         updateFromWpAndYp(whitePages, yellowPages);
@@ -412,7 +417,7 @@ class YHTTPHub extends YGenericHub
         } else {
             // check if subdevice support self flashing
             try {
-                _notificationHandler.hubRequestSync("GET /bySerial/" + serial + "/flash.json?a=state", null, _yctx._networkTimeoutMs);
+                _notificationHandler.hubRequestSync("GET /bySerial/" + serial + "/flash.json?a=state", null, _networkTimeoutMs);
                 baseurl = "/bySerial/" + serial;
                 use_self_flash = true;
             } catch (YAPI_Exception ignored) {
@@ -435,7 +440,7 @@ class YHTTPHub extends YGenericHub
             throw new YAPI_Exception(YAPI.IO_ERROR, "Too many devices in update mode");
         }
         // ensure flash engine is not busy
-        byte[] bytes = _notificationHandler.hubRequestSync("GET " + baseurl + "/flash.json?a=state", null, _yctx._networkTimeoutMs);
+        byte[] bytes = _notificationHandler.hubRequestSync("GET " + baseurl + "/flash.json?a=state", null, _networkTimeoutMs);
         String uploadstate = new String(bytes);
         try {
             YJSONObject uploadres = new YJSONObject(uploadstate);
@@ -492,13 +497,13 @@ class YHTTPHub extends YGenericHub
         if (use_self_flash) {
             progress.firmware_progress(40, "Flash firmware");
             // the hub itself -> reboot in autoflash mode
-            _notificationHandler.hubRequestSync("GET " + baseurl + "/api/module/rebootCountdown?rebootCountdown=-1003", null, _yctx._networkTimeoutMs);
+            _notificationHandler.hubRequestSync("GET " + baseurl + "/api/module/rebootCountdown?rebootCountdown=-1003", null, _networkTimeoutMs);
             Thread.sleep(7000);
         } else {
             // reboot device to bootloader if needed
             if (need_reboot) {
                 // reboot subdevice
-                _notificationHandler.hubRequestSync("GET /bySerial/" + serial + "/api/module/rebootCountdown?rebootCountdown=-2", null, _yctx._networkTimeoutMs);
+                _notificationHandler.hubRequestSync("GET /bySerial/" + serial + "/api/module/rebootCountdown?rebootCountdown=-2", null, _networkTimeoutMs);
             }
             // verify that the device is in bootloader
             long timeout = YAPI.GetTickCount() + YPROG_BOOTLOADER_TIMEOUT;
@@ -558,7 +563,7 @@ class YHTTPHub extends YGenericHub
             throw new YAPI_Exception(YAPI.TIMEOUT, "hub " + this._URL_params.getUrl() + " is not reachable");
         }
         // Setup timeout counter
-        int tcpTimeout = _yctx._networkTimeoutMs;
+        int tcpTimeout = _networkTimeoutMs;
         if (req_first_line.contains("/@YCB")) {
             throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Preloading of URL is only supported for HTTP callback.");
         }
@@ -581,7 +586,7 @@ class YHTTPHub extends YGenericHub
     public synchronized ArrayList<String> getBootloaders() throws YAPI_Exception, InterruptedException
     {
         ArrayList<String> res = new ArrayList<>();
-        byte[] raw_data = _notificationHandler.hubRequestSync("GET /flash.json?a=list", null, _yctx._networkTimeoutMs);
+        byte[] raw_data = _notificationHandler.hubRequestSync("GET /flash.json?a=list", null, _networkTimeoutMs);
         String jsonstr = new String(raw_data);
         try {
             YJSONObject flashres = new YJSONObject(jsonstr);
@@ -619,6 +624,12 @@ class YHTTPHub extends YGenericHub
     boolean isReadOnly()
     {
         return _writeProtected && !_notificationHandler.hasRwAccess();
+    }
+
+    @Override
+    public boolean isOnline()
+    {
+        return _notificationHandler != null && _notificationHandler.isConnected();
     }
 
     public Socket OpenConnectedSocket(InetAddress addr, int mstimeout) throws YAPI_Exception

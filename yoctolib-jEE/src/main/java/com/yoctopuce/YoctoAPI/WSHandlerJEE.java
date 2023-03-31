@@ -40,7 +40,7 @@ public class WSHandlerJEE implements WSHandlerInterface, MessageHandler
         if (!_isHttpCallback) {
             // client mode
             WebSocketContainer webSocketContainer = ContainerProvider.getWebSocketContainer();
-            String url = hub._http_params.getUrl(true, false) + "/not.byn";
+            String url = hub._http_params.getUrl(true, false,false) + "/not.byn";
             URI uri;
             try {
                 uri = new URI(url);

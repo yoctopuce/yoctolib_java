@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 50689 2022-08-17 14:37:15Z mvuilleu $
+ * $Id: YSensor.java 53767 2023-03-30 08:53:07Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -1430,11 +1430,11 @@ public class YSensor extends YFunction
             }
             rawValues.clear();
             refValues.clear();
-            for (double ii:_calraw) {
-                rawValues.add(ii);
+            for (double ii7:_calraw) {
+                rawValues.add(ii7);
             }
-            for (double ii:_calref) {
-                refValues.add(ii);
+            for (double ii8:_calref) {
+                refValues.add(ii8);
             }
         }
         return YAPI.SUCCESS;

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 53427 2023-03-06 11:26:37Z seb $
+ * $Id: YModule.java 53767 2023-03-30 08:53:07Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -1395,18 +1395,18 @@ public class YModule extends YFunction
         ext_settings = ", \"extras\":[";
         templist = get_functionIds("Temperature");
         sep = "";
-        for (String ii: templist) {
+        for (String ii9: templist) {
             if (YAPIContext._atoi(get_firmwareRelease()) > 9000) {
-                url = String.format(Locale.US, "api/%s/sensorType",ii);
+                url = String.format(Locale.US, "api/%s/sensorType",ii9);
                 t_type = new String(_download(url));
                 if (t_type.equals("RES_NTC") || t_type.equals("RES_LINEAR")) {
-                    id = (ii).substring( 11,  11 + (ii).length() - 11);
+                    id = (ii9).substring( 11,  11 + (ii9).length() - 11);
                     if (id.equals("")) {
                         id = "1";
                     }
                     temp_data_bin = _download(String.format(Locale.US, "extra.json?page=%s",id));
                     if ((temp_data_bin).length > 0) {
-                        item = String.format(Locale.US, "%s{\"fid\":\"%s\", \"json\":%s}\n", sep, ii,new String(temp_data_bin));
+                        item = String.format(Locale.US, "%s{\"fid\":\"%s\", \"json\":%s}\n", sep, ii9,new String(temp_data_bin));
                         ext_settings = ext_settings + item;
                         sep = ",";
                     }
@@ -1421,8 +1421,8 @@ public class YModule extends YFunction
             }
             filelist = _json_get_array(json);
             sep = "";
-            for (String ii: filelist) {
-                name = _json_get_key((ii).getBytes(), "name");
+            for (String ii10: filelist) {
+                name = _json_get_key((ii10).getBytes(), "name");
                 if (((name).length() > 0) && !(name.equals("startupConf.json"))) {
                     file_data_bin = _download(_escapeAttr(name));
                     file_data = YAPIContext._bytesToHexStr(file_data_bin, 0, file_data_bin.length);
@@ -1467,10 +1467,10 @@ public class YModule extends YFunction
         String functionId;
         String data;
         extras = _json_get_array((jsonExtra).getBytes());
-        for (String ii: extras) {
-            functionId = _get_json_path(ii, "fid");
+        for (String ii11: extras) {
+            functionId = _get_json_path(ii11, "fid");
             functionId = _decode_json_string(functionId);
-            data = _get_json_path(ii, "json");
+            data = _get_json_path(ii11, "json");
             if (hasFunction(functionId)) {
                 loadThermistorExtra(functionId, data);
             }
@@ -1523,10 +1523,10 @@ public class YModule extends YFunction
             if (!(res.equals("ok"))) { throw new YAPI_Exception( YAPI.IO_ERROR,  "format failed");}
             json_files = _get_json_path(json, "files");
             files = _json_get_array((json_files).getBytes());
-            for (String ii: files) {
-                name = _get_json_path(ii, "name");
+            for (String ii12: files) {
+                name = _get_json_path(ii12, "name");
                 name = _decode_json_string(name);
-                data = _get_json_path(ii, "data");
+                data = _get_json_path(ii12, "data");
                 data = _decode_json_string(data);
                 if (name.equals("")) {
                     fuperror = fuperror + 1;
@@ -1730,8 +1730,8 @@ public class YModule extends YFunction
             } else {
                 if (paramVer == 1) {
                     words_str = new ArrayList<>(Arrays.asList(param.split(",")));
-                    for (String ii:words_str) {
-                        words.add(YAPIContext._atoi(ii));
+                    for (String ii13:words_str) {
+                        words.add(YAPIContext._atoi(ii13));
                     }
                     if (param.equals("") || (words.get(0).intValue() > 10)) {
                         paramScale = 0;
@@ -1907,8 +1907,8 @@ public class YModule extends YFunction
         newval = "";
         old_json_flat = _flattenJsonStruct(settings);
         old_dslist = _json_get_array(old_json_flat);
-        for (String ii:old_dslist) {
-            each_str = _json_get_string((ii).getBytes());
+        for (String ii14:old_dslist) {
+            each_str = _json_get_string((ii14).getBytes());
             // split json path and attr
             leng = (each_str).length();
             eqpos = (each_str).indexOf("=");
@@ -1933,9 +1933,9 @@ public class YModule extends YFunction
         }
         actualSettings = _flattenJsonStruct(actualSettings);
         new_dslist = _json_get_array(actualSettings);
-        for (String ii:new_dslist) {
+        for (String ii15:new_dslist) {
             // remove quotes
-            each_str = _json_get_string((ii).getBytes());
+            each_str = _json_get_string((ii15).getBytes());
             // split json path and attr
             leng = (each_str).length();
             eqpos = (each_str).indexOf("=");
@@ -2153,8 +2153,8 @@ public class YModule extends YFunction
             }
             i = i + 1;
         }
-        for (String ii:restoreLast) {
-            subres = _tryExec(ii);
+        for (String ii16:restoreLast) {
+            subres = _tryExec(ii16);
             if ((res == YAPI.SUCCESS) && (subres != YAPI.SUCCESS)) {
                 res = subres;
             }

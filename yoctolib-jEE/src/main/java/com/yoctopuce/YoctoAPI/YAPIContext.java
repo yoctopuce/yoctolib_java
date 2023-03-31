@@ -30,6 +30,26 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
 public class YAPIContext
 {
 //--- (end of generated code: YAPIContext class start)
+    public YHub FirstHubInUse()
+    {
+        try {
+            YGenericHub yGenericHub = _hubs.get(0);
+            return yGenericHub.getYHub();
+        } catch (IndexOutOfBoundsException ignore) {
+            return null;
+        }
+    }
+
+    public YHub nextHubInUse(YGenericHub genericHub)
+    {
+        int idx = _hubs.indexOf(genericHub);
+        try {
+            YGenericHub yGenericHub = _hubs.get(idx+1);
+            return yGenericHub.getYHub();
+        } catch (IndexOutOfBoundsException ignore) {
+            return null;
+        }
+    }
 
     static class DataEvent
     {
@@ -818,6 +838,9 @@ public class YAPIContext
                         switch (evt.ev) {
                             case PLUG:
                                 if (_arrivalCallback != null) {
+                                    // force (re)loading the module object with up-to-date information
+                                    // this will also ensure we have a valid serialNumber in cache on unplug
+                                    evt.module.isOnline();
                                     _arrivalCallback.yDeviceArrival(evt.module);
                                 }
 

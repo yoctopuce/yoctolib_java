@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 53427 2023-03-06 11:26:37Z seb $
+ * $Id: YGenericHub.java 53767 2023-03-30 08:53:07Z seb $
  *
  * Internal YGenericHub object
  *
@@ -119,13 +119,19 @@ abstract class YGenericHub
     final boolean _reportConnnectionLost;
     private String _hubSerialNumber = null;
     private HashMap<String, Integer> _beaconss = new HashMap<>();
+    private YHub _yhubObj;
+    protected String _lastErrorMessage="";
+    protected int _lastErrorType = YAPI.SUCCESS;
+    protected int _networkTimeoutMs;
 
     YGenericHub(YAPIContext yctx, HTTPParams httpParams, int idx, boolean reportConnnectionLost)
     {
         _yctx = yctx;
+        _networkTimeoutMs = _yctx._networkTimeoutMs;
         _hubidx = idx;
         _reportConnnectionLost = reportConnnectionLost;
         _URL_params = httpParams;
+        _yhubObj = new YHub(yctx, this);
     }
 
     abstract void release();
@@ -288,10 +294,10 @@ abstract class YGenericHub
         for (YDevice dev : _devices.values()) {
             String devSerialNumber = dev.getSerialNumber();
             if (devSerialNumber.equals(serialNumber)) {
-                return _URL_params.getUrl(true, false) + dev.getNetworkUrl() + '/';
+                return _URL_params.getUrl(true, false, false) + dev.getNetworkUrl() + '/';
             }
         }
-        return _URL_params.getUrl(true, false) + '/';
+        return _URL_params.getUrl(true, false, true);
     }
 
     public ArrayList<String> get_subDeviceOf(String serialNumber)
@@ -382,6 +388,34 @@ abstract class YGenericHub
 
     abstract boolean isReadOnly();
 
+    public YHub getYHub()
+    {
+
+        return _yhubObj;
+    }
+
+    public void set_networkTimeout(int networkMsTimeout)
+    {
+        _networkTimeoutMs = networkMsTimeout;
+    }
+
+    public int get_networkTimeout()
+    {
+        return _networkTimeoutMs;
+    }
+
+    public String getLastErrorMessage()
+    {
+        return _lastErrorMessage;
+    }
+
+    public int getLastErrorType()
+    {
+        return _lastErrorType;
+    }
+
+    abstract public boolean isOnline();
+
 
     interface UpdateProgress
     {
@@ -439,11 +473,17 @@ abstract class YGenericHub
         private final String _pass;
         private final String _proto;
         private final String _subDomain;
+        private final String _originalURL;
+
+        public String getOriginalURL()
+        {
+            return _originalURL;
+        }
 
         public HTTPParams(String url)
         {
             int defaultPort = YAPI.YOCTO_DEFAULT_PORT;
-
+            _originalURL = url;
             int pos = 0;
             if (url.startsWith("auto://")) {
                 pos = 7;
@@ -463,7 +503,7 @@ abstract class YGenericHub
                 pos = 6;
                 _proto = "wss";
                 defaultPort = YAPI.YOCTO_DEFAULT_HTTPS_PORT;
-            } else if (url.startsWith("usb://")) {
+            } else if (url.equals("usb")) {
                 pos = 6;
                 _proto = "usb";
                 _user = "";
@@ -519,6 +559,7 @@ abstract class YGenericHub
 
         public HTTPParams(HTTPParams http_params_org, String proto, int port)
         {
+            _originalURL = http_params_org._originalURL;
             _host = http_params_org._host;
             _port = port;
             _user = http_params_org._user;
@@ -553,11 +594,14 @@ abstract class YGenericHub
 
         String getUrl()
         {
-            return getUrl(false, true);
+            return getUrl(false, true, false);
         }
 
-        String getUrl(boolean withProto, boolean withUserPass)
+        String getUrl(boolean withProto, boolean withUserPass, boolean withEndSlash)
         {
+            if (_proto.equals("usb")){
+                return "usb";
+            }
             StringBuilder url = new StringBuilder();
             if (withProto) {
                 url.append(_proto).append("://");
@@ -574,6 +618,9 @@ abstract class YGenericHub
             url.append(":");
             url.append(_port);
             url.append(_subDomain);
+            if (withEndSlash){
+                url.append('/');
+            }
             return url.toString();
         }
 

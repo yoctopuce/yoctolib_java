@@ -1,9 +1,5 @@
-Java v1.10.53532
+Java v1.10.53786
 
-- Improve YSerialPort, YSpiPort and I2cPort class
-- Add support for callbackTemplate and powerFactor
-- Fix handling of file uploads to VirtualHub-4web
-- Fix get_url() method of YModule object that was not working with GatewayHub
-- Fix get_url method of YModule object. Returned URL was missing the last "/"
-- Fix get_subDevices() methods of YModule
-- Fix a few typos in the doc
+- Add YHub class for enumerating connected hubs
+- Fix english in comments
+- Fix to ensure YModule object have a valid serialNumber during unplug events
