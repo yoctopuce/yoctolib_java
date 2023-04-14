@@ -1,5 +1,5 @@
 /*
- * $Id: YDataSet.java 53767 2023-03-30 08:53:07Z seb $
+ * $Id: YDataSet.java 53886 2023-04-05 08:06:39Z mvuilleu $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -218,33 +218,33 @@ public class YDataSet
         summaryStopMs = YAPI.MIN_DOUBLE;
 
         // Parse complete streams
-        for (YDataStream ii2: _streams) {
-            streamStartTimeMs = (double)Math.round(ii2.get_realStartTimeUTC() *1000);
-            streamDuration = ii2.get_realDuration() ;
+        for (YDataStream ii_0: _streams) {
+            streamStartTimeMs = (double)Math.round(ii_0.get_realStartTimeUTC() *1000);
+            streamDuration = ii_0.get_realDuration() ;
             streamEndTimeMs = streamStartTimeMs + (double)Math.round(streamDuration * 1000);
             if ((streamStartTimeMs >= _startTimeMs) && ((_endTimeMs == 0) || (streamEndTimeMs <= _endTimeMs))) {
                 // stream that are completely inside the dataset
-                previewMinVal = ii2.get_minValue();
-                previewAvgVal = ii2.get_averageValue();
-                previewMaxVal = ii2.get_maxValue();
+                previewMinVal = ii_0.get_minValue();
+                previewAvgVal = ii_0.get_averageValue();
+                previewMaxVal = ii_0.get_maxValue();
                 previewStartMs = streamStartTimeMs;
                 previewStopMs = streamEndTimeMs;
                 previewDuration = streamDuration;
             } else {
                 // stream that are partially in the dataset
                 // we need to parse data to filter value outside the dataset
-                if (!(ii2._wasLoaded())) {
-                    url = ii2._get_url();
+                if (!(ii_0._wasLoaded())) {
+                    url = ii_0._get_url();
                     data = _parent._download(url);
-                    ii2._parseStream(data);
+                    ii_0._parseStream(data);
                 }
-                dataRows = ii2.get_dataRows();
+                dataRows = ii_0.get_dataRows();
                 if (dataRows.size() == 0) {
                     return get_progress();
                 }
                 tim = streamStartTimeMs;
-                fitv = (double)Math.round(ii2.get_firstDataSamplesInterval() * 1000);
-                itv = (double)Math.round(ii2.get_dataSamplesInterval() * 1000);
+                fitv = (double)Math.round(ii_0.get_firstDataSamplesInterval() * 1000);
+                itv = (double)Math.round(ii_0.get_dataSamplesInterval() * 1000);
                 nCols = dataRows.get(0).size();
                 minCol = 0;
                 if (nCols > 2) {
@@ -396,16 +396,16 @@ public class YDataSet
         }
 
         firstMeasure = true;
-        for (ArrayList<Double> ii3:dataRows) {
+        for (ArrayList<Double> ii_0:dataRows) {
             if (firstMeasure) {
                 end_ = tim + fitv;
                 firstMeasure = false;
             } else {
                 end_ = tim + itv;
             }
-            avgv = ii3.get(avgCol).doubleValue();
+            avgv = ii_0.get(avgCol).doubleValue();
             if ((end_ > _startTimeMs) && ((_endTimeMs == 0) || (tim < _endTimeMs)) && !(Double.isNaN(avgv))) {
-                _measures.add(new YMeasure(tim / 1000, end_ / 1000, ii3.get(minCol).doubleValue(), avgv, ii3.get(maxCol).doubleValue()));
+                _measures.add(new YMeasure(tim / 1000, end_ / 1000, ii_0.get(minCol).doubleValue(), avgv, ii_0.get(maxCol).doubleValue()));
             }
             tim = end_;
         }
@@ -676,9 +676,9 @@ public class YDataSet
 
         startUtcMs = measure.get_startTimeUTC() * 1000;
         stream = null;
-        for (YDataStream ii4:_streams) {
-            if ((double)Math.round(ii4.get_realStartTimeUTC() *1000) == startUtcMs) {
-                stream = ii4;
+        for (YDataStream ii_0:_streams) {
+            if ((double)Math.round(ii_0.get_realStartTimeUTC() *1000) == startUtcMs) {
+                stream = ii_0;
             }
         }
         if (stream == null) {
@@ -706,10 +706,10 @@ public class YDataSet
             maxCol = 0;
         }
 
-        for (ArrayList<Double> ii5:dataRows) {
+        for (ArrayList<Double> ii_1:dataRows) {
             end_ = tim + itv;
             if ((end_ > _startTimeMs) && ((_endTimeMs == 0) || (tim < _endTimeMs))) {
-                measures.add(new YMeasure(tim / 1000.0, end_ / 1000.0, ii5.get(minCol).doubleValue(), ii5.get(avgCol).doubleValue(), ii5.get(maxCol).doubleValue()));
+                measures.add(new YMeasure(tim / 1000.0, end_ / 1000.0, ii_1.get(minCol).doubleValue(), ii_1.get(avgCol).doubleValue(), ii_1.get(maxCol).doubleValue()));
             }
             tim = end_;
         }

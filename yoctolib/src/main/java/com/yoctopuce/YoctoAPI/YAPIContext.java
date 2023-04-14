@@ -1180,6 +1180,7 @@ public class YAPIContext
      * can additionally cleanup the cache directory.
      *
      * @param removeFiles : True to clear the content of the cache.
+     * @throws YAPI_Exception on error
      */
     public void ClearHTTPCallbackCacheDir(boolean removeFiles)
     {

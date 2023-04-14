@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 53420 2023-03-06 10:38:51Z mvuilleu $
+ *  $Id: YNetwork.java 53886 2023-04-05 08:06:39Z mvuilleu $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -1626,6 +1626,8 @@ public class YNetwork extends YFunction
      * will be loaded for each callback in order to build the data to post to the
      * server. If template file does not exist on the YoctoHub, the callback will
      * fail with an error message indicating the name of the expected template file.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : either YNetwork.CALLBACKTEMPLATE_OFF or YNetwork.CALLBACKTEMPLATE_ON
      *
@@ -1649,6 +1651,8 @@ public class YNetwork extends YFunction
      * will be loaded for each callback in order to build the data to post to the
      * server. If template file does not exist on the YoctoHub, the callback will
      * fail with an error message indicating the name of the expected template file.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
      *
      * @param newval : either YNetwork.CALLBACKTEMPLATE_OFF or YNetwork.CALLBACKTEMPLATE_ON
      *

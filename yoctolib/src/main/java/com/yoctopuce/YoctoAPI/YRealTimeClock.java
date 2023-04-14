@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRealTimeClock.java 50595 2022-07-28 07:54:15Z mvuilleu $
+ *  $Id: YRealTimeClock.java 53863 2023-04-04 16:20:17Z mvuilleu $
  *
  *  Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *
@@ -414,6 +414,9 @@ public class YRealTimeClock extends YFunction
      * To disable automatic synchronization, set the value to true.
      * To enable automatic synchronization (default), set the value to false.
      *
+     * If you want the change to be kept after a device reboot,
+     * make sure  to call the matching module saveToFlash().
+     *
      *  @param newval : either YRealTimeClock.DISABLEHOSTSYNC_FALSE or YRealTimeClock.DISABLEHOSTSYNC_TRUE,
      * according to the automatic clock synchronization with host working state
      *
@@ -435,6 +438,9 @@ public class YRealTimeClock extends YFunction
      * Changes the automatic clock synchronization with host working state.
      * To disable automatic synchronization, set the value to true.
      * To enable automatic synchronization (default), set the value to false.
+     *
+     * If you want the change to be kept after a device reboot,
+     * make sure  to call the matching module saveToFlash().
      *
      *  @param newval : either YRealTimeClock.DISABLEHOSTSYNC_FALSE or YRealTimeClock.DISABLEHOSTSYNC_TRUE,
      * according to the automatic clock synchronization with host working state

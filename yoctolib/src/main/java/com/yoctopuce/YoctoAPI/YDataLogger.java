@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 53767 2023-03-30 08:53:07Z seb $
+ * $Id: YDataLogger.java 53886 2023-04-05 08:06:39Z mvuilleu $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -743,9 +743,9 @@ public class YDataLogger extends YFunction
 
         dslist = _json_get_array(json);
         res.clear();
-        for (String ii6:dslist) {
+        for (String ii_0:dslist) {
             dataset = new YDataSet(this);
-            dataset._parse(ii6);
+            dataset._parse(ii_0);
             res.add(dataset);
         }
         return res;

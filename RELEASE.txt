@@ -1,5 +1,3 @@
-Java v1.10.53786
+Java v1.10.54037
 
-- Add YHub class for enumerating connected hubs
-- Fix english in comments
-- Fix to ensure YModule object have a valid serialNumber during unplug events
+- Add YInputCapture class

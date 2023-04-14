@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHub.java 53783 2023-03-31 07:05:18Z seb $
+ * $Id: YHub.java 53894 2023-04-05 10:33:42Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -175,18 +175,20 @@ public class YHub
      * URLs are pointing to the same hub when the devices connected
      * are sharing the same serial number.
      */
-    public void get_knownUrls(ArrayList<String> knownUrls)
+    public ArrayList<String> get_knownUrls()
     {
+        ArrayList<String> knownUrls = new ArrayList<>();
         knownUrls.clear();
-        for (String ii0:_knownUrls) {
-            knownUrls.add(ii0);
+        for (String ii_0:_knownUrls) {
+            knownUrls.add(ii_0);
         }
+        return knownUrls;
     }
 
     public void imm_inheritFrom(YHub otherHub)
     {
-        for (String ii1:otherHub._knownUrls) {
-            _knownUrls.add(ii1);
+        for (String ii_0:otherHub._knownUrls) {
+            _knownUrls.add(ii_0);
         }
     }
 

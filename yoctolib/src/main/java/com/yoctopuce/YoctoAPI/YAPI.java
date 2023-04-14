@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 53432 2023-03-06 14:23:08Z seb $
+ * $Id: YAPI.java 53903 2023-04-05 12:29:59Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -59,7 +59,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "53786";
+    public static final String YOCTO_API_BUILD_STR = "54037";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -340,7 +340,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".53786" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".54037" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -782,6 +782,7 @@ public class YAPI
      * can additionally cleanup the cache directory.
      *
      * @param removeFiles : True to clear the content of the cache.
+     * @throws YAPI_Exception on error
      */
     public void ClearHTTPCallbackCacheDir(boolean removeFiles)
     {
