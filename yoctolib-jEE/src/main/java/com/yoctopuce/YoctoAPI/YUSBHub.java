@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 53767 2023-03-30 08:53:07Z seb $
+ * $Id: YUSBHub.java 54582 2023-05-15 13:16:01Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -78,6 +78,17 @@ class YUSBHub extends YGenericHub
         }
     }
 
+    @Override
+    public void set_networkTimeout(int networkMsTimeout)
+    {
+
+    }
+
+    @Override
+    public int get_networkTimeout()
+    {
+        return 2000;
+    }
 
     /*
      * Config change callback are not supported on purpose, because it does
@@ -122,9 +133,9 @@ class YUSBHub extends YGenericHub
         return new ArrayList<>();
     }
 
-    YUSBHub(YAPIContext yctx, int idx, boolean requestPermission, int pktAckDelay) throws YAPI_Exception
+    YUSBHub(YAPIContext yctx,  boolean requestPermission, int pktAckDelay) throws YAPI_Exception
     {
-        super(yctx, new HTTPParams("usb"), idx, true);
+        super(yctx, new HTTPParams("usb"), true);
         YJniWrapper.reserveUSBAccess();
     }
 
@@ -165,7 +176,6 @@ class YUSBHub extends YGenericHub
     void release()
     {
         YJniWrapper.releaseUSBAccess();
-        getYHub().setInUse(false);
     }
 
     @Override
@@ -274,7 +284,7 @@ class YUSBHub extends YGenericHub
     @Override
     boolean isSameHub(String url, Object request, Object response, Object session)
     {
-        return url.equals("usb");
+        return url.equals("usb") ;
     }
 
 

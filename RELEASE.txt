@@ -1,3 +1,5 @@
-Java v1.10.54037
+Java v1.10.54821
 
-- Add YInputCapture class
+- Improve implementation of YHub class
+- Reduce memory usage
+- Fix documentation of YAPI class

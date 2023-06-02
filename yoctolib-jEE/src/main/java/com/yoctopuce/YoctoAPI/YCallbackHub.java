@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 53767 2023-03-30 08:53:07Z seb $
+ * $Id: YCallbackHub.java 54582 2023-05-15 13:16:01Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -54,9 +54,9 @@ class YCallbackHub extends YGenericHub
     private final OutputStream _out;
     private YJSONObject _callbackCache;
 
-    YCallbackHub(YAPIContext yctx, int idx, HTTPParams httpParams, InputStream request, OutputStream response) throws YAPI_Exception
+    YCallbackHub(YAPIContext yctx, HTTPParams httpParams, InputStream request, OutputStream response) throws YAPI_Exception
     {
-        super(yctx, httpParams, idx, true);
+        super(yctx, httpParams, true);
         _http_params = httpParams;
         _out = response;
         if (request == null || _out == null) {
@@ -69,10 +69,11 @@ class YCallbackHub extends YGenericHub
         }
     }
 
+
     @Override
     void release()
     {
-        getYHub().setInUse(false);
+
     }
 
     @Override
@@ -84,9 +85,9 @@ class YCallbackHub extends YGenericHub
     @Override
     synchronized boolean isSameHub(String url, Object request, Object response, Object session)
     {
-        HTTPParams params = new HTTPParams(url);
+        boolean sameHub = super.isSameHub(url, request, response, session);
         OutputStream tmp = (OutputStream) response;
-        return params.getUrl().equals(_http_params.getUrl()) && tmp == _out;
+        return sameHub && tmp == _out;
     }
 
     @Override

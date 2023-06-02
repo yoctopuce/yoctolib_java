@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 53886 2023-04-05 08:06:39Z mvuilleu $
+ * $Id: YModule.java 54283 2023-04-28 10:13:05Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -1135,7 +1135,7 @@ public class YModule extends YFunction
         prodname = get_productName();
         prodrel = get_productRelease();
         if (prodrel > 1) {
-            fullname = String.format(Locale.US, "%s rev. %c", prodname,64+prodrel);
+            fullname = String.format(Locale.US, "%s rev. %c", prodname,64 + prodrel);
         } else {
             fullname = prodname;
         }

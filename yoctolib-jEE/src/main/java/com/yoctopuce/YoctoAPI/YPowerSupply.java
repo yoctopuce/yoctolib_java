@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPowerSupply.java 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: YPowerSupply.java 54768 2023-05-26 06:46:41Z seb $
  *
  *  Implements FindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -72,12 +72,6 @@ public class YPowerSupply extends YFunction
     public static final int POWEROUTPUT_ON = 1;
     public static final int POWEROUTPUT_INVALID = -1;
     /**
-     * invalid voltageSense value
-     */
-    public static final int VOLTAGESENSE_INT = 0;
-    public static final int VOLTAGESENSE_EXT = 1;
-    public static final int VOLTAGESENSE_INVALID = -1;
-    /**
      * invalid measuredVoltage value
      */
     public static final double MEASUREDVOLTAGE_INVALID = YAPI.INVALID_DOUBLE;
@@ -89,14 +83,6 @@ public class YPowerSupply extends YFunction
      * invalid inputVoltage value
      */
     public static final double INPUTVOLTAGE_INVALID = YAPI.INVALID_DOUBLE;
-    /**
-     * invalid vInt value
-     */
-    public static final double VINT_INVALID = YAPI.INVALID_DOUBLE;
-    /**
-     * invalid ldoTemperature value
-     */
-    public static final double LDOTEMPERATURE_INVALID = YAPI.INVALID_DOUBLE;
     /**
      * invalid voltageTransition value
      */
@@ -116,12 +102,9 @@ public class YPowerSupply extends YFunction
     protected double _voltageSetPoint = VOLTAGESETPOINT_INVALID;
     protected double _currentLimit = CURRENTLIMIT_INVALID;
     protected int _powerOutput = POWEROUTPUT_INVALID;
-    protected int _voltageSense = VOLTAGESENSE_INVALID;
     protected double _measuredVoltage = MEASUREDVOLTAGE_INVALID;
     protected double _measuredCurrent = MEASUREDCURRENT_INVALID;
     protected double _inputVoltage = INPUTVOLTAGE_INVALID;
-    protected double _vInt = VINT_INVALID;
-    protected double _ldoTemperature = LDOTEMPERATURE_INVALID;
     protected String _voltageTransition = VOLTAGETRANSITION_INVALID;
     protected double _voltageAtStartUp = VOLTAGEATSTARTUP_INVALID;
     protected double _currentAtStartUp = CURRENTATSTARTUP_INVALID;
@@ -191,9 +174,6 @@ public class YPowerSupply extends YFunction
         if (json_val.has("powerOutput")) {
             _powerOutput = json_val.getInt("powerOutput") > 0 ? 1 : 0;
         }
-        if (json_val.has("voltageSense")) {
-            _voltageSense = json_val.getInt("voltageSense");
-        }
         if (json_val.has("measuredVoltage")) {
             _measuredVoltage = Math.round(json_val.getDouble("measuredVoltage") / 65.536) / 1000.0;
         }
@@ -202,12 +182,6 @@ public class YPowerSupply extends YFunction
         }
         if (json_val.has("inputVoltage")) {
             _inputVoltage = Math.round(json_val.getDouble("inputVoltage") / 65.536) / 1000.0;
-        }
-        if (json_val.has("vInt")) {
-            _vInt = Math.round(json_val.getDouble("vInt") / 65.536) / 1000.0;
-        }
-        if (json_val.has("ldoTemperature")) {
-            _ldoTemperature = Math.round(json_val.getDouble("ldoTemperature") / 65.536) / 1000.0;
         }
         if (json_val.has("voltageTransition")) {
             _voltageTransition = json_val.getString("voltageTransition");
@@ -427,76 +401,6 @@ public class YPowerSupply extends YFunction
     }
 
     /**
-     * Returns the output voltage control point.
-     *
-     *  @return either YPowerSupply.VOLTAGESENSE_INT or YPowerSupply.VOLTAGESENSE_EXT, according to the
-     * output voltage control point
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int get_voltageSense() throws YAPI_Exception
-    {
-        int res;
-        synchronized (this) {
-            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
-                    return VOLTAGESENSE_INVALID;
-                }
-            }
-            res = _voltageSense;
-        }
-        return res;
-    }
-
-    /**
-     * Returns the output voltage control point.
-     *
-     *  @return either YPowerSupply.VOLTAGESENSE_INT or YPowerSupply.VOLTAGESENSE_EXT, according to the
-     * output voltage control point
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int getVoltageSense() throws YAPI_Exception
-    {
-        return get_voltageSense();
-    }
-
-    /**
-     * Changes the voltage control point.
-     *
-     *  @param newval : either YPowerSupply.VOLTAGESENSE_INT or YPowerSupply.VOLTAGESENSE_EXT, according to
-     * the voltage control point
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int set_voltageSense(int  newval)  throws YAPI_Exception
-    {
-        String rest_val;
-        synchronized (this) {
-            rest_val = Integer.toString(newval);
-            _setAttr("voltageSense",rest_val);
-        }
-        return YAPI.SUCCESS;
-    }
-
-    /**
-     * Changes the voltage control point.
-     *
-     *  @param newval : either YPowerSupply.VOLTAGESENSE_INT or YPowerSupply.VOLTAGESENSE_EXT, according to
-     * the voltage control point
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int setVoltageSense(int newval)  throws YAPI_Exception
-    {
-        return set_voltageSense(newval);
-    }
-
-    /**
      * Returns the measured output voltage, in V.
      *
      * @return a floating point number corresponding to the measured output voltage, in V
@@ -593,72 +497,6 @@ public class YPowerSupply extends YFunction
     public double getInputVoltage() throws YAPI_Exception
     {
         return get_inputVoltage();
-    }
-
-    /**
-     * Returns the internal voltage, in V.
-     *
-     * @return a floating point number corresponding to the internal voltage, in V
-     *
-     * @throws YAPI_Exception on error
-     */
-    public double get_vInt() throws YAPI_Exception
-    {
-        double res;
-        synchronized (this) {
-            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
-                    return VINT_INVALID;
-                }
-            }
-            res = _vInt;
-        }
-        return res;
-    }
-
-    /**
-     * Returns the internal voltage, in V.
-     *
-     * @return a floating point number corresponding to the internal voltage, in V
-     *
-     * @throws YAPI_Exception on error
-     */
-    public double getVInt() throws YAPI_Exception
-    {
-        return get_vInt();
-    }
-
-    /**
-     * Returns the LDO temperature, in Celsius.
-     *
-     * @return a floating point number corresponding to the LDO temperature, in Celsius
-     *
-     * @throws YAPI_Exception on error
-     */
-    public double get_ldoTemperature() throws YAPI_Exception
-    {
-        double res;
-        synchronized (this) {
-            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
-                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
-                    return LDOTEMPERATURE_INVALID;
-                }
-            }
-            res = _ldoTemperature;
-        }
-        return res;
-    }
-
-    /**
-     * Returns the LDO temperature, in Celsius.
-     *
-     * @return a floating point number corresponding to the LDO temperature, in Celsius
-     *
-     * @throws YAPI_Exception on error
-     */
-    public double getLdoTemperature() throws YAPI_Exception
-    {
-        return get_ldoTemperature();
     }
 
     public String get_voltageTransition() throws YAPI_Exception

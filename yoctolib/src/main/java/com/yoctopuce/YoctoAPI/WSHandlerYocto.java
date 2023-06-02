@@ -7,11 +7,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
-import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
@@ -48,16 +45,12 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         }
     }
 
-
-    @Override
-    public void close()
+    synchronized private void closeSoket()
     {
-        if (_closed) {
-            return;
-        }
-        _closing = true;
         if (_socket != null) {
             try {
+                _nhandler.WSLOG("close socket");
+                //Thread.dumpStack();
                 if (_out != null) {
                     _out.flush();
                     _out.close();
@@ -69,19 +62,33 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (_thread != null) {
-                _thread.interrupt();
-                try {
-                    _thread.join(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    Thread.currentThread().interrupt();
-                }
-            }
             _out = null;
             _in = null;
             _socket = null;
         }
+
+    }
+
+
+    @Override
+    public void close()
+    {
+        if (_closed) {
+            _nhandler.WSLOG("Socket already closed");
+            //Thread.dumpStack();
+            return;
+        }
+        _closing = true;
+        if (_thread != null) {
+            _thread.interrupt();
+            try {
+                _thread.join(1000);
+            } catch (InterruptedException e) {
+                //e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        }
+        closeSoket();
     }
 
     @Override
@@ -151,13 +158,13 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
     {
         long start = System.currentTimeMillis();
         String request = "GET ";
-        String subDomain = hub._http_params.getSubDomain();
+        String subDomain = hub._runtime_http_params.getSubDomain();
         request += subDomain;
         _closed = true;
         _closing = false;
         _fragments = null;
         String host = hub.getHost();
-        _nhandler.WSLOG(String.format(Locale.US, "hub(%s%s:%d) try to open WS connection at %d",  hub._http_params.useSecureSocket()?"secure/":"",host, hub._http_params.getPort(), notifAbsPos));
+        _nhandler.WSLOG(String.format(Locale.US, "hub(%s) try to open WS connection at %d", hub._runtime_http_params.getOriginalURL(), notifAbsPos));
         if (first_notification_connection) {
             request += "/not.byn";
         } else {
@@ -165,7 +172,9 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         }
         try {
             InetAddress addr = InetAddress.getByName(host);
-            _socket = hub.OpenConnectedSocket(addr,mstimeout);
+            _nhandler.WSLOG("Open Socket");
+
+            _socket = hub.OpenConnectedSocket(addr, mstimeout);
             _socket.setTcpNoDelay(true);
             _socket.setSoTimeout(1000);
             _out = new BufferedOutputStream(_socket.getOutputStream());
@@ -267,7 +276,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
             while (!isClosing() && !isClosed()) {
                 try {
                     readBytes = _in.read(rawbuffer, ofs, max);
-                } catch (SocketTimeoutException ex){
+                } catch (SocketTimeoutException ex) {
                     // read timeout check if we need to retry
                     continue;
                 }
@@ -292,11 +301,12 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
                 ofs = avail;
                 max = rawbuffer.length - ofs;
             }
-        } catch (IOException | YAPI_Exception e) {
-            //e.printStackTrace();
-            _closed = true;
+        } catch (IOException e) {
             _nhandler.errorOnSession(YAPI.IO_ERROR, e.getLocalizedMessage());
+        } catch (YAPI_Exception e) {
+            _nhandler.errorOnSession(e.errorType, e.getLocalizedMessage());
         }
+        closeSoket();
         _closed = true;
     }
 

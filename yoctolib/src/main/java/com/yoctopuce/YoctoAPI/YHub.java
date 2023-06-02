@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHub.java 53894 2023-04-05 10:33:42Z mvuilleu $
+ * $Id: YHub.java 54649 2023-05-22 10:09:20Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -52,122 +52,111 @@ import java.util.ArrayList;
 public class YHub
 {
 //--- (end of generated code: YHub class start)
-    private final YAPIContext _yctx;
-    private final YGenericHub _genHub;
-    private boolean _inUse;
     //--- (generated code: YHub definitions)
-    protected String _regUrl = "";
-    protected ArrayList<String> _knownUrls = new ArrayList<>();
+    protected YAPIContext _ctx;
+    protected int _hubref = 0;
     protected Object _userData = null;
 
     //--- (end of generated code: YHub definitions)
 
 
-    protected YHub(YAPIContext yctx, YGenericHub genericHub)
+    protected YHub(YAPIContext yctx, int hubref)
     {
-        _yctx = yctx;
-        _genHub = genericHub;
-        _regUrl = genericHub._URL_params.getOriginalURL();
-        _knownUrls.add(_regUrl);
-        _inUse = true;
         //--- (generated code: YHub attributes initialization)
         //--- (end of generated code: YHub attributes initialization)
+        _ctx = yctx;
+        _hubref = hubref;
     }
 
 
-    /**
-     * Starts the enumeration of hubs currently in use by the API.
-     * Use the method YHub.nextHubInUse() to iterate on the
-     * next hubs.
-     *
-     * @return a pointer to a YHub object, corresponding to
-     *         the first hub currently in use by the API, or a
-     *         null pointer if none has been registered.
-     */
-    public static YHub FirstHubInUse()
+    private String _getStrAttr_internal(String attrName)
     {
-        YAPIContext yapiContext = YAPI.GetYCtx(true);
-        return yapiContext.FirstHubInUse();
+        YGenericHub hub = _ctx.getGenHub(_hubref);
+        if (hub == null) {
+            return "";
+        }
+        switch (attrName) {
+            case "registeredUrl":
+                return hub._URL_params.getOriginalURL();
+            case "connectionUrl":
+                return hub._URL_params.getUrl(true, false, true);
+            case "serialNumber":
+                return hub.getSerialNumber();
+            case "errorMessage":
+                return hub.getLastErrorMessage();
+            default:
+                return "";
+        }
     }
 
-
-    /**
-     * Returns the URL currently in use to communicate with this hub.
-     */
-    public String get_connectionUrl()
+    private int _getIntAttr_internal(String attrName)
     {
-        return _genHub._URL_params.getUrl(true, false, true);
+        YGenericHub hub = _ctx.getGenHub(_hubref);
+        if (attrName.equals("isInUse")) {
+            return hub != null ? 1 : 0;
+        }
+        if (hub == null) {
+            return -1;
+        }
+        switch (attrName) {
+            case "isOnline":
+                return hub.isOnline() ? 1 : 0;
+            case "isReadOnly":
+                return hub.isReadOnly() ? 1 : 0;
+            case "networkTimeout":
+                return hub.get_networkTimeout();
+            case "errorType":
+                return hub.getLastErrorType();
+            default:
+                return -1;
+        }
     }
-
-    /**
-     * Continues the module enumeration started using YHub.FirstHubInUse().
-     * Caution: You can't make any assumption about the order of returned hubs.
-     *
-     * @return a pointer to a YHub object, corresponding to
-     *         the next hub currenlty in use, or a null pointer
-     *         if there are no more hubs to enumerate.
-     */
-    public YHub nextHubInUse()
+    public ArrayList<String> get_knownUrls_internal() throws YAPI_Exception
     {
-        return _yctx.nextHubInUse(this._genHub);
-
+        ArrayList<String> res = new ArrayList<>();
+        YGenericHub hub = _ctx.getGenHub(_hubref);
+        if (hub != null) {
+            res = hub._knownUrls;
+        }
+        return res;
     }
 
-    public boolean isOnline()
+    private void _setIntAttr_internal(String attrName, int value)
     {
-        return  _genHub.isOnline();
+        YGenericHub hub = _ctx.getGenHub(_hubref);
+        if (hub != null && attrName.equals("networkTimeout")) {
+            hub.set_networkTimeout(value);
+        }
     }
-
-    public String get_serialNumber()
-    {
-        return _genHub.getSerialNumber();
-    }
-
-    public boolean isInUse()
-    {
-        return _inUse;
-    }
-
-    void setInUse(boolean inUse)
-    {
-        _inUse = inUse;
-    }
-
-
-    public boolean isReadOnly()
-    {
-        return _genHub.isReadOnly();
-    }
-
-    public int get_errorType()
-    {
-        return _genHub.getLastErrorType();
-    }
-
-    public String get_errorMessage()
-    {
-        return _genHub.getLastErrorMessage();
-    }
-
-
-    public int get_networkTimeout()
-    {
-        return _genHub.get_networkTimeout();
-    }
-
-    public void set_networkTimeout(int ms)
-    {
-        _genHub.set_networkTimeout(ms);
-    }
-
     //--- (generated code: YHub implementation)
 
+    public String _getStrAttr(String attrName)
+    {
+        return _getStrAttr_internal(attrName);
+    }
+
+    //cannot be generated for Java:
+    //public String _getStrAttr_internal(String attrName)
+    public int _getIntAttr(String attrName)
+    {
+        return _getIntAttr_internal(attrName);
+    }
+
+    //cannot be generated for Java:
+    //public int _getIntAttr_internal(String attrName)
+    public void _setIntAttr(String attrName,int value)
+    {
+        _setIntAttr_internal(attrName, value);
+    }
+
+    //cannot be generated for Java:
+    //public void _setIntAttr_internal(String attrName,int value)
     /**
      * Returns the URL that has been used first to register this hub.
      */
     public String get_registeredUrl()
     {
-        return _regUrl;
+        return _getStrAttr("registeredUrl");
     }
 
     /**
@@ -175,21 +164,111 @@ public class YHub
      * URLs are pointing to the same hub when the devices connected
      * are sharing the same serial number.
      */
-    public ArrayList<String> get_knownUrls()
+    public ArrayList<String> get_knownUrls() throws YAPI_Exception
     {
-        ArrayList<String> knownUrls = new ArrayList<>();
-        knownUrls.clear();
-        for (String ii_0:_knownUrls) {
-            knownUrls.add(ii_0);
-        }
-        return knownUrls;
+        return get_knownUrls_internal();
     }
 
-    public void imm_inheritFrom(YHub otherHub)
+    //cannot be generated for Java:
+    //public ArrayList<String> get_knownUrls_internal() throws YAPI_Exception
+    /**
+     * Returns the URL currently in use to communicate with this hub.
+     */
+    public String get_connectionUrl()
     {
-        for (String ii_0:otherHub._knownUrls) {
-            _knownUrls.add(ii_0);
-        }
+        return _getStrAttr("connectionUrl");
+    }
+
+    /**
+     * Returns the hub serial number, if the hub was already connected once.
+     */
+    public String get_serialNumber()
+    {
+        return _getStrAttr("serialNumber");
+    }
+
+    /**
+     * Tells if this hub is still registered within the API.
+     *
+     * @return true if the hub has not been unregistered.
+     */
+    public boolean isInUse()
+    {
+        return _getIntAttr("isInUse") > 0;
+    }
+
+    /**
+     * Tells if there is an active communication channel with this hub.
+     *
+     * @return true if the hub is currently connected.
+     */
+    public boolean isOnline()
+    {
+        return _getIntAttr("isOnline") > 0;
+    }
+
+    /**
+     * Tells if write access on this hub is blocked. Return true if it
+     * is not possible to change attributes on this hub
+     *
+     * @return true if it is not possible to change attributes on this hub.
+     */
+    public boolean isReadOnly()
+    {
+        return _getIntAttr("isReadOnly") > 0;
+    }
+
+    /**
+     * Modifies tthe network connection delay for this hub.
+     * The default value is inherited from ySetNetworkTimeout
+     * at the time when the hub is registered, but it can be updated
+     * afterwards for each specific hub if necessary.
+     *
+     * @param networkMsTimeout : the network connection delay in milliseconds.
+     *
+     */
+    public void set_networkTimeout(int networkMsTimeout)
+    {
+        _setIntAttr("networkTimeout",networkMsTimeout);
+    }
+
+    /**
+     * Returns the network connection delay for this hub.
+     * The default value is inherited from ySetNetworkTimeout
+     * at the time when the hub is registered, but it can be updated
+     * afterwards for each specific hub if necessary.
+     *
+     * @return the network connection delay in milliseconds.
+     */
+    public int get_networkTimeout()
+    {
+        return _getIntAttr("networkTimeout");
+    }
+
+    /**
+     * Returns the numerical error code of the latest error with the hub.
+     * This method is mostly useful when using the Yoctopuce library with
+     * exceptions disabled.
+     *
+     * @return a number corresponding to the code of the latest error that occurred while
+     *         using the hub object
+     */
+    public int get_errorType()
+    {
+        return _getIntAttr("errorType");
+    }
+
+    /**
+     * Returns the error message of the latest error with the hub.
+     * This method is mostly useful when using the Yoctopuce library with
+     * exceptions disabled.
+     *
+     * @return a string corresponding to the latest error message that occured while
+     *         using the hub object
+     */
+    public String get_errorMessage()
+    {
+        return _getStrAttr("errorMessage");
     }
 
     /**
@@ -202,7 +281,7 @@ public class YHub
      */
     public Object get_userData()
     {
-        return this._userData;
+        return _userData;
     }
 
     /**
@@ -217,6 +296,50 @@ public class YHub
     public void set_userData(Object data)
     {
         _userData = data;
+    }
+
+    /**
+     * Starts the enumeration of hubs currently in use by the API.
+     * Use the method YHub.nextHubInUse() to iterate on the
+     * next hubs.
+     *
+     * @return a pointer to a YHub object, corresponding to
+     *         the first hub currently in use by the API, or a
+     *         null pointer if none has been registered.
+     */
+    public static YHub FirstHubInUse()
+    {
+        return YAPI.nextHubInUseInternal(-1);
+    }
+
+    /**
+     * Starts the enumeration of hubs currently in use by the API
+     * in a given YAPI context.
+     * Use the method YHub.nextHubInUse() to iterate on the
+     * next hubs.
+     *
+     * @param yctx : a YAPI context
+     *
+     * @return a pointer to a YHub object, corresponding to
+     *         the first hub currently in use by the API, or a
+     *         null pointer if none has been registered.
+     */
+    public static YHub FirstHubInUseInContext(YAPIContext yctx)
+    {
+        return yctx.nextHubInUseInternal(-1);
+    }
+
+    /**
+     * Continues the module enumeration started using YHub.FirstHubInUse().
+     * Caution: You can't make any assumption about the order of returned hubs.
+     *
+     * @return a pointer to a YHub object, corresponding to
+     *         the next hub currenlty in use, or a null pointer
+     *         if there are no more hubs to enumerate.
+     */
+    public YHub nextHubInUse()
+    {
+        return _ctx.nextHubInUseInternal(_hubref);
     }
 
     //--- (end of generated code: YHub implementation)

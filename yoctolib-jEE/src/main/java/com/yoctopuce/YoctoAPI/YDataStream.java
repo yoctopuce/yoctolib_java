@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 51748 2022-11-24 08:49:14Z mvuilleu $
+ * $Id: YDataStream.java 54262 2023-04-28 08:09:09Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -128,7 +128,7 @@ public class YDataStream
             _startTime = _utcStamp + (ms_offset / 1000.0);
         } else {
             // legacy encoding subtract the measure interval form the UTC timestamp
-            _startTime = _utcStamp -  _dataSamplesInterval;
+            _startTime = _utcStamp - _dataSamplesInterval;
         }
         _firstMeasureDuration = encoded.get(5).intValue();
         if (!(_isAvg)) {

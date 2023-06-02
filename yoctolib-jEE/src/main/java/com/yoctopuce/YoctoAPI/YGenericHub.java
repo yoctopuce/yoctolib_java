@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 53767 2023-03-30 08:53:07Z seb $
+ * $Id: YGenericHub.java 54582 2023-05-15 13:16:01Z seb $
  *
  * Internal YGenericHub object
  *
@@ -108,30 +108,35 @@ abstract class YGenericHub
 
     static final long YPROG_BOOTLOADER_TIMEOUT = 20000;
     final YAPIContext _yctx;
+    /**
+     * The URL used for the creation of the GenericHub objet
+     */
     final HTTPParams _URL_params;
-    int _hubidx;
     protected long _notifyTrigger = 0;
     protected Object _notifyHandle = null;
     volatile boolean _isNotifWorking = false;
     long _devListExpires = 0;
     final ConcurrentHashMap<Integer, String> _serialByYdx = new ConcurrentHashMap<>();
     private HashMap<String, YDevice> _devices = new HashMap<>();
-    final boolean _reportConnnectionLost;
-    private String _hubSerialNumber = null;
+    boolean _reportConnnectionLost;
+    protected String _hubSerialNumber = null;
     private HashMap<String, Integer> _beaconss = new HashMap<>();
-    private YHub _yhubObj;
-    protected String _lastErrorMessage="";
+    protected ArrayList<String> _knownUrls = new ArrayList<>();
+
+    protected String _lastErrorMessage = "";
     protected int _lastErrorType = YAPI.SUCCESS;
     protected int _networkTimeoutMs;
+    private boolean _enabled = true;
+    private final long _creation_time;
 
-    YGenericHub(YAPIContext yctx, HTTPParams httpParams, int idx, boolean reportConnnectionLost)
+    YGenericHub(YAPIContext yctx, HTTPParams httpParams, boolean reportConnnectionLost)
     {
         _yctx = yctx;
         _networkTimeoutMs = _yctx._networkTimeoutMs;
-        _hubidx = idx;
         _reportConnnectionLost = reportConnnectionLost;
         _URL_params = httpParams;
-        _yhubObj = new YHub(yctx, this);
+        _knownUrls.add(httpParams._originalURL);
+        _creation_time = System.currentTimeMillis();
     }
 
     abstract void release();
@@ -139,11 +144,30 @@ abstract class YGenericHub
     abstract String getRootUrl();
 
     @SuppressWarnings("UnusedParameters")
-    abstract boolean isSameHub(String url, Object request, Object response, Object session);
+    boolean isSameHub(String url, Object request, Object response, Object session)
+    {
+        for (String ku : _knownUrls) {
+            if (url.equals(ku)) {
+                return true;
+            }
+        }
+        HTTPParams params = new HTTPParams(url);
+        String paramsUrl = params.getUrl(false, false, false);
+        return paramsUrl.equals(_URL_params.getUrl(false, false, false));
+    }
 
     abstract void startNotifications() throws YAPI_Exception;
 
     abstract void stopNotifications();
+
+    boolean updateHubSerial(String serial) throws YAPI_Exception
+    {
+        if (_hubSerialNumber == null) {
+            _hubSerialNumber = serial;
+            return _yctx._checkForDuplicateHub(this);
+        }
+        return false;
+    }
 
 
     static String decodePubVal(int typeV2, byte[] funcval, int ofs, int funcvallen)
@@ -272,11 +296,12 @@ abstract class YGenericHub
             _devices.remove(serial);
             _yctx._yHash.forgetDevice(serial);
         }
-
-        if (_hubSerialNumber == null) {
-            for (WPEntry wp : whitePages) {
-                if (wp.getNetworkUrl().equals("")) {
-                    _hubSerialNumber = wp.getSerialNumber();
+        synchronized (this) {
+            if (_hubSerialNumber == null) {
+                for (WPEntry wp : whitePages) {
+                    if (wp.getNetworkUrl().equals("")) {
+                        _hubSerialNumber = wp.getSerialNumber();
+                    }
                 }
             }
         }
@@ -388,11 +413,6 @@ abstract class YGenericHub
 
     abstract boolean isReadOnly();
 
-    public YHub getYHub()
-    {
-
-        return _yhubObj;
-    }
 
     public void set_networkTimeout(int networkMsTimeout)
     {
@@ -415,6 +435,35 @@ abstract class YGenericHub
     }
 
     abstract public boolean isOnline();
+
+    synchronized public void merge(YGenericHub newhub)
+    {
+        this.addKnownURL(newhub._URL_params._originalURL);
+        if (_creation_time < newhub._creation_time) {
+            _reportConnnectionLost = newhub._reportConnnectionLost;
+        }
+    }
+
+    public void disable()
+    {
+        _enabled = false;
+    }
+
+    public boolean isEnabled()
+    {
+        return _enabled;
+    }
+
+    synchronized public void addKnownURL(String url)
+    {
+        if (!_knownUrls.contains(url)) {
+            _knownUrls.add(url);
+        }
+    }
+
+    public void requestStop()
+    {
+    }
 
 
     interface UpdateProgress
@@ -599,7 +648,7 @@ abstract class YGenericHub
 
         String getUrl(boolean withProto, boolean withUserPass, boolean withEndSlash)
         {
-            if (_proto.equals("usb")){
+            if (_proto.equals("usb")) {
                 return "usb";
             }
             StringBuilder url = new StringBuilder();
@@ -618,7 +667,7 @@ abstract class YGenericHub
             url.append(":");
             url.append(_port);
             url.append(_subDomain);
-            if (withEndSlash){
+            if (withEndSlash) {
                 url.append('/');
             }
             return url.toString();

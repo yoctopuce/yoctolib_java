@@ -26,7 +26,11 @@ public class WSHandlerJEE implements WSHandlerInterface, MessageHandler
                 public void onMessage(ByteBuffer byteBuffer)
                 {
 
-                    _nhandler.parseBinaryMessage(byteBuffer);
+                    try {
+                        _nhandler.parseBinaryMessage(byteBuffer);
+                    } catch (YAPI_Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             };
             _session.addMessageHandler(messageHandler);
@@ -40,7 +44,7 @@ public class WSHandlerJEE implements WSHandlerInterface, MessageHandler
         if (!_isHttpCallback) {
             // client mode
             WebSocketContainer webSocketContainer = ContainerProvider.getWebSocketContainer();
-            String url = hub._http_params.getUrl(true, false,false) + "/not.byn";
+            String url = hub._runtime_http_params.getUrl(true, false,false) + "/not.byn";
             URI uri;
             try {
                 uri = new URI(url);
@@ -85,7 +89,7 @@ public class WSHandlerJEE implements WSHandlerInterface, MessageHandler
 
 
     @OnMessage
-    public void onMessage(ByteBuffer raw_data, Session session)
+    public void onMessage(ByteBuffer raw_data, Session session) throws YAPI_Exception
     {
 
         if (_session != session) {

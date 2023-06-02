@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 53886 2023-04-05 08:06:39Z mvuilleu $
+ * $Id: YSensor.java 54283 2023-04-28 10:13:05Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -1279,7 +1279,7 @@ public class YSensor extends YFunction
 
         res = _download("api/dataLogger/recording?recording=1");
         //noinspection DoubleNegation
-        if (!((res).length>0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to start datalogger");}
+        if (!((res).length > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to start datalogger");}
         return YAPI.SUCCESS;
     }
 
@@ -1294,7 +1294,7 @@ public class YSensor extends YFunction
 
         res = _download("api/dataLogger/recording?recording=0");
         //noinspection DoubleNegation
-        if (!((res).length>0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to stop datalogger");}
+        if (!((res).length > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to stop datalogger");}
         return YAPI.SUCCESS;
     }
 

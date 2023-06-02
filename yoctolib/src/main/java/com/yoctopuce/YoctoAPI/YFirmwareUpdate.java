@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 49750 2022-05-13 07:10:42Z seb $
+ * $Id: YFirmwareUpdate.java 54582 2023-05-15 13:16:01Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -40,15 +40,11 @@
 package com.yoctopuce.YoctoAPI;
 
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -216,14 +212,7 @@ public class YFirmwareUpdate
                                     hub = yDevice.getHub();
                                 } else {
                                     // test if already in bootloader
-                                    for (YGenericHub h : _yctx._hubs) {
-                                        ArrayList<String> bootloaders = h.getBootloaders();
-                                        if (bootloaders.contains(_serial)) {
-                                            hub = h;
-                                            break;
-
-                                        }
-                                    }
+                                    hub = _yctx.getHubWithBootloader(_serial);
                                 }
                                 if (hub == null) {
                                     throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "device " + _serial + " is not detected");
@@ -326,24 +315,7 @@ public class YFirmwareUpdate
 
     private static ArrayList<String> GetAllBootLoadersInContext_internal(YAPIContext yctx)
     {
-        ArrayList<String> res = new ArrayList<>();
-        for (YGenericHub h : yctx._hubs) {
-            try {
-                ArrayList<String> bootloaders;
-                try {
-                    bootloaders = h.getBootloaders();
-                } catch (InterruptedException e) {
-                    throw new YAPI_Exception(YAPI.IO_ERROR,
-                            "Thread has been interrupted");
-                }
-                if (bootloaders != null) {
-                    res.addAll(bootloaders);
-                }
-            } catch (YAPI_Exception e) {
-                yctx._Log(e.getLocalizedMessage());
-            }
-        }
-        return res;
+        return yctx.getAllBootLoaders();
     }
 
     private static ArrayList<String> GetAllBootLoaders_internal()

@@ -20,7 +20,7 @@ public interface WSHandlerInterface
     {
         void WSLOG(String format);
 
-        void parseBinaryMessage(ByteBuffer data);
+        void parseBinaryMessage(ByteBuffer data) throws YAPI_Exception;
 
         void errorOnSession(int ioError, String reasonPhrase);
     }

@@ -43,7 +43,6 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
     private long _connectionTime = 0;
     private ConnectionState _connectionState = ConnectionState.CONNECTING;
     private int _remoteVersion = 0;
-    private String _remoteSerial;
     private long _remoteNouce;
     private int _nounce;
     private volatile int _session_errno;
@@ -113,18 +112,18 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                 runOnSession();
             } catch (YAPI_Exception e) {
                 //e.printStackTrace();
-                if (e.errorType == YAPI.INVALID_ARGUMENT) {
+                if (e.errorType == YAPI.INVALID_ARGUMENT || e.errorType == YAPI.DOUBLE_ACCES) {
                     _muststop = true;
                 }
                 _session_errno = YAPI.IO_ERROR;
                 _session_error = e.getLocalizedMessage();
             }
+            _wsHandler.close();
             _waitingForConnectionState = true;
             _notifRetryCount++;
             _hub._isNotifWorking = false;
             _error_delay = 100 << (_notifRetryCount > 4 ? 4 : _notifRetryCount);
         } while (!Thread.currentThread().isInterrupted() && !_muststop && !_wsHandler.isCallback());
-        _wsHandler.close();
         synchronized (_stateLock) {
             _connectionState = ConnectionState.DEAD;
             if (_session_errno == 0) {
@@ -294,7 +293,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
     @Override
     String getThreadLabel()
     {
-        return _wsHandler.getThreadLabel() + "_" + _hub._http_params.toString();
+        return _wsHandler.getThreadLabel() + "_" + _hub._runtime_http_params.toString();
     }
 
     @Override
@@ -396,7 +395,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
         }
     }
 
-    public void parseBinaryMessage(ByteBuffer raw_data)
+    public void parseBinaryMessage(ByteBuffer raw_data) throws YAPI_Exception
     {
         WSStream stream;
         WSRequest workingRequest;
@@ -410,7 +409,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
         switch (ystream) {
             case YGenericHub.YSTREAM_TCP_NOTIF:
                 if (_waitingForConnectionState) {
-                    if (!_hub._http_params.hasAuthParam()) {
+                    if (!_hub._runtime_http_params.hasAuthParam()) {
                         synchronized (_stateLock) {
                             _connectionState = ConnectionState.CONNECTED;
                             _stateLock.notifyAll();
@@ -531,7 +530,15 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                                 break;
                             }
                         }
-                        _remoteSerial = new String(serial_char, 0, len, Charset.forName("ISO-8859-1"));
+                        String remoteSerial = new String(serial_char, 0, len, Charset.forName("ISO-8859-1"));
+                        if (_hub.updateHubSerial(remoteSerial)) {
+                            //duplicate hub
+                            synchronized (_stateLock) {
+                                _connectionState = ConnectionState.DEAD;
+                                _stateLock.notifyAll();
+                            }
+                            throw new YAPI_Exception(YAPI.DOUBLE_ACCES, "Duplicate hub detected");
+                        }
                         _remoteNouce = nounce;
                         _connectionTime = YAPI.GetTickCount();
                         Random randomGenerator = new Random();
@@ -561,7 +568,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                         if ((flags & YGenericHub.USB_META_WS_VALID_SHA1) != 0) {
                             byte[] remote_sha1 = new byte[20];
                             raw_data.get(remote_sha1);
-                            byte[] sha1 = computeAUTH(_hub._http_params.getUser(), _hub._http_params.getPass(), _remoteSerial, _nounce);
+                            byte[] sha1 = computeAUTH(_hub._runtime_http_params.getUser(), _hub._runtime_http_params.getPass(), _hub.getSerialNumber(), _nounce);
                             if (Arrays.equals(sha1, remote_sha1)) {
                                 synchronized (_stateLock) {
                                     _connectionState = ConnectionState.CONNECTED;
@@ -569,21 +576,21 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                                 }
                                 _waitingForConnectionState = false;
                             } else {
-                                errorOnSession(YAPI.UNAUTHORIZED, String.format("Authentication as %s failed", _hub._http_params.getUser()));
+                                errorOnSession(YAPI.UNAUTHORIZED, String.format("Authentication as %s failed", _hub._runtime_http_params.getUser()));
                                 break;
                             }
                         } else {
-                            if (!_hub._http_params.hasAuthParam()) {
+                            if (!_hub._runtime_http_params.hasAuthParam() || _hub._runtime_http_params.getPass().equals("")) {
                                 synchronized (_stateLock) {
                                     _connectionState = ConnectionState.CONNECTED;
                                     _stateLock.notifyAll();
                                 }
                                 _waitingForConnectionState = false;
                             } else {
-                                if (_hub._http_params.getUser().equals("admin") && !_rwAccess) {
-                                    errorOnSession(YAPI.UNAUTHORIZED, String.format("Authentication as %s failed", _hub._http_params.getUser()));
+                                if (_hub._runtime_http_params.getUser().equals("admin") && !_rwAccess) {
+                                    errorOnSession(YAPI.UNAUTHORIZED, String.format("Authentication as %s failed", _hub._runtime_http_params.getUser()));
                                 } else {
-                                    errorOnSession(YAPI.UNAUTHORIZED, String.format("Authentication error : hub has no password for %s", _hub._http_params.getUser()));
+                                    errorOnSession(YAPI.UNAUTHORIZED, String.format("Authentication error : hub has no password for %s", _hub._runtime_http_params.getUser()));
                                 }
                                 break;
                             }
@@ -814,11 +821,11 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
         ByteBuffer auth = ByteBuffer.allocate(YGenericHub.USB_META_WS_AUTHENTICATION_SIZE);
         auth.order(ByteOrder.LITTLE_ENDIAN);
         auth.put((byte) YGenericHub.USB_META_WS_AUTHENTICATION);
-        if (_hub._http_params.hasAuthParam()) {
+        if (_hub._runtime_http_params.hasAuthParam()) {
             auth.put((byte) YGenericHub.USB_META_WS_PROTO_V2);
             auth.putShort((short) YGenericHub.USB_META_WS_VALID_SHA1);
             auth.putInt(_nounce);
-            byte[] sha1 = computeAUTH(_hub._http_params.getUser(), _hub._http_params.getPass(), _remoteSerial, _remoteNouce);
+            byte[] sha1 = computeAUTH(_hub._runtime_http_params.getUser(), _hub._runtime_http_params.getPass(), _hub.getSerialNumber(), _remoteNouce);
             auth.put(sha1);
         } else {
             auth.put((byte) YGenericHub.USB_META_WS_PROTO_V2);

@@ -30,26 +30,6 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
 public class YAPIContext
 {
 //--- (end of generated code: YAPIContext class start)
-    public YHub FirstHubInUse()
-    {
-        try {
-            YGenericHub yGenericHub = _hubs.get(0);
-            return yGenericHub.getYHub();
-        } catch (IndexOutOfBoundsException ignore) {
-            return null;
-        }
-    }
-
-    public YHub nextHubInUse(YGenericHub genericHub)
-    {
-        int idx = _hubs.indexOf(genericHub);
-        try {
-            YGenericHub yGenericHub = _hubs.get(idx+1);
-            return yGenericHub.getYHub();
-        } catch (IndexOutOfBoundsException ignore) {
-            return null;
-        }
-    }
 
     static class DataEvent
     {
@@ -410,7 +390,7 @@ public class YAPIContext
     String _defaultEncoding = YAPI.DefaultEncoding;
     final Charset _deviceCharset;
     private int _apiMode;
-    final ArrayList<YGenericHub> _hubs = new ArrayList<>(1); // array of root urls
+    private final ArrayList<YGenericHub> _hubs = new ArrayList<>(1); // array of root urls
     private final Queue<PlugEvent> _pendingCallbacks = new LinkedList<>();
     private final Queue<DataEvent> _data_events = new LinkedList<>();
 
@@ -437,6 +417,7 @@ public class YAPIContext
     long _deviceListValidityMs = 10000;
     int _networkTimeoutMs = YHTTPHub.YIO_DEFAULT_TCP_TIMEOUT;
     final Object _functionCacheLock;
+    private final Map<Integer, YHub> _yhub_cache = new HashMap<>();
 
 
     //--- (generated code: YAPIContext definitions)
@@ -444,6 +425,36 @@ public class YAPIContext
 
     //--- (end of generated code: YAPIContext definitions)
 
+    public boolean _checkForDuplicateHub(YGenericHub newhub)
+    {
+        String serial = newhub.getSerialNumber();
+        YGenericHub previous = null;
+        synchronized (_hubs) {
+            for (YGenericHub hub : _hubs) {
+                if (!hub.isEnabled()) {
+                    continue;
+                }
+                String current = hub.getSerialNumber();
+                if (serial.equals(current) && hub != newhub) {
+                    previous = hub;
+                    break;
+                }
+            }
+            if (previous != null) {
+                System.out.println("Find duplicate hub: new=" + newhub._URL_params.getOriginalURL() + " old=" + previous._URL_params.getOriginalURL() + " th:" + Thread.currentThread().getName());
+                for (YGenericHub hub : _hubs) {
+                    System.out.println(" ---- url=" + hub._URL_params.getOriginalURL() + " enabled=" + (hub.isEnabled() ? "yes" : "no") + " th:" + Thread.currentThread().getName());
+                }
+                previous.merge(newhub);
+                newhub.disable();
+            }
+        }
+        if (previous !=null){
+            newhub.requestStop();
+            return true;
+        }
+        return false;
+    }
 
     private final YSSDP.YSSDPReportInterface _ssdpCallback = new YSSDP.YSSDPReportInterface()
     {
@@ -581,6 +592,7 @@ public class YAPIContext
         _logCallback = null;
         _HubDiscoveryCallback = null;
         _hubs.clear();
+        _yhub_cache.clear();
         _calibHandlers.clear();
         _ssdp.reset();
         _yHash.reset();
@@ -591,26 +603,34 @@ public class YAPIContext
             _calibHandlers.put(i, linearCalibrationHandler);
         }
         _calibHandlers.put(YAPI.YOCTO_CALIB_TYPE_OFS, linearCalibrationHandler);
+
     }
 
     void _pushPlugEvent(String serial, String productName, int productId)
     {
+        if (_arrivalCallback != null) {
         synchronized (_pendingCallbacks) {
-            _pendingCallbacks.add(new PlugEvent(this, PlugEvent.Event.PLUG, serial));
+                _pendingCallbacks.add(new PlugEvent(this, PlugEvent.Event.PLUG, serial));
+            }
         }
     }
 
     void _pushChangeEvent(String serial)
     {
-        synchronized (_pendingCallbacks) {
-            _pendingCallbacks.add(new PlugEvent(this, YAPIContext.PlugEvent.Event.CHANGE, serial));
+        if (_namechgCallback != null) {
+            synchronized (_pendingCallbacks) {
+                _pendingCallbacks.add(new PlugEvent(this, YAPIContext.PlugEvent.Event.CHANGE, serial));
+            }
         }
     }
 
     void _pushUnPlugEvent(String serial)
     {
-        synchronized (_pendingCallbacks) {
-            _pendingCallbacks.add(new PlugEvent(this, PlugEvent.Event.UNPLUG, serial));
+        if (_removalCallback != null) {
+
+            synchronized (_pendingCallbacks) {
+                _pendingCallbacks.add(new PlugEvent(this, PlugEvent.Event.UNPLUG, serial));
+            }
         }
     }
 
@@ -769,9 +789,12 @@ public class YAPIContext
 
     private synchronized int _AddNewHub(String url, boolean reportConnnectionLost, InputStream request, OutputStream response, Object session) throws YAPI_Exception
     {
-        for (YGenericHub h : _hubs) {
-            if (h.isSameHub(url, request, response, session)) {
-                return YAPI.SUCCESS;
+        synchronized (_hubs) {
+            for (YGenericHub h : _hubs) {
+                if (h.isEnabled() && h.isSameHub(url, request, response, session)) {
+                    h.addKnownURL(url);
+                    return YAPI.SUCCESS;
+                }
             }
         }
         YGenericHub newhub;
@@ -780,15 +803,17 @@ public class YAPIContext
         // Add hub to known list
         if (url.equals("usb")) {
             YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(this, _hubs.size(), true, _pktAckDelay);
+            newhub = new YUSBHub(this, true, _pktAckDelay);
         } else if (url.equals("usb_silent")) {
             YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(this, _hubs.size(), false, _pktAckDelay);
+            newhub = new YUSBHub(this, false, _pktAckDelay);
         } else if (url.equals("net")) {
             if ((_apiMode & YAPI.DETECT_NET) == 0) {
                 if (YUSBHub.RegisterLocalhost()) {
-                    newhub = new YHTTPHub(this, _hubs.size(), new YGenericHub.HTTPParams("localhost"), false, null);
-                    _hubs.add(newhub);
+                    newhub = new YHTTPHub(this, new YGenericHub.HTTPParams("localhost"), false, null);
+                    synchronized (_hubs) {
+                        _hubs.add(newhub);
+                    }
                     newhub.startNotifications();
                 }
                 _apiMode |= YAPI.DETECT_NET;
@@ -797,15 +822,17 @@ public class YAPIContext
             return YAPI.SUCCESS;
         } else if (parsedurl.getHost().equals("callback")) {
             if (session != null) {
-                newhub = new YHTTPHub(this, _hubs.size(), parsedurl, reportConnnectionLost, session);
+                newhub = new YHTTPHub(this, parsedurl, reportConnnectionLost, session);
             } else {
-                newhub = new YCallbackHub(this, _hubs.size(), parsedurl, request, response);
+                newhub = new YCallbackHub(this, parsedurl, request, response);
             }
         } else {
-            newhub = new YHTTPHub(this, _hubs.size(), parsedurl, reportConnnectionLost, null);
+            newhub = new YHTTPHub(this, parsedurl, reportConnnectionLost, null);
         }
         newhub.startNotifications();
-        _hubs.add(newhub);
+        synchronized (_hubs) {
+            _hubs.add(newhub);
+        }
         return YAPI.SUCCESS;
     }
 
@@ -815,6 +842,9 @@ public class YAPIContext
         synchronized (this) {
             // Rescan all hubs and update list of online devices
             for (YGenericHub h : _hubs) {
+                if (!h.isEnabled()) {
+                    continue;
+                }
                 try {
                     h.updateDeviceList(forceupdate);
                 } catch (InterruptedException e) {
@@ -1154,7 +1184,62 @@ public class YAPIContext
         return _defaultCacheValidity;
     }
 
+    public YHub nextHubInUseInternal(int hubref)
+    {
+        return nextHubInUseInternal_internal(hubref);
+    }
+
+    //cannot be generated for Java:
+    //public YHub nextHubInUseInternal_internal(int hubref)
+    public YHub getYHubObj(int hubref)
+    {
+        YHub obj;
+        YAPIContext ctx = YAPI.GetYCtx(true);
+        synchronized (ctx._functionCacheLock) {
+            obj = _findYHubFromCache(hubref);
+            if (obj == null) {
+                obj = new YHub(this, hubref);
+                _addYHubToCache(hubref, obj);
+            }
+        }
+        return obj;
+    }
+
     //--- (end of generated code: YAPIContext implementation)
+
+    public YGenericHub getGenHub(int hubref)
+    {
+        if (hubref < 0 || hubref >= _hubs.size()) {
+            return null;
+        }
+        return _hubs.get(hubref);
+    }
+
+
+    private void _addYHubToCache(int hubref, YHub obj)
+    {
+        _yhub_cache.put(hubref, obj);
+    }
+
+    private YHub _findYHubFromCache(int hubref)
+    {
+        return _yhub_cache.get(hubref);
+    }
+
+
+    private synchronized YHub nextHubInUseInternal_internal(int hubref)
+    {
+
+        int nextref = hubref < 0 ? 0 : hubref + 1;
+        while (nextref < _hubs.size() && !_hubs.get(nextref).isEnabled()) {
+            nextref++;
+        }
+        if (nextref >= _hubs.size()) {
+            return null;
+        }
+        return this.getYHubObj(nextref);
+    }
+
 
     /**
      * Enables the HTTP callback cache. When enabled, this cache reduces the quantity of data sent to the
@@ -1254,7 +1339,7 @@ public class YAPIContext
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public int InitAPI(int mode) throws YAPI_Exception
     {
@@ -1290,7 +1375,7 @@ public class YAPIContext
      * You should not call any other library function after calling
      * yFreeAPI(), or your program will crash.
      */
-    public void FreeAPI()
+    public synchronized void FreeAPI()
     {
         if ((_apiMode & YAPI.DETECT_NET) != 0) {
             _ssdp.Stop();
@@ -1353,7 +1438,7 @@ public class YAPIContext
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public int RegisterHub(String url) throws YAPI_Exception
     {
@@ -1446,7 +1531,7 @@ public class YAPIContext
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public int PreregisterHub(String url) throws YAPI_Exception
     {
@@ -1473,17 +1558,15 @@ public class YAPIContext
     @SuppressWarnings("SameParameterValue")
     private void unregisterHubEx(String url, InputStream request, OutputStream response, Object session)
     {
-        for (YGenericHub h : _hubs) {
+        Iterator<YGenericHub> it = _hubs.iterator();
+        while (it.hasNext()) {
+            YGenericHub h = it.next();
+            ;
             if (h.isSameHub(url, request, response, session)) {
+                h.addKnownURL(url);
                 h.stopNotifications();
                 h.release();
-                _hubs.remove(h);
-                /*for (String serial : h._serialByYdx.values()) {
-                    _yHash.forgetDevice(serial);
-                }
-                *
-                 */
-                return;
+                it.remove();
             }
         }
     }
@@ -1510,14 +1593,14 @@ public class YAPIContext
         // Add hub to known list
         if (url.equals("usb")) {
             YUSBHub.CheckUSBAcces();
-            newhub = new YUSBHub(this, 0, true, _pktAckDelay);
+            newhub = new YUSBHub(this, true, _pktAckDelay);
         } else if (url.equals("net")) {
             return YAPI.SUCCESS;
         } else if (parsedurl.getHost().equals("callback")) {
             // fixme add TestHub function  for callback
-            newhub = new YCallbackHub(this, 0, parsedurl, null, null);
+            newhub = new YCallbackHub(this, parsedurl, null, null);
         } else {
-            newhub = new YHTTPHub(this, 0, parsedurl, true, null);
+            newhub = new YHTTPHub(this, parsedurl, true, null);
         }
         return newhub.ping(mstimeout);
     }
@@ -1536,7 +1619,7 @@ public class YAPIContext
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public int UpdateDeviceList() throws YAPI_Exception
     {
@@ -1557,7 +1640,7 @@ public class YAPIContext
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public int HandleEvents() throws YAPI_Exception
     {
@@ -1593,7 +1676,7 @@ public class YAPIContext
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public int Sleep(long ms_duration) throws YAPI_Exception
     {
@@ -1618,7 +1701,7 @@ public class YAPIContext
      * will be called for each net work hub that will respond to the discovery.
      *
      * @return YAPI.SUCCESS when the call succeeds.
-     * @throws YAPI_Exception on error
+     *         On failure returns a negative error code.
      */
     public int TriggerHubDiscovery() throws YAPI_Exception
     {
@@ -1727,5 +1810,37 @@ public class YAPIContext
         }
     }
 
+    ArrayList<String> getAllBootLoaders()
+    {
+        ArrayList<String> res = new ArrayList<>();
+        for (YGenericHub h : _hubs) {
+            try {
+                ArrayList<String> bootloaders;
+                try {
+                    bootloaders = h.getBootloaders();
+                } catch (InterruptedException e) {
+                    throw new YAPI_Exception(YAPI.IO_ERROR,
+                            "Thread has been interrupted");
+                }
+                if (bootloaders != null) {
+                    res.addAll(bootloaders);
+                }
+            } catch (YAPI_Exception e) {
+                this._Log(e.getLocalizedMessage());
+            }
+        }
+        return res;
+    }
+
+    public YGenericHub getHubWithBootloader(String serial) throws YAPI_Exception, InterruptedException
+    {
+        for (YGenericHub h : _hubs) {
+            ArrayList<String> bootloaders = h.getBootloaders();
+            if (bootloaders.contains(serial)) {
+                return h;
+            }
+        }
+        return null;
+    }
 
 }

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 53903 2023-04-05 12:29:59Z mvuilleu $
+ * $Id: YAPI.java 54262 2023-04-28 08:09:09Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -59,7 +59,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "54037";
+    public static final String YOCTO_API_BUILD_STR = "54821";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -340,7 +340,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".54037" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".54821" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -360,7 +360,7 @@ public class YAPI
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static int InitAPI(int mode) throws YAPI_Exception
     {
@@ -458,7 +458,7 @@ public class YAPI
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static int RegisterHub(String url) throws YAPI_Exception
     {
@@ -532,7 +532,7 @@ public class YAPI
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static int PreregisterHub(String url) throws YAPI_Exception
     {
@@ -589,7 +589,7 @@ public class YAPI
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static int UpdateDeviceList() throws YAPI_Exception
     {
@@ -614,7 +614,7 @@ public class YAPI
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static int HandleEvents() throws YAPI_Exception
     {
@@ -641,7 +641,7 @@ public class YAPI
      *
      * @return YAPI.SUCCESS when the call succeeds.
      *
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static int Sleep(long ms_duration) throws YAPI_Exception
     {
@@ -657,7 +657,7 @@ public class YAPI
      * will be called for each net work hub that will respond to the discovery.
      *
      * @return YAPI.SUCCESS when the call succeeds.
-     * @throws YAPI_Exception on error
+     *         On failure returns a negative error code.
      */
     public static int TriggerHubDiscovery() throws YAPI_Exception
     {
@@ -888,6 +888,14 @@ public class YAPI
     public static long GetCacheValidity()
     {
         return GetYCtx(true).GetCacheValidity();
+    }
+    public static YHub nextHubInUseInternal(int hubref)
+    {
+        return GetYCtx(true).nextHubInUseInternal(hubref);
+    }
+    public static YHub getYHubObj(int hubref)
+    {
+        return GetYCtx(true).getYHubObj(hubref);
     }
 //--- (end of generated code: YAPIContext yapiwrapper)
 

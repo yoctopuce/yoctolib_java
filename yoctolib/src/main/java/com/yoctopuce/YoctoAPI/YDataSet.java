@@ -1,5 +1,5 @@
 /*
- * $Id: YDataSet.java 53886 2023-04-05 08:06:39Z mvuilleu $
+ * $Id: YDataSet.java 54283 2023-04-28 10:13:05Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -219,8 +219,8 @@ public class YDataSet
 
         // Parse complete streams
         for (YDataStream ii_0: _streams) {
-            streamStartTimeMs = (double)Math.round(ii_0.get_realStartTimeUTC() *1000);
-            streamDuration = ii_0.get_realDuration() ;
+            streamStartTimeMs = (double)Math.round(ii_0.get_realStartTimeUTC() * 1000);
+            streamDuration = ii_0.get_realDuration();
             streamEndTimeMs = streamStartTimeMs + (double)Math.round(streamDuration * 1000);
             if ((streamStartTimeMs >= _startTimeMs) && ((_endTimeMs == 0) || (streamEndTimeMs <= _endTimeMs))) {
                 // stream that are completely inside the dataset
@@ -265,7 +265,7 @@ public class YDataSet
                 previewMaxVal = YAPI.MIN_DOUBLE;
                 m_pos = 0;
                 while (m_pos < dataRows.size()) {
-                    measure_data  = dataRows.get(m_pos);
+                    measure_data = dataRows.get(m_pos);
                     if (m_pos == 0) {
                         mitv = fitv;
                     } else {
@@ -419,7 +419,7 @@ public class YDataSet
             url = stream._get_url();
             suffix = stream._get_urlsuffix();
             suffixes.add(suffix);
-            idx = _progress+1;
+            idx = _progress + 1;
             while ((idx < _streams.size()) && (suffixes.size() < _bulkLoad)) {
                 stream = _streams.get(idx);
                 if (!(stream._wasLoaded()) && (stream._get_baseurl().equals(baseurl))) {
@@ -584,7 +584,7 @@ public class YDataSet
                 url = String.format(Locale.US, "%s&from=%d",url,imm_get_startTimeUTC());
             }
             if (_endTimeMs != 0) {
-                url = String.format(Locale.US, "%s&to=%d",url,imm_get_endTimeUTC()+1);
+                url = String.format(Locale.US, "%s&to=%d",url,imm_get_endTimeUTC() + 1);
             }
         } else {
             if (_progress >= _streams.size()) {

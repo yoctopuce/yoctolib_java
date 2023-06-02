@@ -18,7 +18,7 @@ class TCPNotificationHandler extends NotificationHandler
     @Override
     String getThreadLabel()
     {
-        return "TCPNotHandler_" + _hub._http_params.toString();
+        return "TCPNotHandler_" + _hub._runtime_http_params.toString();
     }
 
 
@@ -139,6 +139,6 @@ class TCPNotificationHandler extends NotificationHandler
     @Override
     public boolean hasRwAccess()
     {
-        return _hub._http_params.getUser().equals("admin");
+        return _hub._runtime_http_params.getUser().equals("admin");
     }
 }

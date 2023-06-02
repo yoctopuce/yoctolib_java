@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: Demo.java 32627 2018-10-10 13:37:29Z seb $
+ *  $Id: Demo.java 54064 2023-04-14 08:06:16Z seb $
  *
  *  An example that show how to use a  Yocto-Watt
  *
@@ -39,7 +39,7 @@ public class Demo {
 
         while (true) {
             try {
-                System.out.println("Current power: " + psensor.get_currentValue() + " W");
+                System.out.println("Current power: " + psensor.get_currentValue() + " W" + psensor.get_powerFactor() + " ?");
                 System.out.println("  (press Ctrl-C to exit)");
                 YAPI.Sleep(1000);
             } catch (YAPI_Exception ex) {
