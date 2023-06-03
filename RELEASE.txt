@@ -1,4 +1,4 @@
-Java v1.10.54821
+Java v1.10.54852
 
 - Improve implementation of YHub class
 - Reduce memory usage
