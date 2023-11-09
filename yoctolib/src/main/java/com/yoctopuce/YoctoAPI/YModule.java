@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 54283 2023-04-28 10:13:05Z seb $
+ * $Id: YModule.java 57636 2023-11-03 10:35:21Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -262,12 +262,13 @@ public class YModule extends YFunction
     }
 
     /**
-     * Retrieves the type of the <i>n</i>th function on the module.
+     *  Retrieves the type of the <i>n</i>th function on the module. Yoctopuce functions type names match
+     * their class names without the <i>Y</i> prefix, for instance <i>Relay</i>, <i>Temperature</i> etc..
      *
      *  @param functionIndex : the index of the function for which the information is desired, starting at
      * 0 for the first function.
      *
-     * @return a string corresponding to the type of the function
+     * @return a string corresponding to the type of the function.
      *
      * @throws YAPI_Exception on error
      */
@@ -1749,7 +1750,7 @@ public class YModule extends YFunction
                     }
                 } else {
                     if (paramVer == 0) {
-                        ratio = Double.valueOf(param);
+                        ratio = YAPI.ystr2float(param);
                         if (ratio > 0) {
                             calibData.add(0.0);
                             calibData.add(0.0);

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 54262 2023-04-28 08:09:09Z seb $
+ * $Id: YAPI.java 57651 2023-11-06 07:46:14Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -59,7 +59,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "1.10";
-    public static final String YOCTO_API_BUILD_STR = "54852";
+    public static final String YOCTO_API_BUILD_STR = "57762";
     public static final int YOCTO_API_VERSION_BCD = 0x0110;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -87,6 +87,9 @@ public class YAPI
     public static final int RTC_NOT_READY = -13;           // real-time clock has not been initialized (or time was lost)
     public static final int FILE_NOT_FOUND = -14;          // the file is not found
     public static final int SSL_ERROR = -15;               // Error reported by mbedSSL
+    public static final int RFID_SOFT_ERROR = -16;         // Recoverable error with RFID tag (eg. tag out of reach), check YRfidStatus for details
+    public static final int RFID_HARD_ERROR = -17;         // Serious RFID error (eg. write-protected, out-of-boundary), check YRfidStatus for details
+    public static final int BUFFER_TOO_SMALL = -18;        // The buffer provided is too small
 
 //--- (end of generated code: YFunction return codes)
     static final String DefaultEncoding = "ISO-8859-1";
@@ -181,6 +184,16 @@ public class YAPI
         _MultipleYAPI = new HashMap<>();
     }
 
+    static double ystr2float(String val)
+    {
+        double res;
+        try {
+            res = Double.parseDouble(val);
+        } catch (NumberFormatException ignore) {
+            res = 0;
+        }
+        return res;
+    }
 
     static synchronized YAPIContext GetYCtx(boolean instanciateNew)
     {
@@ -340,7 +353,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".54852" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".57762" + YUSBHub.getAPIVersion();
     }
 
     /**

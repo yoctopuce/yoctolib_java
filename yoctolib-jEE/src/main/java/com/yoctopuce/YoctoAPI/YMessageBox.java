@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 50144 2022-06-17 06:59:52Z seb $
+ * $Id: YMessageBox.java 55576 2023-07-25 06:26:34Z mvuilleu $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -78,6 +78,10 @@ public class YMessageBox extends YFunction
      */
     public static final int PDURECEIVED_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid obey value
+     */
+    public static final String OBEY_INVALID = YAPI.INVALID_STRING;
+    /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
@@ -86,6 +90,7 @@ public class YMessageBox extends YFunction
     protected String _slotsBitmap = SLOTSBITMAP_INVALID;
     protected int _pduSent = PDUSENT_INVALID;
     protected int _pduReceived = PDURECEIVED_INVALID;
+    protected String _obey = OBEY_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackMessageBox = null;
     protected int _nextMsgRef = 0;
@@ -164,6 +169,9 @@ public class YMessageBox extends YFunction
         }
         if (json_val.has("pduReceived")) {
             _pduReceived = json_val.getInt("pduReceived");
+        }
+        if (json_val.has("obey")) {
+            _obey = json_val.getString("obey");
         }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
@@ -381,6 +389,100 @@ public class YMessageBox extends YFunction
     public int setPduReceived(int newval)  throws YAPI_Exception
     {
         return set_pduReceived(newval);
+    }
+
+    /**
+     * Returns the phone number authorized to send remote management commands.
+     * When a phone number is specified, the hub will take contre of all incoming
+     * SMS messages: it will execute commands coming from the authorized number,
+     * and delete all messages once received (whether authorized or not).
+     * If you need to receive SMS messages using your own software, leave this
+     * attribute empty.
+     *
+     * @return a string corresponding to the phone number authorized to send remote management commands
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_obey() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return OBEY_INVALID;
+                }
+            }
+            res = _obey;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the phone number authorized to send remote management commands.
+     * When a phone number is specified, the hub will take contre of all incoming
+     * SMS messages: it will execute commands coming from the authorized number,
+     * and delete all messages once received (whether authorized or not).
+     * If you need to receive SMS messages using your own software, leave this
+     * attribute empty.
+     *
+     * @return a string corresponding to the phone number authorized to send remote management commands
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getObey() throws YAPI_Exception
+    {
+        return get_obey();
+    }
+
+    /**
+     * Changes the phone number authorized to send remote management commands.
+     * The phone number usually starts with a '+' and does not include spacers.
+     * When a phone number is specified, the hub will take contre of all incoming
+     * SMS messages: it will execute commands coming from the authorized number,
+     * and delete all messages once received (whether authorized or not).
+     * If you need to receive SMS messages using your own software, leave this
+     * attribute empty. Remember to call the saveToFlash() method of the
+     * module if the modification must be kept.
+     *
+     * This feature is only available since YoctoHub-GSM-4G.
+     *
+     * @param newval : a string corresponding to the phone number authorized to send remote management commands
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_obey(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("obey",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the phone number authorized to send remote management commands.
+     * The phone number usually starts with a '+' and does not include spacers.
+     * When a phone number is specified, the hub will take contre of all incoming
+     * SMS messages: it will execute commands coming from the authorized number,
+     * and delete all messages once received (whether authorized or not).
+     * If you need to receive SMS messages using your own software, leave this
+     * attribute empty. Remember to call the saveToFlash() method of the
+     * module if the modification must be kept.
+     *
+     * This feature is only available since YoctoHub-GSM-4G.
+     *
+     * @param newval : a string corresponding to the phone number authorized to send remote management commands
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setObey(String newval)  throws YAPI_Exception
+    {
+        return set_obey(newval);
     }
 
     public String get_command() throws YAPI_Exception

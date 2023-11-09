@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAnButton.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YAnButton.java 56268 2023-08-25 17:43:56Z mvuilleu $
  *
  *  Implements FindAnButton(), the high-level API for AnButton functions
  *
@@ -115,6 +115,7 @@ public class YAnButton extends YFunction
     public static final int INPUTTYPE_ANALOG_FAST = 0;
     public static final int INPUTTYPE_DIGITAL4 = 1;
     public static final int INPUTTYPE_ANALOG_SMOOTH = 2;
+    public static final int INPUTTYPE_DIGITAL_FAST = 3;
     public static final int INPUTTYPE_INVALID = -1;
     protected int _calibratedValue = CALIBRATEDVALUE_INVALID;
     protected int _rawValue = RAWVALUE_INVALID;
@@ -786,9 +787,9 @@ public class YAnButton extends YFunction
     /**
      * Returns the decoding method applied to the input (analog or multiplexed binary switches).
      *
-     *  @return a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4 and
-     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH corresponding to the decoding method applied to the input (analog
-     * or multiplexed binary switches)
+     *  @return a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4,
+     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH and YAnButton.INPUTTYPE_DIGITAL_FAST corresponding to the
+     * decoding method applied to the input (analog or multiplexed binary switches)
      *
      * @throws YAPI_Exception on error
      */
@@ -809,9 +810,9 @@ public class YAnButton extends YFunction
     /**
      * Returns the decoding method applied to the input (analog or multiplexed binary switches).
      *
-     *  @return a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4 and
-     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH corresponding to the decoding method applied to the input (analog
-     * or multiplexed binary switches)
+     *  @return a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4,
+     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH and YAnButton.INPUTTYPE_DIGITAL_FAST corresponding to the
+     * decoding method applied to the input (analog or multiplexed binary switches)
      *
      * @throws YAPI_Exception on error
      */
@@ -824,9 +825,9 @@ public class YAnButton extends YFunction
      * Changes the decoding method applied to the input (analog or multiplexed binary switches).
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     *  @param newval : a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4 and
-     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH corresponding to the decoding method applied to the input (analog
-     * or multiplexed binary switches)
+     *  @param newval : a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4,
+     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH and YAnButton.INPUTTYPE_DIGITAL_FAST corresponding to the
+     * decoding method applied to the input (analog or multiplexed binary switches)
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -846,9 +847,9 @@ public class YAnButton extends YFunction
      * Changes the decoding method applied to the input (analog or multiplexed binary switches).
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     *  @param newval : a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4 and
-     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH corresponding to the decoding method applied to the input (analog
-     * or multiplexed binary switches)
+     *  @param newval : a value among YAnButton.INPUTTYPE_ANALOG_FAST, YAnButton.INPUTTYPE_DIGITAL4,
+     *  YAnButton.INPUTTYPE_ANALOG_SMOOTH and YAnButton.INPUTTYPE_DIGITAL_FAST corresponding to the
+     * decoding method applied to the input (analog or multiplexed binary switches)
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

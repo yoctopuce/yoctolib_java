@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YInputCaptureData.java 43337 2021-01-18 10:36:22Z web $
+ * $Id: YInputCaptureData.java 56301 2023-08-28 12:16:04Z mvuilleu $
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
@@ -138,6 +138,9 @@ public class YInputCaptureData
         int ms;
         int recSize;
         int count;
+        int mult1;
+        int mult2;
+        int mult3;
         double v;
 
         buffSize = (sdata).length;
@@ -193,11 +196,31 @@ public class YInputCaptureData
                 recOfs = recOfs + 1;
             }
         }
+        if (((recOfs) & (1)) == 1) {
+            // align to next word
+            recOfs = recOfs + 1;
+        }
+        mult1 = 1;
+        mult2 = 1;
+        mult3 = 1;
+        if (recOfs < _recOfs) {
+            // load optional value multiplier
+            mult1 = _decodeU16(sdata, _recOfs);
+            recOfs = recOfs + 2;
+            if (_var2size > 0) {
+                mult2 = _decodeU16(sdata, _recOfs);
+                recOfs = recOfs + 2;
+            }
+            if (_var3size > 0) {
+                mult3 = _decodeU16(sdata, _recOfs);
+                recOfs = recOfs + 2;
+            }
+        }
         recOfs = _recOfs;
         count = _nRecs;
         while ((count > 0) && (recOfs + _var1size <= buffSize)) {
             v = _decodeVal(sdata, recOfs, _var1size) / 1000.0;
-            _var1samples.add(v);
+            _var1samples.add(v*mult1);
             recOfs = recOfs + recSize;
         }
         if (_var2size > 0) {
@@ -205,7 +228,7 @@ public class YInputCaptureData
             count = _nRecs;
             while ((count > 0) && (recOfs + _var2size <= buffSize)) {
                 v = _decodeVal(sdata, recOfs, _var2size) / 1000.0;
-                _var2samples.add(v);
+                _var2samples.add(v*mult2);
                 recOfs = recOfs + recSize;
             }
         }
@@ -214,7 +237,7 @@ public class YInputCaptureData
             count = _nRecs;
             while ((count > 0) && (recOfs + _var3size <= buffSize)) {
                 v = _decodeVal(sdata, recOfs, _var3size) / 1000.0;
-                _var3samples.add(v);
+                _var3samples.add(v*mult3);
                 recOfs = recOfs + recSize;
             }
         }

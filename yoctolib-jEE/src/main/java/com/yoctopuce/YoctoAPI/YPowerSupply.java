@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPowerSupply.java 54768 2023-05-26 06:46:41Z seb $
+ *  $Id: YPowerSupply.java 55576 2023-07-25 06:26:34Z mvuilleu $
  *
  *  Implements FindPowerSupply(), the high-level API for PowerSupply functions
  *
@@ -49,8 +49,8 @@ import java.util.Locale;
  * YPowerSupply Class: regulated power supply control interface
  *
  * The YPowerSupply class allows you to drive a Yoctopuce power supply.
- * It can be use to change the voltage set point,
- * the current limit and the enable/disable the output.
+ * It can be use to change the voltage and current limits, and to enable/disable
+ * the output.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YPowerSupply extends YFunction
@@ -58,9 +58,9 @@ public class YPowerSupply extends YFunction
 //--- (end of YPowerSupply class start)
 //--- (YPowerSupply definitions)
     /**
-     * invalid voltageSetPoint value
+     * invalid voltageLimit value
      */
-    public static final double VOLTAGESETPOINT_INVALID = YAPI.INVALID_DOUBLE;
+    public static final double VOLTAGELIMIT_INVALID = YAPI.INVALID_DOUBLE;
     /**
      * invalid currentLimit value
      */
@@ -88,26 +88,33 @@ public class YPowerSupply extends YFunction
      */
     public static final String VOLTAGETRANSITION_INVALID = YAPI.INVALID_STRING;
     /**
-     * invalid voltageAtStartUp value
+     * invalid voltageLimitAtStartUp value
      */
-    public static final double VOLTAGEATSTARTUP_INVALID = YAPI.INVALID_DOUBLE;
+    public static final double VOLTAGELIMITATSTARTUP_INVALID = YAPI.INVALID_DOUBLE;
     /**
-     * invalid currentAtStartUp value
+     * invalid currentLimitAtStartUp value
      */
-    public static final double CURRENTATSTARTUP_INVALID = YAPI.INVALID_DOUBLE;
+    public static final double CURRENTLIMITATSTARTUP_INVALID = YAPI.INVALID_DOUBLE;
+    /**
+     * invalid powerOutputAtStartUp value
+     */
+    public static final int POWEROUTPUTATSTARTUP_OFF = 0;
+    public static final int POWEROUTPUTATSTARTUP_ON = 1;
+    public static final int POWEROUTPUTATSTARTUP_INVALID = -1;
     /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
-    protected double _voltageSetPoint = VOLTAGESETPOINT_INVALID;
+    protected double _voltageLimit = VOLTAGELIMIT_INVALID;
     protected double _currentLimit = CURRENTLIMIT_INVALID;
     protected int _powerOutput = POWEROUTPUT_INVALID;
     protected double _measuredVoltage = MEASUREDVOLTAGE_INVALID;
     protected double _measuredCurrent = MEASUREDCURRENT_INVALID;
     protected double _inputVoltage = INPUTVOLTAGE_INVALID;
     protected String _voltageTransition = VOLTAGETRANSITION_INVALID;
-    protected double _voltageAtStartUp = VOLTAGEATSTARTUP_INVALID;
-    protected double _currentAtStartUp = CURRENTATSTARTUP_INVALID;
+    protected double _voltageLimitAtStartUp = VOLTAGELIMITATSTARTUP_INVALID;
+    protected double _currentLimitAtStartUp = CURRENTLIMITATSTARTUP_INVALID;
+    protected int _powerOutputAtStartUp = POWEROUTPUTATSTARTUP_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackPowerSupply = null;
 
@@ -165,8 +172,8 @@ public class YPowerSupply extends YFunction
     @Override
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
-        if (json_val.has("voltageSetPoint")) {
-            _voltageSetPoint = Math.round(json_val.getDouble("voltageSetPoint") / 65.536) / 1000.0;
+        if (json_val.has("voltageLimit")) {
+            _voltageLimit = Math.round(json_val.getDouble("voltageLimit") / 65.536) / 1000.0;
         }
         if (json_val.has("currentLimit")) {
             _currentLimit = Math.round(json_val.getDouble("currentLimit") / 65.536) / 1000.0;
@@ -186,11 +193,14 @@ public class YPowerSupply extends YFunction
         if (json_val.has("voltageTransition")) {
             _voltageTransition = json_val.getString("voltageTransition");
         }
-        if (json_val.has("voltageAtStartUp")) {
-            _voltageAtStartUp = Math.round(json_val.getDouble("voltageAtStartUp") / 65.536) / 1000.0;
+        if (json_val.has("voltageLimitAtStartUp")) {
+            _voltageLimitAtStartUp = Math.round(json_val.getDouble("voltageLimitAtStartUp") / 65.536) / 1000.0;
         }
-        if (json_val.has("currentAtStartUp")) {
-            _currentAtStartUp = Math.round(json_val.getDouble("currentAtStartUp") / 65.536) / 1000.0;
+        if (json_val.has("currentLimitAtStartUp")) {
+            _currentLimitAtStartUp = Math.round(json_val.getDouble("currentLimitAtStartUp") / 65.536) / 1000.0;
+        }
+        if (json_val.has("powerOutputAtStartUp")) {
+            _powerOutputAtStartUp = json_val.getInt("powerOutputAtStartUp") > 0 ? 1 : 0;
         }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
@@ -199,69 +209,69 @@ public class YPowerSupply extends YFunction
     }
 
     /**
-     * Changes the voltage set point, in V.
+     * Changes the voltage limit, in V.
      *
-     * @param newval : a floating point number corresponding to the voltage set point, in V
+     * @param newval : a floating point number corresponding to the voltage limit, in V
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int set_voltageSetPoint(double  newval)  throws YAPI_Exception
+    public int set_voltageLimit(double  newval)  throws YAPI_Exception
     {
         String rest_val;
         synchronized (this) {
             rest_val = Long.toString(Math.round(newval * 65536.0));
-            _setAttr("voltageSetPoint",rest_val);
+            _setAttr("voltageLimit",rest_val);
         }
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes the voltage set point, in V.
+     * Changes the voltage limit, in V.
      *
-     * @param newval : a floating point number corresponding to the voltage set point, in V
+     * @param newval : a floating point number corresponding to the voltage limit, in V
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int setVoltageSetPoint(double newval)  throws YAPI_Exception
+    public int setVoltageLimit(double newval)  throws YAPI_Exception
     {
-        return set_voltageSetPoint(newval);
+        return set_voltageLimit(newval);
     }
 
     /**
-     * Returns the voltage set point, in V.
+     * Returns the voltage limit, in V.
      *
-     * @return a floating point number corresponding to the voltage set point, in V
+     * @return a floating point number corresponding to the voltage limit, in V
      *
      * @throws YAPI_Exception on error
      */
-    public double get_voltageSetPoint() throws YAPI_Exception
+    public double get_voltageLimit() throws YAPI_Exception
     {
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
                 if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
-                    return VOLTAGESETPOINT_INVALID;
+                    return VOLTAGELIMIT_INVALID;
                 }
             }
-            res = _voltageSetPoint;
+            res = _voltageLimit;
         }
         return res;
     }
 
     /**
-     * Returns the voltage set point, in V.
+     * Returns the voltage limit, in V.
      *
-     * @return a floating point number corresponding to the voltage set point, in V
+     * @return a floating point number corresponding to the voltage limit, in V
      *
      * @throws YAPI_Exception on error
      */
-    public double getVoltageSetPoint() throws YAPI_Exception
+    public double getVoltageLimit() throws YAPI_Exception
     {
-        return get_voltageSetPoint();
+        return get_voltageLimit();
     }
 
     /**
@@ -534,12 +544,12 @@ public class YPowerSupply extends YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public int set_voltageAtStartUp(double  newval)  throws YAPI_Exception
+    public int set_voltageLimitAtStartUp(double  newval)  throws YAPI_Exception
     {
         String rest_val;
         synchronized (this) {
             rest_val = Long.toString(Math.round(newval * 65536.0));
-            _setAttr("voltageAtStartUp",rest_val);
+            _setAttr("voltageLimitAtStartUp",rest_val);
         }
         return YAPI.SUCCESS;
     }
@@ -554,42 +564,42 @@ public class YPowerSupply extends YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public int setVoltageAtStartUp(double newval)  throws YAPI_Exception
+    public int setVoltageLimitAtStartUp(double newval)  throws YAPI_Exception
     {
-        return set_voltageAtStartUp(newval);
+        return set_voltageLimitAtStartUp(newval);
     }
 
     /**
-     * Returns the selected voltage set point at device startup, in V.
+     * Returns the selected voltage limit at device startup, in V.
      *
-     * @return a floating point number corresponding to the selected voltage set point at device startup, in V
+     * @return a floating point number corresponding to the selected voltage limit at device startup, in V
      *
      * @throws YAPI_Exception on error
      */
-    public double get_voltageAtStartUp() throws YAPI_Exception
+    public double get_voltageLimitAtStartUp() throws YAPI_Exception
     {
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
                 if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
-                    return VOLTAGEATSTARTUP_INVALID;
+                    return VOLTAGELIMITATSTARTUP_INVALID;
                 }
             }
-            res = _voltageAtStartUp;
+            res = _voltageLimitAtStartUp;
         }
         return res;
     }
 
     /**
-     * Returns the selected voltage set point at device startup, in V.
+     * Returns the selected voltage limit at device startup, in V.
      *
-     * @return a floating point number corresponding to the selected voltage set point at device startup, in V
+     * @return a floating point number corresponding to the selected voltage limit at device startup, in V
      *
      * @throws YAPI_Exception on error
      */
-    public double getVoltageAtStartUp() throws YAPI_Exception
+    public double getVoltageLimitAtStartUp() throws YAPI_Exception
     {
-        return get_voltageAtStartUp();
+        return get_voltageLimitAtStartUp();
     }
 
     /**
@@ -602,12 +612,12 @@ public class YPowerSupply extends YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public int set_currentAtStartUp(double  newval)  throws YAPI_Exception
+    public int set_currentLimitAtStartUp(double  newval)  throws YAPI_Exception
     {
         String rest_val;
         synchronized (this) {
             rest_val = Long.toString(Math.round(newval * 65536.0));
-            _setAttr("currentAtStartUp",rest_val);
+            _setAttr("currentLimitAtStartUp",rest_val);
         }
         return YAPI.SUCCESS;
     }
@@ -622,9 +632,9 @@ public class YPowerSupply extends YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public int setCurrentAtStartUp(double newval)  throws YAPI_Exception
+    public int setCurrentLimitAtStartUp(double newval)  throws YAPI_Exception
     {
-        return set_currentAtStartUp(newval);
+        return set_currentLimitAtStartUp(newval);
     }
 
     /**
@@ -634,16 +644,16 @@ public class YPowerSupply extends YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public double get_currentAtStartUp() throws YAPI_Exception
+    public double get_currentLimitAtStartUp() throws YAPI_Exception
     {
         double res;
         synchronized (this) {
             if (_cacheExpiration <= YAPIContext.GetTickCount()) {
                 if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
-                    return CURRENTATSTARTUP_INVALID;
+                    return CURRENTLIMITATSTARTUP_INVALID;
                 }
             }
-            res = _currentAtStartUp;
+            res = _currentLimitAtStartUp;
         }
         return res;
     }
@@ -655,9 +665,81 @@ public class YPowerSupply extends YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public double getCurrentAtStartUp() throws YAPI_Exception
+    public double getCurrentLimitAtStartUp() throws YAPI_Exception
     {
-        return get_currentAtStartUp();
+        return get_currentLimitAtStartUp();
+    }
+
+    /**
+     * Returns the power supply output switch state.
+     *
+     *  @return either YPowerSupply.POWEROUTPUTATSTARTUP_OFF or YPowerSupply.POWEROUTPUTATSTARTUP_ON,
+     * according to the power supply output switch state
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_powerOutputAtStartUp() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return POWEROUTPUTATSTARTUP_INVALID;
+                }
+            }
+            res = _powerOutputAtStartUp;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the power supply output switch state.
+     *
+     *  @return either YPowerSupply.POWEROUTPUTATSTARTUP_OFF or YPowerSupply.POWEROUTPUTATSTARTUP_ON,
+     * according to the power supply output switch state
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getPowerOutputAtStartUp() throws YAPI_Exception
+    {
+        return get_powerOutputAtStartUp();
+    }
+
+    /**
+     * Changes the power supply output switch state at device start up. Remember to call the matching
+     * module saveToFlash() method, otherwise this call has no effect.
+     *
+     *  @param newval : either YPowerSupply.POWEROUTPUTATSTARTUP_OFF or
+     * YPowerSupply.POWEROUTPUTATSTARTUP_ON, according to the power supply output switch state at device start up
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_powerOutputAtStartUp(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("powerOutputAtStartUp",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the power supply output switch state at device start up. Remember to call the matching
+     * module saveToFlash() method, otherwise this call has no effect.
+     *
+     *  @param newval : either YPowerSupply.POWEROUTPUTATSTARTUP_OFF or
+     * YPowerSupply.POWEROUTPUTATSTARTUP_ON, according to the power supply output switch state at device start up
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setPowerOutputAtStartUp(int newval)  throws YAPI_Exception
+    {
+        return set_powerOutputAtStartUp(newval);
     }
 
     public String get_command() throws YAPI_Exception

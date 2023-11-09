@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 54582 2023-05-15 13:16:01Z seb $
+ * $Id: YGenericHub.java 55025 2023-06-12 11:49:16Z seb $
  *
  * Internal YGenericHub object
  *
@@ -602,6 +602,14 @@ abstract class YGenericHub
                 }
             } else {
                 _host = url.substring(pos, end_host);
+                if (_subDomain.length() > 0) {
+                    // overide default port if there is a subdomain (VHub4web)
+                    if (_proto.equals("http")) {
+                        defaultPort = 80;
+                    } else if (_proto.equals("https")) {
+                        defaultPort = 443;
+                    }
+                }
                 _port = defaultPort;
             }
         }

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YInputChain.java 56082 2023-08-15 14:57:14Z mvuilleu $
  *
  *  Implements FindInputChain(), the high-level API for InputChain functions
  *
@@ -126,7 +126,7 @@ public class YInputChain extends YFunction
     protected int _watchdogPeriod = WATCHDOGPERIOD_INVALID;
     protected int _chainDiags = CHAINDIAGS_INVALID;
     protected UpdateCallback _valueCallbackInputChain = null;
-    protected YEventCallback _eventCallback;
+    protected YStateChangeCallback _stateChangeCallback;
     protected int _prevPos = 0;
     protected int _eventPos = 0;
     protected int _eventStamp = 0;
@@ -160,9 +160,9 @@ public class YInputChain extends YFunction
     /**
      * Specialized event Callback for InputChain
      */
-    public interface YEventCallback
+    public interface YStateChangeCallback
     {
-        void eventCallback(YInputChain inputChain, int timestampr, String evtType, String eventData, String eventChange);
+        void stateChangeCallback(YInputChain obj, int timestampr, String evtType, String eventData, String eventChange);
     }
 
     private UpdateCallback yInternalEventCallback = new UpdateCallback()
@@ -1066,7 +1066,7 @@ public class YInputChain extends YFunction
      *         the type of event and a character string with the event data.
      * @throws YAPI_Exception on error
      */
-    public int registerEventCallback(YEventCallback callback) throws YAPI_Exception
+    public int registerStateChangeCallback(YStateChangeCallback callback) throws YAPI_Exception
     {
         if (callback != null) {
             registerValueCallback(yInternalEventCallback);
@@ -1075,7 +1075,7 @@ public class YInputChain extends YFunction
         }
         // register user callback AFTER the internal pseudo-event,
         // to make sure we start with future events only
-        _eventCallback = callback;
+        _stateChangeCallback = callback;
         return 0;
     }
 
@@ -1107,7 +1107,7 @@ public class YInputChain extends YFunction
         if (newPos < _eventPos) {
             return YAPI.SUCCESS;
         }
-        if (!(_eventCallback != null)) {
+        if (!(_stateChangeCallback != null)) {
             // first simulated event, use it to initialize reference values
             _eventPos = newPos;
             _eventChains.clear();
@@ -1157,7 +1157,7 @@ public class YInputChain extends YFunction
                             _eventChains.set( chainIdx, evtData);
                         }
                     }
-                    _eventCallback.eventCallback(this, evtStamp, evtType, evtData, evtChange);
+                    _stateChangeCallback.stateChangeCallback(this, evtStamp, evtType, evtData, evtChange);
                 }
             }
             arrPos = arrPos + 1;

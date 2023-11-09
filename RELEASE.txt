@@ -1,5 +1,4 @@
-Java v1.10.54852
+Java v1.10.57762
 
-- Improve implementation of YHub class
-- Reduce memory usage
-- Fix documentation of YAPI class
+- Update default port strategy on RegisterHub when contacting VirtualHub4Web (was using 4444, now use 80)
+- Fix connection to HTTP server that use chunked encoding written in lower case

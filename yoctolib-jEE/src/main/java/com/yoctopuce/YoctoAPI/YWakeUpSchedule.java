@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpSchedule.java 48183 2022-01-20 10:26:11Z mvuilleu $
+ *  $Id: YWakeUpSchedule.java 56230 2023-08-21 15:20:59Z mvuilleu $
  *
  *  Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -82,6 +82,10 @@ public class YWakeUpSchedule extends YFunction
      */
     public static final int MONTHS_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid secondsBefore value
+     */
+    public static final int SECONDSBEFORE_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid nextOccurence value
      */
     public static final long NEXTOCCURENCE_INVALID = YAPI.INVALID_LONG;
@@ -91,6 +95,7 @@ public class YWakeUpSchedule extends YFunction
     protected int _weekDays = WEEKDAYS_INVALID;
     protected int _monthDays = MONTHDAYS_INVALID;
     protected int _months = MONTHS_INVALID;
+    protected int _secondsBefore = SECONDSBEFORE_INVALID;
     protected long _nextOccurence = NEXTOCCURENCE_INVALID;
     protected UpdateCallback _valueCallbackWakeUpSchedule = null;
 
@@ -165,6 +170,9 @@ public class YWakeUpSchedule extends YFunction
         }
         if (json_val.has("months")) {
             _months = json_val.getInt("months");
+        }
+        if (json_val.has("secondsBefore")) {
+            _secondsBefore = json_val.getInt("secondsBefore");
         }
         if (json_val.has("nextOccurence")) {
             _nextOccurence = json_val.getLong("nextOccurence");
@@ -590,6 +598,84 @@ public class YWakeUpSchedule extends YFunction
     public int setMonths(int newval)  throws YAPI_Exception
     {
         return set_months(newval);
+    }
+
+    /**
+     * Returns the number of seconds to anticipate wake-up time to allow
+     * the system to power-up.
+     *
+     * @return an integer corresponding to the number of seconds to anticipate wake-up time to allow
+     *         the system to power-up
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_secondsBefore() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return SECONDSBEFORE_INVALID;
+                }
+            }
+            res = _secondsBefore;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the number of seconds to anticipate wake-up time to allow
+     * the system to power-up.
+     *
+     * @return an integer corresponding to the number of seconds to anticipate wake-up time to allow
+     *         the system to power-up
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getSecondsBefore() throws YAPI_Exception
+    {
+        return get_secondsBefore();
+    }
+
+    /**
+     * Changes the number of seconds to anticipate wake-up time to allow
+     * the system to power-up.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : an integer corresponding to the number of seconds to anticipate wake-up time to allow
+     *         the system to power-up
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_secondsBefore(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("secondsBefore",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the number of seconds to anticipate wake-up time to allow
+     * the system to power-up.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : an integer corresponding to the number of seconds to anticipate wake-up time to allow
+     *         the system to power-up
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setSecondsBefore(int newval)  throws YAPI_Exception
+    {
+        return set_secondsBefore(newval);
     }
 
     /**

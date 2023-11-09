@@ -441,10 +441,6 @@ public class YAPIContext
                 }
             }
             if (previous != null) {
-                System.out.println("Find duplicate hub: new=" + newhub._URL_params.getOriginalURL() + " old=" + previous._URL_params.getOriginalURL() + " th:" + Thread.currentThread().getName());
-                for (YGenericHub hub : _hubs) {
-                    System.out.println(" ---- url=" + hub._URL_params.getOriginalURL() + " enabled=" + (hub.isEnabled() ? "yes" : "no") + " th:" + Thread.currentThread().getName());
-                }
                 previous.merge(newhub);
                 newhub.disable();
             }
@@ -609,7 +605,7 @@ public class YAPIContext
     void _pushPlugEvent(String serial, String productName, int productId)
     {
         if (_arrivalCallback != null) {
-        synchronized (_pendingCallbacks) {
+            synchronized (_pendingCallbacks) {
                 _pendingCallbacks.add(new PlugEvent(this, PlugEvent.Event.PLUG, serial));
             }
         }

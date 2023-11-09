@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 54061 2023-04-14 08:01:16Z seb $
+ * $Id: yHTTPRequest.java 57637 2023-11-03 10:35:46Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -333,11 +333,12 @@ class yHTTPRequest implements Runnable
                                 if (!parts[0].equals("200") && !parts[0].equals("304")) {
                                     throw new YAPI_Exception(YAPI.IO_ERROR, "Received HTTP status " + parts[0] + " (" + parts[1] + ")");
                                 } else {
-                                    int t_ofs = _header.indexOf("Transfer-Encoding");
+                                    String header_low = _header.toString().toLowerCase();
+                                    int t_ofs = header_low.indexOf("transfer-encoding");
                                     if (t_ofs > 0) {
                                         t_ofs += 17;
-                                        int t_endl = _header.indexOf("\r\n", t_ofs);
-                                        int t_chunk = _header.indexOf("chunked", t_ofs);
+                                        int t_endl = header_low.indexOf("\r\n", t_ofs);
+                                        int t_chunk = header_low.indexOf("chunked", t_ofs);
                                         if (t_chunk > 0 && t_chunk < t_endl) {
                                             _isChuckEncoded = true;
                                         }

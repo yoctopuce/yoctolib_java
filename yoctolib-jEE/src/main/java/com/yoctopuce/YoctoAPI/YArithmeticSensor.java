@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YArithmeticSensor.java 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: YArithmeticSensor.java 57636 2023-11-03 10:35:21Z seb $
  *
  *  Implements FindArithmeticSensor(), the high-level API for ArithmeticSensor functions
  *
@@ -416,7 +416,7 @@ public class YArithmeticSensor extends YSensor
         diags = new String(data);
         //noinspection DoubleNegation
         if (!((diags).substring(0, 8).equals("Result: "))) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  diags);}
-        resval = Double.valueOf((diags).substring( 8,  8 + (diags).length()-8));
+        resval = YAPI.ystr2float((diags).substring( 8,  8 + (diags).length()-8));
         return resval;
     }
 
