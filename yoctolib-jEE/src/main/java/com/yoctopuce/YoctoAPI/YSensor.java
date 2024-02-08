@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 54283 2023-04-28 10:13:05Z seb $
+ * $Id: YSensor.java 59221 2024-02-05 15:46:32Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -1419,7 +1419,7 @@ public class YSensor extends YFunction
         refValues.clear();
         // Load function parameters if not yet loaded
         synchronized (this) {
-            if (_scale == 0) {
+            if ((_scale == 0) || (_cacheExpiration <= YAPIContext.GetTickCount())) {
                 if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return YAPI.DEVICE_NOT_FOUND;
                 }

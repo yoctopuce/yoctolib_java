@@ -178,7 +178,7 @@ public class YRfidStatus
     //--- (end of generated code: YRfidStatus definitions)
 
 
-    protected YRfidStatus()
+    public YRfidStatus()
     {
         //--- (generated code: YRfidStatus attributes initialization)
         //--- (end of generated code: YRfidStatus attributes initialization)

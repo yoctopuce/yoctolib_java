@@ -1,8 +1,8 @@
 /*
  *
- *  $Id: Demo.java 33796 2018-12-20 15:56:11Z seb $
+ *  $Id: Demo.java 58172 2023-11-30 17:10:23Z martinm $
  *
- *  An example that show how to use a  Yocto-Temperature-IR
+ *  An example that shows how to use a  Yocto-Temperature-IR
  *
  *  You can find more information on our web site:
  *   Yocto-Temperature-IR documentation:

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSdi12SnoopingRecord.java 55639 2023-07-26 09:23:52Z seb $
+ * $Id: YSdi12SnoopingRecord.java 58923 2024-01-12 10:12:54Z seb $
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
@@ -51,6 +51,7 @@ public class YSdi12SnoopingRecord
 //--- (end of generated code: YSdi12SnoopingRecord class start)
 //--- (generated code: YSdi12SnoopingRecord definitions)
     protected int _tim = 0;
+    protected int _pos = 0;
     protected int _dir = 0;
     protected String _msg;
 
@@ -63,10 +64,17 @@ public class YSdi12SnoopingRecord
             json.parse();
             //--- (generated code: YSdi12SnoopingRecord attributes initialization)
         //--- (end of generated code: YSdi12SnoopingRecord attributes initialization)
-            _tim = json.getInt("t");
-            final String m = json.getString("m");
-            _dir = (m.charAt(0) == '<' ? 1 : 0);
-            _msg = m.substring(1);
+            if (json.has("t")) {
+                _tim = json.getInt("t");
+            }
+            if (json.has("p")) {
+                _pos = json.getInt("p");
+            }
+            if (json.has("m")) {
+                final String m = json.getString("m");
+                _dir = (m.charAt(0) == '<' ? 1 : 0);
+                _msg = m.substring(1);
+            }
         } catch (Exception e) {
             throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json struct for YSdi12SnoopingRecord");
         }
@@ -83,6 +91,16 @@ public class YSdi12SnoopingRecord
     public int get_time()
     {
         return _tim;
+    }
+
+    /**
+     * Returns the absolute position of the message end.
+     *
+     * @return the absolute position of the message end.
+     */
+    public int get_pos()
+    {
+        return _pos;
     }
 
     /**

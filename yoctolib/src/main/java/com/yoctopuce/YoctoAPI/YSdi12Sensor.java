@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSdi12Sensor.java 56150 2023-08-17 13:41:37Z mvuilleu $
+ * $Id: YSdi12Sensor.java 58892 2024-01-11 11:11:28Z mvuilleu $
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
@@ -75,61 +75,131 @@ public class YSdi12Sensor
 
     //--- (generated code: YSdi12Sensor implementation)
 
+    /**
+     * Returns the sensor address.
+     *
+     * @return the sensor address.
+     */
     public String get_sensorAddress()
     {
         return _addr;
     }
 
+    /**
+     * Returns the compatible SDI-12 version of the sensor.
+     *
+     * @return the compatible SDI-12 version of the sensor.
+     */
     public String get_sensorProtocol()
     {
         return _proto;
     }
 
+    /**
+     * Returns the sensor vendor identification.
+     *
+     * @return the sensor vendor identification.
+     */
     public String get_sensorVendor()
     {
         return _mfg;
     }
 
+    /**
+     * Returns the sensor model number.
+     *
+     * @return the sensor model number.
+     */
     public String get_sensorModel()
     {
         return _model;
     }
 
+    /**
+     * Returns the sensor version.
+     *
+     * @return the sensor version.
+     */
     public String get_sensorVersion()
     {
         return _ver;
     }
 
+    /**
+     * Returns the sensor serial number.
+     *
+     * @return the sensor serial number.
+     */
     public String get_sensorSerial()
     {
         return _sn;
     }
 
+    /**
+     * Returns the number of sensor measurements.
+     *
+     * @return the number of sensor measurements.
+     */
     public int get_measureCount()
     {
         return _valuesDesc.size();
     }
 
+    /**
+     * Returns the sensor measurement command.
+     *
+     * @param measureIndex : measurement index
+     *
+     * @return the sensor measurement command.
+     */
     public String get_measureCommand(int measureIndex)
     {
         return _valuesDesc.get(measureIndex).get(0);
     }
 
+    /**
+     * Returns sensor measurement position.
+     *
+     * @param measureIndex : measurement index
+     *
+     * @return the sensor measurement command.
+     */
     public int get_measurePosition(int measureIndex)
     {
         return YAPIContext._atoi(_valuesDesc.get(measureIndex).get(2));
     }
 
+    /**
+     * Returns the measured value symbol.
+     *
+     * @param measureIndex : measurement index
+     *
+     * @return the sensor measurement command.
+     */
     public String get_measureSymbol(int measureIndex)
     {
         return _valuesDesc.get(measureIndex).get(3);
     }
 
+    /**
+     * Returns the unit of the measured value.
+     *
+     * @param measureIndex : measurement index
+     *
+     * @return the sensor measurement command.
+     */
     public String get_measureUnit(int measureIndex)
     {
         return _valuesDesc.get(measureIndex).get(4);
     }
 
+    /**
+     * Returns the description of the measured value.
+     *
+     * @param measureIndex : measurement index
+     *
+     * @return the sensor measurement command.
+     */
     public String get_measureDescription(int measureIndex)
     {
         return _valuesDesc.get(measureIndex).get(5);
@@ -177,8 +247,10 @@ public class YSdi12Sensor
         int i;
         int j;
         ArrayList<String> listVal = new ArrayList<>();
+        int size;
 
         k = 0;
+        size = 4;
         while (k < 10) {
             infoNbVal = _sdi12Port.querySdi12(_addr, String.format(Locale.US, "IM%d",k), 5000);
             if ((infoNbVal).length() > 1) {
@@ -196,6 +268,9 @@ public class YSdi12Sensor
                         listVal.add(String.format(Locale.US, "M%d",k));
                         listVal.add(Integer.toString(i+1));
                         j = 0;
+                        while (data.size() < size) {
+                            data.add("");
+                        }
                         while (j < data.size()) {
                             listVal.add(data.get(j));
                             j = j + 1;

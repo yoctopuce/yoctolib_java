@@ -105,7 +105,7 @@ public class YRfidReader extends YFunction
      */
     public interface YEventCallback
     {
-        void eventCallback(YRfidReader obj, int timestampr, String evtType, String eventData);
+        void eventCallback(YRfidReader obj, double timestampr, String evtType, String eventData);
     }
 
     private UpdateCallback yInternalEventCallback = new UpdateCallback()
@@ -464,7 +464,7 @@ public class YRfidReader extends YFunction
      * @param status : an RfidStatus object that will contain
      *         the detailled status of the operation
      *
-     * @return YAPI.SUCCESS if the call succeeds.
+     * @return a YRfidTagInfo object.
      *
      * @throws YAPI_Exception on error
      * When it happens, you can get more information from the status object.
@@ -938,7 +938,7 @@ public class YRfidReader extends YFunction
     {
         byte[] content = new byte[0];
 
-        content = _download("events.txt");
+        content = _download("events.txt?pos=0");
         return new String(content);
     }
 
@@ -973,15 +973,11 @@ public class YRfidReader extends YFunction
     {
         int cbPos;
         int cbDPos;
-        int cbNtags;
-        int searchTags;
         String url;
         byte[] content = new byte[0];
         String contentStr;
-        ArrayList<String> currentTags = new ArrayList<>();
         ArrayList<String> eventArr = new ArrayList<>();
         int arrLen;
-        ArrayList<Integer> lastEvents = new ArrayList<>();
         String lenStr;
         int arrPos;
         String eventStr;
@@ -989,13 +985,14 @@ public class YRfidReader extends YFunction
         String hexStamp;
         int typePos;
         int dataPos;
-        int evtStamp;
+        int intStamp;
+        byte[] binMStamp = new byte[0];
+        int msStamp;
+        double evtStamp;
         String evtType;
         String evtData;
-        int tagIdx;
         // detect possible power cycle of the reader to clear event pointer
         cbPos = YAPIContext._atoi(cbVal);
-        cbNtags = ((cbPos) % (1000));
         cbPos = ((cbPos) / (1000));
         cbDPos = ((cbPos - _prevCbPos) & (0x7ffff));
         _prevCbPos = cbPos;
@@ -1005,100 +1002,65 @@ public class YRfidReader extends YFunction
         if (!(_eventCallback != null)) {
             return YAPI.SUCCESS;
         }
-        // load all events since previous call
-        url = String.format(Locale.US, "events.txt?pos=%d",_eventPos);
-
-        content = _download(url);
-        contentStr = new String(content);
-        eventArr = new ArrayList<>(Arrays.asList(contentStr.split("\n")));
-        arrLen = eventArr.size();
-        //noinspection DoubleNegation
-        if (!(arrLen > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "fail to download events");}
-        // last element of array is the new position preceeded by '@'
-        arrLen = arrLen - 1;
-        lenStr = eventArr.get(arrLen);
-        lenStr = (lenStr).substring( 1,  1 + (lenStr).length()-1);
-        // update processed event position pointer
-        _eventPos = YAPIContext._atoi(lenStr);
         if (_isFirstCb) {
             // first emulated value callback caused by registerValueCallback:
-            // attempt to retrieve arrivals of all tags present to emulate arrival
+            // retrieve arrivals of all tags currently present to emulate arrival
             _isFirstCb = false;
             _eventStamp = 0;
-            if (cbNtags == 0) {
-                return YAPI.SUCCESS;
-            }
-            currentTags = get_tagIdList();
-            cbNtags = currentTags.size();
-            searchTags = cbNtags;
-            lastEvents.clear();
-            arrPos = arrLen - 1;
-            while ((arrPos >= 0) && (searchTags > 0)) {
-                eventStr = eventArr.get(arrPos);
-                typePos = (eventStr).indexOf(":")+1;
-                if (typePos > 8) {
-                    dataPos = (eventStr).indexOf("=")+1;
-                    evtType = (eventStr).substring( typePos,  typePos + 1);
-                    if ((dataPos > 10) && evtType.equals("+")) {
-                        evtData = (eventStr).substring( dataPos,  dataPos + (eventStr).length()-dataPos);
-                        tagIdx = searchTags - 1;
-                        while (tagIdx >= 0) {
-                            if (evtData.equals(currentTags.get(tagIdx))) {
-                                lastEvents.add(0+arrPos);
-                                currentTags.set(tagIdx, "");
-                                while ((searchTags > 0) && currentTags.get(searchTags-1).equals("")) {
-                                    searchTags = searchTags - 1;
-                                }
-                                tagIdx = -1;
-                            }
-                            tagIdx = tagIdx - 1;
-                        }
-                    }
-                }
-                arrPos = arrPos - 1;
-            }
-            // If we have any remaining tags without a known arrival event,
-            // create a pseudo callback with timestamp zero
-            tagIdx = 0;
-            while (tagIdx < searchTags) {
-                evtData = currentTags.get(tagIdx);
-                if (!(evtData.equals(""))) {
-                    _eventCallback.eventCallback(this, 0, "+", evtData);
-                }
-                tagIdx = tagIdx + 1;
-            }
+            content = _download("events.txt");
+            contentStr = new String(content);
+            eventArr = new ArrayList<>(Arrays.asList(contentStr.split("\n")));
+            arrLen = eventArr.size();
+            //noinspection DoubleNegation
+            if (!(arrLen > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "fail to download events");}
+            // first element of array is the new position preceeded by '@'
+            arrPos = 1;
+            lenStr = eventArr.get(0);
+            lenStr = (lenStr).substring( 1,  1 + (lenStr).length()-1);
+            // update processed event position pointer
+            _eventPos = YAPIContext._atoi(lenStr);
         } else {
-            // regular callback
-            lastEvents.clear();
-            arrPos = arrLen - 1;
-            while (arrPos >= 0) {
-                lastEvents.add(0+arrPos);
-                arrPos = arrPos - 1;
-            }
+            // load all events since previous call
+            url = String.format(Locale.US, "events.txt?pos=%d",_eventPos);
+            content = _download(url);
+            contentStr = new String(content);
+            eventArr = new ArrayList<>(Arrays.asList(contentStr.split("\n")));
+            arrLen = eventArr.size();
+            //noinspection DoubleNegation
+            if (!(arrLen > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "fail to download events");}
+            // last element of array is the new position preceeded by '@'
+            arrPos = 0;
+            arrLen = arrLen - 1;
+            lenStr = eventArr.get(arrLen);
+            lenStr = (lenStr).substring( 1,  1 + (lenStr).length()-1);
+            // update processed event position pointer
+            _eventPos = YAPIContext._atoi(lenStr);
         }
-        // now generate callbacks for each selected event
-        arrLen = lastEvents.size();
-        arrPos = arrLen - 1;
-        while (arrPos >= 0) {
-            tagIdx = lastEvents.get(arrPos).intValue();
-            eventStr = eventArr.get(tagIdx);
+        // now generate callbacks for each real event
+        while (arrPos < arrLen) {
+            eventStr = eventArr.get(arrPos);
             eventLen = (eventStr).length();
-            if (eventLen >= 1) {
+            typePos = (eventStr).indexOf(":")+1;
+            if ((eventLen >= 14) && (typePos > 10)) {
                 hexStamp = (eventStr).substring(0, 8);
-                evtStamp = Integer.valueOf(hexStamp,16);
-                typePos = (eventStr).indexOf(":")+1;
-                if ((evtStamp >= _eventStamp) && (typePos > 8)) {
-                    _eventStamp = evtStamp;
+                intStamp = Integer.valueOf(hexStamp,16);
+                if (intStamp >= _eventStamp) {
+                    _eventStamp = intStamp;
+                    binMStamp = ((eventStr).substring( 8,  8 + 2)).getBytes();
+                    msStamp = ((binMStamp[0] & 0xff)-64) * 32 + (binMStamp[1] & 0xff);
+                    evtStamp = intStamp + (0.001 * msStamp);
                     dataPos = (eventStr).indexOf("=")+1;
                     evtType = (eventStr).substring( typePos,  typePos + 1);
                     evtData = "";
                     if (dataPos > 10) {
                         evtData = (eventStr).substring( dataPos,  dataPos + eventLen-dataPos);
                     }
-                    _eventCallback.eventCallback(this, evtStamp, evtType, evtData);
+                    if (_eventCallback != null) {
+                        _eventCallback.eventCallback(this, evtStamp, evtType, evtData);
+                    }
                 }
             }
-            arrPos = arrPos - 1;
+            arrPos = arrPos + 1;
         }
         return YAPI.SUCCESS;
     }

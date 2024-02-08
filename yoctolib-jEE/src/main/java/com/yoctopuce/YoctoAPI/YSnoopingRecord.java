@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSnoopingRecord.java 41171 2020-07-02 17:49:00Z mvuilleu $
+ * $Id: YSnoopingRecord.java 58923 2024-01-12 10:12:54Z seb $
  *
  * Implements FindSnoopingRecord(), the high-level API for SnoopingRecord functions
  *
@@ -53,6 +53,7 @@ public class YSnoopingRecord
 //--- (end of generated code: YSnoopingRecord class start)
 //--- (generated code: YSnoopingRecord definitions)
     protected int _tim = 0;
+    protected int _pos = 0;
     protected int _dir = 0;
     protected String _msg;
 
@@ -65,10 +66,17 @@ public class YSnoopingRecord
             json.parse();
             //--- (generated code: YSnoopingRecord attributes initialization)
         //--- (end of generated code: YSnoopingRecord attributes initialization)
-            _tim = json.getInt("t");
-            final String m = json.getString("m");
-            _dir = (m.charAt(0) == '<' ? 1 : 0);
-            _msg = m.substring(1);
+            if (json.has("t")) {
+                _tim = json.getInt("t");
+            }
+            if (json.has("p")) {
+                _pos = json.getInt("p");
+            }
+            if (json.has("m")) {
+                final String m = json.getString("m");
+                _dir = (m.charAt(0) == '<' ? 1 : 0);
+                _msg = m.substring(1);
+            }
         } catch (Exception e) {
             throw new YAPI_Exception(YAPI.IO_ERROR, "invalid json struct for YSnoopingRecord");
         }
@@ -85,6 +93,16 @@ public class YSnoopingRecord
     public int get_time()
     {
         return _tim;
+    }
+
+    /**
+     * Returns the absolute position of the message end.
+     *
+     * @return the absolute position of the message end.
+     */
+    public int get_pos()
+    {
+        return _pos;
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmOutput.java 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: YPwmOutput.java 58892 2024-01-11 11:11:28Z mvuilleu $
  *
  *  Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -84,6 +84,12 @@ public class YPwmOutput extends YFunction
      */
     public static final String PWMTRANSITION_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid invertedOutput value
+     */
+    public static final int INVERTEDOUTPUT_FALSE = 0;
+    public static final int INVERTEDOUTPUT_TRUE = 1;
+    public static final int INVERTEDOUTPUT_INVALID = -1;
+    /**
      * invalid enabledAtPowerOn value
      */
     public static final int ENABLEDATPOWERON_FALSE = 0;
@@ -99,6 +105,7 @@ public class YPwmOutput extends YFunction
     protected double _dutyCycle = DUTYCYCLE_INVALID;
     protected double _pulseDuration = PULSEDURATION_INVALID;
     protected String _pwmTransition = PWMTRANSITION_INVALID;
+    protected int _invertedOutput = INVERTEDOUTPUT_INVALID;
     protected int _enabledAtPowerOn = ENABLEDATPOWERON_INVALID;
     protected double _dutyCycleAtPowerOn = DUTYCYCLEATPOWERON_INVALID;
     protected UpdateCallback _valueCallbackPwmOutput = null;
@@ -174,6 +181,9 @@ public class YPwmOutput extends YFunction
         }
         if (json_val.has("pwmTransition")) {
             _pwmTransition = json_val.getString("pwmTransition");
+        }
+        if (json_val.has("invertedOutput")) {
+            _invertedOutput = json_val.getInt("invertedOutput") > 0 ? 1 : 0;
         }
         if (json_val.has("enabledAtPowerOn")) {
             _enabledAtPowerOn = json_val.getInt("enabledAtPowerOn") > 0 ? 1 : 0;
@@ -562,6 +572,80 @@ public class YPwmOutput extends YFunction
         return YAPI.SUCCESS;
     }
 
+
+    /**
+     * Returns true if the output signal is configured as inverted, and false otherwise.
+     *
+     *  @return either YPwmOutput.INVERTEDOUTPUT_FALSE or YPwmOutput.INVERTEDOUTPUT_TRUE, according to true
+     * if the output signal is configured as inverted, and false otherwise
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_invertedOutput() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return INVERTEDOUTPUT_INVALID;
+                }
+            }
+            res = _invertedOutput;
+        }
+        return res;
+    }
+
+    /**
+     * Returns true if the output signal is configured as inverted, and false otherwise.
+     *
+     *  @return either YPwmOutput.INVERTEDOUTPUT_FALSE or YPwmOutput.INVERTEDOUTPUT_TRUE, according to true
+     * if the output signal is configured as inverted, and false otherwise
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getInvertedOutput() throws YAPI_Exception
+    {
+        return get_invertedOutput();
+    }
+
+    /**
+     * Changes the inversion mode of the output signal.
+     * Remember to call the matching module saveToFlash() method if you want
+     * the change to be kept after power cycle.
+     *
+     *  @param newval : either YPwmOutput.INVERTEDOUTPUT_FALSE or YPwmOutput.INVERTEDOUTPUT_TRUE, according
+     * to the inversion mode of the output signal
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_invertedOutput(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("invertedOutput",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the inversion mode of the output signal.
+     * Remember to call the matching module saveToFlash() method if you want
+     * the change to be kept after power cycle.
+     *
+     *  @param newval : either YPwmOutput.INVERTEDOUTPUT_FALSE or YPwmOutput.INVERTEDOUTPUT_TRUE, according
+     * to the inversion mode of the output signal
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setInvertedOutput(int newval)  throws YAPI_Exception
+    {
+        return set_invertedOutput(newval);
+    }
 
     /**
      * Returns the state of the PWM at device power on.

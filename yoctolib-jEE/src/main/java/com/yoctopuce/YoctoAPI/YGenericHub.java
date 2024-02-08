@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 55025 2023-06-12 11:49:16Z seb $
+ * $Id: YGenericHub.java 58955 2024-01-16 08:39:12Z seb $
  *
  * Internal YGenericHub object
  *
@@ -553,7 +553,6 @@ abstract class YGenericHub
                 _proto = "wss";
                 defaultPort = YAPI.YOCTO_DEFAULT_HTTPS_PORT;
             } else if (url.equals("usb")) {
-                pos = 6;
                 _proto = "usb";
                 _user = "";
                 _pass = "";
@@ -562,7 +561,6 @@ abstract class YGenericHub
                 _port = -1;
                 return;
             } else {
-
                 if (url.startsWith("ws://")) {
                     pos = 5;
                 }
@@ -603,7 +601,7 @@ abstract class YGenericHub
             } else {
                 _host = url.substring(pos, end_host);
                 if (_subDomain.length() > 0) {
-                    // overide default port if there is a subdomain (VHub4web)
+                    // override default port if there is a subdomain (VHub4web)
                     if (_proto.equals("http")) {
                         defaultPort = 80;
                     } else if (_proto.equals("https")) {

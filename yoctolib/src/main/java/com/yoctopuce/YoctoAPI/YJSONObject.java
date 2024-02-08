@@ -173,8 +173,19 @@ class YJSONObject extends YJSONContent
 
     String getString(String key)
     {
-        YJSONString ystr = (YJSONString) _parsed.get(key);
-        return ystr.getString();
+        if(_parsed.get(key).getJSONType() == YJSONType.STRING)
+        {
+            YJSONString ystr = (YJSONString)_parsed.get(key);
+            return ystr.getString();
+        }
+        else if (_parsed.get(key).getJSONType() == YJSONType.NUMBER) {
+            YJSONNumber yint = (YJSONNumber)_parsed.get(key);
+            return String.valueOf(yint.getInt());
+        }
+        else
+        {
+            return "<JSON_getString_error>";
+        }
     }
 
     int getInt(String key)

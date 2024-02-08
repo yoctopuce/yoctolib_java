@@ -1,8 +1,8 @@
 /*
  *
- *  $Id: Demo.java 55641 2023-07-26 09:43:42Z seb $
+ *  $Id: Demo.java 58172 2023-11-30 17:10:23Z martinm $
  *
- *  An example that show how to use a  Yocto-Pressure
+ *  An example that shows how to use a  Yocto-Pressure
  *
  *  You can find more information on our web site:
  *   Yocto-Pressure documentation:

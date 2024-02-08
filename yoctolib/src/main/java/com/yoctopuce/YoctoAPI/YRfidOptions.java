@@ -137,7 +137,7 @@ public class YRfidOptions
     //--- (end of generated code: YRfidOptions definitions)
 
 
-    protected YRfidOptions()
+    public YRfidOptions()
     {
         //--- (generated code: YRfidOptions attributes initialization)
         //--- (end of generated code: YRfidOptions attributes initialization)
