@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 59221 2024-02-05 15:46:32Z seb $
+ * $Id: YSensor.java 59504 2024-02-26 11:42:03Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -943,11 +943,10 @@ public class YSensor extends YFunction
     }
 
     /**
-     * Returns the sensor health state code, which is zero when there is an up-to-date measure
+     * Returns the sensor state code, which is zero when there is an up-to-date measure
      * available or a positive code if the sensor is not able to provide a measure right now.
      *
-     *  @return an integer corresponding to the sensor health state code, which is zero when there is an
-     * up-to-date measure
+     * @return an integer corresponding to the sensor state code, which is zero when there is an up-to-date measure
      *         available or a positive code if the sensor is not able to provide a measure right now
      *
      * @throws YAPI_Exception on error
@@ -967,11 +966,10 @@ public class YSensor extends YFunction
     }
 
     /**
-     * Returns the sensor health state code, which is zero when there is an up-to-date measure
+     * Returns the sensor state code, which is zero when there is an up-to-date measure
      * available or a positive code if the sensor is not able to provide a measure right now.
      *
-     *  @return an integer corresponding to the sensor health state code, which is zero when there is an
-     * up-to-date measure
+     * @return an integer corresponding to the sensor state code, which is zero when there is an up-to-date measure
      *         available or a positive code if the sensor is not able to provide a measure right now
      *
      * @throws YAPI_Exception on error

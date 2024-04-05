@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 53886 2023-04-05 08:06:39Z mvuilleu $
+ * $Id: YDataLogger.java 59504 2024-02-26 11:42:03Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -50,7 +50,7 @@ import java.util.Locale;
  * sensors. Recording can happen automatically, without requiring a permanent
  * connection to a computer.
  * The YDataLogger class controls the global parameters of the internal data
- * logger. Recording control (start/stop) as well as data retreival is done at
+ * logger. Recording control (start/stop) as well as data retrieval is done at
  * sensor objects level.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})

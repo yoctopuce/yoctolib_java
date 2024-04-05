@@ -1,12 +1,10 @@
 /*
  *
- *  $Id: Demo.java 55641 2023-07-26 09:43:42Z seb $
+ *  $Id: svn_id $
  *
- *  An example that shows how to use a  Yocto-Rfid
+ *  Doc-GettingStarted-Yocto-RFID example
  *
  *  You can find more information on our web site:
- *  Yocto-RFID-15693 documentation:
- *      https://www.yoctopuce.com/EN/products/yocto-rfid-15693/doc.html
  *   JAVA API Reference:
  *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
  *
@@ -58,7 +56,7 @@ public class Demo {
             } while (tagList.size() <=0);
                      
             String tagId      = tagList.get(0);
-            YRfidStatus opStatus   = (YRfidStatus)new  YRfidStatus();
+            YRfidStatus opStatus   =  new  YRfidStatus();
             YRfidOptions options    = new YRfidOptions();
             YRfidTagInfo  taginfo   = reader.get_tagInfo(tagId,opStatus);
             Integer blocksize  = taginfo.get_tagBlockSize();

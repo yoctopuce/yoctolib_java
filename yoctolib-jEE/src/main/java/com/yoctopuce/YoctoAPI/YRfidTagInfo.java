@@ -148,7 +148,11 @@ public class YRfidTagInfo
     }
 
     /**
-     * Returns the index of the first usable storage block on the RFID tag.
+     * Returns the index of the block available for data storage on the RFID tag.
+     * Some tags have special block used to configure the tag behavior, these
+     * blocks must be handled with precaution. However, the  block return by
+     * get_tagFirstBlock() can be locked, use get_tagLockState()
+     * to find out  which block are locked.
      *
      * @return the index of the first usable storage block on the RFID tag
      */
@@ -158,7 +162,9 @@ public class YRfidTagInfo
     }
 
     /**
-     * Returns the index of the last usable storage block on the RFID tag.
+     * Returns the index of the last last black available for data storage on the RFID tag,
+     * However, this block can be locked, use get_tagLockState() to find out
+     * which block are locked.
      *
      * @return the index of the last usable storage block on the RFID tag
      */

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: Demo.java 58172 2023-11-30 17:10:23Z martinm $
+ *  $Id: Demo.java 59992 2024-03-18 17:26:43Z seb $
  *
  *  An example that shows how to use a  Yocto-SDI12
  *
@@ -38,7 +38,7 @@ public class Demo
         }
         try {
             sdi12Port.reset();
-            YSdi12Sensor singleSensor = sdi12Port.discoverSingleSensor();
+            YSdi12SensorInfo singleSensor = sdi12Port.discoverSingleSensor();
             System.out.println(String.format("%-35s %s " ,"Sensor address :", singleSensor.get_sensorAddress()));
             System.out.println(String.format("%-35s %s " ,"Sensor SDI-12 compatibility : " , singleSensor.get_sensorProtocol()));
             System.out.println(String.format("%-35s %s " ,"Sensor company name : " , singleSensor.get_sensorVendor()));

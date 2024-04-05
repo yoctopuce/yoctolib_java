@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 57636 2023-11-03 10:35:21Z seb $
+ * $Id: YModule.java 59953 2024-03-18 09:15:08Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -1209,8 +1209,10 @@ public class YModule extends YFunction
      * Registers a device log callback function. This callback will be called each time
      * that a module sends a new log message. Mostly useful to debug a Yoctopuce module.
      *
-     * @param callback : the callback function to call, or a null pointer. The callback function should take two
-     *         arguments: the module object that emitted the log message, and the character string containing the log.
+     * @param callback : the callback function to call, or a null pointer.
+     *         The callback function should take two
+     *         arguments: the module object that emitted the log message,
+     *         and the character string containing the log.
      * @throws YAPI_Exception on error
      */
     public int registerLogCallback(YModule.LogCallback callback) throws YAPI_Exception

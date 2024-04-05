@@ -46,11 +46,13 @@ import java.util.Locale;
 //--- (end of generated code: YRfidOptions yapiwrapper)
 //--- (generated code: YRfidOptions class start)
 /**
- * YRfidOptions Class: Extra parameters for performing RFID tag operations
+ * YRfidOptions Class: Additional parameters for operations on RFID tags.
  *
- * YRfidOptions objects are used to provide optional
- * parameters to RFID commands that interact with tags, and in
- * particular to provide security keys when required.
+ * The YRfidOptions objects are used to specify additional
+ * optional parameters to RFID commands that interact with tags,
+ * including security keys. When instantiated,the parameters of
+ * this object are pre-initialized to a value  which corresponds
+ * to the most common usage.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YRfidOptions
@@ -119,7 +121,7 @@ public class YRfidOptions
      * Disables the tag memory overflow test. By default, the Yoctopuce
      * library's read/write functions detect overruns and do not run
      * commands that are likely to fail. If you nevertheless wish to
-     * access more memory than the tag announces, you can try to use
+     * try to access more memory than the tag announces, you can try to use
      * this option.
      */
     protected boolean DisableBoundaryChecks;

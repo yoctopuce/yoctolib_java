@@ -50,8 +50,21 @@ import java.util.Arrays;
 /**
  * YRfidReader Class: RfidReader function interface
  *
- * The RfidReader class provides access detect,
- * read and write RFID tags.
+ * The YRfidReader class allows you to detect RFID tags, as well as
+ * read and write on these tags if the security settings allow it.
+ *
+ * Short reminder:
+ * <ul>
+ * <li>A tag's memory is generally organized in fixed-size blocks.</li>
+ * <li>At tag level, each block must be read and written in its entirety.</li>
+ * <li>Some blocks are special configuration blocks, and may alter the tag's behaviour
+ * tag behavior if they are rewritten with arbitrary data.</li>
+ * <li>Data blocks can be set to read-only mode, but on many tags, this operation is irreversible.</li>
+ * </ul>
+ *
+ * By default, the RfidReader class automatically manages these blocks so that
+ * arbitrary size data  can be manipulated of  without risk and without knowledge of
+ * tag architecture .
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YRfidReader extends YFunction
@@ -229,7 +242,8 @@ public class YRfidReader extends YFunction
      * Changes the present tag list refresh rate, measured in Hz. The reader will do
      * its best to respect it. Note that the reader cannot detect tag arrival or removal
      * while it is  communicating with a tag.  Maximum frequency is limited to 100Hz,
-     * but in real life it will be difficult to do better than 50Hz.
+     * but in real life it will be difficult to do better than 50Hz.  A zero value
+     * will power off the device radio.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
@@ -253,7 +267,8 @@ public class YRfidReader extends YFunction
      * Changes the present tag list refresh rate, measured in Hz. The reader will do
      * its best to respect it. Note that the reader cannot detect tag arrival or removal
      * while it is  communicating with a tag.  Maximum frequency is limited to 100Hz,
-     * but in real life it will be difficult to do better than 50Hz.
+     * but in real life it will be difficult to do better than 50Hz.  A zero value
+     * will power off the device radio.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
@@ -435,7 +450,7 @@ public class YRfidReader extends YFunction
     /**
      * Returns the list of RFID tags currently detected by the reader.
      *
-     * @return a list of strings, corresponding to each tag identifier.
+     * @return a list of strings, corresponding to each tag identifier (UID).
      *
      * @throws YAPI_Exception on error
      */
@@ -630,7 +645,8 @@ public class YRfidReader extends YFunction
      * number of bytes is larger than the RFID tag block size. By default
      * firstBlock cannot be a special block, and any special block encountered
      * in the middle of the read operation will be skipped automatically.
-     * If you rather want to read special blocks, use EnableRawAccess option.
+     * If you rather want to read special blocks, use the EnableRawAccess
+     * field from the options parameter.
      *
      * @param tagId : identifier of the tag to use
      * @param firstBlock : block number where read should start
@@ -671,7 +687,8 @@ public class YRfidReader extends YFunction
      * is larger than the RFID tag block size.  By default
      * firstBlock cannot be a special block, and any special block encountered
      * in the middle of the read operation will be skipped automatically.
-     * If you rather want to read special blocks, use EnableRawAccess option.
+     * If you rather want to read special blocks, use the EnableRawAccess
+     * field frrm the options parameter.
      *
      * @param tagId : identifier of the tag to use
      * @param firstBlock : block number where read should start
@@ -698,7 +715,8 @@ public class YRfidReader extends YFunction
      * is larger than the RFID tag block size.  By default
      * firstBlock cannot be a special block, and any special block encountered
      * in the middle of the read operation will be skipped automatically.
-     * If you rather want to read special blocks, use EnableRawAccess option.
+     * If you rather want to read special blocks, use the EnableRawAccess
+     * field from the options parameter.
      *
      * @param tagId : identifier of the tag to use
      * @param firstBlock : block number where read should start
@@ -736,7 +754,8 @@ public class YRfidReader extends YFunction
      * is larger than the RFID tag block size.  By default
      * firstBlock cannot be a special block, and any special block encountered
      * in the middle of the read operation will be skipped automatically.
-     * If you rather want to read special blocks, use EnableRawAccess option.
+     * If you rather want to read special blocks, use the EnableRawAccess
+     * field from the options parameter.
      *
      * @param tagId : identifier of the tag to use
      * @param firstBlock : block number where read should start
@@ -763,8 +782,10 @@ public class YRfidReader extends YFunction
      * number of bytes to write is larger than the RFID tag block size.
      * By default firstBlock cannot be a special block, and any special block
      * encountered in the middle of the write operation will be skipped
-     * automatically. If you rather want to rewrite special blocks as well,
-     * use EnableRawAccess option.
+     * automatically. The last data block affected by the operation will
+     * be automatically padded with zeros if neccessary.  If you rather want
+     * to rewrite special blocks as well,
+     * use the EnableRawAccess field from the options parameter.
      *
      * @param tagId : identifier of the tag to use
      * @param firstBlock : block number where write should start
@@ -807,8 +828,10 @@ public class YRfidReader extends YFunction
      * number of bytes to write is larger than the RFID tag block size.
      * By default firstBlock cannot be a special block, and any special block
      * encountered in the middle of the write operation will be skipped
-     * automatically. If you rather want to rewrite special blocks as well,
-     * use EnableRawAccess option.
+     * automatically. The last data block affected by the operation will
+     * be automatically padded with zeros if neccessary.
+     * If you rather want to rewrite special blocks as well,
+     * use the EnableRawAccess field from the options parameter.
      *
      * @param tagId : identifier of the tag to use
      * @param firstBlock : block number where write should start
@@ -848,8 +871,10 @@ public class YRfidReader extends YFunction
      * number of bytes to write is larger than the RFID tag block size.
      * By default firstBlock cannot be a special block, and any special block
      * encountered in the middle of the write operation will be skipped
-     * automatically. If you rather want to rewrite special blocks as well,
-     * use EnableRawAccess option.
+     * automatically. The last data block affected by the operation will
+     * be automatically padded with zeros if neccessary.
+     * If you rather want to rewrite special blocks as well,
+     * use the EnableRawAccess field from the options parameter.
      *
      * @param tagId : identifier of the tag to use
      * @param firstBlock : block number where write should start
@@ -899,10 +924,16 @@ public class YRfidReader extends YFunction
      * Writes data provided as an ASCII string to an RFID tag memory.
      * The write operation may span accross multiple blocks if the
      * number of bytes to write is larger than the RFID tag block size.
+     * Note that only the characters présent  in  the provided string
+     * will be written, there is no notion of string length. If your
+     * string data have variable length, you'll have to encode the
+     * string length yourself.
      * By default firstBlock cannot be a special block, and any special block
      * encountered in the middle of the write operation will be skipped
-     * automatically. If you rather want to rewrite special blocks as well,
-     * use EnableRawAccess option.
+     * automatically. The last data block affected by the operation will
+     * be automatically padded with zeros if neccessary.
+     * If you rather want to rewrite special blocks as well,
+     * use the EnableRawAccess field from the options parameter.
      *
      * @param tagId : identifier of the tag to use
      * @param firstBlock : block number where write should start
@@ -924,6 +955,186 @@ public class YRfidReader extends YFunction
         buff = (text).getBytes();
 
         return tagWriteBin(tagId, firstBlock, buff, options, status);
+    }
+
+    /**
+     * Reads an RFID tag AFI byte (ISO 15693 only).
+     *
+     * @param tagId : identifier of the tag to use
+     * @param options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return the AFI value (0...255)
+     *
+     * @throws YAPI_Exception on error
+     * happens, you can get more information from the status object.
+     */
+    public int tagGetAFI(String tagId,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
+    {
+        String optstr;
+        String url;
+        byte[] json = new byte[0];
+        int res;
+        optstr = options.imm_getParams();
+        url = String.format(Locale.US, "rfid.json?a=rdsf&t=%s&b=0%s",tagId,optstr);
+
+        json = _download(url);
+        _chkerror(tagId, json, status);
+        if (status.get_yapiError() == YAPI.SUCCESS) {
+            res = YAPIContext._atoi(_json_get_key(json, "res"));
+        } else {
+            res = status.get_yapiError();
+        }
+        return res;
+    }
+
+    /**
+     * Change an RFID tag AFI byte (ISO 15693 only).
+     *
+     * @param tagId : identifier of the tag to use
+     * @param afi : the AFI value to write (0...255)
+     * @param options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     * happens, you can get more information from the status object.
+     */
+    public int tagSetAFI(String tagId,int afi,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
+    {
+        String optstr;
+        String url;
+        byte[] json = new byte[0];
+        optstr = options.imm_getParams();
+        url = String.format(Locale.US, "rfid.json?a=wrsf&t=%s&b=0&v=%d%s",tagId,afi,optstr);
+
+        json = _download(url);
+        return _chkerror(tagId, json, status);
+    }
+
+    /**
+     * Locks the RFID tag AFI byte (ISO 15693 only).
+     * This operation is definitive and irreversible.
+     *
+     * @param tagId : identifier of the tag to use
+     * @param options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     * happens, you can get more information from the status object.
+     */
+    public int tagLockAFI(String tagId,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
+    {
+        String optstr;
+        String url;
+        byte[] json = new byte[0];
+        optstr = options.imm_getParams();
+        url = String.format(Locale.US, "rfid.json?a=lksf&t=%s&b=0%s",tagId,optstr);
+
+        json = _download(url);
+        return _chkerror(tagId, json, status);
+    }
+
+    /**
+     * Reads an RFID tag DSFID byte (ISO 15693 only).
+     *
+     * @param tagId : identifier of the tag to use
+     * @param options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return the DSFID value (0...255)
+     *
+     * @throws YAPI_Exception on error
+     * happens, you can get more information from the status object.
+     */
+    public int tagGetDSFID(String tagId,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
+    {
+        String optstr;
+        String url;
+        byte[] json = new byte[0];
+        int res;
+        optstr = options.imm_getParams();
+        url = String.format(Locale.US, "rfid.json?a=rdsf&t=%s&b=1%s",tagId,optstr);
+
+        json = _download(url);
+        _chkerror(tagId, json, status);
+        if (status.get_yapiError() == YAPI.SUCCESS) {
+            res = YAPIContext._atoi(_json_get_key(json, "res"));
+        } else {
+            res = status.get_yapiError();
+        }
+        return res;
+    }
+
+    /**
+     * Change an RFID tag DSFID byte (ISO 15693 only).
+     *
+     * @param tagId : identifier of the tag to use
+     * @param dsfid : the DSFID value to write (0...255)
+     * @param options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     * happens, you can get more information from the status object.
+     */
+    public int tagSetDSFID(String tagId,int dsfid,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
+    {
+        String optstr;
+        String url;
+        byte[] json = new byte[0];
+        optstr = options.imm_getParams();
+        url = String.format(Locale.US, "rfid.json?a=wrsf&t=%s&b=1&v=%d%s",tagId,dsfid,optstr);
+
+        json = _download(url);
+        return _chkerror(tagId, json, status);
+    }
+
+    /**
+     * Locks the RFID tag DSFID byte (ISO 15693 only).
+     * This operation is definitive and irreversible.
+     *
+     * @param tagId : identifier of the tag to use
+     * @param options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     * happens, you can get more information from the status object.
+     */
+    public int tagLockDSFID(String tagId,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
+    {
+        String optstr;
+        String url;
+        byte[] json = new byte[0];
+        optstr = options.imm_getParams();
+        url = String.format(Locale.US, "rfid.json?a=lksf&t=%s&b=1%s",tagId,optstr);
+
+        json = _download(url);
+        return _chkerror(tagId, json, status);
     }
 
     /**

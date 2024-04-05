@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSdi12Port.java 57636 2023-11-03 10:35:21Z seb $
+ *  $Id: YSdi12Port.java 59905 2024-03-15 08:27:48Z seb $
  *
  *  Implements FindSdi12Port(), the high-level API for Sdi12Port functions
  *
@@ -941,7 +941,7 @@ public class YSdi12Port extends YFunction
     }
 
     /**
-     * Retrieves a SDI12 port for a given identifier.
+     * Retrieves an SDI12 port for a given identifier.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -955,7 +955,7 @@ public class YSdi12Port extends YFunction
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YSdi12Port.isOnline() to test if the SDI12 port is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a SDI12 port by logical name, no error is notified: the first instance
+     * an SDI12 port by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
@@ -983,7 +983,7 @@ public class YSdi12Port extends YFunction
     }
 
     /**
-     * Retrieves a SDI12 port for a given identifier in a YAPI context.
+     * Retrieves an SDI12 port for a given identifier in a YAPI context.
      * The identifier can be specified using several formats:
      * <ul>
      * <li>FunctionLogicalName</li>
@@ -997,7 +997,7 @@ public class YSdi12Port extends YFunction
      * it is invoked. The returned object is nevertheless valid.
      * Use the method YSdi12Port.isOnline() to test if the SDI12 port is
      * indeed online at a given time. In case of ambiguity when looking for
-     * a SDI12 port by logical name, no error is notified: the first instance
+     * an SDI12 port by logical name, no error is notified: the first instance
      * found is returned. The search is performed first by hardware name,
      * then by logical name.
      *
@@ -1820,17 +1820,17 @@ public class YSdi12Port extends YFunction
      * This function is intended to be used when the serial port is configured for 'SDI-12' protocol.
      * This function work when only one sensor is connected.
      *
-     * @return the reply returned by the sensor, as a YSdi12Sensor object.
+     * @return the reply returned by the sensor, as a YSdi12SensorInfo object.
      *
      * @throws YAPI_Exception on error
      */
-    public YSdi12Sensor discoverSingleSensor() throws YAPI_Exception
+    public YSdi12SensorInfo discoverSingleSensor() throws YAPI_Exception
     {
         String resStr;
 
         resStr = querySdi12("?","",5000);
         if (resStr.equals("")) {
-            return new YSdi12Sensor(this, "ERSensor Not Found");
+            return new YSdi12SensorInfo(this, "ERSensor Not Found");
         }
 
         return getSensorInformation(resStr);
@@ -1840,13 +1840,13 @@ public class YSdi12Port extends YFunction
      * Sends a discovery command to the bus, and reads all sensors information reply.
      * This function is intended to be used when the serial port is configured for 'SDI-12' protocol.
      *
-     * @return all the information from every connected sensor, as an array of YSdi12Sensor object.
+     * @return all the information from every connected sensor, as an array of YSdi12SensorInfo object.
      *
      * @throws YAPI_Exception on error
      */
-    public ArrayList<YSdi12Sensor> discoverAllSensors() throws YAPI_Exception
+    public ArrayList<YSdi12SensorInfo> discoverAllSensors() throws YAPI_Exception
     {
-        ArrayList<YSdi12Sensor> sensors = new ArrayList<>();
+        ArrayList<YSdi12SensorInfo> sensors = new ArrayList<>();
         ArrayList<String> idSens = new ArrayList<>();
         String res;
         int i;
@@ -1939,13 +1939,13 @@ public class YSdi12Port extends YFunction
      * @param oldAddress : Actual sensor address, as a string
      * @param newAddress : New sensor address, as a string
      *
-     * @return the sensor address and information , as a YSdi12Sensor object.
+     * @return the sensor address and information , as a YSdi12SensorInfo object.
      *
      * @throws YAPI_Exception on error
      */
-    public YSdi12Sensor changeAddress(String oldAddress,String newAddress) throws YAPI_Exception
+    public YSdi12SensorInfo changeAddress(String oldAddress,String newAddress) throws YAPI_Exception
     {
-        YSdi12Sensor addr;
+        YSdi12SensorInfo addr;
 
         querySdi12(oldAddress, "A" + newAddress,1000);
         addr = getSensorInformation(newAddress);
@@ -1962,16 +1962,16 @@ public class YSdi12Port extends YFunction
      *
      * @throws YAPI_Exception on error
      */
-    public YSdi12Sensor getSensorInformation(String sensorAddr) throws YAPI_Exception
+    public YSdi12SensorInfo getSensorInformation(String sensorAddr) throws YAPI_Exception
     {
         String res;
-        YSdi12Sensor sensor;
+        YSdi12SensorInfo sensor;
 
         res = querySdi12(sensorAddr,"I",1000);
         if (res.equals("")) {
-            return new YSdi12Sensor(this, "ERSensor Not Found");
+            return new YSdi12SensorInfo(this, "ERSensor Not Found");
         }
-        sensor = new YSdi12Sensor(this, res);
+        sensor = new YSdi12SensorInfo(this, res);
         sensor._queryValueInfo();
         return sensor;
     }
@@ -2023,12 +2023,13 @@ public class YSdi12Port extends YFunction
      *
      * @param maxWait : the maximum number of milliseconds to wait for a message if none is found
      *         in the receive buffer.
+     * @param maxMsg : the maximum number of messages to be returned by the function; up to 254.
      *
      * @return an array of YSdi12SnoopingRecord objects containing the messages found, if any.
      *
      * @throws YAPI_Exception on error
      */
-    public ArrayList<YSdi12SnoopingRecord> snoopMessages(int maxWait) throws YAPI_Exception
+    public ArrayList<YSdi12SnoopingRecord> snoopMessagesEx(int maxWait,int maxMsg) throws YAPI_Exception
     {
         String url;
         byte[] msgbin = new byte[0];
@@ -2037,7 +2038,7 @@ public class YSdi12Port extends YFunction
         ArrayList<YSdi12SnoopingRecord> res = new ArrayList<>();
         int idx;
 
-        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&t=0", _rxptr,maxWait);
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&t=0&len=%d", _rxptr, maxWait,maxMsg);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
@@ -2056,13 +2057,31 @@ public class YSdi12Port extends YFunction
     }
 
     /**
+     * Retrieves messages (both direction) in the SDI12 port buffer, starting at current position.
+     *
+     * If no message is found, the search waits for one up to the specified maximum timeout
+     * (in milliseconds).
+     *
+     * @param maxWait : the maximum number of milliseconds to wait for a message if none is found
+     *         in the receive buffer.
+     *
+     * @return an array of YSdi12SnoopingRecord objects containing the messages found, if any.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public ArrayList<YSdi12SnoopingRecord> snoopMessages(int maxWait) throws YAPI_Exception
+    {
+        return snoopMessagesEx(maxWait, 255);
+    }
+
+    /**
      * Continues the enumeration of SDI12 ports started using yFirstSdi12Port().
      * Caution: You can't make any assumption about the returned SDI12 ports order.
-     * If you want to find a specific a SDI12 port, use Sdi12Port.findSdi12Port()
+     * If you want to find a specific an SDI12 port, use Sdi12Port.findSdi12Port()
      * and a hardwareID or a logical name.
      *
      * @return a pointer to a YSdi12Port object, corresponding to
-     *         a SDI12 port currently online, or a null pointer
+     *         an SDI12 port currently online, or a null pointer
      *         if there are no more SDI12 ports to enumerate.
      */
     public YSdi12Port nextSdi12Port()

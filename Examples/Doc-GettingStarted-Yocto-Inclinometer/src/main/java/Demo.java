@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: Demo.java 58172 2023-11-30 17:10:23Z martinm $
+ *  $Id: Demo.java 59992 2024-03-18 17:26:43Z seb $
  *
  *  An example that shows how to use a  Yocto-Inclinometer
  *

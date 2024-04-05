@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YInputCaptureData.java 56301 2023-08-28 12:16:04Z mvuilleu $
+ * $Id: YInputCaptureData.java 59594 2024-03-04 08:23:14Z mvuilleu $
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
@@ -205,14 +205,14 @@ public class YInputCaptureData
         mult3 = 1;
         if (recOfs < _recOfs) {
             // load optional value multiplier
-            mult1 = _decodeU16(sdata, _recOfs);
+            mult1 = _decodeU16(sdata, recOfs);
             recOfs = recOfs + 2;
             if (_var2size > 0) {
-                mult2 = _decodeU16(sdata, _recOfs);
+                mult2 = _decodeU16(sdata, recOfs);
                 recOfs = recOfs + 2;
             }
             if (_var3size > 0) {
-                mult3 = _decodeU16(sdata, _recOfs);
+                mult3 = _decodeU16(sdata, recOfs);
                 recOfs = recOfs + 2;
             }
         }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 52892 2023-01-25 10:13:30Z seb $
+ * $Id: YSerialPort.java 59641 2024-03-05 20:50:20Z mvuilleu $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -1863,13 +1863,14 @@ public class YSerialPort extends YFunction
      *
      * @param maxWait : the maximum number of milliseconds to wait for a message if none is found
      *         in the receive buffer.
+     * @param maxMsg : the maximum number of messages to be returned by the function; up to 254.
      *
      * @return an array of YSnoopingRecord objects containing the messages found, if any.
      *         Binary messages are converted to hexadecimal representation.
      *
      * @throws YAPI_Exception on error
      */
-    public ArrayList<YSnoopingRecord> snoopMessages(int maxWait) throws YAPI_Exception
+    public ArrayList<YSnoopingRecord> snoopMessagesEx(int maxWait,int maxMsg) throws YAPI_Exception
     {
         String url;
         byte[] msgbin = new byte[0];
@@ -1878,7 +1879,7 @@ public class YSerialPort extends YFunction
         ArrayList<YSnoopingRecord> res = new ArrayList<>();
         int idx;
 
-        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&t=0", _rxptr,maxWait);
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&t=0&len=%d", _rxptr, maxWait,maxMsg);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
@@ -1894,6 +1895,27 @@ public class YSerialPort extends YFunction
             idx = idx + 1;
         }
         return res;
+    }
+
+    /**
+     * Retrieves messages (both direction) in the serial port buffer, starting at current position.
+     * This function will only compare and return printable characters in the message strings.
+     * Binary protocols are handled as hexadecimal strings.
+     *
+     * If no message is found, the search waits for one up to the specified maximum timeout
+     * (in milliseconds).
+     *
+     * @param maxWait : the maximum number of milliseconds to wait for a message if none is found
+     *         in the receive buffer.
+     *
+     * @return an array of YSnoopingRecord objects containing the messages found, if any.
+     *         Binary messages are converted to hexadecimal representation.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public ArrayList<YSnoopingRecord> snoopMessages(int maxWait) throws YAPI_Exception
+    {
+        return snoopMessagesEx(maxWait, 255);
     }
 
     /**

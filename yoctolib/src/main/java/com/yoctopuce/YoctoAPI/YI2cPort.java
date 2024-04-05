@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 52943 2023-01-26 15:46:47Z mvuilleu $
+ *  $Id: YI2cPort.java 59641 2024-03-05 20:50:20Z mvuilleu $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -1721,12 +1721,13 @@ public class YI2cPort extends YFunction
      *
      * @param maxWait : the maximum number of milliseconds to wait for a message if none is found
      *         in the receive buffer.
+     * @param maxMsg : the maximum number of messages to be returned by the function; up to 254.
      *
      * @return an array of YI2cSnoopingRecord objects containing the messages found, if any.
      *
      * @throws YAPI_Exception on error
      */
-    public ArrayList<YI2cSnoopingRecord> snoopMessages(int maxWait) throws YAPI_Exception
+    public ArrayList<YI2cSnoopingRecord> snoopMessagesEx(int maxWait,int maxMsg) throws YAPI_Exception
     {
         String url;
         byte[] msgbin = new byte[0];
@@ -1735,7 +1736,7 @@ public class YI2cPort extends YFunction
         ArrayList<YI2cSnoopingRecord> res = new ArrayList<>();
         int idx;
 
-        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&t=0", _rxptr,maxWait);
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&t=0&len=%d", _rxptr, maxWait,maxMsg);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
@@ -1751,6 +1752,24 @@ public class YI2cPort extends YFunction
             idx = idx + 1;
         }
         return res;
+    }
+
+    /**
+     * Retrieves messages (both direction) in the I2C port buffer, starting at current position.
+     *
+     * If no message is found, the search waits for one up to the specified maximum timeout
+     * (in milliseconds).
+     *
+     * @param maxWait : the maximum number of milliseconds to wait for a message if none is found
+     *         in the receive buffer.
+     *
+     * @return an array of YI2cSnoopingRecord objects containing the messages found, if any.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public ArrayList<YI2cSnoopingRecord> snoopMessages(int maxWait) throws YAPI_Exception
+    {
+        return snoopMessagesEx(maxWait, 255);
     }
 
     /**

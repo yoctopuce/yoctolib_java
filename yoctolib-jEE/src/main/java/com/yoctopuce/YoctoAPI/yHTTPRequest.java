@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 57651 2023-11-06 07:46:14Z seb $
+ * $Id: yHTTPRequest.java 59800 2024-03-13 09:48:19Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -39,6 +39,7 @@ package com.yoctopuce.YoctoAPI;
 
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
 import java.util.Locale;
 
 
@@ -84,6 +85,88 @@ class yHTTPRequest implements Runnable
     {
         _hub = hub;
         _dbglabel = dbglabel;
+    }
+
+    static byte[] yTcpDownloadEx(String host, int port, String path) throws YAPI_Exception
+    {
+        try {
+            InetAddress addr = InetAddress.getByName(host);
+            Socket socket = new Socket();
+            SocketAddress sockaddr = new InetSocketAddress(addr, port);
+            socket.connect(sockaddr);
+            String request = String.format("GET %s HTTP/1.1\r\n", path);
+            request += String.format("Host: %s\r\nConnection: close\r\n", host);
+            request += "Accept-Encoding:\r\nUser-Agent: Yoctopuce\r\n\r\n";
+            socket.setTcpNoDelay(true);
+            OutputStream out = socket.getOutputStream();
+            InputStream in = socket.getInputStream();
+            out.write(request.getBytes());
+            ByteArrayOutputStream result = new ByteArrayOutputStream(8096);
+            byte[] buffer = new byte[2048];
+            int bytesRead;
+            do {
+                bytesRead = in.read(buffer);
+                if (bytesRead > 0) {
+                    result.write(buffer, 0, bytesRead);
+                }
+            } while (bytesRead >= 0);
+            return result.toByteArray();
+        } catch (IOException e) {
+            throw new YAPI_Exception(YAPI.IO_ERROR, String.format("unable to contact %s:%d (%s)", host, port, e.getLocalizedMessage()), e);
+        }
+    }
+
+    static byte[] yTcpDownload(String host, int port, String path) throws YAPI_Exception
+    {
+        byte[] raw = yTcpDownloadEx(host, port, path);
+        String str_raw = new String(raw);
+        int pos = str_raw.indexOf("\r\n\r\n");
+        if (pos <= 0) {
+            throw new YAPI_Exception(YAPI.IO_ERROR, "Invalid HTTP response header");
+        }
+        pos += 4;
+        String header = str_raw.substring(0, pos);
+        byte[] content = Arrays.copyOfRange(raw, pos, raw.length);
+        if (header.startsWith("0K\r\n") || header.startsWith("OK\r\n")) {
+            return content;
+        }
+        int lpos = header.indexOf("\r\n");
+        if (!header.startsWith("HTTP/1.1 "))
+            throw new YAPI_Exception(YAPI.IO_ERROR, "Invalid HTTP response header");
+
+        String[] parts = header.substring(9, lpos).split(" ");
+        if (parts[0].equals("401")) {
+            throw new YAPI_Exception(YAPI.UNAUTHORIZED, "Authentication required");
+        }
+        String header_low = header.toLowerCase();
+        if (parts[0].equals("301") || parts[0].equals("308")) {
+            int t_ofs = header_low.indexOf("\r\nlocation");
+            if (t_ofs > 0) {
+                t_ofs += 10;
+                int t_endl = header_low.indexOf("\r\n", t_ofs);
+                String new_url = header.substring(t_ofs, t_endl);
+                new_url = new_url.trim();
+                if (new_url.startsWith("http")) {
+                    return YAPIContext.BasicHTTPRequest(new_url);
+                } else {
+                    return yTcpDownload(host, port, new_url);
+                }
+            }
+        }
+        if (!parts[0].equals("200") && !parts[0].equals("304")) {
+            throw new YAPI_Exception(YAPI.IO_ERROR, "Received HTTP status " + parts[0] + " (" + parts[1] + ")");
+        } else {
+            int t_ofs = header_low.indexOf("transfer-encoding");
+            if (t_ofs > 0) {
+                t_ofs += 17;
+                int t_endl = header_low.indexOf("\r\n", t_ofs);
+                int t_chunk = header_low.indexOf("chunked", t_ofs);
+                if (t_chunk > 0 && t_chunk < t_endl) {
+                    content = unpackHTTPRequest(content);
+                }
+            }
+        }
+        return content;
     }
 
     synchronized void _requestReserve() throws YAPI_Exception
@@ -408,7 +491,7 @@ class yHTTPRequest implements Runnable
         return res;
     }
 
-    private byte[] unpackHTTPRequest(byte[] data)
+    private static byte[] unpackHTTPRequest(byte[] data)
     {
         ByteArrayOutputStream res = new ByteArrayOutputStream(data.length);
         int ofs = 0;

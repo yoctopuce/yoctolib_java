@@ -2,6 +2,7 @@ package com.yoctopuce.YoctoAPI;
 
 
 import javax.net.ssl.*;
+
 import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
@@ -445,7 +446,7 @@ public class YAPIContext
                 newhub.disable();
             }
         }
-        if (previous !=null){
+        if (previous != null) {
             newhub.requestStop();
             return true;
         }
@@ -906,36 +907,41 @@ public class YAPIContext
         } catch (MalformedURLException e) {
             throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
         }
-
-
-        BufferedInputStream in = null;
-        try {
-            URLConnection connection = u.openConnection();
-            in = new BufferedInputStream(connection.getInputStream());
-            byte[] buffer = new byte[1024];
-            int readed = 0;
-            while (true) {
-                readed = in.read(buffer, 0, buffer.length);
-                if (readed < 0) {
-                    // end of connection
-                    break;
-                } else {
-                    result.write(buffer, 0, readed);
+        if (url.startsWith("http://")) {
+            String host = u.getHost();
+            int port = u.getPort();
+            String path = u.getPath();
+            return yHTTPRequest.yTcpDownload(host, port, path);
+        } else {
+            BufferedInputStream in = null;
+            try {
+                URLConnection connection = u.openConnection();
+                in = new BufferedInputStream(connection.getInputStream());
+                byte[] buffer = new byte[1024];
+                int readed = 0;
+                while (true) {
+                    readed = in.read(buffer, 0, buffer.length);
+                    if (readed < 0) {
+                        // end of connection
+                        break;
+                    } else {
+                        result.write(buffer, 0, readed);
+                    }
+                }
+            } catch (SSLException e) {
+                throw new YAPI_Exception(YAPI.SSL_ERROR, "unable to contact " + url + " :" + e.getLocalizedMessage(), e);
+            } catch (IOException e) {
+                throw new YAPI_Exception(YAPI.IO_ERROR, "unable to contact " + url + " :" + e.getLocalizedMessage(), e);
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException ignore) {
+                    }
                 }
             }
-        } catch (SSLException e) {
-            throw new YAPI_Exception(YAPI.SSL_ERROR, "unable to contact " + url + " :" + e.getLocalizedMessage(), e);
-        } catch (IOException e) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, "unable to contact " + url + " :" + e.getLocalizedMessage(), e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ignore) {
-                }
-            }
+            return result.toByteArray();
         }
-        return result.toByteArray();
     }
 
 

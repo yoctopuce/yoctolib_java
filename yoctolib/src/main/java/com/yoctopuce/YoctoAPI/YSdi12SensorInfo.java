@@ -1,8 +1,10 @@
-/*********************************************************************
+/*
  *
- * $Id: YSdi12Sensor.java 58892 2024-01-11 11:11:28Z mvuilleu $
+ *  $Id: svn_id $
  *
- * - - - - - - - - - License information: - - - - - - - - -
+ *  Implements FindSdi12SensorInfo(), the high-level API for Sdi12SensorInfo functions
+ *
+ *  - - - - - - - - - License information: - - - - - - - - -
  *
  *  Copyright (C) 2011 and beyond by Yoctopuce Sarl, Switzerland.
  *
@@ -33,7 +35,7 @@
  *  BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE), BREACH OF
  *  WARRANTY, OR OTHERWISE.
  *
- *********************************************************************/
+ */
 
 package com.yoctopuce.YoctoAPI;
 
@@ -41,21 +43,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 
-//--- (generated code: YSdi12Sensor return codes)
-//--- (end of generated code: YSdi12Sensor return codes)
-//--- (generated code: YSdi12Sensor class start)
+//--- (generated code: YSdi12SensorInfo return codes)
+//--- (end of generated code: YSdi12SensorInfo return codes)
+//--- (generated code: YSdi12SensorInfo yapiwrapper)
+//--- (end of generated code: YSdi12SensorInfo yapiwrapper)
+//--- (generated code: YSdi12SensorInfo class start)
 /**
- *  YSdi12Sensor Class: Description of a discovered SDI12 sensor, returned by
+ *  YSdi12SensorInfo Class: Description of a discovered SDI12 sensor, returned by
  * sdi12Port.discoverSingleSensor and sdi12Port.discoverAllSensors methods
  *
  *
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
-public class YSdi12Sensor
+public class YSdi12SensorInfo
 {
-//--- (end of generated code: YSdi12Sensor class start)
-//--- (generated code: YSdi12Sensor definitions)
+//--- (end of generated code: YSdi12SensorInfo class start)
+//--- (generated code: YSdi12SensorInfo definitions)
     protected YSdi12Port _sdi12Port;
+    protected boolean _isValid;
     protected String _addr;
     protected String _proto;
     protected String _mfg;
@@ -64,16 +69,32 @@ public class YSdi12Sensor
     protected String _sn;
     protected ArrayList<ArrayList<String>> _valuesDesc = new ArrayList<>();
 
-    //--- (end of generated code: YSdi12Sensor definitions)
+    //--- (end of generated code: YSdi12SensorInfo definitions)
 
-    YSdi12Sensor(YSdi12Port sdi12Port, String json_str) throws YAPI_Exception
+    YSdi12SensorInfo(YSdi12Port sdi12Port, String json_str) throws YAPI_Exception
     {
         _sdi12Port = sdi12Port;
         _parseInfoStr(json_str);
-
+        //--- (generated code: YSdi12SensorInfo attributes initialization)
+        //--- (end of generated code: YSdi12SensorInfo attributes initialization)
     }
 
-    //--- (generated code: YSdi12Sensor implementation)
+    public void _throw(int errcode,String msg) throws YAPI_Exception
+    {
+        _sdi12Port._throw(errcode,msg);
+    }
+
+    //--- (generated code: YSdi12SensorInfo implementation)
+
+    /**
+     * Returns the sensor state.
+     *
+     * @return the sensor state.
+     */
+    public boolean isValid()
+    {
+        return _isValid;
+    }
 
     /**
      * Returns the sensor address.
@@ -137,6 +158,8 @@ public class YSdi12Sensor
 
     /**
      * Returns the number of sensor measurements.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @return the number of sensor measurements.
      */
@@ -147,61 +170,86 @@ public class YSdi12Sensor
 
     /**
      * Returns the sensor measurement command.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @param measureIndex : measurement index
      *
      * @return the sensor measurement command.
+     * @throws YAPI_Exception on error
      */
-    public String get_measureCommand(int measureIndex)
+    public String get_measureCommand(int measureIndex) throws YAPI_Exception
     {
+        //noinspection DoubleNegation
+        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Invalid measure index");}
         return _valuesDesc.get(measureIndex).get(0);
     }
 
     /**
      * Returns sensor measurement position.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @param measureIndex : measurement index
      *
      * @return the sensor measurement command.
+     * @throws YAPI_Exception on error
      */
-    public int get_measurePosition(int measureIndex)
+    public int get_measurePosition(int measureIndex) throws YAPI_Exception
     {
+        //noinspection DoubleNegation
+        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Invalid measure index");}
         return YAPIContext._atoi(_valuesDesc.get(measureIndex).get(2));
     }
 
     /**
      * Returns the measured value symbol.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @param measureIndex : measurement index
      *
      * @return the sensor measurement command.
+     * @throws YAPI_Exception on error
      */
-    public String get_measureSymbol(int measureIndex)
+    public String get_measureSymbol(int measureIndex) throws YAPI_Exception
     {
+        //noinspection DoubleNegation
+        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Invalid measure index");}
         return _valuesDesc.get(measureIndex).get(3);
     }
 
     /**
      * Returns the unit of the measured value.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @param measureIndex : measurement index
      *
      * @return the sensor measurement command.
+     * @throws YAPI_Exception on error
      */
-    public String get_measureUnit(int measureIndex)
+    public String get_measureUnit(int measureIndex) throws YAPI_Exception
     {
+        //noinspection DoubleNegation
+        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Invalid measure index");}
         return _valuesDesc.get(measureIndex).get(4);
     }
 
     /**
      * Returns the description of the measured value.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @param measureIndex : measurement index
      *
      * @return the sensor measurement command.
+     * @throws YAPI_Exception on error
      */
-    public String get_measureDescription(int measureIndex)
+    public String get_measureDescription(int measureIndex) throws YAPI_Exception
     {
+        //noinspection DoubleNegation
+        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Invalid measure index");}
         return _valuesDesc.get(measureIndex).get(5);
     }
 
@@ -223,6 +271,7 @@ public class YSdi12Sensor
                 _model = errmsg;
                 _ver = errmsg;
                 _sn = errmsg;
+                _isValid = false;
             } else {
                 _addr = (infoStr).substring(0, 1);
                 _proto = (infoStr).substring( 1,  1 + 2);
@@ -230,6 +279,7 @@ public class YSdi12Sensor
                 _model = (infoStr).substring( 11,  11 + 6);
                 _ver = (infoStr).substring( 17,  17 + 3);
                 _sn = (infoStr).substring( 20,  20 + (infoStr).length()-20);
+                _isValid = true;
             }
         }
     }
@@ -285,6 +335,6 @@ public class YSdi12Sensor
         _valuesDesc = val;
     }
 
-    //--- (end of generated code: YSdi12Sensor implementation)
+    //--- (end of generated code: YSdi12SensorInfo implementation)
 }
 
