@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YSms.java 50140 2022-06-16 10:26:30Z seb $
+ * $Id: YSms.java 51257 2022-10-07 09:33:39Z seb $
  *
  * Implements FindSms(), the high-level API for Sms functions
  *

@@ -1,0 +1,17 @@
+{
+    "main": "src\/main\/java\/Demo.java",
+    "other_files": [],
+    "ylib": [
+        "yocto_files",
+        "yocto_genericsensor",
+        "yocto_poweroutput",
+        "yocto_serialport",
+        "yocto_api"
+    ],
+    "skip": true,
+    "xcode": false,
+    "pom": true,
+    "vstudio": false,
+    "gnu": false,
+    "cb": false
+}

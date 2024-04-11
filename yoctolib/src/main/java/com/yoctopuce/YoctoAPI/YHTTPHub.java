@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 54846 2023-06-02 07:46:11Z seb $
+ * $Id: YHTTPHub.java 60484 2024-04-10 09:43:55Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -50,7 +50,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 
-class YHTTPHub extends YGenericHub
+public class YHTTPHub extends YGenericHub
 {
     public static final int YIO_DEFAULT_TCP_TIMEOUT = 20000;
     private static final int YIO_1_MINUTE_TCP_TIMEOUT = 60000;
@@ -181,7 +181,7 @@ class YHTTPHub extends YGenericHub
         }
     }
 
-     public void requestStop()
+    public void requestStop()
     {
         NotificationHandler handler = _notificationHandler;
         if (handler != null) {
@@ -198,7 +198,7 @@ class YHTTPHub extends YGenericHub
         }
     }
 
-    YHTTPHub(YAPIContext yctx,  HTTPParams httpParams, boolean reportConnnectionLost, Object session) throws YAPI_Exception
+    YHTTPHub(YAPIContext yctx, HTTPParams httpParams, boolean reportConnnectionLost, Object session) throws YAPI_Exception
     {
         super(yctx, httpParams, reportConnnectionLost);
         _callbackSession = session;
@@ -228,7 +228,7 @@ class YHTTPHub extends YGenericHub
             String url = String.format("%s://%s:%d%s/info.json", https_req ? "https" : "http", _URL_params.getHost(), _URL_params.getPort(), _URL_params.getSubDomain());
             byte[] raw;
             try {
-                raw = YAPIContext.BasicHTTPRequest(url);
+                raw = _yctx.BasicHTTPRequest(url, 0);
 
                 String json_str = new String(raw, _yctx._deviceCharset);
                 YJSONObject json = new YJSONObject(json_str);
@@ -237,7 +237,7 @@ class YHTTPHub extends YGenericHub
                 } catch (Exception e) {
                     throw new YAPI_Exception(YAPI.IO_ERROR, "Invalid info.json file", e);
                 }
-                if (json.has("serialNumber")){
+                if (json.has("serialNumber")) {
                     this.updateHubSerial(json.getString("serialNumber"));
                 }
                 if (json.has("protocol") && json.getString("protocol").equals("HTTP/1.1")) {
@@ -680,5 +680,10 @@ class YHTTPHub extends YGenericHub
             }
         }
         return socket;
+    }
+
+    public String getBaseUrl(boolean withProto, boolean withUserPass, boolean withEndSlash)
+    {
+        return _runtime_http_params.getUrl(withProto, withUserPass, withEndSlash);
     }
 }

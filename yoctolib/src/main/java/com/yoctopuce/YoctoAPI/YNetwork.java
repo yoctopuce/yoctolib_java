@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 53886 2023-04-05 08:06:39Z mvuilleu $
+ *  $Id: YNetwork.java 60214 2024-03-26 13:01:50Z mvuilleu $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -115,6 +115,18 @@ public class YNetwork extends YFunction
      */
     public static final int HTTPPORT_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid httpsPort value
+     */
+    public static final int HTTPSPORT_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid securityMode value
+     */
+    public static final int SECURITYMODE_UNDEFINED = 0;
+    public static final int SECURITYMODE_LEGACY = 1;
+    public static final int SECURITYMODE_MIXED = 2;
+    public static final int SECURITYMODE_SECURE = 3;
+    public static final int SECURITYMODE_INVALID = -1;
+    /**
      * invalid defaultPage value
      */
     public static final String DEFAULTPAGE_INVALID = YAPI.INVALID_STRING;
@@ -199,6 +211,8 @@ public class YNetwork extends YFunction
     protected String _userPassword = USERPASSWORD_INVALID;
     protected String _adminPassword = ADMINPASSWORD_INVALID;
     protected int _httpPort = HTTPPORT_INVALID;
+    protected int _httpsPort = HTTPSPORT_INVALID;
+    protected int _securityMode = SECURITYMODE_INVALID;
     protected String _defaultPage = DEFAULTPAGE_INVALID;
     protected int _discoverable = DISCOVERABLE_INVALID;
     protected int _wwwWatchdogDelay = WWWWATCHDOGDELAY_INVALID;
@@ -306,6 +320,12 @@ public class YNetwork extends YFunction
         }
         if (json_val.has("httpPort")) {
             _httpPort = json_val.getInt("httpPort");
+        }
+        if (json_val.has("httpsPort")) {
+            _httpsPort = json_val.getInt("httpsPort");
+        }
+        if (json_val.has("securityMode")) {
+            _securityMode = json_val.getInt("securityMode");
         }
         if (json_val.has("defaultPage")) {
             _defaultPage = json_val.getString("defaultPage");
@@ -1091,6 +1111,178 @@ public class YNetwork extends YFunction
     public int setHttpPort(int newval)  throws YAPI_Exception
     {
         return set_httpPort(newval);
+    }
+
+    /**
+     * Returns the secure TCP port used to serve the hub web UI.
+     *
+     * @return an integer corresponding to the secure TCP port used to serve the hub web UI
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_httpsPort() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return HTTPSPORT_INVALID;
+                }
+            }
+            res = _httpsPort;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the secure TCP port used to serve the hub web UI.
+     *
+     * @return an integer corresponding to the secure TCP port used to serve the hub web UI
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getHttpsPort() throws YAPI_Exception
+    {
+        return get_httpsPort();
+    }
+
+    /**
+     * Changes the secure TCP port used to serve the hub web UI. The default value is port 4443,
+     * which is the default for all Web servers. When you change this parameter, remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : an integer corresponding to the secure TCP port used to serve the hub web UI
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_httpsPort(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("httpsPort",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the secure TCP port used to serve the hub web UI. The default value is port 4443,
+     * which is the default for all Web servers. When you change this parameter, remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : an integer corresponding to the secure TCP port used to serve the hub web UI
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setHttpsPort(int newval)  throws YAPI_Exception
+    {
+        return set_httpsPort(newval);
+    }
+
+    /**
+     * Returns the security level chosen to prevent unauthorized access to the server.
+     *
+     *  @return a value among YNetwork.SECURITYMODE_UNDEFINED, YNetwork.SECURITYMODE_LEGACY,
+     *  YNetwork.SECURITYMODE_MIXED and YNetwork.SECURITYMODE_SECURE corresponding to the security level
+     * chosen to prevent unauthorized access to the server
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_securityMode() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return SECURITYMODE_INVALID;
+                }
+            }
+            res = _securityMode;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the security level chosen to prevent unauthorized access to the server.
+     *
+     *  @return a value among YNetwork.SECURITYMODE_UNDEFINED, YNetwork.SECURITYMODE_LEGACY,
+     *  YNetwork.SECURITYMODE_MIXED and YNetwork.SECURITYMODE_SECURE corresponding to the security level
+     * chosen to prevent unauthorized access to the server
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getSecurityMode() throws YAPI_Exception
+    {
+        return get_securityMode();
+    }
+
+    /**
+     * Changes the security level used to prevent unauthorized access to the server.
+     * The value UNDEFINED causes the security configuration wizard to be
+     * displayed the next time you log on to the Web console.
+     * The value LEGACY offers unencrypted HTTP access by default, and
+     * is designed to provide compatibility with legacy applications that do not
+     * handle password or do not support HTTPS. But it should
+     * only be used when system security is guaranteed by other means, such as the
+     * use of a firewall.
+     * The value MIXED requires the configuration of passwords, and allows
+     * access via both HTTP (unencrypted) and HTTPS (encrypted), while requiring
+     * the Yoctopuce API to be tolerant of certificate characteristics.
+     * The value SECURE requires the configuration of passwords and the
+     * use of secure communications in all cases.
+     * When you change this parameter, remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     *  @param newval : a value among YNetwork.SECURITYMODE_UNDEFINED, YNetwork.SECURITYMODE_LEGACY,
+     *  YNetwork.SECURITYMODE_MIXED and YNetwork.SECURITYMODE_SECURE corresponding to the security level
+     * used to prevent unauthorized access to the server
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_securityMode(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("securityMode",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the security level used to prevent unauthorized access to the server.
+     * The value UNDEFINED causes the security configuration wizard to be
+     * displayed the next time you log on to the Web console.
+     * The value LEGACY offers unencrypted HTTP access by default, and
+     * is designed to provide compatibility with legacy applications that do not
+     * handle password or do not support HTTPS. But it should
+     * only be used when system security is guaranteed by other means, such as the
+     * use of a firewall.
+     * The value MIXED requires the configuration of passwords, and allows
+     * access via both HTTP (unencrypted) and HTTPS (encrypted), while requiring
+     * the Yoctopuce API to be tolerant of certificate characteristics.
+     * The value SECURE requires the configuration of passwords and the
+     * use of secure communications in all cases.
+     * When you change this parameter, remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     *  @param newval : a value among YNetwork.SECURITYMODE_UNDEFINED, YNetwork.SECURITYMODE_LEGACY,
+     *  YNetwork.SECURITYMODE_MIXED and YNetwork.SECURITYMODE_SECURE corresponding to the security level
+     * used to prevent unauthorized access to the server
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setSecurityMode(int newval)  throws YAPI_Exception
+    {
+        return set_securityMode(newval);
     }
 
     /**

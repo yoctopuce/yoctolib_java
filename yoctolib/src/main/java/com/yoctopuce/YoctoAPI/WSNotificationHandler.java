@@ -1,5 +1,7 @@
 package com.yoctopuce.YoctoAPI;
 
+import com.yoctopuce.YoctoWSHandler.WSHandlerJEE;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;

@@ -57,8 +57,8 @@ import java.util.Arrays;
  * <ul>
  * <li>A tag's memory is generally organized in fixed-size blocks.</li>
  * <li>At tag level, each block must be read and written in its entirety.</li>
- * <li>Some blocks are special configuration blocks, and may alter the tag's behaviour
- * tag behavior if they are rewritten with arbitrary data.</li>
+ * <li>Some blocks are special configuration blocks, and may alter the tag's behavior
+ * if they are rewritten with arbitrary data.</li>
  * <li>Data blocks can be set to read-only mode, but on many tags, this operation is irreversible.</li>
  * </ul>
  *

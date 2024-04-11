@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 54582 2023-05-15 13:16:01Z seb $
+ * $Id: YFirmwareUpdate.java 60243 2024-03-27 09:47:10Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -76,9 +76,9 @@ public class YFirmwareUpdate
     private final YAPIContext _yctx;
     private Thread _thread = null;
 
-    static byte[] _downloadfile(String url) throws YAPI_Exception
+     byte[] _downloadfile(String url) throws YAPI_Exception
     {
-        return YAPIContext.BasicHTTPRequest(url);
+        return _yctx.BasicHTTPRequest(url,0);
     }
 
 
@@ -197,7 +197,7 @@ public class YFirmwareUpdate
                                 //1% -> 5%
                                 _progress(1, "Loading firmware");
                                 if (_firmwarepath.startsWith("www.yoctopuce.com") || _firmwarepath.startsWith("http://www.yoctopuce.com")) {
-                                    byte[] bytes = YFirmwareUpdate._downloadfile(_firmwarepath);
+                                    byte[] bytes = _yctx.BasicHTTPRequest(_firmwarepath,0);
                                     firmware = YFirmwareFile.Parse(_firmwarepath, bytes);
                                 } else {
                                     firmware = YFirmwareUpdate._loadFirmwareFile(new File(_firmwarepath));
@@ -279,7 +279,7 @@ public class YFirmwareUpdate
         try {
 
             if (path.startsWith("www.yoctopuce.com") || path.startsWith("http://www.yoctopuce.com")) {
-                byte[] json = YFirmwareUpdate._downloadfile("http://www.yoctopuce.com//FR/common/getLastFirmwareLink.php?serial=" + serial);
+                byte[] json =  YAPI.GetYCtx(true).BasicHTTPRequest("http://www.yoctopuce.com/FR/common/getLastFirmwareLink.php?serial=" + serial, 0);
                 YJSONObject obj;
                 try {
                     obj = new YJSONObject(new String(json, Charset.forName("ISO_8859_1")));

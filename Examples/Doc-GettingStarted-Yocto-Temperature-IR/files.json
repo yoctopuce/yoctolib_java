@@ -1,0 +1,15 @@
+{
+    "main": "src\/main\/java\/Demo.java",
+    "other_files": [],
+    "ylib": [
+        "yocto_multisenscontroller",
+        "yocto_temperature",
+        "yocto_api"
+    ],
+    "skip": true,
+    "xcode": false,
+    "pom": true,
+    "vstudio": false,
+    "gnu": false,
+    "cb": false
+}

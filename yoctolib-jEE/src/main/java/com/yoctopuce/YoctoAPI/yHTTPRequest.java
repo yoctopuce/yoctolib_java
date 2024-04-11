@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 59800 2024-03-13 09:48:19Z seb $
+ * $Id: yHTTPRequest.java 60243 2024-03-27 09:47:10Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -116,7 +116,7 @@ class yHTTPRequest implements Runnable
         }
     }
 
-    static byte[] yTcpDownload(String host, int port, String path) throws YAPI_Exception
+    static byte[] yTcpDownload(YAPIContext ctx, String host, int port, String path) throws YAPI_Exception
     {
         byte[] raw = yTcpDownloadEx(host, port, path);
         String str_raw = new String(raw);
@@ -147,9 +147,9 @@ class yHTTPRequest implements Runnable
                 String new_url = header.substring(t_ofs, t_endl);
                 new_url = new_url.trim();
                 if (new_url.startsWith("http")) {
-                    return YAPIContext.BasicHTTPRequest(new_url);
+                    return ctx.BasicHTTPRequest(new_url,0);
                 } else {
-                    return yTcpDownload(host, port, new_url);
+                    return yTcpDownload(ctx,host, port, new_url);
                 }
             }
         }

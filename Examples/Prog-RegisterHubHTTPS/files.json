@@ -1,0 +1,13 @@
+{
+    "main": "src\/main\/java\/main.java",
+    "other_files": [],
+    "ylib": [
+        "yocto_api"
+    ],
+    "skip": true,
+    "xcode": false,
+    "pom": true,
+    "vstudio": false,
+    "gnu": false,
+    "cb": false
+}

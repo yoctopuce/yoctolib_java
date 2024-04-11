@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 53886 2023-04-05 08:06:39Z mvuilleu $
+ * $Id: YCellular.java 59948 2024-03-18 08:39:30Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *

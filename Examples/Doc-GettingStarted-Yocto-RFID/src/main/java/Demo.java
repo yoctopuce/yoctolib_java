@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: Demo.java 60291 2024-04-02 09:00:39Z seb $
  *
  *  Doc-GettingStarted-Yocto-RFID example
  *

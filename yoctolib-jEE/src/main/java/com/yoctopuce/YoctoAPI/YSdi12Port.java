@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSdi12Port.java 59905 2024-03-15 08:27:48Z seb $
+ *  $Id: YSdi12Port.java 59904 2024-03-15 08:23:15Z seb $
  *
  *  Implements FindSdi12Port(), the high-level API for Sdi12Port functions
  *
