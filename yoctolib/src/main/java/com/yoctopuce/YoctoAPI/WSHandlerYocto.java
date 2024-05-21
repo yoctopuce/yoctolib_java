@@ -49,8 +49,6 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
     {
         if (_socket != null) {
             try {
-                _nhandler.WSLOG("close socket");
-                //Thread.dumpStack();
                 if (_out != null) {
                     _out.flush();
                     _out.close();
@@ -74,8 +72,6 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
     public void close()
     {
         if (_closed) {
-            _nhandler.WSLOG("Socket already closed");
-            //Thread.dumpStack();
             return;
         }
         _closing = true;
@@ -157,6 +153,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
     public void connect(YHTTPHub hub, boolean first_notification_connection, int mstimeout, int notifAbsPos) throws YAPI_Exception
     {
         long start = System.currentTimeMillis();
+        boolean isredirect = false;
         String request = "GET ";
         String subDomain = hub._runtime_http_params.getSubDomain();
         request += subDomain;
@@ -172,9 +169,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         }
         try {
             InetAddress addr = InetAddress.getByName(host);
-            _nhandler.WSLOG("Open Socket");
-
-            _socket = hub.OpenConnectedSocket(addr, mstimeout);
+            _socket = hub.OpenConnectedSocket(addr, hub.getPort(), mstimeout);
             _socket.setTcpNoDelay(true);
             _socket.setSoTimeout(1000);
             _out = new BufferedOutputStream(_socket.getOutputStream());
@@ -194,6 +189,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
             String encodedBytes = YAPI.Base64Encode(SecWebSocketKey, 0, SecWebSocketKey.length);
             _websocket_key = encodedBytes;
             _out.write(encodedBytes.getBytes());
+            _out.write(String.format("\r\nHost: %s:%d", host, hub.getPort()).getBytes());
             _out.write(WS_HEADER_END.getBytes());
             _out.flush();
             _closed = false;
@@ -213,8 +209,18 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
                     end_of_head += 2;
                     header.setLength(end_of_head);
                     String fullHeader = header.toString();
-                    int ofs = fullHeader.indexOf("HTTP/1.1 101");
-                    if (ofs != 0) {
+                    int endl = fullHeader.indexOf("\r\n");
+                    String firstline = fullHeader.substring(0, endl);
+                    int ofs = firstline.indexOf("HTTP/1.1 ");
+                    int endcode = firstline.indexOf(" ", 9);
+                    if (ofs != 0 || endcode == -1) {
+                        throw new YAPI_Exception(YAPI.IO_ERROR, "Invalid HTTP header");
+                    }
+                    String httpresponse = firstline.substring(9, endcode);
+                    int httpcode = Integer.parseInt(httpresponse);
+                    if (httpcode == 301 || httpcode == 302 || httpcode == 307 || httpcode == 308) {
+                        isredirect = true;
+                    } else if (httpcode != 101) {
                         throw new YAPI_Exception(YAPI.IO_ERROR, "hub does not support WebSocket");
                     }
                     ofs = fullHeader.indexOf("\r\n");
@@ -233,6 +239,13 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
                                     setupNewWSConnection(buffer, start_bin, read - start_bin);
                                 }
                                 break;
+                            } else if (isredirect && lowerCase.startsWith("location")) {
+                                String value = header.substring(sep + 1, nextofs).trim();
+                                _nhandler.WSLOG("redirect to " + value);
+                                YGenericHub.HTTPParams new_url = new YGenericHub.HTTPParams(value);
+                                // update only host, proto and port
+                                hub._runtime_http_params.updateForRedirect(new_url.getHost(), new_url.getPort(), new_url.useSecureSocket());
+                                break;
                             }
                         }
                         ofs = nextofs;
@@ -240,13 +253,22 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
                     break;
                 }
             }
-            if (!websock_ok) {
+            if (!isredirect && !websock_ok) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, "hub does not support WebSocket");
             }
+        } catch (SSLHandshakeException e) {
+            throw new YAPI_Exception(YAPI.SSL_UNK_CERT, "unable to contact " + host + " :" + e.getLocalizedMessage(), e);
         } catch (SSLException e) {
             throw new YAPI_Exception(YAPI.SSL_ERROR, e.getLocalizedMessage());
         } catch (IOException e) {
             throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
+        }
+        if (isredirect) {
+            close();
+            long spent = System.currentTimeMillis() - start;
+            if (spent < mstimeout) {
+                connect(hub, first_notification_connection, (int) (mstimeout - spent), notifAbsPos);
+            }
         }
     }
 

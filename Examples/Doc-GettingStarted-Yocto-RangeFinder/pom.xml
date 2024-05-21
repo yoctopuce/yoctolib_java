@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.yoctopuce.java</groupId>
         <artifactId>javabundle</artifactId>
-        <version>2.0.60485-SNAPSHOT</version>
+        <version>2.0.61039-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>doc-gettingstarted-yocto-rangefinder</artifactId>
     <packaging>jar</packaging>
     <name>Doc-GettingStarted-Yocto-RangeFinder</name>
-    <version>2.0.60485-SNAPSHOT</version>
+    <version>2.0.61039-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>
         <developer>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.yoctopuce.java</groupId>
             <artifactId>yoctolib</artifactId>
-            <version>2.0.60485-SNAPSHOT</version>
+            <version>2.0.61039-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

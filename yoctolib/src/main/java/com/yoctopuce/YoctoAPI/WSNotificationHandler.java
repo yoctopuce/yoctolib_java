@@ -110,14 +110,14 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
             }
 
             try {
-                _wsHandler.connect(_hub, _waitingForConnectionState, 10000, _notifAbsPos);
+                _wsHandler.connect(_hub, _waitingForConnectionState, _hub._networkTimeoutMs, _notifAbsPos);
                 runOnSession();
             } catch (YAPI_Exception e) {
-                //e.printStackTrace();
-                if (e.errorType == YAPI.INVALID_ARGUMENT || e.errorType == YAPI.DOUBLE_ACCES) {
+                if (e.errorType == YAPI.INVALID_ARGUMENT || e.errorType == YAPI.DOUBLE_ACCES
+                        || e.errorType == YAPI.SSL_UNK_CERT || e.errorType == YAPI.SSL_ERROR) {
                     _muststop = true;
                 }
-                _session_errno = YAPI.IO_ERROR;
+                _session_errno = e.errorType;
                 _session_error = e.getLocalizedMessage();
             }
             _wsHandler.close();
@@ -132,6 +132,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                 _session_errno = YAPI.IO_ERROR;
                 _session_error = "WS Session is closed";
             }
+            _stateLock.notifyAll();
         }
 
     }

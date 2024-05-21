@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 54582 2023-05-15 13:16:01Z seb $
+ * $Id: YCallbackHub.java 60940 2024-05-14 10:01:20Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -348,6 +348,12 @@ class YCallbackHub extends YGenericHub
     public boolean isOnline()
     {
         return true;
+    }
+
+    @Override
+    public String getConnectionUrl()
+    {
+        return _URL_params.getUrl(true, false, true);
     }
 
     @Override

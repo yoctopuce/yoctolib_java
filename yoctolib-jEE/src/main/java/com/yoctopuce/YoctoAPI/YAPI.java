@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 60243 2024-03-27 09:47:10Z seb $
+ * $Id: YAPI.java 60510 2024-04-12 09:37:02Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -59,7 +59,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "2.0";
-    public static final String YOCTO_API_BUILD_STR = "60485";
+    public static final String YOCTO_API_BUILD_STR = "61039";
     public static final int YOCTO_API_VERSION_BCD = 0x0200;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -361,7 +361,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".60485" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".61039" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -877,17 +877,34 @@ public class YAPI
         return GetYCtx(true).AddTrustedCertificates(certificate);
     }
     /**
+     *  Set the path of Certificate Authority file on local filesystem. This method takes as a parameter
+     * the path of a file containing all certificates in PEM format.
+     *  For technical reasons, only one file can be specified. So if you need to connect to several Hubs
+     * instances with self-signed certificates, you'll need to use
+     *  a single file containing all the certificates end-to-end. Passing a empty string will restore the
+     * default settings. This option is only supported by PHP library.
+     *
+     * @param certificatePath : the path of the file containing all certificates in PEM format.
+     *
+     * @return an empty string if the certificate has been added correctly.
+     *         In case of error, returns a string starting with "error:".
+     */
+    public static String SetTrustedCertificatesList(String certificatePath)
+    {
+        return GetYCtx(true).SetTrustedCertificatesList(certificatePath);
+    }
+    /**
      * Enables or disables certain TLS/SSL certificate checks.
      *
-     * @param options: The options: YAPI.NO_TRUSTED_CA_CHECK,
+     * @param opts : The options are YAPI.NO_TRUSTED_CA_CHECK,
      *         YAPI.NO_EXPIRATION_CHECK, YAPI.NO_HOSTNAME_CHECK.
      *
      * @return an empty string if the options are taken into account.
      *         On error, returns a string beginning with "error:".
      */
-    public static String SetNetworkSecurityOptions(int options)
+    public static String SetNetworkSecurityOptions(int opts)
     {
-        return GetYCtx(true).SetNetworkSecurityOptions(options);
+        return GetYCtx(true).SetNetworkSecurityOptions(opts);
     }
     /**
      * Modifies the network connection delay for yRegisterHub() and yUpdateDeviceList().

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 60484 2024-04-10 09:43:55Z seb $
+ * $Id: YHTTPHub.java 60940 2024-05-14 10:01:20Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -76,6 +76,20 @@ public class YHTTPHub extends YGenericHub
      */
     HTTPParams _runtime_http_params = null;
     boolean _usePureHTTP = false;
+    ArrayList<PortInfo> _portInfo = new ArrayList<>();
+    private boolean _useMixedMode;
+
+    static class PortInfo{
+        String proto;
+        int port;
+
+        public PortInfo(String proto, int port)
+        {
+            this.proto = proto;
+            this.port = port;
+        }
+    }
+
 
 
     boolean needRetryWithAuth()
@@ -198,6 +212,12 @@ public class YHTTPHub extends YGenericHub
         }
     }
 
+    @Override
+    public String getConnectionUrl()
+    {
+        return _runtime_http_params.getUrl(true,false, true);
+    }
+
     YHTTPHub(YAPIContext yctx, HTTPParams httpParams, boolean reportConnnectionLost, Object session) throws YAPI_Exception
     {
         super(yctx, httpParams, reportConnnectionLost);
@@ -206,6 +226,73 @@ public class YHTTPHub extends YGenericHub
             mdigest = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException ex) {
             throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "No MD5 provider");
+        }
+    }
+
+
+    enum yHubProto
+    {
+        PROTO_LEGACY,
+        PROTO_AUTO,
+        PROTO_SECURE,
+        PROTO_HTTP,
+        PROTO_WEBSOCKET,
+        PROTO_SECURE_HTTP,
+        PROTO_SECURE_WEBSOCKET,
+        PROTO_UNKNOWN
+    }
+
+
+    void yhubUseBestProto() throws YAPI_Exception
+    {
+        String cur_proto = this._URL_params.getProto();
+        _runtime_http_params = null;
+        _useMixedMode = false;
+        if (this._portInfo.isEmpty()) {
+            _runtime_http_params = _URL_params;
+        } else {
+            if (this._usePureHTTP) {
+                // For VirtualHub-4web we use the first entry available regardless of the protocol and the port set
+                // by the user. In this scenario info.json has the most accurate value. Note: redirection from http to
+                // https has already done by the http redirect mechanism during the download of info.json
+                // Note 2 : Websocket are not supported by VirtualHub-4web
+                if (cur_proto.equals("ws") || cur_proto.equals("wss")) {
+                    throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Websocket protocol is not supported by VirtualHub-4web.");
+                }
+                for (PortInfo portInfo : this._portInfo) {
+                    if (portInfo.proto.startsWith("http")) {
+                        // handle http and https
+                        _yctx._Log(String.format("Hub %s will use %s proto on port %d\n", _URL_params.getHost(), portInfo.proto, portInfo.port));
+                        _runtime_http_params = new HTTPParams(_URL_params, portInfo.proto, portInfo.port);
+                        break;
+                    }
+                }
+
+            } else {
+                int best_port = 0;
+                String best_proto = "ws";
+
+                for (PortInfo portInfo : this._portInfo) {
+                    if (portInfo.proto.equals("http") || portInfo.proto.equals("ws")) {
+                        _useMixedMode = true;
+                    }
+                    if (cur_proto.equals("auto") && best_port == 0) {
+                        if (portInfo.proto.startsWith("http") || portInfo.proto.startsWith("ws")) {
+                            // handle http, https, ws and wss proto
+                            best_proto = portInfo.proto;
+                            best_port = portInfo.port;
+                        }
+                    }
+                }
+                if (best_port != 0) {
+                    _yctx._Log(String.format("Hub %s will use %s proto on port %d\n", _URL_params.getHost(),
+                            best_proto, best_port));
+                    _runtime_http_params = new HTTPParams(_URL_params, best_proto, best_port);
+                }
+            }
+            if (_runtime_http_params == null) {
+                _runtime_http_params = _URL_params;
+            }
         }
     }
 
@@ -220,16 +307,16 @@ public class YHTTPHub extends YGenericHub
             throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "notification already started");
         }
         this._usePureHTTP = false;
+        this._portInfo.clear();
         if (_URL_params.testInfoJson()) {
             boolean https_req = _URL_params.useSecureSocket();
-            if (_URL_params.getPort() == YAPI.YOCTO_DEFAULT_HTTPS_PORT) {
+            if (_URL_params.getPort() == YAPI.YOCTO_DEFAULT_HTTPS_PORT || _URL_params.useSecureSocket()) {
                 https_req = true;
             }
             String url = String.format("%s://%s:%d%s/info.json", https_req ? "https" : "http", _URL_params.getHost(), _URL_params.getPort(), _URL_params.getSubDomain());
             byte[] raw;
             try {
-                raw = _yctx.BasicHTTPRequest(url, 0);
-
+                raw = _yctx.BasicHTTPRequest(url, _networkTimeoutMs, 0);
                 String json_str = new String(raw, _yctx._deviceCharset);
                 YJSONObject json = new YJSONObject(json_str);
                 try {
@@ -245,43 +332,29 @@ public class YHTTPHub extends YGenericHub
                 }
                 if (json.has("port")) {
                     YJSONArray ports = json.getYJSONArray("port");
-                    boolean done = false;
                     int i = 0;
-                    while (!done && i < ports.length()) {
+                    while (i < ports.length()) {
                         String proto_port = ports.getString(i++);
                         String[] split = proto_port.split(":");
                         String proto = split[0];
                         int port = Integer.parseInt(split[1]);
-                        switch (proto) {
-                            case "ws":
-                            case "http":
-                                if (_URL_params.useSecureSocket()) {
-                                    break;
-                                }
-                                //no break on purpose
-                            case "wss":
-                            case "https":
-                                _runtime_http_params = new HTTPParams(_URL_params, proto, port);
-                                done = true;
-                                break;
-                            default:
-                                _yctx._Log(String.format("Skip unknown protocol \"%s\" form info. Please consider upgrading Yoctolib.", proto));
+                        if (port == 0) {
+                            break;
                         }
+                        this._portInfo.add(new PortInfo(proto, port));
                     }
                 }
             } catch (YAPI_Exception ex) {
-                if (ex.errorType == YAPI.SSL_ERROR) {
+                if (ex.errorType == YAPI.SSL_ERROR || ex.errorType == YAPI.SSL_UNK_CERT) {
                     throw ex;
                 }
                 if (_URL_params.useSecureSocket()) {
                     throw ex;
-                } else {
-                    _runtime_http_params = _URL_params;
                 }
             }
-        } else {
-            _runtime_http_params = _URL_params;
         }
+
+        yhubUseBestProto();
         if (_runtime_http_params.useWebSocket()) {
             _notificationHandler = new WSNotificationHandler(this, _callbackSession);
         } else {
@@ -610,6 +683,11 @@ public class YHTTPHub extends YGenericHub
         return _runtime_http_params.getHost();
     }
 
+    public int getPort()
+    {
+        return _runtime_http_params.getPort();
+    }
+
     @Override
     public synchronized ArrayList<String> getBootloaders() throws YAPI_Exception, InterruptedException
     {
@@ -660,18 +738,23 @@ public class YHTTPHub extends YGenericHub
         return _notificationHandler != null && _notificationHandler.isConnected();
     }
 
-    public Socket OpenConnectedSocket(InetAddress addr, int mstimeout) throws YAPI_Exception
+    public Socket OpenConnectedSocket(InetAddress addr, int port, int mstimeout) throws YAPI_Exception
     {
         Socket socket;
+        SocketAddress sockaddr = new InetSocketAddress(addr, port);
         if (_runtime_http_params.useSecureSocket()) {
             try {
-                socket = _yctx.CreateSSLSocket(addr, _runtime_http_params.getPort());
+                int sslFlags = 0;
+                if (_useMixedMode) {
+                    sslFlags = YAPI.NO_HOSTNAME_CHECK | YAPI.NO_EXPIRATION_CHECK | YAPI.NO_TRUSTED_CA_CHECK;
+                }
+                socket = _yctx.CreateSSLSocket(sslFlags);
+                socket.connect(sockaddr, mstimeout);
             } catch (IOException e) {
                 throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
             }
 
         } else {
-            SocketAddress sockaddr = new InetSocketAddress(addr, _runtime_http_params.getPort());
             socket = new Socket();
             try {
                 socket.connect(sockaddr, mstimeout);

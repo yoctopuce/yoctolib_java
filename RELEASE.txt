@@ -1,3 +1,5 @@
-Java v2.0.60485
+Java v2.0.61039
 
-- Bump version number to 2.0
+- Fix timeout duration calculation$
+- Add support for HTTP redirection
+- Fix authentication when request send a redirect

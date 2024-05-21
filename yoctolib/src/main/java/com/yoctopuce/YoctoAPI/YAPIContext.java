@@ -26,6 +26,7 @@ public class YAPIContext
 {
 //--- (end of generated code: YAPIContext class start)
 
+
     static class DataEvent
     {
 
@@ -541,10 +542,11 @@ public class YAPIContext
     }
 
 
-    Socket CreateSSLSocket(InetAddress addr, int port) throws IOException
+    Socket CreateSSLSocket(int sslFlags) throws IOException
     {
-        return this.getSocketFactory(0).createSocket(addr, port);
+        return this.getSocketFactory(sslFlags).createSocket();
     }
+
 
     private void resetContext()
     {
@@ -866,7 +868,7 @@ public class YAPIContext
         }
     }
 
-    byte[] BasicHTTPRequest(String url, int ssl_flags) throws YAPI_Exception
+    byte[] BasicHTTPRequest(String url, int mstimout, int ssl_flags) throws YAPI_Exception
     {
         ByteArrayOutputStream result = new ByteArrayOutputStream(1024);
         URL u;
@@ -891,6 +893,7 @@ public class YAPIContext
             try {
                 URLConnection connection = u.openConnection();
                 HttpsURLConnection httpsUrlConnection = (HttpsURLConnection) connection;
+                httpsUrlConnection.setConnectTimeout(mstimout);
                 httpsUrlConnection.setSSLSocketFactory(this.getSocketFactory(ssl_flags | this._sslFlags));
                 in = new BufferedInputStream(connection.getInputStream());
                 byte[] buffer = new byte[1024];
@@ -1011,6 +1014,11 @@ public class YAPIContext
         return "";
     }
 
+    private String SetTrustedCertificatesList_internal(String certificatePath)
+    {
+        return "error: Not supported in Java";
+    }
+
     //PUBLIC METHOD:
     //--- (generated code: YAPIContext implementation)
 
@@ -1099,21 +1107,41 @@ public class YAPIContext
     //cannot be generated for Java:
     //public String AddTrustedCertificates_internal(String certificate)
     /**
+     *  Set the path of Certificate Authority file on local filesystem. This method takes as a parameter
+     * the path of a file containing all certificates in PEM format.
+     *  For technical reasons, only one file can be specified. So if you need to connect to several Hubs
+     * instances with self-signed certificates, you'll need to use
+     *  a single file containing all the certificates end-to-end. Passing a empty string will restore the
+     * default settings. This option is only supported by PHP library.
+     *
+     * @param certificatePath : the path of the file containing all certificates in PEM format.
+     *
+     * @return an empty string if the certificate has been added correctly.
+     *         In case of error, returns a string starting with "error:".
+     */
+    public String SetTrustedCertificatesList(String certificatePath)
+    {
+        return SetTrustedCertificatesList_internal(certificatePath);
+    }
+
+    //cannot be generated for Java:
+    //public String SetTrustedCertificatesList_internal(String certificatePath)
+    /**
      * Enables or disables certain TLS/SSL certificate checks.
      *
-     * @param options: The options: YAPI.NO_TRUSTED_CA_CHECK,
+     * @param opts : The options are YAPI.NO_TRUSTED_CA_CHECK,
      *         YAPI.NO_EXPIRATION_CHECK, YAPI.NO_HOSTNAME_CHECK.
      *
      * @return an empty string if the options are taken into account.
      *         On error, returns a string beginning with "error:".
      */
-    public String SetNetworkSecurityOptions(int options)
+    public String SetNetworkSecurityOptions(int opts)
     {
-        return SetNetworkSecurityOptions_internal(options);
+        return SetNetworkSecurityOptions_internal(opts);
     }
 
     //cannot be generated for Java:
-    //public String SetNetworkSecurityOptions_internal(int options)
+    //public String SetNetworkSecurityOptions_internal(int opts)
     /**
      * Modifies the network connection delay for yRegisterHub() and yUpdateDeviceList().
      * This delay impacts only the YoctoHubs and VirtualHub
@@ -1438,8 +1466,14 @@ public class YAPIContext
     public int RegisterHub(String url) throws YAPI_Exception
     {
         _AddNewHub(url, true, null, null, null);
-        // Register device list
-        _updateDeviceList_internal(true, false);
+        try {
+            // Register device list
+            _updateDeviceList_internal(true, false);
+        } catch (YAPI_Exception ex) {
+            // remove hub from registred hub list
+            unregisterHubEx(url, null, null, null);
+            throw ex;
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1447,8 +1481,14 @@ public class YAPIContext
     public int RegisterHub(String url, InputStream request, OutputStream response) throws YAPI_Exception
     {
         _AddNewHub(url, true, request, response, null);
-        // Register device list
-        _updateDeviceList_internal(true, false);
+        try {
+            // Register device list
+            _updateDeviceList_internal(true, false);
+        } catch (YAPI_Exception ex) {
+            // remove hub from registred hub list
+            unregisterHubEx(url, request, response, null);
+            throw ex;
+        }
         return YAPI.SUCCESS;
     }
 
@@ -1556,7 +1596,6 @@ public class YAPIContext
         Iterator<YGenericHub> it = _hubs.iterator();
         while (it.hasNext()) {
             YGenericHub h = it.next();
-            ;
             if (h.isSameHub(url, request, response, session)) {
                 h.addKnownURL(url);
                 h.stopNotifications();
@@ -1597,6 +1636,7 @@ public class YAPIContext
         } else {
             newhub = new YHTTPHub(this, parsedurl, true, null);
         }
+        newhub.set_networkTimeout(mstimeout);
         return newhub.ping(mstimeout);
     }
 

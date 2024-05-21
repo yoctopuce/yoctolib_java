@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 60243 2024-03-27 09:47:10Z seb $
+ * $Id: yHTTPRequest.java 60812 2024-05-01 09:34:23Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -139,15 +139,15 @@ class yHTTPRequest implements Runnable
             throw new YAPI_Exception(YAPI.UNAUTHORIZED, "Authentication required");
         }
         String header_low = header.toLowerCase();
-        if (parts[0].equals("301") || parts[0].equals("308")) {
-            int t_ofs = header_low.indexOf("\r\nlocation");
+        if (parts[0].equals("301") || parts[0].equals("302") || parts[0].equals("308")) {
+            int t_ofs = header_low.indexOf("\r\nlocation:");
             if (t_ofs > 0) {
-                t_ofs += 10;
+                t_ofs += 11;
                 int t_endl = header_low.indexOf("\r\n", t_ofs);
                 String new_url = header.substring(t_ofs, t_endl);
                 new_url = new_url.trim();
                 if (new_url.startsWith("http")) {
-                    return ctx.BasicHTTPRequest(new_url,0);
+                    return ctx.BasicHTTPRequest(new_url,YHTTPHub.YIO_DEFAULT_TCP_TIMEOUT,0);
                 } else {
                     return yTcpDownload(ctx,host, port, new_url);
                 }
@@ -246,7 +246,7 @@ class yHTTPRequest implements Runnable
                 if (!_reuse_socket) {
                     InetAddress addr = InetAddress.getByName(_hub.getHost());
                     // Creates an connected socket
-                    _socket = _hub.OpenConnectedSocket(addr, (int) mstimeout);
+                    _socket = _hub.OpenConnectedSocket(addr, _hub.getPort(), (int)mstimeout);
                     _socket.setTcpNoDelay(true);
                     _out = _socket.getOutputStream();
                     _in = _socket.getInputStream();

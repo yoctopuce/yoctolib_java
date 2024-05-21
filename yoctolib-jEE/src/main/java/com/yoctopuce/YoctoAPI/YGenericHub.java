@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 58955 2024-01-16 08:39:12Z seb $
+ * $Id: YGenericHub.java 60948 2024-05-15 08:28:47Z seb $
  *
  * Internal YGenericHub object
  *
@@ -465,6 +465,7 @@ abstract class YGenericHub
     {
     }
 
+    public abstract String getConnectionUrl();
 
     interface UpdateProgress
     {
@@ -516,11 +517,11 @@ abstract class YGenericHub
     static class HTTPParams
     {
 
-        private final String _host;
-        private final int _port;
+        private String _host;
+        private int _port;
         private final String _user;
         private final String _pass;
-        private final String _proto;
+        private String _proto;
         private final String _subDomain;
         private final String _originalURL;
 
@@ -560,11 +561,11 @@ abstract class YGenericHub
                 _host = "";
                 _port = -1;
                 return;
-            } else {
-                if (url.startsWith("ws://")) {
-                    pos = 5;
-                }
+            } else if (url.startsWith("ws://")) {
+                pos = 5;
                 _proto = "ws";
+            } else {
+                _proto = "auto";
             }
             if (url.endsWith("/")) {
                 url = url.substring(0, url.length() - 1);
@@ -716,6 +717,17 @@ abstract class YGenericHub
         public boolean testInfoJson()
         {
             return _proto.equals("auto") || _proto.equals("secure") || _proto.equals("http") || _proto.equals("https");
+        }
+
+        public void updateForRedirect(String host, int port, boolean is_secure)
+        {
+            _host = host;
+            _port = port;
+            if (useWebSocket()) {
+                _proto = is_secure ? "wss" : "ws";
+            } else {
+                _proto = is_secure ? "https" : "http";
+            }
         }
     }
 }
