@@ -1,5 +1,5 @@
-Java v2.0.61039
+Java v2.0.61793
 
-- Fix timeout duration calculation$
-- Add support for HTTP redirection
-- Fix authentication when request send a redirect
+- Fix parsing of URL with Ipv6 address
+- Fix handling of YAPI.NO_HOSTNAME_CHECK flags
+- Fix secure:// URL that where using https protocol instead of wss

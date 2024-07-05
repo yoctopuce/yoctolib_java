@@ -894,7 +894,18 @@ public class YAPIContext
                 URLConnection connection = u.openConnection();
                 HttpsURLConnection httpsUrlConnection = (HttpsURLConnection) connection;
                 httpsUrlConnection.setConnectTimeout(mstimout);
-                httpsUrlConnection.setSSLSocketFactory(this.getSocketFactory(ssl_flags | this._sslFlags));
+                int flags = ssl_flags | this._sslFlags;
+                httpsUrlConnection.setSSLSocketFactory(this.getSocketFactory(flags));
+                if ((flags & YAPI.NO_HOSTNAME_CHECK )!=0) {
+                    httpsUrlConnection.setHostnameVerifier(new HostnameVerifier()
+                    {
+                        @Override
+                        public boolean verify(String hostname, SSLSession sslSession)
+                        {
+                            return true;
+                        }
+                    });
+                }
                 in = new BufferedInputStream(connection.getInputStream());
                 byte[] buffer = new byte[1024];
                 int readed = 0;
@@ -934,8 +945,6 @@ public class YAPIContext
             trustManagers[0] = new YTrustManager(_keyStore, sslFlags | _sslFlags);
             sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustManagers, new SecureRandom());
-
-
             return sslContext.getSocketFactory();
         } catch (Exception e) {
             return null;

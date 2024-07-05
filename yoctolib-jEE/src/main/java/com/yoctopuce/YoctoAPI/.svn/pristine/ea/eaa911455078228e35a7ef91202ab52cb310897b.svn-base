@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YDigitalIO.java 61494 2024-06-17 08:12:29Z seb $
+ *  $Id$
  *
  *  Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *

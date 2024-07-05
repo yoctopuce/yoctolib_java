@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 60940 2024-05-14 10:01:20Z seb $
+ * $Id: YHTTPHub.java 61588 2024-06-21 09:03:38Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -77,9 +77,10 @@ public class YHTTPHub extends YGenericHub
     HTTPParams _runtime_http_params = null;
     boolean _usePureHTTP = false;
     ArrayList<PortInfo> _portInfo = new ArrayList<>();
-    private boolean _useMixedMode;
+    private HubMode _hubMode;
 
-    static class PortInfo{
+    static class PortInfo
+    {
         String proto;
         int port;
 
@@ -89,7 +90,6 @@ public class YHTTPHub extends YGenericHub
             this.port = port;
         }
     }
-
 
 
     boolean needRetryWithAuth()
@@ -215,7 +215,7 @@ public class YHTTPHub extends YGenericHub
     @Override
     public String getConnectionUrl()
     {
-        return _runtime_http_params.getUrl(true,false, true);
+        return _runtime_http_params.getUrl(true, false, true);
     }
 
     YHTTPHub(YAPIContext yctx, HTTPParams httpParams, boolean reportConnnectionLost, Object session) throws YAPI_Exception
@@ -230,15 +230,11 @@ public class YHTTPHub extends YGenericHub
     }
 
 
-    enum yHubProto
+    enum HubMode
     {
-        PROTO_LEGACY,
-        PROTO_AUTO,
-        PROTO_SECURE,
-        PROTO_HTTP,
-        PROTO_WEBSOCKET,
-        PROTO_SECURE_HTTP,
-        PROTO_SECURE_WEBSOCKET,
+        LEGACY,
+        MIXED,
+        SECURE,
         PROTO_UNKNOWN
     }
 
@@ -247,7 +243,7 @@ public class YHTTPHub extends YGenericHub
     {
         String cur_proto = this._URL_params.getProto();
         _runtime_http_params = null;
-        _useMixedMode = false;
+        _hubMode = HubMode.SECURE;
         if (this._portInfo.isEmpty()) {
             _runtime_http_params = _URL_params;
         } else {
@@ -271,13 +267,23 @@ public class YHTTPHub extends YGenericHub
             } else {
                 int best_port = 0;
                 String best_proto = "ws";
+                if (this._portInfo.get(0).proto.equals("http") || this._portInfo.get(0).proto.equals("ws")) {
+                    _hubMode = HubMode.LEGACY;
+                }
 
                 for (PortInfo portInfo : this._portInfo) {
-                    if (portInfo.proto.equals("http") || portInfo.proto.equals("ws")) {
-                        _useMixedMode = true;
+                    if (_hubMode == HubMode.SECURE && (portInfo.proto.equals("http") || portInfo.proto.equals("ws"))) {
+                        _hubMode = HubMode.MIXED;
                     }
                     if (cur_proto.equals("auto") && best_port == 0) {
                         if (portInfo.proto.startsWith("http") || portInfo.proto.startsWith("ws")) {
+                            // handle http, https, ws and wss proto
+                            best_proto = portInfo.proto;
+                            best_port = portInfo.port;
+                        }
+                    }
+                    if (cur_proto.equals("secure") && best_port == 0) {
+                        if (portInfo.proto.equals("https") || portInfo.proto.equals("wss")) {
                             // handle http, https, ws and wss proto
                             best_proto = portInfo.proto;
                             best_port = portInfo.port;
@@ -745,7 +751,7 @@ public class YHTTPHub extends YGenericHub
         if (_runtime_http_params.useSecureSocket()) {
             try {
                 int sslFlags = 0;
-                if (_useMixedMode) {
+                if (_hubMode == HubMode.MIXED || _hubMode == HubMode.LEGACY) {
                     sslFlags = YAPI.NO_HOSTNAME_CHECK | YAPI.NO_EXPIRATION_CHECK | YAPI.NO_TRUSTED_CA_CHECK;
                 }
                 socket = _yctx.CreateSSLSocket(sslFlags);

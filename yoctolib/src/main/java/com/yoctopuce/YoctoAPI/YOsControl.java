@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YOsControl.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ *  $Id: YOsControl.java 61342 2024-06-11 08:30:46Z seb $
  *
  *  Implements FindOsControl(), the high-level API for OsControl functions
  *
@@ -59,7 +59,7 @@ public class YOsControl extends YFunction
     /**
      * invalid shutdownCountdown value
      */
-    public static final int SHUTDOWNCOUNTDOWN_INVALID = YAPI.INVALID_UINT;
+    public static final int SHUTDOWNCOUNTDOWN_INVALID = YAPI.INVALID_INT;
     protected int _shutdownCountdown = SHUTDOWNCOUNTDOWN_INVALID;
     protected UpdateCallback _valueCallbackOsControl = null;
 
@@ -304,6 +304,20 @@ public class YOsControl extends YFunction
     public int shutdown(int secBeforeShutDown) throws YAPI_Exception
     {
         return set_shutdownCountdown(secBeforeShutDown);
+    }
+
+    /**
+     * Schedules an OS reboot after a given number of seconds.
+     *
+     * @param secBeforeReboot : number of seconds before reboot
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int reboot(int secBeforeReboot) throws YAPI_Exception
+    {
+        return set_shutdownCountdown(0 - secBeforeReboot);
     }
 
     /**

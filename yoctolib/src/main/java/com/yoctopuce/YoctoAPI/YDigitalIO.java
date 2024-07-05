@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YDigitalIO.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ *  $Id: YDigitalIO.java 61494 2024-06-17 08:12:29Z seb $
  *
  *  Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -515,11 +515,11 @@ public class YDigitalIO extends YFunction
     }
 
     /**
-     * Returns the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only). Bit 0 indicates a shortcut on
-     * output 0, etc. Bit 8 indicates a power failure, and bit 9 signals overheating (overcurrent).
+     * Returns the port state diagnostics. Bit 0 indicates a shortcut on output 0, etc.
+     * Bit 8 indicates a power failure, and bit 9 signals overheating (overcurrent).
      * During normal use, all diagnostic bits should stay clear.
      *
-     * @return an integer corresponding to the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only)
+     * @return an integer corresponding to the port state diagnostics
      *
      * @throws YAPI_Exception on error
      */
@@ -538,11 +538,11 @@ public class YDigitalIO extends YFunction
     }
 
     /**
-     * Returns the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only). Bit 0 indicates a shortcut on
-     * output 0, etc. Bit 8 indicates a power failure, and bit 9 signals overheating (overcurrent).
+     * Returns the port state diagnostics. Bit 0 indicates a shortcut on output 0, etc.
+     * Bit 8 indicates a power failure, and bit 9 signals overheating (overcurrent).
      * During normal use, all diagnostic bits should stay clear.
      *
-     * @return an integer corresponding to the port state diagnostics (Yocto-IO and Yocto-MaxiIO-V2 only)
+     * @return an integer corresponding to the port state diagnostics
      *
      * @throws YAPI_Exception on error
      */

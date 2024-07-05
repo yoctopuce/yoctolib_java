@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 60948 2024-05-15 08:28:47Z seb $
+ * $Id: YGenericHub.java 61586 2024-06-21 09:01:55Z seb $
  *
  * Internal YGenericHub object
  *
@@ -590,7 +590,13 @@ abstract class YGenericHub
             } else {
                 _subDomain = url.substring(end_host);
             }
+            int endv6 = url.indexOf(']', pos);
             int portpos = url.indexOf(':', pos);
+            if (portpos>0 && endv6 < end_host && portpos < endv6 ) {
+                // ipv6 URL
+                portpos = url.indexOf(':', endv6);
+            }
+
             if (portpos > 0) {
                 if (portpos + 1 < end_host) {
                     _host = url.substring(pos, portpos);
@@ -711,7 +717,7 @@ abstract class YGenericHub
         @Override
         public String toString()
         {
-            return _proto + "/" + _host + ':' + _port + _subDomain;
+            return _proto + "://" + _host + ':' + _port + _subDomain;
         }
 
         public boolean testInfoJson()

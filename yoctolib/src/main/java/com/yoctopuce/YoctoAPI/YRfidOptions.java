@@ -84,7 +84,7 @@ public class YRfidOptions
     protected String HexKey;
 
     /**
-     * Force the use of single-block commands to access RFID tag memory blocks.
+     * Forces the use of single-block commands to access RFID tag memory blocks.
      * By default, the Yoctopuce library uses the most efficient access strategy
      * generally available for each tag type, but you can force the use of
      * single-block commands if the RFID tags you are using do not support
@@ -94,7 +94,7 @@ public class YRfidOptions
     protected boolean ForceSingleBlockAccess;
 
     /**
-     * Force the use of multi-block commands to access RFID tag memory blocks.
+     * Forces the use of multi-block commands to access RFID tag memory blocks.
      * By default, the Yoctopuce library uses the most efficient access strategy
      * generally available for each tag type, but you can force the use of
      * multi-block commands if you know for sure that the RFID tags you are using
@@ -106,7 +106,7 @@ public class YRfidOptions
     protected boolean ForceMultiBlockAccess;
 
     /**
-     * Enable direct access to RFID tag control blocks.
+     * Enables direct access to RFID tag control blocks.
      * By default, Yoctopuce library read and write functions only work
      * on data blocks and automatically skip special blocks, as specific functions are provided
      * to configure security parameters found in control blocks.
@@ -127,7 +127,7 @@ public class YRfidOptions
     protected boolean DisableBoundaryChecks;
 
     /**
-     * Enable simulation mode to check the affected block range as well
+     * Enables simulation mode to check the affected block range as well
      * as access rights. When this option is active, the operation is
      * not fully applied to the RFID tag but the affected block range
      * is determined and the optional access key is tested on these blocks.
