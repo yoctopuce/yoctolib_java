@@ -1,4 +1,4 @@
-Java v2.0.61793
+Java v2.0.61813
 
 - Fix parsing of URL with Ipv6 address
 - Fix handling of YAPI.NO_HOSTNAME_CHECK flags
