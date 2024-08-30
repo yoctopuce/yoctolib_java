@@ -262,9 +262,9 @@ public class YSdi12SensorInfo
     {
         String errmsg;
 
-        if ((infoStr).length() > 1) {
+        if (infoStr.length() > 1) {
             if ((infoStr).substring(0, 2).equals("ER")) {
-                errmsg = (infoStr).substring( 2,  2 + (infoStr).length()-2);
+                errmsg = (infoStr).substring( 2,  2 + infoStr.length()-2);
                 _addr = errmsg;
                 _proto = errmsg;
                 _mfg = errmsg;
@@ -278,7 +278,7 @@ public class YSdi12SensorInfo
                 _mfg = (infoStr).substring( 3,  3 + 8);
                 _model = (infoStr).substring( 11,  11 + 6);
                 _ver = (infoStr).substring( 17,  17 + 3);
-                _sn = (infoStr).substring( 20,  20 + (infoStr).length()-20);
+                _sn = (infoStr).substring( 20,  20 + infoStr.length()-20);
                 _isValid = true;
             }
         }
@@ -303,8 +303,8 @@ public class YSdi12SensorInfo
         size = 4;
         while (k < 10) {
             infoNbVal = _sdi12Port.querySdi12(_addr, String.format(Locale.US, "IM%d",k), 5000);
-            if ((infoNbVal).length() > 1) {
-                value = (infoNbVal).substring( 4,  4 + (infoNbVal).length()-4);
+            if (infoNbVal.length() > 1) {
+                value = (infoNbVal).substring( 4,  4 + infoNbVal.length()-4);
                 nbVal = YAPIContext._atoi(value);
                 if (nbVal != 0) {
                     val.clear();

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 61588 2024-06-21 09:03:38Z seb $
+ * $Id: YHTTPHub.java 62258 2024-08-22 06:32:12Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -103,6 +103,19 @@ public class YHTTPHub extends YGenericHub
     {
         synchronized (_authLock) {
             _authRetryCount = 0;
+        }
+    }
+
+    @Override
+    public synchronized void addKnownURL(String url)
+    {
+        super.addKnownURL(url);
+        HTTPParams params = new HTTPParams(url);
+        if (params.hasAuthParam() && !this._URL_params.hasAuthParam()) {
+            this._URL_params.updateAuth(params.getUser(), params.getPass());
+            if (this._runtime_http_params != null) {
+                this._runtime_http_params.updateAuth(params.getUser(), params.getPass());
+            }
         }
     }
 

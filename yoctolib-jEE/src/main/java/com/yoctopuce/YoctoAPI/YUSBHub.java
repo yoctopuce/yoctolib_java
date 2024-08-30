@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 60940 2024-05-14 10:01:20Z seb $
+ * $Id: YUSBHub.java 62233 2024-08-20 08:42:07Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -291,12 +291,6 @@ class YUSBHub extends YGenericHub
     boolean isSameHub(String url, Object request, Object response, Object session)
     {
         return url.equals("usb");
-    }
-
-
-    public static boolean RegisterLocalhost()
-    {
-        return true;
     }
 
 }

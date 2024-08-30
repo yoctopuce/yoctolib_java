@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YInputCaptureData.java 59594 2024-03-04 08:23:14Z mvuilleu $
+ * $Id: YInputCaptureData.java 62194 2024-08-19 12:21:29Z seb $
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
@@ -196,7 +196,7 @@ public class YInputCaptureData
                 recOfs = recOfs + 1;
             }
         }
-        if (((recOfs) & (1)) == 1) {
+        if ((recOfs & 1) == 1) {
             // align to next word
             recOfs = recOfs + 1;
         }

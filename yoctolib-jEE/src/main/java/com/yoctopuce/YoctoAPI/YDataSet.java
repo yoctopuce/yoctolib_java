@@ -1,5 +1,5 @@
 /*
- * $Id: YDataSet.java 54283 2023-04-28 10:13:05Z seb $
+ * $Id: YDataSet.java 62194 2024-08-19 12:21:29Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -562,7 +562,7 @@ public class YDataSet
         if (_progress >= _streams.size()) {
             return 100;
         }
-        return ((1 + (1 + _progress) * 98) / ((1 + _streams.size())));
+        return ((1 + (1 + _progress) * 98) / (1 + _streams.size()));
     }
 
     /**

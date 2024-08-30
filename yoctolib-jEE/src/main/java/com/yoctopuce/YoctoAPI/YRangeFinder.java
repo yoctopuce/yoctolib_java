@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRangeFinder.java 52848 2023-01-20 15:49:48Z mvuilleu $
+ *  $Id: YRangeFinder.java 62194 2024-08-19 12:21:29Z seb $
  *
  *  Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -663,7 +663,7 @@ public class YRangeFinder extends YSensor
         if (!((hwcal).substring(0, 1).equals("@"))) {
             return YAPI.INVALID_DOUBLE;
         }
-        return YAPIContext._atoi((hwcal).substring(1, 1 + (hwcal).length()));
+        return YAPIContext._atoi((hwcal).substring(1, 1 + hwcal.length()));
     }
 
     /**

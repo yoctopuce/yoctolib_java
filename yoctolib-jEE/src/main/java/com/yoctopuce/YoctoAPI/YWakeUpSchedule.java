@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpSchedule.java 56230 2023-08-21 15:20:59Z mvuilleu $
+ *  $Id: YWakeUpSchedule.java 62194 2024-08-19 12:21:29Z seb $
  *
  *  Implements FindWakeUpSchedule(), the high-level API for WakeUpSchedule functions
  *
@@ -840,7 +840,7 @@ public class YWakeUpSchedule extends YFunction
         long res;
 
         res = get_minutesB();
-        res = ((res) << (30));
+        res = (res << 30);
         res = res + get_minutesA();
         return res;
     }
@@ -856,9 +856,9 @@ public class YWakeUpSchedule extends YFunction
      */
     public int set_minutes(long bitmap) throws YAPI_Exception
     {
-        set_minutesA((int)(((bitmap) & (0x3fffffff))));
-        bitmap = ((bitmap) >> (30));
-        return set_minutesB((int)(((bitmap) & (0x3fffffff))));
+        set_minutesA((int)((bitmap & 0x3fffffff)));
+        bitmap = (bitmap >> 30);
+        return set_minutesB((int)((bitmap & 0x3fffffff)));
     }
 
     /**

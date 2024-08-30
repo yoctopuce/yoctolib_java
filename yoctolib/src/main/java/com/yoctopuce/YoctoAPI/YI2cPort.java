@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 59641 2024-03-05 20:50:20Z mvuilleu $
+ *  $Id: YI2cPort.java 62194 2024-08-19 12:21:29Z seb $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -1164,7 +1164,7 @@ public class YI2cPort extends YFunction
 
         databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         availPosStr = new String(databin);
-        atPos = (availPosStr).indexOf("@");
+        atPos = availPosStr.indexOf("@");
         res = YAPIContext._atoi((availPosStr).substring(0, atPos));
         return res;
     }
@@ -1178,8 +1178,8 @@ public class YI2cPort extends YFunction
 
         databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         availPosStr = new String(databin);
-        atPos = (availPosStr).indexOf("@");
-        res = YAPIContext._atoi((availPosStr).substring( atPos+1,  atPos+1 + (availPosStr).length()-atPos-1));
+        atPos = availPosStr.indexOf("@");
+        res = YAPIContext._atoi((availPosStr).substring( atPos+1,  atPos+1 + availPosStr.length()-atPos-1));
         return res;
     }
 
@@ -1203,7 +1203,7 @@ public class YI2cPort extends YFunction
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
-        if ((query).length() <= 80) {
+        if (query.length() <= 80) {
             // fast query
             url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
         } else {
@@ -1250,7 +1250,7 @@ public class YI2cPort extends YFunction
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
-        if ((hexString).length() <= 80) {
+        if (hexString.length() <= 80) {
             // fast query
             url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=$%s", maxWait,hexString);
         } else {
@@ -1354,11 +1354,11 @@ public class YI2cPort extends YFunction
 
         reply = queryLine(msg,1000);
         //noinspection DoubleNegation
-        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
-        idx = (reply).indexOf("[N]!");
+        if (!(reply.length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
+        idx = reply.indexOf("[N]!");
         //noinspection DoubleNegation
         if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
-        idx = (reply).indexOf("!");
+        idx = reply.indexOf("!");
         //noinspection DoubleNegation
         if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
         return YAPI.SUCCESS;
@@ -1393,11 +1393,11 @@ public class YI2cPort extends YFunction
 
         reply = queryLine(msg,1000);
         //noinspection DoubleNegation
-        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
-        idx = (reply).indexOf("[N]!");
+        if (!(reply.length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
+        idx = reply.indexOf("[N]!");
         //noinspection DoubleNegation
         if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
-        idx = (reply).indexOf("!");
+        idx = reply.indexOf("!");
         //noinspection DoubleNegation
         if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
         return YAPI.SUCCESS;
@@ -1453,14 +1453,14 @@ public class YI2cPort extends YFunction
 
         reply = queryLine(msg,1000);
         //noinspection DoubleNegation
-        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
-        idx = (reply).indexOf("[N]!");
+        if (!(reply.length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
+        idx = reply.indexOf("[N]!");
         //noinspection DoubleNegation
         if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
-        idx = (reply).indexOf("!");
+        idx = reply.indexOf("!");
         //noinspection DoubleNegation
         if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
-        reply = (reply).substring( (reply).length()-2*rcvCount,  (reply).length()-2*rcvCount + 2*rcvCount);
+        reply = (reply).substring( reply.length()-2*rcvCount,  reply.length()-2*rcvCount + 2*rcvCount);
         rcvbytes = YAPIContext._hexStrToBin(reply);
         return rcvbytes;
     }
@@ -1516,14 +1516,14 @@ public class YI2cPort extends YFunction
 
         reply = queryLine(msg,1000);
         //noinspection DoubleNegation
-        if (!((reply).length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
-        idx = (reply).indexOf("[N]!");
+        if (!(reply.length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
+        idx = reply.indexOf("[N]!");
         //noinspection DoubleNegation
         if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
-        idx = (reply).indexOf("!");
+        idx = reply.indexOf("!");
         //noinspection DoubleNegation
         if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
-        reply = (reply).substring( (reply).length()-2*rcvCount,  (reply).length()-2*rcvCount + 2*rcvCount);
+        reply = (reply).substring( reply.length()-2*rcvCount,  reply.length()-2*rcvCount + 2*rcvCount);
         rcvbytes = YAPIContext._hexStrToBin(reply);
         res.clear();
         idx = 0;
@@ -1607,7 +1607,7 @@ public class YI2cPort extends YFunction
     {
         int bufflen;
         byte[] buff = new byte[0];
-        bufflen = (codes).length();
+        bufflen = codes.length();
         if (bufflen < 100) {
             return sendCommand(String.format(Locale.US, "!%s",codes));
         }
@@ -1646,7 +1646,7 @@ public class YI2cPort extends YFunction
     {
         int bufflen;
         byte[] buff = new byte[0];
-        bufflen = (hexString).length();
+        bufflen = hexString.length();
         if (bufflen < 100) {
             return sendCommand(String.format(Locale.US, "+%s",hexString));
         }

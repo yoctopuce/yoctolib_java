@@ -157,16 +157,16 @@ public class YRfidOptions
             opt = 0;
         }
         if (ForceMultiBlockAccess) {
-            opt = ((opt) | (2));
+            opt = (opt | 2);
         }
         if (EnableRawAccess) {
-            opt = ((opt) | (4));
+            opt = (opt | 4);
         }
         if (DisableBoundaryChecks) {
-            opt = ((opt) | (8));
+            opt = (opt | 8);
         }
         if (EnableDryRun) {
-            opt = ((opt) | (16));
+            opt = (opt | 16);
         }
         res = String.format(Locale.US, "&o=%d",opt);
         if (KeyType != 0) {

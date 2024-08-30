@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 61586 2024-06-21 09:01:55Z seb $
+ * $Id: YGenericHub.java 62258 2024-08-22 06:32:12Z seb $
  *
  * Internal YGenericHub object
  *
@@ -128,6 +128,8 @@ abstract class YGenericHub
     protected int _networkTimeoutMs;
     private boolean _enabled = true;
     private final long _creation_time;
+    private static int _global_hub_id = 0;
+    private final int _hubid;
 
     YGenericHub(YAPIContext yctx, HTTPParams httpParams, boolean reportConnnectionLost)
     {
@@ -137,7 +139,11 @@ abstract class YGenericHub
         _URL_params = httpParams;
         _knownUrls.add(httpParams._originalURL);
         _creation_time = System.currentTimeMillis();
+        _hubid = _global_hub_id++;
+
     }
+
+
 
     abstract void release();
 
@@ -467,6 +473,11 @@ abstract class YGenericHub
 
     public abstract String getConnectionUrl();
 
+    public int get_hubid()
+    {
+        return _hubid;
+    }
+
     interface UpdateProgress
     {
         void firmware_progress(int percent, String message);
@@ -519,8 +530,8 @@ abstract class YGenericHub
 
         private String _host;
         private int _port;
-        private final String _user;
-        private final String _pass;
+        private String _user;
+        private String _pass;
         private String _proto;
         private final String _subDomain;
         private final String _originalURL;
@@ -592,7 +603,7 @@ abstract class YGenericHub
             }
             int endv6 = url.indexOf(']', pos);
             int portpos = url.indexOf(':', pos);
-            if (portpos>0 && endv6 < end_host && portpos < endv6 ) {
+            if (portpos > 0 && endv6 < end_host && portpos < endv6) {
                 // ipv6 URL
                 portpos = url.indexOf(':', endv6);
             }
@@ -735,5 +746,12 @@ abstract class YGenericHub
                 _proto = is_secure ? "https" : "http";
             }
         }
+
+        public void updateAuth(String user, String pass)
+        {
+            _user = user;
+            _pass = pass;
+        }
+
     }
 }

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWeighScale.java 57636 2023-11-03 10:35:21Z seb $
+ *  $Id: YWeighScale.java 62194 2024-08-19 12:21:29Z seb $
  *
  *  Implements FindWeighScale(), the high-level API for WeighScale functions
  *
@@ -914,11 +914,11 @@ public class YWeighScale extends YSensor
         double comp;
 
         id = get_functionId();
-        id = (id).substring( 10,  10 + (id).length() - 10);
+        id = (id).substring( 10,  10 + id.length() - 10);
         bin_json = _download(String.format(Locale.US, "extra.json?page=%d",(4*YAPIContext._atoi(id))+tableIndex));
         paramlist = _json_get_array(bin_json);
         // convert all values to float and append records
-        siz = ((paramlist.size()) >> (1));
+        siz = ((paramlist.size()) >> 1);
         tempValues.clear();
         compValues.clear();
         idx = 0;

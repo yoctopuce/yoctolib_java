@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmOutput.java 58892 2024-01-11 11:11:28Z mvuilleu $
+ *  $Id: YPwmOutput.java 61964 2024-07-29 15:54:55Z seb $
  *
  *  Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -49,7 +49,7 @@ import java.util.Locale;
  * YPwmOutput Class: PWM generator control interface, available for instance in the Yocto-PWM-Tx
  *
  * The YPwmOutput class allows you to drive a pulse-width modulated output (PWM).
- * You can configure the frequency as well as the duty cycle, and setup progressive
+ * You can configure the frequency as well as the duty cycle, and set up progressive
  * transitions.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})

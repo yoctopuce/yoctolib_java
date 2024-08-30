@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YArithmeticSensor.java 57636 2023-11-03 10:35:21Z seb $
+ *  $Id: YArithmeticSensor.java 62194 2024-08-19 12:21:29Z seb $
  *
  *  Implements FindArithmeticSensor(), the high-level API for ArithmeticSensor functions
  *
@@ -408,7 +408,7 @@ public class YArithmeticSensor extends YSensor
         String diags;
         double resval;
         id = get_functionId();
-        id = (id).substring( 16,  16 + (id).length() - 16);
+        id = (id).substring( 16,  16 + id.length() - 16);
         fname = String.format(Locale.US, "arithmExpr%s.txt",id);
 
         content = String.format(Locale.US, "// %s\n%s", descr,expr);
@@ -416,7 +416,7 @@ public class YArithmeticSensor extends YSensor
         diags = new String(data);
         //noinspection DoubleNegation
         if (!((diags).substring(0, 8).equals("Result: "))) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  diags);}
-        resval = YAPI.ystr2float((diags).substring( 8,  8 + (diags).length()-8));
+        resval = YAPI.ystr2float((diags).substring( 8,  8 + diags.length()-8));
         return resval;
     }
 
@@ -435,13 +435,13 @@ public class YArithmeticSensor extends YSensor
         String content;
         int idx;
         id = get_functionId();
-        id = (id).substring( 16,  16 + (id).length() - 16);
+        id = (id).substring( 16,  16 + id.length() - 16);
         fname = String.format(Locale.US, "arithmExpr%s.txt",id);
 
         content = new String(_download(fname));
-        idx = (content).indexOf("\n");
+        idx = content.indexOf("\n");
         if (idx > 0) {
-            content = (content).substring( idx+1,  idx+1 + (content).length()-(idx+1));
+            content = (content).substring( idx+1,  idx+1 + content.length()-(idx+1));
         }
         return content;
     }

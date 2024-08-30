@@ -1,5 +1,5 @@
 /*
- * $Id: YConsolidatedDataSet.java 54283 2023-04-28 10:13:05Z seb $
+ * $Id: YConsolidatedDataSet.java 62194 2024-08-19 12:21:29Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -231,7 +231,7 @@ public class YConsolidatedDataSet
             s = s + 1;
         }
         if (globprogress > 0) {
-            globprogress = ((globprogress) / (_nsensors));
+            globprogress = (globprogress / _nsensors);
             if (globprogress > 99) {
                 globprogress = 99;
             }

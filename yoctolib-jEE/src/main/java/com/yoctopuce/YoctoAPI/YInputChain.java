@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YInputChain.java 56082 2023-08-15 14:57:14Z mvuilleu $
+ *  $Id: YInputChain.java 62194 2024-08-19 12:21:29Z seb $
  *
  *  Implements FindInputChain(), the high-level API for InputChain functions
  *
@@ -1023,7 +1023,7 @@ public class YInputChain extends YFunction
 
     /**
      * Resets the application watchdog countdown.
-     * If you have setup a non-zero watchdogPeriod, you should
+     * If you have set up a non-zero watchdogPeriod, you should
      * call this function on a regular basis to prevent the application
      * inactivity error to be triggered.
      *
@@ -1131,26 +1131,26 @@ public class YInputChain extends YFunction
         // last element of array is the new position preceeded by '@'
         arrLen = arrLen - 1;
         lenStr = eventArr.get(arrLen);
-        lenStr = (lenStr).substring( 1,  1 + (lenStr).length()-1);
+        lenStr = (lenStr).substring( 1,  1 + lenStr.length()-1);
         // update processed event position pointer
         _eventPos = YAPIContext._atoi(lenStr);
         // now generate callbacks for each event received
         arrPos = 0;
         while (arrPos < arrLen) {
             eventStr = eventArr.get(arrPos);
-            eventLen = (eventStr).length();
+            eventLen = eventStr.length();
             if (eventLen >= 1) {
                 hexStamp = (eventStr).substring(0, 8);
                 evtStamp = Integer.valueOf(hexStamp,16);
-                typePos = (eventStr).indexOf(":")+1;
+                typePos = eventStr.indexOf(":")+1;
                 if ((evtStamp >= _eventStamp) && (typePos > 8)) {
                     _eventStamp = evtStamp;
-                    dataPos = (eventStr).indexOf("=")+1;
+                    dataPos = eventStr.indexOf("=")+1;
                     evtType = (eventStr).substring( typePos,  typePos + 1);
                     evtData = "";
                     evtChange = "";
                     if (dataPos > 10) {
-                        evtData = (eventStr).substring( dataPos,  dataPos + (eventStr).length()-dataPos);
+                        evtData = (eventStr).substring( dataPos,  dataPos + eventStr.length()-dataPos);
                         if (("1234567").indexOf(evtType) >= 0) {
                             chainIdx = YAPIContext._atoi(evtType) - 1;
                             evtChange = _strXor(evtData, _eventChains.get(chainIdx));
@@ -1174,8 +1174,8 @@ public class YInputChain extends YFunction
         int digitA;
         int digitB;
         // make sure the result has the same length as first argument
-        lenA = (a).length();
-        lenB = (b).length();
+        lenA = a.length();
+        lenB = b.length();
         if (lenA > lenB) {
             res = (a).substring(0, lenA-lenB);
             a = (a).substring( lenA-lenB,  lenA-lenB + lenB);
@@ -1189,7 +1189,7 @@ public class YInputChain extends YFunction
         while (idx < lenA) {
             digitA = Integer.valueOf((a).substring( idx,  idx + 1),16);
             digitB = Integer.valueOf((b).substring( idx,  idx + 1),16);
-            res = String.format(Locale.US, "%s%x", res,((digitA) ^ (digitB)));
+            res = String.format(Locale.US, "%s%x", res,(digitA ^ digitB));
             idx = idx + 1;
         }
         return res;
@@ -1201,16 +1201,16 @@ public class YInputChain extends YFunction
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int digit;
-        hexlen = (hexstr).length();
+        hexlen = hexstr.length();
         res.clear();
         idx = hexlen;
         while (idx > 0) {
             idx = idx - 1;
             digit = Integer.valueOf((hexstr).substring( idx,  idx + 1),16);
-            res.add(((digit) & (1)));
-            res.add(((((digit) >> (1))) & (1)));
-            res.add(((((digit) >> (2))) & (1)));
-            res.add(((((digit) >> (3))) & (1)));
+            res.add((digit & 1));
+            res.add(((digit >> 1) & 1));
+            res.add(((digit >> 2) & 1));
+            res.add(((digit >> 3) & 1));
         }
         return res;
     }

@@ -1,5 +1,5 @@
-Java v2.0.61813
+Java v2.0.62334
 
-- Fix parsing of URL with Ipv6 address
-- Fix handling of YAPI.NO_HOSTNAME_CHECK flags
-- Fix secure:// URL that where using https protocol instead of wss
+- Fix RegisterHub("net") that was implicitly register "localhost"
+- Fix authentication parameter that was not updated if the same hub is registered multiples times
+- Add support Windows ARM 64 bits

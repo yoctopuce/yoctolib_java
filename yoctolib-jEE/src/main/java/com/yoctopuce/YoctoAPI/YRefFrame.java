@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRefFrame.java 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: YRefFrame.java 62194 2024-08-19 12:21:29Z seb $
  *
  *  Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -50,7 +50,7 @@ import java.util.Locale;
  *  YRefFrame Class: 3D reference frame configuration interface, available for instance in the
  * Yocto-3D-V2 or the Yocto-Inclinometer
  *
- * The YRefFrame class is used to setup the base orientation of the Yoctopuce inertial
+ * The YRefFrame class is used to set up the base orientation of the Yoctopuce inertial
  * sensors. Thanks to this, orientation functions relative to the earth surface plane
  * can use the proper reference frame. For some devices, the class also implements a
  * tridimensional sensor calibration process, which can compensate for local variations
@@ -275,7 +275,7 @@ public class YRefFrame extends YFunction
      * indicated by the compass is the difference between the measured magnetic
      * heading and the reference bearing indicated here.
      *
-     * For instance, if you setup as reference bearing the value of the earth
+     * For instance, if you set up as reference bearing the value of the earth
      * magnetic declination, the compass will provide the orientation relative
      * to the geographic North.
      *
@@ -307,7 +307,7 @@ public class YRefFrame extends YFunction
      * indicated by the compass is the difference between the measured magnetic
      * heading and the reference bearing indicated here.
      *
-     * For instance, if you setup as reference bearing the value of the earth
+     * For instance, if you set up as reference bearing the value of the earth
      * magnetic declination, the compass will provide the orientation relative
      * to the geographic North.
      *
@@ -612,7 +612,7 @@ public class YRefFrame extends YFunction
         if (position < 0) {
             return MOUNTPOSITION.INVALID;
         }
-        return MOUNTPOSITION.fromInt(((position) >> (2)));
+        return MOUNTPOSITION.fromInt((position >> 2));
     }
 
     /**
@@ -637,7 +637,7 @@ public class YRefFrame extends YFunction
         if (position < 0) {
             return MOUNTORIENTATION.INVALID;
         }
-        return MOUNTORIENTATION.fromInt(((position) & (3)));
+        return MOUNTORIENTATION.fromInt((position & 3));
     }
 
     /**
@@ -668,7 +668,7 @@ public class YRefFrame extends YFunction
     public int set_mountPosition(MOUNTPOSITION position,MOUNTORIENTATION orientation) throws YAPI_Exception
     {
         int mixedPos;
-        mixedPos = ((position.value) << (2)) + orientation.value;
+        mixedPos = (position.value << 2) + orientation.value;
         return set_mountPos(mixedPos);
     }
 
@@ -695,11 +695,11 @@ public class YRefFrame extends YFunction
 
         calibParam = get_calibrationParam();
         iCalib = YAPIContext._decodeFloats(calibParam);
-        caltyp = ((iCalib.get(0).intValue()) / (1000));
+        caltyp = ((iCalib.get(0).intValue()) / 1000);
         if (caltyp != 33) {
             return YAPI.NOT_SUPPORTED;
         }
-        res = ((iCalib.get(1).intValue()) / (1000));
+        res = ((iCalib.get(1).intValue()) / 1000);
         return res;
     }
 
@@ -725,11 +725,11 @@ public class YRefFrame extends YFunction
 
         calibParam = get_calibrationParam();
         iCalib = YAPIContext._decodeFloats(calibParam);
-        caltyp = ((iCalib.get(0).intValue()) / (1000));
+        caltyp = ((iCalib.get(0).intValue()) / 1000);
         if (caltyp != 33) {
             return YAPI.NOT_SUPPORTED;
         }
-        res = ((iCalib.get(2).intValue()) / (1000));
+        res = ((iCalib.get(2).intValue()) / 1000);
         return res;
     }
 
@@ -807,7 +807,7 @@ public class YRefFrame extends YFunction
         _calibStageProgress = 0;
         _calibProgress = 1;
         _calibInternalPos = 0;
-        _calibPrevTick = (int) ((YAPIContext.GetTickCount()) & (0x7FFFFFFF));
+        _calibPrevTick = (int) ((YAPIContext.GetTickCount()) & 0x7FFFFFFF);
         _calibOrient.clear();
         _calibDataAccX.clear();
         _calibDataAccY.clear();
@@ -857,14 +857,14 @@ public class YRefFrame extends YFunction
             return YAPI.SUCCESS;
         }
         // make sure we leave at least 160 ms between samples
-        currTick =  (int) ((YAPIContext.GetTickCount()) & (0x7FFFFFFF));
-        if (((currTick - _calibPrevTick) & (0x7FFFFFFF)) < 160) {
+        currTick =  (int) ((YAPIContext.GetTickCount()) & 0x7FFFFFFF);
+        if (((currTick - _calibPrevTick) & 0x7FFFFFFF) < 160) {
             return YAPI.SUCCESS;
         }
         // load current accelerometer values, make sure we are on a straight angle
         // (default timeout to 0,5 sec without reading measure when out of range)
         _calibStageHint = "Set down the device on a steady horizontal surface";
-        _calibPrevTick = ((currTick + 500) & (0x7FFFFFFF));
+        _calibPrevTick = ((currTick + 500) & 0x7FFFFFFF);
         jsonData = _download("api/accelerometer.json");
         xVal = YAPIContext._atoi(_json_get_key(jsonData, "xValue")) / 65536.0;
         yVal = YAPIContext._atoi(_json_get_key(jsonData, "yValue")) / 65536.0;
@@ -948,15 +948,15 @@ public class YRefFrame extends YFunction
         _calibDataAccZ.add(zVal);
         _calibDataAcc.add(norm);
         _calibInternalPos = _calibInternalPos + 1;
-        _calibProgress = 1 + 16 * (_calibStage - 1) + ((16 * _calibInternalPos) / (_calibCount));
+        _calibProgress = 1 + 16 * (_calibStage - 1) + ((16 * _calibInternalPos) / _calibCount);
         if (_calibInternalPos < _calibCount) {
-            _calibStageProgress = 1 + ((99 * _calibInternalPos) / (_calibCount));
+            _calibStageProgress = 1 + ((99 * _calibInternalPos) / _calibCount);
             return YAPI.SUCCESS;
         }
         // Stage done, compute preliminary result
         intpos = (_calibStage - 1) * _calibCount;
         _calibSort(intpos, intpos + _calibCount);
-        intpos = intpos + ((_calibCount) / (2));
+        intpos = intpos + (_calibCount / 2);
         _calibLogMsg = String.format(Locale.US, "Stage %d: median is %d,%d,%d", _calibStage,
         (int) (double)Math.round(1000*_calibDataAccX.get(intpos).doubleValue()),
         (int) (double)Math.round(1000*_calibDataAccY.get(intpos).doubleValue()),(int) (double)Math.round(1000*_calibDataAccZ.get(intpos).doubleValue()));
@@ -964,7 +964,7 @@ public class YRefFrame extends YFunction
         _calibStage = _calibStage + 1;
         if (_calibStage < 7) {
             _calibStageHint = "Turn the device on another face";
-            _calibPrevTick = ((currTick + 500) & (0x7FFFFFFF));
+            _calibPrevTick = ((currTick + 500) & 0x7FFFFFFF);
             _calibStageProgress = 0;
             _calibInternalPos = 0;
             return YAPI.SUCCESS;
@@ -975,7 +975,7 @@ public class YRefFrame extends YFunction
         zVal = 0;
         idx = 0;
         while (idx < 6) {
-            intpos = idx * _calibCount + ((_calibCount) / (2));
+            intpos = idx * _calibCount + (_calibCount / 2);
             orient = _calibOrient.get(idx).intValue();
             if (orient == 0 || orient == 1) {
                 zVal = zVal + _calibDataAccZ.get(intpos).doubleValue();
@@ -1013,7 +1013,7 @@ public class YRefFrame extends YFunction
         zVal = 0;
         idx = 0;
         while (idx < 6) {
-            intpos = idx * _calibCount + ((_calibCount) / (2));
+            intpos = idx * _calibCount + (_calibCount / 2);
             orient = _calibOrient.get(idx).intValue();
             if (orient == 0 || orient == 1) {
                 zVal = zVal + _calibDataAcc.get(intpos).doubleValue();
@@ -1053,11 +1053,11 @@ public class YRefFrame extends YFunction
         }
         // make sure we don't start before previous calibration is cleared
         if (_calibStage == 1) {
-            currTick = (int) ((YAPIContext.GetTickCount()) & (0x7FFFFFFF));
-            currTick = ((currTick - _calibPrevTick) & (0x7FFFFFFF));
+            currTick = (int) ((YAPIContext.GetTickCount()) & 0x7FFFFFFF);
+            currTick = ((currTick - _calibPrevTick) & 0x7FFFFFFF);
             if (currTick < 1600) {
                 _calibStageHint = "Set down the device on a steady horizontal surface";
-                _calibStageProgress = ((currTick) / (40));
+                _calibStageProgress = (currTick / 40);
                 _calibProgress = 1;
                 return YAPI.SUCCESS;
             }
@@ -1065,9 +1065,9 @@ public class YRefFrame extends YFunction
 
         calibParam = _download("api/refFrame/calibrationParam.txt");
         iCalib = YAPIContext._decodeFloats(new String(calibParam));
-        cal3 = ((iCalib.get(1).intValue()) / (1000));
-        calAcc = ((cal3) / (100));
-        calMag = ((cal3) / (10)) - 10*calAcc;
+        cal3 = ((iCalib.get(1).intValue()) / 1000);
+        calAcc = (cal3 / 100);
+        calMag = (cal3 / 10) - 10*calAcc;
         calGyr = ((cal3) % (10));
         if (calGyr < 3) {
             _calibStageHint = "Set down the device on a steady horizontal surface";
@@ -1212,9 +1212,9 @@ public class YRefFrame extends YFunction
             }
         }
         if (scaleExp > 0) {
-            scaleX = ((scaleX) >> (scaleExp));
-            scaleY = ((scaleY) >> (scaleExp));
-            scaleZ = ((scaleZ) >> (scaleExp));
+            scaleX = (scaleX >> scaleExp);
+            scaleY = (scaleY >> scaleExp);
+            scaleZ = (scaleZ >> scaleExp);
         }
         if (scaleX < 0) {
             scaleX = scaleX + 1024;
@@ -1225,8 +1225,8 @@ public class YRefFrame extends YFunction
         if (scaleZ < 0) {
             scaleZ = scaleZ + 1024;
         }
-        scaleLo = ((((scaleY) & (15))) << (12)) + ((scaleX) << (2)) + scaleExp;
-        scaleHi = ((scaleZ) << (6)) + ((scaleY) >> (4));
+        scaleLo = ((scaleY & 15) << 12) + (scaleX << 2) + scaleExp;
+        scaleHi = (scaleZ << 6) + (scaleY >> 4);
         // Save calibration parameters
         newcalib = String.format(Locale.US, "5,%d,%d,%d,%d,%d", shiftX, shiftY, shiftZ, scaleLo,scaleHi);
         _calibStage = 0;

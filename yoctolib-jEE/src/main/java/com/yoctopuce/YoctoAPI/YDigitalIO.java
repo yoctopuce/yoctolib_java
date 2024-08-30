@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YDigitalIO.java 61494 2024-06-17 08:12:29Z seb $
+ *  $Id: YDigitalIO.java 62194 2024-08-19 12:21:29Z seb $
  *
  *  Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -50,7 +50,7 @@ import java.util.Locale;
  * Yocto-Maxi-IO-V2
  *
  * The YDigitalIO class allows you drive a Yoctopuce digital input/output port.
- * It can be used to setup the direction of each channel, to read the state of each channel
+ * It can be used to set up the direction of each channel, to read the state of each channel
  * and to switch the state of each channel configures as an output.
  * You can work on all channels at once, or one by one. Most functions
  * use a binary representation for channels where bit 0 matches channel #0 , bit 1 matches channel
@@ -834,7 +834,7 @@ public class YDigitalIO extends YFunction
     {
         int portVal;
         portVal = get_portState();
-        return ((((portVal) >> (bitno))) & (1));
+        return ((portVal >> bitno) & 1);
     }
 
     /**
@@ -885,7 +885,7 @@ public class YDigitalIO extends YFunction
     {
         int portDir;
         portDir = get_portDirection();
-        return ((((portDir) >> (bitno))) & (1));
+        return ((portDir >> bitno) & 1);
     }
 
     /**
@@ -923,7 +923,7 @@ public class YDigitalIO extends YFunction
     {
         int portPol;
         portPol = get_portPolarity();
-        return ((((portPol) >> (bitno))) & (1));
+        return ((portPol >> bitno) & 1);
     }
 
     /**
@@ -962,7 +962,7 @@ public class YDigitalIO extends YFunction
     {
         int portOpenDrain;
         portOpenDrain = get_portOpenDrain();
-        return ((((portOpenDrain) >> (bitno))) & (1));
+        return ((portOpenDrain >> bitno) & 1);
     }
 
     /**

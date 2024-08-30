@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSdi12Port.java 59904 2024-03-15 08:23:15Z seb $
+ *  $Id: YSdi12Port.java 62194 2024-08-19 12:21:29Z seb $
  *
  *  Implements FindSdi12Port(), the high-level API for Sdi12Port functions
  *
@@ -1192,7 +1192,7 @@ public class YSdi12Port extends YFunction
 
         databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         availPosStr = new String(databin);
-        atPos = (availPosStr).indexOf("@");
+        atPos = availPosStr.indexOf("@");
         res = YAPIContext._atoi((availPosStr).substring(0, atPos));
         return res;
     }
@@ -1206,8 +1206,8 @@ public class YSdi12Port extends YFunction
 
         databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         availPosStr = new String(databin);
-        atPos = (availPosStr).indexOf("@");
-        res = YAPIContext._atoi((availPosStr).substring( atPos+1,  atPos+1 + (availPosStr).length()-atPos-1));
+        atPos = availPosStr.indexOf("@");
+        res = YAPIContext._atoi((availPosStr).substring( atPos+1,  atPos+1 + availPosStr.length()-atPos-1));
         return res;
     }
 
@@ -1231,7 +1231,7 @@ public class YSdi12Port extends YFunction
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
-        if ((query).length() <= 80) {
+        if (query.length() <= 80) {
             // fast query
             url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
         } else {
@@ -1278,7 +1278,7 @@ public class YSdi12Port extends YFunction
         ArrayList<String> msgarr = new ArrayList<>();
         int msglen;
         String res;
-        if ((hexString).length() <= 80) {
+        if (hexString.length() <= 80) {
             // fast query
             url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=$%s", maxWait,hexString);
         } else {
@@ -1464,11 +1464,11 @@ public class YSdi12Port extends YFunction
         int idx;
         int hexb;
         int res;
-        bufflen = (hexString).length();
+        bufflen = hexString.length();
         if (bufflen < 100) {
             return sendCommand(String.format(Locale.US, "$%s",hexString));
         }
-        bufflen = ((bufflen) >> (1));
+        bufflen = (bufflen >> 1);
         buff = new byte[bufflen];
         idx = 0;
         while (idx < bufflen) {
@@ -1780,7 +1780,7 @@ public class YSdi12Port extends YFunction
         cmdChar  = "";
 
         pattern = sensorAddr;
-        if ((cmd).length() > 0) {
+        if (cmd.length() > 0) {
             cmdChar = (cmd).substring(0, 1);
         }
         if (sensorAddr.equals("?")) {
@@ -1858,7 +1858,7 @@ public class YSdi12Port extends YFunction
         i = 0 ;
         while (i < 10) {
             res = querySdi12(Integer.toString(i),"!",500);
-            if ((res).length() >= 1) {
+            if (res.length() >= 1) {
                 idSens.add(res);
             }
             i = i+1;
@@ -1868,14 +1868,14 @@ public class YSdi12Port extends YFunction
         i = 0;
         while (i<26) {
             res = querySdi12((lettreMin).substring(i, i + 1),"!",500);
-            if ((res).length() >= 1) {
+            if (res.length() >= 1) {
                 idSens.add(res);
             }
             i = i +1;
         }
         while (i<26) {
             res = querySdi12((lettreMaj).substring(i, i + 1),"!",500);
-            if ((res).length() >= 1) {
+            if (res.length() >= 1) {
                 idSens.add(res);
             }
             i = i +1;

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiSensController.java 49501 2022-04-21 07:09:25Z mvuilleu $
+ *  $Id: YMultiSensController.java 61964 2024-07-29 15:54:55Z seb $
  *
  *  Implements FindMultiSensController(), the high-level API for MultiSensController functions
  *
@@ -49,7 +49,7 @@ import java.util.Locale;
  *  YMultiSensController Class: Sensor chain configuration interface, available for instance in the
  * Yocto-Temperature-IR
  *
- * The YMultiSensController class allows you to setup a customized
+ * The YMultiSensController class allows you to set up a customized
  * sensor chain on devices featuring that functionality.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})

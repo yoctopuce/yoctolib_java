@@ -760,6 +760,7 @@ public class YAPIContext
             for (YGenericHub h : _hubs) {
                 if (h.isEnabled() && h.isSameHub(url, request, response, session)) {
                     h.addKnownURL(url);
+
                     return YAPI.SUCCESS;
                 }
             }
@@ -776,13 +777,6 @@ public class YAPIContext
             newhub = new YUSBHub(this, false, _pktAckDelay);
         } else if (url.equals("net")) {
             if ((_apiMode & YAPI.DETECT_NET) == 0) {
-                if (YUSBHub.RegisterLocalhost()) {
-                    newhub = new YHTTPHub(this, new YGenericHub.HTTPParams("localhost"), false, null);
-                    synchronized (_hubs) {
-                        _hubs.add(newhub);
-                    }
-                    newhub.startNotifications();
-                }
                 _apiMode |= YAPI.DETECT_NET;
                 _ssdp.addCallback(_ssdpCallback);
             }
@@ -896,7 +890,7 @@ public class YAPIContext
                 httpsUrlConnection.setConnectTimeout(mstimout);
                 int flags = ssl_flags | this._sslFlags;
                 httpsUrlConnection.setSSLSocketFactory(this.getSocketFactory(flags));
-                if ((flags & YAPI.NO_HOSTNAME_CHECK )!=0) {
+                if ((flags & YAPI.NO_HOSTNAME_CHECK) != 0) {
                     httpsUrlConnection.setHostnameVerifier(new HostnameVerifier()
                     {
                         @Override
@@ -1241,10 +1235,12 @@ public class YAPIContext
 
     public YGenericHub getGenHub(int hubref)
     {
-        if (hubref < 0 || hubref >= _hubs.size()) {
-            return null;
+        for (YGenericHub h : _hubs) {
+            if (h.get_hubid() == hubref) {
+                return h;
+            }
         }
-        return _hubs.get(hubref);
+        return null;
     }
 
 
@@ -1263,13 +1259,27 @@ public class YAPIContext
     {
 
         int nextref = hubref < 0 ? 0 : hubref + 1;
-        while (nextref < _hubs.size() && !_hubs.get(nextref).isEnabled()) {
-            nextref++;
+        int next_avail_ref = Integer.MAX_VALUE;
+
+        for (YGenericHub h : _hubs) {
+            if (!h.isEnabled()) {
+                continue;
+            }
+            int hubid = h.get_hubid();
+            if (hubid == nextref) {
+                return this.getYHubObj(nextref);
+            } else {
+                if (hubid > nextref && hubid < next_avail_ref) {
+                    next_avail_ref = hubid;
+                }
+            }
+
         }
-        if (nextref >= _hubs.size()) {
-            return null;
+        if (next_avail_ref != Integer.MAX_VALUE) {
+            return this.getYHubObj(next_avail_ref);
         }
-        return this.getYHubObj(nextref);
+
+        return null;
     }
 
 
@@ -1394,7 +1404,7 @@ public class YAPIContext
      *
      * From an operating system standpoint, it is generally not required to call
      * this function since the OS will automatically free allocated resources
-     * once your program is completed. However there are two situations when
+     * once your program is completed. However, there are two situations when
      * you may really want to use that function:
      *
      * - Free all dynamically allocated memory blocks in order to
@@ -1421,7 +1431,7 @@ public class YAPIContext
 
 
     /**
-     * Setup the Yoctopuce library to use modules connected on a given machine. Idealy this
+     * Set up the Yoctopuce library to use modules connected on a given machine. Idealy this
      * call will be made once at the begining of your application.  The
      * parameter will determine how the API will work. Use the following values:
      *
@@ -1438,7 +1448,7 @@ public class YAPIContext
      * computer, use the IP address 127.0.0.1. If the given IP is unresponsive, yRegisterHub
      * will not return until a time-out defined by ySetNetworkTimeout has elapsed.
      * However, it is possible to preventively test a connection  with yTestHub.
-     * If you cannot afford a network time-out, you can use the non blocking yPregisterHub
+     * If you cannot afford a network time-out, you can use the non-blocking yPregisterHub
      * function that will establish the connection as soon as it is available.
      *
      *
@@ -1453,7 +1463,7 @@ public class YAPIContext
      * while trying to access the USB modules. In particular, this means
      * that you must stop the VirtualHub software before starting
      * an application that uses direct USB access. The workaround
-     * for this limitation is to setup the library to use the VirtualHub
+     * for this limitation is to set up the library to use the VirtualHub
      * rather than direct USB access.
      *
      * If access control has been activated on the hub, virtual or not, you want to
@@ -1584,7 +1594,7 @@ public class YAPIContext
     }
 
     /**
-     * Setup the Yoctopuce library to no more use modules connected on a previously
+     * Set up the Yoctopuce library to no more use modules connected on a previously
      * registered machine with RegisterHub.
      *
      * @param url : a string containing either "usb" or the
@@ -1631,14 +1641,15 @@ public class YAPIContext
      */
     public int TestHub(String url, int mstimeout) throws YAPI_Exception
     {
+        if (url.equals("net")) {
+            throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid URL");
+        }
         YGenericHub newhub;
         YGenericHub.HTTPParams parsedurl = new YGenericHub.HTTPParams(url);
         // Add hub to known list
         if (url.equals("usb")) {
             YUSBHub.CheckUSBAcces();
             newhub = new YUSBHub(this, true, _pktAckDelay);
-        } else if (url.equals("net")) {
-            return YAPI.SUCCESS;
         } else if (parsedurl.getHost().equals("callback")) {
             // fixme add TestHub function  for callback
             newhub = new YCallbackHub(this, parsedurl, null, null);
@@ -1769,7 +1780,7 @@ public class YAPIContext
     /**
      * Checks if a given string is valid as logical name for a module or a function.
      * A valid logical name has a maximum of 19 characters, all among
-     * A..Z, a..z, 0..9, _, and -.
+     * A...Z, a...z, 0...9, _, and -.
      * If you try to configure a logical name with an incorrect string,
      * the invalid characters are ignored.
      *

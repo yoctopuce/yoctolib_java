@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 59504 2024-02-26 11:42:03Z seb $
+ * $Id: YSensor.java 62194 2024-08-19 12:21:29Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -49,7 +49,7 @@ import java.util.Locale;
  * The YSensor class is the parent class for all Yoctopuce sensor types. It can be
  * used to read the current value and unit of any sensor, read the min/max
  * value, configure autonomous recording frequency and access recorded data.
- * It also provide a function to register a callback invoked each time the
+ * It also provides a function to register a callback invoked each time the
  * observed value changes, or at a predefined interval. Using this class rather
  * than a specific subclass makes it possible to create generic applications
  * that work with any Yoctopuce sensor, even those that do not yet exist.
@@ -1127,10 +1127,10 @@ public class YSensor extends YFunction
             _caltyp = 0;
             return 0;
         }
-        if ((_calibrationParam).indexOf(",") >= 0) {
+        if (_calibrationParam.indexOf(",") >= 0) {
             // Plain text format
             iCalib = YAPIContext._decodeFloats(_calibrationParam);
-            _caltyp = ((iCalib.get(0).intValue()) / (1000));
+            _caltyp = ((iCalib.get(0).intValue()) / 1000);
             if (_caltyp > 0) {
                 if (_caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
                     // Unknown calibration type: calibrated value will be provided by the device
@@ -1528,7 +1528,7 @@ public class YSensor extends YFunction
                 poww = poww * 0x100;
                 i = i + 1;
             }
-            if (((byteVal) & (0x80)) != 0) {
+            if ((byteVal & 0x80) != 0) {
                 avgRaw = avgRaw - poww;
             }
             avgVal = avgRaw / 1000.0;
@@ -1541,7 +1541,7 @@ public class YSensor extends YFunction
             maxVal = avgVal;
         } else {
             // averaged report: avg,avg-min,max-avg
-            sublen = 1 + ((report.get(1).intValue()) & (3));
+            sublen = 1 + ((report.get(1).intValue()) & 3);
             poww = 1;
             avgRaw = 0;
             byteVal = 0;
@@ -1553,10 +1553,10 @@ public class YSensor extends YFunction
                 i = i + 1;
                 sublen = sublen - 1;
             }
-            if (((byteVal) & (0x80)) != 0) {
+            if ((byteVal & 0x80) != 0) {
                 avgRaw = avgRaw - poww;
             }
-            sublen = 1 + ((((report.get(1).intValue()) >> (2))) & (3));
+            sublen = 1 + (((report.get(1).intValue()) >> 2) & 3);
             poww = 1;
             difRaw = 0;
             while ((sublen > 0) && (i < report.size())) {
@@ -1567,7 +1567,7 @@ public class YSensor extends YFunction
                 sublen = sublen - 1;
             }
             minRaw = avgRaw - difRaw;
-            sublen = 1 + ((((report.get(1).intValue()) >> (4))) & (3));
+            sublen = 1 + (((report.get(1).intValue()) >> 4) & 3);
             poww = 1;
             difRaw = 0;
             while ((sublen > 0) && (i < report.size())) {
