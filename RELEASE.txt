@@ -1,4 +1,4 @@
-Java v2.0.62367
+Java v2.0.62388
 
 - Fix RegisterHub("net") that was implicitly register "localhost"
 - Fix authentication parameter that was not updated if the same hub is registered multiples times

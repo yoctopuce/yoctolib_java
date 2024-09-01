@@ -29,6 +29,13 @@ public class YJniWrapper
                         throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot load yapi64.dll. Check your java.library.path property.");
                     }
                     loaded = true;
+                } else if (os_arch.equals("aarch64")) {
+                    try {
+                        System.loadLibrary("yapiARM");
+                    } catch (UnsatisfiedLinkError ex) {
+                        throw new YAPI_Exception(YAPI.IO_ERROR, "Cannot load yapiARM.dll. Check your java.library.path property.");
+                    }
+                    loaded = true;
                 } else {
                     loaded = false;
                     throw new YAPI_Exception("Unknown Windows version:" + os_name + " (" + os_arch + ")");
