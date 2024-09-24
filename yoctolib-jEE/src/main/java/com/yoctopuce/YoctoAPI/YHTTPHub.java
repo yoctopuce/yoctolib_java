@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 62258 2024-08-22 06:32:12Z seb $
+ * $Id: YHTTPHub.java 62437 2024-09-03 09:38:28Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -258,7 +258,7 @@ public class YHTTPHub extends YGenericHub
         _runtime_http_params = null;
         _hubMode = HubMode.SECURE;
         if (this._portInfo.isEmpty()) {
-            _runtime_http_params = _URL_params;
+            _runtime_http_params = new HTTPParams(_URL_params);
         } else {
             if (this._usePureHTTP) {
                 // For VirtualHub-4web we use the first entry available regardless of the protocol and the port set
@@ -310,7 +310,7 @@ public class YHTTPHub extends YGenericHub
                 }
             }
             if (_runtime_http_params == null) {
-                _runtime_http_params = _URL_params;
+                _runtime_http_params = new HTTPParams(_URL_params);
             }
         }
     }

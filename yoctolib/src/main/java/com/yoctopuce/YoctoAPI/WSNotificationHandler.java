@@ -763,8 +763,15 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                             if (datalen > WSStream.MAX_DATA_LEN) {
                                 datalen = WSStream.MAX_DATA_LEN;
                             }
+                            int pos = requestBytes.position();
+                            if (pos < 180 && pos + datalen >= 192) {
+                                // on a YoctoHub, the input FIFO is limited to 192, and we can only
+                                // accept a frame if it fits entirely in the input FIFO. So make sure
+                                // the beginning of the request gets delivered entirely
+                                datalen = 191 - pos;
+                            }
                             WSStream wsstream;
-                            if (req.isAsync() && (requestBytes.position() + datalen == requestBytes.limit())) {
+                            if (req.isAsync() && (pos + datalen == requestBytes.limit())) {
                                 if (datalen == WSStream.MAX_DATA_LEN) {
                                     // last frame is already full we must send the async close in another one
                                     wsstream = new WSStream(YGenericHub.YSTREAM_TCP, tcpchan, datalen, requestBytes);

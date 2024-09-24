@@ -1,5 +1,3 @@
-Java v2.0.62388
+Java v2.0.62710
 
-- Fix RegisterHub("net") that was implicitly register "localhost"
-- Fix authentication parameter that was not updated if the same hub is registered multiples times
-- Add support Windows ARM 64 bits
+- Fix batch script that start the examples

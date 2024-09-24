@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 62258 2024-08-22 06:32:12Z seb $
+ * $Id: YGenericHub.java 62437 2024-09-03 09:38:28Z seb $
  *
  * Internal YGenericHub object
  *
@@ -539,6 +539,17 @@ abstract class YGenericHub
         public String getOriginalURL()
         {
             return _originalURL;
+        }
+
+        public HTTPParams(HTTPParams org)
+        {
+            this._host = org._host;
+            this._port = org._port;
+            this._user = org._user;
+            this._pass = org._pass;
+            this._proto = org._proto;
+            this._subDomain = org._subDomain;
+            this._originalURL = org._originalURL;
         }
 
         public HTTPParams(String url)
