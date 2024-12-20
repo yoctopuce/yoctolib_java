@@ -1,5 +1,7 @@
 package com.yoctopuce.YoctoAPI;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 class YJSONArray extends YJSONContent
@@ -149,20 +151,23 @@ class YJSONArray extends YJSONContent
     }
 
     @Override
-    String toJSON()
+    byte[] toJSON()
     {
 
-        StringBuilder res = new StringBuilder();
-        res.append('[');
-        String sep = "";
-        for (YJSONContent yjsonContent : _arrayValue) {
-            String subres = yjsonContent.toJSON();
-            res.append(sep);
-            res.append(subres);
-            sep = ",";
+        ByteArrayOutputStream res = new ByteArrayOutputStream();
+        try {
+            res.write('[');
+            String sep = "";
+            for (YJSONContent yjsonContent : _arrayValue) {
+                byte[] subres = yjsonContent.toJSON();
+                res.write(sep.getBytes(YAPI.DefaultEncoding));
+                res.write(subres);
+                sep = ",";
+            }
+            res.write(']');
+        } catch (IOException ignored) {
         }
-        res.append(']');
-        return res.toString();
+        return res.toByteArray();
     }
 
     @Override

@@ -170,7 +170,7 @@ public class YRfidOptions
         }
         res = String.format(Locale.US, "&o=%d",opt);
         if (KeyType != 0) {
-            res = String.format(Locale.US, "%s&k=%02x:%s", res, KeyType,HexKey);
+            res = String.format(Locale.US, "%s&k=%02x:%s",res,KeyType,HexKey);
         }
         return res;
     }

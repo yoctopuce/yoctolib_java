@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 60940 2024-05-14 10:01:20Z seb $
+ * $Id: YCallbackHub.java 63473 2024-11-25 14:42:43Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -234,7 +234,7 @@ class YCallbackHub extends YGenericHub
                 if (getmodule) {
                     jsonres = jsonres.getYJSONObject("module");
                 }
-                return jsonres.toJSON().getBytes(_yctx._deviceCharset);
+                return jsonres.toJSON();
             } catch (Exception ex) {
                 return "".getBytes();
             }

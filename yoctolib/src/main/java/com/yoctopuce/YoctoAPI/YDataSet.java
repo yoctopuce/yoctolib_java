@@ -1,5 +1,5 @@
 /*
- * $Id: YDataSet.java 62194 2024-08-19 12:21:29Z seb $
+ * $Id: YDataSet.java 63599 2024-12-06 10:17:59Z seb $
  *
  * Implements yFindDataSet(), the high-level API for DataSet functions
  *
@@ -85,11 +85,13 @@ public class YDataSet
     protected double _summaryTotalTime = 0;
 
     //--- (end of generated code: YDataSet definitions)
+    private final YAPIContext _yapi;
 
     // YDataSet constructor, when instantiated directly by a function
     YDataSet(YFunction parent, String functionId, String unit, double startTime, double endTime)
     {
         _parent = parent;
+        _yapi = parent._yapi;
         _functionId = functionId;
         _unit = unit;
         _startTimeMs = startTime*1000;
@@ -103,6 +105,7 @@ public class YDataSet
     public YDataSet(YFunction parent)
     {
         _parent = parent;
+        _yapi = parent._yapi;
         _startTimeMs = 0;
         _endTimeMs = 0;
         _hardwareId = "";
@@ -200,7 +203,7 @@ public class YDataSet
         ArrayList<Double> measure_data = new ArrayList<>();
 
         if (_progress < 0) {
-            strdata = new String(data);
+            strdata = new String(data, _yapi._deviceCharset);
             if (strdata.equals("{}")) {
                 _parent._throw(YAPI.VERSION_MISMATCH, "device firmware is too old");
                 return YAPI.VERSION_MISMATCH;
@@ -218,7 +221,7 @@ public class YDataSet
         summaryStopMs = YAPI.MIN_DOUBLE;
 
         // Parse complete streams
-        for (YDataStream ii_0: _streams) {
+        for (YDataStream ii_0:_streams) {
             streamStartTimeMs = (double)Math.round(ii_0.get_realStartTimeUTC() * 1000);
             streamDuration = ii_0.get_realDuration();
             streamEndTimeMs = streamStartTimeMs + (double)Math.round(streamDuration * 1000);
@@ -354,9 +357,8 @@ public class YDataSet
         ArrayList<String> suffixes = new ArrayList<>();
         int idx;
         byte[] bulkFile = new byte[0];
-        ArrayList<String> streamStr = new ArrayList<>();
         int urlIdx;
-        byte[] streamBin = new byte[0];
+        ArrayList<byte[]> streamBin = new ArrayList<>();
 
         if (progress != _progress) {
             return _progress;
@@ -430,14 +432,13 @@ public class YDataSet
                 idx = idx + 1;
             }
             bulkFile = _parent._download(url);
-            streamStr = _parent._json_get_array(bulkFile);
+            streamBin = _parent._json_get_array(bulkFile);
             urlIdx = 0;
             idx = _progress;
-            while ((idx < _streams.size()) && (urlIdx < suffixes.size()) && (urlIdx < streamStr.size())) {
+            while ((idx < _streams.size()) && (urlIdx < suffixes.size()) && (urlIdx < streamBin.size())) {
                 stream = _streams.get(idx);
                 if ((stream._get_baseurl().equals(baseurl)) && (stream._get_urlsuffix().equals(suffixes.get(urlIdx)))) {
-                    streamBin = (streamStr.get(urlIdx)).getBytes();
-                    stream._parseStream(streamBin);
+                    stream._parseStream(streamBin.get(urlIdx));
                     urlIdx = urlIdx + 1;
                 }
                 idx = idx + 1;
@@ -468,7 +469,7 @@ public class YDataSet
             return _hardwareId;
         }
         mo = _parent.get_module();
-        _hardwareId = String.format(Locale.US, "%s.%s", mo.get_serialNumber(),get_functionId());
+        _hardwareId = String.format(Locale.US, "%s.%s",mo.get_serialNumber(),get_functionId());
         return _hardwareId;
     }
 
@@ -593,7 +594,7 @@ public class YDataSet
                 stream = _streams.get(_progress);
                 if (stream._wasLoaded()) {
                     // Do not reload stream if it was already loaded
-                    return processMore(_progress, ("").getBytes());
+                    return processMore(_progress, ("").getBytes(_yapi._deviceCharset));
                 }
                 url = stream._get_url();
             }

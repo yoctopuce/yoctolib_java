@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YSms.java 62194 2024-08-19 12:21:29Z seb $
+ * $Id: YSms.java 63704 2024-12-16 10:05:02Z seb $
  *
  * Implements FindSms(), the high-level API for Sms functions
  *
@@ -74,6 +74,8 @@ public class YSms
     protected int _aggCnt = 0;
 
     //--- (end of generated code: YSms definitions)
+    private final YAPIContext _yapi;
+
 
 
     /**
@@ -82,6 +84,8 @@ public class YSms
     protected YSms(YMessageBox mbox)
     {
         _mbox = mbox;
+        _yapi = mbox._yapi;
+
         //--- (generated code: YSms attributes initialization)
         //--- (end of generated code: YSms attributes initialization)
     }
@@ -180,10 +184,10 @@ public class YSms
                 isolatin[i] = (byte)((_udata[2*i+1] & 0xff) & 0xff);
                 i = i + 1;
             }
-            return new String(isolatin);
+            return new String(isolatin, _yapi._deviceCharset);
         }
         // default: convert 8 bit to string as-is
-        return new String(_udata);
+        return new String(_udata, _yapi._deviceCharset);
     }
 
     public ArrayList<Integer> get_unicodeData()
@@ -416,11 +420,11 @@ public class YSms
             if (newdatalen == 0) {
                 // 7-bit not possible, switch to unicode
                 convertToUnicode();
-                newdata = (val).getBytes();
+                newdata = (val).getBytes(_yapi._deviceCharset);
                 newdatalen = (newdata).length;
             }
         } else {
-            newdata = (val).getBytes();
+            newdata = (val).getBytes(_yapi._deviceCharset);
             newdatalen = (newdata).length;
         }
         udatalen = (_udata).length;
@@ -597,7 +601,7 @@ public class YSms
         int val;
         int digit;
         byte[] res = new byte[0];
-        bytes = (addr).getBytes();
+        bytes = (addr).getBytes(_yapi._deviceCharset);
         srclen = (bytes).length;
         numlen = 0;
         i = 0;
@@ -689,7 +693,7 @@ public class YSms
             i = 0;
             while (i < siz) {
                 byt = (addr[ofs+i+1] & 0xff);
-                res = String.format(Locale.US, "%s%x%x", res, (byt & 15),(byt >> 4));
+                res = String.format(Locale.US, "%s%x%x",res,(byt & 15),(byt >> 4));
                 i = i + 1;
             }
             // remove padding digit if needed
@@ -738,10 +742,10 @@ public class YSms
         }
         if ((exp).substring(4, 4 + 1).equals("-") || (exp).substring(4, 4 + 1).equals("/")) {
             // ignore century
-            exp = (exp).substring( 2,  2 + explen-2);
+            exp = (exp).substring(2, 2 + explen-2);
             explen = exp.length();
         }
-        expasc = (exp).getBytes();
+        expasc = (exp).getBytes(_yapi._deviceCharset);
         res = new byte[7];
         n = 0;
         i = 0;
@@ -817,7 +821,7 @@ public class YSms
         i = 0;
         while ((i < siz) && (i < 6)) {
             byt = (exp[ofs+i] & 0xff);
-            res = String.format(Locale.US, "%s%x%x", res, (byt & 15),(byt >> 4));
+            res = String.format(Locale.US, "%s%x%x",res,(byt & 15),(byt >> 4));
             if (i < 3) {
                 if (i < 2) {
                     res = String.format(Locale.US, "%s-",res);
@@ -847,7 +851,7 @@ public class YSms
             if (ss.length()<2) {
                 ss = String.format(Locale.US, "0%s",ss);
             }
-            res = String.format(Locale.US, "%s%s%s:%s", res, sign, hh,ss);
+            res = String.format(Locale.US, "%s%s%s:%s",res,sign,hh,ss);
         }
         return res;
     }
@@ -1114,16 +1118,14 @@ public class YSms
             if (i + ielen <= udhlen) {
                 if ((iei == 0) && (ielen == 3)) {
                     // concatenated SMS, 8-bit ref
-                    sig = String.format(Locale.US, "%s-%s-%02x-%02x", _orig, _dest,
-                    _mref,(_udh[i] & 0xff));
+                    sig = String.format(Locale.US, "%s-%s-%02x-%02x",_orig,_dest,_mref,(_udh[i] & 0xff));
                     _aggSig = sig;
                     _aggCnt = (_udh[i+1] & 0xff);
                     _aggIdx = (_udh[i+2] & 0xff);
                 }
                 if ((iei == 8) && (ielen == 4)) {
                     // concatenated SMS, 16-bit ref
-                    sig = String.format(Locale.US, "%s-%s-%02x-%02x%02x", _orig, _dest,
-                    _mref, (_udh[i] & 0xff),(_udh[i+1] & 0xff));
+                    sig = String.format(Locale.US, "%s-%s-%02x-%02x%02x",_orig,_dest,_mref,(_udh[i] & 0xff),(_udh[i+1] & 0xff));
                     _aggSig = sig;
                     _aggCnt = (_udh[i+2] & 0xff);
                     _aggIdx = (_udh[i+3] & 0xff);

@@ -217,11 +217,11 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
         byte[] req_first_lineBytes;
         if (req_head_and_body == null) {
             req_first_line += "\r\n\r\n";
-            req_first_lineBytes = req_first_line.getBytes();
+            req_first_lineBytes = req_first_line.getBytes(_hub._yctx._deviceCharset);
             full_request = req_first_lineBytes;
         } else {
             req_first_line += "\r\n";
-            req_first_lineBytes = req_first_line.getBytes();
+            req_first_lineBytes = req_first_line.getBytes(_hub._yctx._deviceCharset);
             full_request = new byte[req_first_lineBytes.length + req_head_and_body.length];
             System.arraycopy(req_first_lineBytes, 0, full_request, 0, req_first_lineBytes.length);
             System.arraycopy(req_head_and_body, 0, full_request, req_first_lineBytes.length, req_head_and_body.length);
@@ -273,10 +273,10 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
 
         }
         byte[] full_result = wsRequest.getResponseBytes();
-        int okpos = YAPIContext._find_in_bytes(full_result, "OK".getBytes());
+        int okpos = YAPIContext._find_in_bytes(full_result, "OK".getBytes(_hub._yctx._deviceCharset));
         if (okpos != 0) {
-            okpos = YAPIContext._find_in_bytes(full_result, "HTTP/1.1 ".getBytes());
-            int endl = YAPIContext._find_in_bytes(full_result, "\r\n".getBytes());
+            okpos = YAPIContext._find_in_bytes(full_result, "HTTP/1.1 ".getBytes(_hub._yctx._deviceCharset));
+            int endl = YAPIContext._find_in_bytes(full_result, "\r\n".getBytes(_hub._yctx._deviceCharset));
             if (okpos == 0 && endl > 8) {
                 String line = new String(full_result, 9, endl - 9);
                 String[] parts = line.trim().split(" ");
@@ -286,7 +286,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                 throw new YAPI_Exception(line.trim());
             }
         }
-        int hpos = YAPIContext._find_in_bytes(full_result, "\r\n\r\n".getBytes());
+        int hpos = YAPIContext._find_in_bytes(full_result, "\r\n\r\n".getBytes(_hub._yctx._deviceCharset));
         if (hpos >= 0) {
             return Arrays.copyOfRange(full_result, hpos + 4, full_result.length);
         }
@@ -860,13 +860,13 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
     {
         String ha1_str = user + ":" + serial + ":" + pass;
         _md5.reset();
-        _md5.update(ha1_str.getBytes());
+        _md5.update(ha1_str.getBytes(_hub._yctx._deviceCharset));
         byte[] digest = _md5.digest();
         String ha1 = YAPIContext._bytesToHexStr(digest, 0, digest.length).toLowerCase();
         String sha1_raw = ha1 + String.format("%02x%02x%02x%02x",
                 noune & 0xff, (noune >> 8) & 0xff, (noune >> 16) & 0xff, (noune >> 24) & 0xff);
         _sha1.reset();
-        _sha1.update(sha1_raw.getBytes());
+        _sha1.update(sha1_raw.getBytes(_hub._yctx._deviceCharset));
         return _sha1.digest();
     }
 

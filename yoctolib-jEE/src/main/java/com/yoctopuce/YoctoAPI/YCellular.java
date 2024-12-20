@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 62194 2024-08-19 12:21:29Z seb $
+ * $Id: YCellular.java 63599 2024-12-06 10:17:59Z seb $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *
@@ -1396,7 +1396,7 @@ public class YCellular extends YFunction
         String gsmMsg;
         gsmMsg = get_message();
         //noinspection DoubleNegation
-        if (!((gsmMsg).substring(0, 13).equals("Enter SIM PUK"))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT,  "PUK not expected at this time");}
+        if (!((gsmMsg).substring(0, 13).equals("Enter SIM PUK"))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "PUK not expected at this time");}
         if (newPin.equals("")) {
             return set_command(String.format(Locale.US, "AT+CPIN=%s,0000;+CLCK=SC,0,0000",puk));
         }
@@ -1465,19 +1465,19 @@ public class YCellular extends YFunction
         cmdLen = cmd.length();
         chrPos = cmd.indexOf("#");
         while (chrPos >= 0) {
-            cmd = String.format(Locale.US, "%s%c23%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmd = String.format(Locale.US, "%s%c23%s",(cmd).substring(0, chrPos),37,(cmd).substring(chrPos+1, chrPos+1 + cmdLen-chrPos-1));
             cmdLen = cmdLen + 2;
             chrPos = cmd.indexOf("#");
         }
         chrPos = cmd.indexOf("+");
         while (chrPos >= 0) {
-            cmd = String.format(Locale.US, "%s%c2B%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmd = String.format(Locale.US, "%s%c2B%s",(cmd).substring(0, chrPos),37,(cmd).substring(chrPos+1, chrPos+1 + cmdLen-chrPos-1));
             cmdLen = cmdLen + 2;
             chrPos = cmd.indexOf("+");
         }
         chrPos = cmd.indexOf("=");
         while (chrPos >= 0) {
-            cmd = String.format(Locale.US, "%s%c3D%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmd = String.format(Locale.US, "%s%c3D%s",(cmd).substring(0, chrPos),37,(cmd).substring(chrPos+1, chrPos+1 + cmdLen-chrPos-1));
             cmdLen = cmdLen + 2;
             chrPos = cmd.indexOf("=");
         }
@@ -1488,7 +1488,7 @@ public class YCellular extends YFunction
         while (waitMore > 0) {
             buff = _download(cmd);
             bufflen = (buff).length;
-            buffstr = new String(buff);
+            buffstr = new String(buff, _yapi._deviceCharset);
             buffstrlen = buffstr.length();
             idx = bufflen - 1;
             while ((idx > 0) && ((buff[idx] & 0xff) != 64) && ((buff[idx] & 0xff) != 10) && ((buff[idx] & 0xff) != 13)) {
@@ -1497,14 +1497,14 @@ public class YCellular extends YFunction
             if ((buff[idx] & 0xff) == 64) {
                 // continuation detected
                 suffixlen = bufflen - idx;
-                cmd = String.format(Locale.US, "at.txt?cmd=%s",(buffstr).substring( buffstrlen - suffixlen,  buffstrlen - suffixlen + suffixlen));
+                cmd = String.format(Locale.US, "at.txt?cmd=%s",(buffstr).substring(buffstrlen - suffixlen, buffstrlen - suffixlen + suffixlen));
                 buffstr = (buffstr).substring(0, buffstrlen - suffixlen);
                 waitMore = waitMore - 1;
             } else {
                 // request complete
                 waitMore = 0;
             }
-            res = String.format(Locale.US, "%s%s", res,buffstr);
+            res = String.format(Locale.US, "%s%s",res,buffstr);
         }
         return res;
     }
@@ -1531,11 +1531,11 @@ public class YCellular extends YFunction
         idx = cops.indexOf("(");
         while (idx >= 0) {
             slen = slen - (idx+1);
-            cops = (cops).substring( idx+1,  idx+1 + slen);
+            cops = (cops).substring(idx+1, idx+1 + slen);
             idx = cops.indexOf("\"");
             if (idx > 0) {
                 slen = slen - (idx+1);
-                cops = (cops).substring( idx+1,  idx+1 + slen);
+                cops = (cops).substring(idx+1, idx+1 + slen);
                 idx = cops.indexOf("\"");
                 if (idx > 0) {
                     res.add((cops).substring(0, idx));
@@ -6099,7 +6099,7 @@ public class YCellular extends YFunction
         lines = new ArrayList<>(Arrays.asList(profiles.split("\n")));
         nlines = lines.size();
         //noinspection DoubleNegation
-        if (!(nlines > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "fail to retrieve profile list");}
+        if (!(nlines > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "fail to retrieve profile list");}
         res.clear();
         idx = 0;
         while (idx < nlines) {

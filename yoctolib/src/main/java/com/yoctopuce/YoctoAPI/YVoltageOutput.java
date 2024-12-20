@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YVoltageOutput.java 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: YVoltageOutput.java 63325 2024-11-13 09:33:33Z seb $
  *
  *  Implements FindVoltageOutput(), the high-level API for VoltageOutput functions
  *
@@ -437,7 +437,7 @@ public class YVoltageOutput extends YFunction
         if (V_target > 10.0) {
             V_target = 10.0;
         }
-        newval = String.format(Locale.US, "%d:%d", (int) (double)Math.round(V_target*65536),ms_duration);
+        newval = String.format(Locale.US, "%d:%d",(int) (double)Math.round(V_target*65536),ms_duration);
 
         return set_voltageTransition(newval);
     }

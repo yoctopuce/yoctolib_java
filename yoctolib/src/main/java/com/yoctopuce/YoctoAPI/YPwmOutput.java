@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmOutput.java 61964 2024-07-29 15:54:55Z seb $
+ *  $Id: YPwmOutput.java 63325 2024-11-13 09:33:33Z seb $
  *
  *  Implements FindPwmOutput(), the high-level API for PwmOutput functions
  *
@@ -928,7 +928,7 @@ public class YPwmOutput extends YFunction
         if (ms_target < 0.0) {
             ms_target = 0.0;
         }
-        newval = String.format(Locale.US, "%dms:%d", (int) (double)Math.round(ms_target*65536),ms_duration);
+        newval = String.format(Locale.US, "%dms:%d",(int) (double)Math.round(ms_target*65536),ms_duration);
         return set_pwmTransition(newval);
     }
 
@@ -953,7 +953,7 @@ public class YPwmOutput extends YFunction
         if (target > 100.0) {
             target = 100.0;
         }
-        newval = String.format(Locale.US, "%d:%d", (int) (double)Math.round(target*65536),ms_duration);
+        newval = String.format(Locale.US, "%d:%d",(int) (double)Math.round(target*65536),ms_duration);
         return set_pwmTransition(newval);
     }
 
@@ -974,7 +974,7 @@ public class YPwmOutput extends YFunction
         if (target < 0.001) {
             target = 0.001;
         }
-        newval = String.format(Locale.US, "%fHz:%d", target,ms_duration);
+        newval = String.format(Locale.US, "%fHz:%d",target,ms_duration);
         return set_pwmTransition(newval);
     }
 
@@ -995,7 +995,7 @@ public class YPwmOutput extends YFunction
     public int phaseMove(double target,int ms_duration) throws YAPI_Exception
     {
         String newval;
-        newval = String.format(Locale.US, "%fps:%d", target,ms_duration);
+        newval = String.format(Locale.US, "%fps:%d",target,ms_duration);
         return set_pwmTransition(newval);
     }
 
@@ -1017,7 +1017,7 @@ public class YPwmOutput extends YFunction
         if (ms_target < 0.0) {
             ms_target = 0.0;
         }
-        newval = String.format(Locale.US, "%dms*%d", (int) (double)Math.round(ms_target*65536),n_pulses);
+        newval = String.format(Locale.US, "%dms*%d",(int) (double)Math.round(ms_target*65536),n_pulses);
         return set_pwmTransition(newval);
     }
 
@@ -1042,7 +1042,7 @@ public class YPwmOutput extends YFunction
         if (target > 100.0) {
             target = 100.0;
         }
-        newval = String.format(Locale.US, "%d*%d", (int) (double)Math.round(target*65536),n_pulses);
+        newval = String.format(Locale.US, "%d*%d",(int) (double)Math.round(target*65536),n_pulses);
         return set_pwmTransition(newval);
     }
 
@@ -1063,7 +1063,7 @@ public class YPwmOutput extends YFunction
         if (target < 0.001) {
             target = 0.001;
         }
-        newval = String.format(Locale.US, "%fHz*%d", target,n_pulses);
+        newval = String.format(Locale.US, "%fHz*%d",target,n_pulses);
         return set_pwmTransition(newval);
     }
 

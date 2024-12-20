@@ -419,7 +419,7 @@ public class YRfidReader extends YFunction
             fab = -1;
             lab = -1;
         } else {
-            jsonStr = new String(json);
+            jsonStr = new String(json, _yapi._deviceCharset);
             errCode = YAPIContext._atoi(_json_get_key(json, "err"));
             errBlk = YAPIContext._atoi(_json_get_key(json, "errBlk"))-1;
             if (jsonStr.indexOf("\"fab\":") >= 0) {
@@ -433,7 +433,7 @@ public class YRfidReader extends YFunction
         status.imm_init(tagId, errCode, errBlk, fab, lab);
         retcode = status.get_yapiError();
         //noinspection DoubleNegation
-        if (!(retcode == YAPI.SUCCESS)) { throw new YAPI_Exception( retcode,  status.get_errorMessage());}
+        if (!(retcode == YAPI.SUCCESS)) { throw new YAPI_Exception(retcode, status.get_errorMessage());}
         return YAPI.SUCCESS;
     }
 
@@ -457,15 +457,15 @@ public class YRfidReader extends YFunction
     public ArrayList<String> get_tagIdList() throws YAPI_Exception
     {
         byte[] json = new byte[0];
-        ArrayList<String> jsonList = new ArrayList<>();
+        ArrayList<byte[]> jsonList = new ArrayList<>();
         ArrayList<String> taglist = new ArrayList<>();
 
         json = _download("rfid.json?a=list");
         taglist.clear();
         if ((json).length > 3) {
             jsonList = _json_get_array(json);
-            for (String ii_0:jsonList) {
-                taglist.add(_json_get_string((ii_0).getBytes()));
+            for (byte[] ii_0:jsonList) {
+                taglist.add(_json_get_string(ii_0));
             }
         }
         return taglist;
@@ -773,7 +773,7 @@ public class YRfidReader extends YFunction
      */
     public String tagReadStr(String tagId,int firstBlock,int nChars,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
     {
-        return new String(tagReadBin(tagId, firstBlock, nChars, options, status));
+        return new String(tagReadBin(tagId, firstBlock, nChars, options, status), _yapi._deviceCharset);
     }
 
     /**
@@ -912,7 +912,7 @@ public class YRfidReader extends YFunction
             buff = new byte[bufflen];
             idx = 0;
             while (idx < bufflen) {
-                hexb = Integer.valueOf((hexString).substring( 2 * idx,  2 * idx + 2),16);
+                hexb = Integer.valueOf((hexString).substring(2 * idx, 2 * idx + 2),16);
                 buff[idx] = (byte)(hexb & 0xff);
                 idx = idx + 1;
             }
@@ -958,7 +958,7 @@ public class YRfidReader extends YFunction
     public int tagWriteStr(String tagId,int firstBlock,String text,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
     {
         byte[] buff = new byte[0];
-        buff = (text).getBytes();
+        buff = (text).getBytes(_yapi._deviceCharset);
 
         return tagWriteBin(tagId, firstBlock, buff, options, status);
     }
@@ -1156,7 +1156,7 @@ public class YRfidReader extends YFunction
         byte[] content = new byte[0];
 
         content = _download("events.txt?pos=0");
-        return new String(content);
+        return new String(content, _yapi._deviceCharset);
     }
 
     /**
@@ -1225,31 +1225,31 @@ public class YRfidReader extends YFunction
             _isFirstCb = false;
             _eventStamp = 0;
             content = _download("events.txt");
-            contentStr = new String(content);
+            contentStr = new String(content, _yapi._deviceCharset);
             eventArr = new ArrayList<>(Arrays.asList(contentStr.split("\n")));
             arrLen = eventArr.size();
             //noinspection DoubleNegation
-            if (!(arrLen > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "fail to download events");}
+            if (!(arrLen > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "fail to download events");}
             // first element of array is the new position preceeded by '@'
             arrPos = 1;
             lenStr = eventArr.get(0);
-            lenStr = (lenStr).substring( 1,  1 + lenStr.length()-1);
+            lenStr = (lenStr).substring(1, 1 + lenStr.length()-1);
             // update processed event position pointer
             _eventPos = YAPIContext._atoi(lenStr);
         } else {
             // load all events since previous call
             url = String.format(Locale.US, "events.txt?pos=%d",_eventPos);
             content = _download(url);
-            contentStr = new String(content);
+            contentStr = new String(content, _yapi._deviceCharset);
             eventArr = new ArrayList<>(Arrays.asList(contentStr.split("\n")));
             arrLen = eventArr.size();
             //noinspection DoubleNegation
-            if (!(arrLen > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "fail to download events");}
+            if (!(arrLen > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "fail to download events");}
             // last element of array is the new position preceeded by '@'
             arrPos = 0;
             arrLen = arrLen - 1;
             lenStr = eventArr.get(arrLen);
-            lenStr = (lenStr).substring( 1,  1 + lenStr.length()-1);
+            lenStr = (lenStr).substring(1, 1 + lenStr.length()-1);
             // update processed event position pointer
             _eventPos = YAPIContext._atoi(lenStr);
         }
@@ -1263,14 +1263,14 @@ public class YRfidReader extends YFunction
                 intStamp = Integer.valueOf(hexStamp,16);
                 if (intStamp >= _eventStamp) {
                     _eventStamp = intStamp;
-                    binMStamp = ((eventStr).substring( 8,  8 + 2)).getBytes();
+                    binMStamp = ((eventStr).substring(8, 8 + 2)).getBytes(_yapi._deviceCharset);
                     msStamp = ((binMStamp[0] & 0xff)-64) * 32 + (binMStamp[1] & 0xff);
                     evtStamp = intStamp + (0.001 * msStamp);
                     dataPos = eventStr.indexOf("=")+1;
-                    evtType = (eventStr).substring( typePos,  typePos + 1);
+                    evtType = (eventStr).substring(typePos, typePos + 1);
                     evtData = "";
                     if (dataPos > 10) {
-                        evtData = (eventStr).substring( dataPos,  dataPos + eventLen-dataPos);
+                        evtData = (eventStr).substring(dataPos, dataPos + eventLen-dataPos);
                     }
                     if (_eventCallback != null) {
                         _eventCallback.eventCallback(this, evtStamp, evtType, evtData);

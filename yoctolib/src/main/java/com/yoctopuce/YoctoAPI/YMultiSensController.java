@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiSensController.java 61964 2024-07-29 15:54:55Z seb $
+ *  $Id: YMultiSensController.java 63325 2024-11-13 09:33:33Z seb $
  *
  *  Implements FindMultiSensController(), the high-level API for MultiSensController functions
  *
@@ -548,13 +548,13 @@ public class YMultiSensController extends YFunction
         cmd = String.format(Locale.US, "A%d",addr);
         res = set_command(cmd);
         //noinspection DoubleNegation
-        if (!(res == YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to trigger address change");}
+        if (!(res == YAPI.SUCCESS)) { throw new YAPI_Exception(YAPI.IO_ERROR, "unable to trigger address change");}
         YAPI.Sleep(1500);
         res = get_lastAddressDetected();
         //noinspection DoubleNegation
-        if (!(res > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "IR sensor not found");}
+        if (!(res > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "IR sensor not found");}
         //noinspection DoubleNegation
-        if (!(res == addr)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "address change failed");}
+        if (!(res == addr)) { throw new YAPI_Exception(YAPI.IO_ERROR, "address change failed");}
         return YAPI.SUCCESS;
     }
 
@@ -572,7 +572,7 @@ public class YMultiSensController extends YFunction
         int res;
         res = set_command("a");
         //noinspection DoubleNegation
-        if (!(res == YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to trigger address detection");}
+        if (!(res == YAPI.SUCCESS)) { throw new YAPI_Exception(YAPI.IO_ERROR, "unable to trigger address detection");}
         YAPI.Sleep(1000);
         res = get_lastAddressDetected();
         return res;

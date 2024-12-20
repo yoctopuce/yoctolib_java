@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 62194 2024-08-19 12:21:29Z seb $
+ *  $Id: YI2cPort.java 63599 2024-12-06 10:17:59Z seb $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -1055,7 +1055,7 @@ public class YI2cPort extends YFunction
     {
         String url;
         byte[] msgbin = new byte[0];
-        ArrayList<String> msgarr = new ArrayList<>();
+        ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         String res;
 
@@ -1068,11 +1068,11 @@ public class YI2cPort extends YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        _rxptr = _decode_json_int(msgarr.get(msglen));
         if (msglen == 0) {
             return "";
         }
-        res = _json_get_string((msgarr.get(0)).getBytes());
+        res = _json_get_string(msgarr.get(0));
         return res;
     }
 
@@ -1101,12 +1101,12 @@ public class YI2cPort extends YFunction
     {
         String url;
         byte[] msgbin = new byte[0];
-        ArrayList<String> msgarr = new ArrayList<>();
+        ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         ArrayList<String> res = new ArrayList<>();
         int idx;
 
-        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&pat=%s", _rxptr, maxWait,pattern);
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&pat=%s",_rxptr,maxWait,pattern);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
@@ -1115,10 +1115,10 @@ public class YI2cPort extends YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        _rxptr = _decode_json_int(msgarr.get(msglen));
         idx = 0;
         while (idx < msglen) {
-            res.add(_json_get_string((msgarr.get(idx)).getBytes()));
+            res.add(_json_get_string(msgarr.get(idx)));
             idx = idx + 1;
         }
         return res;
@@ -1163,7 +1163,7 @@ public class YI2cPort extends YFunction
         byte[] databin = new byte[0];
 
         databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
-        availPosStr = new String(databin);
+        availPosStr = new String(databin, _yapi._deviceCharset);
         atPos = availPosStr.indexOf("@");
         res = YAPIContext._atoi((availPosStr).substring(0, atPos));
         return res;
@@ -1177,9 +1177,9 @@ public class YI2cPort extends YFunction
         byte[] databin = new byte[0];
 
         databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
-        availPosStr = new String(databin);
+        availPosStr = new String(databin, _yapi._deviceCharset);
         atPos = availPosStr.indexOf("@");
-        res = YAPIContext._atoi((availPosStr).substring( atPos+1,  atPos+1 + availPosStr.length()-atPos-1));
+        res = YAPIContext._atoi((availPosStr).substring(atPos+1, atPos+1 + availPosStr.length()-atPos-1));
         return res;
     }
 
@@ -1200,17 +1200,17 @@ public class YI2cPort extends YFunction
         int prevpos;
         String url;
         byte[] msgbin = new byte[0];
-        ArrayList<String> msgarr = new ArrayList<>();
+        ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         String res;
         if (query.length() <= 80) {
             // fast query
-            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s", maxWait,_escapeAttr(query));
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=!%s",maxWait,_escapeAttr(query));
         } else {
             // long query
             prevpos = end_tell();
-            _upload("txdata", (query + "\r\n").getBytes());
-            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&pos=%d", maxWait,prevpos);
+            _upload("txdata", (query + "\r\n").getBytes(_yapi._deviceCharset));
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&pos=%d",maxWait,prevpos);
         }
 
         msgbin = _download(url);
@@ -1221,11 +1221,11 @@ public class YI2cPort extends YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        _rxptr = _decode_json_int(msgarr.get(msglen));
         if (msglen == 0) {
             return "";
         }
-        res = _json_get_string((msgarr.get(0)).getBytes());
+        res = _json_get_string(msgarr.get(0));
         return res;
     }
 
@@ -1247,17 +1247,17 @@ public class YI2cPort extends YFunction
         int prevpos;
         String url;
         byte[] msgbin = new byte[0];
-        ArrayList<String> msgarr = new ArrayList<>();
+        ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         String res;
         if (hexString.length() <= 80) {
             // fast query
-            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=$%s", maxWait,hexString);
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&cmd=$%s",maxWait,hexString);
         } else {
             // long query
             prevpos = end_tell();
             _upload("txdata", YAPIContext._hexStrToBin(hexString));
-            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&pos=%d", maxWait,prevpos);
+            url = String.format(Locale.US, "rxmsg.json?len=1&maxw=%d&pos=%d",maxWait,prevpos);
         }
 
         msgbin = _download(url);
@@ -1268,11 +1268,11 @@ public class YI2cPort extends YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        _rxptr = _decode_json_int(msgarr.get(msglen));
         if (msglen == 0) {
             return "";
         }
-        res = _json_get_string((msgarr.get(0)).getBytes());
+        res = _json_get_string(msgarr.get(0));
         return res;
     }
 
@@ -1289,7 +1289,7 @@ public class YI2cPort extends YFunction
      */
     public int uploadJob(String jobfile,String jsonDef) throws YAPI_Exception
     {
-        _upload(jobfile, (jsonDef).getBytes());
+        _upload(jobfile, (jsonDef).getBytes(_yapi._deviceCharset));
         return YAPI.SUCCESS;
     }
 
@@ -1348,19 +1348,19 @@ public class YI2cPort extends YFunction
         idx = 0;
         while (idx < nBytes) {
             val = (buff[idx] & 0xff);
-            msg = String.format(Locale.US, "%s%02x", msg,val);
+            msg = String.format(Locale.US, "%s%02x",msg,val);
             idx = idx + 1;
         }
 
         reply = queryLine(msg,1000);
         //noinspection DoubleNegation
-        if (!(reply.length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
+        if (!(reply.length() > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "No response from I2C device");}
         idx = reply.indexOf("[N]!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
+        if (!(idx < 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "No I2C ACK received");}
         idx = reply.indexOf("!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
+        if (!(idx < 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "I2C protocol error");}
         return YAPI.SUCCESS;
     }
 
@@ -1387,19 +1387,19 @@ public class YI2cPort extends YFunction
         idx = 0;
         while (idx < nBytes) {
             val = values.get(idx).intValue();
-            msg = String.format(Locale.US, "%s%02x", msg,val);
+            msg = String.format(Locale.US, "%s%02x",msg,val);
             idx = idx + 1;
         }
 
         reply = queryLine(msg,1000);
         //noinspection DoubleNegation
-        if (!(reply.length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
+        if (!(reply.length() > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "No response from I2C device");}
         idx = reply.indexOf("[N]!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
+        if (!(idx < 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "No I2C ACK received");}
         idx = reply.indexOf("!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
+        if (!(idx < 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "I2C protocol error");}
         return YAPI.SUCCESS;
     }
 
@@ -1426,13 +1426,13 @@ public class YI2cPort extends YFunction
         byte[] rcvbytes = new byte[0];
         rcvbytes = new byte[0];
         //noinspection DoubleNegation
-        if (!(rcvCount<=512)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Cannot read more than 512 bytes");}
+        if (!(rcvCount<=512)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Cannot read more than 512 bytes");}
         msg = String.format(Locale.US, "@%02x:",slaveAddr);
         nBytes = (buff).length;
         idx = 0;
         while (idx < nBytes) {
             val = (buff[idx] & 0xff);
-            msg = String.format(Locale.US, "%s%02x", msg,val);
+            msg = String.format(Locale.US, "%s%02x",msg,val);
             idx = idx + 1;
         }
         idx = 0;
@@ -1442,7 +1442,7 @@ public class YI2cPort extends YFunction
                 idx = idx + 255;
             }
             if (rcvCount - idx > 2) {
-                msg = String.format(Locale.US, "%sxx*%02X", msg,(rcvCount - idx));
+                msg = String.format(Locale.US, "%sxx*%02X",msg,(rcvCount - idx));
                 idx = rcvCount;
             }
         }
@@ -1453,14 +1453,14 @@ public class YI2cPort extends YFunction
 
         reply = queryLine(msg,1000);
         //noinspection DoubleNegation
-        if (!(reply.length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
+        if (!(reply.length() > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "No response from I2C device");}
         idx = reply.indexOf("[N]!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
+        if (!(idx < 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "No I2C ACK received");}
         idx = reply.indexOf("!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
-        reply = (reply).substring( reply.length()-2*rcvCount,  reply.length()-2*rcvCount + 2*rcvCount);
+        if (!(idx < 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "I2C protocol error");}
+        reply = (reply).substring(reply.length()-2*rcvCount, reply.length()-2*rcvCount + 2*rcvCount);
         rcvbytes = YAPIContext._hexStrToBin(reply);
         return rcvbytes;
     }
@@ -1489,13 +1489,13 @@ public class YI2cPort extends YFunction
         ArrayList<Integer> res = new ArrayList<>();
         res.clear();
         //noinspection DoubleNegation
-        if (!(rcvCount<=512)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Cannot read more than 512 bytes");}
+        if (!(rcvCount<=512)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Cannot read more than 512 bytes");}
         msg = String.format(Locale.US, "@%02x:",slaveAddr);
         nBytes = values.size();
         idx = 0;
         while (idx < nBytes) {
             val = values.get(idx).intValue();
-            msg = String.format(Locale.US, "%s%02x", msg,val);
+            msg = String.format(Locale.US, "%s%02x",msg,val);
             idx = idx + 1;
         }
         idx = 0;
@@ -1505,7 +1505,7 @@ public class YI2cPort extends YFunction
                 idx = idx + 255;
             }
             if (rcvCount - idx > 2) {
-                msg = String.format(Locale.US, "%sxx*%02X", msg,(rcvCount - idx));
+                msg = String.format(Locale.US, "%sxx*%02X",msg,(rcvCount - idx));
                 idx = rcvCount;
             }
         }
@@ -1516,14 +1516,14 @@ public class YI2cPort extends YFunction
 
         reply = queryLine(msg,1000);
         //noinspection DoubleNegation
-        if (!(reply.length() > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No response from I2C device");}
+        if (!(reply.length() > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "No response from I2C device");}
         idx = reply.indexOf("[N]!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "No I2C ACK received");}
+        if (!(idx < 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "No I2C ACK received");}
         idx = reply.indexOf("!");
         //noinspection DoubleNegation
-        if (!(idx < 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "I2C protocol error");}
-        reply = (reply).substring( reply.length()-2*rcvCount,  reply.length()-2*rcvCount + 2*rcvCount);
+        if (!(idx < 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "I2C protocol error");}
+        reply = (reply).substring(reply.length()-2*rcvCount, reply.length()-2*rcvCount + 2*rcvCount);
         rcvbytes = YAPIContext._hexStrToBin(reply);
         res.clear();
         idx = 0;
@@ -1561,7 +1561,7 @@ public class YI2cPort extends YFunction
         byte[] buff = new byte[0];
         int idx;
         int ch;
-        buff = (codes).getBytes();
+        buff = (codes).getBytes(_yapi._deviceCharset);
         bufflen = (buff).length;
         if (bufflen < 100) {
             // if string is pure text, we can send it as a simple command (faster)
@@ -1612,7 +1612,7 @@ public class YI2cPort extends YFunction
             return sendCommand(String.format(Locale.US, "!%s",codes));
         }
         // send string using file upload
-        buff = (String.format(Locale.US, "%s\n",codes)).getBytes();
+        buff = (String.format(Locale.US, "%s\n",codes)).getBytes(_yapi._deviceCharset);
         return _upload("txdata", buff);
     }
 
@@ -1650,7 +1650,7 @@ public class YI2cPort extends YFunction
         if (bufflen < 100) {
             return sendCommand(String.format(Locale.US, "+%s",hexString));
         }
-        buff = (hexString).getBytes();
+        buff = (hexString).getBytes(_yapi._deviceCharset);
 
         return _upload("txdata", buff);
     }
@@ -1677,7 +1677,7 @@ public class YI2cPort extends YFunction
         idx = 0;
         while (idx < nBytes) {
             val = (buff[idx] & 0xff);
-            msg = String.format(Locale.US, "%s%02x", msg,val);
+            msg = String.format(Locale.US, "%s%02x",msg,val);
             idx = idx + 1;
         }
 
@@ -1706,7 +1706,7 @@ public class YI2cPort extends YFunction
         idx = 0;
         while (idx < nBytes) {
             val = byteList.get(idx).intValue();
-            msg = String.format(Locale.US, "%s%02x", msg,val);
+            msg = String.format(Locale.US, "%s%02x",msg,val);
             idx = idx + 1;
         }
 
@@ -1731,12 +1731,12 @@ public class YI2cPort extends YFunction
     {
         String url;
         byte[] msgbin = new byte[0];
-        ArrayList<String> msgarr = new ArrayList<>();
+        ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         ArrayList<YI2cSnoopingRecord> res = new ArrayList<>();
         int idx;
 
-        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&t=0&len=%d", _rxptr, maxWait,maxMsg);
+        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=%d&t=0&len=%d",_rxptr,maxWait,maxMsg);
         msgbin = _download(url);
         msgarr = _json_get_array(msgbin);
         msglen = msgarr.size();
@@ -1745,10 +1745,10 @@ public class YI2cPort extends YFunction
         }
         // last element of array is the new position
         msglen = msglen - 1;
-        _rxptr = YAPIContext._atoi(msgarr.get(msglen));
+        _rxptr = _decode_json_int(msgarr.get(msglen));
         idx = 0;
         while (idx < msglen) {
-            res.add(new YI2cSnoopingRecord(msgarr.get(idx)));
+            res.add(new YI2cSnoopingRecord(new String(msgarr.get(idx), _yapi._deviceCharset)));
             idx = idx + 1;
         }
         return res;

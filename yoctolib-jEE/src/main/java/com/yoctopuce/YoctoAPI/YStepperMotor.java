@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YStepperMotor.java 61964 2024-07-29 15:54:55Z seb $
+ *  $Id: YStepperMotor.java 63325 2024-11-13 09:33:33Z seb $
  *
  *  Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *
@@ -1181,17 +1181,17 @@ public class YStepperMotor extends YFunction
         byte[] retBin = new byte[0];
         int res;
         id = get_functionId();
-        id = (id).substring( 12,  12 + 1);
-        url = String.format(Locale.US, "cmd.txt?%s=%s", id,command);
+        id = (id).substring(12, 12 + 1);
+        url = String.format(Locale.US, "cmd.txt?%s=%s",id,command);
         //may throw an exception
         retBin = _download(url);
         res = (retBin[0] & 0xff);
         if (res < 58) {
             //noinspection DoubleNegation
-            if (!(res == 48)) { throw new YAPI_Exception( YAPI.DEVICE_BUSY,  "Motor command pipeline is full, try again later");}
+            if (!(res == 48)) { throw new YAPI_Exception(YAPI.DEVICE_BUSY, "Motor command pipeline is full, try again later");}
         } else {
             //noinspection DoubleNegation
-            if (!(res == 48)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "Motor command failed permanently");}
+            if (!(res == 48)) { throw new YAPI_Exception(YAPI.IO_ERROR, "Motor command failed permanently");}
         }
         return YAPI.SUCCESS;
     }
@@ -1331,7 +1331,7 @@ public class YStepperMotor extends YFunction
     public int alertStepDir(int dir) throws YAPI_Exception
     {
         //noinspection DoubleNegation
-        if (!(dir != 0)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "direction must be +1 or -1");}
+        if (!(dir != 0)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "direction must be +1 or -1");}
         if (dir > 0) {
             return set_command(".+");
         }

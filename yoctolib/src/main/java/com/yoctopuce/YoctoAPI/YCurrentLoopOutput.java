@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCurrentLoopOutput.java 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: YCurrentLoopOutput.java 63325 2024-11-13 09:33:33Z seb $
  *
  *  Implements FindCurrentLoopOutput(), the high-level API for CurrentLoopOutput functions
  *
@@ -493,7 +493,7 @@ public class YCurrentLoopOutput extends YFunction
         if (mA_target > 21.0) {
             mA_target = 21.0;
         }
-        newval = String.format(Locale.US, "%d:%d", (int) (double)Math.round(mA_target*65536),ms_duration);
+        newval = String.format(Locale.US, "%d:%d",(int) (double)Math.round(mA_target*65536),ms_duration);
 
         return set_currentTransition(newval);
     }

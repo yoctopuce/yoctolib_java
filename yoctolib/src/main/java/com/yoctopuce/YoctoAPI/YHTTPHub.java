@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 62437 2024-09-03 09:38:28Z seb $
+ * $Id: YHTTPHub.java 63599 2024-12-06 10:17:59Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -168,7 +168,7 @@ public class YHTTPHub extends YGenericHub
 
             String plaintext = _runtime_http_params.getUser() + ":" + _http_realm + ":" + _runtime_http_params.getPass();
             mdigest.reset();
-            mdigest.update(plaintext.getBytes());
+            mdigest.update(plaintext.getBytes(_yctx._deviceCharset));
             byte[] digest = this.mdigest.digest();
             _ha1 = YAPIContext._bytesToHexStr(digest, 0, digest.length).toLowerCase();
         }
@@ -193,7 +193,7 @@ public class YHTTPHub extends YGenericHub
 
             String plaintext = method + ":" + uri;
             mdigest.reset();
-            mdigest.update(plaintext.getBytes());
+            mdigest.update(plaintext.getBytes(_yctx._deviceCharset));
             byte[] digest = this.mdigest.digest();
             String ha2 = YAPIContext._bytesToHexStr(digest, 0, digest.length).toLowerCase();
             plaintext = _ha1 + ":" + _nounce + ":" + nc + ":" + cnonce + ":auth:" + ha2;
@@ -600,8 +600,8 @@ public class YHTTPHub extends YGenericHub
                 jsonObject.parse();
                 YJSONObject settingsOnly = jsonObject.getYJSONObject("api");
                 settingsOnly.remove("services");
-                String startupConfStr = settingsOnly.toJSON();
-                startupConf = startupConfStr.getBytes();
+                String startupConfStr = new String(settingsOnly.toJSON());
+                startupConf = startupConfStr.getBytes(_yctx._deviceCharset);
             } catch (Exception ex) {
                 startupConf = new byte[0];
             }

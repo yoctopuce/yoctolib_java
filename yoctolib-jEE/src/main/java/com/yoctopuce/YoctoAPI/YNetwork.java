@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 61964 2024-07-29 15:54:55Z seb $
+ *  $Id: YNetwork.java 63599 2024-12-06 10:17:59Z seb $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *
@@ -2419,7 +2419,7 @@ public class YNetwork extends YFunction
      */
     public int useDHCP(String fallbackIpAddr,int fallbackSubnetMaskLen,String fallbackRouter) throws YAPI_Exception
     {
-        return set_ipConfig(String.format(Locale.US, "DHCP:%s/%d/%s", fallbackIpAddr, fallbackSubnetMaskLen,fallbackRouter));
+        return set_ipConfig(String.format(Locale.US, "DHCP:%s/%d/%s",fallbackIpAddr,fallbackSubnetMaskLen,fallbackRouter));
     }
 
     /**
@@ -2451,7 +2451,7 @@ public class YNetwork extends YFunction
      */
     public int useStaticIP(String ipAddress,int subnetMaskLen,String router) throws YAPI_Exception
     {
-        return set_ipConfig(String.format(Locale.US, "STATIC:%s/%d/%s", ipAddress, subnetMaskLen,router));
+        return set_ipConfig(String.format(Locale.US, "STATIC:%s/%d/%s",ipAddress,subnetMaskLen,router));
     }
 
     /**
@@ -2468,7 +2468,7 @@ public class YNetwork extends YFunction
         byte[] content = new byte[0];
 
         content = _download(String.format(Locale.US, "ping.txt?host=%s",host));
-        return new String(content);
+        return new String(content, _yapi._deviceCharset);
     }
 
     /**

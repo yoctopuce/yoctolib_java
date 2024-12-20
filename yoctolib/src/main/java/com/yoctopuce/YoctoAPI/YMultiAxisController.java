@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiAxisController.java 48017 2022-01-12 08:17:52Z seb $
+ *  $Id: YMultiAxisController.java 63325 2024-11-13 09:33:33Z seb $
  *
  *  Implements FindMultiAxisController(), the high-level API for MultiAxisController functions
  *
@@ -408,10 +408,10 @@ public class YMultiAxisController extends YFunction
         res = (retBin[0] & 0xff);
         if (res < 58) {
             //noinspection DoubleNegation
-            if (!(res == 48)) { throw new YAPI_Exception( YAPI.DEVICE_BUSY,  "Motor command pipeline is full, try again later");}
+            if (!(res == 48)) { throw new YAPI_Exception(YAPI.DEVICE_BUSY, "Motor command pipeline is full, try again later");}
         } else {
             //noinspection DoubleNegation
-            if (!(res == 48)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "Motor command failed permanently");}
+            if (!(res == 48)) { throw new YAPI_Exception(YAPI.IO_ERROR, "Motor command failed permanently");}
         }
         return YAPI.SUCCESS;
     }
@@ -444,7 +444,7 @@ public class YMultiAxisController extends YFunction
         cmd = String.format(Locale.US, "H%d",(int) (double)Math.round(1000*speed.get(0).intValue()));
         i = 1;
         while (i < ndim) {
-            cmd = String.format(Locale.US, "%s,%d", cmd,(int) (double)Math.round(1000*speed.get(i).intValue()));
+            cmd = String.format(Locale.US, "%s,%d",cmd,(int) (double)Math.round(1000*speed.get(i).intValue()));
             i = i + 1;
         }
         return sendCommand(cmd);
@@ -470,7 +470,7 @@ public class YMultiAxisController extends YFunction
         cmd = String.format(Locale.US, "M%d",(int) (double)Math.round(16*absPos.get(0).intValue()));
         i = 1;
         while (i < ndim) {
-            cmd = String.format(Locale.US, "%s,%d", cmd,(int) (double)Math.round(16*absPos.get(i).intValue()));
+            cmd = String.format(Locale.US, "%s,%d",cmd,(int) (double)Math.round(16*absPos.get(i).intValue()));
             i = i + 1;
         }
         return sendCommand(cmd);
@@ -496,7 +496,7 @@ public class YMultiAxisController extends YFunction
         cmd = String.format(Locale.US, "m%d",(int) (double)Math.round(16*relPos.get(0).intValue()));
         i = 1;
         while (i < ndim) {
-            cmd = String.format(Locale.US, "%s,%d", cmd,(int) (double)Math.round(16*relPos.get(i).intValue()));
+            cmd = String.format(Locale.US, "%s,%d",cmd,(int) (double)Math.round(16*relPos.get(i).intValue()));
             i = i + 1;
         }
         return sendCommand(cmd);

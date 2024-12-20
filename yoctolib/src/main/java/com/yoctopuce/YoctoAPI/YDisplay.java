@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 43580 2021-01-26 17:46:01Z mvuilleu $
+ * $Id: YDisplay.java 63599 2024-12-06 10:17:59Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -912,7 +912,7 @@ public class YDisplay extends YFunction
     {
         flushLayers();
         _recording = false;
-        _upload(sequenceName, (_sequence).getBytes());
+        _upload(sequenceName, (_sequence).getBytes(_yapi._deviceCharset));
         //We need to use YPRINTF("") for Objective-C
         _sequence = "";
         return YAPI.SUCCESS;
@@ -1043,7 +1043,7 @@ public class YDisplay extends YFunction
         int idx;
         layercount = get_layerCount();
         //noinspection DoubleNegation
-        if (!((layerId >= 0) && (layerId < layercount))) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "invalid DisplayLayer index");}
+        if (!((layerId >= 0) && (layerId < layercount))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "invalid DisplayLayer index");}
         if (_allDisplayLayers.size() == 0) {
             idx = 0;
             while (idx < layercount) {

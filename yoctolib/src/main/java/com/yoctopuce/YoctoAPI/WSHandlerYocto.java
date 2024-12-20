@@ -181,16 +181,16 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         }
         // write request
         try {
-            _out.write(request.getBytes());
-            _out.write(WS_HEADER_START.getBytes());
+            _out.write(request.getBytes(hub._yctx._defaultEncoding));
+            _out.write(WS_HEADER_START.getBytes(hub._yctx._defaultEncoding));
 
             byte[] SecWebSocketKey = new byte[16];
             _randGen.nextBytes(SecWebSocketKey);
             String encodedBytes = YAPI.Base64Encode(SecWebSocketKey, 0, SecWebSocketKey.length);
             _websocket_key = encodedBytes;
-            _out.write(encodedBytes.getBytes());
-            _out.write(String.format("\r\nHost: %s:%d", host, hub.getPort()).getBytes());
-            _out.write(WS_HEADER_END.getBytes());
+            _out.write(encodedBytes.getBytes(hub._yctx._defaultEncoding));
+            _out.write(String.format("\r\nHost: %s:%d", host, hub.getPort()).getBytes(hub._yctx._defaultEncoding));
+            _out.write(WS_HEADER_END.getBytes(hub._yctx._defaultEncoding));
             _out.flush();
             _closed = false;
 

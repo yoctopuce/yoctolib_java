@@ -1,5 +1,8 @@
 package com.yoctopuce.YoctoAPI;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 class YJSONString extends YJSONContent
 {
     private String _stringValue;
@@ -28,7 +31,7 @@ class YJSONString extends YJSONContent
         StringBuilder value = new StringBuilder();
         int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
 
-        if (cur_pos >= _data_boundary ||_data.charAt(cur_pos) != '"') {
+        if (cur_pos >= _data_boundary || _data.charAt(cur_pos) != '"') {
             throw new Exception(formatError("double quote was expected", cur_pos));
         }
         cur_pos++;
@@ -66,45 +69,49 @@ class YJSONString extends YJSONContent
     }
 
     @Override
-    String toJSON()
+    byte[] toJSON()
     {
-        StringBuilder res = new StringBuilder(_stringValue.length() * 2);
-        res.append('"');
-        int len = _stringValue.length();
-        for (int i = 0; i < len; i++) {
-            char c = _stringValue.charAt(i);
-            switch (c) {
-                case '"':
-                    res.append("\\\"");
-                    break;
-                case '\\':
-                    res.append("\\\\");
-                    break;
-                case '/':
-                    res.append("\\/");
-                    break;
-                case '\b':
-                    res.append("\\b");
-                    break;
-                case '\f':
-                    res.append("\\f");
-                    break;
-                case '\n':
-                    res.append("\\n");
-                    break;
-                case '\r':
-                    res.append("\\r");
-                    break;
-                case '\t':
-                    res.append("\\t");
-                    break;
-                default:
-                    res.append(c);
-                    break;
+        byte[] stringValueBytes = _stringValue.getBytes();
+        ByteArrayOutputStream res = new ByteArrayOutputStream(stringValueBytes.length * 2);
+        try {
+            res.write('"');
+            int len = stringValueBytes.length;
+            for (int i = 0; i < len; i++) {
+                char c = (char)stringValueBytes[i];
+                switch (c) {
+                    case '"':
+                        res.write("\\\"".getBytes(YAPI.DefaultEncoding));
+                        break;
+                    case '\\':
+                        res.write("\\\\".getBytes(YAPI.DefaultEncoding));
+                        break;
+                    case '/':
+                        res.write("\\/".getBytes(YAPI.DefaultEncoding));
+                        break;
+                    case '\b':
+                        res.write("\\b".getBytes(YAPI.DefaultEncoding));
+                        break;
+                    case '\f':
+                        res.write("\\f".getBytes(YAPI.DefaultEncoding));
+                        break;
+                    case '\n':
+                        res.write("\\n".getBytes(YAPI.DefaultEncoding));
+                        break;
+                    case '\r':
+                        res.write("\\r".getBytes(YAPI.DefaultEncoding));
+                        break;
+                    case '\t':
+                        res.write("\\t".getBytes(YAPI.DefaultEncoding));
+                        break;
+                    default:
+                        res.write(c);
+                        break;
+                }
             }
+            res.write('"');
+        } catch (IOException ignored) {
         }
-        res.append('"');
-        return res.toString();
+        return res.toByteArray();
     }
 
     String getString()

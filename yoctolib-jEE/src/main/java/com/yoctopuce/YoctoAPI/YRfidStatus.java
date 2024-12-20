@@ -597,7 +597,7 @@ public class YRfidStatus
                 errMsg = "Radio is OFF (refreshRate=0).";
             }
             if (errBlk >= 0) {
-                errMsg = String.format(Locale.US, "%s (block %d)", errMsg,errBlk);
+                errMsg = String.format(Locale.US, "%s (block %d)",errMsg,errBlk);
             }
         }
         _tagId = tagId;

@@ -79,6 +79,12 @@ public class YMicroPython extends YFunction
      */
     public static final String STARTUPSCRIPT_INVALID = YAPI.INVALID_STRING;
     /**
+     * invalid debugMode value
+     */
+    public static final int DEBUGMODE_OFF = 0;
+    public static final int DEBUGMODE_ON = 1;
+    public static final int DEBUGMODE_INVALID = -1;
+    /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
@@ -87,6 +93,7 @@ public class YMicroPython extends YFunction
     protected int _xheapUsage = XHEAPUSAGE_INVALID;
     protected String _currentScript = CURRENTSCRIPT_INVALID;
     protected String _startupScript = STARTUPSCRIPT_INVALID;
+    protected int _debugMode = DEBUGMODE_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackMicroPython = null;
     protected YMicroPythonLogCallback _logCallback;
@@ -184,6 +191,9 @@ public class YMicroPython extends YFunction
         }
         if (json_val.has("startupScript")) {
             _startupScript = json_val.getString("startupScript");
+        }
+        if (json_val.has("debugMode")) {
+            _debugMode = json_val.getInt("debugMode") > 0 ? 1 : 0;
         }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
@@ -440,6 +450,76 @@ public class YMicroPython extends YFunction
         return set_startupScript(newval);
     }
 
+    /**
+     * Returns the activation state of micropython debugging interface.
+     *
+     *  @return either YMicroPython.DEBUGMODE_OFF or YMicroPython.DEBUGMODE_ON, according to the activation
+     * state of micropython debugging interface
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_debugMode() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return DEBUGMODE_INVALID;
+                }
+            }
+            res = _debugMode;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the activation state of micropython debugging interface.
+     *
+     *  @return either YMicroPython.DEBUGMODE_OFF or YMicroPython.DEBUGMODE_ON, according to the activation
+     * state of micropython debugging interface
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getDebugMode() throws YAPI_Exception
+    {
+        return get_debugMode();
+    }
+
+    /**
+     * Changes the activation state of micropython debugging interface.
+     *
+     *  @param newval : either YMicroPython.DEBUGMODE_OFF or YMicroPython.DEBUGMODE_ON, according to the
+     * activation state of micropython debugging interface
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_debugMode(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("debugMode",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the activation state of micropython debugging interface.
+     *
+     *  @param newval : either YMicroPython.DEBUGMODE_OFF or YMicroPython.DEBUGMODE_ON, according to the
+     * activation state of micropython debugging interface
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setDebugMode(int newval)  throws YAPI_Exception
+    {
+        return set_debugMode(newval);
+    }
+
     public String get_command() throws YAPI_Exception
     {
         String res;
@@ -613,7 +693,7 @@ public class YMicroPython extends YFunction
         String fullname;
         int res;
         fullname = String.format(Locale.US, "mpy:%s",codeName);
-        res = _upload(fullname, (mpyCode).getBytes());
+        res = _upload(fullname, (mpyCode).getBytes(_yapi._deviceCharset));
         return res;
     }
 
@@ -632,7 +712,7 @@ public class YMicroPython extends YFunction
 
         res = set_command("Z");
         //noinspection DoubleNegation
-        if (!(res == YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to trigger MicroPython reset");}
+        if (!(res == YAPI.SUCCESS)) { throw new YAPI_Exception(YAPI.IO_ERROR, "unable to trigger MicroPython reset");}
         // Wait until the reset is effective
         state = (get_advertisedValue()).substring(0, 1);
         while (!(state.equals("z"))) {
@@ -660,7 +740,7 @@ public class YMicroPython extends YFunction
         while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
             bufflen = bufflen - 1;
         }
-        res = (new String(buff)).substring(0, bufflen);
+        res = (new String(buff, _yapi._deviceCharset)).substring(0, bufflen);
         return res;
     }
 
@@ -732,15 +812,15 @@ public class YMicroPython extends YFunction
         }
 
         content = _download(url);
-        contentStr = new String(content);
+        contentStr = new String(content, _yapi._deviceCharset);
         // look for new position indicator at end of logs
         endPos = (content).length - 1;
         while ((endPos >= 0) && ((content[endPos] & 0xff) != 64)) {
             endPos = endPos - 1;
         }
         //noinspection DoubleNegation
-        if (!(endPos > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "fail to download micropython logs");}
-        lenStr = (contentStr).substring( endPos+1,  endPos+1 + contentStr.length()-(endPos+1));
+        if (!(endPos > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "fail to download micropython logs");}
+        lenStr = (contentStr).substring(endPos+1, endPos+1 + contentStr.length()-(endPos+1));
         // update processed event position pointer
         _logPos = YAPIContext._atoi(lenStr);
         if (_isFirstCb) {
@@ -751,12 +831,12 @@ public class YMicroPython extends YFunction
         // now generate callbacks for each complete log line
         endPos = endPos - 1;
         //noinspection DoubleNegation
-        if (!((content[endPos] & 0xff) == 10)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "fail to download micropython logs");}
+        if (!((content[endPos] & 0xff) == 10)) { throw new YAPI_Exception(YAPI.IO_ERROR, "fail to download micropython logs");}
         contentStr = (contentStr).substring(0, endPos);
         msgArr = new ArrayList<>(Arrays.asList(contentStr.split("\n")));
         arrLen = msgArr.size() - 1;
         if (arrLen > 0) {
-            logMsg = String.format(Locale.US, "%s%s", _prevPartialLog,msgArr.get(0));
+            logMsg = String.format(Locale.US, "%s%s",_prevPartialLog,msgArr.get(0));
             if (_logCallback != null) {
                 _logCallback.logCallback(this, logMsg);
             }
@@ -770,7 +850,7 @@ public class YMicroPython extends YFunction
                 arrPos = arrPos + 1;
             }
         }
-        _prevPartialLog = String.format(Locale.US, "%s%s", _prevPartialLog,msgArr.get(arrLen));
+        _prevPartialLog = String.format(Locale.US, "%s%s",_prevPartialLog,msgArr.get(arrLen));
         return YAPI.SUCCESS;
     }
 

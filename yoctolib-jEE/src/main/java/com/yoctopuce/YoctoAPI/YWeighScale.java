@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWeighScale.java 62194 2024-08-19 12:21:29Z seb $
+ *  $Id: YWeighScale.java 63599 2024-12-06 10:17:59Z seb $
  *
  *  Implements FindWeighScale(), the high-level API for WeighScale functions
  *
@@ -854,7 +854,7 @@ public class YWeighScale extends YSensor
      */
     public int setupSpan(double currWeight,double maxWeight) throws YAPI_Exception
     {
-        return set_command(String.format(Locale.US, "S%d:%d", (int) (double)Math.round(1000*currWeight),(int) (double)Math.round(1000*maxWeight)));
+        return set_command(String.format(Locale.US, "S%d:%d",(int) (double)Math.round(1000*currWeight),(int) (double)Math.round(1000*maxWeight)));
     }
 
     public int setCompensationTable(int tableIndex,ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
@@ -869,13 +869,13 @@ public class YWeighScale extends YSensor
         double idxTemp;
         siz = tempValues.size();
         //noinspection DoubleNegation
-        if (!(siz != 1)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "thermal compensation table must have at least two points");}
+        if (!(siz != 1)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "thermal compensation table must have at least two points");}
         //noinspection DoubleNegation
-        if (!(siz == compValues.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "table sizes mismatch");}
+        if (!(siz == compValues.size())) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "table sizes mismatch");}
 
         res = set_command(String.format(Locale.US, "%dZ",tableIndex));
         //noinspection DoubleNegation
-        if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermal compensation table");}
+        if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception(YAPI.IO_ERROR, "unable to reset thermal compensation table");}
         // add records in growing temperature value
         found = 1;
         prev = -999999.0;
@@ -894,9 +894,9 @@ public class YWeighScale extends YSensor
                 idx = idx + 1;
             }
             if (found > 0) {
-                res = set_command(String.format(Locale.US, "%dm%d:%d", tableIndex, (int) (double)Math.round(1000*curr),(int) (double)Math.round(1000*currComp)));
+                res = set_command(String.format(Locale.US, "%dm%d:%d",tableIndex,(int) (double)Math.round(1000*curr),(int) (double)Math.round(1000*currComp)));
                 //noinspection DoubleNegation
-                if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to set thermal compensation table");}
+                if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception(YAPI.IO_ERROR, "unable to set thermal compensation table");}
                 prev = curr;
             }
         }
@@ -907,14 +907,14 @@ public class YWeighScale extends YSensor
     {
         String id;
         byte[] bin_json = new byte[0];
-        ArrayList<String> paramlist = new ArrayList<>();
+        ArrayList<byte[]> paramlist = new ArrayList<>();
         int siz;
         int idx;
         double temp;
         double comp;
 
         id = get_functionId();
-        id = (id).substring( 10,  10 + id.length() - 10);
+        id = (id).substring(10, 10 + id.length() - 10);
         bin_json = _download(String.format(Locale.US, "extra.json?page=%d",(4*YAPIContext._atoi(id))+tableIndex));
         paramlist = _json_get_array(bin_json);
         // convert all values to float and append records
@@ -923,8 +923,8 @@ public class YWeighScale extends YSensor
         compValues.clear();
         idx = 0;
         while (idx < siz) {
-            temp = YAPI.ystr2float(paramlist.get(2*idx))/1000.0;
-            comp = YAPI.ystr2float(paramlist.get(2*idx+1))/1000.0;
+            temp = YAPI.ystr2float(new String(paramlist.get(2*idx), _yapi._deviceCharset))/1000.0;
+            comp = YAPI.ystr2float(new String(paramlist.get(2*idx+1), _yapi._deviceCharset))/1000.0;
             tempValues.add(temp);
             compValues.add(comp);
             idx = idx + 1;

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 53689 2023-03-22 11:17:15Z mvuilleu $
+ * $Id: YFunction.java 63599 2024-12-06 10:17:59Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -486,9 +486,9 @@ public class YFunction
     {
         String url;
         byte[] attrVal = new byte[0];
-        url = String.format(Locale.US, "api/%s/%s", get_functionId(),attrName);
+        url = String.format(Locale.US, "api/%s/%s",get_functionId(),attrName);
         attrVal = _download(url);
-        return new String(attrVal);
+        return new String(attrVal, _yapi._deviceCharset);
     }
 
     /**
@@ -760,7 +760,7 @@ public class YFunction
     {
         YJSONArray array = null;
         try {
-            String s = new String(json, _yapi._deviceCharset);
+            String s = new String(json,YAPI.DefaultEncoding);
             YJSONString yjsonString = new YJSONString(s, 0, s.length());
             yjsonString.parse();
             return yjsonString.getString();
@@ -769,7 +769,28 @@ public class YFunction
         }
     }
 
-    protected ArrayList<String> _json_get_array(byte[] json) throws YAPI_Exception
+    protected String _decode_json_string(byte[] json)
+    {
+        try {
+            return _json_get_string(json);
+        } catch (YAPI_Exception ex) {
+            return "";
+        }
+    }
+
+    protected int _decode_json_int(byte[] json)
+    {
+        try {
+            String s = new String(json, _yapi._deviceCharset);
+            YJSONNumber yjsonNumber = new YJSONNumber(s, 0, s.length());
+            yjsonNumber.parse();
+            return yjsonNumber.getInt();
+        } catch (Exception ex) {
+            return 0;
+        }
+    }
+
+    protected ArrayList<byte[]> _json_get_array(byte[] json) throws YAPI_Exception
     {
         YJSONArray array = null;
         try {
@@ -778,7 +799,7 @@ public class YFunction
         } catch (Exception ex) {
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
-        ArrayList<String> list = new ArrayList<>();
+        ArrayList<byte[]> list = new ArrayList<>();
         int len = array.length();
         for (int i = 0; i < len; i++) {
             try {
@@ -803,7 +824,7 @@ public class YFunction
         YJSONContent obj = jsonObject.get(key);
         if (obj != null) {
             if (paths.length == ofs + 1) {
-                return obj.toJSON();
+                return new String(obj.toJSON());
             }
             if (obj.getJSONType() == YJSONContent.YJSONType.ARRAY) {
                 return _get_json_path_array(jsonObject.getYJSONArray(key), paths, ofs + 1);
@@ -824,7 +845,7 @@ public class YFunction
         YJSONContent obj = jsonArray.get(key);
         if (obj != null) {
             if (paths.length == ofs + 1) {
-                return obj.toJSON();
+                return new String(obj.toJSON());
             }
             if (obj.getJSONType() == YJSONContent.YJSONType.ARRAY) {
                 return _get_json_path_array(jsonArray.getYJSONArray(key), paths, ofs + 1);
@@ -836,38 +857,28 @@ public class YFunction
     }
 
 
-    protected String _get_json_path(String json, String path)
+    protected byte[] _get_json_path(byte[] json, String path)
     {
         YJSONObject jsonObject = null;
         try {
-            jsonObject = new YJSONObject(json);
+            jsonObject = new YJSONObject(new String(json,_yapi._deviceCharset));
             jsonObject.parse();
         } catch (Exception ex) {
-            return "";
+            return new byte[0];
         }
 
         String[] split = path.split("\\|");
         int ofs = 0;
-        return _get_json_path_struct(jsonObject, split, 0);
+        String tmp = _get_json_path_struct(jsonObject, split, 0);
+        return tmp.getBytes(_yapi._deviceCharset);
     }
 
-    String _decode_json_string(String json)
-    {
-
-        try {
-            YJSONString yjsonString = new YJSONString(json);
-            yjsonString.parse();
-            return yjsonString.getString();
-        } catch (Exception ex) {
-            return "";
-        }
-    }
 
     // Load and parse the REST API for a function given by class name and
     // identifier, possibly applying changes
     // Device cache will be preloaded when loading function "module" and
     // leveraged for other modules
-     YJSONObject _devRequest(String extra) throws YAPI_Exception
+    YJSONObject _devRequest(String extra) throws YAPI_Exception
     {
         YDevice dev = getYDevice();
         _hwId = _yapi._yHash.resolveHwID(_className, _func);

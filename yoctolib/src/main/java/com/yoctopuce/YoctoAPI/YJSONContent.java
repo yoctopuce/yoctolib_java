@@ -104,5 +104,5 @@ abstract class YJSONContent
         return errmsg;
     }
 
-    abstract String toJSON();
+    abstract byte[] toJSON();
 }

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDataLogger.java 62194 2024-08-19 12:21:29Z seb $
+ * $Id: YDataLogger.java 63599 2024-12-06 10:17:59Z seb $
  *
  * Implements yFindDataLogger(), the high-level API for DataLogger functions
  *
@@ -737,15 +737,15 @@ public class YDataLogger extends YFunction
 
     public ArrayList<YDataSet> parse_dataSets(byte[] jsonbuff) throws YAPI_Exception
     {
-        ArrayList<String> dslist = new ArrayList<>();
+        ArrayList<byte[]> dslist = new ArrayList<>();
         YDataSet dataset;
         ArrayList<YDataSet> res = new ArrayList<>();
 
         dslist = _json_get_array(jsonbuff);
         res.clear();
-        for (String ii_0:dslist) {
+        for (byte[] ii_0:dslist) {
             dataset = new YDataSet(this);
-            dataset._parse(ii_0);
+            dataset._parse(new String(ii_0, _yapi._deviceCharset));
             res.add(dataset);
         }
         return res;

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 62194 2024-08-19 12:21:29Z seb $
+ * $Id: YMessageBox.java 63599 2024-12-06 10:17:59Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -690,19 +690,19 @@ public class YMessageBox extends YFunction
         cmdLen = cmd.length();
         chrPos = cmd.indexOf("#");
         while (chrPos >= 0) {
-            cmd = String.format(Locale.US, "%s%c23%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmd = String.format(Locale.US, "%s%c23%s",(cmd).substring(0, chrPos),37,(cmd).substring(chrPos+1, chrPos+1 + cmdLen-chrPos-1));
             cmdLen = cmdLen + 2;
             chrPos = cmd.indexOf("#");
         }
         chrPos = cmd.indexOf("+");
         while (chrPos >= 0) {
-            cmd = String.format(Locale.US, "%s%c2B%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmd = String.format(Locale.US, "%s%c2B%s",(cmd).substring(0, chrPos),37,(cmd).substring(chrPos+1, chrPos+1 + cmdLen-chrPos-1));
             cmdLen = cmdLen + 2;
             chrPos = cmd.indexOf("+");
         }
         chrPos = cmd.indexOf("=");
         while (chrPos >= 0) {
-            cmd = String.format(Locale.US, "%s%c3D%s", (cmd).substring(0, chrPos), 37,(cmd).substring( chrPos+1,  chrPos+1 + cmdLen-chrPos-1));
+            cmd = String.format(Locale.US, "%s%c3D%s",(cmd).substring(0, chrPos),37,(cmd).substring(chrPos+1, chrPos+1 + cmdLen-chrPos-1));
             cmdLen = cmdLen + 2;
             chrPos = cmd.indexOf("=");
         }
@@ -713,7 +713,7 @@ public class YMessageBox extends YFunction
         while (waitMore > 0) {
             buff = _download(cmd);
             bufflen = (buff).length;
-            buffstr = new String(buff);
+            buffstr = new String(buff, _yapi._deviceCharset);
             buffstrlen = buffstr.length();
             idx = bufflen - 1;
             while ((idx > 0) && ((buff[idx] & 0xff) != 64) && ((buff[idx] & 0xff) != 10) && ((buff[idx] & 0xff) != 13)) {
@@ -722,14 +722,14 @@ public class YMessageBox extends YFunction
             if ((buff[idx] & 0xff) == 64) {
                 // continuation detected
                 suffixlen = bufflen - idx;
-                cmd = String.format(Locale.US, "at.txt?cmd=%s",(buffstr).substring( buffstrlen - suffixlen,  buffstrlen - suffixlen + suffixlen));
+                cmd = String.format(Locale.US, "at.txt?cmd=%s",(buffstr).substring(buffstrlen - suffixlen, buffstrlen - suffixlen + suffixlen));
                 buffstr = (buffstr).substring(0, buffstrlen - suffixlen);
                 waitMore = waitMore - 1;
             } else {
                 // request complete
                 waitMore = 0;
             }
-            res = String.format(Locale.US, "%s%s", res,buffstr);
+            res = String.format(Locale.US, "%s%s",res,buffstr);
         }
         return res;
     }
@@ -737,7 +737,7 @@ public class YMessageBox extends YFunction
     public YSms fetchPdu(int slot) throws YAPI_Exception
     {
         byte[] binPdu = new byte[0];
-        ArrayList<String> arrPdu = new ArrayList<>();
+        ArrayList<byte[]> arrPdu = new ArrayList<>();
         String hexPdu;
         YSms sms;
 
@@ -798,14 +798,14 @@ public class YMessageBox extends YFunction
             i = i + 1;
         }
         // exceptions in range 20-7A
-        _gsm2unicode.set( 36, 164);
-        _gsm2unicode.set( 64, 161);
-        _gsm2unicode.set( 91, 196);
-        _gsm2unicode.set( 92, 214);
-        _gsm2unicode.set( 93, 209);
-        _gsm2unicode.set( 94, 220);
-        _gsm2unicode.set( 95, 167);
-        _gsm2unicode.set( 96, 191);
+        _gsm2unicode.set(36, 164);
+        _gsm2unicode.set(64, 161);
+        _gsm2unicode.set(91, 196);
+        _gsm2unicode.set(92, 214);
+        _gsm2unicode.set(93, 209);
+        _gsm2unicode.set(94, 220);
+        _gsm2unicode.set(95, 167);
+        _gsm2unicode.set(96, 191);
         // 7B-7F
         _gsm2unicode.add(228);
         _gsm2unicode.add(246);
@@ -1002,7 +1002,7 @@ public class YMessageBox extends YFunction
             }
             i = i + 1;
         }
-        resstr = new String(resbin);
+        resstr = new String(resbin, _yapi._deviceCharset);
         if (resstr.length() > reslen) {
             resstr = (resstr).substring(0, reslen);
         }
@@ -1022,7 +1022,7 @@ public class YMessageBox extends YFunction
         if (!(_gsm2unicodeReady)) {
             initGsm2Unicode();
         }
-        asc = (msg).getBytes();
+        asc = (msg).getBytes(_yapi._deviceCharset);
         asclen = (asc).length;
         extra = 0;
         i = 0;

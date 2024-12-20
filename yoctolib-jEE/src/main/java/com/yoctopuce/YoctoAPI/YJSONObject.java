@@ -1,5 +1,7 @@
 package com.yoctopuce.YoctoAPI;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -27,7 +29,7 @@ class YJSONObject extends YJSONContent
         int name_start = _data_start;
         int cur_pos = SkipGarbage(_data, _data_start, _data_boundary);
 
-        if (_data.length() <= cur_pos || cur_pos >= _data_boundary ||_data.charAt(cur_pos) != '{') {
+        if (_data.length() <= cur_pos || cur_pos >= _data_boundary || _data.charAt(cur_pos) != '{') {
             throw new Exception(formatError("Opening braces was expected", cur_pos));
         }
         cur_pos++;
@@ -173,17 +175,13 @@ class YJSONObject extends YJSONContent
 
     String getString(String key)
     {
-        if(_parsed.get(key).getJSONType() == YJSONType.STRING)
-        {
-            YJSONString ystr = (YJSONString)_parsed.get(key);
+        if (_parsed.get(key).getJSONType() == YJSONType.STRING) {
+            YJSONString ystr = (YJSONString) _parsed.get(key);
             return ystr.getString();
-        }
-        else if (_parsed.get(key).getJSONType() == YJSONType.NUMBER) {
-            YJSONNumber yint = (YJSONNumber)_parsed.get(key);
+        } else if (_parsed.get(key).getJSONType() == YJSONType.NUMBER) {
+            YJSONNumber yint = (YJSONNumber) _parsed.get(key);
             return String.valueOf(yint.getInt());
-        }
-        else
-        {
+        } else {
             return "<JSON_getString_error>";
         }
     }
@@ -212,23 +210,26 @@ class YJSONObject extends YJSONContent
     }
 
     @Override
-    String toJSON()
+    byte[] toJSON()
     {
-        StringBuilder res = new StringBuilder();
-        res.append('{');
-        String sep = "";
-        for (String key : _parsed.keySet()) {
-            YJSONContent subContent = _parsed.get(key);
-            String subres = subContent.toJSON();
-            res.append(sep);
-            res.append('"');
-            res.append(key);
-            res.append("\":");
-            res.append(subres);
-            sep = ",";
+        ByteArrayOutputStream res = new ByteArrayOutputStream();
+        try {
+            res.write('{');
+            String sep = "";
+            for (String key : _parsed.keySet()) {
+                YJSONContent subContent = _parsed.get(key);
+                byte[] subres = subContent.toJSON();
+                res.write(sep.getBytes(YAPI.DefaultEncoding));
+                res.write('"');
+                res.write(key.getBytes(YAPI.DefaultEncoding));
+                res.write("\":".getBytes(YAPI.DefaultEncoding));
+                res.write(subres);
+                sep = ",";
+            }
+            res.write('}');
+        } catch (IOException ignored) {
         }
-        res.append('}');
-        return res.toString();
+        return res.toByteArray();
     }
 
     @Override

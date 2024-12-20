@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpMonitor.java 48183 2022-01-20 10:26:11Z mvuilleu $
+ *  $Id: YWakeUpMonitor.java 63325 2024-11-13 09:33:33Z seb $
  *
  *  Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -619,7 +619,7 @@ public class YWakeUpMonitor extends YFunction
         int currTime;
         currTime = (int)(get_rtcTime());
         //noinspection DoubleNegation
-        if (!(currTime != 0)) { throw new YAPI_Exception( YAPI.RTC_NOT_READY,  "RTC time not set");}
+        if (!(currTime != 0)) { throw new YAPI_Exception(YAPI.RTC_NOT_READY, "RTC time not set");}
         set_nextWakeUp(_endOfTime);
         set_sleepCountdown(secBeforeSleep);
         return YAPI.SUCCESS;
@@ -642,7 +642,7 @@ public class YWakeUpMonitor extends YFunction
         int currTime;
         currTime = (int)(get_rtcTime());
         //noinspection DoubleNegation
-        if (!(currTime != 0)) { throw new YAPI_Exception( YAPI.RTC_NOT_READY,  "RTC time not set");}
+        if (!(currTime != 0)) { throw new YAPI_Exception(YAPI.RTC_NOT_READY, "RTC time not set");}
         set_nextWakeUp(currTime+secUntilWakeUp);
         set_sleepCountdown(secBeforeSleep);
         return YAPI.SUCCESS;
@@ -665,7 +665,7 @@ public class YWakeUpMonitor extends YFunction
         int currTime;
         currTime = (int)(get_rtcTime());
         //noinspection DoubleNegation
-        if (!(currTime != 0)) { throw new YAPI_Exception( YAPI.RTC_NOT_READY,  "RTC time not set");}
+        if (!(currTime != 0)) { throw new YAPI_Exception(YAPI.RTC_NOT_READY, "RTC time not set");}
         set_nextWakeUp(wakeUpTime);
         set_sleepCountdown(secBeforeSleep);
         return YAPI.SUCCESS;

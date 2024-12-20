@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YDigitalIO.java 62194 2024-08-19 12:21:29Z seb $
+ *  $Id: YDigitalIO.java 63325 2024-11-13 09:33:33Z seb $
  *
  *  Implements FindDigitalIO(), the high-level API for DigitalIO functions
  *
@@ -815,9 +815,9 @@ public class YDigitalIO extends YFunction
     public int set_bitState(int bitno,int bitstate) throws YAPI_Exception
     {
         //noinspection DoubleNegation
-        if (!(bitstate >= 0)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "invalid bit state");}
+        if (!(bitstate >= 0)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "invalid bit state");}
         //noinspection DoubleNegation
-        if (!(bitstate <= 1)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "invalid bit state");}
+        if (!(bitstate <= 1)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "invalid bit state");}
         return set_command(String.format(Locale.US, "%c%d",82+bitstate,bitno));
     }
 
@@ -865,9 +865,9 @@ public class YDigitalIO extends YFunction
     public int set_bitDirection(int bitno,int bitdirection) throws YAPI_Exception
     {
         //noinspection DoubleNegation
-        if (!(bitdirection >= 0)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "invalid direction");}
+        if (!(bitdirection >= 0)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "invalid direction");}
         //noinspection DoubleNegation
-        if (!(bitdirection <= 1)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "invalid direction");}
+        if (!(bitdirection <= 1)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "invalid direction");}
         return set_command(String.format(Locale.US, "%c%d",73+6*bitdirection,bitno));
     }
 
@@ -903,9 +903,9 @@ public class YDigitalIO extends YFunction
     public int set_bitPolarity(int bitno,int bitpolarity) throws YAPI_Exception
     {
         //noinspection DoubleNegation
-        if (!(bitpolarity >= 0)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "invalid bit polarity");}
+        if (!(bitpolarity >= 0)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "invalid bit polarity");}
         //noinspection DoubleNegation
-        if (!(bitpolarity <= 1)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "invalid bit polarity");}
+        if (!(bitpolarity <= 1)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "invalid bit polarity");}
         return set_command(String.format(Locale.US, "%c%d",110+4*bitpolarity,bitno));
     }
 
@@ -941,9 +941,9 @@ public class YDigitalIO extends YFunction
     public int set_bitOpenDrain(int bitno,int opendrain) throws YAPI_Exception
     {
         //noinspection DoubleNegation
-        if (!(opendrain >= 0)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "invalid state");}
+        if (!(opendrain >= 0)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "invalid state");}
         //noinspection DoubleNegation
-        if (!(opendrain <= 1)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "invalid state");}
+        if (!(opendrain <= 1)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "invalid state");}
         return set_command(String.format(Locale.US, "%c%d",100-32*opendrain,bitno));
     }
 
@@ -979,7 +979,7 @@ public class YDigitalIO extends YFunction
      */
     public int pulse(int bitno,int ms_duration) throws YAPI_Exception
     {
-        return set_command(String.format(Locale.US, "Z%d,0,%d", bitno,ms_duration));
+        return set_command(String.format(Locale.US, "Z%d,0,%d",bitno,ms_duration));
     }
 
     /**

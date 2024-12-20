@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 62194 2024-08-19 12:21:29Z seb $
+ * $Id: YFirmwareUpdate.java 63599 2024-12-06 10:17:59Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -73,12 +73,12 @@ public class YFirmwareUpdate
     protected boolean _force;
 
     //--- (end of generated code: YFirmwareUpdate definitions)
-    private final YAPIContext _yctx;
+    private final YAPIContext _yapi;
     private Thread _thread = null;
 
      byte[] _downloadfile(String url) throws YAPI_Exception
     {
-        return _yctx.BasicHTTPRequest(url,_yctx._networkTimeoutMs,0);
+        return _yapi.BasicHTTPRequest(url, _yapi._networkTimeoutMs,0);
     }
 
 
@@ -156,7 +156,7 @@ public class YFirmwareUpdate
         _serial = serial;
         _firmwarepath = path;
         _settings = settings;
-        _yctx = yctx;
+        _yapi = yctx;
         _force = force;
         //--- (generated code: YFirmwareUpdate attributes initialization)
         //--- (end of generated code: YFirmwareUpdate attributes initialization)
@@ -197,7 +197,7 @@ public class YFirmwareUpdate
                                 //1% -> 5%
                                 _progress(1, "Loading firmware");
                                 if (_firmwarepath.startsWith("www.yoctopuce.com") || _firmwarepath.startsWith("http://www.yoctopuce.com")) {
-                                    byte[] bytes = _yctx.BasicHTTPRequest(_firmwarepath,_yctx._networkTimeoutMs,0);
+                                    byte[] bytes = _yapi.BasicHTTPRequest(_firmwarepath, _yapi._networkTimeoutMs,0);
                                     firmware = YFirmwareFile.Parse(_firmwarepath, bytes);
                                 } else {
                                     firmware = YFirmwareUpdate._loadFirmwareFile(new File(_firmwarepath));
@@ -206,13 +206,13 @@ public class YFirmwareUpdate
                                 //5% -> 10%
                                 _progress(5, "check if module is already in bootloader");
                                 YGenericHub hub = null;
-                                YModule module = YModule.FindModuleInContext(_yctx, _serial + ".module");
+                                YModule module = YModule.FindModuleInContext(_yapi, _serial + ".module");
                                 if (module.isOnline()) {
                                     YDevice yDevice = module.getYDevice();
                                     hub = yDevice.getHub();
                                 } else {
                                     // test if already in bootloader
-                                    hub = _yctx.getHubWithBootloader(_serial);
+                                    hub = _yapi.getHubWithBootloader(_serial);
                                 }
                                 if (hub == null) {
                                     throw new YAPI_Exception(YAPI.DEVICE_NOT_FOUND, "device " + _serial + " is not detected");
@@ -236,7 +236,7 @@ public class YFirmwareUpdate
                                 while (!module.isOnline() && timeout > YAPI.GetTickCount()) {
                                     Thread.sleep(500);
                                     try {
-                                        _yctx.UpdateDeviceList();
+                                        _yapi.UpdateDeviceList();
                                     } catch (YAPI_Exception ignore) {
                                     }
                                 }
@@ -422,11 +422,11 @@ public class YFirmwareUpdate
     {
         String err;
         int leng;
-        err = new String(_settings);
+        err = new String(_settings, _yapi._deviceCharset);
         leng = err.length();
         if ((leng >= 6) && ("error:".equals((err).substring(0, 6)))) {
             _progress = -1;
-            _progress_msg = (err).substring( 6,  6 + leng - 6);
+            _progress_msg = (err).substring(6, 6 + leng - 6);
         } else {
             _progress = 0;
             _progress_c = 0;

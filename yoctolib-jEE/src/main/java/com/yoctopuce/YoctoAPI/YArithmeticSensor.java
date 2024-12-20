@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YArithmeticSensor.java 62194 2024-08-19 12:21:29Z seb $
+ *  $Id: YArithmeticSensor.java 63599 2024-12-06 10:17:59Z seb $
  *
  *  Implements FindArithmeticSensor(), the high-level API for ArithmeticSensor functions
  *
@@ -408,15 +408,15 @@ public class YArithmeticSensor extends YSensor
         String diags;
         double resval;
         id = get_functionId();
-        id = (id).substring( 16,  16 + id.length() - 16);
+        id = (id).substring(16, 16 + id.length() - 16);
         fname = String.format(Locale.US, "arithmExpr%s.txt",id);
 
-        content = String.format(Locale.US, "// %s\n%s", descr,expr);
-        data = _uploadEx(fname, (content).getBytes());
-        diags = new String(data);
+        content = String.format(Locale.US, "// %s\n%s",descr,expr);
+        data = _uploadEx(fname, (content).getBytes(_yapi._deviceCharset));
+        diags = new String(data, _yapi._deviceCharset);
         //noinspection DoubleNegation
-        if (!((diags).substring(0, 8).equals("Result: "))) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  diags);}
-        resval = YAPI.ystr2float((diags).substring( 8,  8 + diags.length()-8));
+        if (!((diags).substring(0, 8).equals("Result: "))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, diags);}
+        resval = YAPI.ystr2float((diags).substring(8, 8 + diags.length()-8));
         return resval;
     }
 
@@ -435,13 +435,13 @@ public class YArithmeticSensor extends YSensor
         String content;
         int idx;
         id = get_functionId();
-        id = (id).substring( 16,  16 + id.length() - 16);
+        id = (id).substring(16, 16 + id.length() - 16);
         fname = String.format(Locale.US, "arithmExpr%s.txt",id);
 
-        content = new String(_download(fname));
+        content = new String(_download(fname), _yapi._deviceCharset);
         idx = content.indexOf("\n");
         if (idx > 0) {
-            content = (content).substring( idx+1,  idx+1 + content.length()-(idx+1));
+            content = (content).substring(idx+1, idx+1 + content.length()-(idx+1));
         }
         return content;
     }
@@ -473,20 +473,20 @@ public class YArithmeticSensor extends YSensor
         String fname;
         siz = inputValues.size();
         //noinspection DoubleNegation
-        if (!(siz > 1)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "auxiliary function must be defined by at least two points");}
+        if (!(siz > 1)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "auxiliary function must be defined by at least two points");}
         //noinspection DoubleNegation
-        if (!(siz == outputValues.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "table sizes mismatch");}
+        if (!(siz == outputValues.size())) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "table sizes mismatch");}
         defstr = "";
         idx = 0;
         while (idx < siz) {
             inputVal = inputValues.get(idx).doubleValue();
             outputVal = outputValues.get(idx).doubleValue();
-            defstr = String.format(Locale.US, "%s%f:%f\n", defstr, inputVal,outputVal);
+            defstr = String.format(Locale.US, "%s%f:%f\n",defstr,inputVal,outputVal);
             idx = idx + 1;
         }
         fname = String.format(Locale.US, "userMap%s.txt",name);
 
-        return _upload(fname, (defstr).getBytes());
+        return _upload(fname, (defstr).getBytes(_yapi._deviceCharset));
     }
 
     /**
@@ -513,7 +513,7 @@ public class YArithmeticSensor extends YSensor
         defbin = _download(fname);
         siz = (defbin).length;
         //noinspection DoubleNegation
-        if (!(siz > 0)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "auxiliary function does not exist");}
+        if (!(siz > 0)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "auxiliary function does not exist");}
         inputValues.clear();
         outputValues.clear();
         // FIXME: decode line by line

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java 53886 2023-04-05 08:06:39Z mvuilleu $
+ * $Id: YWireless.java 63599 2024-12-06 10:17:59Z seb $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *
@@ -590,7 +590,7 @@ public class YWireless extends YFunction
      */
     public int joinNetwork(String ssid,String securityKey) throws YAPI_Exception
     {
-        return set_wlanConfig(String.format(Locale.US, "INFRA:%s\\%s", ssid,securityKey));
+        return set_wlanConfig(String.format(Locale.US, "INFRA:%s\\%s",ssid,securityKey));
     }
 
     /**
@@ -616,7 +616,7 @@ public class YWireless extends YFunction
      */
     public int adhocNetwork(String ssid,String securityKey) throws YAPI_Exception
     {
-        return set_wlanConfig(String.format(Locale.US, "ADHOC:%s\\%s", ssid,securityKey));
+        return set_wlanConfig(String.format(Locale.US, "ADHOC:%s\\%s",ssid,securityKey));
     }
 
     /**
@@ -643,7 +643,7 @@ public class YWireless extends YFunction
      */
     public int softAPNetwork(String ssid,String securityKey) throws YAPI_Exception
     {
-        return set_wlanConfig(String.format(Locale.US, "SOFTAP:%s\\%s", ssid,securityKey));
+        return set_wlanConfig(String.format(Locale.US, "SOFTAP:%s\\%s",ssid,securityKey));
     }
 
     /**
@@ -660,14 +660,14 @@ public class YWireless extends YFunction
     public ArrayList<YWlanRecord> get_detectedWlans() throws YAPI_Exception
     {
         byte[] json = new byte[0];
-        ArrayList<String> wlanlist = new ArrayList<>();
+        ArrayList<byte[]> wlanlist = new ArrayList<>();
         ArrayList<YWlanRecord> res = new ArrayList<>();
 
         json = _download("wlan.json?by=name");
         wlanlist = _json_get_array(json);
         res.clear();
-        for (String ii_0:wlanlist) {
-            res.add(new YWlanRecord(ii_0));
+        for (byte[] ii_0:wlanlist) {
+            res.add(new YWlanRecord(new String(ii_0, _yapi._deviceCharset)));
         }
         return res;
     }

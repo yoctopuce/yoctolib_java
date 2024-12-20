@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 62233 2024-08-20 08:42:07Z seb $
+ * $Id: YUSBHub.java 63599 2024-12-06 10:17:59Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -257,7 +257,7 @@ class YUSBHub extends YGenericHub
         }
         byte[] currentRequest = prepareRequest(req_first_line, req_head_and_body);
         byte[] result = YJniWrapper.devRequestSync(device.getSerialNumber(), currentRequest);
-        int hpos = YAPIContext._find_in_bytes(result, "\r\n\r\n".getBytes());
+        int hpos = YAPIContext._find_in_bytes(result, "\r\n\r\n".getBytes(_yctx._deviceCharset));
         if (hpos >= 0) {
             return Arrays.copyOfRange(result, hpos + 4, result.length);
         }
@@ -269,12 +269,12 @@ class YUSBHub extends YGenericHub
     {
         byte[] currentRequest;
         if (rest_of_request == null) {
-            currentRequest = (firstLine + "\r\n\r\n").getBytes();
+            currentRequest = (firstLine + "\r\n\r\n").getBytes(_yctx._deviceCharset);
         } else {
             firstLine += "\r\n";
             int len = firstLine.length() + rest_of_request.length;
             currentRequest = new byte[len];
-            System.arraycopy(firstLine.getBytes(), 0, currentRequest, 0, len);
+            System.arraycopy(firstLine.getBytes(_yctx._deviceCharset), 0, currentRequest, 0, len);
             System.arraycopy(rest_of_request, 0, currentRequest, firstLine.length(), rest_of_request.length);
         }
         return currentRequest;

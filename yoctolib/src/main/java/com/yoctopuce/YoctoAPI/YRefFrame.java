@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRefFrame.java 62194 2024-08-19 12:21:29Z seb $
+ *  $Id: YRefFrame.java 63599 2024-12-06 10:17:59Z seb $
  *
  *  Implements FindRefFrame(), the high-level API for RefFrame functions
  *
@@ -750,20 +750,20 @@ public class YRefFrame extends YFunction
             while (idx < stopidx) {
                 b = _calibDataAcc.get(idx).doubleValue();
                 if (a > b) {
-                    _calibDataAcc.set( idx-1, b);
-                    _calibDataAcc.set( idx, a);
+                    _calibDataAcc.set(idx-1, b);
+                    _calibDataAcc.set(idx, a);
                     xa = _calibDataAccX.get(idx-1).doubleValue();
                     xb = _calibDataAccX.get(idx).doubleValue();
-                    _calibDataAccX.set( idx-1, xb);
-                    _calibDataAccX.set( idx, xa);
+                    _calibDataAccX.set(idx-1, xb);
+                    _calibDataAccX.set(idx, xa);
                     xa = _calibDataAccY.get(idx-1).doubleValue();
                     xb = _calibDataAccY.get(idx).doubleValue();
-                    _calibDataAccY.set( idx-1, xb);
-                    _calibDataAccY.set( idx, xa);
+                    _calibDataAccY.set(idx-1, xb);
+                    _calibDataAccY.set(idx, xa);
                     xa = _calibDataAccZ.get(idx-1).doubleValue();
                     xb = _calibDataAccZ.get(idx).doubleValue();
-                    _calibDataAccZ.set( idx-1, xb);
-                    _calibDataAccZ.set( idx, xa);
+                    _calibDataAccZ.set(idx-1, xb);
+                    _calibDataAccZ.set(idx, xa);
                     changed = changed + 1;
                 } else {
                     a = b;
@@ -957,9 +957,7 @@ public class YRefFrame extends YFunction
         intpos = (_calibStage - 1) * _calibCount;
         _calibSort(intpos, intpos + _calibCount);
         intpos = intpos + (_calibCount / 2);
-        _calibLogMsg = String.format(Locale.US, "Stage %d: median is %d,%d,%d", _calibStage,
-        (int) (double)Math.round(1000*_calibDataAccX.get(intpos).doubleValue()),
-        (int) (double)Math.round(1000*_calibDataAccY.get(intpos).doubleValue()),(int) (double)Math.round(1000*_calibDataAccZ.get(intpos).doubleValue()));
+        _calibLogMsg = String.format(Locale.US, "Stage %d: median is %d,%d,%d",_calibStage,(int) (double)Math.round(1000*_calibDataAccX.get(intpos).doubleValue()),(int) (double)Math.round(1000*_calibDataAccY.get(intpos).doubleValue()),(int) (double)Math.round(1000*_calibDataAccZ.get(intpos).doubleValue()));
         // move to next stage
         _calibStage = _calibStage + 1;
         if (_calibStage < 7) {
@@ -998,7 +996,7 @@ public class YRefFrame extends YFunction
             yVal = _calibDataAccY.get(intpos).doubleValue() - _calibAccYOfs;
             zVal = _calibDataAccZ.get(intpos).doubleValue() - _calibAccZOfs;
             norm = java.lang.Math.sqrt(xVal * xVal + yVal * yVal + zVal * zVal);
-            _calibDataAcc.set( intpos, norm);
+            _calibDataAcc.set(intpos, norm);
             intpos = intpos + 1;
         }
         idx = 0;
@@ -1064,7 +1062,7 @@ public class YRefFrame extends YFunction
         }
 
         calibParam = _download("api/refFrame/calibrationParam.txt");
-        iCalib = YAPIContext._decodeFloats(new String(calibParam));
+        iCalib = YAPIContext._decodeFloats(new String(calibParam, _yapi._deviceCharset));
         cal3 = ((iCalib.get(1).intValue()) / 1000);
         calAcc = (cal3 / 100);
         calMag = (cal3 / 10) - 10*calAcc;
@@ -1228,7 +1226,7 @@ public class YRefFrame extends YFunction
         scaleLo = ((scaleY & 15) << 12) + (scaleX << 2) + scaleExp;
         scaleHi = (scaleZ << 6) + (scaleY >> 4);
         // Save calibration parameters
-        newcalib = String.format(Locale.US, "5,%d,%d,%d,%d,%d", shiftX, shiftY, shiftZ, scaleLo,scaleHi);
+        newcalib = String.format(Locale.US, "5,%d,%d,%d,%d,%d",shiftX,shiftY,shiftZ,scaleLo,scaleHi);
         _calibStage = 0;
         return set_calibrationParam(newcalib);
     }

@@ -181,7 +181,7 @@ public class YSdi12SensorInfo
     public String get_measureCommand(int measureIndex) throws YAPI_Exception
     {
         //noinspection DoubleNegation
-        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Invalid measure index");}
+        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid measure index");}
         return _valuesDesc.get(measureIndex).get(0);
     }
 
@@ -198,7 +198,7 @@ public class YSdi12SensorInfo
     public int get_measurePosition(int measureIndex) throws YAPI_Exception
     {
         //noinspection DoubleNegation
-        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Invalid measure index");}
+        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid measure index");}
         return YAPIContext._atoi(_valuesDesc.get(measureIndex).get(2));
     }
 
@@ -215,7 +215,7 @@ public class YSdi12SensorInfo
     public String get_measureSymbol(int measureIndex) throws YAPI_Exception
     {
         //noinspection DoubleNegation
-        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Invalid measure index");}
+        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid measure index");}
         return _valuesDesc.get(measureIndex).get(3);
     }
 
@@ -232,7 +232,7 @@ public class YSdi12SensorInfo
     public String get_measureUnit(int measureIndex) throws YAPI_Exception
     {
         //noinspection DoubleNegation
-        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Invalid measure index");}
+        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid measure index");}
         return _valuesDesc.get(measureIndex).get(4);
     }
 
@@ -249,7 +249,7 @@ public class YSdi12SensorInfo
     public String get_measureDescription(int measureIndex) throws YAPI_Exception
     {
         //noinspection DoubleNegation
-        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "Invalid measure index");}
+        if (!(measureIndex < _valuesDesc.size())) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "Invalid measure index");}
         return _valuesDesc.get(measureIndex).get(5);
     }
 
@@ -264,7 +264,7 @@ public class YSdi12SensorInfo
 
         if (infoStr.length() > 1) {
             if ((infoStr).substring(0, 2).equals("ER")) {
-                errmsg = (infoStr).substring( 2,  2 + infoStr.length()-2);
+                errmsg = (infoStr).substring(2, 2 + infoStr.length()-2);
                 _addr = errmsg;
                 _proto = errmsg;
                 _mfg = errmsg;
@@ -274,11 +274,11 @@ public class YSdi12SensorInfo
                 _isValid = false;
             } else {
                 _addr = (infoStr).substring(0, 1);
-                _proto = (infoStr).substring( 1,  1 + 2);
-                _mfg = (infoStr).substring( 3,  3 + 8);
-                _model = (infoStr).substring( 11,  11 + 6);
-                _ver = (infoStr).substring( 17,  17 + 3);
-                _sn = (infoStr).substring( 20,  20 + infoStr.length()-20);
+                _proto = (infoStr).substring(1, 1 + 2);
+                _mfg = (infoStr).substring(3, 3 + 8);
+                _model = (infoStr).substring(11, 11 + 6);
+                _ver = (infoStr).substring(17, 17 + 3);
+                _sn = (infoStr).substring(20, 20 + infoStr.length()-20);
                 _isValid = true;
             }
         }
@@ -304,13 +304,13 @@ public class YSdi12SensorInfo
         while (k < 10) {
             infoNbVal = _sdi12Port.querySdi12(_addr, String.format(Locale.US, "IM%d",k), 5000);
             if (infoNbVal.length() > 1) {
-                value = (infoNbVal).substring( 4,  4 + infoNbVal.length()-4);
+                value = (infoNbVal).substring(4, 4 + infoNbVal.length()-4);
                 nbVal = YAPIContext._atoi(value);
                 if (nbVal != 0) {
                     val.clear();
                     i = 0;
                     while (i < nbVal) {
-                        cmd = String.format(Locale.US, "IM%d_00%d", k,i+1);
+                        cmd = String.format(Locale.US, "IM%d_00%d",k,i+1);
                         infoVal = _sdi12Port.querySdi12(_addr, cmd, 5000);
                         data = new ArrayList<>(Arrays.asList(infoVal.split(";")));
                         data = new ArrayList<>(Arrays.asList(data.get(0).split(",")));

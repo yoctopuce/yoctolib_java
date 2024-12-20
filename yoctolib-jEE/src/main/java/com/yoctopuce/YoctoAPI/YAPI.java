@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 61964 2024-07-29 15:54:55Z seb $
+ * $Id: YAPI.java 62907 2024-10-08 07:05:55Z mvuilleu $
  *
  * High-level programming interface, common to all modules
  *
@@ -59,7 +59,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "2.0";
-    public static final String YOCTO_API_BUILD_STR = "62733";
+    public static final String YOCTO_API_BUILD_STR = "63797";
     public static final int YOCTO_API_VERSION_BCD = 0x0200;
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
@@ -361,7 +361,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return YOCTO_API_VERSION_STR + ".62733" + YUSBHub.getAPIVersion();
+        return YOCTO_API_VERSION_STR + ".63797" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -910,7 +910,7 @@ public class YAPI
      * Modifies the network connection delay for yRegisterHub() and yUpdateDeviceList().
      * This delay impacts only the YoctoHubs and VirtualHub
      * which are accessible through the network. By default, this delay is of 20000 milliseconds,
-     * but depending or you network you may want to change this delay,
+     * but depending on your network you may want to change this delay,
      * gor example if your network infrastructure is based on a GSM connection.
      *
      * @param networkMsTimeout : the network connection delay in milliseconds.
@@ -924,7 +924,7 @@ public class YAPI
      * Returns the network connection delay for yRegisterHub() and yUpdateDeviceList().
      * This delay impacts only the YoctoHubs and VirtualHub
      * which are accessible through the network. By default, this delay is of 20000 milliseconds,
-     * but depending or you network you may want to change this delay,
+     * but depending on your network you may want to change this delay,
      * for example if your network infrastructure is based on a GSM connection.
      *
      * @return the network connection delay in milliseconds.

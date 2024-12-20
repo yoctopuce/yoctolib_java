@@ -182,7 +182,7 @@ abstract class NotificationHandler implements Runnable
             }
             char notype = ev.charAt(4);
             if (notype == NOTIFY_NETPKT_NOT_SYNC) {
-                _notifyPos = Integer.valueOf(ev.substring(5));
+                _notifyPos = Long.valueOf(ev.substring(5));
             } else {
                 String[] parts;
                 switch (notype) {

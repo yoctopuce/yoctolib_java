@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 62194 2024-08-19 12:21:29Z seb $
+ * $Id: YModule.java 63704 2024-12-16 10:05:02Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -357,7 +357,7 @@ public class YModule extends YFunction
                 }
             }
         }
-        return out.toJSON().getBytes();
+        return out.toJSON();
     }
 
 
@@ -1136,7 +1136,7 @@ public class YModule extends YFunction
         prodname = get_productName();
         prodrel = get_productRelease();
         if (prodrel > 1) {
-            fullname = String.format(Locale.US, "%s rev. %c", prodname,64 + prodrel);
+            fullname = String.format(Locale.US, "%s rev. %c",prodname,64 + prodrel);
         } else {
             fullname = prodname;
         }
@@ -1347,7 +1347,7 @@ public class YModule extends YFunction
         settings = get_allSettings();
         if ((settings).length == 0) {
             _throw(YAPI.IO_ERROR, "Unable to get device settings");
-            settings = ("error:Unable to get device settings").getBytes();
+            settings = ("error:Unable to get device settings").getBytes(_yapi._deviceCharset);
         }
         return new YFirmwareUpdate(_yapi, serial, path, settings, force);
     }
@@ -1376,7 +1376,7 @@ public class YModule extends YFunction
     public byte[] get_allSettings() throws YAPI_Exception
     {
         byte[] settings = new byte[0];
-        byte[] json_bin = new byte[0];
+        byte[] json = new byte[0];
         byte[] res = new byte[0];
         String sep;
         String name;
@@ -1388,7 +1388,7 @@ public class YModule extends YFunction
         byte[] file_data_bin = new byte[0];
         byte[] temp_data_bin = new byte[0];
         String ext_settings;
-        ArrayList<String> filelist = new ArrayList<>();
+        ArrayList<byte[]> filelist = new ArrayList<>();
         ArrayList<String> templist = new ArrayList<>();
 
         settings = _download("api.json");
@@ -1398,18 +1398,18 @@ public class YModule extends YFunction
         ext_settings = ", \"extras\":[";
         templist = get_functionIds("Temperature");
         sep = "";
-        for (String ii_0: templist) {
+        for (String ii_0:templist) {
             if (YAPIContext._atoi(get_firmwareRelease()) > 9000) {
                 url = String.format(Locale.US, "api/%s/sensorType",ii_0);
-                t_type = new String(_download(url));
+                t_type = new String(_download(url), _yapi._deviceCharset);
                 if (t_type.equals("RES_NTC") || t_type.equals("RES_LINEAR")) {
-                    pageid = (ii_0).substring( 11,  11 + ii_0.length() - 11);
+                    pageid = (ii_0).substring(11, 11 + ii_0.length() - 11);
                     if (pageid.equals("")) {
                         pageid = "1";
                     }
                     temp_data_bin = _download(String.format(Locale.US, "extra.json?page=%s",pageid));
                     if ((temp_data_bin).length > 0) {
-                        item = String.format(Locale.US, "%s{\"fid\":\"%s\", \"json\":%s}\n", sep, ii_0,new String(temp_data_bin));
+                        item = String.format(Locale.US, "%s{\"fid\":\"%s\", \"json\":%s}\n",sep,ii_0,new String(temp_data_bin, _yapi._deviceCharset));
                         ext_settings = ext_settings + item;
                         sep = ",";
                     }
@@ -1418,46 +1418,50 @@ public class YModule extends YFunction
         }
         ext_settings = ext_settings + "],\n\"files\":[";
         if (hasFunction("files")) {
-            json_bin = _download("files.json?a=dir&f=");
-            if ((json_bin).length == 0) {
-                return json_bin;
+            json = _download("files.json?a=dir&f=");
+            if ((json).length == 0) {
+                return json;
             }
-            filelist = _json_get_array(json_bin);
+            filelist = _json_get_array(json);
             sep = "";
-            for (String ii_1: filelist) {
-                name = _json_get_key((ii_1).getBytes(), "name");
+            for (byte[] ii_1:filelist) {
+                name = _json_get_key(ii_1, "name");
                 if ((name.length() > 0) && !(name.equals("startupConf.json"))) {
                     file_data_bin = _download(_escapeAttr(name));
                     file_data = YAPIContext._bytesToHexStr(file_data_bin, 0, file_data_bin.length);
-                    item = String.format(Locale.US, "%s{\"name\":\"%s\", \"data\":\"%s\"}\n", sep, name,file_data);
+                    item = String.format(Locale.US, "%s{\"name\":\"%s\", \"data\":\"%s\"}\n",sep,name,file_data);
                     ext_settings = ext_settings + item;
                     sep = ",";
                 }
             }
         }
-        res = ("{ \"api\":" + new String(settings) + ext_settings + "]}").getBytes();
+        res = ("{ \"api\":" + new String(settings, _yapi._deviceCharset) + ext_settings + "]}").getBytes(_yapi._deviceCharset);
         return res;
     }
 
     public int loadThermistorExtra(String funcId,String jsonExtra) throws YAPI_Exception
     {
-        ArrayList<String> values = new ArrayList<>();
+        ArrayList<byte[]> values = new ArrayList<>();
         String url;
         String curr;
+        byte[] binCurr = new byte[0];
         String currTemp;
+        byte[] binCurrTemp = new byte[0];
         int ofs;
         int size;
         url = "api/" + funcId + ".json?command=Z";
 
         _download(url);
         // add records in growing resistance value
-        values = _json_get_array((jsonExtra).getBytes());
+        values = _json_get_array((jsonExtra).getBytes(_yapi._deviceCharset));
         ofs = 0;
         size = values.size();
         while (ofs + 1 < size) {
-            curr = values.get(ofs);
-            currTemp = values.get(ofs + 1);
-            url = String.format(Locale.US, "api/%s.json?command=m%s:%s", funcId, curr,currTemp);
+            binCurr = values.get(ofs);
+            binCurrTemp = values.get(ofs + 1);
+            curr = _json_get_string(binCurr);
+            currTemp = _json_get_string(binCurrTemp);
+            url = String.format(Locale.US, "api/%s.json?command=m%s:%s",funcId,curr,currTemp);
             _download(url);
             ofs = ofs + 2;
         }
@@ -1466,16 +1470,17 @@ public class YModule extends YFunction
 
     public int set_extraSettings(String jsonExtra) throws YAPI_Exception
     {
-        ArrayList<String> extras = new ArrayList<>();
+        ArrayList<byte[]> extras = new ArrayList<>();
+        byte[] tmp = new byte[0];
         String functionId;
-        String data;
-        extras = _json_get_array((jsonExtra).getBytes());
-        for (String ii_0: extras) {
-            functionId = _get_json_path(ii_0, "fid");
-            functionId = _decode_json_string(functionId);
+        byte[] data = new byte[0];
+        extras = _json_get_array((jsonExtra).getBytes(_yapi._deviceCharset));
+        for (byte[] ii_0:extras) {
+            tmp = _get_json_path(ii_0, "fid");
+            functionId = _json_get_string(tmp);
             data = _get_json_path(ii_0, "json");
             if (hasFunction(functionId)) {
-                loadThermistorExtra(functionId, data);
+                loadThermistorExtra(functionId, new String(data, _yapi._deviceCharset));
             }
         }
         return YAPI.SUCCESS;
@@ -1497,40 +1502,40 @@ public class YModule extends YFunction
     public int set_allSettingsAndFiles(byte[] settings) throws YAPI_Exception
     {
         byte[] down = new byte[0];
-        String json_bin;
-        String json_api;
-        String json_files;
-        String json_extra;
+        byte[] json_bin = new byte[0];
+        byte[] json_api = new byte[0];
+        byte[] json_files = new byte[0];
+        byte[] json_extra = new byte[0];
         int fuperror;
         int globalres;
         fuperror = 0;
-        json_bin = new String(settings);
-        json_api = _get_json_path(json_bin, "api");
-        if (json_api.equals("")) {
+        json_api = _get_json_path(settings, "api");
+        if ((json_api).length == 0) {
             return set_allSettings(settings);
         }
-        json_extra = _get_json_path(json_bin, "extras");
-        if (!(json_extra.equals(""))) {
-            set_extraSettings(json_extra);
+        json_extra = _get_json_path(settings, "extras");
+        if ((json_extra).length > 0) {
+            set_extraSettings(new String(json_extra, _yapi._deviceCharset));
         }
-        set_allSettings((json_api).getBytes());
+        set_allSettings(json_api);
         if (hasFunction("files")) {
-            ArrayList<String> files = new ArrayList<>();
+            ArrayList<byte[]> files = new ArrayList<>();
             String res;
+            byte[] tmp = new byte[0];
             String name;
             String data;
             down = _download("files.json?a=format");
-            res = _get_json_path(new String(down), "res");
-            res = _decode_json_string(res);
+            down = _get_json_path(down, "res");
+            res = _json_get_string(down);
             //noinspection DoubleNegation
-            if (!(res.equals("ok"))) { throw new YAPI_Exception( YAPI.IO_ERROR,  "format failed");}
-            json_files = _get_json_path(json_bin, "files");
-            files = _json_get_array((json_files).getBytes());
-            for (String ii_0: files) {
-                name = _get_json_path(ii_0, "name");
-                name = _decode_json_string(name);
-                data = _get_json_path(ii_0, "data");
-                data = _decode_json_string(data);
+            if (!(res.equals("ok"))) { throw new YAPI_Exception(YAPI.IO_ERROR, "format failed");}
+            json_files = _get_json_path(settings, "files");
+            files = _json_get_array(json_files);
+            for (byte[] ii_0:files) {
+                tmp = _get_json_path(ii_0, "name");
+                name = _json_get_string(tmp);
+                tmp = _get_json_path(ii_0, "data");
+                data = _json_get_string(tmp);
                 if (name.equals("")) {
                     fuperror = fuperror + 1;
                 } else {
@@ -1539,9 +1544,9 @@ public class YModule extends YFunction
             }
         }
         // Apply settings a second time for file-dependent settings and dynamic sensor nodes
-        globalres = set_allSettings((json_api).getBytes());
+        globalres = set_allSettings(json_api);
         //noinspection DoubleNegation
-        if (!(fuperror == 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "Error during file upload");}
+        if (!(fuperror == 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "Error during file upload");}
         return globalres;
     }
 
@@ -1766,10 +1771,10 @@ public class YModule extends YFunction
             while (i < calibData.size()) {
                 if (paramScale > 0) {
                     // scalar decoding
-                    calibData.set( i, (calibData.get(i).doubleValue() - paramOffset) / paramScale);
+                    calibData.set(i, (calibData.get(i).doubleValue() - paramOffset) / paramScale);
                 } else {
                     // floating-point decoding
-                    calibData.set( i, YAPIContext._decimalToDouble((int) (double)Math.round(calibData.get(i).doubleValue())));
+                    calibData.set(i, YAPIContext._decimalToDouble((int) (double)Math.round(calibData.get(i).doubleValue())));
                 }
                 i = i + 1;
             }
@@ -1868,12 +1873,12 @@ public class YModule extends YFunction
     {
         ArrayList<String> restoreLast = new ArrayList<>();
         byte[] old_json_flat = new byte[0];
-        ArrayList<String> old_dslist = new ArrayList<>();
+        ArrayList<byte[]> old_dslist = new ArrayList<>();
         ArrayList<String> old_jpath = new ArrayList<>();
         ArrayList<Integer> old_jpath_len = new ArrayList<>();
         ArrayList<String> old_val_arr = new ArrayList<>();
         byte[] actualSettings = new byte[0];
-        ArrayList<String> new_dslist = new ArrayList<>();
+        ArrayList<byte[]> new_dslist = new ArrayList<>();
         ArrayList<String> new_jpath = new ArrayList<>();
         ArrayList<Integer> new_jpath_len = new ArrayList<>();
         ArrayList<String> new_val_arr = new ArrayList<>();
@@ -1889,8 +1894,11 @@ public class YModule extends YFunction
         String fun;
         String attr;
         String value;
+        String old_serial;
+        String new_serial;
         String url;
         String tmp;
+        byte[] binTmp = new byte[0];
         String sensorType;
         String unit_name;
         String newval;
@@ -1900,17 +1908,17 @@ public class YModule extends YFunction
         boolean do_update;
         boolean found;
         res = YAPI.SUCCESS;
-        tmp = new String(settings);
-        tmp = _get_json_path(tmp, "api");
-        if (!(tmp.equals(""))) {
-            settings = (tmp).getBytes();
+        binTmp = _get_json_path(settings, "api");
+        if ((binTmp).length > 0) {
+            settings = binTmp;
         }
+        old_serial = "";
         oldval = "";
         newval = "";
         old_json_flat = _flattenJsonStruct(settings);
         old_dslist = _json_get_array(old_json_flat);
-        for (String ii_0:old_dslist) {
-            each_str = _json_get_string((ii_0).getBytes());
+        for (byte[] ii_0:old_dslist) {
+            each_str = _json_get_string(ii_0);
             // split json path and attr
             leng = each_str.length();
             eqpos = each_str.indexOf("=");
@@ -1920,10 +1928,13 @@ public class YModule extends YFunction
             }
             jpath = (each_str).substring(0, eqpos);
             eqpos = eqpos + 1;
-            value = (each_str).substring( eqpos,  eqpos + leng - eqpos);
+            value = (each_str).substring(eqpos, eqpos + leng - eqpos);
             old_jpath.add(jpath);
             old_jpath_len.add(jpath.length());
             old_val_arr.add(value);
+            if (jpath.equals("module/serialNumber")) {
+                old_serial = value;
+            }
         }
 
         try {
@@ -1933,11 +1944,15 @@ public class YModule extends YFunction
             YAPI.Sleep(500);
             actualSettings = _download("api.json");
         }
+        new_serial = get_serialNumber();
+        if (old_serial.equals(new_serial) || old_serial.equals("")) {
+            old_serial = "_NO_SERIAL_FILTER_";
+        }
         actualSettings = _flattenJsonStruct(actualSettings);
         new_dslist = _json_get_array(actualSettings);
-        for (String ii_1:new_dslist) {
+        for (byte[] ii_1:new_dslist) {
             // remove quotes
-            each_str = _json_get_string((ii_1).getBytes());
+            each_str = _json_get_string(ii_1);
             // split json path and attr
             leng = each_str.length();
             eqpos = each_str.indexOf("=");
@@ -1947,7 +1962,7 @@ public class YModule extends YFunction
             }
             jpath = (each_str).substring(0, eqpos);
             eqpos = eqpos + 1;
-            value = (each_str).substring( eqpos,  eqpos + leng - eqpos);
+            value = (each_str).substring(eqpos, eqpos + leng - eqpos);
             new_jpath.add(jpath);
             new_jpath_len.add(jpath.length());
             new_val_arr.add(value);
@@ -1962,7 +1977,7 @@ public class YModule extends YFunction
             }
             fun = (njpath).substring(0, cpos);
             cpos = cpos + 1;
-            attr = (njpath).substring( cpos,  cpos + leng - cpos);
+            attr = (njpath).substring(cpos, cpos + leng - cpos);
             do_update = true;
             if (fun.equals("services")) {
                 do_update = false;
@@ -2086,14 +2101,14 @@ public class YModule extends YFunction
             }
             if (do_update) {
                 do_update = false;
-                newval = new_val_arr.get(i);
                 j = 0;
                 found = false;
+                newval = new_val_arr.get(i);
                 while ((j < old_jpath.size()) && !(found)) {
                     if ((new_jpath_len.get(i).intValue() == old_jpath_len.get(j).intValue()) && (new_jpath.get(i).equals(old_jpath.get(j)))) {
                         found = true;
                         oldval = old_val_arr.get(j);
-                        if (!(newval.equals(oldval))) {
+                        if (!(newval.equals(oldval)) && !(oldval.equals(old_serial))) {
                             do_update = true;
                         }
                     }
@@ -2216,7 +2231,7 @@ public class YModule extends YFunction
 
     /**
      * Returns the icon of the module. The icon is a PNG image and does not
-     * exceeds 1536 bytes.
+     * exceed 1536 bytes.
      *
      * @return a binary buffer with module icon, in png format.
      * @throws YAPI_Exception on error
@@ -2238,7 +2253,7 @@ public class YModule extends YFunction
         byte[] content = new byte[0];
 
         content = _download("logs.txt");
-        return new String(content);
+        return new String(content, _yapi._deviceCharset);
     }
 
     /**
@@ -2254,7 +2269,7 @@ public class YModule extends YFunction
      */
     public int log(String text) throws YAPI_Exception
     {
-        return _upload("logs.txt", (text).getBytes());
+        return _upload("logs.txt", (text).getBytes(_yapi._deviceCharset));
     }
 
     /**

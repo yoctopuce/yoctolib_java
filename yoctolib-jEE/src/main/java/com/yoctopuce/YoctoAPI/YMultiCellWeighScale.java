@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiCellWeighScale.java 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: YMultiCellWeighScale.java 63325 2024-11-13 09:33:33Z seb $
  *
  *  Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *
@@ -1019,7 +1019,7 @@ public class YMultiCellWeighScale extends YSensor
      */
     public int setupSpan(double currWeight,double maxWeight) throws YAPI_Exception
     {
-        return set_command(String.format(Locale.US, "S%d:%d", (int) (double)Math.round(1000*currWeight),(int) (double)Math.round(1000*maxWeight)));
+        return set_command(String.format(Locale.US, "S%d:%d",(int) (double)Math.round(1000*currWeight),(int) (double)Math.round(1000*maxWeight)));
     }
 
     /**

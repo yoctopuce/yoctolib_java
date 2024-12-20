@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 62437 2024-09-03 09:38:28Z seb $
+ * $Id: YGenericHub.java 63476 2024-11-26 08:03:53Z seb $
  *
  * Internal YGenericHub object
  *
@@ -140,10 +140,7 @@ abstract class YGenericHub
         _knownUrls.add(httpParams._originalURL);
         _creation_time = System.currentTimeMillis();
         _hubid = _global_hub_id++;
-
     }
-
-
 
     abstract void release();
 

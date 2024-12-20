@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHub.java 60940 2024-05-14 10:01:20Z seb $
+ * $Id: YHub.java 62907 2024-10-08 07:05:55Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -222,7 +222,7 @@ public class YHub
      * Modifies tthe network connection delay for this hub.
      * The default value is inherited from ySetNetworkTimeout
      * at the time when the hub is registered, but it can be updated
-     * afterwards for each specific hub if necessary.
+     * afterward for each specific hub if necessary.
      *
      * @param networkMsTimeout : the network connection delay in milliseconds.
      *
@@ -236,7 +236,7 @@ public class YHub
      * Returns the network connection delay for this hub.
      * The default value is inherited from ySetNetworkTimeout
      * at the time when the hub is registered, but it can be updated
-     * afterwards for each specific hub if necessary.
+     * afterward for each specific hub if necessary.
      *
      * @return the network connection delay in milliseconds.
      */

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 62194 2024-08-19 12:21:29Z seb $
+ * $Id: YDataStream.java 63325 2024-11-13 09:33:33Z seb $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -253,16 +253,14 @@ public class YDataStream
     public String _get_url()
     {
         String url;
-        url = String.format(Locale.US, "logger.json?id=%s&run=%d&utc=%d",
-        _functionId,_runNo,_utcStamp);
+        url = String.format(Locale.US, "logger.json?id=%s&run=%d&utc=%d",_functionId,_runNo,_utcStamp);
         return url;
     }
 
     public String _get_baseurl()
     {
         String url;
-        url = String.format(Locale.US, "logger.json?id=%s&run=%d&utc=",
-        _functionId,_runNo);
+        url = String.format(Locale.US, "logger.json?id=%s&run=%d&utc=",_functionId,_runNo);
         return url;
     }
 

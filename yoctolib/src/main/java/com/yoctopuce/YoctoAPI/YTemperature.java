@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTemperature.java 62194 2024-08-19 12:21:29Z seb $
+ *  $Id: YTemperature.java 63599 2024-12-06 10:17:59Z seb $
  *
  *  Implements FindTemperature(), the high-level API for Temperature functions
  *
@@ -635,13 +635,13 @@ public class YTemperature extends YSensor
         double idxres;
         siz = tempValues.size();
         //noinspection DoubleNegation
-        if (!(siz >= 2)) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "thermistor response table must have at least two points");}
+        if (!(siz >= 2)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "thermistor response table must have at least two points");}
         //noinspection DoubleNegation
-        if (!(siz == resValues.size())) { throw new YAPI_Exception( YAPI.INVALID_ARGUMENT,  "table sizes mismatch");}
+        if (!(siz == resValues.size())) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "table sizes mismatch");}
 
         res = set_command("Z");
         //noinspection DoubleNegation
-        if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermistor parameters");}
+        if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception(YAPI.IO_ERROR, "unable to reset thermistor parameters");}
         // add records in growing resistance value
         found = 1;
         prev = 0.0;
@@ -660,9 +660,9 @@ public class YTemperature extends YSensor
                 idx = idx + 1;
             }
             if (found > 0) {
-                res = set_command(String.format(Locale.US, "m%d:%d", (int) (double)Math.round(1000*curr),(int) (double)Math.round(1000*currTemp)));
+                res = set_command(String.format(Locale.US, "m%d:%d",(int) (double)Math.round(1000*curr),(int) (double)Math.round(1000*currTemp)));
                 //noinspection DoubleNegation
-                if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to reset thermistor parameters");}
+                if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception(YAPI.IO_ERROR, "unable to reset thermistor parameters");}
                 prev = curr;
             }
         }
@@ -689,7 +689,7 @@ public class YTemperature extends YSensor
     {
         String id;
         byte[] bin_json = new byte[0];
-        ArrayList<String> paramlist = new ArrayList<>();
+        ArrayList<byte[]> paramlist = new ArrayList<>();
         ArrayList<Double> templist = new ArrayList<>();
         int siz;
         int idx;
@@ -702,7 +702,7 @@ public class YTemperature extends YSensor
         resValues.clear();
 
         id = get_functionId();
-        id = (id).substring( 11,  11 + id.length() - 11);
+        id = (id).substring(11, 11 + id.length() - 11);
         if (id.equals("")) {
             id = "1";
         }
@@ -713,7 +713,7 @@ public class YTemperature extends YSensor
         templist.clear();
         idx = 0;
         while (idx < siz) {
-            temp = YAPI.ystr2float(paramlist.get(2*idx+1))/1000.0;
+            temp = YAPI.ystr2float(new String(paramlist.get(2*idx+1), _yapi._deviceCharset))/1000.0;
             templist.add(temp);
             idx = idx + 1;
         }
@@ -731,7 +731,7 @@ public class YTemperature extends YSensor
                 temp = templist.get(idx).doubleValue();
                 if ((temp > prev) && (temp < curr)) {
                     curr = temp;
-                    currRes = YAPI.ystr2float(paramlist.get(2*idx))/1000.0;
+                    currRes = YAPI.ystr2float(new String(paramlist.get(2*idx), _yapi._deviceCharset))/1000.0;
                     found = 1;
                 }
                 idx = idx + 1;

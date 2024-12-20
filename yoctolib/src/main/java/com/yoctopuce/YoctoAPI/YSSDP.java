@@ -209,7 +209,7 @@ class YSSDP
         msearchSocket.setTimeToLive(2);
         msearchSocket.setNetworkInterface(netIf);
         // format MSEARCH packet with MX=5s
-        byte[] outPktContent = SSDP_DISCOVERY_MESSAGE.getBytes();
+        byte[] outPktContent = SSDP_DISCOVERY_MESSAGE.getBytes(YAPI.DefaultEncoding);
         outPkt = new DatagramPacket(outPktContent, outPktContent.length, mMcastAddr);
         int response_delay = 20000;
         msearchSocket.setSoTimeout(response_delay);

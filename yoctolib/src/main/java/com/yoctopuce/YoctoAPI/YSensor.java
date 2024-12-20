@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 62194 2024-08-19 12:21:29Z seb $
+ * $Id: YSensor.java 63325 2024-11-13 09:33:33Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -1277,7 +1277,7 @@ public class YSensor extends YFunction
 
         res = _download("api/dataLogger/recording?recording=1");
         //noinspection DoubleNegation
-        if (!((res).length > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to start datalogger");}
+        if (!((res).length > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "unable to start datalogger");}
         return YAPI.SUCCESS;
     }
 
@@ -1292,7 +1292,7 @@ public class YSensor extends YFunction
 
         res = _download("api/dataLogger/recording?recording=0");
         //noinspection DoubleNegation
-        if (!((res).length > 0)) { throw new YAPI_Exception( YAPI.IO_ERROR,  "unable to stop datalogger");}
+        if (!((res).length > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "unable to stop datalogger");}
         return YAPI.SUCCESS;
     }
 
@@ -1467,7 +1467,7 @@ public class YSensor extends YFunction
         res = String.format(Locale.US, "%d",YAPI.YOCTO_CALIB_TYPE_OFS);
         idx = 0;
         while (idx < npt) {
-            res = String.format(Locale.US, "%s,%f,%f", res, rawValues.get(idx).doubleValue(),refValues.get(idx).doubleValue());
+            res = String.format(Locale.US, "%s,%f,%f",res,rawValues.get(idx).doubleValue(),refValues.get(idx).doubleValue());
             idx = idx + 1;
         }
         return res;

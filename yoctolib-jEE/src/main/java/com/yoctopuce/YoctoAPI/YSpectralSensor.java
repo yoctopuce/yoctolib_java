@@ -73,9 +73,47 @@ public class YSpectralSensor extends YFunction
      */
     public static final int GAIN_INVALID = YAPI.INVALID_INT;
     /**
+     * invalid estimationModel value
+     */
+    public static final int ESTIMATIONMODEL_REFLECTION = 0;
+    public static final int ESTIMATIONMODEL_EMISSION = 1;
+    public static final int ESTIMATIONMODEL_INVALID = -1;
+    /**
      * invalid saturation value
      */
     public static final int SATURATION_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid estimatedRGB value
+     */
+    public static final int ESTIMATEDRGB_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid estimatedHSL value
+     */
+    public static final int ESTIMATEDHSL_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid estimatedXYZ value
+     */
+    public static final String ESTIMATEDXYZ_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid estimatedOkLab value
+     */
+    public static final String ESTIMATEDOKLAB_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid nearRAL1 value
+     */
+    public static final String NEARRAL1_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid nearRAL2 value
+     */
+    public static final String NEARRAL2_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid nearRAL3 value
+     */
+    public static final String NEARRAL3_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid nearHTMLColor value
+     */
+    public static final String NEARHTMLCOLOR_INVALID = YAPI.INVALID_STRING;
     /**
      * invalid ledCurrentAtPowerOn value
      */
@@ -92,7 +130,16 @@ public class YSpectralSensor extends YFunction
     protected double _resolution = RESOLUTION_INVALID;
     protected int _integrationTime = INTEGRATIONTIME_INVALID;
     protected int _gain = GAIN_INVALID;
+    protected int _estimationModel = ESTIMATIONMODEL_INVALID;
     protected int _saturation = SATURATION_INVALID;
+    protected int _estimatedRGB = ESTIMATEDRGB_INVALID;
+    protected int _estimatedHSL = ESTIMATEDHSL_INVALID;
+    protected String _estimatedXYZ = ESTIMATEDXYZ_INVALID;
+    protected String _estimatedOkLab = ESTIMATEDOKLAB_INVALID;
+    protected String _nearRAL1 = NEARRAL1_INVALID;
+    protected String _nearRAL2 = NEARRAL2_INVALID;
+    protected String _nearRAL3 = NEARRAL3_INVALID;
+    protected String _nearHTMLColor = NEARHTMLCOLOR_INVALID;
     protected int _ledCurrentAtPowerOn = LEDCURRENTATPOWERON_INVALID;
     protected int _integrationTimeAtPowerOn = INTEGRATIONTIMEATPOWERON_INVALID;
     protected int _gainAtPowerOn = GAINATPOWERON_INVALID;
@@ -164,8 +211,35 @@ public class YSpectralSensor extends YFunction
         if (json_val.has("gain")) {
             _gain = json_val.getInt("gain");
         }
+        if (json_val.has("estimationModel")) {
+            _estimationModel = json_val.getInt("estimationModel");
+        }
         if (json_val.has("saturation")) {
             _saturation = json_val.getInt("saturation");
+        }
+        if (json_val.has("estimatedRGB")) {
+            _estimatedRGB = json_val.getInt("estimatedRGB");
+        }
+        if (json_val.has("estimatedHSL")) {
+            _estimatedHSL = json_val.getInt("estimatedHSL");
+        }
+        if (json_val.has("estimatedXYZ")) {
+            _estimatedXYZ = json_val.getString("estimatedXYZ");
+        }
+        if (json_val.has("estimatedOkLab")) {
+            _estimatedOkLab = json_val.getString("estimatedOkLab");
+        }
+        if (json_val.has("nearRAL1")) {
+            _nearRAL1 = json_val.getString("nearRAL1");
+        }
+        if (json_val.has("nearRAL2")) {
+            _nearRAL2 = json_val.getString("nearRAL2");
+        }
+        if (json_val.has("nearRAL3")) {
+            _nearRAL3 = json_val.getString("nearRAL3");
+        }
+        if (json_val.has("nearHTMLColor")) {
+            _nearHTMLColor = json_val.getString("nearHTMLColor");
         }
         if (json_val.has("ledCurrentAtPowerOn")) {
             _ledCurrentAtPowerOn = json_val.getInt("ledCurrentAtPowerOn");
@@ -180,8 +254,11 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Returns the current value of the LED.
+     * This method retrieves the current flowing through the LED
+     * and returns it as an integer or an object.
      *
-     * @return an integer
+     * @return an integer corresponding to the current value of the LED
      *
      * @throws YAPI_Exception on error
      */
@@ -200,8 +277,11 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Returns the current value of the LED.
+     * This method retrieves the current flowing through the LED
+     * and returns it as an integer or an object.
      *
-     * @return an integer
+     * @return an integer corresponding to the current value of the LED
      *
      * @throws YAPI_Exception on error
      */
@@ -324,8 +404,11 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Returns the current integration time.
+     * This method retrieves the integration time value
+     * used for data processing and returns it as an integer or an object.
      *
-     * @return an integer
+     * @return an integer corresponding to the current integration time
      *
      * @throws YAPI_Exception on error
      */
@@ -344,8 +427,11 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Returns the current integration time.
+     * This method retrieves the integration time value
+     * used for data processing and returns it as an integer or an object.
      *
-     * @return an integer
+     * @return an integer corresponding to the current integration time
      *
      * @throws YAPI_Exception on error
      */
@@ -355,10 +441,10 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
-     * Change the integration time for a measure. The parameter is a
-     * value between 0 and 100.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
+     * Sets the integration time for data processing.
+     * This method takes a parameter `val` and assigns it
+     * as the new integration time. This affects the duration
+     * for which data is integrated before being processed.
      *
      * @param newval : an integer
      *
@@ -377,10 +463,10 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
-     * Change the integration time for a measure. The parameter is a
-     * value between 0 and 100.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
+     * Sets the integration time for data processing.
+     * This method takes a parameter `val` and assigns it
+     * as the new integration time. This affects the duration
+     * for which data is integrated before being processed.
      *
      * @param newval : an integer
      *
@@ -394,6 +480,8 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Retrieves the current gain.
+     * This method updates the gain value.
      *
      * @return an integer
      *
@@ -414,6 +502,8 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Retrieves the current gain.
+     * This method updates the gain value.
      *
      * @return an integer
      *
@@ -425,8 +515,10 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
+     * Sets the gain for signal processing.
+     * This method takes a parameter `val` and assigns it
+     * as the new gain. This affects the sensitivity and
+     * intensity of the processed signal.
      *
      * @param newval : an integer
      *
@@ -445,8 +537,10 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
+     * Sets the gain for signal processing.
+     * This method takes a parameter `val` and assigns it
+     * as the new gain. This affects the sensitivity and
+     * intensity of the processed signal.
      *
      * @param newval : an integer
      *
@@ -460,8 +554,76 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Return the model for the estimation colors.
      *
-     * @return an integer
+     * @return either YSpectralSensor.ESTIMATIONMODEL_REFLECTION or YSpectralSensor.ESTIMATIONMODEL_EMISSION
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_estimationModel() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return ESTIMATIONMODEL_INVALID;
+                }
+            }
+            res = _estimationModel;
+        }
+        return res;
+    }
+
+    /**
+     * Return the model for the estimation colors.
+     *
+     * @return either YSpectralSensor.ESTIMATIONMODEL_REFLECTION or YSpectralSensor.ESTIMATIONMODEL_EMISSION
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getEstimationModel() throws YAPI_Exception
+    {
+        return get_estimationModel();
+    }
+
+    /**
+     * Change the model for the estimation colors.
+     *
+     * @param newval : either YSpectralSensor.ESTIMATIONMODEL_REFLECTION or YSpectralSensor.ESTIMATIONMODEL_EMISSION
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_estimationModel(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("estimationModel",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Change the model for the estimation colors.
+     *
+     * @param newval : either YSpectralSensor.ESTIMATIONMODEL_REFLECTION or YSpectralSensor.ESTIMATIONMODEL_EMISSION
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setEstimationModel(int newval)  throws YAPI_Exception
+    {
+        return set_estimationModel(newval);
+    }
+
+    /**
+     * Returns the current saturation of the sensor.
+     * This function updates the sensor's saturation value.
+     *
+     * @return an integer corresponding to the current saturation of the sensor
      *
      * @throws YAPI_Exception on error
      */
@@ -480,8 +642,10 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Returns the current saturation of the sensor.
+     * This function updates the sensor's saturation value.
      *
-     * @return an integer
+     * @return an integer corresponding to the current saturation of the sensor
      *
      * @throws YAPI_Exception on error
      */
@@ -491,11 +655,209 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Returns the estimated color in RGB format.
+     * This method retrieves the estimated color values
+     * and returns them as an RGB object or structure.
      *
-     * @return an integer
+     * @return an integer corresponding to the estimated color in RGB format
      *
      * @throws YAPI_Exception on error
      */
+    public int get_estimatedRGB() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return ESTIMATEDRGB_INVALID;
+                }
+            }
+            res = _estimatedRGB;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the estimated color in RGB format.
+     * This method retrieves the estimated color values
+     * and returns them as an RGB object or structure.
+     *
+     * @return an integer corresponding to the estimated color in RGB format
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getEstimatedRGB() throws YAPI_Exception
+    {
+        return get_estimatedRGB();
+    }
+
+    /**
+     * Returns the estimated color in HSL format.
+     * This method retrieves the estimated color values
+     * and returns them as an HSL object or structure.
+     *
+     * @return an integer corresponding to the estimated color in HSL format
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_estimatedHSL() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return ESTIMATEDHSL_INVALID;
+                }
+            }
+            res = _estimatedHSL;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the estimated color in HSL format.
+     * This method retrieves the estimated color values
+     * and returns them as an HSL object or structure.
+     *
+     * @return an integer corresponding to the estimated color in HSL format
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getEstimatedHSL() throws YAPI_Exception
+    {
+        return get_estimatedHSL();
+    }
+
+    /**
+     * Returns the estimated color in XYZ format.
+     * This method retrieves the estimated color values
+     * and returns them as an XYZ object or structure.
+     *
+     * @return a string corresponding to the estimated color in XYZ format
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_estimatedXYZ() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return ESTIMATEDXYZ_INVALID;
+                }
+            }
+            res = _estimatedXYZ;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the estimated color in XYZ format.
+     * This method retrieves the estimated color values
+     * and returns them as an XYZ object or structure.
+     *
+     * @return a string corresponding to the estimated color in XYZ format
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getEstimatedXYZ() throws YAPI_Exception
+    {
+        return get_estimatedXYZ();
+    }
+
+    /**
+     * Returns the estimated color in OkLab format.
+     * This method retrieves the estimated color values
+     * and returns them as an OkLab object or structure.
+     *
+     * @return a string corresponding to the estimated color in OkLab format
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_estimatedOkLab() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return ESTIMATEDOKLAB_INVALID;
+                }
+            }
+            res = _estimatedOkLab;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the estimated color in OkLab format.
+     * This method retrieves the estimated color values
+     * and returns them as an OkLab object or structure.
+     *
+     * @return a string corresponding to the estimated color in OkLab format
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getEstimatedOkLab() throws YAPI_Exception
+    {
+        return get_estimatedOkLab();
+    }
+
+    public String get_nearRAL1() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return NEARRAL1_INVALID;
+                }
+            }
+            res = _nearRAL1;
+        }
+        return res;
+    }
+
+    public String get_nearRAL2() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return NEARRAL2_INVALID;
+                }
+            }
+            res = _nearRAL2;
+        }
+        return res;
+    }
+
+    public String get_nearRAL3() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return NEARRAL3_INVALID;
+                }
+            }
+            res = _nearRAL3;
+        }
+        return res;
+    }
+
+    public String get_nearHTMLColor() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return NEARHTMLCOLOR_INVALID;
+                }
+            }
+            res = _nearHTMLColor;
+        }
+        return res;
+    }
+
     public int get_ledCurrentAtPowerOn() throws YAPI_Exception
     {
         int res;
@@ -511,17 +873,10 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
-     *
-     * @return an integer
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int getLedCurrentAtPowerOn() throws YAPI_Exception
-    {
-        return get_ledCurrentAtPowerOn();
-    }
-
-    /**
+     * Sets the LED current at power-on.
+     * This method takes a parameter `val` and assigns it to startupLumin, representing the LED current defined
+     * at startup.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer
      *
@@ -540,6 +895,10 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Sets the LED current at power-on.
+     * This method takes a parameter `val` and assigns it to startupLumin, representing the LED current defined
+     * at startup.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer
      *
@@ -553,6 +912,8 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Retrieves the integration time at power-on.
+     * This method updates the power-on integration time value.
      *
      * @return an integer
      *
@@ -573,6 +934,8 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Retrieves the integration time at power-on.
+     * This method updates the power-on integration time value.
      *
      * @return an integer
      *
@@ -584,6 +947,10 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Sets the integration time at power-on.
+     * This method takes a parameter `val` and assigns it to startupIntegTime, representing the integration time
+     * defined at startup.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer
      *
@@ -602,6 +969,10 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Sets the integration time at power-on.
+     * This method takes a parameter `val` and assigns it to startupIntegTime, representing the integration time
+     * defined at startup.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer
      *
@@ -614,12 +985,6 @@ public class YSpectralSensor extends YFunction
         return set_integrationTimeAtPowerOn(newval);
     }
 
-    /**
-     *
-     * @return an integer
-     *
-     * @throws YAPI_Exception on error
-     */
     public int get_gainAtPowerOn() throws YAPI_Exception
     {
         int res;
@@ -635,17 +1000,9 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
-     *
-     * @return an integer
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int getGainAtPowerOn() throws YAPI_Exception
-    {
-        return get_gainAtPowerOn();
-    }
-
-    /**
+     * Sets the gain at power-on.
+     * This method takes a parameter `val` and assigns it to startupGain, representing the gain defined at startup.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer
      *
@@ -664,6 +1021,9 @@ public class YSpectralSensor extends YFunction
     }
 
     /**
+     * Sets the gain at power-on.
+     * This method takes a parameter `val` and assigns it to startupGain, representing the gain defined at startup.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer
      *
