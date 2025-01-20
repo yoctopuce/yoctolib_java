@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 63599 2024-12-06 10:17:59Z seb $
+ *  $Id: YI2cPort.java 64098 2025-01-08 10:59:39Z seb $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -1584,8 +1584,7 @@ public class YI2cPort extends YFunction
     }
 
     /**
-     * Sends a text-encoded I2C code stream to the I2C bus, and terminate
-     * the message en relâchant le bus.
+     * Sends a text-encoded I2C code stream to the I2C bus, and release the bus.
      * An I2C code stream is a string made of hexadecimal data bytes,
      * but that may also include the I2C state transitions code:
      * "{S}" to emit a start condition,

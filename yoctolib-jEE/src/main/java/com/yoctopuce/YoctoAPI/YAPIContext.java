@@ -747,7 +747,10 @@ public class YAPIContext
         }
         return null;
     }
-
+    private String GetYAPISharedLibraryPath_internal()
+    {
+        return YUSBHub.getYAPISharedLibraryPath();
+    }
 
     public String AddUdevRule_internal(boolean force)
     {
@@ -1056,6 +1059,21 @@ public class YAPIContext
 
     //cannot be generated for Java:
     //public int GetDeviceListValidity_internal()
+    /**
+     * Returns the path to the dynamic YAPI library. This function is useful for debugging problems loading the
+     *  dynamic library YAPI. This function is supported by the C#, Python and VB languages. The other
+     * libraries return an
+     * empty string.
+     *
+     * @return a string containing the path of the YAPI dynamic library.
+     */
+    public String GetYAPISharedLibraryPath()
+    {
+        return GetYAPISharedLibraryPath_internal();
+    }
+
+    //cannot be generated for Java:
+    //public String GetYAPISharedLibraryPath_internal()
     /**
      * Adds a UDEV rule which authorizes all users to access Yoctopuce modules
      * connected to the USB ports. This function works only under Linux. The process that

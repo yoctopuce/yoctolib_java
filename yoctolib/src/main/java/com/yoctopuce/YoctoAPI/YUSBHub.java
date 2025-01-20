@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 63599 2024-12-06 10:17:59Z seb $
+ * $Id: YUSBHub.java 64129 2025-01-13 14:05:07Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -66,6 +66,17 @@ class YUSBHub extends YGenericHub
             return "";
         }
     }
+
+    public static String getYAPISharedLibraryPath()
+    {
+        try {
+            YJniWrapper.Check();
+            return YJniWrapper.getYAPISharedLibraryPath();
+        } catch (YAPI_Exception e) {
+            return "";
+        }
+    }
+
 
     public static String addUdevRule(boolean force)
     {

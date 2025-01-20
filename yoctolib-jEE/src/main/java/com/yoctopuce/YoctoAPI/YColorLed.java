@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLed.java 56017 2023-08-14 08:47:38Z mvuilleu $
+ *  $Id: YColorLed.java 64082 2025-01-07 09:41:13Z seb $
  *
  *  Implements FindColorLed(), the high-level API for ColorLed functions
  *
@@ -471,8 +471,9 @@ public class YColorLed extends YFunction
 
     /**
      * Changes the color that the LED displays by default when the module is turned on.
-     * Remember to call the saveToFlash()
-     * method of the module if the modification must be kept.
+     * Remember to call the saveLedsConfigAtPowerOn() method of the module if the modification must be kept.
+     * Note: for the original modules Yocto-Color (version 1) et Yocto-PowerColor, the  saveToFlash()
+     * method must be used instead.
      *
      *  @param newval : an integer corresponding to the color that the LED displays by default when the
      * module is turned on
@@ -493,8 +494,9 @@ public class YColorLed extends YFunction
 
     /**
      * Changes the color that the LED displays by default when the module is turned on.
-     * Remember to call the saveToFlash()
-     * method of the module if the modification must be kept.
+     * Remember to call the saveLedsConfigAtPowerOn() method of the module if the modification must be kept.
+     * Note: for the original modules Yocto-Color (version 1) et Yocto-PowerColor, the  saveToFlash()
+     * method must be used instead.
      *
      *  @param newval : an integer corresponding to the color that the LED displays by default when the
      * module is turned on
@@ -827,6 +829,18 @@ public class YColorLed extends YFunction
     public int resetBlinkSeq() throws YAPI_Exception
     {
         return sendCommand("Z");
+    }
+
+    /**
+     * Saves the LEDs power-on configuration.  Warning: this method is not supported by
+     * Yocto-Color (version 1) and Yocto-PowerColor modules. For these devices, the saveToFlash()
+     * method of the module must be used instead.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int saveLedsConfigAtPowerOn() throws YAPI_Exception
+    {
+        return sendCommand("W");
     }
 
     /**

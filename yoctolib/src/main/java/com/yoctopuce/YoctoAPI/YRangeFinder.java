@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YRangeFinder.java 62194 2024-08-19 12:21:29Z seb $
+ *  $Id: YRangeFinder.java 64098 2025-01-08 10:59:39Z seb $
  *
  *  Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *
@@ -670,7 +670,7 @@ public class YRangeFinder extends YSensor
      * Triggers a sensor calibration according to the current ambient temperature. That
      * calibration process needs no physical interaction with the sensor. It is performed
      * automatically at device startup, but it is recommended to start it again when the
-     * temperature delta since the latest calibration exceeds 8°C.
+     * temperature delta since the latest calibration exceeds 8 degrees Celsius.
      *
      * @return YAPI.SUCCESS if the call succeeds.
      * @throws YAPI_Exception on error

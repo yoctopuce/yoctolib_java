@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 63599 2024-12-06 10:17:59Z seb $
+ * $Id: YHTTPHub.java 64016 2025-01-06 13:13:09Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -124,7 +124,7 @@ public class YHTTPHub extends YGenericHub
     void parseWWWAuthenticate(String header)
     {
         synchronized (_authLock) {
-            int pos = header.indexOf("\r\nWWW-Authenticate:");
+            int pos = header.toLowerCase().indexOf("\r\nwww-authenticate:");
             if (pos == -1) return;
             header = header.substring(pos + 19);
             int eol = header.indexOf('\r');
