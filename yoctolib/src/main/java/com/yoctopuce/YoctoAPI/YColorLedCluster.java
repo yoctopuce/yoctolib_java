@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YColorLedCluster.java 64098 2025-01-08 10:59:39Z seb $
+ *  $Id: svn_id $
  *
  *  Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *

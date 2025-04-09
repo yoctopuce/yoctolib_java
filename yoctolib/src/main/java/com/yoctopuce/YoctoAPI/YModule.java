@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 63704 2024-12-16 10:05:02Z seb $
+ * $Id: YModule.java 65106 2025-03-17 12:51:27Z mvuilleu $
  *
  * YModule Class: Module control interface
  *
@@ -1418,7 +1418,7 @@ public class YModule extends YFunction
         }
         ext_settings = ext_settings + "],\n\"files\":[";
         if (hasFunction("files")) {
-            json = _download("files.json?a=dir&f=");
+            json = _download("files.json?a=dir&d=1&f=");
             if ((json).length == 0) {
                 return json;
             }
@@ -1427,8 +1427,12 @@ public class YModule extends YFunction
             for (byte[] ii_1:filelist) {
                 name = _json_get_key(ii_1, "name");
                 if ((name.length() > 0) && !(name.equals("startupConf.json"))) {
-                    file_data_bin = _download(_escapeAttr(name));
-                    file_data = YAPIContext._bytesToHexStr(file_data_bin, 0, file_data_bin.length);
+                    if ((name).substring(name.length()-1, name.length()-1 + 1).equals("/")) {
+                        file_data = "";
+                    } else {
+                        file_data_bin = _download(_escapeAttr(name));
+                        file_data = YAPIContext._bytesToHexStr(file_data_bin, 0, file_data_bin.length);
+                    }
                     item = String.format(Locale.US, "%s{\"name\":\"%s\", \"data\":\"%s\"}\n",sep,name,file_data);
                     ext_settings = ext_settings + item;
                     sep = ",";

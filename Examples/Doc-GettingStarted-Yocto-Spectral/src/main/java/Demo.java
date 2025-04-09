@@ -1,6 +1,20 @@
 /*
  *
- *  $Id: Demo.java 58172 2023-11-30 17:10:23Z martinm $
+ *  $Id: Demo.java 65287 2025-03-24 13:18:15Z seb $
+ *
+ *  An example that shows how to use a  Yocto-Spectral
+ *
+ *  You can find more information on our web site:
+ *   Yocto-Spectral documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-spectral/doc.html
+ *   JAVA API Reference:
+ *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
+ *
+ */
+
+/*
+ *
+ *  $Id: Demo.java 65287 2025-03-24 13:18:15Z seb $
  *
  *  An example that shows how to use a  Yocto-Spectral
  *
@@ -30,22 +44,26 @@ public class Demo
             System.exit(1);
         }
 
-        YSpectralSensor spectralSensor;
+        YColorSensor colorSensor;
         if (args.length > 0) {
-            spectralSensor = YI2cPort.FindSpectralSensor(args[0] + ".spectralSensor");
+            colorSensor = YColorSensor.FindColorSensor(args[0] + ".colorSensor");
         } else {
-            spectralSensor = YI2cPort.FirstSpectralSensor();
+            colorSensor = YColorSensor.FirstColorSensor();
         }
-        if (spectralSensorspectralSensor == null || !spectralSensor.isOnline()) {
+        if (colorSensor == null || !colorSensor.isOnline()) {
             System.out.println("No module connected (check USB cable)");
             System.exit(1);
         }
         try {
-            spectralSensor.set_gain(6);
-            spectralSensor.set_integrationTime(150);
-            spectralSensor.set_ledCurrent(6);
-
-            System.out.println("Near estimated HTML color detected: " + spectralSensor.get_nearHTMLColor());
+            colorSensor.set_workingMode(YColorSensor.WORKINGMODE_AUTO); // Set Working Mode Auto
+            colorSensor.set_estimationModel(YColorSensor.ESTIMATIONMODEL_REFLECTION); // Set Prediction Model Reflexion
+            while (colorSensor.isOnline()) {
+                System.out.println("Near color : " + colorSensor.get_nearSimpleColor());
+                System.out.println("RGB HEX : #" + colorSensor.get_estimatedRGB());
+                System.out.println("------------------------------------");
+                System.out.println("  (press Ctrl-C to exit)");
+                YAPI.Sleep(2000);
+            }
         } catch (YAPI_Exception ex) {
             System.out.println("Module not connected (check identification and USB cable)");
         }

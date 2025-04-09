@@ -2,7 +2,8 @@
     "main": "src\/main\/java\/Demo.java",
     "other_files": [],
     "ylib": [
-        "yocto_spectral",
+        "yocto_colorsensor",
+        "yocto_spectralchannel",
         "yocto_api"
     ],
     "skip": true,

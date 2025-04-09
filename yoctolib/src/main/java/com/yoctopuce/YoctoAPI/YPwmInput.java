@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YPwmInput.java 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: svn_id $
  *
  *  Implements FindPwmInput(), the high-level API for PwmInput functions
  *
@@ -102,6 +102,10 @@ public class YPwmInput extends YSensor
      */
     public static final int DEBOUNCEPERIOD_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid minFrequency value
+     */
+    public static final double MINFREQUENCY_INVALID = YAPI.INVALID_DOUBLE;
+    /**
      * invalid bandwidth value
      */
     public static final int BANDWIDTH_INVALID = YAPI.INVALID_UINT;
@@ -117,6 +121,7 @@ public class YPwmInput extends YSensor
     protected long _pulseTimer = PULSETIMER_INVALID;
     protected int _pwmReportMode = PWMREPORTMODE_INVALID;
     protected int _debouncePeriod = DEBOUNCEPERIOD_INVALID;
+    protected double _minFrequency = MINFREQUENCY_INVALID;
     protected int _bandwidth = BANDWIDTH_INVALID;
     protected int _edgesPerPeriod = EDGESPERPERIOD_INVALID;
     protected UpdateCallback _valueCallbackPwmInput = null;
@@ -199,6 +204,9 @@ public class YPwmInput extends YSensor
         }
         if (json_val.has("debouncePeriod")) {
             _debouncePeriod = json_val.getInt("debouncePeriod");
+        }
+        if (json_val.has("minFrequency")) {
+            _minFrequency = Math.round(json_val.getDouble("minFrequency") / 65.536) / 1000.0;
         }
         if (json_val.has("bandwidth")) {
             _bandwidth = json_val.getInt("bandwidth");
@@ -636,6 +644,74 @@ public class YPwmInput extends YSensor
     }
 
     /**
+     * Changes the minimum detected frequency, in Hz. Slower signals will be consider as zero frequency.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     * @param newval : a floating point number corresponding to the minimum detected frequency, in Hz
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_minFrequency(double  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("minFrequency",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the minimum detected frequency, in Hz. Slower signals will be consider as zero frequency.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     * @param newval : a floating point number corresponding to the minimum detected frequency, in Hz
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setMinFrequency(double newval)  throws YAPI_Exception
+    {
+        return set_minFrequency(newval);
+    }
+
+    /**
+     * Returns the minimum detected frequency, in Hz. Slower signals will be consider as zero frequency.
+     *
+     * @return a floating point number corresponding to the minimum detected frequency, in Hz
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_minFrequency() throws YAPI_Exception
+    {
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return MINFREQUENCY_INVALID;
+                }
+            }
+            res = _minFrequency;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the minimum detected frequency, in Hz. Slower signals will be consider as zero frequency.
+     *
+     * @return a floating point number corresponding to the minimum detected frequency, in Hz
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getMinFrequency() throws YAPI_Exception
+    {
+        return get_minFrequency();
+    }
+
+    /**
      * Returns the input signal sampling rate, in kHz.
      *
      * @return an integer corresponding to the input signal sampling rate, in kHz
@@ -901,7 +977,19 @@ public class YPwmInput extends YSensor
     }
 
     /**
-     * Returns the pulse counter value as well as its timer.
+     * Resets the periodicity detection algorithm.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int resetPeriodDetection() throws YAPI_Exception
+    {
+        return set_bandwidth(get_bandwidth());
+    }
+
+    /**
+     * Resets the pulse counter value as well as its timer.
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

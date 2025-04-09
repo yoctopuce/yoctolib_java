@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YTemperature.java 63599 2024-12-06 10:17:59Z seb $
+ *  $Id: svn_id $
  *
  *  Implements FindTemperature(), the high-level API for Temperature functions
  *

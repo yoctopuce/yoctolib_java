@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAnButton.java 56268 2023-08-25 17:43:56Z mvuilleu $
+ *  $Id: svn_id $
  *
  *  Implements FindAnButton(), the high-level API for AnButton functions
  *

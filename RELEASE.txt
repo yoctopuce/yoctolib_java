@@ -1,7 +1,3 @@
-Java v2.0.64286
+Java v2.1.654
 
-- Add YAPI::GetYAPISharedLibraryPath method
-- Fix handling of notification position
-- Fix HTTP authentication with Web server that return header in lower case.
-- Fix typos
-- Remove exotic char form YCellular class
+- test build version

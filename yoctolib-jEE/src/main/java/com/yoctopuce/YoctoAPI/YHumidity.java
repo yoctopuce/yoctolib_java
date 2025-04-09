@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YHumidity.java 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: svn_id $
  *
  *  Implements FindHumidity(), the high-level API for Humidity functions
  *

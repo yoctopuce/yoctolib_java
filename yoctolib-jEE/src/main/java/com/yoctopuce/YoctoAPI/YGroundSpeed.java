@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YGroundSpeed.java 39658 2020-03-12 15:36:29Z seb $
+ *  $Id: svn_id $
  *
  *  Implements FindGroundSpeed(), the high-level API for GroundSpeed functions
  *

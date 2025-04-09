@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAltitude.java 50689 2022-08-17 14:37:15Z mvuilleu $
+ *  $Id: svn_id $
  *
  *  Implements FindAltitude(), the high-level API for Altitude functions
  *

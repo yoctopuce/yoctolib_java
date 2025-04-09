@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YNetwork.java 63599 2024-12-06 10:17:59Z seb $
+ *  $Id: svn_id $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *

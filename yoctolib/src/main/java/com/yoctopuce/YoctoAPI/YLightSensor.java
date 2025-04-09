@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLightSensor.java 45292 2021-05-25 23:27:54Z mvuilleu $
+ *  $Id: svn_id $
  *
  *  Implements FindLightSensor(), the high-level API for LightSensor functions
  *

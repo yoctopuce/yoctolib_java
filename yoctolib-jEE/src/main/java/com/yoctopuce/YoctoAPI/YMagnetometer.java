@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMagnetometer.java 61964 2024-07-29 15:54:55Z seb $
+ *  $Id: svn_id $
  *
  *  Implements FindMagnetometer(), the high-level API for Magnetometer functions
  *

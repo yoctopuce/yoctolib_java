@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YInputCapture.java 63325 2024-11-13 09:33:33Z seb $
+ *  $Id: YInputCapture.java 65158 2025-03-19 10:49:26Z mvuilleu $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *
@@ -976,7 +976,14 @@ public class YInputCapture extends YFunction
     }
 
     /**
-     * comment from .yc definition
+     * Continues the enumeration of instant snapshot triggers started using yFirstInputCapture().
+     * Caution: You can't make any assumption about the returned instant snapshot triggers order.
+     * If you want to find a specific an instant snapshot trigger, use InputCapture.findInputCapture()
+     * and a hardwareID or a logical name.
+     *
+     * @return a pointer to a YInputCapture object, corresponding to
+     *         an instant snapshot trigger currently online, or a null pointer
+     *         if there are no more instant snapshot triggers to enumerate.
      */
     public YInputCapture nextInputCapture()
     {
@@ -992,7 +999,13 @@ public class YInputCapture extends YFunction
     }
 
     /**
-     * comment from .yc definition
+     * Starts the enumeration of instant snapshot triggers currently accessible.
+     * Use the method YInputCapture.nextInputCapture() to iterate on
+     * next instant snapshot triggers.
+     *
+     * @return a pointer to a YInputCapture object, corresponding to
+     *         the first instant snapshot trigger currently online, or a null pointer
+     *         if there are none.
      */
     public static YInputCapture FirstInputCapture()
     {
@@ -1004,7 +1017,15 @@ public class YInputCapture extends YFunction
     }
 
     /**
-     * comment from .yc definition
+     * Starts the enumeration of instant snapshot triggers currently accessible.
+     * Use the method YInputCapture.nextInputCapture() to iterate on
+     * next instant snapshot triggers.
+     *
+     * @param yctx : a YAPI context.
+     *
+     * @return a pointer to a YInputCapture object, corresponding to
+     *         the first instant snapshot trigger currently online, or a null pointer
+     *         if there are none.
      */
     public static YInputCapture FirstInputCaptureInContext(YAPIContext yctx)
     {

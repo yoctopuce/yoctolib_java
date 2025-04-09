@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWakeUpMonitor.java 63325 2024-11-13 09:33:33Z seb $
+ *  $Id: svn_id $
  *
  *  Implements FindWakeUpMonitor(), the high-level API for WakeUpMonitor functions
  *
@@ -77,6 +77,7 @@ public class YWakeUpMonitor extends YFunction
     public static final int WAKEUPREASON_EXTSIG1 = 3;
     public static final int WAKEUPREASON_SCHEDULE1 = 4;
     public static final int WAKEUPREASON_SCHEDULE2 = 5;
+    public static final int WAKEUPREASON_SCHEDULE3 = 6;
     public static final int WAKEUPREASON_INVALID = -1;
     /**
      * invalid wakeUpState value
@@ -381,8 +382,8 @@ public class YWakeUpMonitor extends YFunction
      *
      *  @return a value among YWakeUpMonitor.WAKEUPREASON_USBPOWER, YWakeUpMonitor.WAKEUPREASON_EXTPOWER,
      *  YWakeUpMonitor.WAKEUPREASON_ENDOFSLEEP, YWakeUpMonitor.WAKEUPREASON_EXTSIG1,
-     *  YWakeUpMonitor.WAKEUPREASON_SCHEDULE1 and YWakeUpMonitor.WAKEUPREASON_SCHEDULE2 corresponding to
-     * the latest wake up reason
+     *  YWakeUpMonitor.WAKEUPREASON_SCHEDULE1, YWakeUpMonitor.WAKEUPREASON_SCHEDULE2 and
+     * YWakeUpMonitor.WAKEUPREASON_SCHEDULE3 corresponding to the latest wake up reason
      *
      * @throws YAPI_Exception on error
      */
@@ -405,8 +406,8 @@ public class YWakeUpMonitor extends YFunction
      *
      *  @return a value among YWakeUpMonitor.WAKEUPREASON_USBPOWER, YWakeUpMonitor.WAKEUPREASON_EXTPOWER,
      *  YWakeUpMonitor.WAKEUPREASON_ENDOFSLEEP, YWakeUpMonitor.WAKEUPREASON_EXTSIG1,
-     *  YWakeUpMonitor.WAKEUPREASON_SCHEDULE1 and YWakeUpMonitor.WAKEUPREASON_SCHEDULE2 corresponding to
-     * the latest wake up reason
+     *  YWakeUpMonitor.WAKEUPREASON_SCHEDULE1, YWakeUpMonitor.WAKEUPREASON_SCHEDULE2 and
+     * YWakeUpMonitor.WAKEUPREASON_SCHEDULE3 corresponding to the latest wake up reason
      *
      * @throws YAPI_Exception on error
      */

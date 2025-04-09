@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCarbonDioxide.java 44175 2021-03-11 11:27:12Z mvuilleu $
+ *  $Id: svn_id $
  *
  *  Implements FindCarbonDioxide(), the high-level API for CarbonDioxide functions
  *
