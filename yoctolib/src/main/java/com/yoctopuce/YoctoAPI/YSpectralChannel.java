@@ -125,9 +125,7 @@ public class YSpectralChannel extends YSensor
     }
 
     /**
-     * Retrieves the raw count of data samples.
-     * This method returns the current value of rawCount, representing the total number of samples collected
-     * by the sensor.
+     * Retrieves the raw cspectral intensity value as measured by the sensor, without any scaling or calibration.
      *
      * @return an integer
      *
@@ -148,9 +146,7 @@ public class YSpectralChannel extends YSensor
     }
 
     /**
-     * Retrieves the raw count of data samples.
-     * This method returns the current value of rawCount, representing the total number of samples collected
-     * by the sensor.
+     * Retrieves the raw cspectral intensity value as measured by the sensor, without any scaling or calibration.
      *
      * @return an integer
      *
