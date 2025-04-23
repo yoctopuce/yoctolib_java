@@ -48,7 +48,7 @@ package com.yoctopuce.YoctoAPI;
  * YSpectralChannel Class: spectral analysis channel control interface
  *
  * The YSpectralChannel class allows you to read and configure Yoctopuce spectral analysis channels.
- * It inherits from YSensor class the core functions to read measurements,
+ * It inherits from YSensor class the core functions to read measures,
  * to register callback functions, and to access the autonomous datalogger.
  */
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
@@ -60,7 +60,17 @@ public class YSpectralChannel extends YSensor
      * invalid rawCount value
      */
     public static final int RAWCOUNT_INVALID = YAPI.INVALID_INT;
+    /**
+     * invalid channelName value
+     */
+    public static final String CHANNELNAME_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid peakWavelength value
+     */
+    public static final int PEAKWAVELENGTH_INVALID = YAPI.INVALID_INT;
     protected int _rawCount = RAWCOUNT_INVALID;
+    protected String _channelName = CHANNELNAME_INVALID;
+    protected int _peakWavelength = PEAKWAVELENGTH_INVALID;
     protected UpdateCallback _valueCallbackSpectralChannel = null;
     protected TimedReportCallback _timedReportCallbackSpectralChannel = null;
 
@@ -121,11 +131,17 @@ public class YSpectralChannel extends YSensor
         if (json_val.has("rawCount")) {
             _rawCount = json_val.getInt("rawCount");
         }
+        if (json_val.has("channelName")) {
+            _channelName = json_val.getString("channelName");
+        }
+        if (json_val.has("peakWavelength")) {
+            _peakWavelength = json_val.getInt("peakWavelength");
+        }
         super._parseAttr(json_val);
     }
 
     /**
-     * Retrieves the raw cspectral intensity value as measured by the sensor, without any scaling or calibration.
+     * Retrieves the raw spectral intensity value as measured by the sensor, without any scaling or calibration.
      *
      * @return an integer
      *
@@ -146,7 +162,7 @@ public class YSpectralChannel extends YSensor
     }
 
     /**
-     * Retrieves the raw cspectral intensity value as measured by the sensor, without any scaling or calibration.
+     * Retrieves the raw spectral intensity value as measured by the sensor, without any scaling or calibration.
      *
      * @return an integer
      *
@@ -155,6 +171,72 @@ public class YSpectralChannel extends YSensor
     public int getRawCount() throws YAPI_Exception
     {
         return get_rawCount();
+    }
+
+    /**
+     * Returns the target spectral band name.
+     *
+     * @return a string corresponding to the target spectral band name
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_channelName() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return CHANNELNAME_INVALID;
+                }
+            }
+            res = _channelName;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the target spectral band name.
+     *
+     * @return a string corresponding to the target spectral band name
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getChannelName() throws YAPI_Exception
+    {
+        return get_channelName();
+    }
+
+    /**
+     * Returns the target spectral band peak wavelenght, in nm.
+     *
+     * @return an integer corresponding to the target spectral band peak wavelenght, in nm
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_peakWavelength() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return PEAKWAVELENGTH_INVALID;
+                }
+            }
+            res = _peakWavelength;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the target spectral band peak wavelenght, in nm.
+     *
+     * @return an integer corresponding to the target spectral band peak wavelenght, in nm
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getPeakWavelength() throws YAPI_Exception
+    {
+        return get_peakWavelength();
     }
 
     /**

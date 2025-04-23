@@ -300,11 +300,11 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Changes the mpredictive model to be used for color estimation (reflective or emissive).
+     * Changes the predictive model to be used for color estimation (reflective or emissive).
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : either YColorSensor.ESTIMATIONMODEL_REFLECTION or
-     *  YColorSensor.ESTIMATIONMODEL_EMISSION, according to the mpredictive model to be used for color
+     *  YColorSensor.ESTIMATIONMODEL_EMISSION, according to the predictive model to be used for color
      * estimation (reflective or emissive)
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -322,11 +322,11 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Changes the mpredictive model to be used for color estimation (reflective or emissive).
+     * Changes the predictive model to be used for color estimation (reflective or emissive).
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      *  @param newval : either YColorSensor.ESTIMATIONMODEL_REFLECTION or
-     *  YColorSensor.ESTIMATIONMODEL_EMISSION, according to the mpredictive model to be used for color
+     *  YColorSensor.ESTIMATIONMODEL_EMISSION, according to the predictive model to be used for color
      * estimation (reflective or emissive)
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -419,11 +419,10 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the amount of current sent to the illumination LEDs, for reflection measurements.
+     * Returns the amount of current sent to the illumination LEDs, for reflection measures.
      * The value is an integer ranging from 0 (LEDs off) to 254 (LEDs at maximum intensity).
      *
-     *  @return an integer corresponding to the amount of current sent to the illumination LEDs, for
-     * reflection measurements
+     * @return an integer corresponding to the amount of current sent to the illumination LEDs, for reflection measures
      *
      * @throws YAPI_Exception on error
      */
@@ -442,11 +441,10 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the amount of current sent to the illumination LEDs, for reflection measurements.
+     * Returns the amount of current sent to the illumination LEDs, for reflection measures.
      * The value is an integer ranging from 0 (LEDs off) to 254 (LEDs at maximum intensity).
      *
-     *  @return an integer corresponding to the amount of current sent to the illumination LEDs, for
-     * reflection measurements
+     * @return an integer corresponding to the amount of current sent to the illumination LEDs, for reflection measures
      *
      * @throws YAPI_Exception on error
      */
@@ -456,11 +454,11 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Changes the amount of current sent to the illumination LEDs, for reflection measurements.
+     * Changes the amount of current sent to the illumination LEDs, for reflection measures.
      * The value is an integer ranging from 0 (LEDs off) to 254 (LEDs at maximum intensity).
      *
      *  @param newval : an integer corresponding to the amount of current sent to the illumination LEDs,
-     * for reflection measurements
+     * for reflection measures
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -477,11 +475,11 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Changes the amount of current sent to the illumination LEDs, for reflection measurements.
+     * Changes the amount of current sent to the illumination LEDs, for reflection measures.
      * The value is an integer ranging from 0 (LEDs off) to 254 (LEDs at maximum intensity).
      *
      *  @param newval : an integer corresponding to the amount of current sent to the illumination LEDs,
-     * for reflection measurements
+     * for reflection measures
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -493,9 +491,9 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the current sent to the illumination LEDs during the last calibration.
+     * Returns the current sent to the illumination LEDs during the latest calibration.
      *
-     * @return an integer corresponding to the current sent to the illumination LEDs during the last calibration
+     * @return an integer corresponding to the current sent to the illumination LEDs during the latest calibration
      *
      * @throws YAPI_Exception on error
      */
@@ -514,9 +512,9 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the current sent to the illumination LEDs during the last calibration.
+     * Returns the current sent to the illumination LEDs during the latest calibration.
      *
-     * @return an integer corresponding to the current sent to the illumination LEDs during the last calibration
+     * @return an integer corresponding to the current sent to the illumination LEDs during the latest calibration
      *
      * @throws YAPI_Exception on error
      */
@@ -527,7 +525,7 @@ public class YColorSensor extends YFunction
 
     /**
      * Remember the LED current sent to the illumination LEDs during a calibration.
-     * Thanks to this, the device will be able to use the same current during measurements.
+     * Thanks to this, the device is able to use the same current when taking measures.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer
@@ -548,7 +546,7 @@ public class YColorSensor extends YFunction
 
     /**
      * Remember the LED current sent to the illumination LEDs during a calibration.
-     * Thanks to this, the device will be able to use the same current during measurements.
+     * Thanks to this, the device is able to use the same current when taking measures.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer
@@ -563,11 +561,11 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the current integration time for spectral measurement, in milliseconds.
+     * Returns the current integration time for spectral measure, in milliseconds.
      * A longer integration time increase the sensitivity for low light conditions,
-     * but reduces the measurement rate and may lead to saturation for lighter colors.
+     * but reduces the measure taking rate and may lead to saturation for lighter colors.
      *
-     * @return an integer corresponding to the current integration time for spectral measurement, in milliseconds
+     * @return an integer corresponding to the current integration time for spectral measure, in milliseconds
      *
      * @throws YAPI_Exception on error
      */
@@ -586,11 +584,11 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the current integration time for spectral measurement, in milliseconds.
+     * Returns the current integration time for spectral measure, in milliseconds.
      * A longer integration time increase the sensitivity for low light conditions,
-     * but reduces the measurement rate and may lead to saturation for lighter colors.
+     * but reduces the measure taking rate and may lead to saturation for lighter colors.
      *
-     * @return an integer corresponding to the current integration time for spectral measurement, in milliseconds
+     * @return an integer corresponding to the current integration time for spectral measure, in milliseconds
      *
      * @throws YAPI_Exception on error
      */
@@ -600,14 +598,14 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Changes the integration time for spectral measurement, in milliseconds.
+     * Changes the integration time for spectral measure, in milliseconds.
      * A longer integration time increase the sensitivity for low light conditions,
-     * but reduces the measurement rate and may lead to saturation for lighter colors.
+     * but reduces the measure taking rate and may lead to saturation for lighter colors.
      * This method can only be used when the sensor is configured in expert mode;
-     * when running in auto mode, the change will be ignored.
+     * when running in auto mode, the change is ignored.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     * @param newval : an integer corresponding to the integration time for spectral measurement, in milliseconds
+     * @param newval : an integer corresponding to the integration time for spectral measure, in milliseconds
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -624,14 +622,14 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Changes the integration time for spectral measurement, in milliseconds.
+     * Changes the integration time for spectral measure, in milliseconds.
      * A longer integration time increase the sensitivity for low light conditions,
-     * but reduces the measurement rate and may lead to saturation for lighter colors.
+     * but reduces the measure taking rate and may lead to saturation for lighter colors.
      * This method can only be used when the sensor is configured in expert mode;
-     * when running in auto mode, the change will be ignored.
+     * when running in auto mode, the change is ignored.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     * @param newval : an integer corresponding to the integration time for spectral measurement, in milliseconds
+     * @param newval : an integer corresponding to the integration time for spectral measure, in milliseconds
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -684,7 +682,7 @@ public class YColorSensor extends YFunction
      * For a value n ranging from 0 to 12, the applied gain is 2^(n-1).
      * 0 corresponds to a gain of 0.5, and 12 corresponds to a gain of 2048.
      * This method can only be used when the sensor is configured in expert mode;
-     * when running in auto mode, the change will be ignored.
+     * when running in auto mode, the change is ignored.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the spectral channel detector gain exponent
@@ -708,7 +706,7 @@ public class YColorSensor extends YFunction
      * For a value n ranging from 0 to 12, the applied gain is 2^(n-1).
      * 0 corresponds to a gain of 0.5, and 12 corresponds to a gain of 2048.
      * This method can only be used when the sensor is configured in expert mode;
-     * when running in auto mode, the change will be ignored.
+     * when running in auto mode, the change is ignored.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param newval : an integer corresponding to the spectral channel detector gain exponent
@@ -766,9 +764,9 @@ public class YColorSensor extends YFunction
     /**
      * Returns the estimated color in RGB color model (0xRRGGBB).
      * The RGB color model describes each color using a combination of 3 components:<ul>
-     * <li>Red (R): the intensity of red, in thee range 0...255</li>
-     * <li>Green (G): the intensity of green, in thee range 0...255</li>
-     * <li>Blue (B): the intensity of blue, in thee range 0...255</li></ul>
+     * <li>Red (R): the intensity of red, in the 0...255 range</li>
+     * <li>Green (G): the intensity of green, in the 0...255 range</li>
+     * <li>Blue (B): the intensity of blue, in the 0...255 range</li></ul>
      *
      * @return an integer corresponding to the estimated color in RGB color model (0xRRGGBB)
      *
@@ -791,9 +789,9 @@ public class YColorSensor extends YFunction
     /**
      * Returns the estimated color in RGB color model (0xRRGGBB).
      * The RGB color model describes each color using a combination of 3 components:<ul>
-     * <li>Red (R): the intensity of red, in thee range 0...255</li>
-     * <li>Green (G): the intensity of green, in thee range 0...255</li>
-     * <li>Blue (B): the intensity of blue, in thee range 0...255</li></ul>
+     * <li>Red (R): the intensity of red, in the 0...255 range</li>
+     * <li>Green (G): the intensity of green, in the 0...255 range</li>
+     * <li>Blue (B): the intensity of blue, in the 0...255 range</li></ul>
      *
      * @return an integer corresponding to the estimated color in RGB color model (0xRRGGBB)
      *
@@ -891,9 +889,10 @@ public class YColorSensor extends YFunction
     /**
      * Returns the estimated color according to the OkLab color model.
      * OkLab is a perceptual color model that aims to align human color perception with numerical
-     * values, so that visually near colors are also numerically near. Colors are represented using three components:
-     * <li>L: lightness, a real number between 0 and 1<li>
-     * <li>a: color variations between green and red, between -0.5 and 0.5<li>
+     *  values, so that colors that are visually near are also numerically near. Colors are represented
+     * using three components:
+     * <li>L: lightness, a real number between 0 and 1</li>
+     * <li>a: color variations between green and red, between -0.5 and 0.5</li>
      * <li>b: color variations between blue and yellow, between -0.5 and 0.5.</li></ul>
      *
      * @return a string corresponding to the estimated color according to the OkLab color model
@@ -917,9 +916,10 @@ public class YColorSensor extends YFunction
     /**
      * Returns the estimated color according to the OkLab color model.
      * OkLab is a perceptual color model that aims to align human color perception with numerical
-     * values, so that visually near colors are also numerically near. Colors are represented using three components:
-     * <li>L: lightness, a real number between 0 and 1<li>
-     * <li>a: color variations between green and red, between -0.5 and 0.5<li>
+     *  values, so that colors that are visually near are also numerically near. Colors are represented
+     * using three components:
+     * <li>L: lightness, a real number between 0 and 1</li>
+     * <li>a: color variations between green and red, between -0.5 and 0.5</li>
      * <li>b: color variations between blue and yellow, between -0.5 and 0.5.</li></ul>
      *
      * @return a string corresponding to the estimated color according to the OkLab color model
@@ -1291,7 +1291,7 @@ public class YColorSensor extends YFunction
     }
 
     /**
-     * Turns on the built-in illumination LEDs using the same current as used during last calibration.
+     * Turns on the built-in illumination LEDs using the same current as used during the latest calibration.
      * @throws YAPI_Exception on error
      */
     public int turnLedOn() throws YAPI_Exception

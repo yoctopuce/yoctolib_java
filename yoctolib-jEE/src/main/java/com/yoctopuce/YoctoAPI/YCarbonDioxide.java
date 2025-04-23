@@ -49,7 +49,7 @@ import java.util.Locale;
  * YCarbonDioxide Class: CO2 sensor control interface, available for instance in the Yocto-CO2-V2
  *
  * The YCarbonDioxide class allows you to read and configure Yoctopuce CO2 sensors.
- * It inherits from YSensor class the core functions to read measurements,
+ * It inherits from YSensor class the core functions to read measures,
  * to register callback functions, and to access the autonomous datalogger.
  * This class adds the ability to perform manual calibration if required.
  */

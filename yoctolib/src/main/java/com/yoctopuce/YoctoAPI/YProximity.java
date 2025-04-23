@@ -48,7 +48,7 @@ package com.yoctopuce.YoctoAPI;
  * YProximity Class: proximity sensor control interface, available for instance in the Yocto-Proximity
  *
  * The YProximity class allows you to read and configure Yoctopuce proximity sensors.
- * It inherits from YSensor class the core functions to read measurements,
+ * It inherits from YSensor class the core functions to read measures,
  * to register callback functions, and to access the autonomous datalogger.
  * This class adds the ability to set up a detection threshold and to count the
  * number of detected state changes.
