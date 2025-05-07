@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: Demo.java 58172 2023-11-30 17:10:23Z martinm $
+ *  $Id: Demo.java 66320 2025-05-07 06:52:50Z seb $
  *
  *  An example that shows how to use a  Yocto-Color
  *
@@ -42,7 +42,7 @@ public class Demo {
         for(int color : all_colors) {
             try {
                 System.out.println(String.format("Change color to 0x%06x", color));
-                led1.set_rgbColor(color);//led2.rgbMove(color, 1000); // smooth transition
+                led1.set_rgbColor(color);// immediate transition
                 led2.rgbMove(color, 1000); // smooth transition
                 YAPI.Sleep(1000);
             } catch (YAPI_Exception ex) {

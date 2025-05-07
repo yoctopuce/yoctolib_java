@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHub.java 62907 2024-10-08 07:05:55Z mvuilleu $
+ * $Id: YHub.java 66046 2025-04-24 09:40:34Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -44,7 +44,7 @@ import java.util.ArrayList;
 
 //--- (generated code: YHub class start)
 /**
- * YHub Class: Hub Interface
+ * YHub Class: YoctoHub or VirtualHub currently in use by the API.
  *
  *
  */

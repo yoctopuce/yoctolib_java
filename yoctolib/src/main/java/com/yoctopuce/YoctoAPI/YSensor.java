@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 63325 2024-11-13 09:33:33Z seb $
+ * $Id: YSensor.java 65973 2025-04-22 09:50:13Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *

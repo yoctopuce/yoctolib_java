@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: Demo.java 60035 2024-03-20 09:56:43Z seb $
+ *  $Id: Demo.java 66320 2025-05-07 06:52:50Z seb $
  *
  *  An example that shows how to use a  Yocto-Color-V2
  *
@@ -31,7 +31,7 @@ public class Demo
         }
         YColorLedCluster ledCluster;
         if (args.length > 0) {
-            ledCluster = YColorLedCluster.FindColorLedCluster(args[0] + ".colorLed1");
+            ledCluster = YColorLedCluster.FindColorLedCluster(args[0] + ".colorLedCluster");
         } else {
             ledCluster = YColorLedCluster.FirstColorLedCluster();
             if (ledCluster == null) {
@@ -45,7 +45,7 @@ public class Demo
             ledCluster.set_activeLedCount(nb_leds);
             ledCluster.set_ledType(YColorLedCluster.LEDTYPE_RGB);
 
-            int all_colors[] = {0xff0000, 0x00ff00, 0x0000ff};
+            int[] all_colors = {0xff0000, 0x00ff00, 0x0000ff};
             for (int color : all_colors) {
                 System.out.println(String.format("Change color to 0x%06x", color));
 
