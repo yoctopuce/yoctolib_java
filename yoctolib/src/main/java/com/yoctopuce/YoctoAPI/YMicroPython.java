@@ -723,6 +723,21 @@ public class YMicroPython extends YFunction
     }
 
     /**
+     * Clears MicroPython interpreter console log buffer.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int clearLogs() throws YAPI_Exception
+    {
+        int res;
+
+        res = set_command("z");
+        return res;
+    }
+
+    /**
      * Returns a string with last logs of the MicroPython interpreter.
      * This method return only logs that are still in the module.
      *

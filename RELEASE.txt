@@ -1,3 +1,3 @@
-Java v2.1.6320
+Java v2.1.6511
 
-- Add documentation of YHub class
+- Fix build number on Maven central
