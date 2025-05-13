@@ -1,3 +1,3 @@
-Java v2.1.6511
+Java v2.1.6624
 
-- Fix build number on Maven central
+- update package to work with new maven central
