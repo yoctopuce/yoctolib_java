@@ -42,11 +42,11 @@ import java.util.Locale;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-//--- (YMicroPython return codes)
-//--- (end of YMicroPython return codes)
-//--- (YMicroPython yapiwrapper)
-//--- (end of YMicroPython yapiwrapper)
-//--- (YMicroPython class start)
+//--- (generated code: YMicroPython return codes)
+//--- (end of generated code: YMicroPython return codes)
+//--- (generated code: YMicroPython yapiwrapper)
+//--- (end of generated code: YMicroPython yapiwrapper)
+//--- (generated code: YMicroPython class start)
 /**
  * YMicroPython Class: MicroPython interpreter control interface
  *
@@ -56,8 +56,8 @@ import java.util.Arrays;
 @SuppressWarnings({"UnusedDeclaration", "UnusedAssignment"})
 public class YMicroPython extends YFunction
 {
-//--- (end of YMicroPython class start)
-//--- (YMicroPython definitions)
+//--- (end of generated code: YMicroPython class start)
+//--- (generated code: YMicroPython definitions)
     /**
      * invalid lastMsg value
      */
@@ -67,9 +67,17 @@ public class YMicroPython extends YFunction
      */
     public static final int HEAPUSAGE_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid heapFrag value
+     */
+    public static final int HEAPFRAG_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid xheapUsage value
      */
     public static final int XHEAPUSAGE_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid stackUsage value
+     */
+    public static final int STACKUSAGE_INVALID = YAPI.INVALID_UINT;
     /**
      * invalid currentScript value
      */
@@ -78,6 +86,10 @@ public class YMicroPython extends YFunction
      * invalid startupScript value
      */
     public static final String STARTUPSCRIPT_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid startupDelay value
+     */
+    public static final double STARTUPDELAY_INVALID = YAPI.INVALID_DOUBLE;
     /**
      * invalid debugMode value
      */
@@ -90,9 +102,12 @@ public class YMicroPython extends YFunction
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
     protected String _lastMsg = LASTMSG_INVALID;
     protected int _heapUsage = HEAPUSAGE_INVALID;
+    protected int _heapFrag = HEAPFRAG_INVALID;
     protected int _xheapUsage = XHEAPUSAGE_INVALID;
+    protected int _stackUsage = STACKUSAGE_INVALID;
     protected String _currentScript = CURRENTSCRIPT_INVALID;
     protected String _startupScript = STARTUPSCRIPT_INVALID;
+    protected double _startupDelay = STARTUPDELAY_INVALID;
     protected int _debugMode = DEBUGMODE_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackMicroPython = null;
@@ -148,7 +163,7 @@ public class YMicroPython extends YFunction
         }
     };
 
-    //--- (end of YMicroPython definitions)
+    //--- (end of generated code: YMicroPython definitions)
 
 
     /**
@@ -159,8 +174,8 @@ public class YMicroPython extends YFunction
     {
         super(ctx, func);
         _className = "MicroPython";
-        //--- (YMicroPython attributes initialization)
-        //--- (end of YMicroPython attributes initialization)
+        //--- (generated code: YMicroPython attributes initialization)
+        //--- (end of generated code: YMicroPython attributes initialization)
     }
 
     /**
@@ -172,7 +187,7 @@ public class YMicroPython extends YFunction
         this(YAPI.GetYCtx(true), func);
     }
 
-    //--- (YMicroPython implementation)
+    //--- (generated code: YMicroPython implementation)
     @SuppressWarnings("EmptyMethod")
     @Override
     protected void  _parseAttr(YJSONObject json_val) throws Exception
@@ -183,14 +198,23 @@ public class YMicroPython extends YFunction
         if (json_val.has("heapUsage")) {
             _heapUsage = json_val.getInt("heapUsage");
         }
+        if (json_val.has("heapFrag")) {
+            _heapFrag = json_val.getInt("heapFrag");
+        }
         if (json_val.has("xheapUsage")) {
             _xheapUsage = json_val.getInt("xheapUsage");
+        }
+        if (json_val.has("stackUsage")) {
+            _stackUsage = json_val.getInt("stackUsage");
         }
         if (json_val.has("currentScript")) {
             _currentScript = json_val.getString("currentScript");
         }
         if (json_val.has("startupScript")) {
             _startupScript = json_val.getString("startupScript");
+        }
+        if (json_val.has("startupDelay")) {
+            _startupDelay = Math.round(json_val.getDouble("startupDelay") / 65.536) / 1000.0;
         }
         if (json_val.has("debugMode")) {
             _debugMode = json_val.getInt("debugMode") > 0 ? 1 : 0;
@@ -235,10 +259,10 @@ public class YMicroPython extends YFunction
     }
 
     /**
-     * Returns the percentage of micropython main memory in use,
+     * Returns the percentage of MicroPython main memory in use,
      * as observed at the end of the last garbage collection.
      *
-     * @return an integer corresponding to the percentage of micropython main memory in use,
+     * @return an integer corresponding to the percentage of MicroPython main memory in use,
      *         as observed at the end of the last garbage collection
      *
      * @throws YAPI_Exception on error
@@ -258,10 +282,10 @@ public class YMicroPython extends YFunction
     }
 
     /**
-     * Returns the percentage of micropython main memory in use,
+     * Returns the percentage of MicroPython main memory in use,
      * as observed at the end of the last garbage collection.
      *
-     * @return an integer corresponding to the percentage of micropython main memory in use,
+     * @return an integer corresponding to the percentage of MicroPython main memory in use,
      *         as observed at the end of the last garbage collection
      *
      * @throws YAPI_Exception on error
@@ -272,10 +296,47 @@ public class YMicroPython extends YFunction
     }
 
     /**
-     * Returns the percentage of micropython external memory in use,
+     * Returns the fragmentation ratio of MicroPython main memory,
      * as observed at the end of the last garbage collection.
      *
-     * @return an integer corresponding to the percentage of micropython external memory in use,
+     * @return an integer corresponding to the fragmentation ratio of MicroPython main memory,
+     *         as observed at the end of the last garbage collection
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_heapFrag() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return HEAPFRAG_INVALID;
+                }
+            }
+            res = _heapFrag;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the fragmentation ratio of MicroPython main memory,
+     * as observed at the end of the last garbage collection.
+     *
+     * @return an integer corresponding to the fragmentation ratio of MicroPython main memory,
+     *         as observed at the end of the last garbage collection
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getHeapFrag() throws YAPI_Exception
+    {
+        return get_heapFrag();
+    }
+
+    /**
+     * Returns the percentage of MicroPython external memory in use,
+     * as observed at the end of the last garbage collection.
+     *
+     * @return an integer corresponding to the percentage of MicroPython external memory in use,
      *         as observed at the end of the last garbage collection
      *
      * @throws YAPI_Exception on error
@@ -295,10 +356,10 @@ public class YMicroPython extends YFunction
     }
 
     /**
-     * Returns the percentage of micropython external memory in use,
+     * Returns the percentage of MicroPython external memory in use,
      * as observed at the end of the last garbage collection.
      *
-     * @return an integer corresponding to the percentage of micropython external memory in use,
+     * @return an integer corresponding to the percentage of MicroPython external memory in use,
      *         as observed at the end of the last garbage collection
      *
      * @throws YAPI_Exception on error
@@ -306,6 +367,43 @@ public class YMicroPython extends YFunction
     public int getXheapUsage() throws YAPI_Exception
     {
         return get_xheapUsage();
+    }
+
+    /**
+     * Returns the maximum percentage of MicroPython call stack in use,
+     * as observed at the end of the last garbage collection.
+     *
+     * @return an integer corresponding to the maximum percentage of MicroPython call stack in use,
+     *         as observed at the end of the last garbage collection
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_stackUsage() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return STACKUSAGE_INVALID;
+                }
+            }
+            res = _stackUsage;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the maximum percentage of MicroPython call stack in use,
+     * as observed at the end of the last garbage collection.
+     *
+     * @return an integer corresponding to the maximum percentage of MicroPython call stack in use,
+     *         as observed at the end of the last garbage collection
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getStackUsage() throws YAPI_Exception
+    {
+        return get_stackUsage();
     }
 
     /**
@@ -451,10 +549,88 @@ public class YMicroPython extends YFunction
     }
 
     /**
-     * Returns the activation state of micropython debugging interface.
+     * Changes the wait time before running the startup script on power on, between 0.1
+     * second and 25 seconds. Remember to call the saveToFlash() method of the
+     * module if the modification must be kept.
+     *
+     *  @param newval : a floating point number corresponding to the wait time before running the startup
+     * script on power on, between 0.1
+     *         second and 25 seconds
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_startupDelay(double  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("startupDelay",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the wait time before running the startup script on power on, between 0.1
+     * second and 25 seconds. Remember to call the saveToFlash() method of the
+     * module if the modification must be kept.
+     *
+     *  @param newval : a floating point number corresponding to the wait time before running the startup
+     * script on power on, between 0.1
+     *         second and 25 seconds
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setStartupDelay(double newval)  throws YAPI_Exception
+    {
+        return set_startupDelay(newval);
+    }
+
+    /**
+     * Returns the wait time before running the startup script on power on,
+     * between 0.1 second and 25 seconds.
+     *
+     * @return a floating point number corresponding to the wait time before running the startup script on power on,
+     *         between 0.1 second and 25 seconds
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_startupDelay() throws YAPI_Exception
+    {
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return STARTUPDELAY_INVALID;
+                }
+            }
+            res = _startupDelay;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the wait time before running the startup script on power on,
+     * between 0.1 second and 25 seconds.
+     *
+     * @return a floating point number corresponding to the wait time before running the startup script on power on,
+     *         between 0.1 second and 25 seconds
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getStartupDelay() throws YAPI_Exception
+    {
+        return get_startupDelay();
+    }
+
+    /**
+     * Returns the activation state of MicroPython debugging interface.
      *
      *  @return either YMicroPython.DEBUGMODE_OFF or YMicroPython.DEBUGMODE_ON, according to the activation
-     * state of micropython debugging interface
+     * state of MicroPython debugging interface
      *
      * @throws YAPI_Exception on error
      */
@@ -473,10 +649,10 @@ public class YMicroPython extends YFunction
     }
 
     /**
-     * Returns the activation state of micropython debugging interface.
+     * Returns the activation state of MicroPython debugging interface.
      *
      *  @return either YMicroPython.DEBUGMODE_OFF or YMicroPython.DEBUGMODE_ON, according to the activation
-     * state of micropython debugging interface
+     * state of MicroPython debugging interface
      *
      * @throws YAPI_Exception on error
      */
@@ -486,10 +662,10 @@ public class YMicroPython extends YFunction
     }
 
     /**
-     * Changes the activation state of micropython debugging interface.
+     * Changes the activation state of MicroPython debugging interface.
      *
      *  @param newval : either YMicroPython.DEBUGMODE_OFF or YMicroPython.DEBUGMODE_ON, according to the
-     * activation state of micropython debugging interface
+     * activation state of MicroPython debugging interface
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -506,10 +682,10 @@ public class YMicroPython extends YFunction
     }
 
     /**
-     * Changes the activation state of micropython debugging interface.
+     * Changes the activation state of MicroPython debugging interface.
      *
      *  @param newval : either YMicroPython.DEBUGMODE_OFF or YMicroPython.DEBUGMODE_ON, according to the
-     * activation state of micropython debugging interface
+     * activation state of MicroPython debugging interface
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -928,6 +1104,6 @@ public class YMicroPython extends YFunction
         return FindMicroPythonInContext(yctx, next_hwid);
     }
 
-    //--- (end of YMicroPython implementation)
+    //--- (end of generated code: YMicroPython implementation)
 }
 

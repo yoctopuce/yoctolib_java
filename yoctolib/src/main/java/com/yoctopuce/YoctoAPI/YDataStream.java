@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 63325 2024-11-13 09:33:33Z seb $
+ * $Id: YDataStream.java 67383 2025-06-11 05:44:27Z mvuilleu $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -109,8 +109,8 @@ public class YDataStream
         double fRef;
         ArrayList<Integer> iCalib = new ArrayList<>();
         // decode sequence header to extract data
-        _runNo = encoded.get(0).intValue() + (((encoded.get(1).intValue()) << 16));
-        _utcStamp = encoded.get(2).intValue() + (((encoded.get(3).intValue()) << 16));
+        _runNo = encoded.get(0).intValue() + ((encoded.get(1).intValue() << 16));
+        _utcStamp = encoded.get(2).intValue() + ((encoded.get(3).intValue() << 16));
         val = encoded.get(4).intValue();
         _isAvg = ((val & 0x100) == 0);
         samplesPerHour = (val & 0xff);
@@ -189,9 +189,9 @@ public class YDataStream
         }
         // decode min/avg/max values for the sequence
         if (_nRows > 0) {
-            _avgVal = _decodeAvg(encoded.get(8).intValue() + ((((encoded.get(9).intValue()) ^ 0x8000) << 16)), 1);
-            _minVal = _decodeVal(encoded.get(10).intValue() + (((encoded.get(11).intValue()) << 16)));
-            _maxVal = _decodeVal(encoded.get(12).intValue() + (((encoded.get(13).intValue()) << 16)));
+            _avgVal = _decodeAvg(encoded.get(8).intValue() + (((encoded.get(9).intValue() ^ 0x8000) << 16)), 1);
+            _minVal = _decodeVal(encoded.get(10).intValue() + ((encoded.get(11).intValue() << 16)));
+            _maxVal = _decodeVal(encoded.get(12).intValue() + ((encoded.get(13).intValue() << 16)));
         }
         return 0;
     }
@@ -220,9 +220,9 @@ public class YDataStream
                     dat.add(Double.NaN);
                     dat.add(Double.NaN);
                 } else {
-                    dat.add(_decodeVal(udat.get(idx + 2).intValue() + (((udat.get(idx + 3).intValue()) << 16))));
-                    dat.add(_decodeAvg(udat.get(idx).intValue() + ((((udat.get(idx + 1).intValue()) ^ 0x8000) << 16)), 1));
-                    dat.add(_decodeVal(udat.get(idx + 4).intValue() + (((udat.get(idx + 5).intValue()) << 16))));
+                    dat.add(_decodeVal(udat.get(idx + 2).intValue() + ((udat.get(idx + 3).intValue() << 16))));
+                    dat.add(_decodeAvg(udat.get(idx).intValue() + (((udat.get(idx + 1).intValue() ^ 0x8000) << 16)), 1));
+                    dat.add(_decodeVal(udat.get(idx + 4).intValue() + ((udat.get(idx + 5).intValue() << 16))));
                 }
                 idx = idx + 6;
                 _values.add(new ArrayList<Double>(dat));
@@ -233,7 +233,7 @@ public class YDataStream
                 if ((udat.get(idx).intValue() == 65535) && (udat.get(idx + 1).intValue() == 65535)) {
                     dat.add(Double.NaN);
                 } else {
-                    dat.add(_decodeAvg(udat.get(idx).intValue() + ((((udat.get(idx + 1).intValue()) ^ 0x8000) << 16)), 1));
+                    dat.add(_decodeAvg(udat.get(idx).intValue() + (((udat.get(idx + 1).intValue() ^ 0x8000) << 16)), 1));
                 }
                 _values.add(new ArrayList<Double>(dat));
                 idx = idx + 2;

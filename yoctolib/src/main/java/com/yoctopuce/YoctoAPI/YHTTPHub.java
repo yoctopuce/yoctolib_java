@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 64016 2025-01-06 13:13:09Z seb $
+ * $Id: YHTTPHub.java 68744 2025-09-03 09:51:29Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -78,6 +78,7 @@ public class YHTTPHub extends YGenericHub
     boolean _usePureHTTP = false;
     ArrayList<PortInfo> _portInfo = new ArrayList<>();
     private HubMode _hubMode;
+    private int _securityMode = 0;
 
     static class PortInfo
     {
@@ -346,6 +347,12 @@ public class YHTTPHub extends YGenericHub
                 if (json.has("serialNumber")) {
                     this.updateHubSerial(json.getString("serialNumber"));
                 }
+                if (json.has("securityMode")) {
+                    this._securityMode = (json.getInt("securityMode"));
+                    if (this._securityMode == 0) {
+                        throw new YAPI_Exception(YAPI.UNCONFIGURED, "Remote hub is not yet configured");
+                    }
+                }
                 if (json.has("protocol") && json.getString("protocol").equals("HTTP/1.1")) {
                     this._usePureHTTP = true;
                 }
@@ -364,7 +371,7 @@ public class YHTTPHub extends YGenericHub
                     }
                 }
             } catch (YAPI_Exception ex) {
-                if (ex.errorType == YAPI.SSL_ERROR || ex.errorType == YAPI.SSL_UNK_CERT) {
+                if (ex.errorType == YAPI.SSL_ERROR || ex.errorType == YAPI.SSL_UNK_CERT || ex.errorType == YAPI.UNCONFIGURED) {
                     throw ex;
                 }
                 if (_URL_params.useSecureSocket()) {
@@ -379,7 +386,7 @@ public class YHTTPHub extends YGenericHub
         } else {
             _notificationHandler = new TCPNotificationHandler(this);
         }
-
+        _notificationHandler.set_connectionState(YHub.TRYING);
         _thread = new Thread(_notificationHandler, _notificationHandler.getThreadLabel());
         _thread.start();
     }
@@ -394,8 +401,12 @@ public class YHTTPHub extends YGenericHub
                     _yctx._Log(String.format("Stop hub %s before all async request has ended", getHost()));
                 }
                 _thread.interrupt();
+                // close open socket can delay the interrupt call.
+                _notificationHandler.stopSocketsOfThread();
                 _thread.join(10000);
             } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
                 _thread = null;
             }
             _notificationHandler = null;
@@ -757,10 +768,25 @@ public class YHTTPHub extends YGenericHub
         return _notificationHandler != null && _notificationHandler.isConnected();
     }
 
-    public Socket OpenConnectedSocket(InetAddress addr, int port, int mstimeout) throws YAPI_Exception
+
+    @Override
+    public int get_connectionState()
+    {
+        if (_notificationHandler == null) {
+            return YHub.UNREGISTERED;
+        }
+        return _notificationHandler.get_connectionState();
+    }
+
+    public Socket OpenConnectedSocket(InetAddress addr, int port, long expirationMs) throws YAPI_Exception
     {
         Socket socket;
         SocketAddress sockaddr = new InetSocketAddress(addr, port);
+        long now = System.currentTimeMillis();
+        if (now > expirationMs) {
+            throw new YAPI_Exception(YAPI.TIMEOUT, "Unable to open socket in time");
+        }
+        int mstimeout = (int) (expirationMs - now);
         if (_runtime_http_params.useSecureSocket()) {
             try {
                 int sslFlags = 0;

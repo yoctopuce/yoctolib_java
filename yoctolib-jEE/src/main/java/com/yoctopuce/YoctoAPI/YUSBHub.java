@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 64129 2025-01-13 14:05:07Z seb $
+ * $Id: YUSBHub.java 68026 2025-07-28 09:07:30Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -124,6 +124,15 @@ class YUSBHub extends YGenericHub
     public boolean isOnline()
     {
         return this._processNotifications;
+    }
+
+    @Override
+    public int get_connectionState()
+    {
+        if (this._processNotifications) {
+            return YHub.CONNECTED;
+        }
+        return YHub.ABORTED;
     }
 
     @Override

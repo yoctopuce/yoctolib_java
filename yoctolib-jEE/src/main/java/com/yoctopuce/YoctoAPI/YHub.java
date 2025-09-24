@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHub.java 66046 2025-04-24 09:40:34Z seb $
+ * $Id: YHub.java 68388 2025-08-18 06:51:32Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -53,6 +53,11 @@ public class YHub
 {
 //--- (end of generated code: YHub class start)
     //--- (generated code: YHub definitions)
+    public static final int TRYING = 1;
+    public static final int CONNECTED = 2;
+    public static final int RECONNECTING = 3;
+    public static final int ABORTED = 4;
+    public static final int UNREGISTERED = 5;
     protected YAPIContext _ctx;
     protected int _hubref = 0;
     protected Object _userData = null;
@@ -95,6 +100,12 @@ public class YHub
         if (attrName.equals("isInUse")) {
             return hub != null ? 1 : 0;
         }
+        if (attrName.equals("connectionState")) {
+            if (hub == null) {
+                return YHub.UNREGISTERED;
+            }
+            return hub.get_connectionState();
+        }
         if (hub == null) {
             return -1;
         }
@@ -111,6 +122,7 @@ public class YHub
                 return -1;
         }
     }
+
     public ArrayList<String> get_knownUrls_internal() throws YAPI_Exception
     {
         ArrayList<String> res = new ArrayList<>();
@@ -177,6 +189,14 @@ public class YHub
     public String get_connectionUrl()
     {
         return _getStrAttr("connectionUrl");
+    }
+
+    /**
+     * Returns the state of the connection with this hub. (TRYING, CONNECTED, RECONNECTING, ABORTED, UNREGISTERED)
+     */
+    public int get_connectionState()
+    {
+        return _getIntAttr("connectionState");
     }
 
     /**
@@ -330,11 +350,42 @@ public class YHub
     }
 
     /**
+     * Retrieves hub for a given identifier. The identifier can be the URL or the
+     * serial of the hub.
+     *
+     * @param url : The url or serial of the hub.
+     *
+     * @return a pointer to a YHub object, corresponding to
+     *         the first hub currently in use by the API, or a
+     *         null pointer if none has been registered.
+     */
+    public static YHub FindHubInUse(String url)
+    {
+        return YAPI.findYHubFromID(url);
+    }
+
+    /**
+     * Retrieves hub for a given identifier in a given YAPI context. The identifier can be the URL or the
+     * serial of the hub.
+     *
+     * @param yctx : a YAPI context
+     * @param url : The url or serial of the hub.
+     *
+     * @return a pointer to a YHub object, corresponding to
+     *         the first hub currently in use by the API, or a
+     *         null pointer if none has been registered.
+     */
+    public static YHub FindHubInUseInContext(YAPIContext yctx,String url)
+    {
+        return yctx.findYHubFromID(url);
+    }
+
+    /**
      * Continues the module enumeration started using YHub.FirstHubInUse().
      * Caution: You can't make any assumption about the order of returned hubs.
      *
      * @return a pointer to a YHub object, corresponding to
-     *         the next hub currenlty in use, or a null pointer
+     *         the next hub currently in use, or a null pointer
      *         if there are no more hubs to enumerate.
      */
     public YHub nextHubInUse()

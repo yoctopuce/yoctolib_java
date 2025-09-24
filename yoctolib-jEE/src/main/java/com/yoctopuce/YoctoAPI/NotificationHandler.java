@@ -30,10 +30,28 @@ abstract class NotificationHandler implements Runnable
     int _error_delay = 0;
     boolean _sendPingNotification = false;
     long _lastPing = 0;
+    private volatile int _connectionState = YHub.UNREGISTERED;
 
 
     final YHTTPHub _hub;
 
+
+    public synchronized int get_connectionState()
+    {
+        if (_sendPingNotification && (_lastPing + NET_HUB_NOT_CONNECTION_TIMEOUT) > System.currentTimeMillis()) {
+            // if we have ping notifications working and valid do not check _connectionState.
+            // this prevents potential trying and reconnecting value that occurs periodically with VirtualHub-4web
+            return YHub.CONNECTED;
+        }
+        //System.out.println(String.format("%s get connection state %s.", this.toString(), _connectionState));
+        return _connectionState;
+    }
+
+    public synchronized void set_connectionState(int connectionState)
+    {
+        //System.out.println(String.format("%s Setting connection state to %s (was %d).", this.toString(), connectionState, this._connectionState));
+        this._connectionState = connectionState;
+    }
 
     NotificationHandler(YHTTPHub hub)
     {
@@ -193,8 +211,14 @@ abstract class NotificationHandler implements Runnable
                             _hub.handleBeaconNotification(parts[0], parts[1], beacon);
                         } catch (NumberFormatException ignore) {
                         }
-                        // no break on purpose
+                        _hub._devListExpires = 0;
+                        break;
                     case NOTIFY_NETPKT_CHILD: // device plug/unplug
+                        parts = ev.split(",");
+                        if ("0".equals(parts[2])) {
+                            _hub.UnplugDevice(parts[1]);
+                        }
+                        // no break on purpose
                     case NOTIFY_NETPKT_FUNCNAME: // function name change
                     case NOTIFY_NETPKT_FUNCNAMEYDX: // function name change (ydx)
                         _hub._devListExpires = 0;
@@ -250,6 +274,8 @@ abstract class NotificationHandler implements Runnable
      * @throws InterruptedException
      */
     abstract boolean waitAndFreeAsyncTasks(long timeout) throws InterruptedException;
+
+    abstract void stopSocketsOfThread();
 
     abstract boolean isConnected();
 

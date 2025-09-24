@@ -1248,6 +1248,22 @@ public class YAPIContext
         return obj;
     }
 
+    public YHub findYHubFromID(String id)
+    {
+        YHub rhub;
+        rhub = nextHubInUseInternal(-1);
+        while (!(rhub == null)) {
+            if (rhub.get_serialNumber().equals(id)) {
+                return rhub;
+            }
+            if (rhub.get_registeredUrl().equals(id)) {
+                return rhub;
+            }
+            rhub = rhub.nextHubInUse();
+        }
+        return rhub;
+    }
+
     //--- (end of generated code: YAPIContext implementation)
 
     public YGenericHub getGenHub(int hubref)

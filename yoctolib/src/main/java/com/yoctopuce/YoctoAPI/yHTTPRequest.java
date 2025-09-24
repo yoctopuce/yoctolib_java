@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 63599 2024-12-06 10:17:59Z seb $
+ * $Id: yHTTPRequest.java 68744 2025-09-03 09:51:29Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -147,9 +147,9 @@ class yHTTPRequest implements Runnable
                 String new_url = header.substring(t_ofs, t_endl);
                 new_url = new_url.trim();
                 if (new_url.startsWith("http")) {
-                    return ctx.BasicHTTPRequest(new_url,YHTTPHub.YIO_DEFAULT_TCP_TIMEOUT,0);
+                    return ctx.BasicHTTPRequest(new_url, YHTTPHub.YIO_DEFAULT_TCP_TIMEOUT, 0);
                 } else {
-                    return yTcpDownload(ctx,host, port, new_url);
+                    return yTcpDownload(ctx, host, port, new_url);
                 }
             }
         }
@@ -204,7 +204,12 @@ class yHTTPRequest implements Runnable
         _resultCallback = resultCallback;
         boolean persistent = "&.".equals(firstLine.substring(firstLine.length() - 2));
         String header = "";
-
+        long expiration;
+        if (mstimeout > 0) {
+            expiration = System.currentTimeMillis() + mstimeout;
+        } else {
+            expiration = System.currentTimeMillis() + _hub._networkTimeoutMs;
+        }
         int cur = 0;
         int ofs = firstLine.indexOf(" ");
         header += firstLine.substring(0, ofs + 1);
@@ -246,7 +251,7 @@ class yHTTPRequest implements Runnable
                 if (!_reuse_socket) {
                     InetAddress addr = InetAddress.getByName(_hub.getHost());
                     // Creates an connected socket
-                    _socket = _hub.OpenConnectedSocket(addr, _hub.getPort(), (int)mstimeout);
+                    _socket = _hub.OpenConnectedSocket(addr, _hub.getPort(), expiration);
                     _socket.setTcpNoDelay(true);
                     _out = _socket.getOutputStream();
                     _in = _socket.getInputStream();

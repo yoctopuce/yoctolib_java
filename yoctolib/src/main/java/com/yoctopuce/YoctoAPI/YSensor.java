@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 65973 2025-04-22 09:50:13Z seb $
+ * $Id: YSensor.java 67627 2025-06-20 14:29:43Z mvuilleu $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -364,7 +364,7 @@ public class YSensor extends YFunction
      * Returns the current value of the measure, in the specified unit, as a floating point number.
      * Note that a get_currentValue() call will *not* start a measure in the device, it
      * will just return the last measure that occurred in the device. Indeed, internally, each Yoctopuce
-     * devices is continuously making measures at a hardware specific frequency.
+     * devices is continuously making measurements at a hardware specific frequency.
      *
      * If continuously calling  get_currentValue() leads you to performances issues, then
      * you might consider to switch to callback programming model. Check the "advanced
@@ -398,7 +398,7 @@ public class YSensor extends YFunction
      * Returns the current value of the measure, in the specified unit, as a floating point number.
      * Note that a get_currentValue() call will *not* start a measure in the device, it
      * will just return the last measure that occurred in the device. Indeed, internally, each Yoctopuce
-     * devices is continuously making measures at a hardware specific frequency.
+     * devices is continuously making measurements at a hardware specific frequency.
      *
      * If continuously calling  get_currentValue() leads you to performances issues, then
      * you might consider to switch to callback programming model. Check the "advanced
@@ -1130,7 +1130,7 @@ public class YSensor extends YFunction
         if (_calibrationParam.indexOf(",") >= 0) {
             // Plain text format
             iCalib = YAPIContext._decodeFloats(_calibrationParam);
-            _caltyp = ((iCalib.get(0).intValue()) / 1000);
+            _caltyp = (iCalib.get(0).intValue() / 1000);
             if (_caltyp > 0) {
                 if (_caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
                     // Unknown calibration type: calibrated value will be provided by the device
@@ -1541,7 +1541,7 @@ public class YSensor extends YFunction
             maxVal = avgVal;
         } else {
             // averaged report: avg,avg-min,max-avg
-            sublen = 1 + ((report.get(1).intValue()) & 3);
+            sublen = 1 + (report.get(1).intValue() & 3);
             poww = 1;
             avgRaw = 0;
             byteVal = 0;
@@ -1556,7 +1556,7 @@ public class YSensor extends YFunction
             if ((byteVal & 0x80) != 0) {
                 avgRaw = avgRaw - poww;
             }
-            sublen = 1 + (((report.get(1).intValue()) >> 2) & 3);
+            sublen = 1 + ((report.get(1).intValue() >> 2) & 3);
             poww = 1;
             difRaw = 0;
             while ((sublen > 0) && (i < report.size())) {
@@ -1567,7 +1567,7 @@ public class YSensor extends YFunction
                 sublen = sublen - 1;
             }
             minRaw = avgRaw - difRaw;
-            sublen = 1 + (((report.get(1).intValue()) >> 4) & 3);
+            sublen = 1 + ((report.get(1).intValue() >> 4) & 3);
             poww = 1;
             difRaw = 0;
             while ((sublen > 0) && (i < report.size())) {

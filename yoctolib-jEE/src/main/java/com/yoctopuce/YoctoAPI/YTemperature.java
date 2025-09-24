@@ -51,7 +51,7 @@ import java.util.Locale;
  * Yocto-Meteo-V2, the Yocto-PT100, the Yocto-Temperature or the Yocto-Thermocouple
  *
  * The YTemperature class allows you to read and configure Yoctopuce temperature sensors.
- * It inherits from YSensor class the core functions to read measures,
+ * It inherits from YSensor class the core functions to read measurements,
  * to register callback functions, and to access the autonomous datalogger.
  * This class adds the ability to configure some specific parameters
  * for some sensors (connection type, temperature mapping table).
@@ -709,7 +709,7 @@ public class YTemperature extends YSensor
         bin_json = _download(String.format(Locale.US, "extra.json?page=%s",id));
         paramlist = _json_get_array(bin_json);
         // first convert all temperatures to float
-        siz = ((paramlist.size()) >> 1);
+        siz = (paramlist.size() >> 1);
         templist.clear();
         idx = 0;
         while (idx < siz) {

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 63599 2024-12-06 10:17:59Z seb $
+ * $Id: YSerialPort.java 67383 2025-06-11 05:44:27Z mvuilleu $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -2047,7 +2047,7 @@ public class YSerialPort extends YFunction
         cmd = String.format(Locale.US, "%02X%02X",slaveNo,funCode);
         i = 1;
         while (i < pduBytes.size()) {
-            cmd = String.format(Locale.US, "%s%02X",cmd,((pduBytes.get(i).intValue()) & 0xff));
+            cmd = String.format(Locale.US, "%s%02X",cmd,(pduBytes.get(i).intValue() & 0xff));
             i = i + 1;
         }
         if (cmd.length() <= 80) {
@@ -2238,7 +2238,7 @@ public class YSerialPort extends YFunction
         regpos = 0;
         idx = 2;
         while (regpos < nWords) {
-            val = ((reply.get(idx).intValue()) << 8);
+            val = (reply.get(idx).intValue() << 8);
             idx = idx + 1;
             val = val + reply.get(idx).intValue();
             idx = idx + 1;
@@ -2284,7 +2284,7 @@ public class YSerialPort extends YFunction
         regpos = 0;
         idx = 2;
         while (regpos < nWords) {
-            val = ((reply.get(idx).intValue()) << 8);
+            val = (reply.get(idx).intValue() << 8);
             idx = idx + 1;
             val = val + reply.get(idx).intValue();
             idx = idx + 1;
@@ -2390,7 +2390,7 @@ public class YSerialPort extends YFunction
         if (reply.get(0).intValue() != pdu.get(0).intValue()) {
             return res;
         }
-        res = ((reply.get(3).intValue()) << 8);
+        res = (reply.get(3).intValue() << 8);
         res = res + reply.get(4).intValue();
         return res;
     }
@@ -2475,7 +2475,7 @@ public class YSerialPort extends YFunction
         if (reply.get(0).intValue() != pdu.get(0).intValue()) {
             return res;
         }
-        res = ((reply.get(3).intValue()) << 8);
+        res = (reply.get(3).intValue() << 8);
         res = res + reply.get(4).intValue();
         return res;
     }
@@ -2535,7 +2535,7 @@ public class YSerialPort extends YFunction
         regpos = 0;
         idx = 2;
         while (regpos < nReadWords) {
-            val = ((reply.get(idx).intValue()) << 8);
+            val = (reply.get(idx).intValue() << 8);
             idx = idx + 1;
             val = val + reply.get(idx).intValue();
             idx = idx + 1;

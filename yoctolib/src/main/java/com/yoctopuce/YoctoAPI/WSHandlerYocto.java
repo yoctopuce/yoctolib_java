@@ -31,13 +31,24 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
     private BufferedInputStream _in;
     private final Random _randGen = new Random();
     private ByteArrayOutputStream _fragments = null;
-    private boolean _closing;
-    private boolean _closed;
+
+    enum State
+    {
+        AVAIL,
+        CONNECTING,
+        CONNECTED,
+        CLOSING,
+    }
+
+    ;
+
+    private State _state;
     private Thread _thread;
 
     WSHandlerYocto(WSHandlerResponseInterface notificationHandler)
     {
         _nhandler = notificationHandler;
+        _state = State.AVAIL;
         try {
             _sha1 = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
@@ -45,8 +56,9 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         }
     }
 
-    synchronized private void closeSoket()
+    synchronized private void closeSocket()
     {
+        _state = State.CLOSING;
         if (_socket != null) {
             try {
                 if (_out != null) {
@@ -59,10 +71,12 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
                 _socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                _out = null;
+                _in = null;
+                _socket = null;
+                _state = State.AVAIL;
             }
-            _out = null;
-            _in = null;
-            _socket = null;
         }
 
     }
@@ -71,10 +85,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
     @Override
     public void close()
     {
-        if (_closed) {
-            return;
-        }
-        _closing = true;
+        closeSocket();
         if (_thread != null) {
             _thread.interrupt();
             try {
@@ -84,14 +95,13 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
                 Thread.currentThread().interrupt();
             }
         }
-        closeSoket();
     }
 
     @Override
     public boolean isOpen()
     {
 
-        return !isClosed() & !isClosing();
+        return _state == State.CONNECTED;
     }
 
     @Override
@@ -121,6 +131,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
             }
         } catch (IOException e) {
             e.printStackTrace();
+            throw new YAPI_Exception(YAPI.IO_ERROR, e.getMessage());
         }
 
     }
@@ -150,15 +161,16 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
 
 
     @Override
-    public void connect(YHTTPHub hub, boolean first_notification_connection, int mstimeout, int notifAbsPos) throws YAPI_Exception
+    public void connect(YHTTPHub hub, boolean first_notification_connection, long expiration, int notifAbsPos) throws YAPI_Exception
     {
-        long start = System.currentTimeMillis();
         boolean isredirect = false;
         String request = "GET ";
         String subDomain = hub._runtime_http_params.getSubDomain();
         request += subDomain;
-        _closed = true;
-        _closing = false;
+        if (_state != State.AVAIL) {
+            throw new YAPI_Exception(YAPI.IO_ERROR, "Websocket socket state not available");
+        }
+        _state = State.CONNECTING;
         _fragments = null;
         String host = hub.getHost();
         _nhandler.WSLOG(String.format(Locale.US, "hub(%s) try to open WS connection at %d", hub._runtime_http_params.getOriginalURL(), notifAbsPos));
@@ -169,7 +181,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         }
         try {
             InetAddress addr = InetAddress.getByName(host);
-            _socket = hub.OpenConnectedSocket(addr, hub.getPort(), mstimeout);
+            _socket = hub.OpenConnectedSocket(addr, hub.getPort(), expiration);
             _socket.setTcpNoDelay(true);
             _socket.setSoTimeout(1000);
             _out = new BufferedOutputStream(_socket.getOutputStream());
@@ -192,12 +204,10 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
             _out.write(String.format("\r\nHost: %s:%d", host, hub.getPort()).getBytes(hub._yctx._defaultEncoding));
             _out.write(WS_HEADER_END.getBytes(hub._yctx._defaultEncoding));
             _out.flush();
-            _closed = false;
-
             StringBuilder header = new StringBuilder(2048);
             byte[] buffer = new byte[2048];
             boolean websock_ok = false;
-            while ((System.currentTimeMillis() - start) < mstimeout) {
+            while (System.currentTimeMillis() < expiration) {
                 int read = _in.read(buffer, 0, buffer.length);
                 if (read < 0) {
                     break;
@@ -265,16 +275,15 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         }
         if (isredirect) {
             close();
-            long spent = System.currentTimeMillis() - start;
-            if (spent < mstimeout) {
-                connect(hub, first_notification_connection, (int) (mstimeout - spent), notifAbsPos);
+            if (System.currentTimeMillis() < expiration) {
+                connect(hub, first_notification_connection, expiration, notifAbsPos);
             }
         }
     }
 
     private void setupNewWSConnection(byte[] buffer, int ofs, int len) throws YAPI_Exception
     {
-        _closing = false;
+        _state = State.CONNECTED;
         //_nhandler.WSLOG("Websocket handshake done");
         if (len > 0) {
             decodeFrame(buffer, ofs, len);
@@ -295,7 +304,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         int readBytes;
 
         try {
-            while (!isClosing() && !isClosed()) {
+            while (_state == State.CONNECTED) {
                 try {
                     readBytes = _in.read(rawbuffer, ofs, max);
                 } catch (SocketTimeoutException ex) {
@@ -327,9 +336,9 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
             _nhandler.errorOnSession(YAPI.IO_ERROR, e.getLocalizedMessage());
         } catch (YAPI_Exception e) {
             _nhandler.errorOnSession(e.errorType, e.getLocalizedMessage());
+        } finally {
+            closeSocket();
         }
-        closeSoket();
-        _closed = true;
     }
 
 
@@ -388,7 +397,7 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
                     e.printStackTrace();
                     throw new YAPI_Exception(YAPI.IO_ERROR, "io error on base socket:" + e.getLocalizedMessage());
                 }
-                _closed = true;
+                _state = State.AVAIL;
             } else {
                 // unhandled packet
                 _nhandler.WSLOG(String.format(Locale.US, "unhandled packet:%x%x\n", data[ofs], data[ofs + 1]));
@@ -433,17 +442,4 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         }
         return hdrlen + pktlen;
     }
-
-
-    private boolean isClosed()
-    {
-        return _closed;
-    }
-
-    private boolean isClosing()
-    {
-        return _closing;
-    }
-
-
 }

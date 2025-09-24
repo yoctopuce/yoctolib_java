@@ -65,6 +65,7 @@ public class YColorSensor extends YFunction
      */
     public static final int WORKINGMODE_AUTO = 0;
     public static final int WORKINGMODE_EXPERT = 1;
+    public static final int WORKINGMODE_AUTOGAIN = 2;
     public static final int WORKINGMODE_INVALID = -1;
     /**
      * invalid ledCurrent value
@@ -343,8 +344,8 @@ public class YColorSensor extends YFunction
      * In Auto mode, sensor parameters are automatically set based on the selected estimation model.
      * In Expert mode, sensor parameters such as gain and integration time are configured manually.
      *
-     *  @return either YColorSensor.WORKINGMODE_AUTO or YColorSensor.WORKINGMODE_EXPERT, according to the
-     * sensor working mode
+     *  @return a value among YColorSensor.WORKINGMODE_AUTO, YColorSensor.WORKINGMODE_EXPERT and
+     * YColorSensor.WORKINGMODE_AUTOGAIN corresponding to the sensor working mode
      *
      * @throws YAPI_Exception on error
      */
@@ -367,8 +368,8 @@ public class YColorSensor extends YFunction
      * In Auto mode, sensor parameters are automatically set based on the selected estimation model.
      * In Expert mode, sensor parameters such as gain and integration time are configured manually.
      *
-     *  @return either YColorSensor.WORKINGMODE_AUTO or YColorSensor.WORKINGMODE_EXPERT, according to the
-     * sensor working mode
+     *  @return a value among YColorSensor.WORKINGMODE_AUTO, YColorSensor.WORKINGMODE_EXPERT and
+     * YColorSensor.WORKINGMODE_AUTOGAIN corresponding to the sensor working mode
      *
      * @throws YAPI_Exception on error
      */
@@ -383,8 +384,8 @@ public class YColorSensor extends YFunction
      * In Expert mode, sensor parameters such as gain and integration time are configured manually.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     *  @param newval : either YColorSensor.WORKINGMODE_AUTO or YColorSensor.WORKINGMODE_EXPERT, according
-     * to the sensor working mode
+     *  @param newval : a value among YColorSensor.WORKINGMODE_AUTO, YColorSensor.WORKINGMODE_EXPERT and
+     * YColorSensor.WORKINGMODE_AUTOGAIN corresponding to the sensor working mode
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -406,8 +407,8 @@ public class YColorSensor extends YFunction
      * In Expert mode, sensor parameters such as gain and integration time are configured manually.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     *  @param newval : either YColorSensor.WORKINGMODE_AUTO or YColorSensor.WORKINGMODE_EXPERT, according
-     * to the sensor working mode
+     *  @param newval : a value among YColorSensor.WORKINGMODE_AUTO, YColorSensor.WORKINGMODE_EXPERT and
+     * YColorSensor.WORKINGMODE_AUTOGAIN corresponding to the sensor working mode
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *

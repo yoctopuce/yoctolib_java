@@ -43,7 +43,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
     private volatile boolean _waitingForConnectionState;
     private volatile boolean _muststop;
     private long _connectionTime = 0;
-    private ConnectionState _connectionState = ConnectionState.CONNECTING;
+    private ConnectionState _wsSocketState = ConnectionState.CONNECTING;
     private int _remoteVersion = 0;
     private long _remoteNouce;
     private int _nounce;
@@ -97,6 +97,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
     public void run()
     {
         _waitingForConnectionState = true;
+        int firt_try = 1;
         do {
             if (_error_delay > 0) {
                 try {
@@ -105,12 +106,18 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                     break;
                 }
             }
+            if (firt_try > 0) {
+                set_connectionState(YHub.TRYING);
+                firt_try = 0;
+            } else {
+                set_connectionState(YHub.RECONNECTING);
+            }
             synchronized (_stateLock) {
-                _connectionState = ConnectionState.CONNECTING;
+                _wsSocketState = ConnectionState.CONNECTING;
             }
 
             try {
-                _wsHandler.connect(_hub, _waitingForConnectionState, _hub._networkTimeoutMs, _notifAbsPos);
+                _wsHandler.connect(_hub, _waitingForConnectionState, System.currentTimeMillis() + _hub._networkTimeoutMs, _notifAbsPos);
                 runOnSession();
             } catch (YAPI_Exception e) {
                 if (e.errorType == YAPI.INVALID_ARGUMENT || e.errorType == YAPI.DOUBLE_ACCES
@@ -126,8 +133,9 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
             _hub._isNotifWorking = false;
             _error_delay = 100 << (_notifRetryCount > 4 ? 4 : _notifRetryCount);
         } while (!Thread.currentThread().isInterrupted() && !_muststop && !_wsHandler.isCallback());
+        set_connectionState(YHub.ABORTED);
         synchronized (_stateLock) {
-            _connectionState = ConnectionState.DEAD;
+            _wsSocketState = ConnectionState.DEAD;
             if (_session_errno == 0) {
                 _session_errno = YAPI.IO_ERROR;
                 _session_error = "WS Session is closed";
@@ -148,11 +156,11 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
         try {
             long timeout = System.currentTimeMillis() + 10000;
             synchronized (_stateLock) {
-                while (_connectionState == ConnectionState.CONNECTING && !_muststop) {
+                while (_wsSocketState == ConnectionState.CONNECTING && !_muststop) {
                     _stateLock.wait(1000);
                     if (timeout < System.currentTimeMillis()) {
                         WSLOG("YoctoHub did not send any data for 10 secs");
-                        _connectionState = ConnectionState.DISCONNECTED;
+                        _wsSocketState = ConnectionState.DISCONNECTED;
                         _stateLock.notifyAll();
                         return;
                     }
@@ -204,7 +212,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
             }
         }
         synchronized (_stateLock) {
-            _connectionState = ConnectionState.DISCONNECTED;
+            _wsSocketState = ConnectionState.DISCONNECTED;
             _stateLock.notifyAll();
         }
 
@@ -232,10 +240,10 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
             expiration = timeout;
         }
         synchronized (_stateLock) {
-            while ((_connectionState != ConnectionState.CONNECTED && _connectionState != ConnectionState.DEAD)) {
+            while ((_wsSocketState != ConnectionState.CONNECTED && _wsSocketState != ConnectionState.DEAD)) {
                 long delay = expiration - System.currentTimeMillis();
                 if (delay <= 0) {
-                    if (_connectionState != ConnectionState.CONNECTED && _connectionState != ConnectionState.CONNECTING) {
+                    if (_wsSocketState != ConnectionState.CONNECTED && _wsSocketState != ConnectionState.CONNECTING) {
                         throw new YAPI_Exception(YAPI.IO_ERROR, "IO error with hub");
                     } else {
                         if (_session_errno != YAPI.SUCCESS) {
@@ -248,12 +256,12 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                     _stateLock.wait(delay);
                 }
             }
-            if (_connectionState == ConnectionState.DEAD) {
+            if (_wsSocketState == ConnectionState.DEAD) {
                 throw new YAPI_Exception(_session_errno, _session_error);
             }
             if (async) {
                 request = new WSRequest(tcpchanel, _nextAsyncId++, full_request, expiration);
-                if (_nextAsyncId >= 127) {
+                if (_nextAsyncId == 127) {
                     _nextAsyncId = 48;
                 }
             } else {
@@ -368,15 +376,23 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
     }
 
     @Override
+    void stopSocketsOfThread()
+    {
+        if (_wsHandler != null) {
+            _wsHandler.close();
+        }
+    }
+
+    @Override
     public boolean isConnected()
     {
         if (_sendPingNotification) {
             return (_lastPing + NET_HUB_NOT_CONNECTION_TIMEOUT) > System.currentTimeMillis();
         } else {
             synchronized (_stateLock) {
-                return _connectionState == ConnectionState.CONNECTED ||
-                        _connectionState == ConnectionState.AUTHENTICATING ||
-                        _connectionState == ConnectionState.CONNECTING;
+                return _wsSocketState == ConnectionState.CONNECTED ||
+                        _wsSocketState == ConnectionState.AUTHENTICATING ||
+                        _wsSocketState == ConnectionState.CONNECTING;
             }
         }
     }
@@ -414,9 +430,10 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                 if (_waitingForConnectionState) {
                     if (!_hub._runtime_http_params.hasAuthParam()) {
                         synchronized (_stateLock) {
-                            _connectionState = ConnectionState.CONNECTED;
+                            _wsSocketState = ConnectionState.CONNECTED;
                             _stateLock.notifyAll();
                         }
+                        set_connectionState(YHub.CONNECTED);
                         _waitingForConnectionState = false;
                     } else {
                         return;
@@ -537,7 +554,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                         if (_hub.updateHubSerial(remoteSerial)) {
                             //duplicate hub
                             synchronized (_stateLock) {
-                                _connectionState = ConnectionState.DEAD;
+                                _wsSocketState = ConnectionState.DEAD;
                                 _stateLock.notifyAll();
                             }
                             throw new YAPI_Exception(YAPI.DOUBLE_ACCES, "Duplicate hub detected");
@@ -547,14 +564,14 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                         Random randomGenerator = new Random();
                         _nounce = randomGenerator.nextInt();
                         synchronized (_stateLock) {
-                            _connectionState = ConnectionState.AUTHENTICATING;
+                            _wsSocketState = ConnectionState.AUTHENTICATING;
                             _stateLock.notifyAll();
                         }
                         sendAuthenticationMeta();
                         break;
                     case YGenericHub.USB_META_WS_AUTHENTICATION:
                         synchronized (_stateLock) {
-                            if (_connectionState != ConnectionState.AUTHENTICATING)
+                            if (_wsSocketState != ConnectionState.AUTHENTICATING)
                                 return;
                         }
                         version = raw_data.get() & 0xff;
@@ -574,9 +591,10 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                             byte[] sha1 = computeAUTH(_hub._runtime_http_params.getUser(), _hub._runtime_http_params.getPass(), _hub.getSerialNumber(), _nounce);
                             if (Arrays.equals(sha1, remote_sha1)) {
                                 synchronized (_stateLock) {
-                                    _connectionState = ConnectionState.CONNECTED;
+                                    _wsSocketState = ConnectionState.CONNECTED;
                                     _stateLock.notifyAll();
                                 }
+                                set_connectionState(YHub.CONNECTED);
                                 _waitingForConnectionState = false;
                             } else {
                                 errorOnSession(YAPI.UNAUTHORIZED, String.format("Authentication as %s failed", _hub._runtime_http_params.getUser()));
@@ -585,9 +603,10 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
                         } else {
                             if (!_hub._runtime_http_params.hasAuthParam() || _hub._runtime_http_params.getPass().equals("")) {
                                 synchronized (_stateLock) {
-                                    _connectionState = ConnectionState.CONNECTED;
+                                    _wsSocketState = ConnectionState.CONNECTED;
                                     _stateLock.notifyAll();
                                 }
+                                set_connectionState(YHub.CONNECTED);
                                 _waitingForConnectionState = false;
                             } else {
                                 if (_hub._runtime_http_params.getUser().equals("admin") && !_rwAccess) {
@@ -881,7 +900,7 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
             if (pos < 0) break;
             String line = _notificationsFifo.substring(0, pos + 1);
             if (line.indexOf(27) == -1) {
-                // drop notification that contain esc char
+                // drop notifications that contain esc char
                 handleNetNotification(line);
             }
             _notificationsFifo.delete(0, pos + 1);
@@ -892,15 +911,15 @@ class WSNotificationHandler extends NotificationHandler implements WSHandlerInte
     public void errorOnSession(int errno, String closeReason)
     {
         synchronized (_stateLock) {
-            if (_connectionState == ConnectionState.DEAD) {
+            if (_wsSocketState == ConnectionState.DEAD) {
                 // already dead
                 return;
             }
-            _connectionState = ConnectionState.DEAD;
+            _wsSocketState = ConnectionState.DEAD;
             if (errno != YAPI.SUCCESS) {
                 _session_errno = errno;
                 if (!closeReason.equals("")) {
-                    _session_error = closeReason;
+                    _session_error = "Close reason : " + closeReason;
                 } else {
                     _session_error = "WebSocket connection has been closed";
                 }

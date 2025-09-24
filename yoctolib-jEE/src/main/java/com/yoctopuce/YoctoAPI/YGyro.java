@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java 62194 2024-08-19 12:21:29Z seb $
+ * $Id: YGyro.java 67383 2025-06-11 05:44:27Z mvuilleu $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *
@@ -525,7 +525,7 @@ public class YGyro extends YSensor
     {
         int now_stamp;
         int age_ms;
-        now_stamp = (int) ((YAPIContext.GetTickCount()) & 0x7FFFFFFF);
+        now_stamp = (int) (YAPIContext.GetTickCount() & 0x7FFFFFFF);
         age_ms = ((now_stamp - _qt_stamp) & 0x7FFFFFFF);
         if ((age_ms >= 10) || (_qt_stamp == 0)) {
             if (load(10) != YAPI.SUCCESS) {
@@ -812,7 +812,7 @@ public class YGyro extends YSensor
         if (qtIndex < 4) {
             return 0;
         }
-        _qt_stamp = (int) ((YAPIContext.GetTickCount()) & 0x7FFFFFFF);
+        _qt_stamp = (int) (YAPIContext.GetTickCount() & 0x7FFFFFFF);
         if (_quatCallback != null) {
             _quatCallback.yQuaternionCallback(this, _w, _x, _y, _z);
         }

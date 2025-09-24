@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 65106 2025-03-17 12:51:27Z mvuilleu $
+ * $Id: YModule.java 67524 2025-06-16 14:47:10Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -1506,7 +1506,6 @@ public class YModule extends YFunction
     public int set_allSettingsAndFiles(byte[] settings) throws YAPI_Exception
     {
         byte[] down = new byte[0];
-        byte[] json_bin = new byte[0];
         byte[] json_api = new byte[0];
         byte[] json_files = new byte[0];
         byte[] json_extra = new byte[0];
@@ -1816,7 +1815,7 @@ public class YModule extends YFunction
         } else {
             if (funVer >= 1) {
                 // Encode parameters for older devices
-                nPoints = ((calibData.size()) / 2);
+                nPoints = (calibData.size() / 2);
                 param = Integer.toString(nPoints);
                 i = 0;
                 while (i < 2 * nPoints) {
@@ -2235,7 +2234,7 @@ public class YModule extends YFunction
 
     /**
      * Returns the icon of the module. The icon is a PNG image and does not
-     * exceed 1536 bytes.
+     * exceeds 1536 bytes.
      *
      * @return a binary buffer with module icon, in png format.
      * @throws YAPI_Exception on error
@@ -2257,6 +2256,9 @@ public class YModule extends YFunction
         byte[] content = new byte[0];
 
         content = _download("logs.txt");
+        if ((content).length == 0) {
+            return YAPI.INVALID_STRING;
+        }
         return new String(content, _yapi._deviceCharset);
     }
 

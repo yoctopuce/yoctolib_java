@@ -1,3 +1,6 @@
-Java v2.1.6624
+Java v2.1.9018
 
-- update package to work with new maven central
+- Fix parsing of URL with user but no password
+- Fix undetected device unplug in case only set_XXX functions were used
+- Fix some incorrect timeouts when hubs are offline
+- Improve error message when using RegisterHub on non configured hubs

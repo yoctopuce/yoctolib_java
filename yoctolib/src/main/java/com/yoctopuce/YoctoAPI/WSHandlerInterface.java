@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 public interface WSHandlerInterface
 {
-    void connect(YHTTPHub hub, boolean first_notification_connection, int mstimeout, int notifAbsPos) throws YAPI_Exception;
+    void connect(YHTTPHub hub, boolean first_notification_connection, long expiration, int notifAbsPos) throws YAPI_Exception;
 
     void close();
 

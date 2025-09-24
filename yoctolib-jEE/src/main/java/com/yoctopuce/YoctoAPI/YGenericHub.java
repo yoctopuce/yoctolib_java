@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 63476 2024-11-26 08:03:53Z seb $
+ * $Id: YGenericHub.java 68278 2025-08-11 15:37:07Z seb $
  *
  * Internal YGenericHub object
  *
@@ -294,10 +294,8 @@ abstract class YGenericHub
 
         for (YDevice dev : toRemove) {
             String serial = dev.getSerialNumber();
-            _yctx._pushUnPlugEvent(serial);
             _yctx._Log("HUB: device " + serial + " has been unplugged\n");
-            _devices.remove(serial);
-            _yctx._yHash.forgetDevice(serial);
+            UnplugDevice(serial);
         }
         synchronized (this) {
             if (_hubSerialNumber == null) {
@@ -312,8 +310,18 @@ abstract class YGenericHub
 
     }
 
+    void UnplugDevice(String serial)
+    {
+        _yctx._pushUnPlugEvent(serial);
+        _devices.remove(serial);
+        _yctx._yHash.forgetDevice(serial);
+    }
+
     String getSerialNumber()
     {
+        if (_hubSerialNumber == null) {
+            return "";
+        }
         return _hubSerialNumber;
     }
 
@@ -475,6 +483,8 @@ abstract class YGenericHub
         return _hubid;
     }
 
+    abstract public int get_connectionState();
+
     interface UpdateProgress
     {
         void firmware_progress(int percent, String message);
@@ -590,10 +600,15 @@ abstract class YGenericHub
                 url = url.substring(0, url.length() - 1);
             }
             int end_auth = url.indexOf('@', pos);
-            int end_user = url.indexOf(':', pos);
-            if (end_user >= 0 && end_user < end_auth) {
-                _user = url.substring(pos, end_user);
-                _pass = url.substring(end_user + 1, end_auth);
+            if (end_auth > 0) {
+                int end_user = url.indexOf(':', pos);
+                if (end_user >= 0 && end_user < end_auth) {
+                    _user = url.substring(pos, end_user);
+                    _pass = url.substring(end_user + 1, end_auth);
+                } else {
+                    _user = url.substring(pos, end_auth);
+                    _pass = "";
+                }
                 pos = end_auth + 1;
             } else {
                 _user = "";

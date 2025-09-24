@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java 65865 2025-04-15 06:42:38Z seb $
+ * $Id: YAPI.java 68026 2025-07-28 09:07:30Z seb $
  *
  * High-level programming interface, common to all modules
  *
@@ -42,6 +42,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.zip.CRC32;
 
 /**
  *
@@ -59,7 +60,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "2.1";
-    public static final String YOCTO_API_BUILD_STR = "66624";
+    public static final String YOCTO_API_BUILD_STR = "69018";
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
     public static final int YOCTO_DEVID_BOOTLOADER = 2;
@@ -91,6 +92,7 @@ public class YAPI
     public static final int BUFFER_TOO_SMALL = -18;        // The buffer provided is too small
     public static final int DNS_ERROR = -19;               // Error during name resolutions (invalid hostname or dns communication error)
     public static final int SSL_UNK_CERT = -20;            // The certificate is not correctly signed by the trusted CA
+    public static final int UNCONFIGURED = -21;            // Remote hub is not yet configured
 
     // Yoctopuce error codes, used by default as function return value
     public static final int NO_TRUSTED_CA_CHECK = 1;       // Disables certificate checking
@@ -123,6 +125,19 @@ public class YAPI
     public static final int DETECT_NET = 2;
     public static final int RESEND_MISSING_PKT = 4;
     public static final int DETECT_ALL = DETECT_USB | DETECT_NET;
+
+    public static int _bincrc(byte[] content, int ofs, int len)
+    {
+        CRC32 crc32 = new CRC32();
+        crc32.update(content, ofs, len);
+        long crc = crc32.getValue();
+        if (crc > 0x7fffffff) {
+            return (int) (crc - 0x100000000l);
+        } else {
+            return (int) crc;
+        }
+
+    }
 
 
     /**
@@ -360,7 +375,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return "2.1.6624" + YUSBHub.getAPIVersion();
+        return "2.1.9018" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -981,6 +996,10 @@ public class YAPI
     public static YHub getYHubObj(int hubref)
     {
         return GetYCtx(true).getYHubObj(hubref);
+    }
+    public static YHub findYHubFromID(String id)
+    {
+        return GetYCtx(true).findYHubFromID(id);
     }
 //--- (end of generated code: YAPIContext yapiwrapper)
 

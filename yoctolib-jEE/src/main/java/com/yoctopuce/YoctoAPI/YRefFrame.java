@@ -695,11 +695,11 @@ public class YRefFrame extends YFunction
 
         calibParam = get_calibrationParam();
         iCalib = YAPIContext._decodeFloats(calibParam);
-        caltyp = ((iCalib.get(0).intValue()) / 1000);
+        caltyp = (iCalib.get(0).intValue() / 1000);
         if (caltyp != 33) {
             return YAPI.NOT_SUPPORTED;
         }
-        res = ((iCalib.get(1).intValue()) / 1000);
+        res = (iCalib.get(1).intValue() / 1000);
         return res;
     }
 
@@ -725,11 +725,11 @@ public class YRefFrame extends YFunction
 
         calibParam = get_calibrationParam();
         iCalib = YAPIContext._decodeFloats(calibParam);
-        caltyp = ((iCalib.get(0).intValue()) / 1000);
+        caltyp = (iCalib.get(0).intValue() / 1000);
         if (caltyp != 33) {
             return YAPI.NOT_SUPPORTED;
         }
-        res = ((iCalib.get(2).intValue()) / 1000);
+        res = (iCalib.get(2).intValue() / 1000);
         return res;
     }
 
@@ -807,7 +807,7 @@ public class YRefFrame extends YFunction
         _calibStageProgress = 0;
         _calibProgress = 1;
         _calibInternalPos = 0;
-        _calibPrevTick = (int) ((YAPIContext.GetTickCount()) & 0x7FFFFFFF);
+        _calibPrevTick = (int) (YAPIContext.GetTickCount() & 0x7FFFFFFF);
         _calibOrient.clear();
         _calibDataAccX.clear();
         _calibDataAccY.clear();
@@ -857,7 +857,7 @@ public class YRefFrame extends YFunction
             return YAPI.SUCCESS;
         }
         // make sure we leave at least 160 ms between samples
-        currTick =  (int) ((YAPIContext.GetTickCount()) & 0x7FFFFFFF);
+        currTick =  (int) (YAPIContext.GetTickCount() & 0x7FFFFFFF);
         if (((currTick - _calibPrevTick) & 0x7FFFFFFF) < 160) {
             return YAPI.SUCCESS;
         }
@@ -1051,7 +1051,7 @@ public class YRefFrame extends YFunction
         }
         // make sure we don't start before previous calibration is cleared
         if (_calibStage == 1) {
-            currTick = (int) ((YAPIContext.GetTickCount()) & 0x7FFFFFFF);
+            currTick = (int) (YAPIContext.GetTickCount() & 0x7FFFFFFF);
             currTick = ((currTick - _calibPrevTick) & 0x7FFFFFFF);
             if (currTick < 1600) {
                 _calibStageHint = "Set down the device on a steady horizontal surface";
@@ -1063,7 +1063,7 @@ public class YRefFrame extends YFunction
 
         calibParam = _download("api/refFrame/calibrationParam.txt");
         iCalib = YAPIContext._decodeFloats(new String(calibParam, _yapi._deviceCharset));
-        cal3 = ((iCalib.get(1).intValue()) / 1000);
+        cal3 = (iCalib.get(1).intValue() / 1000);
         calAcc = (cal3 / 100);
         calMag = (cal3 / 10) - 10*calAcc;
         calGyr = ((cal3) % (10));

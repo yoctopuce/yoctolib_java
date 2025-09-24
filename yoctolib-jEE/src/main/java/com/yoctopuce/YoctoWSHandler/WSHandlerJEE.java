@@ -44,7 +44,7 @@ public class WSHandlerJEE implements WSHandlerInterface, MessageHandler
     }
 
     @Override
-    public void connect(YHTTPHub hub, boolean first_notification_connection, int mstimeout, int notifAbsPos) throws YAPI_Exception
+    public void connect(YHTTPHub hub, boolean first_notification_connection, long expiration, int notifAbsPos) throws YAPI_Exception
     {
         if (!_isHttpCallback) {
             // client mode

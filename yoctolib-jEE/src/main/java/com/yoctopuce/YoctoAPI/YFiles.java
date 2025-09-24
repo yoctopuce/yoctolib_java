@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 63599 2024-12-06 10:17:59Z seb $
+ * $Id: YFiles.java 67404 2025-06-12 07:46:02Z seb $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -70,6 +70,7 @@ public class YFiles extends YFunction
     protected int _filesCount = FILESCOUNT_INVALID;
     protected int _freeSpace = FREESPACE_INVALID;
     protected UpdateCallback _valueCallbackFiles = null;
+    protected int _ver = 0;
 
     /**
      * Deprecated UpdateCallback for Files
@@ -324,6 +325,23 @@ public class YFiles extends YFunction
         return _download(url);
     }
 
+    public int _getVersion() throws YAPI_Exception
+    {
+        byte[] json = new byte[0];
+        if (_ver > 0) {
+            return _ver;
+        }
+        //may throw an exception
+        json = sendCommand("info");
+        if ((json[0] & 0xff) != 123) {
+            // ascii code for '{'
+            _ver = 30;
+        } else {
+            _ver = YAPIContext._atoi(_json_get_key(json, "ver"));
+        }
+        return _ver;
+    }
+
     /**
      * Reinitialize the filesystem to its clean, unfragmented, empty state.
      * All files previously uploaded are permanently lost.
@@ -371,11 +389,11 @@ public class YFiles extends YFunction
     }
 
     /**
-     * Test if a file exist on the filesystem of the module.
+     * Tests if a file exists on the filesystem of the module.
      *
-     * @param filename : the file name to test.
+     * @param filename : the filename to test.
      *
-     * @return a true if the file exist, false otherwise.
+     * @return true if the file exists, false otherwise.
      *
      * @throws YAPI_Exception on error
      */
@@ -447,6 +465,58 @@ public class YFiles extends YFunction
         //noinspection DoubleNegation
         if (!(res.equals("ok"))) { throw new YAPI_Exception(YAPI.IO_ERROR, "unable to remove file");}
         return YAPI.SUCCESS;
+    }
+
+    /**
+     * Returns the expected file CRC for a given content.
+     * Note that the CRC value may vary depending on the version
+     * of the filesystem used by the hub, so it is important to
+     * use this method if a reference value needs to be computed.
+     *
+     * @param content : a buffer representing a file content
+     *
+     * @return the 32-bit CRC summarizing the file content, as it would
+     *         be returned by the get_crc() method of
+     *         YFileRecord objects returned by get_list().
+     */
+    public int get_content_crc(byte[] content) throws YAPI_Exception
+    {
+        int fsver;
+        int sz;
+        int blkcnt;
+        byte[] meta = new byte[0];
+        int blkidx;
+        int blksz;
+        int part;
+        int res;
+        sz = (content).length;
+        if (sz == 0) {
+            res = YAPI._bincrc(content, 0, 0);
+            return res;
+        }
+
+        fsver = _getVersion();
+        if (fsver < 40) {
+            res = YAPI._bincrc(content, 0, sz);
+            return res;
+        }
+        blkcnt = ((sz + 255) / 256);
+        meta = new byte[4 * blkcnt];
+        blkidx = 0;
+        while (blkidx < blkcnt) {
+            blksz = sz - blkidx * 256;
+            if (blksz > 256) {
+                blksz = 256;
+            }
+            part = (YAPI._bincrc(content, blkidx * 256, blksz) ^ ((int) 0xffffffff));
+            meta[4 * blkidx] = (byte)((part & 255) & 0xff);
+            meta[4 * blkidx + 1] = (byte)(((part >> 8) & 255) & 0xff);
+            meta[4 * blkidx + 2] = (byte)(((part >> 16) & 255) & 0xff);
+            meta[4 * blkidx + 3] = (byte)(((part >> 24) & 255) & 0xff);
+            blkidx = blkidx + 1;
+        }
+        res = (YAPI._bincrc(meta, 0, 4 * blkcnt) ^ ((int) 0xffffffff));
+        return res;
     }
 
     /**

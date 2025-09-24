@@ -5,8 +5,6 @@ import java.util.Locale;
 
 class TCPNotificationHandler extends NotificationHandler
 {
-    private volatile boolean _connected = false;
-    private volatile boolean _connecting = true;
     private HashMap<YDevice, yHTTPRequest> _httpReqByDev = new HashMap<>();
 
 
@@ -25,18 +23,25 @@ class TCPNotificationHandler extends NotificationHandler
     @Override
     public void run()
     {
+        int firt_try = 1;
         yHTTPRequest yreq = new yHTTPRequest(_hub, "Notification of " + _hub.getRootUrl());
         while (!Thread.currentThread().isInterrupted()) {
             if (_error_delay > 0) {
                 try {
                     Thread.sleep(_error_delay);
                 } catch (InterruptedException ex) {
-                    _connected = false;
+                    set_connectionState(YHub.ABORTED);
                     Thread.currentThread().interrupt();
                     return;
                 }
             }
             try {
+                if (firt_try > 0) {
+                    set_connectionState(YHub.TRYING);
+                    firt_try = 0;
+                } else {
+                    set_connectionState(YHub.RECONNECTING);
+                }
                 yreq._requestReserve();
                 String notUrl;
                 if (_notifyPos < 0) {
@@ -44,9 +49,9 @@ class TCPNotificationHandler extends NotificationHandler
                 } else {
                     notUrl = String.format(Locale.US, "GET /not.byn?abs=%d", _notifyPos);
                 }
+                // no request timeout for notifcations
                 yreq._requestStart(notUrl, null, 0, null, null);
-                _connected = true;
-                _connecting = false;
+                set_connectionState(YHub.CONNECTED);
                 String fifo = "";
                 do {
                     byte[] partial;
@@ -68,7 +73,7 @@ class TCPNotificationHandler extends NotificationHandler
                         if (pos < 0) break;
                         String line = fifo.substring(0, pos + 1);
                         if (line.indexOf(27) == -1) {
-                            // drop notification that contain esc char
+                            // drop notifications that contain esc char
                             handleNetNotification(line);
                         }
                         fifo = fifo.substring(pos + 1);
@@ -78,14 +83,17 @@ class TCPNotificationHandler extends NotificationHandler
                 yreq._requestStop();
                 yreq._requestRelease();
             } catch (YAPI_Exception ex) {
-                _connected = false;
-                yreq._requestStop();
-                yreq._requestRelease();
+                if (ex.errorType == YAPI.UNAUTHORIZED || ex.errorType == YAPI.SSL_UNK_CERT) {
+                    break;
+                } else {
+                    set_connectionState(YHub.RECONNECTING);
+                }
                 _notifRetryCount++;
                 _hub._isNotifWorking = false;
                 _error_delay = 100 << (_notifRetryCount > 4 ? 4 : _notifRetryCount);
             }
         }
+        set_connectionState(YHub.ABORTED);
         yreq._requestStop();
         yreq._requestRelease();
     }
@@ -126,13 +134,20 @@ class TCPNotificationHandler extends NotificationHandler
         return false;
     }
 
+    @Override
+    void stopSocketsOfThread()
+    {
+
+    }
+
 
     public boolean isConnected()
     {
         if (_sendPingNotification) {
             return (_lastPing + NET_HUB_NOT_CONNECTION_TIMEOUT) > System.currentTimeMillis();
         } else {
-            return _connecting || _connected;
+            int c_state = get_connectionState();
+            return c_state == YHub.TRYING || c_state == YHub.CONNECTED || c_state == YHub.RECONNECTING;
         }
     }
 

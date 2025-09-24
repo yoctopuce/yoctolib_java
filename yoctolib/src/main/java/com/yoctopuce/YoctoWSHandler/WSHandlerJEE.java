@@ -17,7 +17,7 @@ public class WSHandlerJEE implements WSHandlerInterface
     }
 
     @Override
-    public void connect(YHTTPHub hub, boolean first_notification_connection, int mstimeout, int notifAbsPos) throws YAPI_Exception
+    public void connect(YHTTPHub hub, boolean first_notification_connection, long expiration, int notifAbsPos) throws YAPI_Exception
     {
         throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "WSHandlerJEE is only supported in library yoctolib-jEE");
     }

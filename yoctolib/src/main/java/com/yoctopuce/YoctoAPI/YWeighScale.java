@@ -918,7 +918,7 @@ public class YWeighScale extends YSensor
         bin_json = _download(String.format(Locale.US, "extra.json?page=%d",(4*YAPIContext._atoi(id))+tableIndex));
         paramlist = _json_get_array(bin_json);
         // convert all values to float and append records
-        siz = ((paramlist.size()) >> 1);
+        siz = (paramlist.size() >> 1);
         tempValues.clear();
         compValues.clear();
         idx = 0;

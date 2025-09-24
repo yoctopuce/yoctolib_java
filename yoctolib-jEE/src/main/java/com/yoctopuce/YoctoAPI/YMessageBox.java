@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 63599 2024-12-06 10:17:59Z seb $
+ * $Id: YMessageBox.java 68482 2025-08-21 10:07:30Z mvuilleu $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -1183,6 +1183,7 @@ public class YMessageBox extends YFunction
         }
         _pdus = newArr;
         // append complete concatenated messages
+        newAgg.clear();
         i = 0;
         while (i < nsig) {
             sig = signatures.get(i);
