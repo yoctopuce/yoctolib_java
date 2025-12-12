@@ -1032,7 +1032,7 @@ public class YColorLedCluster extends YFunction
     public int set_rgbColorArray(int ledIndex,ArrayList<Integer> rgbList) throws YAPI_Exception
     {
         int listlen;
-        byte[] buff = new byte[0];
+        byte[] buff;
         int idx;
         int rgb;
         int res;
@@ -1067,7 +1067,7 @@ public class YColorLedCluster extends YFunction
     public int rgbArrayOfs_move(int ledIndex,ArrayList<Integer> rgbList,int delay) throws YAPI_Exception
     {
         int listlen;
-        byte[] buff = new byte[0];
+        byte[] buff;
         int idx;
         int rgb;
         int res;
@@ -1138,7 +1138,7 @@ public class YColorLedCluster extends YFunction
     public int set_hslColorArray(int ledIndex,ArrayList<Integer> hslList) throws YAPI_Exception
     {
         int listlen;
-        byte[] buff = new byte[0];
+        byte[] buff;
         int idx;
         int hsl;
         int res;
@@ -1193,7 +1193,7 @@ public class YColorLedCluster extends YFunction
     public int hslArrayOfs_move(int ledIndex,ArrayList<Integer> hslList,int delay) throws YAPI_Exception
     {
         int listlen;
-        byte[] buff = new byte[0];
+        byte[] buff;
         int idx;
         int hsl;
         int res;
@@ -1226,7 +1226,7 @@ public class YColorLedCluster extends YFunction
      */
     public byte[] get_rgbColorBuffer(int ledIndex,int count) throws YAPI_Exception
     {
-        return _download(String.format(Locale.US, "rgb.bin?typ=0&pos=%d&len=%d",3*ledIndex,3*count));
+        return _download(String.format(Locale.US, "rgb.bin?typ=%d&pos=%d&len=%d",0,3*ledIndex,3*count));
     }
 
     /**
@@ -1243,14 +1243,14 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_rgbColorArray(int ledIndex,int count) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int r;
         int g;
         int b;
 
-        buff = _download(String.format(Locale.US, "rgb.bin?typ=0&pos=%d&len=%d",3*ledIndex,3*count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=%d&pos=%d&len=%d",0,3*ledIndex,3*count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1277,14 +1277,14 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_rgbColorArrayAtPowerOn(int ledIndex,int count) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int r;
         int g;
         int b;
 
-        buff = _download(String.format(Locale.US, "rgb.bin?typ=4&pos=%d&len=%d",3*ledIndex,3*count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=%d&pos=%d&len=%d",4,3*ledIndex,3*count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1311,12 +1311,12 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_linkedSeqArray(int ledIndex,int count) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int seq;
 
-        buff = _download(String.format(Locale.US, "rgb.bin?typ=1&pos=%d&len=%d",ledIndex,count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=%d&pos=%d&len=%d",1,ledIndex,count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1341,7 +1341,7 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_blinkSeqSignatures(int seqIndex,int count) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int hh;
@@ -1349,7 +1349,7 @@ public class YColorLedCluster extends YFunction
         int lh;
         int ll;
 
-        buff = _download(String.format(Locale.US, "rgb.bin?typ=2&pos=%d&len=%d",4*seqIndex,4*count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=%d&pos=%d&len=%d",2,4*seqIndex,4*count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1375,13 +1375,13 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_blinkSeqStateSpeed(int seqIndex,int count) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int lh;
         int ll;
 
-        buff = _download(String.format(Locale.US, "rgb.bin?typ=6&pos=%d&len=%d",seqIndex,count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=%d&pos=%d&len=%d",6,seqIndex,count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1405,12 +1405,12 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_blinkSeqStateAtPowerOn(int seqIndex,int count) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int started;
 
-        buff = _download(String.format(Locale.US, "rgb.bin?typ=5&pos=%d&len=%d",seqIndex,count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=%d&pos=%d&len=%d",5,seqIndex,count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1433,12 +1433,12 @@ public class YColorLedCluster extends YFunction
      */
     public ArrayList<Integer> get_blinkSeqState(int seqIndex,int count) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         ArrayList<Integer> res = new ArrayList<>();
         int idx;
         int started;
 
-        buff = _download(String.format(Locale.US, "rgb.bin?typ=3&pos=%d&len=%d",seqIndex,count));
+        buff = _download(String.format(Locale.US, "rgb.bin?typ=%d&pos=%d&len=%d",3,seqIndex,count));
         res.clear();
         idx = 0;
         while (idx < count) {
@@ -1485,39 +1485,29 @@ public class YColorLedCluster extends YFunction
         if (L<=127) {
             temp2 = L * (255 + S);
         } else {
-            temp2 = (L+S) * 255 - L*S;
+            temp2 = (L + S) * 255 - L * S;
         }
         temp1 = 510 * L - temp2;
         // R
-        temp3 = (H + 85);
-        if (temp3 > 255) {
-            temp3 = temp3-255;
-        }
+        temp3 = ((H + 85) & 0xff);
         R = hsl2rgbInt(temp1, temp2, temp3);
         // G
-        temp3 = H;
-        if (temp3 > 255) {
-            temp3 = temp3-255;
-        }
+        temp3 = (H & 0xff);
         G = hsl2rgbInt(temp1, temp2, temp3);
         // B
-        if (H >= 85) {
-            temp3 = H - 85 ;
-        } else {
-            temp3 = H + 170;
-        }
+        temp3 = ((H + 170) & 0xff);
         B = hsl2rgbInt(temp1, temp2, temp3);
         // just in case
-        if (R>255) {
-            R=255;
+        if (R > 255) {
+            R = 255;
         }
-        if (G>255) {
-            G=255;
+        if (G > 255) {
+            G = 255;
         }
-        if (B>255) {
-            B=255;
+        if (B > 255) {
+            B = 255;
         }
-        res = (R << 16)+(G << 8)+B;
+        res = (R << 16) + (G << 8) + B;
         return res;
     }
 

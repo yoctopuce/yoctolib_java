@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 68278 2025-08-11 15:37:07Z seb $
+ * $Id: YGenericHub.java 69338 2025-10-08 07:57:22Z seb $
  *
  * Internal YGenericHub object
  *
@@ -123,9 +123,10 @@ abstract class YGenericHub
     private HashMap<String, Integer> _beaconss = new HashMap<>();
     protected ArrayList<String> _knownUrls = new ArrayList<>();
 
-    protected String _lastErrorMessage = "";
-    protected int _lastErrorType = YAPI.SUCCESS;
-    protected int _networkTimeoutMs;
+    private volatile int _lastErrorType = YAPI.SUCCESS;
+    private volatile String _lastErrorMessage = "";
+    private volatile Exception _lastExecption = null;
+    protected volatile int _networkTimeoutMs;
     private boolean _enabled = true;
     private final long _creation_time;
     private static int _global_hub_id = 0;
@@ -146,6 +147,13 @@ abstract class YGenericHub
 
     abstract String getRootUrl();
 
+    protected void dbglog(int level, String msg)
+    {
+        if (_yctx._dbglog_level >= level) {
+            _yctx.dbglog(level, String.format("hub_%d(%s): %s", _hubid, this._URL_params._originalURL, msg));
+        }
+    }
+
     @SuppressWarnings("UnusedParameters")
     boolean isSameHub(String url, Object request, Object response, Object session)
     {
@@ -163,9 +171,10 @@ abstract class YGenericHub
 
     abstract void stopNotifications();
 
-    boolean updateHubSerial(String serial) throws YAPI_Exception
+    synchronized boolean updateHubSerial(String serial) throws YAPI_Exception
     {
         if (_hubSerialNumber == null) {
+            dbglog(3, "serial is " + serial);
             _hubSerialNumber = serial;
             return _yctx._checkForDuplicateHub(this);
         }
@@ -301,7 +310,7 @@ abstract class YGenericHub
             if (_hubSerialNumber == null) {
                 for (WPEntry wp : whitePages) {
                     if (wp.getNetworkUrl().equals("")) {
-                        _hubSerialNumber = wp.getSerialNumber();
+                        updateHubSerial(wp.getSerialNumber());
                     }
                 }
             }
@@ -445,10 +454,19 @@ abstract class YGenericHub
         return _lastErrorType;
     }
 
+    void saveLastError(int type, String message, Exception ex)
+    {
+        dbglog(4, String.format("saveLastError %d:%s (%s)", type, message, ex));
+        _lastErrorType = type;
+        _lastErrorMessage = message;
+        _lastExecption = ex;
+    }
+
     abstract public boolean isOnline();
 
     synchronized public void merge(YGenericHub newhub)
     {
+        _yctx.dbglog(2, String.format("merge hub %s(%d) ->%s(%d)", newhub._URL_params._originalURL, newhub.get_hubid(), _URL_params._originalURL, get_hubid()));
         this.addKnownURL(newhub._URL_params._originalURL);
         if (_creation_time < newhub._creation_time) {
             _reportConnnectionLost = newhub._reportConnnectionLost;
@@ -484,6 +502,28 @@ abstract class YGenericHub
     }
 
     abstract public int get_connectionState();
+
+    public int waitIsOnline(int msTimeout) throws YAPI_Exception
+    {
+
+        long expiration = System.currentTimeMillis() + msTimeout;
+        dbglog(3, String.format("waitIsOnline: wait %dms", msTimeout));
+        while (!isOnline() && this._lastErrorType == YAPI.SUCCESS && expiration >= System.currentTimeMillis()) {
+            _yctx.Sleep(100);
+        }
+
+        if (isOnline()) {
+            dbglog(3,"waitIsOnline: hub is online");
+            return YAPI.SUCCESS;
+        } else {
+            dbglog(3, String.format("waitIsOnline: hub  is offline (%d:%s)", this._lastErrorType, this._lastErrorMessage));
+            if (this._lastErrorType != YAPI.SUCCESS) {
+                throw new YAPI_Exception(this._lastErrorType, this._lastErrorMessage, this._lastExecption);
+            }
+            throw new YAPI_Exception(YAPI.TIMEOUT, String.format("Unable to connect to hub %s:%s", this._URL_params.getHost(), this._URL_params.getPort()));
+        }
+
+    }
 
     interface UpdateProgress
     {

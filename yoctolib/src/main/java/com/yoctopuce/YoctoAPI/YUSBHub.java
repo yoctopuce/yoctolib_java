@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YUSBHub.java 68026 2025-07-28 09:07:30Z seb $
+ * $Id: YUSBHub.java 69323 2025-10-06 12:40:24Z seb $
  *
  * YUSBHub stub (native usb is only supported in Android)
  *
@@ -233,13 +233,11 @@ class YUSBHub extends YGenericHub
             }
             updateFromWpAndYp(whitePages, yellowPages);
         } catch (YAPI_Exception ex) {
-            this._lastErrorMessage = ex.getLocalizedMessage();
-            this._lastErrorType = ex.errorType;
+            saveLastError(ex.errorType, ex.getLocalizedMessage(), ex);
             throw ex;
         }
         // reset device list cache timeout for this hub
-        this._lastErrorType = YAPI.SUCCESS;
-        this._lastErrorMessage = "";
+        saveLastError(YAPI.SUCCESS, "", null);
         now = YAPI.GetTickCount();
         _devListExpires = now + 500;
     }

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 52478 2022-12-21 10:33:33Z seb $
+ * $Id: YDevice.java 69316 2025-10-03 09:24:07Z seb $
  *
  * Internal YDevice class
  *
@@ -163,8 +163,14 @@ class YDevice
         }
         YJSONObject cache_json;
         try {
-            cache_json = new YJSONObject(yreq);
-            cache_json.parseWithRef(_cache_json);
+            if (_cache_json != null) {
+                YJSONArray yzon = new YJSONArray(yreq);
+                yzon.parse();
+                cache_json = (YJSONObject) _cache_json.updateFroJZon(yzon);
+            }else{
+                cache_json = new YJSONObject(yreq);
+                cache_json.parse();
+            }
         } catch (Exception ex) {
             _cache_json = null;
             throw new YAPI_Exception(YAPI.IO_ERROR,

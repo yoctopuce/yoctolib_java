@@ -70,13 +70,15 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
                 }
                 _socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             } finally {
                 _out = null;
                 _in = null;
                 _socket = null;
                 _state = State.AVAIL;
             }
+        } else {
+            _state = State.AVAIL;
         }
 
     }
@@ -208,59 +210,62 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
             byte[] buffer = new byte[2048];
             boolean websock_ok = false;
             while (System.currentTimeMillis() < expiration) {
-                int read = _in.read(buffer, 0, buffer.length);
-                if (read < 0) {
-                    break;
-                }
-                String part = new String(buffer, 0, read, hub._yctx._deviceCharset);
-                header.append(part);
-                int end_of_head = header.indexOf("\r\n\r\n");
-                if (end_of_head > 0) {
-                    end_of_head += 2;
-                    header.setLength(end_of_head);
-                    String fullHeader = header.toString();
-                    int endl = fullHeader.indexOf("\r\n");
-                    String firstline = fullHeader.substring(0, endl);
-                    int ofs = firstline.indexOf("HTTP/1.1 ");
-                    int endcode = firstline.indexOf(" ", 9);
-                    if (ofs != 0 || endcode == -1) {
-                        throw new YAPI_Exception(YAPI.IO_ERROR, "Invalid HTTP header");
+                try {
+                    int read = _in.read(buffer, 0, buffer.length);
+                    if (read < 0) {
+                        break;
                     }
-                    String httpresponse = firstline.substring(9, endcode);
-                    int httpcode = Integer.parseInt(httpresponse);
-                    if (httpcode == 301 || httpcode == 302 || httpcode == 307 || httpcode == 308) {
-                        isredirect = true;
-                    } else if (httpcode != 101) {
-                        throw new YAPI_Exception(YAPI.IO_ERROR, "hub does not support WebSocket");
-                    }
-                    ofs = fullHeader.indexOf("\r\n");
-                    while (ofs > 0 && ofs < fullHeader.length() - 2) {
-                        ofs += 2;
-                        int nextofs = header.indexOf("\r\n", ofs);
-                        int sep = header.indexOf(":", ofs);
-                        if (sep > 0 && nextofs > sep) {
-                            String field = header.substring(ofs, sep);
-                            String lowerCase = field.toLowerCase().trim();
-                            if (lowerCase.startsWith("sec-websocket-accept")) {
-                                String value = header.substring(sep + 1, nextofs);
-                                websock_ok = VerifyWebsocketKey(value);
-                                if (websock_ok) {
-                                    int start_bin = end_of_head + 2;
-                                    setupNewWSConnection(buffer, start_bin, read - start_bin);
-                                }
-                                break;
-                            } else if (isredirect && lowerCase.startsWith("location")) {
-                                String value = header.substring(sep + 1, nextofs).trim();
-                                _nhandler.WSLOG("redirect to " + value);
-                                YGenericHub.HTTPParams new_url = new YGenericHub.HTTPParams(value);
-                                // update only host, proto and port
-                                hub._runtime_http_params.updateForRedirect(new_url.getHost(), new_url.getPort(), new_url.useSecureSocket());
-                                break;
-                            }
+                    String part = new String(buffer, 0, read, hub._yctx._deviceCharset);
+                    header.append(part);
+                    int end_of_head = header.indexOf("\r\n\r\n");
+                    if (end_of_head > 0) {
+                        end_of_head += 2;
+                        header.setLength(end_of_head);
+                        String fullHeader = header.toString();
+                        int endl = fullHeader.indexOf("\r\n");
+                        String firstline = fullHeader.substring(0, endl);
+                        int ofs = firstline.indexOf("HTTP/1.1 ");
+                        int endcode = firstline.indexOf(" ", 9);
+                        if (ofs != 0 || endcode == -1) {
+                            throw new YAPI_Exception(YAPI.IO_ERROR, "Invalid HTTP header");
                         }
-                        ofs = nextofs;
+                        String httpresponse = firstline.substring(9, endcode);
+                        int httpcode = Integer.parseInt(httpresponse);
+                        if (httpcode == 301 || httpcode == 302 || httpcode == 307 || httpcode == 308) {
+                            isredirect = true;
+                        } else if (httpcode != 101) {
+                            throw new YAPI_Exception(YAPI.IO_ERROR, "hub does not support WebSocket");
+                        }
+                        ofs = fullHeader.indexOf("\r\n");
+                        while (ofs > 0 && ofs < fullHeader.length() - 2) {
+                            ofs += 2;
+                            int nextofs = header.indexOf("\r\n", ofs);
+                            int sep = header.indexOf(":", ofs);
+                            if (sep > 0 && nextofs > sep) {
+                                String field = header.substring(ofs, sep);
+                                String lowerCase = field.toLowerCase().trim();
+                                if (lowerCase.startsWith("sec-websocket-accept")) {
+                                    String value = header.substring(sep + 1, nextofs);
+                                    websock_ok = VerifyWebsocketKey(value);
+                                    if (websock_ok) {
+                                        int start_bin = end_of_head + 2;
+                                        setupNewWSConnection(buffer, start_bin, read - start_bin);
+                                    }
+                                    break;
+                                } else if (isredirect && lowerCase.startsWith("location")) {
+                                    String value = header.substring(sep + 1, nextofs).trim();
+                                    _nhandler.WSLOG("redirect to " + value);
+                                    YGenericHub.HTTPParams new_url = new YGenericHub.HTTPParams(value);
+                                    // update only host, proto and port
+                                    hub._runtime_http_params.updateForRedirect(new_url.getHost(), new_url.getPort(), new_url.useSecureSocket());
+                                    break;
+                                }
+                            }
+                            ofs = nextofs;
+                        }
+                        break;
                     }
-                    break;
+                } catch (SocketTimeoutException ignored) {
                 }
             }
             if (!isredirect && !websock_ok) {
@@ -269,9 +274,9 @@ class WSHandlerYocto implements WSHandlerInterface, Runnable
         } catch (SSLHandshakeException e) {
             throw new YAPI_Exception(YAPI.SSL_UNK_CERT, "unable to contact " + host + " :" + e.getLocalizedMessage(), e);
         } catch (SSLException e) {
-            throw new YAPI_Exception(YAPI.SSL_ERROR, e.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.SSL_ERROR, e.getLocalizedMessage(), e);
         } catch (IOException e) {
-            throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage());
+            throw new YAPI_Exception(YAPI.IO_ERROR, e.getLocalizedMessage(), e);
         }
         if (isredirect) {
             close();

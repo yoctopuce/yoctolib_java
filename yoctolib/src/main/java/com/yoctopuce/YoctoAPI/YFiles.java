@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java 67404 2025-06-12 07:46:02Z seb $
+ * $Id: YFiles.java 70518 2025-11-26 16:18:50Z mvuilleu $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -327,7 +327,7 @@ public class YFiles extends YFunction
 
     public int _getVersion() throws YAPI_Exception
     {
-        byte[] json = new byte[0];
+        byte[] json;
         if (_ver > 0) {
             return _ver;
         }
@@ -352,7 +352,7 @@ public class YFiles extends YFunction
      */
     public int format_fs() throws YAPI_Exception
     {
-        byte[] json = new byte[0];
+        byte[] json;
         String res;
         json = sendCommand("format");
         res = _json_get_key(json, "res");
@@ -376,7 +376,7 @@ public class YFiles extends YFunction
      */
     public ArrayList<YFileRecord> get_list(String pattern) throws YAPI_Exception
     {
-        byte[] json = new byte[0];
+        byte[] json;
         ArrayList<byte[]> filelist = new ArrayList<>();
         ArrayList<YFileRecord> res = new ArrayList<>();
         json = sendCommand(String.format(Locale.US, "dir&f=%s",pattern));
@@ -399,7 +399,7 @@ public class YFiles extends YFunction
      */
     public boolean fileExist(String filename) throws YAPI_Exception
     {
-        byte[] json = new byte[0];
+        byte[] json;
         ArrayList<byte[]> filelist = new ArrayList<>();
         if (filename.length() == 0) {
             return false;
@@ -458,7 +458,7 @@ public class YFiles extends YFunction
      */
     public int remove(String pathname) throws YAPI_Exception
     {
-        byte[] json = new byte[0];
+        byte[] json;
         String res;
         json = sendCommand(String.format(Locale.US, "del&f=%s",pathname));
         res  = _json_get_key(json, "res");
@@ -484,20 +484,17 @@ public class YFiles extends YFunction
         int fsver;
         int sz;
         int blkcnt;
-        byte[] meta = new byte[0];
+        byte[] meta;
         int blkidx;
         int blksz;
         int part;
         int res;
         sz = (content).length;
-        if (sz == 0) {
-            res = YAPI._bincrc(content, 0, 0);
-            return res;
-        }
 
         fsver = _getVersion();
         if (fsver < 40) {
             res = YAPI._bincrc(content, 0, sz);
+            res = ((res & 0x7fffffff) - 2 * ((res >> 1) & 0x40000000));
             return res;
         }
         blkcnt = ((sz + 255) / 256);
@@ -516,6 +513,7 @@ public class YFiles extends YFunction
             blkidx = blkidx + 1;
         }
         res = (YAPI._bincrc(meta, 0, 4 * blkcnt) ^ ((int) 0xffffffff));
+        res = ((res & 0x7fffffff) - 2 * ((res >> 1) & 0x40000000));
         return res;
     }
 

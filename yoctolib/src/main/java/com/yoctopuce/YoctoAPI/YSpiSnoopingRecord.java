@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSpiSnoopingRecord.java 58923 2024-01-12 10:12:54Z seb $
+ * $Id: YSpiSnoopingRecord.java 69225 2025-09-23 07:25:53Z seb $
  *
  * - - - - - - - - - License information: - - - - - - - - -
  *
@@ -53,7 +53,7 @@ public class YSpiSnoopingRecord
     protected int _tim = 0;
     protected int _pos = 0;
     protected int _dir = 0;
-    protected String _msg;
+    protected String _msg = "";
 
     //--- (end of generated code: YSpiSnoopingRecord definitions)
 

@@ -61,12 +61,12 @@ public class YSdi12SensorInfo
 //--- (generated code: YSdi12SensorInfo definitions)
     protected YSdi12Port _sdi12Port;
     protected boolean _isValid;
-    protected String _addr;
-    protected String _proto;
-    protected String _mfg;
-    protected String _model;
-    protected String _ver;
-    protected String _sn;
+    protected String _addr = "";
+    protected String _proto = "";
+    protected String _mfg = "";
+    protected String _model = "";
+    protected String _ver = "";
+    protected String _sn = "";
     protected ArrayList<ArrayList<String>> _valuesDesc = new ArrayList<>();
 
     //--- (end of generated code: YSdi12SensorInfo definitions)

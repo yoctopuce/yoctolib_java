@@ -932,8 +932,8 @@ public class YNetwork extends YFunction
     public int set_userPassword(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        if (newval.length() > YAPI.HASH_BUF_SIZE)
-            _throw(YAPI.INVALID_ARGUMENT,String.format(Locale.US,"Password too long (max %d chars) :%s",YAPI.HASH_BUF_SIZE,  newval));
+        if (!_is_valid_pass(newval))
+            return YAPI.INVALID_ARGUMENT;
         synchronized (this) {
             rest_val = newval;
             _setAttr("userPassword",rest_val);
@@ -1012,8 +1012,8 @@ public class YNetwork extends YFunction
     public int set_adminPassword(String  newval)  throws YAPI_Exception
     {
         String rest_val;
-        if (newval.length() > YAPI.HASH_BUF_SIZE)
-            _throw(YAPI.INVALID_ARGUMENT,String.format(Locale.US,"Password too long (max %d chars) :%s",YAPI.HASH_BUF_SIZE,  newval));
+        if (!_is_valid_pass(newval))
+            return YAPI.INVALID_ARGUMENT;
         synchronized (this) {
             rest_val = newval;
             _setAttr("adminPassword",rest_val);
@@ -2465,7 +2465,7 @@ public class YNetwork extends YFunction
      */
     public String ping(String host) throws YAPI_Exception
     {
-        byte[] content = new byte[0];
+        byte[] content;
 
         content = _download(String.format(Locale.US, "ping.txt?host=%s",host));
         return new String(content, _yapi._deviceCharset);

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellRecord.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ * $Id: YCellRecord.java 69225 2025-09-23 07:25:53Z seb $
  *
  * Implements FindCellRecord(), the high-level API for CellRecord functions
  *
@@ -53,7 +53,7 @@ public class YCellRecord
 {
 //--- (end of generated code: YCellRecord class start)
 //--- (generated code: YCellRecord definitions)
-    protected String _oper;
+    protected String _oper = "";
     protected int _mcc = 0;
     protected int _mnc = 0;
     protected int _lac = 0;

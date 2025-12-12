@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 68482 2025-08-21 10:07:30Z mvuilleu $
+ * $Id: YMessageBox.java 69225 2025-09-23 07:25:53Z seb $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -644,7 +644,7 @@ public class YMessageBox extends YFunction
         String res;
         String bitmapStr;
         int int_res;
-        byte[] newBitmap = new byte[0];
+        byte[] newBitmap;
         int bitVal;
 
         retry = 5;
@@ -679,7 +679,7 @@ public class YMessageBox extends YFunction
         int cmdLen;
         int waitMore;
         String res;
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         String buffstr;
         int buffstrlen;
@@ -736,7 +736,7 @@ public class YMessageBox extends YFunction
 
     public YSms fetchPdu(int slot) throws YAPI_Exception
     {
-        byte[] binPdu = new byte[0];
+        byte[] binPdu;
         ArrayList<byte[]> arrPdu = new ArrayList<>();
         String hexPdu;
         YSms sms;
@@ -923,7 +923,7 @@ public class YMessageBox extends YFunction
         int i;
         int gsmlen;
         int reslen;
-        byte[] resbin = new byte[0];
+        byte[] resbin;
         String resstr;
         int uni;
         if (!(_gsm2unicodeReady)) {
@@ -1011,13 +1011,13 @@ public class YMessageBox extends YFunction
 
     public byte[] str2gsm(String msg)
     {
-        byte[] asc = new byte[0];
+        byte[] asc;
         int asclen;
         int i;
         int ch;
         int gsm7;
         int extra;
-        byte[] res = new byte[0];
+        byte[] res;
         int wpos;
         if (!(_gsm2unicodeReady)) {
             initGsm2Unicode();
@@ -1088,8 +1088,8 @@ public class YMessageBox extends YFunction
     public int checkNewMessages() throws YAPI_Exception
     {
         String bitmapStr;
-        byte[] prevBitmap = new byte[0];
-        byte[] newBitmap = new byte[0];
+        byte[] prevBitmap;
+        byte[] newBitmap;
         int slot;
         int nslots;
         int pduIdx;

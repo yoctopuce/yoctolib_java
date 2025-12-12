@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 67524 2025-06-16 14:47:10Z seb $
+ * $Id: YModule.java 69225 2025-09-23 07:25:53Z seb $
  *
  * YModule Class: Module control interface
  *
@@ -1341,7 +1341,7 @@ public class YModule extends YFunction
     public YFirmwareUpdate updateFirmwareEx(String path,boolean force) throws YAPI_Exception
     {
         String serial;
-        byte[] settings = new byte[0];
+        byte[] settings;
 
         serial = get_serialNumber();
         settings = get_allSettings();
@@ -1375,9 +1375,9 @@ public class YModule extends YFunction
      */
     public byte[] get_allSettings() throws YAPI_Exception
     {
-        byte[] settings = new byte[0];
-        byte[] json = new byte[0];
-        byte[] res = new byte[0];
+        byte[] settings;
+        byte[] json;
+        byte[] res;
         String sep;
         String name;
         String item;
@@ -1385,8 +1385,8 @@ public class YModule extends YFunction
         String pageid;
         String url;
         String file_data;
-        byte[] file_data_bin = new byte[0];
-        byte[] temp_data_bin = new byte[0];
+        byte[] file_data_bin;
+        byte[] temp_data_bin;
         String ext_settings;
         ArrayList<byte[]> filelist = new ArrayList<>();
         ArrayList<String> templist = new ArrayList<>();
@@ -1448,9 +1448,9 @@ public class YModule extends YFunction
         ArrayList<byte[]> values = new ArrayList<>();
         String url;
         String curr;
-        byte[] binCurr = new byte[0];
+        byte[] binCurr;
         String currTemp;
-        byte[] binCurrTemp = new byte[0];
+        byte[] binCurrTemp;
         int ofs;
         int size;
         url = "api/" + funcId + ".json?command=Z";
@@ -1475,9 +1475,9 @@ public class YModule extends YFunction
     public int set_extraSettings(String jsonExtra) throws YAPI_Exception
     {
         ArrayList<byte[]> extras = new ArrayList<>();
-        byte[] tmp = new byte[0];
+        byte[] tmp;
         String functionId;
-        byte[] data = new byte[0];
+        byte[] data;
         extras = _json_get_array((jsonExtra).getBytes(_yapi._deviceCharset));
         for (byte[] ii_0:extras) {
             tmp = _get_json_path(ii_0, "fid");
@@ -1505,10 +1505,10 @@ public class YModule extends YFunction
      */
     public int set_allSettingsAndFiles(byte[] settings) throws YAPI_Exception
     {
-        byte[] down = new byte[0];
-        byte[] json_api = new byte[0];
-        byte[] json_files = new byte[0];
-        byte[] json_extra = new byte[0];
+        byte[] down;
+        byte[] json_api;
+        byte[] json_files;
+        byte[] json_extra;
         int fuperror;
         int globalres;
         fuperror = 0;
@@ -1524,7 +1524,7 @@ public class YModule extends YFunction
         if (hasFunction("files")) {
             ArrayList<byte[]> files = new ArrayList<>();
             String res;
-            byte[] tmp = new byte[0];
+            byte[] tmp;
             String name;
             String data;
             down = _download("files.json?a=format");
@@ -1679,7 +1679,7 @@ public class YModule extends YFunction
         ArrayList<Integer> words = new ArrayList<>();
         ArrayList<String> words_str = new ArrayList<>();
         ArrayList<Double> calibData = new ArrayList<>();
-        ArrayList<Integer> iCalib = new ArrayList<>();
+        ArrayList<Integer> iCalib;
         int calibType;
         int i;
         int maxSize;
@@ -1875,12 +1875,12 @@ public class YModule extends YFunction
     public int set_allSettings(byte[] settings) throws YAPI_Exception
     {
         ArrayList<String> restoreLast = new ArrayList<>();
-        byte[] old_json_flat = new byte[0];
+        byte[] old_json_flat;
         ArrayList<byte[]> old_dslist = new ArrayList<>();
         ArrayList<String> old_jpath = new ArrayList<>();
         ArrayList<Integer> old_jpath_len = new ArrayList<>();
         ArrayList<String> old_val_arr = new ArrayList<>();
-        byte[] actualSettings = new byte[0];
+        byte[] actualSettings;
         ArrayList<byte[]> new_dslist = new ArrayList<>();
         ArrayList<String> new_jpath = new ArrayList<>();
         ArrayList<Integer> new_jpath_len = new ArrayList<>();
@@ -1901,7 +1901,7 @@ public class YModule extends YFunction
         String new_serial;
         String url;
         String tmp;
-        byte[] binTmp = new byte[0];
+        byte[] binTmp;
         String sensorType;
         String unit_name;
         String newval;
@@ -2193,7 +2193,7 @@ public class YModule extends YFunction
      */
     public int addFileToHTTPCallback(String filename) throws YAPI_Exception
     {
-        byte[] content = new byte[0];
+        byte[] content;
 
         content = _download("@YCB+" + filename);
         if ((content).length == 0) {
@@ -2253,7 +2253,7 @@ public class YModule extends YFunction
      */
     public String get_lastLogs() throws YAPI_Exception
     {
-        byte[] content = new byte[0];
+        byte[] content;
 
         content = _download("logs.txt");
         if ((content).length == 0) {

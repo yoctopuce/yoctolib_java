@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 67383 2025-06-11 05:44:27Z mvuilleu $
+ * $Id: YDataStream.java 70416 2025-11-21 08:13:12Z mvuilleu $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *
@@ -73,21 +73,18 @@ public class YDataStream
     protected double _dataSamplesInterval = 0;
     protected double _firstMeasureDuration = 0;
     protected ArrayList<String> _columnNames = new ArrayList<>();
-    protected String _functionId;
+    protected String _functionId = "";
     protected boolean _isClosed;
     protected boolean _isAvg;
     protected double _minVal = 0;
     protected double _avgVal = 0;
     protected double _maxVal = 0;
-    protected int _caltyp = 0;
-    protected ArrayList<Integer> _calpar = new ArrayList<>();
-    protected ArrayList<Double> _calraw = new ArrayList<>();
-    protected ArrayList<Double> _calref = new ArrayList<>();
     protected ArrayList<ArrayList<Double>> _values = new ArrayList<>();
     protected boolean _isLoaded;
 
     //--- (end of generated code: YDataStream definitions)
     protected YAPI.CalibrationHandlerCallback _calhdl = null;
+    private YCalibCtx _cal =null;
 
 
     YDataStream(YFunction parent, YDataSet dataset, ArrayList<Integer> encoded)
@@ -98,16 +95,60 @@ public class YDataStream
 
     //--- (generated code: YDataStream implementation)
 
+    public int _parseCalibArr(ArrayList<Integer> iCalib)
+    {
+        int caltyp;
+        YAPI.CalibrationHandlerCallback calhdl;
+        int maxpos;
+        int position;
+        ArrayList<Integer> calpar = new ArrayList<>();
+        ArrayList<Double> calraw = new ArrayList<>();
+        ArrayList<Double> calref = new ArrayList<>();
+        double fRaw;
+        double fRef;
+        caltyp = (iCalib.get(0).intValue() / 1000);
+        if (caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
+            // Unknown calibration type: calibrated value will be provided by the device
+            _cal = null;
+            return YAPI.SUCCESS;
+        }
+        calhdl = _parent._yapi._getCalibrationHandler(caltyp);
+        if (!(calhdl != null)) {
+            // Unknown calibration type: calibrated value will be provided by the device
+            _cal = null;
+            return YAPI.SUCCESS;
+        }
+        // New 32 bits text format
+        maxpos = iCalib.size();
+        calpar.clear();
+        position = 1;
+        while (position < maxpos) {
+            calpar.add(iCalib.get(position));
+            position = position + 1;
+        }
+        calraw.clear();
+        calref.clear();
+        position = 1;
+        while (position + 1 < maxpos) {
+            fRaw = iCalib.get(position).doubleValue();
+            fRaw = fRaw / 1000.0;
+            fRef = iCalib.get(position + 1).doubleValue();
+            fRef = fRef / 1000.0;
+            calraw.add(fRaw);
+            calref.add(fRef);
+            position = position + 2;
+        }
+        _cal = new YCalibCtx("", calhdl, caltyp, calpar, calraw, calref);
+        return YAPI.SUCCESS;
+    }
+
     public int _initFromDataSet(YDataSet dataset,ArrayList<Integer> encoded)
     {
         int val;
-        int i;
-        int maxpos;
         int ms_offset;
         int samplesPerHour;
-        double fRaw;
-        double fRef;
-        ArrayList<Integer> iCalib = new ArrayList<>();
+        int caltyp;
+        ArrayList<Integer> iCalib;
         // decode sequence header to extract data
         _runNo = encoded.get(0).intValue() + ((encoded.get(1).intValue() << 16));
         _utcStamp = encoded.get(2).intValue() + ((encoded.get(3).intValue() << 16));
@@ -151,28 +192,11 @@ public class YDataStream
         }
         // precompute decoding parameters
         iCalib = dataset._get_calibration();
-        _caltyp = iCalib.get(0).intValue();
-        if (_caltyp != 0) {
-            _calhdl = _parent._yapi._getCalibrationHandler(_caltyp);
-            maxpos = iCalib.size();
-            _calpar.clear();
-            _calraw.clear();
-            _calref.clear();
-            i = 1;
-            while (i < maxpos) {
-                _calpar.add(iCalib.get(i));
-                i = i + 1;
-            }
-            i = 1;
-            while (i + 1 < maxpos) {
-                fRaw = iCalib.get(i).doubleValue();
-                fRaw = fRaw / 1000.0;
-                fRef = iCalib.get(i + 1).doubleValue();
-                fRef = fRef / 1000.0;
-                _calraw.add(fRaw);
-                _calref.add(fRef);
-                i = i + 2;
-            }
+        caltyp = iCalib.get(0).intValue();
+        if (caltyp == 0) {
+            _cal = null;
+        } else {
+            _parseCalibArr(iCalib);
         }
         // preload column names for backward-compatibility
         _functionId = dataset.get_functionId();
@@ -279,12 +303,9 @@ public class YDataStream
     public double _decodeVal(int w)
     {
         double val;
-        val = w;
-        val = val / 1000.0;
-        if (_caltyp != 0) {
-            if (_calhdl != null) {
-                val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
-            }
+        val = (w) / 1000.0;
+        if (!(_cal == null)) {
+            val = _cal.hdl.yCalibrationHandler(val, _cal.typ, _cal.par, _cal.raw, _cal.cal);
         }
         return val;
     }
@@ -292,12 +313,9 @@ public class YDataStream
     public double _decodeAvg(int dw,int count)
     {
         double val;
-        val = dw;
-        val = val / 1000.0;
-        if (_caltyp != 0) {
-            if (_calhdl != null) {
-                val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
-            }
+        val = (dw) / 1000.0;
+        if (!(_cal == null)) {
+            val = _cal.hdl.yCalibrationHandler(val, _cal.typ, _cal.par, _cal.raw, _cal.cal);
         }
         return val;
     }
@@ -351,7 +369,7 @@ public class YDataStream
      */
     public long get_startTimeUTC()
     {
-        return (int) (double)Math.round(_startTime);
+        return (long) (double)Math.round(_startTime);
     }
 
     /**

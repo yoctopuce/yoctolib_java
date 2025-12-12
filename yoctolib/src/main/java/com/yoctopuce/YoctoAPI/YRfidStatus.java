@@ -172,10 +172,10 @@ public class YRfidStatus
     public static final int INVALID_SIZE = -154;
     public static final int BAD_PASSWORD_FORMAT = -155;
     public static final int RADIO_IS_OFF = -156;
-    protected String _tagId;
+    protected String _tagId = "";
     protected int _errCode = 0;
     protected int _errBlk = 0;
-    protected String _errMsg;
+    protected String _errMsg = "";
     protected int _yapierr = 0;
     protected int _fab = 0;
     protected int _lab = 0;

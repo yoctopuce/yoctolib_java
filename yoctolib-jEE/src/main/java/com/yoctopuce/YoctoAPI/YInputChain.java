@@ -1046,7 +1046,7 @@ public class YInputChain extends YFunction
      */
     public String get_lastEvents() throws YAPI_Exception
     {
-        byte[] content = new byte[0];
+        byte[] content;
 
         content = _download("events.txt");
         return new String(content, _yapi._deviceCharset);
@@ -1083,7 +1083,7 @@ public class YInputChain extends YFunction
     {
         int newPos;
         String url;
-        byte[] content = new byte[0];
+        byte[] content;
         String contentStr;
         ArrayList<String> eventArr = new ArrayList<>();
         int arrLen;

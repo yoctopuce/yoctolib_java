@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 68026 2025-07-28 09:07:30Z seb $
+ * $Id: YCallbackHub.java 69323 2025-10-06 12:40:24Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -270,8 +270,7 @@ class YCallbackHub extends YGenericHub
             }
             yreq = new String(data);
         } catch (IOException ex) {
-            this._lastErrorType = YAPI.IO_ERROR;
-            this._lastErrorMessage = ex.getLocalizedMessage();
+            saveLastError(YAPI.IO_ERROR, ex.getLocalizedMessage(), ex);
             throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
         }
         HashMap<String, ArrayList<YPEntry>> yellowPages = new HashMap<>();
@@ -281,9 +280,9 @@ class YCallbackHub extends YGenericHub
             loadval = new YJSONObject(yreq);
             loadval.parse();
             if (!loadval.has("services") || !loadval.getYJSONObject("services").has("whitePages")) {
-                this._lastErrorType = YAPI.INVALID_ARGUMENT;
-                this._lastErrorMessage = "Device " + _http_params.getHost() + " is not a hub";
-                throw new YAPI_Exception(this._lastErrorType, this._lastErrorMessage);
+                String message = "Device " + _http_params.getHost() + " is not a hub";
+                saveLastError(YAPI.INVALID_ARGUMENT, message, null);
+                throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, message);
             }
 
             YJSONArray whitePages_json = loadval.getYJSONObject("services").getYJSONArray("whitePages");
@@ -312,15 +311,14 @@ class YCallbackHub extends YGenericHub
                 whitePages.add(devinfo);
             }
         } catch (Exception e) {
-            this._lastErrorType = YAPI.IO_ERROR;
-            this._lastErrorMessage = "Request failed, could not parse API result for " + _http_params.getHost();
-            throw new YAPI_Exception(this._lastErrorType, this._lastErrorMessage, e);
+            String message = "Request failed, could not parse API result for " + _http_params.getHost();
+            saveLastError(YAPI.IO_ERROR, message, e);
+            throw new YAPI_Exception(YAPI.IO_ERROR, message, e);
         }
         updateFromWpAndYp(whitePages, yellowPages);
 
         // reset device list cache timeout for this hub
-        this._lastErrorType = YAPI.SUCCESS;
-        this._lastErrorMessage = "";
+        saveLastError(YAPI.SUCCESS, "", null);
         now = YAPI.GetTickCount();
         _devListExpires = now + 500;
     }

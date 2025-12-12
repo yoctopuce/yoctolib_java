@@ -105,4 +105,15 @@ abstract class YJSONContent
     }
 
     abstract byte[] toJSON();
+
+    YJSONContent updateFroJZon(YJSONContent newItem) throws Exception
+    {
+        YJSONType jsonType = newItem.getJSONType();
+        if (jsonType != _type) {
+            throw new Exception(String.format("Unable to convert %s to %s",
+                    newItem.getJSONType().toString(),this.getJSONType().toString()));
+        }
+        return newItem;
+    }
+
 }

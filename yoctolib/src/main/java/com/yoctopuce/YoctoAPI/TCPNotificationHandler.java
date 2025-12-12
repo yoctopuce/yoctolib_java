@@ -20,38 +20,42 @@ class TCPNotificationHandler extends NotificationHandler
     }
 
 
-    @Override
-    public void run()
+    public void run(long expiration)
     {
         int firt_try = 1;
         yHTTPRequest yreq = new yHTTPRequest(_hub, "Notification of " + _hub.getRootUrl());
-        while (!Thread.currentThread().isInterrupted()) {
+        while (_hub.workerThreadMustContinue()) {
             if (_error_delay > 0) {
                 try {
                     Thread.sleep(_error_delay);
                 } catch (InterruptedException ex) {
-                    set_connectionState(YHub.ABORTED);
+                    _hub.set_connectionState(YHub.ABORTED);
                     Thread.currentThread().interrupt();
                     return;
                 }
             }
             try {
                 if (firt_try > 0) {
-                    set_connectionState(YHub.TRYING);
+                    if (System.currentTimeMillis() > expiration) {
+                        throw new YAPI_Exception(YAPI.TIMEOUT, "Unable to start the request in time");
+                    }
+                    _hub.set_connectionState(YHub.TRYING);
                     firt_try = 0;
                 } else {
-                    set_connectionState(YHub.RECONNECTING);
+                    _hub.set_connectionState(YHub.RECONNECTING);
                 }
                 yreq._requestReserve();
                 String notUrl;
                 if (_notifyPos < 0) {
                     notUrl = "GET /not.byn";
+                    _hub.dbglog(4, "request /not.byn");
                 } else {
                     notUrl = String.format(Locale.US, "GET /not.byn?abs=%d", _notifyPos);
+                    _hub.dbglog(4, String.format("request /not.byn?abs=%d", _notifyPos));
                 }
-                // no request timeout for notifcations
+                // no request timeout for notifications
                 yreq._requestStart(notUrl, null, 0, null, null);
-                set_connectionState(YHub.CONNECTED);
+                _hub.set_connectionState(YHub.CONNECTED);
                 String fifo = "";
                 do {
                     byte[] partial;
@@ -79,21 +83,21 @@ class TCPNotificationHandler extends NotificationHandler
                         fifo = fifo.substring(pos + 1);
                     } while (pos >= 0);
                     _error_delay = 0;
-                } while (!Thread.currentThread().isInterrupted());
+                } while (_hub.workerThreadMustContinue());
                 yreq._requestStop();
                 yreq._requestRelease();
             } catch (YAPI_Exception ex) {
                 if (ex.errorType == YAPI.UNAUTHORIZED || ex.errorType == YAPI.SSL_UNK_CERT) {
                     break;
                 } else {
-                    set_connectionState(YHub.RECONNECTING);
+                    _hub.set_connectionState(YHub.RECONNECTING);
                 }
                 _notifRetryCount++;
                 _hub._isNotifWorking = false;
                 _error_delay = 100 << (_notifRetryCount > 4 ? 4 : _notifRetryCount);
             }
         }
-        set_connectionState(YHub.ABORTED);
+        _hub.set_connectionState(YHub.ABORTED);
         yreq._requestStop();
         yreq._requestRelease();
     }
@@ -138,17 +142,6 @@ class TCPNotificationHandler extends NotificationHandler
     void stopSocketsOfThread()
     {
 
-    }
-
-
-    public boolean isConnected()
-    {
-        if (_sendPingNotification) {
-            return (_lastPing + NET_HUB_NOT_CONNECTION_TIMEOUT) > System.currentTimeMillis();
-        } else {
-            int c_state = get_connectionState();
-            return c_state == YHub.TRYING || c_state == YHub.CONNECTED || c_state == YHub.RECONNECTING;
-        }
     }
 
     @Override

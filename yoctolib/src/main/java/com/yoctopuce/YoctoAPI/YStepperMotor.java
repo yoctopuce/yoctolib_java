@@ -1178,7 +1178,7 @@ public class YStepperMotor extends YFunction
     {
         String id;
         String url;
-        byte[] retBin = new byte[0];
+        byte[] retBin;
         int res;
         id = get_functionId();
         id = (id).substring(12, 12 + 1);

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 @SuppressWarnings("unused")
-abstract class NotificationHandler implements Runnable
+abstract class NotificationHandler
 {
     private final static char NOTIFY_NETPKT_NAME = '0';
     private final static char NOTIFY_NETPKT_CHILD = '2';
@@ -22,42 +22,21 @@ abstract class NotificationHandler implements Runnable
     private final static char NOTIFY_NETPKT_NOT_SYNC = '@';
     private final static char NOTIFY_NETPKT_LOG = '7';
     private static final int NOTIFY_NETPKT_STOP = 10;
-    static final int NET_HUB_NOT_CONNECTION_TIMEOUT = 6000;
 
 
     long _notifyPos = -1;
     int _notifRetryCount = 0;
     int _error_delay = 0;
-    boolean _sendPingNotification = false;
-    long _lastPing = 0;
-    private volatile int _connectionState = YHub.UNREGISTERED;
-
 
     final YHTTPHub _hub;
 
-
-    public synchronized int get_connectionState()
-    {
-        if (_sendPingNotification && (_lastPing + NET_HUB_NOT_CONNECTION_TIMEOUT) > System.currentTimeMillis()) {
-            // if we have ping notifications working and valid do not check _connectionState.
-            // this prevents potential trying and reconnecting value that occurs periodically with VirtualHub-4web
-            return YHub.CONNECTED;
-        }
-        //System.out.println(String.format("%s get connection state %s.", this.toString(), _connectionState));
-        return _connectionState;
-    }
-
-    public synchronized void set_connectionState(int connectionState)
-    {
-        //System.out.println(String.format("%s Setting connection state to %s (was %d).", this.toString(), connectionState, this._connectionState));
-        this._connectionState = connectionState;
-    }
 
     NotificationHandler(YHTTPHub hub)
     {
         _hub = hub;
     }
 
+    abstract public void run(long expriation);
 
     abstract String getThreadLabel();
 
@@ -107,10 +86,10 @@ abstract class NotificationHandler implements Runnable
     void handleNetNotification(String notification_line)
     {
         String ev = notification_line.trim();
-        _lastPing = System.currentTimeMillis();
+        _hub._lastPing = System.currentTimeMillis();
         if ("".equals(ev)) {
             //drop ping notification
-            _sendPingNotification = true;
+            _hub._sendPingNotification = true;
             return;
         }
         if (ev.length() >= 3 && ev.charAt(0) >= NOTIFY_NETPKT_CONFCHGYDX && ev.charAt(0) <= NOTIFY_NETPKT_TIMEAVGYDX) {
@@ -276,8 +255,6 @@ abstract class NotificationHandler implements Runnable
     abstract boolean waitAndFreeAsyncTasks(long timeout) throws InterruptedException;
 
     abstract void stopSocketsOfThread();
-
-    abstract boolean isConnected();
 
     abstract boolean hasRwAccess();
 

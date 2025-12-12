@@ -66,9 +66,9 @@ public class YRfidTagInfo
     public static final int IEC_14443_NTAG_215 = 8;
     public static final int IEC_14443_NTAG_216 = 9;
     public static final int IEC_14443_NTAG_424_DNA = 10;
-    protected String _tagId;
+    protected String _tagId = "";
     protected int _tagType = 0;
-    protected String _typeStr;
+    protected String _typeStr = "";
     protected int _size = 0;
     protected int _usable = 0;
     protected int _blksize = 0;

@@ -1,6 +1,11 @@
-Java v2.1.9018
+Java v2.1.10736
 
-- Fix parsing of URL with user but no password
-- Fix undetected device unplug in case only set_XXX functions were used
+- Add YFiles.get_content_crc method
+- Reduce network traffic during enumeration
+- Prevent setting passwords with unsupported characters (@ and /)
+- Fix unplug of device that was not correctly detected the app only execute set_XXX functions
 - Fix some incorrect timeouts when hubs are offline
-- Improve error message when using RegisterHub on non configured hubs
+- Fix parsing of URL with user but no password
+- Fix timeout on YAPI.PreregisterHub method
+- Fix Prog-FirmwareUpdate example to properly handle VirtualHub-4web and VirtualHub-V2
+- Fix behavior of YSerialPort.readByte when there is no data available

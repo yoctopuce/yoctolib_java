@@ -79,7 +79,7 @@ public class Demo
                     shield.add(serial);
                 } else if (product.startsWith("YoctoHub")) {
                     hubs.add(serial);
-                } else if (!product.equals("VirtualHub")) {
+                } else if (!product.startsWith("VirtualHub")) {
                     devices.add(serial);
                 }
                 module = module.nextModule();

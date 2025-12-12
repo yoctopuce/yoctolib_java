@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI_Exception.java 25362 2016-09-16 08:23:48Z seb $
+ * $Id: YAPI_Exception.java 69316 2025-10-03 09:24:07Z seb $
  *
  * Class used to report exceptions within Yocto-API
  *
@@ -42,7 +42,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
-public class YAPI_Exception extends Exception {
+public class YAPI_Exception extends Exception
+{
 
     protected String _subStackTrace = "";
     private Exception _subExeptions = null;
@@ -99,5 +100,15 @@ public class YAPI_Exception extends Exception {
         }
 
         return _subStackTrace + writer.toString();
+    }
+
+
+    @Override
+    public void printStackTrace()
+    {
+        if (_subExeptions != null) {
+            _subExeptions.printStackTrace();
+        }
+        super.printStackTrace();
     }
 }

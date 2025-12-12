@@ -38,6 +38,7 @@
  */
 
 package com.yoctopuce.YoctoAPI;
+import java.util.Locale;
 
 //--- (YColorSensor return codes)
 //--- (end of YColorSensor return codes)
@@ -83,6 +84,10 @@ public class YColorSensor extends YFunction
      * invalid gain value
      */
     public static final int GAIN_INVALID = YAPI.INVALID_UINT;
+    /**
+     * invalid autoGain value
+     */
+    public static final String AUTOGAIN_INVALID = YAPI.INVALID_STRING;
     /**
      * invalid saturation value
      */
@@ -144,6 +149,7 @@ public class YColorSensor extends YFunction
     protected int _ledCalibration = LEDCALIBRATION_INVALID;
     protected int _integrationTime = INTEGRATIONTIME_INVALID;
     protected int _gain = GAIN_INVALID;
+    protected String _autoGain = AUTOGAIN_INVALID;
     protected int _saturation = SATURATION_INVALID;
     protected int _estimatedRGB = ESTIMATEDRGB_INVALID;
     protected int _estimatedHSL = ESTIMATEDHSL_INVALID;
@@ -228,6 +234,9 @@ public class YColorSensor extends YFunction
         }
         if (json_val.has("gain")) {
             _gain = json_val.getInt("gain");
+        }
+        if (json_val.has("autoGain")) {
+            _autoGain = json_val.getString("autoGain");
         }
         if (json_val.has("saturation")) {
             _saturation = json_val.getInt("saturation");
@@ -719,6 +728,74 @@ public class YColorSensor extends YFunction
     public int setGain(int newval)  throws YAPI_Exception
     {
         return set_gain(newval);
+    }
+
+    /**
+     * Returns the current autogain parameters of the sensor as a character string.
+     * The returned parameter format is: "Min &lt; Channel &lt; Max:Saturation".
+     *
+     * @return a string corresponding to the current autogain parameters of the sensor as a character string
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_autoGain() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return AUTOGAIN_INVALID;
+                }
+            }
+            res = _autoGain;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the current autogain parameters of the sensor as a character string.
+     * The returned parameter format is: "Min &lt; Channel &lt; Max:Saturation".
+     *
+     * @return a string corresponding to the current autogain parameters of the sensor as a character string
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getAutoGain() throws YAPI_Exception
+    {
+        return get_autoGain();
+    }
+
+    /**
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     * @param newval : a string
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_autoGain(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("autoGain",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     * @param newval : a string
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setAutoGain(String newval)  throws YAPI_Exception
+    {
+        return set_autoGain(newval);
     }
 
     /**
@@ -1289,6 +1366,32 @@ public class YColorSensor extends YFunction
             super._invokeValueCallback(value);
         }
         return 0;
+    }
+
+    /**
+     * Changes the sensor automatic gain control settings.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     * @param channel : reference channel to use for automated gain control.
+     * @param minRaw : lower threshold for the measured raw value, below which the gain is
+     *         automatically increased as long as possible.
+     * @param maxRaw : high threshold for the measured raw value, over which the gain is
+     *         automatically decreased as long as possible.
+     * @param noSatur : enables gain reduction in case of sensor saturation.
+     *
+     * @return YAPI.SUCCESS if the operation completes successfully.
+     * @throws YAPI_Exception on error
+     */
+    public int configureAutoGain(String channel,int minRaw,int maxRaw,boolean noSatur) throws YAPI_Exception
+    {
+        String opt;
+        if (noSatur) {
+            opt = "nosat";
+        } else {
+            opt = "";
+        }
+
+        return set_autoGain(String.format(Locale.US, "%d < %s < %d:%s",minRaw,channel,maxRaw,opt));
     }
 
     /**

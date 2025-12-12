@@ -251,47 +251,55 @@ class YJSONObject extends YJSONContent
         return res.toString();
     }
 
-    public void parseWithRef(YJSONObject reference) throws Exception
-    {
-        if (reference != null) {
-            try {
-                YJSONArray yzon = new YJSONArray(_data, _data_start, _data_boundary);
-                yzon.parse();
-                convert(reference, yzon);
-                return;
-            } catch (Exception ignored) {
-
-            }
-        }
-        this.parse();
-    }
-
-    private void convert(YJSONObject reference, YJSONArray newArray) throws Exception
-    {
-        int length = newArray.length();
-        for (int i = 0; i < length; i++) {
-            String key = reference.getKeyFromIdx(i);
-            YJSONContent new_item = newArray.get(i);
-            YJSONContent reference_item = reference.get(key);
-
-            if (new_item.getJSONType() == reference_item.getJSONType()) {
-                _parsed.put(key, new_item);
-                _keys.add(key);
-            } else if (new_item.getJSONType() == YJSONType.ARRAY && reference_item.getJSONType() == YJSONType.OBJECT) {
-                YJSONObject jobj = new YJSONObject(new_item._data, new_item._data_start, reference_item._data_boundary);
-                jobj.convert((YJSONObject) reference_item, (YJSONArray) new_item);
-                _parsed.put(key, jobj);
-                _keys.add(key);
-            } else {
-                throw new Exception(String.format("Unable to convert %s to %s",
-                        new_item.getJSONType().toString(), reference.getJSONType().toString()));
-
-            }
-        }
-    }
-
-    private String getKeyFromIdx(int i)
+    String getKeyFromIdx(int i)
     {
         return _keys.get(i);
+    }
+
+
+    @Override
+    YJSONContent updateFroJZon(YJSONContent newItem) throws Exception
+    {
+        YJSONType newItemJSONType = newItem.getJSONType();
+        if (newItemJSONType != YJSONType.ARRAY && newItemJSONType != YJSONType.OBJECT) {
+            throw new Exception(String.format("Unable to convert %s to %s",
+                    newItem.getJSONType().toString(), getJSONType().toString()));
+        }
+        YJSONObject result = new YJSONObject(newItem._data, newItem._data_start, newItem._data_boundary);
+        if (newItemJSONType == YJSONType.ARRAY) {
+            YJSONArray jzonArr = (YJSONArray) newItem;
+            for (int i = 0; i < jzonArr.length(); i++) {
+                String key = this.getKeyFromIdx(i);
+                YJSONContent jzonContent = jzonArr.get(i);
+                YJSONContent updatedContent = _parsed.get(key).updateFroJZon(jzonContent);
+                result._keys.add(key);
+                result._parsed.put(key, updatedContent);
+            }
+        } else {
+            YJSONObject newObj = (YJSONObject) newItem;
+            if (_keys.size() == 0) {
+                throw new Exception(String.format("Unable to convert %s to %s (empty object)",
+                        newItem.getJSONType().toString(), getJSONType().toString()));
+            }
+            YJSONContent first_reference = _parsed.get(_keys.get(0));
+            for (String key : newObj._keys) {
+                YJSONContent jzonContent = newObj.get(key);
+                YJSONContent updatedContent;
+                if (_keys.contains(key)) {
+                    YJSONContent jsonContent = _parsed.get(key);
+                    if (jsonContent.getJSONType() == YJSONType.ARRAY && ((YJSONArray) jsonContent).length() == 0) {
+                        // special case for yellow page. Use first function type as ref
+                        updatedContent = first_reference.updateFroJZon(jzonContent);
+                    } else {
+                        updatedContent = jsonContent.updateFroJZon(jzonContent);
+                    }
+                } else {
+                    updatedContent = first_reference.updateFroJZon(jzonContent);
+                }
+                result._keys.add(key);
+                result._parsed.put(key, updatedContent);
+            }
+        }
+        return result;
     }
 }

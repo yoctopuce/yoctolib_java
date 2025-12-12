@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 67383 2025-06-11 05:44:27Z mvuilleu $
+ * $Id: YSerialPort.java 70736 2025-12-12 07:53:30Z mvuilleu $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -1128,7 +1128,7 @@ public class YSerialPort extends YFunction
     public String readLine() throws YAPI_Exception
     {
         String url;
-        byte[] msgbin = new byte[0];
+        byte[] msgbin;
         ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1174,7 +1174,7 @@ public class YSerialPort extends YFunction
     public ArrayList<String> readMessages(String pattern,int maxWait) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin = new byte[0];
+        byte[] msgbin;
         ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         ArrayList<String> res = new ArrayList<>();
@@ -1234,7 +1234,7 @@ public class YSerialPort extends YFunction
         String availPosStr;
         int atPos;
         int res;
-        byte[] databin = new byte[0];
+        byte[] databin;
 
         databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         availPosStr = new String(databin, _yapi._deviceCharset);
@@ -1248,7 +1248,7 @@ public class YSerialPort extends YFunction
         String availPosStr;
         int atPos;
         int res;
-        byte[] databin = new byte[0];
+        byte[] databin;
 
         databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         availPosStr = new String(databin, _yapi._deviceCharset);
@@ -1273,7 +1273,7 @@ public class YSerialPort extends YFunction
     {
         int prevpos;
         String url;
-        byte[] msgbin = new byte[0];
+        byte[] msgbin;
         ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1320,7 +1320,7 @@ public class YSerialPort extends YFunction
     {
         int prevpos;
         String url;
-        byte[] msgbin = new byte[0];
+        byte[] msgbin;
         ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1425,7 +1425,7 @@ public class YSerialPort extends YFunction
      */
     public int writeStr(String text) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int idx;
         int ch;
@@ -1476,7 +1476,7 @@ public class YSerialPort extends YFunction
      */
     public int writeArray(ArrayList<Integer> byteList) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int idx;
         int hexb;
@@ -1505,7 +1505,7 @@ public class YSerialPort extends YFunction
      */
     public int writeHex(String hexString) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int idx;
         int hexb;
@@ -1538,7 +1538,7 @@ public class YSerialPort extends YFunction
      */
     public int writeLine(String text) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int idx;
         int ch;
@@ -1577,7 +1577,7 @@ public class YSerialPort extends YFunction
     {
         int currpos;
         int reqlen;
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int mult;
         int endpos;
@@ -1594,7 +1594,8 @@ public class YSerialPort extends YFunction
         reqlen = 1024;
         buff = readBin(reqlen);
         bufflen = (buff).length;
-        if (_rxptr == currpos+bufflen) {
+        if ((bufflen > 0) && (_rxptr == currpos+bufflen)) {
+            // up to 1024 bytes in buffer, all in direction Rx
             res = (buff[0] & 0xff);
             _rxptr = currpos+1;
             _rxbuffptr = currpos;
@@ -1606,7 +1607,8 @@ public class YSerialPort extends YFunction
         reqlen = 16;
         buff = readBin(reqlen);
         bufflen = (buff).length;
-        if (_rxptr == currpos+bufflen) {
+        if ((bufflen > 0) && (_rxptr == currpos+bufflen)) {
+            // up to 16 bytes in buffer, all in direction Rx
             res = (buff[0] & 0xff);
             _rxptr = currpos+1;
             _rxbuffptr = currpos;
@@ -1646,7 +1648,7 @@ public class YSerialPort extends YFunction
      */
     public String readStr(int nChars) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int mult;
         int endpos;
@@ -1682,12 +1684,12 @@ public class YSerialPort extends YFunction
      */
     public byte[] readBin(int nChars) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int mult;
         int endpos;
         int idx;
-        byte[] res = new byte[0];
+        byte[] res;
         if (nChars > 65535) {
             nChars = 65535;
         }
@@ -1724,7 +1726,7 @@ public class YSerialPort extends YFunction
      */
     public ArrayList<Integer> readArray(int nChars) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int mult;
         int endpos;
@@ -1768,7 +1770,7 @@ public class YSerialPort extends YFunction
      */
     public String readHex(int nBytes) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int mult;
         int endpos;
@@ -1843,7 +1845,7 @@ public class YSerialPort extends YFunction
      */
     public int get_CTS() throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int res;
 
         buff = _download("cts.txt");
@@ -1873,7 +1875,7 @@ public class YSerialPort extends YFunction
     public ArrayList<YSnoopingRecord> snoopMessagesEx(int maxWait,int maxMsg) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin = new byte[0];
+        byte[] msgbin;
         ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         ArrayList<YSnoopingRecord> res = new ArrayList<>();
@@ -1948,7 +1950,7 @@ public class YSerialPort extends YFunction
     public int _internalEventHandler(String advstr) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin = new byte[0];
+        byte[] msgbin;
         ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         int idx;
@@ -1992,7 +1994,7 @@ public class YSerialPort extends YFunction
      */
     public int writeStxEtx(String text) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         buff = (String.format(Locale.US, "%c%s%c",2,text,3)).getBytes(_yapi._deviceCharset);
         // send string using file upload
         return _upload("txdata", buff);
@@ -2035,7 +2037,7 @@ public class YSerialPort extends YFunction
         int prevpos;
         String url;
         String pat;
-        byte[] msgs = new byte[0];
+        byte[] msgs;
         ArrayList<byte[]> reps = new ArrayList<>();
         String rep;
         ArrayList<Integer> res = new ArrayList<>();

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 68744 2025-09-03 09:51:29Z seb $
+ * $Id: yHTTPRequest.java 69338 2025-10-08 07:57:22Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -87,13 +87,13 @@ class yHTTPRequest implements Runnable
         _dbglabel = dbglabel;
     }
 
-    static byte[] yTcpDownloadEx(String host, int port, String path) throws YAPI_Exception
+    static byte[] yTcpDownloadEx(String host, int port, String path, int timeout) throws YAPI_Exception
     {
         try {
             InetAddress addr = InetAddress.getByName(host);
             Socket socket = new Socket();
             SocketAddress sockaddr = new InetSocketAddress(addr, port);
-            socket.connect(sockaddr);
+            socket.connect(sockaddr, timeout);
             String request = String.format("GET %s HTTP/1.1\r\n", path);
             request += String.format("Host: %s\r\nConnection: close\r\n", host);
             request += "Accept-Encoding:\r\nUser-Agent: Yoctopuce\r\n\r\n";
@@ -116,9 +116,9 @@ class yHTTPRequest implements Runnable
         }
     }
 
-    static byte[] yTcpDownload(YAPIContext ctx, String host, int port, String path) throws YAPI_Exception
+    static byte[] yTcpDownload(YAPIContext ctx, String host, int port, String path, int timeout) throws YAPI_Exception
     {
-        byte[] raw = yTcpDownloadEx(host, port, path);
+        byte[] raw = yTcpDownloadEx(host, port, path, timeout);
         String str_raw = new String(raw);
         int pos = str_raw.indexOf("\r\n\r\n");
         if (pos <= 0) {
@@ -149,7 +149,7 @@ class yHTTPRequest implements Runnable
                 if (new_url.startsWith("http")) {
                     return ctx.BasicHTTPRequest(new_url, YHTTPHub.YIO_DEFAULT_TCP_TIMEOUT, 0);
                 } else {
-                    return yTcpDownload(ctx, host, port, new_url);
+                    return yTcpDownload(ctx, host, port, new_url, timeout);
                 }
             }
         }

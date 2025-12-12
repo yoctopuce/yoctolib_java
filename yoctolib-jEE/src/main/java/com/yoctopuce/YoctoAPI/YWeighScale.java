@@ -906,7 +906,7 @@ public class YWeighScale extends YSensor
     public int loadCompensationTable(int tableIndex,ArrayList<Double> tempValues,ArrayList<Double> compValues) throws YAPI_Exception
     {
         String id;
-        byte[] bin_json = new byte[0];
+        byte[] bin_json;
         ArrayList<byte[]> paramlist = new ArrayList<>();
         int siz;
         int idx;

@@ -404,7 +404,7 @@ public class YArithmeticSensor extends YSensor
         String id;
         String fname;
         String content;
-        byte[] data = new byte[0];
+        byte[] data;
         String diags;
         double resval;
         id = get_functionId();
@@ -506,7 +506,7 @@ public class YArithmeticSensor extends YSensor
     public int loadAuxiliaryFunction(String name,ArrayList<Double> inputValues,ArrayList<Double> outputValues) throws YAPI_Exception
     {
         String fname;
-        byte[] defbin = new byte[0];
+        byte[] defbin;
         int siz;
 
         fname = String.format(Locale.US, "userMap%s.txt",name);

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSensor.java 67627 2025-06-20 14:29:43Z mvuilleu $
+ * $Id: YSensor.java 69225 2025-09-23 07:25:53Z seb $
  *
  * Implements yFindSensor(), the high-level API for Sensor functions
  *
@@ -60,7 +60,7 @@ import java.util.Locale;
 public class YSensor extends YFunction
 {
 //--- (end of generated code: YSensor class start)
-
+    protected YCalibCtx _cal = null;
     //--- (generated code: YSensor definitions)
     /**
      * invalid unit value
@@ -123,16 +123,8 @@ public class YSensor extends YFunction
     protected int _sensorState = SENSORSTATE_INVALID;
     protected UpdateCallback _valueCallbackSensor = null;
     protected TimedReportCallback _timedReportCallbackSensor = null;
-    protected double _prevTimedReport = 0;
+    protected double _prevTR = 0;
     protected double _iresol = 0;
-    protected double _offset = 0;
-    protected double _scale = 0;
-    protected double _decexp = 0;
-    protected int _caltyp = 0;
-    protected ArrayList<Integer> _calpar = new ArrayList<>();
-    protected ArrayList<Double> _calraw = new ArrayList<>();
-    protected ArrayList<Double> _calref = new ArrayList<>();
-    protected YAPI.CalibrationHandlerCallback _calhdl;
 
     /**
      * Deprecated UpdateCallback for Sensor
@@ -384,12 +376,15 @@ public class YSensor extends YFunction
                     return CURRENTVALUE_INVALID;
                 }
             }
-            res = _applyCalibration(_currentRawValue);
-            if (res == CURRENTVALUE_INVALID) {
+            if (_cal == null) {
                 res = _currentValue;
+            } else {
+                res = _applyCalibration(_currentRawValue);
             }
-            res = res * _iresol;
-            res = (double)Math.round(res) / _iresol;
+            if (res == CURRENTVALUE_INVALID) {
+                return res;
+            }
+            res = (double)Math.round(res * _iresol) / _iresol;
         }
         return res;
     }
@@ -467,8 +462,7 @@ public class YSensor extends YFunction
                     return LOWESTVALUE_INVALID;
                 }
             }
-            res = _lowestValue * _iresol;
-            res = (double)Math.round(res) / _iresol;
+            res = (double)Math.round(_lowestValue * _iresol) / _iresol;
         }
         return res;
     }
@@ -540,8 +534,7 @@ public class YSensor extends YFunction
                     return HIGHESTVALUE_INVALID;
                 }
             }
-            res = _highestValue * _iresol;
-            res = (double)Math.round(res) / _iresol;
+            res = (double)Math.round(_highestValue * _iresol) / _iresol;
         }
         return res;
     }
@@ -1103,120 +1096,22 @@ public class YSensor extends YFunction
     @Override
     public int _parserHelper()
     {
-        int position;
-        int maxpos;
-        ArrayList<Integer> iCalib = new ArrayList<>();
-        int iRaw;
-        int iRef;
-        double fRaw;
-        double fRef;
-        _caltyp = -1;
-        _scale = -1;
-        _calpar.clear();
-        _calraw.clear();
-        _calref.clear();
+        String calibStr;
         // Store inverted resolution, to provide better rounding
         if (_resolution > 0) {
             _iresol = (double)Math.round(1.0 / _resolution);
         } else {
             _iresol = 10000;
-            _resolution = 0.0001;
         }
-        // Old format: supported when there is no calibration
-        if (_calibrationParam.equals("") || _calibrationParam.equals("0")) {
-            _caltyp = 0;
+        // Shortcut when there is no calibration parameter
+        calibStr = _calibrationParam;
+        if (calibStr.equals("0,") || calibStr.equals("") || calibStr.equals("0")) {
+            _cal = null;
             return 0;
         }
-        if (_calibrationParam.indexOf(",") >= 0) {
-            // Plain text format
-            iCalib = YAPIContext._decodeFloats(_calibrationParam);
-            _caltyp = (iCalib.get(0).intValue() / 1000);
-            if (_caltyp > 0) {
-                if (_caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
-                    // Unknown calibration type: calibrated value will be provided by the device
-                    _caltyp = -1;
-                    return 0;
-                }
-                _calhdl = _yapi._getCalibrationHandler(_caltyp);
-                if (!(_calhdl != null)) {
-                    // Unknown calibration type: calibrated value will be provided by the device
-                    _caltyp = -1;
-                    return 0;
-                }
-            }
-            // New 32 bits text format
-            _offset = 0;
-            _scale = 1000;
-            maxpos = iCalib.size();
-            _calpar.clear();
-            position = 1;
-            while (position < maxpos) {
-                _calpar.add(iCalib.get(position));
-                position = position + 1;
-            }
-            _calraw.clear();
-            _calref.clear();
-            position = 1;
-            while (position + 1 < maxpos) {
-                fRaw = iCalib.get(position).doubleValue();
-                fRaw = fRaw / 1000.0;
-                fRef = iCalib.get(position + 1).doubleValue();
-                fRef = fRef / 1000.0;
-                _calraw.add(fRaw);
-                _calref.add(fRef);
-                position = position + 2;
-            }
-        } else {
-            // Recorder-encoded format, including encoding
-            iCalib = YAPIContext._decodeWords(_calibrationParam);
-            // In case of unknown format, calibrated value will be provided by the device
-            if (iCalib.size() < 2) {
-                _caltyp = -1;
-                return 0;
-            }
-            // Save variable format (scale for scalar, or decimal exponent)
-            _offset = 0;
-            _scale = 1;
-            _decexp = 1.0;
-            position = iCalib.get(0).intValue();
-            while (position > 0) {
-                _decexp = _decexp * 10;
-                position = position - 1;
-            }
-            // Shortcut when there is no calibration parameter
-            if (iCalib.size() == 2) {
-                _caltyp = 0;
-                return 0;
-            }
-            _caltyp = iCalib.get(2).intValue();
-            _calhdl = _yapi._getCalibrationHandler(_caltyp);
-            // parse calibration points
-            if (_caltyp <= 10) {
-                maxpos = _caltyp;
-            } else {
-                if (_caltyp <= 20) {
-                    maxpos = _caltyp - 10;
-                } else {
-                    maxpos = 5;
-                }
-            }
-            maxpos = 3 + 2 * maxpos;
-            if (maxpos > iCalib.size()) {
-                maxpos = iCalib.size();
-            }
-            _calpar.clear();
-            _calraw.clear();
-            _calref.clear();
-            position = 3;
-            while (position + 1 < maxpos) {
-                iRaw = iCalib.get(position).intValue();
-                iRef = iCalib.get(position + 1).intValue();
-                _calpar.add(iRaw);
-                _calpar.add(iRef);
-                _calraw.add(YAPIContext._decimalToDouble(iRaw));
-                _calref.add(YAPIContext._decimalToDouble(iRef));
-                position = position + 2;
-            }
+        // Parse calibration parameters only if they have changed
+        if (_cal == null || !(_cal.src.equals(calibStr))) {
+            _parseCalibStr(calibStr);
         }
         return 0;
     }
@@ -1231,10 +1126,11 @@ public class YSensor extends YFunction
      */
     public boolean isSensorReady()
     {
-        if (!(isOnline())) {
-            return false;
-        }
-        if (!(_sensorState == 0)) {
+        try {
+            if (get_sensorState() != 0) {
+                return false;
+            }
+        } catch (Exception ex) {
             return false;
         }
         return true;
@@ -1264,6 +1160,101 @@ public class YSensor extends YFunction
         return logger;
     }
 
+    public int _parseCalibStr(String calibStr)
+    {
+        ArrayList<Integer> iCalib;
+        int caltyp;
+        YAPI.CalibrationHandlerCallback calhdl;
+        int maxpos;
+        int position;
+        ArrayList<Integer> calpar = new ArrayList<>();
+        ArrayList<Double> calraw = new ArrayList<>();
+        ArrayList<Double> calref = new ArrayList<>();
+        double fRaw;
+        double fRef;
+        int iRaw;
+        int iRef;
+        if (calibStr.indexOf(",") >= 0) {
+            // Plain text format
+            iCalib = YAPIContext._decodeFloats(calibStr);
+            caltyp = (iCalib.get(0).intValue() / 1000);
+            if (caltyp < YAPI.YOCTO_CALIB_TYPE_OFS) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                _cal = null;
+                return YAPI.SUCCESS;
+            }
+            calhdl = _yapi._getCalibrationHandler(caltyp);
+            if (!(calhdl != null)) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                _cal = null;
+                return YAPI.SUCCESS;
+            }
+            // New 32 bits text format
+            maxpos = iCalib.size();
+            calpar.clear();
+            position = 1;
+            while (position < maxpos) {
+                calpar.add(iCalib.get(position));
+                position = position + 1;
+            }
+            calraw.clear();
+            calref.clear();
+            position = 1;
+            while (position + 1 < maxpos) {
+                fRaw = iCalib.get(position).doubleValue();
+                fRaw = fRaw / 1000.0;
+                fRef = iCalib.get(position + 1).doubleValue();
+                fRef = fRef / 1000.0;
+                calraw.add(fRaw);
+                calref.add(fRef);
+                position = position + 2;
+            }
+        } else {
+            // Old recorder-encoded format, including encoding
+            iCalib = YAPIContext._decodeWords(calibStr);
+            if (iCalib.size() <= 2) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                _cal = null;
+                return YAPI.SUCCESS;
+            }
+            caltyp = iCalib.get(2).intValue();
+            calhdl = _yapi._getCalibrationHandler(caltyp);
+            if (!(calhdl != null)) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                _cal = null;
+                return YAPI.SUCCESS;
+            }
+            if (caltyp <= 10) {
+                maxpos = caltyp;
+            } else {
+                if (caltyp <= 20) {
+                    maxpos = caltyp - 10;
+                } else {
+                    maxpos = 5;
+                }
+            }
+            maxpos = 3 + 2 * maxpos;
+            if (maxpos > iCalib.size()) {
+                maxpos = iCalib.size();
+            }
+            calpar.clear();
+            calraw.clear();
+            calref.clear();
+            position = 3;
+            while (position + 1 < maxpos) {
+                iRaw = iCalib.get(position).intValue();
+                iRef = iCalib.get(position + 1).intValue();
+                calpar.add(iRaw);
+                calpar.add(iRef);
+                calraw.add(YAPIContext._decimalToDouble(iRaw));
+                calref.add(YAPIContext._decimalToDouble(iRef));
+                position = position + 2;
+            }
+        }
+        _cal = new YCalibCtx(calibStr, calhdl, caltyp, calpar, calraw, calref);
+        return YAPI.SUCCESS;
+    }
+
     /**
      * Starts the data logger on the device. Note that the data logger
      * will only save the measures on this sensor if the logFrequency
@@ -1273,7 +1264,7 @@ public class YSensor extends YFunction
      */
     public int startDataLogger() throws YAPI_Exception
     {
-        byte[] res = new byte[0];
+        byte[] res;
 
         res = _download("api/dataLogger/recording?recording=1");
         //noinspection DoubleNegation
@@ -1288,7 +1279,7 @@ public class YSensor extends YFunction
      */
     public int stopDataLogger() throws YAPI_Exception
     {
-        byte[] res = new byte[0];
+        byte[] res;
 
         res = _download("api/dataLogger/recording?recording=0");
         //noinspection DoubleNegation
@@ -1417,21 +1408,20 @@ public class YSensor extends YFunction
         refValues.clear();
         // Load function parameters if not yet loaded
         synchronized (this) {
-            if ((_scale == 0) || (_cacheExpiration <= YAPIContext.GetTickCount())) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
                 if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
                     return YAPI.DEVICE_NOT_FOUND;
                 }
             }
-            if (_caltyp < 0) {
-                _throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
-                return YAPI.NOT_SUPPORTED;
+            if (_cal == null) {
+                return YAPI.SUCCESS;
             }
             rawValues.clear();
             refValues.clear();
-            for (double ii_0:_calraw) {
+            for (double ii_0:_cal.raw) {
                 rawValues.add(ii_0);
             }
-            for (double ii_1:_calref) {
+            for (double ii_1:_cal.cal) {
                 refValues.add(ii_1);
             }
         }
@@ -1452,18 +1442,7 @@ public class YSensor extends YFunction
         if (npt == 0) {
             return "0";
         }
-        // Load function parameters if not yet loaded
-        if (_scale == 0) {
-            if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
-                return YAPI.INVALID_STRING;
-            }
-        }
-        // Detect old firmware
-        if ((_caltyp < 0) || (_scale < 0)) {
-            _throw(YAPI.NOT_SUPPORTED, "Calibration parameters format mismatch. Please upgrade your library or firmware.");
-            return "0";
-        }
-        // 32-bit fixed-point encoding
+        // Encode using newer 32-bit fixed-point method
         res = String.format(Locale.US, "%d",YAPI.YOCTO_CALIB_TYPE_OFS);
         idx = 0;
         while (idx < npt) {
@@ -1475,19 +1454,13 @@ public class YSensor extends YFunction
 
     public double _applyCalibration(double rawValue)
     {
+        if (_cal == null) {
+            return rawValue;
+        }
         if (rawValue == CURRENTVALUE_INVALID) {
             return CURRENTVALUE_INVALID;
         }
-        if (_caltyp == 0) {
-            return rawValue;
-        }
-        if (_caltyp < 0) {
-            return CURRENTVALUE_INVALID;
-        }
-        if (!(_calhdl != null)) {
-            return CURRENTVALUE_INVALID;
-        }
-        return _calhdl.yCalibrationHandler(rawValue, _caltyp, _calpar, _calraw, _calref);
+        return _cal.hdl.yCalibrationHandler(rawValue, _cal.typ, _cal.par, _cal.raw, _cal.cal);
     }
 
     public YMeasure _decodeTimedReport(double timestamp,double duration,ArrayList<Integer> report)
@@ -1508,10 +1481,10 @@ public class YSensor extends YFunction
         if (duration > 0) {
             startTime = timestamp - duration;
         } else {
-            startTime = _prevTimedReport;
+            startTime = _prevTR;
         }
         endTime = timestamp;
-        _prevTimedReport = endTime;
+        _prevTR = endTime;
         if (startTime == 0) {
             startTime = endTime;
         }
@@ -1532,10 +1505,8 @@ public class YSensor extends YFunction
                 avgRaw = avgRaw - poww;
             }
             avgVal = avgRaw / 1000.0;
-            if (_caltyp != 0) {
-                if (_calhdl != null) {
-                    avgVal = _calhdl.yCalibrationHandler(avgVal, _caltyp, _calpar, _calraw, _calref);
-                }
+            if (!(_cal == null)) {
+                avgVal = _cal.hdl.yCalibrationHandler(avgVal, _cal.typ, _cal.par, _cal.raw, _cal.cal);
             }
             minVal = avgVal;
             maxVal = avgVal;
@@ -1581,12 +1552,10 @@ public class YSensor extends YFunction
             avgVal = avgRaw / 1000.0;
             minVal = minRaw / 1000.0;
             maxVal = maxRaw / 1000.0;
-            if (_caltyp != 0) {
-                if (_calhdl != null) {
-                    avgVal = _calhdl.yCalibrationHandler(avgVal, _caltyp, _calpar, _calraw, _calref);
-                    minVal = _calhdl.yCalibrationHandler(minVal, _caltyp, _calpar, _calraw, _calref);
-                    maxVal = _calhdl.yCalibrationHandler(maxVal, _caltyp, _calpar, _calraw, _calref);
-                }
+            if (!(_cal == null)) {
+                avgVal = _cal.hdl.yCalibrationHandler(avgVal, _cal.typ, _cal.par, _cal.raw, _cal.cal);
+                minVal = _cal.hdl.yCalibrationHandler(minVal, _cal.typ, _cal.par, _cal.raw, _cal.cal);
+                maxVal = _cal.hdl.yCalibrationHandler(maxVal, _cal.typ, _cal.par, _cal.raw, _cal.cal);
             }
         }
         return new YMeasure(startTime, endTime, minVal, avgVal, maxVal);
@@ -1596,10 +1565,8 @@ public class YSensor extends YFunction
     {
         double val;
         val = w;
-        if (_caltyp != 0) {
-            if (_calhdl != null) {
-                val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
-            }
+        if (!(_cal == null)) {
+            val = _cal.hdl.yCalibrationHandler(val, _cal.typ, _cal.par, _cal.raw, _cal.cal);
         }
         return val;
     }
@@ -1608,10 +1575,8 @@ public class YSensor extends YFunction
     {
         double val;
         val = dw;
-        if (_caltyp != 0) {
-            if (_calhdl != null) {
-                val = _calhdl.yCalibrationHandler(val, _caltyp, _calpar, _calraw, _calref);
-            }
+        if (!(_cal == null)) {
+            val = _cal.hdl.yCalibrationHandler(val, _cal.typ, _cal.par, _cal.raw, _cal.cal);
         }
         return val;
     }

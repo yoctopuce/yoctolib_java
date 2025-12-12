@@ -620,7 +620,7 @@ public class YBuzzer extends YFunction
         int note;
         int num;
         int typ;
-        byte[] ascNotes = new byte[0];
+        byte[] ascNotes;
         int notesLen;
         int i;
         int ch;

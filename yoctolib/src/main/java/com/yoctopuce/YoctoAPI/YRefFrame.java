@@ -156,11 +156,11 @@ public class YRefFrame extends YFunction
     protected UpdateCallback _valueCallbackRefFrame = null;
     protected boolean _calibV2;
     protected int _calibStage = 0;
-    protected String _calibStageHint;
+    protected String _calibStageHint = "";
     protected int _calibStageProgress = 0;
     protected int _calibProgress = 0;
-    protected String _calibLogMsg;
-    protected String _calibSavedParams;
+    protected String _calibLogMsg = "";
+    protected String _calibSavedParams = "";
     protected int _calibCount = 0;
     protected int _calibInternalPos = 0;
     protected int _calibPrevTick = 0;
@@ -689,7 +689,7 @@ public class YRefFrame extends YFunction
     public int get_calibrationState() throws YAPI_Exception
     {
         String calibParam;
-        ArrayList<Integer> iCalib = new ArrayList<>();
+        ArrayList<Integer> iCalib;
         int caltyp;
         int res;
 
@@ -719,7 +719,7 @@ public class YRefFrame extends YFunction
     public int get_measureQuality() throws YAPI_Exception
     {
         String calibParam;
-        ArrayList<Integer> iCalib = new ArrayList<>();
+        ArrayList<Integer> iCalib;
         int caltyp;
         int res;
 
@@ -837,7 +837,7 @@ public class YRefFrame extends YFunction
     public int more3DCalibrationV1() throws YAPI_Exception
     {
         int currTick;
-        byte[] jsonData = new byte[0];
+        byte[] jsonData;
         double xVal;
         double yVal;
         double zVal;
@@ -1036,8 +1036,8 @@ public class YRefFrame extends YFunction
     public int more3DCalibrationV2() throws YAPI_Exception
     {
         int currTick;
-        byte[] calibParam = new byte[0];
-        ArrayList<Integer> iCalib = new ArrayList<>();
+        byte[] calibParam;
+        ArrayList<Integer> iCalib;
         int cal3;
         int calAcc;
         int calMag;

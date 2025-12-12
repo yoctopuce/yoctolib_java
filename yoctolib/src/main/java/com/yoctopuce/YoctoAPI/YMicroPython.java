@@ -115,7 +115,7 @@ public class YMicroPython extends YFunction
     protected boolean _isFirstCb;
     protected int _prevCbPos = 0;
     protected int _logPos = 0;
-    protected String _prevPartialLog;
+    protected String _prevPartialLog = "";
 
     /**
      * Deprecated UpdateCallback for MicroPython
@@ -591,10 +591,10 @@ public class YMicroPython extends YFunction
 
     /**
      * Returns the wait time before running the startup script on power on,
-     * between 0.1 second and 25 seconds.
+     * measured in seconds.
      *
      * @return a floating point number corresponding to the wait time before running the startup script on power on,
-     *         between 0.1 second and 25 seconds
+     *         measured in seconds
      *
      * @throws YAPI_Exception on error
      */
@@ -614,10 +614,10 @@ public class YMicroPython extends YFunction
 
     /**
      * Returns the wait time before running the startup script on power on,
-     * between 0.1 second and 25 seconds.
+     * measured in seconds.
      *
      * @return a floating point number corresponding to the wait time before running the startup script on power on,
-     *         between 0.1 second and 25 seconds
+     *         measured in seconds
      *
      * @throws YAPI_Exception on error
      */
@@ -922,7 +922,7 @@ public class YMicroPython extends YFunction
      */
     public String get_lastLogs() throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         String res;
 
@@ -973,7 +973,7 @@ public class YMicroPython extends YFunction
         int cbPos;
         int cbDPos;
         String url;
-        byte[] content = new byte[0];
+        byte[] content;
         int endPos;
         String contentStr;
         ArrayList<String> msgArr = new ArrayList<>();

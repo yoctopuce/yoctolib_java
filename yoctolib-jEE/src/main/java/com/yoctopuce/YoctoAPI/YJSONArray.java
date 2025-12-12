@@ -186,4 +186,26 @@ class YJSONArray extends YJSONContent
         return res.toString();
     }
 
+
+    @Override
+    YJSONContent updateFroJZon(YJSONContent newItem) throws Exception
+    {
+        if (newItem.getJSONType() != YJSONType.ARRAY) {
+            throw new Exception(String.format("Unable to convert %s to array",
+                    newItem.getJSONType().toString()));
+        }
+        YJSONArray result = new YJSONArray(newItem._data, newItem._data_start, newItem._data_len);
+        YJSONArray jzonArr = (YJSONArray) newItem;
+        if (length() == 0 && jzonArr.length() > 0) {
+            throw new Exception(String.format("Unable to convert %s to array (empty array)",
+                    newItem.getJSONType().toString()));
+        }
+        YJSONContent ref = _arrayValue.get(0);//fixme
+        for (int i = 0; i < jzonArr.length(); i++) {
+            YJSONContent jzonContent = jzonArr.get(i);
+            YJSONContent yjsonContent = ref.updateFroJZon(jzonContent);
+            result._arrayValue.add(yjsonContent);
+        }
+        return result;
+    }
 }

@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFileRecord.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ * $Id: YFileRecord.java 69225 2025-09-23 07:25:53Z seb $
  *
  * YFileRecord Class: Description of a file on the device filesystem
  *
@@ -53,7 +53,7 @@ public class YFileRecord
 //--- (end of generated code: YFileRecord class start)
 
     //--- (generated code: YFileRecord definitions)
-    protected String _name;
+    protected String _name = "";
     protected int _size = 0;
     protected int _crc = 0;
 

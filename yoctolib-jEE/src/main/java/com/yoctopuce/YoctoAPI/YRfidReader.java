@@ -439,7 +439,7 @@ public class YRfidReader extends YFunction
 
     public int reset() throws YAPI_Exception
     {
-        byte[] json = new byte[0];
+        byte[] json;
         YRfidStatus status;
         status = new YRfidStatus();
 
@@ -456,7 +456,7 @@ public class YRfidReader extends YFunction
      */
     public ArrayList<String> get_tagIdList() throws YAPI_Exception
     {
-        byte[] json = new byte[0];
+        byte[] json;
         ArrayList<byte[]> jsonList = new ArrayList<>();
         ArrayList<String> taglist = new ArrayList<>();
 
@@ -487,7 +487,7 @@ public class YRfidReader extends YFunction
     public YRfidTagInfo get_tagInfo(String tagId,YRfidStatus status) throws YAPI_Exception
     {
         String url;
-        byte[] json = new byte[0];
+        byte[] json;
         int tagType;
         int size;
         int usable;
@@ -534,7 +534,7 @@ public class YRfidReader extends YFunction
     {
         String optstr;
         String url;
-        byte[] json = new byte[0];
+        byte[] json;
         optstr = options.imm_getParams();
         url = String.format(Locale.US, "rfid.json?a=lock&t=%s&b=%d&n=%d%s",tagId,firstBlock,nBlocks,optstr);
 
@@ -566,8 +566,8 @@ public class YRfidReader extends YFunction
     {
         String optstr;
         String url;
-        byte[] json = new byte[0];
-        byte[] binRes = new byte[0];
+        byte[] json;
+        byte[] binRes;
         ArrayList<Boolean> res = new ArrayList<>();
         int idx;
         int val;
@@ -614,8 +614,8 @@ public class YRfidReader extends YFunction
     {
         String optstr;
         String url;
-        byte[] json = new byte[0];
-        byte[] binRes = new byte[0];
+        byte[] json;
+        byte[] binRes;
         ArrayList<Boolean> res = new ArrayList<>();
         int idx;
         int val;
@@ -666,7 +666,7 @@ public class YRfidReader extends YFunction
     {
         String optstr;
         String url;
-        byte[] json = new byte[0];
+        byte[] json;
         String hexbuf;
         optstr = options.imm_getParams();
         url = String.format(Locale.US, "rfid.json?a=read&t=%s&b=%d&n=%d%s",tagId,firstBlock,nBytes,optstr);
@@ -734,7 +734,7 @@ public class YRfidReader extends YFunction
      */
     public ArrayList<Integer> tagReadArray(String tagId,int firstBlock,int nBytes,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
     {
-        byte[] blk = new byte[0];
+        byte[] blk;
         int idx;
         int endidx;
         ArrayList<Integer> res = new ArrayList<>();
@@ -807,7 +807,7 @@ public class YRfidReader extends YFunction
         String hexstr;
         int buflen;
         String fname;
-        byte[] json = new byte[0];
+        byte[] json;
         buflen = (buff).length;
         if (buflen <= 16) {
             // short data, use an URL-based command
@@ -850,7 +850,7 @@ public class YRfidReader extends YFunction
     public int tagWriteArray(String tagId,int firstBlock,ArrayList<Integer> byteList,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
     {
         int bufflen;
-        byte[] buff = new byte[0];
+        byte[] buff;
         int idx;
         int hexb;
         bufflen = byteList.size();
@@ -895,8 +895,8 @@ public class YRfidReader extends YFunction
         int bufflen;
         String optstr;
         String url;
-        byte[] json = new byte[0];
-        byte[] buff = new byte[0];
+        byte[] json;
+        byte[] buff;
         int idx;
         int hexb;
         bufflen = hexString.length();
@@ -957,7 +957,7 @@ public class YRfidReader extends YFunction
      */
     public int tagWriteStr(String tagId,int firstBlock,String text,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         buff = (text).getBytes(_yapi._deviceCharset);
 
         return tagWriteBin(tagId, firstBlock, buff, options, status);
@@ -982,7 +982,7 @@ public class YRfidReader extends YFunction
     {
         String optstr;
         String url;
-        byte[] json = new byte[0];
+        byte[] json;
         int res;
         optstr = options.imm_getParams();
         url = String.format(Locale.US, "rfid.json?a=rdsf&t=%s&b=0%s",tagId,optstr);
@@ -1017,7 +1017,7 @@ public class YRfidReader extends YFunction
     {
         String optstr;
         String url;
-        byte[] json = new byte[0];
+        byte[] json;
         optstr = options.imm_getParams();
         url = String.format(Locale.US, "rfid.json?a=wrsf&t=%s&b=0&v=%d%s",tagId,afi,optstr);
 
@@ -1045,7 +1045,7 @@ public class YRfidReader extends YFunction
     {
         String optstr;
         String url;
-        byte[] json = new byte[0];
+        byte[] json;
         optstr = options.imm_getParams();
         url = String.format(Locale.US, "rfid.json?a=lksf&t=%s&b=0%s",tagId,optstr);
 
@@ -1072,7 +1072,7 @@ public class YRfidReader extends YFunction
     {
         String optstr;
         String url;
-        byte[] json = new byte[0];
+        byte[] json;
         int res;
         optstr = options.imm_getParams();
         url = String.format(Locale.US, "rfid.json?a=rdsf&t=%s&b=1%s",tagId,optstr);
@@ -1107,7 +1107,7 @@ public class YRfidReader extends YFunction
     {
         String optstr;
         String url;
-        byte[] json = new byte[0];
+        byte[] json;
         optstr = options.imm_getParams();
         url = String.format(Locale.US, "rfid.json?a=wrsf&t=%s&b=1&v=%d%s",tagId,dsfid,optstr);
 
@@ -1135,7 +1135,7 @@ public class YRfidReader extends YFunction
     {
         String optstr;
         String url;
-        byte[] json = new byte[0];
+        byte[] json;
         optstr = options.imm_getParams();
         url = String.format(Locale.US, "rfid.json?a=lksf&t=%s&b=1%s",tagId,optstr);
 
@@ -1153,7 +1153,7 @@ public class YRfidReader extends YFunction
      */
     public String get_lastEvents() throws YAPI_Exception
     {
-        byte[] content = new byte[0];
+        byte[] content;
 
         content = _download("events.txt?pos=0");
         return new String(content, _yapi._deviceCharset);
@@ -1191,7 +1191,7 @@ public class YRfidReader extends YFunction
         int cbPos;
         int cbDPos;
         String url;
-        byte[] content = new byte[0];
+        byte[] content;
         String contentStr;
         ArrayList<String> eventArr = new ArrayList<>();
         int arrLen;
@@ -1203,7 +1203,7 @@ public class YRfidReader extends YFunction
         int typePos;
         int dataPos;
         int intStamp;
-        byte[] binMStamp = new byte[0];
+        byte[] binMStamp;
         int msStamp;
         double evtStamp;
         String evtType;

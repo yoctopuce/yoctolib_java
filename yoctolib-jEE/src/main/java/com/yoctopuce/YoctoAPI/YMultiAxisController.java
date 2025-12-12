@@ -400,7 +400,7 @@ public class YMultiAxisController extends YFunction
     public int sendCommand(String command) throws YAPI_Exception
     {
         String url;
-        byte[] retBin = new byte[0];
+        byte[] retBin;
         int res;
         url = String.format(Locale.US, "cmd.txt?X=%s",command);
         //may throw an exception

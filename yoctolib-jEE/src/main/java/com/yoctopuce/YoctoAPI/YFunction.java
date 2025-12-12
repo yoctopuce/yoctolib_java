@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 63599 2024-12-06 10:17:59Z seb $
+ * $Id: YFunction.java 70666 2025-12-09 10:26:00Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -68,7 +68,7 @@ public class YFunction
 
     public static final String FUNCTIONDESCRIPTOR_INVALID = "!INVALID!";
     protected final YAPIContext _yapi;
-    protected String _className; // todo: look if we can make this final
+    protected String _className;
     protected final String _func;
     protected int _lastErrorType;
     protected String _lastErrorMsg;
@@ -87,9 +87,9 @@ public class YFunction
     protected String _advertisedValue = ADVERTISEDVALUE_INVALID;
     protected UpdateCallback _valueCallbackFunction = null;
     protected long _cacheExpiration = 0;
-    protected String _serial;
-    protected String _funId;
-    protected String _hwId;
+    protected String _serial = "";
+    protected String _funId = "";
+    protected String _hwId = "";
 
     /**
      * Deprecated UpdateCallback for Function
@@ -485,7 +485,7 @@ public class YFunction
     public String loadAttribute(String attrName) throws YAPI_Exception
     {
         String url;
-        byte[] attrVal = new byte[0];
+        byte[] attrVal;
         url = String.format(Locale.US, "api/%s/%s",get_functionId(),attrName);
         attrVal = _download(url);
         return new String(attrVal, _yapi._deviceCharset);
@@ -522,6 +522,25 @@ public class YFunction
     public int _parserHelper()
     {
         return 0;
+    }
+
+    public boolean _is_valid_pass(String passwd) throws YAPI_Exception
+    {
+        String tmp;
+        if (passwd.length() > YAPI.HASH_BUF_SIZE) {
+            tmp = String.format(Locale.US, "Password too long (max %d chars) :%s",YAPI.HASH_BUF_SIZE,passwd);
+            _throw(YAPI.INVALID_ARGUMENT, tmp);
+            return false;
+        }
+        if (passwd.indexOf("@") >=0) {
+            _throw(YAPI.INVALID_ARGUMENT, "Character @ is not allowed in password");
+            return false;
+        }
+        if (passwd.indexOf("/") >=0) {
+            _throw(YAPI.INVALID_ARGUMENT, "Character / is not allowed in password");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -760,7 +779,7 @@ public class YFunction
     {
         YJSONArray array = null;
         try {
-            String s = new String(json,YAPI.DefaultEncoding);
+            String s = new String(json, YAPI.DefaultEncoding);
             YJSONString yjsonString = new YJSONString(s, 0, s.length());
             yjsonString.parse();
             return yjsonString.getString();
@@ -861,7 +880,7 @@ public class YFunction
     {
         YJSONObject jsonObject = null;
         try {
-            jsonObject = new YJSONObject(new String(json,_yapi._deviceCharset));
+            jsonObject = new YJSONObject(new String(json, _yapi._deviceCharset));
             jsonObject.parse();
         } catch (Exception ex) {
             return new byte[0];

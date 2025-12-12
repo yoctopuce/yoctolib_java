@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSpiPort.java 63599 2024-12-06 10:17:59Z seb $
+ *  $Id: YSpiPort.java 70736 2025-12-12 07:53:30Z mvuilleu $
  *
  *  Implements FindSpiPort(), the high-level API for SpiPort functions
  *
@@ -1245,7 +1245,7 @@ public class YSpiPort extends YFunction
     public String readLine() throws YAPI_Exception
     {
         String url;
-        byte[] msgbin = new byte[0];
+        byte[] msgbin;
         ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1291,7 +1291,7 @@ public class YSpiPort extends YFunction
     public ArrayList<String> readMessages(String pattern,int maxWait) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin = new byte[0];
+        byte[] msgbin;
         ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         ArrayList<String> res = new ArrayList<>();
@@ -1351,7 +1351,7 @@ public class YSpiPort extends YFunction
         String availPosStr;
         int atPos;
         int res;
-        byte[] databin = new byte[0];
+        byte[] databin;
 
         databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         availPosStr = new String(databin, _yapi._deviceCharset);
@@ -1365,7 +1365,7 @@ public class YSpiPort extends YFunction
         String availPosStr;
         int atPos;
         int res;
-        byte[] databin = new byte[0];
+        byte[] databin;
 
         databin = _download(String.format(Locale.US, "rxcnt.bin?pos=%d",_rxptr));
         availPosStr = new String(databin, _yapi._deviceCharset);
@@ -1390,7 +1390,7 @@ public class YSpiPort extends YFunction
     {
         int prevpos;
         String url;
-        byte[] msgbin = new byte[0];
+        byte[] msgbin;
         ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1437,7 +1437,7 @@ public class YSpiPort extends YFunction
     {
         int prevpos;
         String url;
-        byte[] msgbin = new byte[0];
+        byte[] msgbin;
         ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         String res;
@@ -1542,7 +1542,7 @@ public class YSpiPort extends YFunction
      */
     public int writeStr(String text) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int idx;
         int ch;
@@ -1593,7 +1593,7 @@ public class YSpiPort extends YFunction
      */
     public int writeArray(ArrayList<Integer> byteList) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int idx;
         int hexb;
@@ -1622,7 +1622,7 @@ public class YSpiPort extends YFunction
      */
     public int writeHex(String hexString) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int idx;
         int hexb;
@@ -1655,7 +1655,7 @@ public class YSpiPort extends YFunction
      */
     public int writeLine(String text) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int idx;
         int ch;
@@ -1694,7 +1694,7 @@ public class YSpiPort extends YFunction
     {
         int currpos;
         int reqlen;
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int mult;
         int endpos;
@@ -1711,7 +1711,8 @@ public class YSpiPort extends YFunction
         reqlen = 1024;
         buff = readBin(reqlen);
         bufflen = (buff).length;
-        if (_rxptr == currpos+bufflen) {
+        if ((bufflen > 0) && (_rxptr == currpos+bufflen)) {
+            // up to 1024 bytes in buffer, all in direction Rx
             res = (buff[0] & 0xff);
             _rxptr = currpos+1;
             _rxbuffptr = currpos;
@@ -1723,7 +1724,8 @@ public class YSpiPort extends YFunction
         reqlen = 16;
         buff = readBin(reqlen);
         bufflen = (buff).length;
-        if (_rxptr == currpos+bufflen) {
+        if ((bufflen > 0) && (_rxptr == currpos+bufflen)) {
+            // up to 16 bytes in buffer, all in direction Rx
             res = (buff[0] & 0xff);
             _rxptr = currpos+1;
             _rxbuffptr = currpos;
@@ -1763,7 +1765,7 @@ public class YSpiPort extends YFunction
      */
     public String readStr(int nChars) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int mult;
         int endpos;
@@ -1799,12 +1801,12 @@ public class YSpiPort extends YFunction
      */
     public byte[] readBin(int nChars) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int mult;
         int endpos;
         int idx;
-        byte[] res = new byte[0];
+        byte[] res;
         if (nChars > 65535) {
             nChars = 65535;
         }
@@ -1841,7 +1843,7 @@ public class YSpiPort extends YFunction
      */
     public ArrayList<Integer> readArray(int nChars) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int mult;
         int endpos;
@@ -1885,7 +1887,7 @@ public class YSpiPort extends YFunction
      */
     public String readHex(int nBytes) throws YAPI_Exception
     {
-        byte[] buff = new byte[0];
+        byte[] buff;
         int bufflen;
         int mult;
         int endpos;
@@ -1950,7 +1952,7 @@ public class YSpiPort extends YFunction
     public ArrayList<YSpiSnoopingRecord> snoopMessagesEx(int maxWait,int maxMsg) throws YAPI_Exception
     {
         String url;
-        byte[] msgbin = new byte[0];
+        byte[] msgbin;
         ArrayList<byte[]> msgarr = new ArrayList<>();
         int msglen;
         ArrayList<YSpiSnoopingRecord> res = new ArrayList<>();

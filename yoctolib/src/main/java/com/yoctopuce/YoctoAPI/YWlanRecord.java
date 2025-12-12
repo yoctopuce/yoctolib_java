@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWlanRecord.java 38899 2019-12-20 17:21:03Z mvuilleu $
+ * $Id: YWlanRecord.java 69225 2025-09-23 07:25:53Z seb $
  *
  * YWlanRecord Class: Description of a wireless network detected
  *
@@ -52,9 +52,9 @@ public class YWlanRecord
 {
 //--- (end of generated code: YWlanRecord class start)
     //--- (generated code: YWlanRecord definitions)
-    protected String _ssid;
+    protected String _ssid = "";
     protected int _channel = 0;
-    protected String _sec;
+    protected String _sec = "";
     protected int _rssi = 0;
 
     //--- (end of generated code: YWlanRecord definitions)

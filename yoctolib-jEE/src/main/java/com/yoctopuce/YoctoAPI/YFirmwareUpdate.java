@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 63599 2024-12-06 10:17:59Z seb $
+ * $Id: YFirmwareUpdate.java 70568 2025-12-04 08:55:25Z seb $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *
@@ -63,10 +63,10 @@ public class YFirmwareUpdate
 {
 //--- (end of generated code: YFirmwareUpdate class start)
 //--- (generated code: YFirmwareUpdate definitions)
-    protected String _serial;
+    protected String _serial = "";
     protected byte[] _settings = new byte[0];
-    protected String _firmwarepath;
-    protected String _progress_msg;
+    protected String _firmwarepath = "";
+    protected String _progress_msg = "";
     protected int _progress_c = 0;
     protected int _progress = 0;
     protected int _restore_step = 0;
@@ -291,7 +291,7 @@ public class YFirmwareUpdate
                     link = obj.getString("link");
                     best_rev = obj.getInt("version");
                 } catch (Exception e) {
-                    throw new YAPI_Exception(YAPI.IO_ERROR, "invalid respond form www.yoctopuce.com" + e.getLocalizedMessage());
+                    throw new YAPI_Exception(YAPI.IO_ERROR, "invalid respond form www.yoctopuce.com : " + e.getLocalizedMessage());
                 }
             } else {
                 File folder = new File(path);
