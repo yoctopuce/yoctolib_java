@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 63599 2024-12-06 10:17:59Z seb $
+ * $Id: YDisplay.java 71578 2026-01-28 15:59:12Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -80,6 +80,10 @@ public class YDisplay extends YFunction
      */
     public static final int BRIGHTNESS_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid autoInvertDelay value
+     */
+    public static final int AUTOINVERTDELAY_INVALID = YAPI.INVALID_UINT;
+    /**
      * invalid orientation value
      */
     public static final int ORIENTATION_LEFT = 0;
@@ -87,6 +91,10 @@ public class YDisplay extends YFunction
     public static final int ORIENTATION_RIGHT = 2;
     public static final int ORIENTATION_DOWN = 3;
     public static final int ORIENTATION_INVALID = -1;
+    /**
+     * invalid displayPanel value
+     */
+    public static final String DISPLAYPANEL_INVALID = YAPI.INVALID_STRING;
     /**
      * invalid displayWidth value
      */
@@ -101,6 +109,7 @@ public class YDisplay extends YFunction
     public static final int DISPLAYTYPE_MONO = 0;
     public static final int DISPLAYTYPE_GRAY = 1;
     public static final int DISPLAYTYPE_RGB = 2;
+    public static final int DISPLAYTYPE_EPAPER = 3;
     public static final int DISPLAYTYPE_INVALID = -1;
     /**
      * invalid layerWidth value
@@ -121,7 +130,9 @@ public class YDisplay extends YFunction
     protected int _enabled = ENABLED_INVALID;
     protected String _startupSeq = STARTUPSEQ_INVALID;
     protected int _brightness = BRIGHTNESS_INVALID;
+    protected int _autoInvertDelay = AUTOINVERTDELAY_INVALID;
     protected int _orientation = ORIENTATION_INVALID;
+    protected String _displayPanel = DISPLAYPANEL_INVALID;
     protected int _displayWidth = DISPLAYWIDTH_INVALID;
     protected int _displayHeight = DISPLAYHEIGHT_INVALID;
     protected int _displayType = DISPLAYTYPE_INVALID;
@@ -190,8 +201,14 @@ public class YDisplay extends YFunction
         if (json_val.has("brightness")) {
             _brightness = json_val.getInt("brightness");
         }
+        if (json_val.has("autoInvertDelay")) {
+            _autoInvertDelay = json_val.getInt("autoInvertDelay");
+        }
         if (json_val.has("orientation")) {
             _orientation = json_val.getInt("orientation");
+        }
+        if (json_val.has("displayPanel")) {
+            _displayPanel = json_val.getString("displayPanel");
         }
         if (json_val.has("displayWidth")) {
             _displayWidth = json_val.getInt("displayWidth");
@@ -428,6 +445,90 @@ public class YDisplay extends YFunction
     }
 
     /**
+     * Returns the interval between automatic display inversions, or 0 if automatic
+     * inversion is disabled. Using the automatic inversion mechanism reduces the
+     * burn-in that occurs on OLED screens over long periods when the same content
+     * remains displayed on the screen.
+     *
+     * @return an integer corresponding to the interval between automatic display inversions, or 0 if automatic
+     *         inversion is disabled
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_autoInvertDelay() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return AUTOINVERTDELAY_INVALID;
+                }
+            }
+            res = _autoInvertDelay;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the interval between automatic display inversions, or 0 if automatic
+     * inversion is disabled. Using the automatic inversion mechanism reduces the
+     * burn-in that occurs on OLED screens over long periods when the same content
+     * remains displayed on the screen.
+     *
+     * @return an integer corresponding to the interval between automatic display inversions, or 0 if automatic
+     *         inversion is disabled
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getAutoInvertDelay() throws YAPI_Exception
+    {
+        return get_autoInvertDelay();
+    }
+
+    /**
+     * Changes the interval between automatic display inversions.
+     * The parameter is the number of seconds, or 0 to disable automatic inversion.
+     * Using the automatic inversion mechanism reduces the burn-in that occurs on OLED
+     * screens over long periods when the same content remains displayed on the screen.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : an integer corresponding to the interval between automatic display inversions
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_autoInvertDelay(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Integer.toString(newval);
+            _setAttr("autoInvertDelay",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the interval between automatic display inversions.
+     * The parameter is the number of seconds, or 0 to disable automatic inversion.
+     * Using the automatic inversion mechanism reduces the burn-in that occurs on OLED
+     * screens over long periods when the same content remains displayed on the screen.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : an integer corresponding to the interval between automatic display inversions
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setAutoInvertDelay(int newval)  throws YAPI_Exception
+    {
+        return set_autoInvertDelay(newval);
+    }
+
+    /**
      * Returns the currently selected display orientation.
      *
      *  @return a value among YDisplay.ORIENTATION_LEFT, YDisplay.ORIENTATION_UP,
@@ -502,6 +603,80 @@ public class YDisplay extends YFunction
     }
 
     /**
+     * Returns the exact model of the display panel.
+     *
+     * @return a string corresponding to the exact model of the display panel
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String get_displayPanel() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return DISPLAYPANEL_INVALID;
+                }
+            }
+            res = _displayPanel;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the exact model of the display panel.
+     *
+     * @return a string corresponding to the exact model of the display panel
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String getDisplayPanel() throws YAPI_Exception
+    {
+        return get_displayPanel();
+    }
+
+    /**
+     * Changes the model of display to match the connected display panel.
+     * This function has no effect if the module does not support the selected
+     * display panel.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : a string corresponding to the model of display to match the connected display panel
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_displayPanel(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("displayPanel",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the model of display to match the connected display panel.
+     * This function has no effect if the module does not support the selected
+     * display panel.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param newval : a string corresponding to the model of display to match the connected display panel
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setDisplayPanel(String newval)  throws YAPI_Exception
+    {
+        return set_displayPanel(newval);
+    }
+
+    /**
      * Returns the display width, in pixels.
      *
      * @return an integer corresponding to the display width, in pixels
@@ -570,8 +745,9 @@ public class YDisplay extends YFunction
     /**
      * Returns the display type: monochrome, gray levels or full color.
      *
-     *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_GRAY and
-     * YDisplay.DISPLAYTYPE_RGB corresponding to the display type: monochrome, gray levels or full color
+     *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_GRAY,
+     *  YDisplay.DISPLAYTYPE_RGB and YDisplay.DISPLAYTYPE_EPAPER corresponding to the display type:
+     * monochrome, gray levels or full color
      *
      * @throws YAPI_Exception on error
      */
@@ -592,8 +768,9 @@ public class YDisplay extends YFunction
     /**
      * Returns the display type: monochrome, gray levels or full color.
      *
-     *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_GRAY and
-     * YDisplay.DISPLAYTYPE_RGB corresponding to the display type: monochrome, gray levels or full color
+     *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_GRAY,
+     *  YDisplay.DISPLAYTYPE_RGB and YDisplay.DISPLAYTYPE_EPAPER corresponding to the display type:
+     * monochrome, gray levels or full color
      *
      * @throws YAPI_Exception on error
      */
@@ -864,6 +1041,50 @@ public class YDisplay extends YFunction
     }
 
     /**
+     * Forces an ePaper screen to perform a regenerative update using the slow
+     * update method. Periodic use of the slow method (total panel update with
+     * multiple inversions) prevents ghosting effects and improves contrast.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int regenerateDisplay() throws YAPI_Exception
+    {
+        return sendCommand("z");
+    }
+
+    /**
+     * Disables screen refresh for a short period of time. The combination of
+     * postponeRefresh and triggerRefresh can be used as an
+     * alternative to double-buffering to avoid flickering during display updates.
+     *
+     * @param duration : duration of deactivation in milliseconds (max. 30 seconds)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int postponeRefresh(int duration) throws YAPI_Exception
+    {
+        return sendCommand(String.format(Locale.US, "H%d",duration));
+    }
+
+    /**
+     * Trigger an immediate screen refresh. The combination of
+     * postponeRefresh and triggerRefresh can be used as an
+     * alternative to double-buffering to avoid flickering during display updates.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int triggerRefresh() throws YAPI_Exception
+    {
+        return sendCommand("H0");
+    }
+
+    /**
      * Smoothly changes the brightness of the screen to produce a fade-in or fade-out
      * effect.
      *
@@ -1052,6 +1273,202 @@ public class YDisplay extends YFunction
             }
         }
         return _allDisplayLayers.get(layerId);
+    }
+
+    /**
+     * Returns a color image with the current content of the display.
+     * The image is returned as a binary object, where each byte represents a pixel,
+     * from left to right and from top to bottom. The palette used to map byte
+     * values to RGB colors is filled into the list provided as argument.
+     * In all cases, the first palette entry (value 0) corresponds to the
+     * screen default background color.
+     * The image dimensions are given by the display width and height.
+     *
+     * @param palette : a list to be filled with the image palette
+     *
+     * @return a binary object if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public byte[] readDisplay(ArrayList<Integer> palette) throws YAPI_Exception
+    {
+        byte[] zipmap;
+        int zipsize;
+        int zipwidth;
+        int zipheight;
+        int ziprotate;
+        int zipcolors;
+        int zipcol;
+        int zipbits;
+        int zipmask;
+        int srcpos;
+        int endrun;
+        int srcpat;
+        int srcbit;
+        int srcval;
+        int srcx;
+        int srcy;
+        int srci;
+        int incx;
+        byte[] pixmap;
+        int pixcount;
+        int pixval;
+        int pixpos;
+        byte[] rotmap;
+        pixmap = new byte[0];
+        // Check if the display firmware has autoInvertDelay and pixels.bin support
+
+        if (get_autoInvertDelay() < 0) {
+            // Old firmware, use uncompressed GIF output to rebuild pixmap
+            zipmap = _download("display.gif");
+            zipsize = (zipmap).length;
+            if (zipsize == 0) {
+                return pixmap;
+            }
+            //noinspection DoubleNegation
+            if (!(zipsize >= 32)) { throw new YAPI_Exception(YAPI.IO_ERROR, "not a GIF image");}
+            //noinspection DoubleNegation
+            if (!(((zipmap[0] & 0xff) == 71) && ((zipmap[2] & 0xff) == 70))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "not a GIF image");}
+            zipwidth = (zipmap[6] & 0xff) + 256 * (zipmap[7] & 0xff);
+            zipheight = (zipmap[8] & 0xff) + 256 * (zipmap[9] & 0xff);
+            palette.clear();
+            zipcol = (zipmap[13] & 0xff) * 65536 + (zipmap[14] & 0xff) * 256 + (zipmap[15] & 0xff);
+            palette.add(zipcol);
+            zipcol = (zipmap[16] & 0xff) * 65536 + (zipmap[17] & 0xff) * 256 + (zipmap[18] & 0xff);
+            palette.add(zipcol);
+            pixcount = zipwidth * zipheight;
+            pixmap = new byte[pixcount];
+            pixpos = 0;
+            srcpos = 30;
+            zipsize = zipsize - 2;
+            while (srcpos < zipsize) {
+                // load next run size
+                endrun = srcpos + 1 + (zipmap[srcpos] & 0xff);
+                srcpos = srcpos + 1;
+                while (srcpos < endrun) {
+                    srcval = (zipmap[srcpos] & 0xff);
+                    srcpos = srcpos + 1;
+                    srcbit = 8;
+                    while (srcbit != 0) {
+                        if (srcbit < 3) {
+                            srcval = srcval + ((zipmap[srcpos] & 0xff) << srcbit);
+                            srcpos = srcpos + 1;
+                        }
+                        pixval = (srcval & 7);
+                        srcval = (srcval >> 3);
+                        //noinspection DoubleNegation
+                        if (!((pixval > 1) && (pixval != 4))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "unexpected encoding");}
+                        pixmap[pixpos] = (byte)(pixval & 0xff);
+                        pixpos = pixpos + 1;
+                        srcbit = srcbit - 3;
+                    }
+                }
+            }
+            return pixmap;
+        }
+        // New firmware, use compressed pixels.bin
+        zipmap = _download("pixels.bin");
+        zipsize = (zipmap).length;
+        if (zipsize == 0) {
+            return pixmap;
+        }
+        //noinspection DoubleNegation
+        if (!(zipsize >= 16)) { throw new YAPI_Exception(YAPI.IO_ERROR, "not a pixmap");}
+        //noinspection DoubleNegation
+        if (!(((zipmap[0] & 0xff) == 80) && ((zipmap[2] & 0xff) == 88))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "not a pixmap");}
+        zipwidth = (zipmap[4] & 0xff) + 256 * (zipmap[5] & 0xff);
+        zipheight = (zipmap[6] & 0xff) + 256 * (zipmap[7] & 0xff);
+        ziprotate = (zipmap[8] & 0xff);
+        zipcolors = (zipmap[9] & 0xff);
+        palette.clear();
+        srcpos = 10;
+        srci = 0;
+        while (srci < zipcolors) {
+            zipcol = (zipmap[srcpos] & 0xff) * 65536 + (zipmap[srcpos+1] & 0xff) * 256 + (zipmap[srcpos+2] & 0xff);
+            palette.add(zipcol);
+            srcpos = srcpos + 3;
+            srci = srci + 1;
+        }
+        zipbits = 1;
+        while ((1 << zipbits) < zipcolors) {
+            zipbits = zipbits + 1;
+        }
+        zipmask = (1 << zipbits) - 1;
+        pixcount = zipwidth * zipheight;
+        pixmap = new byte[pixcount];
+        srcx = 0;
+        srcy = 0;
+        incx = (8 / zipbits);
+        srcval = 0;
+        while (srcpos < zipsize) {
+            // load next compression pattern byte
+            srcpat = (zipmap[srcpos] & 0xff);
+            srcpos = srcpos + 1;
+            srcbit = 7;
+            while (srcbit >= 0) {
+                // get next bitmap byte
+                if ((srcpat & 128) != 0) {
+                    srcval = (zipmap[srcpos] & 0xff);
+                    srcpos = srcpos + 1;
+                }
+                srcpat = (srcpat << 1);
+                pixpos = srcy * zipwidth + srcx;
+                // produce 8 pixels (or 4, if bitmap uses 2 bits per pixel)
+                srci = 8 - zipbits;
+                while (srci >= 0) {
+                    pixval = ((srcval >> srci) & zipmask);
+                    pixmap[pixpos] = (byte)(pixval & 0xff);
+                    pixpos = pixpos + 1;
+                    srci = srci - zipbits;
+                }
+                srcy = srcy + 1;
+                if (srcy >= zipheight) {
+                    srcy = 0;
+                    srcx = srcx + incx;
+                    // drop last bytes if image is not a multiple of 8
+                    if (srcx >= zipwidth) {
+                        srcbit = 0;
+                    }
+                }
+                srcbit = srcbit - 1;
+            }
+        }
+        // rotate pixmap to match display orientation
+        if (ziprotate == 0) {
+            return pixmap;
+        }
+        if ((ziprotate & 2) != 0) {
+            // rotate buffer 180 degrees by swapping pixels
+            srcpos = 0;
+            pixpos = pixcount - 1;
+            while (srcpos < pixpos) {
+                pixval = (pixmap[srcpos] & 0xff);
+                pixmap[srcpos] = (byte)((pixmap[pixpos] & 0xff) & 0xff);
+                pixmap[pixpos] = (byte)(pixval & 0xff);
+                srcpos = srcpos + 1;
+                pixpos = pixpos - 1;
+            }
+        }
+        if ((ziprotate & 1) == 0) {
+            return pixmap;
+        }
+        // rotate 90 ccw: first pixel is bottom left
+        rotmap = new byte[pixcount];
+        srcx = 0;
+        srcy = zipwidth - 1;
+        srcpos = 0;
+        while (srcpos < pixcount) {
+            pixval = (pixmap[srcpos] & 0xff);
+            pixpos = srcy * zipheight + srcx;
+            rotmap[pixpos] = (byte)(pixval & 0xff);
+            srcy = srcy - 1;
+            if (srcy < 0) {
+                srcx = srcx + 1;
+                srcy = zipwidth - 1;
+            }
+            srcpos = srcpos + 1;
+        }
+        return rotmap;
     }
 
     /**
