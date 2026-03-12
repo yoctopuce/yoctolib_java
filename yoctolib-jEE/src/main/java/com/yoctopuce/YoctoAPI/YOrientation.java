@@ -38,6 +38,8 @@
  */
 
 package com.yoctopuce.YoctoAPI;
+import java.util.ArrayList;
+import java.util.Locale;
 
 //--- (YOrientation return codes)
 //--- (end of YOrientation return codes)
@@ -56,6 +58,16 @@ public class YOrientation extends YSensor
 {
 //--- (end of YOrientation class start)
 //--- (YOrientation definitions)
+    /**
+     * invalid command value
+     */
+    public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
+    /**
+     * invalid zeroOffset value
+     */
+    public static final double ZEROOFFSET_INVALID = YAPI.INVALID_DOUBLE;
+    protected String _command = COMMAND_INVALID;
+    protected double _zeroOffset = ZEROOFFSET_INVALID;
     protected UpdateCallback _valueCallbackOrientation = null;
     protected TimedReportCallback _timedReportCallbackOrientation = null;
 
@@ -113,7 +125,114 @@ public class YOrientation extends YSensor
     @Override
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
+        if (json_val.has("command")) {
+            _command = json_val.getString("command");
+        }
+        if (json_val.has("zeroOffset")) {
+            _zeroOffset = Math.round(json_val.getDouble("zeroOffset") / 65.536) / 1000.0;
+        }
         super._parseAttr(json_val);
+    }
+
+    public String get_command() throws YAPI_Exception
+    {
+        String res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return COMMAND_INVALID;
+                }
+            }
+            res = _command;
+        }
+        return res;
+    }
+
+    public int set_command(String  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = newval;
+            _setAttr("command",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+
+    /**
+     * Sets an offset between the orientation reported by the sensor and the actual orientation. This
+     * can typically be used  to compensate for mechanical offset. This offset can also be set
+     * automatically using the zero() method.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     * @throws YAPI_Exception on error
+     *
+     * @param newval : a floating point number
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_zeroOffset(double  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = Long.toString(Math.round(newval * 65536.0));
+            _setAttr("zeroOffset",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Sets an offset between the orientation reported by the sensor and the actual orientation. This
+     * can typically be used  to compensate for mechanical offset. This offset can also be set
+     * automatically using the zero() method.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     * @throws YAPI_Exception on error
+     *
+     * @param newval : a floating point number
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setZeroOffset(double newval)  throws YAPI_Exception
+    {
+        return set_zeroOffset(newval);
+    }
+
+    /**
+     * Returns the Offset between the orientation reported by the sensor and the actual orientation.
+     *
+     *  @return a floating point number corresponding to the Offset between the orientation reported by the
+     * sensor and the actual orientation
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double get_zeroOffset() throws YAPI_Exception
+    {
+        double res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return ZEROOFFSET_INVALID;
+                }
+            }
+            res = _zeroOffset;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the Offset between the orientation reported by the sensor and the actual orientation.
+     *
+     *  @return a floating point number corresponding to the Offset between the orientation reported by the
+     * sensor and the actual orientation
+     *
+     * @throws YAPI_Exception on error
+     */
+    public double getZeroOffset() throws YAPI_Exception
+    {
+        return get_zeroOffset();
     }
 
     /**
@@ -198,9 +317,11 @@ public class YOrientation extends YSensor
 
     /**
      * Registers the callback function that is invoked on every change of advertised value.
-     * The callback is invoked only during the execution of ySleep or yHandleEvents.
-     * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-     * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * The callback is then invoked only during the execution of ySleep or yHandleEvents.
+     * This provides control over the time when the callback is triggered. For good responsiveness,
+     * remember to call one of these two functions periodically. The callback is called once juste after beeing
+     * registered, passing the current advertised value  of the function, provided that it is not an empty string.
+     * To unregister a callback, pass a null pointer as argument.
      *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
@@ -270,6 +391,100 @@ public class YOrientation extends YSensor
             super._invokeTimedReportCallback(value);
         }
         return 0;
+    }
+
+    public int sendCommand(String command) throws YAPI_Exception
+    {
+        return set_command(command);
+    }
+
+    /**
+     * Reset the sensor's zero to current position by automatically setting a new offset.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int zero() throws YAPI_Exception
+    {
+        return sendCommand("Z");
+    }
+
+    /**
+     * Modifies the calibration of the MA600A sensor using an array of 32
+     * values representing the offset in degrees between the true values and
+     * those measured regularly every 11.25 degrees starting from zero. The calibration
+     * is applied immediately and is stored permanently in the MA600A sensor.
+     * Before calculating the offset values, remember to clear any previous
+     * calibration using the clearCalibration function and set
+     * the zero offset  to 0. After a calibration change, the sensor will stop
+     * measurements for about one second.
+     * Do not confuse this function with the generic calibrateFromPoints function,
+     * which works at the YSensor level and is not necessarily well suited to
+     * a sensor returning circular values.
+     *
+     * @param offsetValues : array of 32 floating point values in the [-11.25..+11.25] range
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_calibration(ArrayList<Double> offsetValues) throws YAPI_Exception
+    {
+        String res;
+        int npt;
+        int idx;
+        int corr;
+        npt = offsetValues.size();
+        if (npt != 32) {
+            _throw(YAPI.INVALID_ARGUMENT, "Invalid calibration parameters (32 expected)");
+            return YAPI.INVALID_ARGUMENT;
+        }
+        res = "C";
+        idx = 0;
+        while (idx < npt) {
+            corr = (int) (double)Math.round(offsetValues.get(idx).doubleValue() * 128 / 11.25);
+            if ((corr < -128) || (corr > 127)) {
+                _throw(YAPI.INVALID_ARGUMENT, "Calibration parameter exceeds permitted range (+/-11.25)");
+                return YAPI.INVALID_ARGUMENT;
+            }
+            if (corr < 0) {
+                corr = corr + 256;
+            }
+            res = String.format(Locale.US, "%s%02x",res,corr);
+            idx = idx + 1;
+        }
+        return sendCommand(res);
+    }
+
+    /**
+     * Retrieves offset correction data points previously entered using the method
+     * set_calibration.
+     *
+     * @param offsetValues : array of 32 floating point numbers, that will be filled by the
+     *         function with the offset values for the correction points.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_Calibration(ArrayList<Double> offsetValues) throws YAPI_Exception
+    {
+        return 0;
+    }
+
+    /**
+     * Cancels any calibration set with set_calibration. This function
+     * is equivalent to calling set_calibration with only zeros.
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int clearCalibration() throws YAPI_Exception
+    {
+        return sendCommand("-");
     }
 
     /**

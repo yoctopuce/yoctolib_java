@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YSms.java 69225 2025-09-23 07:25:53Z seb $
+ * $Id: YSms.java 72410 2026-03-11 07:18:41Z mvuilleu $
  *
  * Implements FindSms(), the high-level API for Sms functions
  *
@@ -56,6 +56,7 @@ public class YSms
     protected YMessageBox _mbox;
     protected int _slot = 0;
     protected boolean _deliv;
+    protected boolean _isnew;
     protected String _smsc = "";
     protected int _mref = 0;
     protected String _orig = "";
@@ -108,9 +109,9 @@ public class YSms
         return _mref;
     }
 
-    public String get_sender()
+    public int get_protocolId()
     {
-        return _orig;
+        return _pid;
     }
 
     public String get_recipient()
@@ -118,9 +119,9 @@ public class YSms
         return _dest;
     }
 
-    public int get_protocolId()
+    public boolean isNew()
     {
-        return _pid;
+        return _isnew;
     }
 
     public boolean isReceived()
@@ -143,12 +144,7 @@ public class YSms
 
     public int get_dcs()
     {
-        return (_mclass | ((_alphab << 2)));
-    }
-
-    public String get_timestamp()
-    {
-        return _stamp;
+        return (_mclass | (_alphab << 2));
     }
 
     public byte[] get_userDataHeader()
@@ -162,9 +158,40 @@ public class YSms
     }
 
     /**
-     * Returns the content of the message.
+     * Returns true iff the message is a "Flash" SMS (class 0 message). Flash messages
+     * are displayed on the handset immediately and usually not saved on the SIM card.
      *
-     * @return  a string with the content of the message.
+     * @return a boolean.
+     */
+    public boolean isFlashMessage()
+    {
+        return get_msgClass() == 0;
+    }
+
+    /**
+     * Returns the reported message timestamp.
+     *
+     * @return the timestamp as a text string.
+     */
+    public String get_timestamp()
+    {
+        return _stamp;
+    }
+
+    /**
+     * Returns the reported message sender.
+     *
+     * @return a text string.
+     */
+    public String get_sender()
+    {
+        return _orig;
+    }
+
+    /**
+     * Returns the content of the message as a text string.
+     *
+     * @return a string with the content of the message.
      */
     public String get_textData()
     {
@@ -190,6 +217,11 @@ public class YSms
         return new String(_udata, _yapi._deviceCharset);
     }
 
+    /**
+     * Returns the content of the message, as a list of integer unicode values.
+     *
+     * @return a list of integers.
+     */
     public ArrayList<Integer> get_unicodeData()
     {
         ArrayList<Integer> res = new ArrayList<>();
@@ -283,6 +315,12 @@ public class YSms
         return YAPI.SUCCESS;
     }
 
+    public int set_new(boolean val)
+    {
+        _isnew = val;
+        return YAPI.SUCCESS;
+    }
+
     public int set_smsc(String val)
     {
         _smsc = val;
@@ -338,7 +376,7 @@ public class YSms
 
     public int set_dcs(int val)
     {
-        _alphab = (((val >> 2)) & 3);
+        _alphab = ((val >> 2) & 3);
         _mclass = (val & (16+3));
         _npdu = 0;
         return YAPI.SUCCESS;
@@ -394,7 +432,7 @@ public class YSms
     }
 
     /**
-     * Add a regular text to the SMS. This function support messages
+     * Adds regular text to the SMS. This function support messages
      * of more than 160 characters. ISO-latin accented characters
      * are supported. For messages with special unicode characters such as asian
      * characters and emoticons, use the  addUnicodeData method.
@@ -461,10 +499,10 @@ public class YSms
     }
 
     /**
-     * Add a unicode text to the SMS. This function support messages
+     * Adds unicode characters to the SMS. This function support messages
      * of more than 160 characters, using SMS concatenation.
      *
-     * @param val : an array of special unicode characters
+     * @param val : a list of unicode characters provided as integers
      *
      * @return YAPI.SUCCESS when the call succeeds.
      */
@@ -504,11 +542,11 @@ public class YSms
             uni = val.get(i).intValue();
             if (uni >= 65536) {
                 surrogate = uni - 65536;
-                uni = (((surrogate >> 10) & 1023)) + 55296;
+                uni = ((surrogate >> 10) & 1023) + 55296;
                 udata[udatalen] = (byte)((uni >> 8) & 0xff);
                 udata[udatalen+1] = (byte)((uni & 255) & 0xff);
                 udatalen = udatalen + 2;
-                uni = ((surrogate & 1023)) + 56320;
+                uni = (surrogate & 1023) + 56320;
             }
             udata[udatalen] = (byte)((uni >> 8) & 0xff);
             udata[udatalen+1] = (byte)((uni & 255) & 0xff);
@@ -677,7 +715,7 @@ public class YSms
                 } else {
                     byt = (addr[ofs+rpos] & 0xff);
                     rpos = rpos + 1;
-                    gsm7[i] = (byte)((carry | (((byt << nbits)) & 127)) & 0xff);
+                    gsm7[i] = (byte)((carry | ((byt << nbits) & 127)) & 0xff);
                     carry = (byt >> (7 - nbits));
                     nbits = nbits + 1;
                 }
@@ -929,7 +967,7 @@ public class YSms
                     nbits = 7;
                 } else {
                     thi_b = (_udata[i] & 0xff);
-                    res[wpos] = (byte)((carry | (((thi_b << nbits)) & 255)) & 0xff);
+                    res[wpos] = (byte)((carry | ((thi_b << nbits) & 255)) & 0xff);
                     wpos = wpos + 1;
                     nbits = nbits - 1;
                     carry = (thi_b >> (7 - nbits));
@@ -1171,8 +1209,8 @@ public class YSms
             rpos = rpos + 1;
             _dest = decodeAddress(pdu, rpos, addrlen);
             _orig = "";
-            if (((pdutyp & 16)) != 0) {
-                if (((pdutyp & 8)) != 0) {
+            if ((pdutyp & 16) != 0) {
+                if ((pdutyp & 8) != 0) {
                     tslen = 7;
                 } else {
                     tslen= 1;
@@ -1181,12 +1219,12 @@ public class YSms
                 tslen = 0;
             }
         }
-        rpos = rpos + (((addrlen+3) >> 1));
+        rpos = rpos + ((addrlen+3) >> 1);
         _pid = (pdu[rpos] & 0xff);
         rpos = rpos + 1;
         dcs = (pdu[rpos] & 0xff);
         rpos = rpos + 1;
-        _alphab = (((dcs >> 2)) & 3);
+        _alphab = ((dcs >> 2) & 3);
         _mclass = (dcs & (16+3));
         _stamp = decodeTimeStamp(pdu, rpos, tslen);
         rpos = rpos + tslen;
@@ -1236,7 +1274,7 @@ public class YSms
                 } else {
                     thi_b = (pdu[rpos] & 0xff);
                     rpos = rpos + 1;
-                    _udata[i] = (byte)((carry | (((thi_b << nbits)) & 127)) & 0xff);
+                    _udata[i] = (byte)((carry | ((thi_b << nbits) & 127)) & 0xff);
                     carry = (thi_b >> (7 - nbits));
                     nbits = nbits + 1;
                 }
@@ -1272,19 +1310,28 @@ public class YSms
         if (_npdu == 0) {
             generatePdu();
         }
-        if (_npdu == 1) {
-            return _mbox._upload("sendSMS", _pdu);
+        if (_npdu > 1) {
+            // send multiple PDUs using recursive call
+            retcode = YAPI.SUCCESS;
+            i = 0;
+            while ((i < _npdu) && (retcode == YAPI.SUCCESS)) {
+                pdu = _parts.get(i);
+                retcode= pdu.send();
+                i = i + 1;
+            }
+            return retcode;
         }
-        retcode = YAPI.SUCCESS;
-        i = 0;
-        while ((i < _npdu) && (retcode == YAPI.SUCCESS)) {
-            pdu = _parts.get(i);
-            retcode= pdu.send();
-            i = i + 1;
-        }
-        return retcode;
+        // send a single PDU
+        return _mbox.sendPDU(_pdu);
     }
 
+    /**
+     * Delete the SMS from the SIM card.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
     public int deleteFromSIM() throws YAPI_Exception
     {
         int i;

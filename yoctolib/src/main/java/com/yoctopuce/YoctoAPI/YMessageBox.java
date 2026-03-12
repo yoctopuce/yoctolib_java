@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YMessageBox.java 69225 2025-09-23 07:25:53Z seb $
+ * $Id: YMessageBox.java 72410 2026-03-11 07:18:41Z mvuilleu $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *
@@ -93,6 +93,7 @@ public class YMessageBox extends YFunction
     protected String _obey = OBEY_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackMessageBox = null;
+    protected YSmsCallback _smsCallback;
     protected int _nextMsgRef = 0;
     protected String _prevBitmapStr = "";
     protected ArrayList<YSms> _pdus = new ArrayList<>();
@@ -126,6 +127,27 @@ public class YMessageBox extends YFunction
          */
         void timedReportCallback(YMessageBox  function, YMeasure measure);
     }
+    /**
+     * Specialized event Callback for MessageBox
+     */
+    public interface YSmsCallback
+    {
+        void smsCallback(YMessageBox obj, YSms sms);
+    }
+
+    private UpdateCallback yInternalEventCallback = new UpdateCallback()
+    {
+        @Override
+        public void yNewValue(YMessageBox obj, String value)
+        {
+            try {
+                obj._internalEventHandler(value);
+            } catch (YAPI_Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
     //--- (end of generated code: YMessageBox definitions)
 
 
@@ -592,9 +614,11 @@ public class YMessageBox extends YFunction
 
     /**
      * Registers the callback function that is invoked on every change of advertised value.
-     * The callback is invoked only during the execution of ySleep or yHandleEvents.
-     * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-     * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * The callback is then invoked only during the execution of ySleep or yHandleEvents.
+     * This provides control over the time when the callback is triggered. For good responsiveness,
+     * remember to call one of these two functions periodically. The callback is called once juste after beeing
+     * registered, passing the current advertised value  of the function, provided that it is not an empty string.
+     * To unregister a callback, pass a null pointer as argument.
      *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
@@ -641,7 +665,6 @@ public class YMessageBox extends YFunction
     {
         int retry;
         int idx;
-        String res;
         String bitmapStr;
         int int_res;
         byte[] newBitmap;
@@ -654,8 +677,8 @@ public class YMessageBox extends YFunction
             newBitmap = YAPIContext._hexStrToBin(bitmapStr);
             idx = (slot >> 3);
             if (idx < (newBitmap).length) {
-                bitVal = (1 << ((slot & 7)));
-                if ((((newBitmap[idx] & 0xff) & bitVal)) != 0) {
+                bitVal = (1 << (slot & 7));
+                if (((newBitmap[idx] & 0xff) & bitVal) != 0) {
                     _prevBitmapStr = "";
                     int_res = set_command(String.format(Locale.US, "DS%d",slot));
                     if (int_res < 0) {
@@ -667,71 +690,56 @@ public class YMessageBox extends YFunction
             } else {
                 return YAPI.INVALID_ARGUMENT;
             }
-            res = _AT("");
+            _download("at.txt?cmd=");
             retry = retry - 1;
         }
         return YAPI.IO_ERROR;
     }
 
-    public String _AT(String cmd) throws YAPI_Exception
+    public int sendPDU(byte[] pdu) throws YAPI_Exception
     {
-        int chrPos;
-        int cmdLen;
-        int waitMore;
-        String res;
+        int i;
         byte[] buff;
         int bufflen;
         String buffstr;
-        int buffstrlen;
-        int idx;
-        int suffixlen;
-        // copied form the YCellular class
-        // quote dangerous characters used in AT commands
-        cmdLen = cmd.length();
-        chrPos = cmd.indexOf("#");
-        while (chrPos >= 0) {
-            cmd = String.format(Locale.US, "%s%c23%s",(cmd).substring(0, chrPos),37,(cmd).substring(chrPos+1, chrPos+1 + cmdLen-chrPos-1));
-            cmdLen = cmdLen + 2;
-            chrPos = cmd.indexOf("#");
+        String res;
+        int waitMore;
+        String cmd;
+
+        buff = _uploadEx("sendSMS", pdu);
+        if ((buff).length < 2) {
+            return YAPI.SUCCESS;
         }
-        chrPos = cmd.indexOf("+");
-        while (chrPos >= 0) {
-            cmd = String.format(Locale.US, "%s%c2B%s",(cmd).substring(0, chrPos),37,(cmd).substring(chrPos+1, chrPos+1 + cmdLen-chrPos-1));
-            cmdLen = cmdLen + 2;
-            chrPos = cmd.indexOf("+");
+        if ((buff[0] & 0xff) != 64) {
+            return YAPI.SUCCESS;
         }
-        chrPos = cmd.indexOf("=");
-        while (chrPos >= 0) {
-            cmd = String.format(Locale.US, "%s%c3D%s",(cmd).substring(0, chrPos),37,(cmd).substring(chrPos+1, chrPos+1 + cmdLen-chrPos-1));
-            cmdLen = cmdLen + 2;
-            chrPos = cmd.indexOf("=");
-        }
-        cmd = String.format(Locale.US, "at.txt?cmd=%s",cmd);
+        // new firmware provides a way to check result of SMS send command
         res = "";
-        // max 2 minutes (each iteration may take up to 5 seconds if waiting)
-        waitMore = 24;
+        bufflen = (buff).length;
+        buffstr = new String(buff, _yapi._deviceCharset);
+        i = 0;
+        waitMore = 10;
         while (waitMore > 0) {
+            cmd = String.format(Locale.US, "at.txt?cmd=%s",(buffstr).substring(i, i + bufflen - i));
             buff = _download(cmd);
             bufflen = (buff).length;
             buffstr = new String(buff, _yapi._deviceCharset);
-            buffstrlen = buffstr.length();
-            idx = bufflen - 1;
-            while ((idx > 0) && ((buff[idx] & 0xff) != 64) && ((buff[idx] & 0xff) != 10) && ((buff[idx] & 0xff) != 13)) {
-                idx = idx - 1;
+            i = bufflen - 1;
+            while ((i > 0) && ((buff[i] & 0xff) != 64) && ((buff[i] & 0xff) != 10) && ((buff[i] & 0xff) != 13)) {
+                i = i - 1;
             }
-            if ((buff[idx] & 0xff) == 64) {
+            if ((i >= 0) && ((buff[i] & 0xff) == 64)) {
                 // continuation detected
-                suffixlen = bufflen - idx;
-                cmd = String.format(Locale.US, "at.txt?cmd=%s",(buffstr).substring(buffstrlen - suffixlen, buffstrlen - suffixlen + suffixlen));
-                buffstr = (buffstr).substring(0, buffstrlen - suffixlen);
                 waitMore = waitMore - 1;
             } else {
                 // request complete
                 waitMore = 0;
             }
-            res = String.format(Locale.US, "%s%s",res,buffstr);
+            res = String.format(Locale.US, "%s%s",res,(buffstr).substring(0, i));
         }
-        return res;
+        //noinspection DoubleNegation
+        if (!(res.indexOf("OK") >= 0)) { throw new YAPI_Exception(YAPI.NOT_SUPPORTED, "Failed to send SMS");}
+        return YAPI.SUCCESS;
     }
 
     public YSms fetchPdu(int slot) throws YAPI_Exception
@@ -740,12 +748,19 @@ public class YMessageBox extends YFunction
         ArrayList<byte[]> arrPdu = new ArrayList<>();
         String hexPdu;
         YSms sms;
-
-        binPdu = _download(String.format(Locale.US, "sms.json?pos=%d&len=1",slot));
-        arrPdu = _json_get_array(binPdu);
-        hexPdu = _decode_json_string(arrPdu.get(0));
         sms = new YSms(this);
         sms.set_slot(slot);
+
+        binPdu = _download(String.format(Locale.US, "sms.json?pos=%d&len=1",slot));
+        if ((binPdu).length<8) {
+            // Retry in case SIM was busy
+            YAPI.Sleep(250);
+            binPdu = _download(String.format(Locale.US, "sms.json?pos=%d&len=1",slot));
+            //noinspection DoubleNegation
+            if (!((binPdu).length>=8)) { throw new YAPI_Exception(YAPI.IO_ERROR, "unable to retrieve SMS");}
+        }
+        arrPdu = _json_get_array(binPdu);
+        hexPdu = _decode_json_string(arrPdu.get(0));
         sms.parsePdu(YAPIContext._hexStrToBin(hexPdu));
         return sms;
     }
@@ -1088,18 +1103,17 @@ public class YMessageBox extends YFunction
     public int checkNewMessages() throws YAPI_Exception
     {
         String bitmapStr;
-        byte[] prevBitmap;
         byte[] newBitmap;
         int slot;
         int nslots;
         int pduIdx;
         int idx;
         int bitVal;
-        int prevBit;
         int i;
         int nsig;
         int cnt;
         String sig;
+        boolean isnew;
         ArrayList<YSms> newArr = new ArrayList<>();
         ArrayList<YSms> newMsg = new ArrayList<>();
         ArrayList<YSms> newAgg = new ArrayList<>();
@@ -1110,9 +1124,8 @@ public class YMessageBox extends YFunction
         if (bitmapStr.equals(_prevBitmapStr)) {
             return YAPI.SUCCESS;
         }
-        prevBitmap = YAPIContext._hexStrToBin(_prevBitmapStr);
-        newBitmap = YAPIContext._hexStrToBin(bitmapStr);
         _prevBitmapStr = bitmapStr;
+        newBitmap = YAPIContext._hexStrToBin(bitmapStr);
         nslots = 8*(newBitmap).length;
         newArr.clear();
         newMsg.clear();
@@ -1125,8 +1138,10 @@ public class YMessageBox extends YFunction
             slot = sms.get_slot();
             idx = (slot >> 3);
             if (idx < (newBitmap).length) {
-                bitVal = (1 << ((slot & 7)));
-                if ((((newBitmap[idx] & 0xff) & bitVal)) != 0) {
+                bitVal = (1 << (slot & 7));
+                if (((newBitmap[idx] & 0xff) & bitVal) != 0) {
+                    newBitmap[idx] = (byte)(((newBitmap[idx] & 0xff) ^ bitVal) & 0xff);
+                    sms.set_new(false);
                     newArr.add(sms);
                     if (sms.get_concatCount() == 0) {
                         newMsg.add(sms);
@@ -1152,30 +1167,25 @@ public class YMessageBox extends YFunction
         slot = 0;
         while (slot < nslots) {
             idx = (slot >> 3);
-            bitVal = (1 << ((slot & 7)));
-            prevBit = 0;
-            if (idx < (prevBitmap).length) {
-                prevBit = ((prevBitmap[idx] & 0xff) & bitVal);
-            }
-            if ((((newBitmap[idx] & 0xff) & bitVal)) != 0) {
-                if (prevBit == 0) {
-                    sms = fetchPdu(slot);
-                    newArr.add(sms);
-                    if (sms.get_concatCount() == 0) {
-                        newMsg.add(sms);
-                    } else {
-                        sig = sms.get_concatSignature();
-                        i = 0;
-                        while ((i < nsig) && (sig.length() > 0)) {
-                            if (signatures.get(i).equals(sig)) {
-                                sig = "";
-                            }
-                            i = i + 1;
+            bitVal = (1 << (slot & 7));
+            if (((newBitmap[idx] & 0xff) & bitVal) != 0) {
+                sms = fetchPdu(slot);
+                sms.set_new(true);
+                newArr.add(sms);
+                if (sms.get_concatCount() == 0) {
+                    newMsg.add(sms);
+                } else {
+                    sig = sms.get_concatSignature();
+                    i = 0;
+                    while ((i < nsig) && (sig.length() > 0)) {
+                        if (signatures.get(i).equals(sig)) {
+                            sig = "";
                         }
-                        if (sig.length() > 0) {
-                            signatures.add(sig);
-                            nsig = nsig + 1;
-                        }
+                        i = i + 1;
+                    }
+                    if (sig.length() > 0) {
+                        signatures.add(sig);
+                        nsig = nsig + 1;
                     }
                 }
             }
@@ -1189,6 +1199,7 @@ public class YMessageBox extends YFunction
             sig = signatures.get(i);
             cnt = 0;
             pduIdx = 0;
+            isnew = true;
             while (pduIdx < _pdus.size()) {
                 sms = _pdus.get(pduIdx);
                 if (sms.get_concatCount() > 0) {
@@ -1197,6 +1208,7 @@ public class YMessageBox extends YFunction
                             cnt = sms.get_concatCount();
                             newAgg.clear();
                         }
+                        isnew = sms.isNew();
                         newAgg.add(sms);
                     }
                 }
@@ -1205,6 +1217,7 @@ public class YMessageBox extends YFunction
             if ((cnt > 0) && (newAgg.size() == cnt)) {
                 sms = new YSms(this);
                 sms.set_parts(newAgg);
+                sms.set_new(isnew);
                 newMsg.add(sms);
             }
             i = i + 1;
@@ -1320,6 +1333,54 @@ public class YMessageBox extends YFunction
     {
         checkNewMessages();
         return _messages;
+    }
+
+    /**
+     * Registers a callback function to be called each time that a new SMS is received.
+     * The callback is invoked only during the execution of ySleep or yHandleEvents.
+     * This provides control over the time when the callback is triggered.
+     * For good responsiveness, remember to call one of these two functions periodically.
+     * To unregister a callback, pass a null pointer as argument.
+     *
+     * @param callback : the callback function to call, or a null pointer.
+     *         The callback function should take four arguments:
+     *         the YMessageBox object that emitted the event, and
+     *         the YSms object containing the received message.
+     * @throws YAPI_Exception on error
+     */
+    public int registerSmsCallback(YSmsCallback callback) throws YAPI_Exception
+    {
+        _smsCallback = (YSmsCallback) null;
+        if (callback != null) {
+            registerValueCallback(yInternalEventCallback);
+        } else {
+            registerValueCallback((UpdateCallback) null);
+        }
+        _smsCallback = callback;
+        return 0;
+    }
+
+    public int _internalEventHandler(String cbVal) throws YAPI_Exception
+    {
+        int arrLen;
+        int arrPos;
+        ArrayList<YSms> messages = new ArrayList<>();
+        YSms sms;
+
+        messages = get_messages();
+        // invoke callback for all new messages
+        arrLen = messages.size();
+        arrPos = 0;
+        while (arrPos < arrLen) {
+            sms = messages.get(arrPos);
+            if (sms.isNew()) {
+                if (_smsCallback != null) {
+                    _smsCallback.smsCallback(this, sms);
+                }
+            }
+            arrPos = arrPos + 1;
+        }
+        return YAPI.SUCCESS;
     }
 
     /**

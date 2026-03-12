@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGenericHub.java 69338 2025-10-08 07:57:22Z seb $
+ * $Id: YGenericHub.java 72247 2026-03-02 15:47:05Z seb $
  *
  * Internal YGenericHub object
  *
@@ -131,6 +131,7 @@ abstract class YGenericHub
     private final long _creation_time;
     private static int _global_hub_id = 0;
     private final int _hubid;
+    protected boolean _firstArrival = true;
 
     YGenericHub(YAPIContext yctx, HTTPParams httpParams, boolean reportConnnectionLost)
     {
@@ -275,7 +276,7 @@ abstract class YGenericHub
 
     void updateFromWpAndYp(ArrayList<WPEntry> whitePages, HashMap<String, ArrayList<YPEntry>> yellowPages) throws YAPI_Exception
     {
-
+        boolean callback_called = false;
         // by default consider all known device as unplugged
         ArrayList<YDevice> toRemove = new ArrayList<>(_devices.values());
 
@@ -291,12 +292,15 @@ abstract class YGenericHub
                 } else if (currdev.getBeacon() > 0 != wp.getBeacon() > 0) {
                     currdev.refresh();
                 }
+                if (_firstArrival) {
+                    callback_called |= _yctx._pushPlugEvent(serial, wp.getProductName(), wp.getProductId(), _firstArrival);
+                }
                 toRemove.remove(currdev);
             } else {
                 YDevice dev = new YDevice(this, wp, yellowPages);
                 _yctx._yHash.reindexDevice(dev);
                 _devices.put(serial, dev);
-                _yctx._pushPlugEvent(serial, wp.getProductName(), wp.getProductId());
+                callback_called |= _yctx._pushPlugEvent(serial, wp.getProductName(), wp.getProductId(), _firstArrival);
                 _yctx._Log("HUB: device " + serial + " has been plugged\n");
             }
         }
@@ -316,6 +320,9 @@ abstract class YGenericHub
             }
         }
         _yctx._yHash.reindexYellowPages(yellowPages);
+        if (callback_called) {
+            _firstArrival = false;
+        }
 
     }
 
@@ -513,7 +520,7 @@ abstract class YGenericHub
         }
 
         if (isOnline()) {
-            dbglog(3,"waitIsOnline: hub is online");
+            dbglog(3, "waitIsOnline: hub is online");
             return YAPI.SUCCESS;
         } else {
             dbglog(3, String.format("waitIsOnline: hub  is offline (%d:%s)", this._lastErrorType, this._lastErrorMessage));

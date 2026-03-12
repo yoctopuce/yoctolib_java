@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 71578 2026-01-28 15:59:12Z mvuilleu $
+ * $Id: YDisplay.java 72057 2026-02-17 09:44:53Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -107,9 +107,9 @@ public class YDisplay extends YFunction
      * invalid displayType value
      */
     public static final int DISPLAYTYPE_MONO = 0;
-    public static final int DISPLAYTYPE_GRAY = 1;
-    public static final int DISPLAYTYPE_RGB = 2;
-    public static final int DISPLAYTYPE_EPAPER = 3;
+    public static final int DISPLAYTYPE_EPAPER_BW = 1;
+    public static final int DISPLAYTYPE_EPAPER_BWR = 2;
+    public static final int DISPLAYTYPE_EPAPER_BWRY = 3;
     public static final int DISPLAYTYPE_INVALID = -1;
     /**
      * invalid layerWidth value
@@ -743,11 +743,11 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Returns the display type: monochrome, gray levels or full color.
+     * Returns the display type: monochrome OLED, black and white ePaper, color ePaper, etc.
      *
-     *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_GRAY,
-     *  YDisplay.DISPLAYTYPE_RGB and YDisplay.DISPLAYTYPE_EPAPER corresponding to the display type:
-     * monochrome, gray levels or full color
+     *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_EPAPER_BW,
+     *  YDisplay.DISPLAYTYPE_EPAPER_BWR and YDisplay.DISPLAYTYPE_EPAPER_BWRY corresponding to the display
+     * type: monochrome OLED, black and white ePaper, color ePaper, etc
      *
      * @throws YAPI_Exception on error
      */
@@ -766,11 +766,11 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Returns the display type: monochrome, gray levels or full color.
+     * Returns the display type: monochrome OLED, black and white ePaper, color ePaper, etc.
      *
-     *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_GRAY,
-     *  YDisplay.DISPLAYTYPE_RGB and YDisplay.DISPLAYTYPE_EPAPER corresponding to the display type:
-     * monochrome, gray levels or full color
+     *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_EPAPER_BW,
+     *  YDisplay.DISPLAYTYPE_EPAPER_BWR and YDisplay.DISPLAYTYPE_EPAPER_BWRY corresponding to the display
+     * type: monochrome OLED, black and white ePaper, color ePaper, etc
      *
      * @throws YAPI_Exception on error
      */
@@ -985,9 +985,11 @@ public class YDisplay extends YFunction
 
     /**
      * Registers the callback function that is invoked on every change of advertised value.
-     * The callback is invoked only during the execution of ySleep or yHandleEvents.
-     * This provides control over the time when the callback is triggered. For good responsiveness, remember to call
-     * one of these two functions periodically. To unregister a callback, pass a null pointer as argument.
+     * The callback is then invoked only during the execution of ySleep or yHandleEvents.
+     * This provides control over the time when the callback is triggered. For good responsiveness,
+     * remember to call one of these two functions periodically. The callback is called once juste after beeing
+     * registered, passing the current advertised value  of the function, provided that it is not an empty string.
+     * To unregister a callback, pass a null pointer as argument.
      *
      * @param callback : the callback function to call, or a null pointer. The callback function should take two
      *         arguments: the function object of which the value has changed, and the character string describing
@@ -1309,7 +1311,6 @@ public class YDisplay extends YFunction
         int srcx;
         int srcy;
         int srci;
-        int incx;
         byte[] pixmap;
         int pixcount;
         int pixval;
@@ -1398,7 +1399,6 @@ public class YDisplay extends YFunction
         pixmap = new byte[pixcount];
         srcx = 0;
         srcy = 0;
-        incx = (8 / zipbits);
         srcval = 0;
         while (srcpos < zipsize) {
             // load next compression pattern byte
@@ -1410,11 +1410,15 @@ public class YDisplay extends YFunction
                 if ((srcpat & 128) != 0) {
                     srcval = (zipmap[srcpos] & 0xff);
                     srcpos = srcpos + 1;
+                    if (zipbits > 1) {
+                        srcval = (srcval << 8) + (zipmap[srcpos] & 0xff);
+                        srcpos = srcpos + 1;
+                    }
                 }
                 srcpat = (srcpat << 1);
                 pixpos = srcy * zipwidth + srcx;
-                // produce 8 pixels (or 4, if bitmap uses 2 bits per pixel)
-                srci = 8 - zipbits;
+                // produce 8 pixels
+                srci = 7 * zipbits;
                 while (srci >= 0) {
                     pixval = ((srcval >> srci) & zipmask);
                     pixmap[pixpos] = (byte)(pixval & 0xff);
@@ -1424,7 +1428,7 @@ public class YDisplay extends YFunction
                 srcy = srcy + 1;
                 if (srcy >= zipheight) {
                     srcy = 0;
-                    srcx = srcx + incx;
+                    srcx = srcx + 8;
                     // drop last bytes if image is not a multiple of 8
                     if (srcx >= zipwidth) {
                         srcbit = 0;

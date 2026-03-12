@@ -598,12 +598,15 @@ public class YAPIContext
 
     }
 
-    void _pushPlugEvent(String serial, String productName, int productId)
+    boolean _pushPlugEvent(String serial, String productName, int productId, boolean first_arrival)
     {
         if (_arrivalCallback != null) {
             synchronized (_pendingCallbacks) {
                 _pendingCallbacks.add(new PlugEvent(this, PlugEvent.Event.PLUG, serial));
+                return true;
             }
+        } else {
+            return false;
         }
     }
 
@@ -772,6 +775,7 @@ public class YAPIContext
         }
         return null;
     }
+
     private String GetYAPISharedLibraryPath_internal()
     {
         return YUSBHub.getYAPISharedLibraryPath();
