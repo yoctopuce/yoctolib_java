@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 71629 2026-01-29 15:08:26Z mvuilleu $
+ * $Id: YDisplayLayer.java 74504 2026-06-01 14:50:23Z seb $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *
@@ -120,6 +120,8 @@ public class YDisplayLayer
     public static final int NO_INK = -1;
     public static final int BG_INK = -2;
     public static final int FG_INK = -3;
+    protected String _cmdbuff = "";
+    protected boolean _hidden = false;
     protected int _polyPrevX = 0;
     protected int _polyPrevY = 0;
 
@@ -127,56 +129,67 @@ public class YDisplayLayer
 
     private YDisplay _display;
     private int _id;
-    private StringBuilder _cmdbuff;
-    private Boolean _hidden;
-
-    // internal function to flush any pending command for this layer
-    public synchronized int flush_now()  throws YAPI_Exception
-    {
-        int res = YAPI.SUCCESS;
-        if (_cmdbuff.length() > 0) {
-            res = this._display.sendCommand(this._cmdbuff.toString());
-            _cmdbuff.setLength(0);
-        }
-        return res;
-    }
-
-    // internal function to buffer a command for this layer
-    private synchronized int command_push(String cmd)  throws YAPI_Exception
-    {
-        int res = YAPI.SUCCESS;
-
-        if (_cmdbuff.length() + cmd.length() >= 100) {
-            // force flush before, to prevent overflow
-            res = this.flush_now();
-        }
-        if (_cmdbuff.length() == 0) {
-            // always prepend layer ID first
-            _cmdbuff.append(this._id);
-        }
-        _cmdbuff.append(cmd);
-        return res;
-    }
-
-    // internal function to send a command for this layer
-    private synchronized int command_flush(String cmd)  throws YAPI_Exception
-    {
-        int res = this.command_push(cmd);
-        if (_hidden) {
-            return res;
-        }
-        return this.flush_now();
-    }
 
     public YDisplayLayer(YDisplay parent, int id)
     {
         this._display = parent;
         this._id = id;
-        this._cmdbuff = new StringBuilder(128);
         this._hidden = false;
     }
 
     //--- (generated code: YDisplayLayer implementation)
+
+    public boolean must_be_flushed()
+    {
+        return _cmdbuff.length() > 0;
+    }
+
+    public int resetHiddenFlag()
+    {
+        _hidden = false;
+        return YAPI.SUCCESS;
+    }
+
+    public int flush_now() throws YAPI_Exception
+    {
+        int res;
+        res = YAPI.SUCCESS;
+        if (_cmdbuff.length() > 0) {
+            res = _display.sendCommand(_cmdbuff);
+            _cmdbuff = "";
+        }
+        return res;
+    }
+
+    public int command_push(String cmd) throws YAPI_Exception
+    {
+        int res;
+        res = YAPI.SUCCESS;
+        if (_cmdbuff.length() + cmd.length() >= 100) {
+            // force flush before, to prevent overflow
+            flush_now();
+        }
+        if (_cmdbuff.length() == 0) {
+            // always prepend layer ID first
+            _cmdbuff = Integer.toString(_id);
+        }
+        _cmdbuff = _cmdbuff + cmd;
+        return res;
+    }
+
+    public int command_flush(String cmd) throws YAPI_Exception
+    {
+        int res;
+
+        res = command_push(cmd);
+        if (_hidden) {
+            return res;
+        }
+        if (_display.isFrozen()) {
+            return res;
+        }
+        return flush_now();
+    }
 
     /**
      * Reverts the layer to its initial state (fully transparent, default settings).
@@ -822,12 +835,6 @@ public class YDisplayLayer
     public int get_layerHeight() throws YAPI_Exception
     {
         return _display.get_layerHeight();
-    }
-
-    public int resetHiddenFlag()
-    {
-        _hidden = false;
-        return YAPI.SUCCESS;
     }
 
     //--- (end of generated code: YDisplayLayer implementation)

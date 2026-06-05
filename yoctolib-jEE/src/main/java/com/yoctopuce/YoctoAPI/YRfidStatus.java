@@ -172,6 +172,14 @@ public class YRfidStatus
     public static final int INVALID_SIZE = -154;
     public static final int BAD_PASSWORD_FORMAT = -155;
     public static final int RADIO_IS_OFF = -156;
+    public static final int NOT_AVAILABLE_ON_THIS_TAG = -157;
+    public static final int PASSWORD_FEATURE_NOT_SUPPORTED = -158;
+    public static final int BAD_PASSWORD_LENGTH = -159 ;
+    public static final int BAD_PASSWORD_TYPE = -160;
+    public static final int BAD_PASSWORD = -161;
+    public static final int PASSWORD_REQUIRED = -162;
+    public static final int MULTIWRITE_NOT_SUPPORTED = -163;
+    public static final int MULTIREAD_NOT_SUPPORTED = -164;
     protected String _tagId = "";
     protected int _errCode = 0;
     protected int _errBlk = 0;
@@ -336,7 +344,7 @@ public class YRfidStatus
                 errMsg = "Block / byte is already locked and thus cannot be locked again.";
             }
             if (errCode == BLOCK_LOCKED) {
-                errMsg = "Block / byte is locked and its content cannot be changed";
+                errMsg = "Block / byte is either locked and its content cannot be changed or operation might require a password.";
             }
             if (errCode == BLOCK_NOT_SUCESSFULLY_PROGRAMMED) {
                 errMsg = "Block was not successfully programmed";
@@ -595,6 +603,30 @@ public class YRfidStatus
             }
             if (errCode == RADIO_IS_OFF) {
                 errMsg = "Radio is OFF (refreshRate=0).";
+            }
+            if (errCode == NOT_AVAILABLE_ON_THIS_TAG) {
+                errMsg = "Tag does not provide this feature.";
+            }
+            if (errCode == PASSWORD_FEATURE_NOT_SUPPORTED) {
+                errMsg = "Password feature not supported this tag.";
+            }
+            if (errCode == BAD_PASSWORD_LENGTH) {
+                errMsg = "Incorrect password length";
+            }
+            if (errCode == BAD_PASSWORD_TYPE) {
+                errMsg = "Bad password type.";
+            }
+            if (errCode == BAD_PASSWORD) {
+                errMsg = "Bad password.";
+            }
+            if (errCode == PASSWORD_REQUIRED) {
+                errMsg = "Operation requires a password";
+            }
+            if (errCode == MULTIWRITE_NOT_SUPPORTED) {
+                errMsg = "Multi block write unavailable on this tag.";
+            }
+            if (errCode == MULTIREAD_NOT_SUPPORTED) {
+                errMsg = "Multi block read unavailable on this tag.";
             }
             if (errBlk >= 0) {
                 errMsg = String.format(Locale.US, "%s (block %d)",errMsg,errBlk);

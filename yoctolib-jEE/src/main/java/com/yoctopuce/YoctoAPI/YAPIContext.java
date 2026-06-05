@@ -11,8 +11,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.*;
-//import java.time.LocalTime;
-//import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 //--- (generated code: YAPIContext return codes)
@@ -115,16 +113,28 @@ public class YAPIContext
         public enum Event
         {
 
-            PLUG, UNPLUG, CHANGE
+            PLUG, UNPLUG, CHANGE, DISCOVERY
         }
 
-        Event ev;
-        public YModule module;
+        final Event ev;
+        final public YModule module;
+        final public String serial;
+        final public String url;
 
         PlugEvent(YAPIContext yctx, Event ev, String serial)
         {
             this.ev = ev;
             this.module = YModule.FindModuleInContext(yctx, serial + ".module");
+            this.serial = serial;
+            this.url = "";
+        }
+
+        PlugEvent(YAPIContext yctx, Event ev, String serial, String url)
+        {
+            this.ev = ev;
+            this.module = null;
+            this.serial = serial;
+            this.url = url;
         }
     }
 
@@ -399,7 +409,6 @@ public class YAPIContext
     private final Object _logCallbackLock = new Object();
     private YAPI.LogCallback _logCallback;
 
-    private final Object _newHubCallbackLock = new Object();
     private YAPI.HubDiscoveryCallback _HubDiscoveryCallback;
     private final HashMap<Integer, YAPI.CalibrationHandlerCallback> _calibHandlers = new HashMap<>();
     private final YSSDP _ssdp;
@@ -480,10 +489,7 @@ public class YAPIContext
         public void HubDiscoveryCallback(String serial, String urlToRegister, String urlToUnregister)
         {
             if (urlToRegister != null) {
-                synchronized (_newHubCallbackLock) {
-                    if (_HubDiscoveryCallback != null)
-                        _HubDiscoveryCallback.yHubDiscoveryCallback(serial, urlToRegister);
-                }
+                _pushDiscoveryEvent(serial, urlToRegister);
             }
             if ((_apiMode & YAPI.DETECT_NET) != 0) {
                 if (urlToRegister != null) {
@@ -625,6 +631,15 @@ public class YAPIContext
 
             synchronized (_pendingCallbacks) {
                 _pendingCallbacks.add(new PlugEvent(this, PlugEvent.Event.UNPLUG, serial));
+            }
+        }
+    }
+
+    void _pushDiscoveryEvent(String serial, String urlToRegister)
+    {
+        if (_HubDiscoveryCallback != null) {
+            synchronized (_pendingCallbacks) {
+                _pendingCallbacks.add(new PlugEvent(this, PlugEvent.Event.DISCOVERY, serial,urlToRegister));
             }
         }
     }
@@ -842,7 +857,6 @@ public class YAPIContext
                 } else {
                     newhub.stopNotifications();
                 }
-                ex.printStackTrace();
                 throw ex;
             }
         }
@@ -861,6 +875,7 @@ public class YAPIContext
 
     private void _updateDeviceList_internal(boolean forceupdate, boolean invokecallbacks) throws YAPI_Exception
     {
+        YAPI_Exception first_ex = null;
         synchronized (this) {
             // Rescan all hubs and update list of online devices
             for (YGenericHub h : _hubs) {
@@ -872,6 +887,11 @@ public class YAPIContext
                 } catch (InterruptedException e) {
                     throw new YAPI_Exception(YAPI.IO_ERROR,
                             "Thread has been interrupted");
+                } catch (YAPI_Exception ex) {
+                    if (first_ex == null) {
+                        first_ex = ex;
+                    }
+                    this._Log("Error during UpdateDeviceList:" + ex.getLocalizedMessage());
                 }
             }
         }
@@ -907,10 +927,18 @@ public class YAPIContext
                                     _removalCallback.yDeviceRemoval(evt.module);
                                 }
                                 break;
+                            case DISCOVERY:
+                                if (_HubDiscoveryCallback != null) {
+                                    _HubDiscoveryCallback.yHubDiscoveryCallback(evt.serial, evt.url);
+                                }
+                                break;
                         }
                     }
                 }
             }
+        }
+        if (first_ex != null) {
+            throw first_ex;
         }
     }
 
@@ -1954,7 +1982,7 @@ public class YAPIContext
      */
     public void RegisterHubDiscoveryCallback(YAPI.HubDiscoveryCallback hubDiscoveryCallback)
     {
-        synchronized (_newHubCallbackLock) {
+        synchronized (_regCbLock) {
             _HubDiscoveryCallback = hubDiscoveryCallback;
         }
         try {

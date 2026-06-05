@@ -1,5 +1,4 @@
-Java v2.1.12413
+Java v2.1.14544
 
-- Add error handling when sending SMS
-- Add registerSmsCallback support
-- Add example showing how to use SMS functions (Prog-SMS-Example)
+- Add support for new device firmware
+- Fix SSDP discovery

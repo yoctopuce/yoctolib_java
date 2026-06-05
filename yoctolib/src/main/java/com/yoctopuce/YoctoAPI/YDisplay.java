@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 72057 2026-02-17 09:44:53Z mvuilleu $
+ * $Id: YDisplay.java 74504 2026-06-01 14:50:23Z seb $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -127,6 +127,35 @@ public class YDisplay extends YFunction
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
+    public enum DISPLAYSTATE {
+        FAILURE(0),
+        OFF(1),
+        POWERING(2),
+        IDLE(3),
+        REFRESHING(4);
+        public final int value;
+        DISPLAYSTATE(int val)
+        {
+            this.value = val;
+        }
+        public static DISPLAYSTATE fromInt(int intval)
+        {
+            switch(intval) {
+            case 0:
+                return FAILURE;
+            case 1:
+                return OFF;
+            case 2:
+                return POWERING;
+            case 3:
+                return IDLE;
+            case 4:
+                return REFRESHING;
+            }
+            return null;
+        }
+    }
+
     protected int _enabled = ENABLED_INVALID;
     protected String _startupSeq = STARTUPSEQ_INVALID;
     protected int _brightness = BRIGHTNESS_INVALID;
@@ -142,6 +171,9 @@ public class YDisplay extends YFunction
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackDisplay = null;
     protected ArrayList<YDisplayLayer> _allDisplayLayers = new ArrayList<>();
+    protected long _frozenUntil = 0;
+    protected boolean _recording;
+    protected String _sequence = "";
 
     /**
      * Deprecated UpdateCallback for Display
@@ -1026,6 +1058,45 @@ public class YDisplay extends YFunction
         return 0;
     }
 
+    public int sendCommand(String cmd) throws YAPI_Exception
+    {
+        if (!(_recording)) {
+            return set_command(cmd);
+        }
+        _sequence = String.format(Locale.US, "%s%s\n",_sequence,cmd);
+        return YAPI.SUCCESS;
+    }
+
+    public int flushLayers() throws YAPI_Exception
+    {
+        for (YDisplayLayer ii_0:_allDisplayLayers) {
+            if (ii_0.must_be_flushed()) {
+                ii_0.flush_now();
+            }
+        }
+        return YAPI.SUCCESS;
+    }
+
+    public int resetHiddenLayerFlags()
+    {
+        for (YDisplayLayer ii_0:_allDisplayLayers) {
+            ii_0.resetHiddenFlag();
+        }
+        return YAPI.SUCCESS;
+    }
+
+    public boolean isFrozen()
+    {
+        if (_frozenUntil == 0) {
+            return false;
+        }
+        if (_frozenUntil <= YAPIContext.GetTickCount()) {
+            _frozenUntil = 0;
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Clears the display screen and resets all display layers to their default state.
      * Using this function in a sequence will kill the sequence play-back. Don't use that
@@ -1057,6 +1128,52 @@ public class YDisplay extends YFunction
     }
 
     /**
+     * Returns the current state of an ePaper display, specifically to
+     * determine whether an update is in progress or whether a
+     * configuration issue has been detected. If a display configuration
+     * error has been detected, the error message can be retrieved.
+     *
+     * @return a value among the enumeration YDisplay.DISPLAYSTATE
+     *         (YDisplay.DISPLAYSTATE.FAILURE, YDisplay.DISPLAYSTATE.OFF,
+     *         YDisplay.DISPLAYSTATE.POWERING, YDisplay.DISPLAYSTATE.IDLE,
+     *         YDisplay.DISPLAYSTATE.REFRESHING)
+     *         corresponding to the current display state.
+     */
+    public DISPLAYSTATE get_ePaperState(String errmsg) throws YAPI_Exception
+    {
+        byte[] json;
+        String dispError;
+        int dispState;
+
+        if (get_displayType() == DISPLAYTYPE_MONO) {
+            errmsg = "Not an ePaper display";
+            return DISPLAYSTATE.fromInt(0);
+        }
+        json = _download("disp.json");
+        if ((json).length == 0) {
+            errmsg = get_errorMessage();
+            return DISPLAYSTATE.fromInt(0);
+        } else {
+            dispError = _json_get_string(_get_json_path(json, "err"));
+            errmsg = dispError;
+            if (dispError.length() > 0) {
+                return DISPLAYSTATE.fromInt(0);
+            }
+            dispState = YAPIContext._atoi(_json_get_key(json, "state"));
+            if (dispState > 10) {
+                return DISPLAYSTATE.fromInt(4);
+            }
+            if (dispState == 10) {
+                return DISPLAYSTATE.fromInt(3);
+            }
+            if (dispState > 0) {
+                return DISPLAYSTATE.fromInt(2);
+            }
+        }
+        return DISPLAYSTATE.fromInt(1);
+    }
+
+    /**
      * Disables screen refresh for a short period of time. The combination of
      * postponeRefresh and triggerRefresh can be used as an
      * alternative to double-buffering to avoid flickering during display updates.
@@ -1069,6 +1186,7 @@ public class YDisplay extends YFunction
      */
     public int postponeRefresh(int duration) throws YAPI_Exception
     {
+        _frozenUntil = YAPIContext.GetTickCount() + duration;
         return sendCommand(String.format(Locale.US, "H%d",duration));
     }
 
@@ -1083,6 +1201,8 @@ public class YDisplay extends YFunction
      */
     public int triggerRefresh() throws YAPI_Exception
     {
+        _frozenUntil = 0;
+        flushLayers();
         return sendCommand("H0");
     }
 
@@ -1205,6 +1325,7 @@ public class YDisplay extends YFunction
      */
     public int upload(String pathname,byte[] content) throws YAPI_Exception
     {
+        flushLayers();
         return _upload(pathname, content);
     }
 
@@ -1535,35 +1656,5 @@ public class YDisplay extends YFunction
     }
 
     //--- (end of generated code: YDisplay implementation)
-    private Boolean _recording = false;
-    private String _sequence;
-
-    public synchronized int flushLayers() throws YAPI_Exception
-    {
-        if (_allDisplayLayers.size() > 0) {
-            for (YDisplayLayer _allDisplayLayer : _allDisplayLayers) {
-                _allDisplayLayer.flush_now();
-            }
-        }
-        return YAPI.SUCCESS;
-    }
-
-    public synchronized void resetHiddenLayerFlags()
-    {
-        if (_allDisplayLayers.size() > 0) {
-            for (YDisplayLayer _allDisplayLayer : _allDisplayLayers) {
-                _allDisplayLayer.resetHiddenFlag();
-            }
-        }
-    }
-
-    public synchronized int sendCommand(String cmd) throws YAPI_Exception
-    {
-        if (!_recording) {
-            return this.set_command(cmd);
-        }
-        this._sequence += cmd + "\n";
-        return YAPI.SUCCESS;
-    }
 }
 

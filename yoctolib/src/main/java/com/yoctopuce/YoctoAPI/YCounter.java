@@ -57,9 +57,16 @@ public class YCounter extends YSensor
 //--- (end of YCounter class start)
 //--- (YCounter definitions)
     /**
+     * invalid decimalMode value
+     */
+    public static final int DECIMALMODE_FALSE = 0;
+    public static final int DECIMALMODE_TRUE = 1;
+    public static final int DECIMALMODE_INVALID = -1;
+    /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
+    protected int _decimalMode = DECIMALMODE_INVALID;
     protected String _command = COMMAND_INVALID;
     protected UpdateCallback _valueCallbackCounter = null;
     protected TimedReportCallback _timedReportCallbackCounter = null;
@@ -118,10 +125,85 @@ public class YCounter extends YSensor
     @Override
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
+        if (json_val.has("decimalMode")) {
+            _decimalMode = json_val.getInt("decimalMode") > 0 ? 1 : 0;
+        }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
         }
         super._parseAttr(json_val);
+    }
+
+    /**
+     * Returns a value indicating if the senseur compute whole or fractional values.
+     *
+     *  @return either YCounter.DECIMALMODE_FALSE or YCounter.DECIMALMODE_TRUE, according to a value
+     * indicating if the senseur compute whole or fractional values
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_decimalMode() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return DECIMALMODE_INVALID;
+                }
+            }
+            res = _decimalMode;
+        }
+        return res;
+    }
+
+    /**
+     * Returns a value indicating if the senseur compute whole or fractional values.
+     *
+     *  @return either YCounter.DECIMALMODE_FALSE or YCounter.DECIMALMODE_TRUE, according to a value
+     * indicating if the senseur compute whole or fractional values
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getDecimalMode() throws YAPI_Exception
+    {
+        return get_decimalMode();
+    }
+
+    /**
+     * Changes the sensor's operating mode so that it computes integer or decimal values.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     *  @param newval : either YCounter.DECIMALMODE_FALSE or YCounter.DECIMALMODE_TRUE, according to the
+     * sensor's operating mode so that it computes integer or decimal values
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_decimalMode(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("decimalMode",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Changes the sensor's operating mode so that it computes integer or decimal values.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     *  @param newval : either YCounter.DECIMALMODE_FALSE or YCounter.DECIMALMODE_TRUE, according to the
+     * sensor's operating mode so that it computes integer or decimal values
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setDecimalMode(int newval)  throws YAPI_Exception
+    {
+        return set_decimalMode(newval);
     }
 
     public String get_command() throws YAPI_Exception
@@ -315,7 +397,10 @@ public class YCounter extends YSensor
     /**
      * Reset the counter to zero.
      *
-     * @return YAPI.SUCCESS if the call succeeds.
+     * @return YAPI.SUCCESS if the call succeeds. Please note that this function only resets
+     *         the integer part of the counter. In CONTINUOUS mode, the decimal part is calculated
+     *         from the angle measured by the sensor. To set the decimal part of the sensor to zero,
+     *         the origin of the sensor must be changed with the YOrientation.zero().
      *
      * @throws YAPI_Exception on error
      */

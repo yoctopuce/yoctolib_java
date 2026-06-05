@@ -62,6 +62,13 @@ public class YRfidOptions
     public static final int NO_RFID_KEY = 0;
     public static final int MIFARE_KEY_A = 1;
     public static final int MIFARE_KEY_B = 2;
+    public static final int ST25DV_CONFIG_PWD = 3;
+    public static final int ST25DV_PWD1 = 4;
+    public static final int ST25DV_PWD2 = 5;
+    public static final int ST25DV_PWD3 = 6;
+    public static final int ST25TV_CONFIG_PWD = 7;
+    public static final int ST25TV_PWD1 = 8;
+    public static final int ST25TV_PWD2 = 9;
 
     /**
      * Type of security key to be used to access the RFID tag.

@@ -66,6 +66,12 @@ public class YRfidTagInfo
     public static final int IEC_14443_NTAG_215 = 8;
     public static final int IEC_14443_NTAG_216 = 9;
     public static final int IEC_14443_NTAG_424_DNA = 10;
+    public static final int IEC_15693_ST25DV = 11;
+    public static final int IEC_15693_ST25TV = 12;
+    public static final int IEC_15693_TAGIT_HFI = 13;
+    public static final int IEC_15693_MB89R = 14 ;
+    public static final int IEC_15693_ICODE_DNA = 15;
+    public static final int IEC_15693_ICODE_SLI = 16;
     protected String _tagId = "";
     protected int _tagType = 0;
     protected String _typeStr = "";
@@ -207,6 +213,25 @@ public class YRfidTagInfo
         if (tagType == IEC_14443_NTAG_424_DNA) {
             typeStr = "NTAG 424 DNA";
         }
+        if (tagType == IEC_15693_ST25DV) {
+            typeStr = "ST25DVxx";
+        }
+        if (tagType == IEC_15693_ST25TV) {
+            typeStr = "ST25TVxx";
+        }
+        if (tagType == IEC_15693_TAGIT_HFI) {
+            typeStr = "TI TAGIT HFI";
+        }
+        if (tagType == IEC_15693_MB89R) {
+            typeStr = "MB89Rxx";
+        }
+        if (tagType == IEC_15693_ICODE_DNA) {
+            typeStr = "ICODE DNA";
+        }
+        if (tagType == IEC_15693_ICODE_SLI) {
+            typeStr = "ICODE SLI";
+        }
+
         _tagId = tagId;
         _tagType = tagType;
         _typeStr = typeStr;

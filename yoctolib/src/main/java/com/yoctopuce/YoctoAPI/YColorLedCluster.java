@@ -726,6 +726,66 @@ public class YColorLedCluster extends YFunction
     }
 
     /**
+     * Changes the color displayed by the last LED and shifts all currently displayed colors
+     * toward the beginning of the RGB LED string. The new color is encoded as follows: 0xRRGGBB.
+     *
+     * @param rgbValue :  new color.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int shl_rgb(int rgbValue) throws YAPI_Exception
+    {
+        return sendCommand(String.format(Locale.US, "<R%x",rgbValue));
+    }
+
+    /**
+     * Changes the color displayed by the first LED and shifts all currently displayed colors
+     * toward the end of the RGB LED string. The new color is encoded as follows: 0xRRGGBB.
+     *
+     * @param rgbValue :  new color.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int shr_rgb(int rgbValue) throws YAPI_Exception
+    {
+        return sendCommand(String.format(Locale.US, ">R%x",rgbValue));
+    }
+
+    /**
+     * Changes the color displayed by the last LED and shifts all currently displayed colors
+     * toward the beginning of the RGB LED string. The new color is encoded as follows: 0xHHSSLL.
+     *
+     * @param hslValue :  new color.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int shl_hsl(int hslValue) throws YAPI_Exception
+    {
+        return sendCommand(String.format(Locale.US, "<H%x",hslValue));
+    }
+
+    /**
+     * Changes the color displayed by the first LED and shifts all currently displayed colors
+     * toward the end of the RGB LED string. The new color is encoded as follows: 0xHHSSLL.
+     *
+     * @param hslValue :  new color.
+     *
+     * @return YAPI.SUCCESS when the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int shr_hsl(int hslValue) throws YAPI_Exception
+    {
+        return sendCommand(String.format(Locale.US, ">H%x",hslValue));
+    }
+
+    /**
      * Adds an RGB transition to a sequence. A sequence is a transition list, which can
      * be executed in loop by a group of LEDs.  Sequences are persistent and are saved
      * in the device flash memory as soon as the saveBlinkSeq() method is called.

@@ -59,6 +59,12 @@ public class YOrientation extends YSensor
 //--- (end of YOrientation class start)
 //--- (YOrientation definitions)
     /**
+     * invalid counterClockwise value
+     */
+    public static final int COUNTERCLOCKWISE_FALSE = 0;
+    public static final int COUNTERCLOCKWISE_TRUE = 1;
+    public static final int COUNTERCLOCKWISE_INVALID = -1;
+    /**
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
@@ -66,6 +72,7 @@ public class YOrientation extends YSensor
      * invalid zeroOffset value
      */
     public static final double ZEROOFFSET_INVALID = YAPI.INVALID_DOUBLE;
+    protected int _counterClockwise = COUNTERCLOCKWISE_INVALID;
     protected String _command = COMMAND_INVALID;
     protected double _zeroOffset = ZEROOFFSET_INVALID;
     protected UpdateCallback _valueCallbackOrientation = null;
@@ -125,6 +132,9 @@ public class YOrientation extends YSensor
     @Override
     protected void  _parseAttr(YJSONObject json_val) throws Exception
     {
+        if (json_val.has("counterClockwise")) {
+            _counterClockwise = json_val.getInt("counterClockwise") > 0 ? 1 : 0;
+        }
         if (json_val.has("command")) {
             _command = json_val.getString("command");
         }
@@ -132,6 +142,78 @@ public class YOrientation extends YSensor
             _zeroOffset = Math.round(json_val.getDouble("zeroOffset") / 65.536) / 1000.0;
         }
         super._parseAttr(json_val);
+    }
+
+    /**
+     * Returns a value indicating whether the sensor is operating in a counterclockwise direction.
+     *
+     *  @return either YOrientation.COUNTERCLOCKWISE_FALSE or YOrientation.COUNTERCLOCKWISE_TRUE, according
+     * to a value indicating whether the sensor is operating in a counterclockwise direction
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_counterClockwise() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return COUNTERCLOCKWISE_INVALID;
+                }
+            }
+            res = _counterClockwise;
+        }
+        return res;
+    }
+
+    /**
+     * Returns a value indicating whether the sensor is operating in a counterclockwise direction.
+     *
+     *  @return either YOrientation.COUNTERCLOCKWISE_FALSE or YOrientation.COUNTERCLOCKWISE_TRUE, according
+     * to a value indicating whether the sensor is operating in a counterclockwise direction
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getCounterClockwise() throws YAPI_Exception
+    {
+        return get_counterClockwise();
+    }
+
+    /**
+     * Defines the operating direction of the sensor.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : either YOrientation.COUNTERCLOCKWISE_FALSE or YOrientation.COUNTERCLOCKWISE_TRUE
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_counterClockwise(int  newval)  throws YAPI_Exception
+    {
+        String rest_val;
+        synchronized (this) {
+            rest_val = (newval > 0 ? "1" : "0");
+            _setAttr("counterClockwise",rest_val);
+        }
+        return YAPI.SUCCESS;
+    }
+
+    /**
+     * Defines the operating direction of the sensor.
+     * Remember to call the saveToFlash() method of the module if the
+     * modification must be kept.
+     *
+     * @param newval : either YOrientation.COUNTERCLOCKWISE_FALSE or YOrientation.COUNTERCLOCKWISE_TRUE
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int setCounterClockwise(int newval)  throws YAPI_Exception
+    {
+        return set_counterClockwise(newval);
     }
 
     public String get_command() throws YAPI_Exception
@@ -164,7 +246,6 @@ public class YOrientation extends YSensor
      * can typically be used  to compensate for mechanical offset. This offset can also be set
      * automatically using the zero() method.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
-     * @throws YAPI_Exception on error
      *
      * @param newval : a floating point number
      *
@@ -187,7 +268,6 @@ public class YOrientation extends YSensor
      * can typically be used  to compensate for mechanical offset. This offset can also be set
      * automatically using the zero() method.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
-     * @throws YAPI_Exception on error
      *
      * @param newval : a floating point number
      *
@@ -403,7 +483,6 @@ public class YOrientation extends YSensor
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @return YAPI.SUCCESS if the call succeeds.
-     *
      * @throws YAPI_Exception on error
      */
     public int zero() throws YAPI_Exception

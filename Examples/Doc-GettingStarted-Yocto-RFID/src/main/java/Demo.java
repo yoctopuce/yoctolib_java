@@ -1,10 +1,12 @@
 /*
  *
- *  $Id: Demo.java 60291 2024-04-02 09:00:39Z seb $
+ *  $Id: Demo.java 72955 2026-04-24 08:26:36Z seb $
  *
- *  Doc-GettingStarted-Yocto-RFID example
+ *  An example that shows how to use a  Yocto-RFID
  *
  *  You can find more information on our web site:
+ *   Yocto-RFID documentation:
+ *      https://www.yoctopuce.com/EN/products/yocto-rfid/doc.html
  *   JAVA API Reference:
  *      https://www.yoctopuce.com/EN/doc/reference/yoctolib-java-EN.html
  *
