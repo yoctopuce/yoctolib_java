@@ -1,4 +1,4 @@
-Java v2.1.14544
+Java v2.1.14699
 
-- Add support for new device firmware
+- Add support for new RFID tags
 - Fix SSDP discovery
