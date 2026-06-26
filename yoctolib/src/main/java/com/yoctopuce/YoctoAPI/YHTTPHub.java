@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 70326 2025-11-17 11:17:46Z seb $
+ * $Id: YHTTPHub.java 74799 2026-06-22 06:45:40Z seb $
  *
  * Internal YHTTPHUB object
  *
@@ -554,6 +554,8 @@ public class YHTTPHub extends YGenericHub
         }
         if (!isOnline()) {
             String message = "hub " + this._runtime_http_params.getUrl() + " is not reachable";
+            this._yctx._Log(String.format("_sendPingNotification=%b lastping=%x (exp%d) _connectionState=%d\n",
+                    _sendPingNotification,_lastPing,(_lastPing + NET_HUB_NOT_CONNECTION_TIMEOUT) - System.currentTimeMillis(),_connectionState));
             saveLastError(YAPI.TIMEOUT, message, null);
             if (_reportConnnectionLost) {
                 throw new YAPI_Exception(YAPI.TIMEOUT, message);

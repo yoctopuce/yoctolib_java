@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 69338 2025-10-08 07:57:22Z seb $
+ * $Id: yHTTPRequest.java 74799 2026-06-22 06:45:40Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -39,7 +39,9 @@ package com.yoctopuce.YoctoAPI;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Locale;
 
 
@@ -52,6 +54,7 @@ class yHTTPRequest implements Runnable
 
     private YGenericHub.RequestAsyncResult _resultCallback;
     private boolean _isChuckEncoded;
+    private int _chunkSize;
 
     public void kill()
     {
@@ -61,6 +64,29 @@ class yHTTPRequest implements Runnable
     private enum State
     {
         AVAIL, IN_REQUEST, STOPPED
+    }
+
+    static class YArrayDeque extends ArrayDeque<Byte>
+    {
+
+        public YArrayDeque(int size)
+        {
+            super(size);
+        }
+
+        public byte[] getAllBytes()
+        {
+            byte[] res = new byte[this.size()];
+            int i = 0;
+            for (Byte b : this) {
+                res[i++] = b;
+            }
+            return res;
+        }
+        public  String getAsString()
+        {
+            return new String(this.getAllBytes());
+        }
     }
 
     private final YHTTPHub _hub;
@@ -76,7 +102,7 @@ class yHTTPRequest implements Runnable
     private final String _dbglabel;
     private final StringBuilder _header = new StringBuilder(1024);
     private Boolean _header_found;
-    private final ByteArrayOutputStream _result = new ByteArrayOutputStream(4096);
+    private final YArrayDeque _result = new YArrayDeque(4096);
     private long _startRequestTime;
     private long _lastReceiveTime;
     private long _requestTimeout;
@@ -256,10 +282,11 @@ class yHTTPRequest implements Runnable
                     _out = _socket.getOutputStream();
                     _in = _socket.getInputStream();
                 }
-                _result.reset();
+                _result.clear();
                 _header.setLength(0);
                 _header_found = false;
                 _isChuckEncoded = false;
+                _chunkSize = 0;
                 _eof = false;
 
             } catch (UnknownHostException e) {
@@ -393,10 +420,10 @@ class yHTTPRequest implements Runnable
                         int pos = _header.indexOf("\r\n\r\n");
                         if (pos > 0) {
                             pos += 4;
-                            try {
-                                _result.write(_header.substring(pos).getBytes(_hub._yctx._deviceCharset));
-                            } catch (IOException ex) {
-                                throw new YAPI_Exception(YAPI.IO_ERROR, ex.getLocalizedMessage());
+                            String tmp = _header.substring(pos);
+                            byte[] bytes = tmp.getBytes(_hub._yctx._deviceCharset);
+                            for (int i = 0; i < bytes.length; i++) {
+                                _result.addLast(bytes[i]);
                             }
                             _header_found = true;
                             _header.setLength(pos);
@@ -436,7 +463,9 @@ class yHTTPRequest implements Runnable
                             _hub.authSucceded();
                         }
                     } else {
-                        _result.write(buffer, 0, read);
+                        for (int i = 0; i < read; i++) {
+                            _result.addLast(buffer[i]);
+                        }
                     }
                     if (_reuse_socket) {
                         if (_result.toString().endsWith("\r\n")) {
@@ -452,19 +481,73 @@ class yHTTPRequest implements Runnable
 
     byte[] getPartialResult() throws YAPI_Exception
     {
-        byte[] res;
+
         synchronized (_result) {
             if (!_header_found)
                 return null;
-            if (_result.size() == 0) {
+            if (_result.isEmpty()) {
                 if (_eof)
                     throw new YAPI_Exception(YAPI.NO_MORE_DATA, "end of file reached");
                 return null;
             }
-            res = _result.toByteArray();
-            _result.reset();
+            if (_isChuckEncoded) {
+                if (_chunkSize == 0) {
+
+                    if (_result.size() < 2) {
+                        return null;
+                    }
+                    String tmp = _result.getAsString();
+
+                    int offset = 0;
+                    StringBuilder hex_str = new StringBuilder();
+                    Iterator<Byte> iterator = _result.iterator();
+                    while (iterator.hasNext()) {
+                        Byte next = iterator.next();
+                        char c = (char) next.byteValue();
+                        if (c == '\n') {
+                            break;
+                        }
+                        hex_str.append(c);
+                        offset++;
+                    }
+                    if (!iterator.hasNext() && offset == _result.size()) {
+                        return null;
+                    }
+                    try {
+                        String string = hex_str.toString().trim();
+                        _chunkSize = Integer.parseInt(string, 16);
+                    } catch (NumberFormatException ex) {
+                        _chunkSize = 0;
+                    }
+                    // remove header
+                    for (int i = 0; i < offset + 1 && !_result.isEmpty(); i++) {
+                        _result.removeFirst();
+                    }
+                    tmp = _result.getAsString();
+                    offset++;
+                }
+                if (_chunkSize > 0 && !_result.isEmpty()) {
+                    int avail = Math.min(_chunkSize, _result.size());
+                    byte[] res = new byte[avail];
+                    for (int i = 0; i < avail; i++) {
+                        res[i] = _result.removeFirst();
+                        _chunkSize--;
+                    }
+                    String tmp = _result.getAsString();
+                    return res;
+                } else {
+                    return null;
+                }
+            } else {
+                byte[] res = new byte[_result.size()];
+                int i = 0;
+                for (Byte b : _result) {
+                    res[i++] = b;
+                }
+                _result.clear();
+                return res;
+            }
         }
-        return res;
     }
 
 
@@ -479,8 +562,13 @@ class yHTTPRequest implements Runnable
                 read = _requestProcesss();
             } while (read >= 0);
             synchronized (_result) {
-                res = _result.toByteArray();
-                _result.reset();
+                res = new byte[_result.size()];
+                int i = 0;
+                for (Byte b : _result) {
+                    res[i++] = b;
+                }
+                _result.clear();
+                String tmp = new String(res);
                 if (_isChuckEncoded) {
                     res = unpackHTTPRequest(res);
                 }
@@ -540,8 +628,12 @@ class yHTTPRequest implements Runnable
                 read = _requestProcesss();
             } while (read >= 0);
             synchronized (_result) {
-                res = _result.toByteArray();
-                _result.reset();
+                res = new byte[_result.size()];
+                int i = 0;
+                for (Byte b : _result) {
+                    res[i++] = b;
+                }
+                _result.clear();
             }
         } catch (YAPI_Exception ex) {
             errorType = ex.errorType;

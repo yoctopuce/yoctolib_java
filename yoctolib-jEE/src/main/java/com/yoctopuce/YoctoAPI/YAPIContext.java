@@ -432,10 +432,7 @@ public class YAPIContext
     void dbglog(int level, String msg)
     {
         if (_dbglog_level >= level) {
-            //LocalTime maintenant = LocalTime.now();
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
-            //String timestamp = maintenant.format(formatter);
-            //System.out.println(String.format("%s: %s", timestamp, msg));
+            System.out.println( msg);
         }
     }
 

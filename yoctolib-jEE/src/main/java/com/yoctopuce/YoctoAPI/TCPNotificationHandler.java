@@ -84,8 +84,6 @@ class TCPNotificationHandler extends NotificationHandler
                     } while (pos >= 0);
                     _error_delay = 0;
                 } while (_hub.workerThreadMustContinue());
-                yreq._requestStop();
-                yreq._requestRelease();
             } catch (YAPI_Exception ex) {
                 if (ex.errorType == YAPI.UNAUTHORIZED || ex.errorType == YAPI.SSL_UNK_CERT) {
                     break;
@@ -95,6 +93,9 @@ class TCPNotificationHandler extends NotificationHandler
                 _notifRetryCount++;
                 _hub._isNotifWorking = false;
                 _error_delay = 100 << (_notifRetryCount > 4 ? 4 : _notifRetryCount);
+            } finally {
+                yreq._requestStop();
+                yreq._requestRelease();
             }
         }
         _hub.set_connectionState(YHub.ABORTED);
