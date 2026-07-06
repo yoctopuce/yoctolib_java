@@ -9,9 +9,9 @@
         <version>2.1.15129-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>prog-modbus</artifactId>
+    <artifactId>doc-gettingstarted-yocto-display-epaper</artifactId>
     <packaging>jar</packaging>
-    <name>Prog-MODBUS</name>
+    <name>Doc-GettingStarted-Yocto-Display-ePaper</name>
     <version>2.1.15129-SNAPSHOT</version>
     <url>http://www.yoctopuce.com</url>
     <developers>

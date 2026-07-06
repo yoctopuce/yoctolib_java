@@ -75,6 +75,7 @@ public class YRfidTagInfo
     protected String _tagId = "";
     protected int _tagType = 0;
     protected String _typeStr = "";
+    protected int _nfcType = 0;
     protected int _size = 0;
     protected int _usable = 0;
     protected int _blksize = 0;
@@ -121,6 +122,17 @@ public class YRfidTagInfo
     public String get_tagTypeStr()
     {
         return _typeStr;
+    }
+
+    /**
+     * Returns the type of NFC type usable on the RFID tag, between 1 and 5.
+     * If no known NFC type is know for the RFID tag, returns zero.
+     *
+     * @return an integer corresponding to the RFID tag type
+     */
+    public int get_tagNFCtype()
+    {
+        return _nfcType;
     }
 
     /**
@@ -182,6 +194,7 @@ public class YRfidTagInfo
     public void imm_init(String tagId,int tagType,int size,int usable,int blksize,int fblk,int lblk)
     {
         String typeStr;
+        int nfcType;
         typeStr = "unknown";
         if (tagType == IEC_15693) {
             typeStr = "IEC 15693";
@@ -231,9 +244,19 @@ public class YRfidTagInfo
         if (tagType == IEC_15693_ICODE_SLI) {
             typeStr = "ICODE SLI";
         }
-
+        nfcType = 0;
+        if ((tagType == IEC_14443_MIFARE_ULTRALIGHT) || (tagType == IEC_14443_MIFARE_CLASSIC1K) || (tagType == IEC_14443_MIFARE_CLASSIC4K) || (tagType == IEC_14443_NTAG_213) || (tagType == IEC_14443_NTAG_215) || (tagType == IEC_14443_NTAG_216) || (tagType == IEC_14443_NTAG_424_DNA)) {
+            nfcType = 2;
+        }
+        if (tagType == IEC_14443_MIFARE_DESFIRE) {
+            nfcType = 4;
+        }
+        if ((tagType == IEC_15693) || (tagType == IEC_15693_ST25DV) || (tagType == IEC_15693_ST25TV) || (tagType == IEC_15693_TAGIT_HFI) || (tagType == IEC_15693_MB89R) || (tagType == IEC_15693_ICODE_DNA) || (tagType == IEC_15693_ICODE_SLI)) {
+            nfcType = 5;
+        }
         _tagId = tagId;
         _tagType = tagType;
+        _nfcType = nfcType;
         _typeStr = typeStr;
         _size = size;
         _usable = usable;

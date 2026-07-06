@@ -2,11 +2,9 @@
     "main": "src\/main\/java\/Demo.java",
     "other_files": [],
     "ylib": [
-        "yocto_airquality",
-        "yocto_humidity",
+        "yocto_display",
+        "yocto_files",
         "yocto_temperature",
-        "yocto_tvoc",
-        "yocto_voc",
         "yocto_api"
     ],
     "skip": true,

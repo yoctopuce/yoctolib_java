@@ -970,6 +970,284 @@ public class YRfidReader extends YFunction
     }
 
     /**
+     * Writes data provided as a binary object to an RFID tag, using NFC
+     * compatible encoding.
+     * The function will automatically create a NFC Capability Container,
+     * and encapsulate the content with the required NDEF header corresponding
+     * to the given content type.
+     *
+     * @param tagId : identifier of the tag to use
+     * @param ndefType : the content type, either "U" for a URL, or a
+     *         generic MIME type like "text/vcard"
+     * @param payload : the payload of the NDEF record
+     * @param options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     * happens, you can get more information from the status object.
+     */
+    public int tagWriteBinNFC(String tagId,String ndefType,byte[] payload,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
+    {
+        YRfidTagInfo tagInfo;
+        int nfcType;
+        int usableSize;
+        int nfcBlocks;
+        int ccLen;
+        int typeLen;
+        int payloadLen;
+        int srBit;
+        int ndefLen;
+        int tlvHdrLen;
+        int totalLen;
+        int absPos;
+        int idx;
+        byte[] binType;
+        byte[] buff;
+
+        tagInfo = get_tagInfo(tagId, status);
+        // for now, we only allow NFC Type 5 (T5T)
+        nfcType = tagInfo.get_tagNFCtype();
+        //noinspection DoubleNegation
+        if (!(nfcType == 5)) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "no NFC support for this tag");}
+        usableSize = tagInfo.get_tagUsableSize();
+        ccLen = 4;
+        nfcBlocks = ((usableSize - ccLen) / 8);
+        if (nfcBlocks > 255) {
+            if (nfcType == 5) {
+                ccLen = 8;
+                nfcBlocks = ((usableSize - ccLen) / 8);
+            } else {
+                nfcBlocks = 255;
+            }
+        }
+        binType = (ndefType).getBytes(_yapi._deviceCharset);
+        typeLen = (binType).length;
+        payloadLen = (payload).length;
+        // compute the total length of the NDEF record
+        ndefLen = 3 + typeLen + payloadLen;
+        srBit = 0x10;
+        if (payloadLen > 255) {
+            ndefLen = ndefLen + 3;
+            srBit = 0;
+        }
+        // compute the total length of the TLV record
+        tlvHdrLen = 2;
+        if (ndefLen > 254) {
+            tlvHdrLen = 4;
+        }
+        // make sure the content fits on the tag
+        //noinspection DoubleNegation
+        if (!((tlvHdrLen + ndefLen + 1) <= (8 * nfcBlocks))) { throw new YAPI_Exception(YAPI.INVALID_ARGUMENT, "content is too large");}
+        totalLen = ccLen + tlvHdrLen + ndefLen + 1;
+        buff = new byte[totalLen];
+        // CC header
+        if (ccLen == 4) {
+            buff[0] = (byte)(0xE1 & 0xff);
+            if (nfcType == 5) {
+                buff[1] = (byte)(0x40 & 0xff);
+            } else {
+                buff[1] = (byte)(0x10 & 0xff);
+            }
+            buff[2] = (byte)(nfcBlocks & 0xff);
+            buff[3] = (byte)(0x00 & 0xff);
+        } else {
+            buff[0] = (byte)(0xE2 & 0xff);
+            buff[1] = (byte)(0x40 & 0xff);
+            buff[2] = (byte)(0x00 & 0xff);
+            buff[3] = (byte)(0x01 & 0xff);
+            buff[4] = (byte)(0x00 & 0xff);
+            buff[5] = (byte)(0x00 & 0xff);
+            buff[6] = (byte)((nfcBlocks / 256) & 0xff);
+            buff[7] = (byte)((nfcBlocks & 255) & 0xff);
+        }
+        // TLV header
+        buff[ccLen] = (byte)(3 & 0xff);
+        if (tlvHdrLen == 2) {
+            buff[ccLen + 1] = (byte)(ndefLen & 0xff);
+        } else {
+            buff[ccLen + 1] = (byte)(0xff & 0xff);
+            buff[ccLen + 2] = (byte)((ndefLen / 256) & 0xff);
+            buff[ccLen + 3] = (byte)((ndefLen & 255) & 0xff);
+        }
+        absPos = ccLen + tlvHdrLen;
+        // NDEF record
+        if (typeLen <= 3) {
+            // NFC Forum type
+            buff[absPos] = (byte)(0xC1 + srBit & 0xff);
+        } else {
+            // MIME type
+            buff[absPos] = (byte)(0xC2 + srBit & 0xff);
+        }
+        if (srBit > 0) {
+            buff[absPos + 1] = (byte)(typeLen & 0xff);
+            buff[absPos + 2] = (byte)(payloadLen & 0xff);
+            absPos = absPos + 3;
+        } else {
+            buff[absPos + 1] = (byte)(typeLen & 0xff);
+            buff[absPos + 2] = 0;
+            buff[absPos + 3] = 0;
+            buff[absPos + 4] = (byte)((payloadLen / 256) & 0xff);
+            buff[absPos + 5] = (byte)((payloadLen & 255) & 0xff);
+            absPos = absPos + 6;
+        }
+        idx = 0;
+        while (idx < typeLen) {
+            buff[absPos + idx] = (byte)((binType[idx] & 0xff) & 0xff);
+            idx = idx + 1;
+        }
+        absPos = absPos + typeLen;
+        idx = 0;
+        while (idx < payloadLen) {
+            buff[absPos + idx] = (byte)((payload[idx] & 0xff) & 0xff);
+            idx = idx + 1;
+        }
+        absPos = absPos + payloadLen;
+        // TLV trailer
+        buff[absPos] = (byte)(0xfe & 0xff);
+        idx = tagInfo.get_tagFirstBlock();
+        return tagWriteBin(tagId, idx, buff, options, status);
+    }
+
+    /**
+     * Writes an URL to an RFID tag using NFC compatible encoding, so that
+     * mobile phones with NFC support automatically offer to open
+     * the URL when reading the tag.
+     *
+     * @param tagId : identifier of the tag to use
+     * @param url : the URL to write on the tag
+     * @param options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     * happens, you can get more information from the status object.
+     */
+    public int tagWriteUrlNFC(String tagId,String url,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
+    {
+        int prefix;
+        byte[] binUrl;
+        prefix = 0;
+        if ((url).substring(0, 8).equals("https://")) {
+            prefix = 4;
+            url = (url).substring(8, 8 + url.length() - 8);
+        } else {
+            if ((url).substring(0, 8).equals("http://")) {
+                prefix = 3;
+                url = (url).substring(7, 7 + url.length() - 7);
+            }
+        }
+        if ((url).substring(0, 8).equals("www.")) {
+            prefix = prefix - 2;
+            url = (url).substring(4, 4 + url.length() - 4);
+        }
+        binUrl = ("_" + url).getBytes(_yapi._deviceCharset);
+        binUrl[0] = (byte)(prefix & 0xff);
+        return tagWriteBinNFC(tagId, "U", binUrl, options, status);
+    }
+
+    /**
+     * Writes WiFi settings to an RFID tag using NFC compatible encoding, so that
+     * mobile phones with NFC support automatically offer to connect to this WiFi
+     * network.
+     *
+     * @param tagId : identifier of the tag to use
+     * @param ssid : the SSID of the WiFi network to connect to
+     * @param auth : the network authentication type (currently always "WPA2")
+     * @param secret : the network password
+     * @param options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     * happens, you can get more information from the status object.
+     */
+    public int tagWriteWifiConfigNFC(String tagId,String ssid,String auth,String secret,YRfidOptions options,YRfidStatus status) throws YAPI_Exception
+    {
+        byte[] ssidBin;
+        int ssidLen;
+        byte[] secretBin;
+        int secretLen;
+        int payloadLen;
+        byte[] payload;
+        int idx;
+        ssidBin = (ssid).getBytes(_yapi._deviceCharset);
+        ssidLen = (ssidBin).length;
+        secretBin = (secret).getBytes(_yapi._deviceCharset);
+        secretLen = (secretBin).length;
+        payloadLen = ssidLen + secretLen + 39;
+        payload = new byte[payloadLen];
+        // Credential header
+        payload[0] = (byte)(0x10 & 0xff);
+        payload[1] = (byte)(0x0e & 0xff);
+        payload[2] = 0;
+        payload[3] = (byte)(payloadLen - 4 & 0xff);
+        // Network index
+        payload[4] = (byte)(0x10 & 0xff);
+        payload[5] = (byte)(0x26 & 0xff);
+        payload[6] = 0;
+        payload[7] = (byte)(1 & 0xff);
+        payload[8] = (byte)(1 & 0xff);
+        // SSID
+        payload[9] = (byte)(0x10 & 0xff);
+        payload[10] = (byte)(0x45 & 0xff);
+        payload[11] = 0;
+        payload[12] = (byte)(ssidLen & 0xff);
+        idx = 0;
+        while (idx < ssidLen) {
+            payload[13 + idx] = (byte)((ssidBin[idx] & 0xff) & 0xff);
+            idx = idx + 1;
+        }
+        // Auth: WPA2-Personal
+        payload[13 + ssidLen] = (byte)(0x10 & 0xff);
+        payload[14 + ssidLen] = (byte)(0x03 & 0xff);
+        payload[15 + ssidLen] = 0;
+        payload[16 + ssidLen] = (byte)(2 & 0xff);
+        payload[17 + ssidLen] = 0;
+        payload[18 + ssidLen] = (byte)(32 & 0xff);
+        // Encryption: AES
+        payload[19 + ssidLen] = (byte)(0x10 & 0xff);
+        payload[20 + ssidLen] = (byte)(0x0f & 0xff);
+        payload[21 + ssidLen] = 0;
+        payload[22 + ssidLen] = (byte)(2 & 0xff);
+        payload[23 + ssidLen] = 0;
+        payload[24 + ssidLen] = (byte)(8 & 0xff);
+        // Network key
+        payload[25 + ssidLen] = (byte)(0x10 & 0xff);
+        payload[26 + ssidLen] = (byte)(0x27 & 0xff);
+        payload[27 + ssidLen] = 0;
+        payload[28 + ssidLen] = (byte)(secretLen & 0xff);
+        idx = 0;
+        while (idx < secretLen) {
+            payload[29 + ssidLen + idx] = (byte)((secretBin[idx] & 0xff) & 0xff);
+            idx = idx + 1;
+        }
+        // MAC broadcast
+        payload[29 + ssidLen + secretLen] = (byte)(0x10 & 0xff);
+        payload[30 + ssidLen + secretLen] = (byte)(0x20 & 0xff);
+        payload[31 + ssidLen + secretLen] = 0;
+        payload[32 + ssidLen + secretLen] = (byte)(6 & 0xff);
+        idx = 0;
+        while (idx < 6) {
+            payload[33 + ssidLen + secretLen + idx] = (byte)(0xff & 0xff);
+            idx = idx + 1;
+        }
+        return tagWriteBinNFC(tagId, "application/vnd.wfa.wsc", payload, options, status);
+    }
+
+    /**
      * Reads an RFID tag AFI byte (ISO 15693 only).
      *
      * @param tagId : identifier of the tag to use
