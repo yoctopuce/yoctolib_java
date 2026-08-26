@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 72057 2026-02-17 09:44:53Z mvuilleu $
+ * $Id: YSerialPort.java 75514 2026-08-13 07:24:08Z mvuilleu $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -144,6 +144,11 @@ public class YSerialPort extends YFunction
     protected int _rxbuffptr = 0;
     protected int _eventPos = 0;
     protected YSnoopingCallback _eventCallback;
+    protected String _xyproto = "";
+    protected String _xyfname = "";
+    protected byte[] _xyfdata = new byte[0];
+    protected int _xytotal = 0;
+    protected int _xysent = 0;
 
     /**
      * Deprecated UpdateCallback for SerialPort
@@ -1960,22 +1965,26 @@ public class YSerialPort extends YFunction
             // first simulated event, use it only to initialize reference values
             _eventPos = 0;
         }
-
-        url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=0&t=0",_eventPos);
-        msgbin = _download(url);
-        msgarr = _json_get_array(msgbin);
-        msglen = msgarr.size();
-        if (msglen == 0) {
-            return YAPI.SUCCESS;
-        }
-        // last element of array is the new position
-        msglen = msglen - 1;
-        if (!(_eventCallback != null)) {
-            // first simulated event, use it only to initialize reference values
+        try {
+            url = String.format(Locale.US, "rxmsg.json?pos=%d&maxw=0&t=0",_eventPos);
+            msgbin = _download(url);
+            msgarr = _json_get_array(msgbin);
+            msglen = msgarr.size();
+            if (msglen == 0) {
+                return YAPI.SUCCESS;
+            }
+            // last element of array is the new position
+            msglen = msglen - 1;
+            if (!(_eventCallback != null)) {
+                // first simulated event, use it only to initialize reference values
+                _eventPos = _decode_json_int(msgarr.get(msglen));
+                return YAPI.SUCCESS;
+            }
             _eventPos = _decode_json_int(msgarr.get(msglen));
-            return YAPI.SUCCESS;
+        } catch (Exception ex) {
+            return YAPI.IO_ERROR;
         }
-        _eventPos = _decode_json_int(msgarr.get(msglen));
+
         idx = 0;
         while (idx < msglen) {
             _eventCallback.snoopingCallback(this, new YSnoopingRecord(new String(msgarr.get(idx), _yapi._deviceCharset)));
@@ -2547,6 +2556,204 @@ public class YSerialPort extends YFunction
             regpos = regpos + 1;
         }
         return res;
+    }
+
+    public int _xymodemQueue(String proto,String fname,byte[] buff,int timeoutSec) throws YAPI_Exception
+    {
+        if (_xyproto.length() > 0) {
+            _throw(YAPI.DEVICE_BUSY, "file transfer already in progress");
+            return YAPI.DEVICE_BUSY;
+        }
+        _xyproto = proto;
+        _xyfname = fname;
+        _xyfdata = buff;
+        _xytotal = (buff).length;
+        _xysent = 0;
+        return _xymodemProcess(timeoutSec);
+    }
+
+    public int _xymodemProcess(int timeoutSec) throws YAPI_Exception
+    {
+        String proto;
+        int blksize;
+        int cnt;
+        byte[] datablock;
+        String namesuffix;
+        String fullproto;
+        byte[] json;
+        String jsonStr;
+        String errStr;
+        int sentBytes;
+        byte[] empty;
+        proto = _xyproto;
+        if (proto.length() == 0) {
+            _throw(YAPI.INVALID_ARGUMENT, "no file transfer in progress");
+            return YAPI.INVALID_ARGUMENT;
+        }
+        // create a data block up to 1k
+        blksize = _xytotal - _xysent;
+        if (blksize > 1024) {
+            blksize = 1024;
+        }
+        datablock = new byte[blksize];
+        cnt = 0;
+        while (cnt < blksize) {
+            datablock[cnt] = (byte)((_xyfdata[_xysent + cnt] & 0xff) & 0xff);
+            cnt = cnt + 1;
+        }
+        namesuffix = "";
+        if (_xysent == 0) {
+            if ((proto).substring(0, 6).equals("ymodem")) {
+                namesuffix = String.format(Locale.US, ":%s",_xyfname);
+            }
+        } else {
+            namesuffix = "+";
+        }
+        if (_xytotal > _xysent + blksize) {
+            fullproto = String.format(Locale.US, "%s-t%d-m%s",proto,timeoutSec,namesuffix);
+        } else {
+            fullproto = String.format(Locale.US, "%s-t%d%s",proto,timeoutSec,namesuffix);
+        }
+
+        // backup _xyproto and clear it, to drop transfer in case of exception
+        _xyproto = "";
+        json = _uploadEx(fullproto, datablock);
+        if ((json).length == 0) {
+            _throw(YAPI.IO_ERROR, "failed to receive result from device");
+            return YAPI.IO_ERROR;
+        }
+        jsonStr = new String(json, _yapi._deviceCharset);
+        errStr = _json_get_key(json, "err");
+        if (errStr.length() > 0) {
+            _throw(YAPI.IO_ERROR, errStr);
+            return YAPI.IO_ERROR;
+        }
+        sentBytes = YAPIContext._atoi(_json_get_key(json, "sent"));
+        if (sentBytes >= _xytotal) {
+            // done, free binary buffer
+            empty = new byte[0];
+            _xyfdata = empty;
+            return 100;
+        }
+        _xyproto = proto;
+        _xysent = sentBytes;
+        return ((100 * sentBytes) / _xytotal);
+    }
+
+    /**
+     * Initiates a buffer transmit to the serial port using the standard XMODEM protocol.
+     * The function will block until the XMODEM receiver triggers the transfer,
+     * up to the specified timeout.
+     * Once the transfer is started, the function returns the current percentage
+     * of completion. The caller should then invoke method
+     * xmodemUploadMore() until it returns 100 (percent).
+     *
+     * @param buff : the binary buffer to send
+     * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return an integer in the range 0 to 100 (percentage of completion),
+     *         or a negative error code in case of failure.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int xmodemUpload(byte[] buff,int timeoutSec) throws YAPI_Exception
+    {
+        return _xymodemQueue("xmodem", "", buff, timeoutSec);
+    }
+
+    /**
+     * Continues a standard XMODEM upload previously started with xmodemUpload.
+     * The function will block until the data sent has been acknowledged by receiver,
+     * up to the specified timeout, and return the current percentage of completion.
+     * It should be called continuously until it returns the 100 (percent).
+     *
+     * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return an integer in the range 0 to 100 (percentage of completion),
+     *         or a negative error code in case of failure.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int xmodemUploadMore(int timeoutSec) throws YAPI_Exception
+    {
+        return _xymodemProcess(timeoutSec);
+    }
+
+    /**
+     * Initiates a buffer transmit to the serial port using the standard XMODEM-1k protocol.
+     * The function will block until the XMODEM receiver triggers the transfer,
+     * up to the specified timeout.
+     * Once the transfer is started, the function returns the current percentage
+     * of completion. The caller should then invoke method
+     * xmodem1kUploadMore() until it returns 100 (percent).
+     *
+     * @param buff : the binary buffer to send
+     * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int xmodem1kUpload(byte[] buff,int timeoutSec) throws YAPI_Exception
+    {
+        return _xymodemQueue("xmodem-1k", "", buff, timeoutSec);
+    }
+
+    /**
+     * Continues a XMODEM-1k upload previously started with xmodem1kUpload.
+     * The function will block until the data sent has been acknowledged by receiver,
+     * up to the specified timeout, and return the current percentage of completion.
+     * It should be called continuously until it returns the 100 (percent).
+     *
+     * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return an integer in the range 0 to 100 (percentage of completion),
+     *         or a negative error code in case of failure.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int xmodem1kUploadMore(int timeoutSec) throws YAPI_Exception
+    {
+        return _xymodemProcess(timeoutSec);
+    }
+
+    /**
+     * Initiates a buffer transmit to the serial port using the standard YMODEM protocol.
+     * The function will block until the YMODEM receiver triggers the transfer,
+     * up to the specified timeout.
+     * Once the transfer is started, the function returns the current percentage
+     * of completion. The caller should then invoke method
+     * ymodemUploadMore() until it returns 100 (percent).
+     *
+     * @param filename : the filename associated with the data in the buffer
+     * @param buff : the binary buffer to send
+     * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int ymodemUpload(String filename,byte[] buff,int timeoutSec) throws YAPI_Exception
+    {
+        return _xymodemQueue("ymodem", filename, buff, timeoutSec);
+    }
+
+    /**
+     * Continues a YMODEM upload previously started with ymodemUpload.
+     * The function will block until the data sent has been acknowledged by receiver,
+     * up to the specified timeout, and return the current percentage of completion.
+     * It should be called continuously until it returns the 100 (percent).
+     *
+     * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return an integer in the range 0 to 100 (percentage of completion),
+     *         or a negative error code in case of failure.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int ymodemUploadMore(int timeoutSec) throws YAPI_Exception
+    {
+        return _xymodemProcess(timeoutSec);
     }
 
     /**

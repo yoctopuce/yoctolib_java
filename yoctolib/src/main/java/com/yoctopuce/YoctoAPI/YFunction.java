@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 72344 2026-03-09 14:01:56Z seb $
+ * $Id: YFunction.java 75362 2026-08-03 12:50:58Z seb $
  *
  * YFunction Class (virtual class, used internally)
  *
@@ -1069,6 +1069,11 @@ public class YFunction
         }
     }
 
+    protected void _clearLazyCache()
+    {
+        clearCache();
+        _cacheExpiration = 0;
+    }
 
     /**
      * Preloads the function cache with a specified validity duration.

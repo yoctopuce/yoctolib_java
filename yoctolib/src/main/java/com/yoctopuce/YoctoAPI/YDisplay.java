@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java 74504 2026-06-01 14:50:23Z seb $
+ * $Id: YDisplay.java 75637 2026-08-20 16:54:40Z mvuilleu $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -127,12 +127,134 @@ public class YDisplay extends YFunction
      * invalid command value
      */
     public static final String COMMAND_INVALID = YAPI.INVALID_STRING;
+    public enum FASTREFRESH {
+        WHENEVER_POSSIBLE(0),
+        WHENEVER_SUPPORTED(1),
+        NEVER(2),
+        INVALID(3);
+        public final int value;
+        FASTREFRESH(int val)
+        {
+            this.value = val;
+        }
+        public static FASTREFRESH fromInt(int intval)
+        {
+            switch(intval) {
+            case 0:
+                return WHENEVER_POSSIBLE;
+            case 1:
+                return WHENEVER_SUPPORTED;
+            case 2:
+                return NEVER;
+            case 3:
+                return INVALID;
+            }
+            return null;
+        }
+    }
+
+    public enum REGENERATE {
+        ON_REQUEST_ONLY(0),
+        EVERY_DAY(1),
+        EVERY_12H(2),
+        EVERY_6H(3),
+        EVERY_3H(4),
+        EVERY_2H(5),
+        EVERY_HOUR(6),
+        EVERY_30MIN(7),
+        EVERY_15MIN(8),
+        EVERY_480(9),
+        EVERY_432(10),
+        EVERY_360(11),
+        EVERY_288(12),
+        EVERY_240(13),
+        EVERY_192(14),
+        EVERY_144(15),
+        EVERY_96(16),
+        EVERY_48(17),
+        EVERY_36(18),
+        EVERY_24(19),
+        EVERY_12(20),
+        EVERY_10(21),
+        EVERY_8(22),
+        EVERY_6(23),
+        EVERY_4(24),
+        ALWAYS(25),
+        INVALID(26);
+        public final int value;
+        REGENERATE(int val)
+        {
+            this.value = val;
+        }
+        public static REGENERATE fromInt(int intval)
+        {
+            switch(intval) {
+            case 0:
+                return ON_REQUEST_ONLY;
+            case 1:
+                return EVERY_DAY;
+            case 2:
+                return EVERY_12H;
+            case 3:
+                return EVERY_6H;
+            case 4:
+                return EVERY_3H;
+            case 5:
+                return EVERY_2H;
+            case 6:
+                return EVERY_HOUR;
+            case 7:
+                return EVERY_30MIN;
+            case 8:
+                return EVERY_15MIN;
+            case 9:
+                return EVERY_480;
+            case 10:
+                return EVERY_432;
+            case 11:
+                return EVERY_360;
+            case 12:
+                return EVERY_288;
+            case 13:
+                return EVERY_240;
+            case 14:
+                return EVERY_192;
+            case 15:
+                return EVERY_144;
+            case 16:
+                return EVERY_96;
+            case 17:
+                return EVERY_48;
+            case 18:
+                return EVERY_36;
+            case 19:
+                return EVERY_24;
+            case 20:
+                return EVERY_12;
+            case 21:
+                return EVERY_10;
+            case 22:
+                return EVERY_8;
+            case 23:
+                return EVERY_6;
+            case 24:
+                return EVERY_4;
+            case 25:
+                return ALWAYS;
+            case 26:
+                return INVALID;
+            }
+            return null;
+        }
+    }
+
     public enum DISPLAYSTATE {
         FAILURE(0),
         OFF(1),
         POWERING(2),
         IDLE(3),
-        REFRESHING(4);
+        REFRESHING(4),
+        INVALID(5);
         public final int value;
         DISPLAYSTATE(int val)
         {
@@ -151,6 +273,8 @@ public class YDisplay extends YFunction
                 return IDLE;
             case 4:
                 return REFRESHING;
+            case 5:
+                return INVALID;
             }
             return null;
         }
@@ -370,11 +494,11 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Changes the name of the sequence to play when the displayed is powered on.
+     * Changes the name of the sequence to play when the display is powered on.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     * @param newval : a string corresponding to the name of the sequence to play when the displayed is powered on
+     * @param newval : a string corresponding to the name of the sequence to play when the display is powered on
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -391,11 +515,11 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Changes the name of the sequence to play when the displayed is powered on.
+     * Changes the name of the sequence to play when the display is powered on.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     * @param newval : a string corresponding to the name of the sequence to play when the displayed is powered on
+     * @param newval : a string corresponding to the name of the sequence to play when the display is powered on
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
@@ -561,7 +685,10 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Returns the currently selected display orientation.
+     *  Returns the currently selected display orientation. The orientation is defined as the side of the
+     * screen where the
+     * USB connector (for OLED displays) or the ribbon cable (for ePaper panels) is located when the
+     * display is up straight.
      *
      *  @return a value among YDisplay.ORIENTATION_LEFT, YDisplay.ORIENTATION_UP,
      *  YDisplay.ORIENTATION_RIGHT and YDisplay.ORIENTATION_DOWN corresponding to the currently selected
@@ -584,7 +711,10 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Returns the currently selected display orientation.
+     *  Returns the currently selected display orientation. The orientation is defined as the side of the
+     * screen where the
+     * USB connector (for OLED displays) or the ribbon cable (for ePaper panels) is located when the
+     * display is up straight.
      *
      *  @return a value among YDisplay.ORIENTATION_LEFT, YDisplay.ORIENTATION_UP,
      *  YDisplay.ORIENTATION_RIGHT and YDisplay.ORIENTATION_DOWN corresponding to the currently selected
@@ -598,7 +728,9 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Changes the display orientation. Remember to call the saveToFlash()
+     * Changes the display orientation. he orientation is defined as the side of the screen where the
+     * USB connector (for OLED displays) or the ribbon cable (for ePaper panels) is located when the
+     * display is up straight. Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
      *  @param newval : a value among YDisplay.ORIENTATION_LEFT, YDisplay.ORIENTATION_UP,
@@ -614,12 +746,15 @@ public class YDisplay extends YFunction
         synchronized (this) {
             rest_val = Integer.toString(newval);
             _setAttr("orientation",rest_val);
+            _clearLazyCache();
         }
         return YAPI.SUCCESS;
     }
 
     /**
-     * Changes the display orientation. Remember to call the saveToFlash()
+     * Changes the display orientation. he orientation is defined as the side of the screen where the
+     * USB connector (for OLED displays) or the ribbon cable (for ePaper panels) is located when the
+     * display is up straight. Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
      *  @param newval : a value among YDisplay.ORIENTATION_LEFT, YDisplay.ORIENTATION_UP,
@@ -670,8 +805,7 @@ public class YDisplay extends YFunction
     /**
      * Changes the model of display to match the connected display panel.
      * This function has no effect if the module does not support the selected
-     * display panel.
-     * Remember to call the saveToFlash()
+     * display panel. Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the model of display to match the connected display panel
@@ -686,6 +820,7 @@ public class YDisplay extends YFunction
         synchronized (this) {
             rest_val = newval;
             _setAttr("displayPanel",rest_val);
+            _clearLazyCache();
         }
         return YAPI.SUCCESS;
     }
@@ -693,8 +828,7 @@ public class YDisplay extends YFunction
     /**
      * Changes the model of display to match the connected display panel.
      * This function has no effect if the module does not support the selected
-     * display panel.
-     * Remember to call the saveToFlash()
+     * display panel. Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
      * @param newval : a string corresponding to the model of display to match the connected display panel
@@ -775,11 +909,11 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Returns the display type: monochrome OLED, black and white ePaper, color ePaper, etc.
+     * Returns the display type: monochrome OLED, black and white ePaper, color ePaper, and so on.
      *
      *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_EPAPER_BW,
      *  YDisplay.DISPLAYTYPE_EPAPER_BWR and YDisplay.DISPLAYTYPE_EPAPER_BWRY corresponding to the display
-     * type: monochrome OLED, black and white ePaper, color ePaper, etc
+     * type: monochrome OLED, black and white ePaper, color ePaper, and so on
      *
      * @throws YAPI_Exception on error
      */
@@ -798,11 +932,11 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Returns the display type: monochrome OLED, black and white ePaper, color ePaper, etc.
+     * Returns the display type: monochrome OLED, black and white ePaper, color ePaper, and so on.
      *
      *  @return a value among YDisplay.DISPLAYTYPE_MONO, YDisplay.DISPLAYTYPE_EPAPER_BW,
      *  YDisplay.DISPLAYTYPE_EPAPER_BWR and YDisplay.DISPLAYTYPE_EPAPER_BWRY corresponding to the display
-     * type: monochrome OLED, black and white ePaper, color ePaper, etc
+     * type: monochrome OLED, black and white ePaper, color ePaper, and so on
      *
      * @throws YAPI_Exception on error
      */
@@ -1098,8 +1232,125 @@ public class YDisplay extends YFunction
     }
 
     /**
+     * Returns the fast refresh usage policy in use (ePaper displays only).
+     * This setting is combined with the regenerate policy to determine when the screen
+     * should be updated using a fast update versus or regenerated using a slower,
+     * flickering full refresh.
+     *
+     * @return a value among the YDisplay.FASTREFRESH enumeration
+     *         (YDisplay.FASTREFRESH_WHENEVER_POSSIBLE,
+     *         YDisplay.FASTREFRESH_WHENEVER_SUPPORTED,
+     *         YDisplay.FASTREFRESH_NEVER).
+     *
+     * @throws YAPI_Exception on error
+     */
+    public FASTREFRESH get_fastRefreshPolicy() throws YAPI_Exception
+    {
+        int combined;
+        int fmod;
+        combined = get_brightness();
+        if (combined < 0) {
+            return FASTREFRESH.INVALID;
+        }
+        fmod = (combined / 25);
+        if (fmod >= 2) {
+            fmod = fmod - 2;
+        }
+        return FASTREFRESH.fromInt(fmod);
+    }
+
+    /**
+     * Returns the display regeneration minimal frequency (ePaper displays only).
+     * This setting is combined with the fast refresh usage policy to determine
+     * when the screen should be updated using a fast update versus or regenerated
+     * using a slower, flickering full refresh. To change the display regeneration minimal
+     * frequency, use methode set_fastRefreshPolicy().
+     *
+     * @return a value among the YDisplay.REGENERATE enumeration
+     *         (YDisplay.REGENERATE_ON_REQUEST_ONLY,
+     *         YDisplay.REGENERATE_EVERY_DAY, YDisplay.REGENERATE_EVERY_12H,
+     *         YDisplay.REGENERATE_EVERY_6H, YDisplay.REGENERATE_EVERY_3H,
+     *         YDisplay.REGENERATE_EVERY_2H, YDisplay.REGENERATE_EVERY_HOUR,
+     *         YDisplay.REGENERATE_EVERY_30MIN, YDisplay.REGENERATE_EVERY_15MIN,
+     *         YDisplay.REGENERATE_EVERY_480, YDisplay.REGENERATE_EVERY_432,
+     *         YDisplay.REGENERATE_EVERY_360, YDisplay.REGENERATE_EVERY_288,
+     *         YDisplay.REGENERATE_EVERY_240, YDisplay.REGENERATE_EVERY_192,
+     *         YDisplay.REGENERATE_EVERY_144, YDisplay.REGENERATE_EVERY_96,
+     *         YDisplay.REGENERATE_EVERY_48, YDisplay.REGENERATE_EVERY_36,
+     *         YDisplay.REGENERATE_EVERY_24, YDisplay.REGENERATE_EVERY_12,
+     *         YDisplay.REGENERATE_EVERY_10, YDisplay.REGENERATE_EVERY_8,
+     *         YDisplay.REGENERATE_EVERY_6, YDisplay.REGENERATE_EVERY_4,
+     *         YDisplay.REGENERATE_ALWAYS).
+     *
+     * @throws YAPI_Exception on error
+     */
+    public REGENERATE get_regeneratePolicy() throws YAPI_Exception
+    {
+        int combined;
+        int fval;
+        combined= get_brightness();
+        if (combined < 0) {
+            return REGENERATE.INVALID;
+        }
+        if (combined >= 100) {
+            fval = 25;
+        } else {
+            fval = (combined % 25);
+        }
+        return REGENERATE.fromInt(fval);
+    }
+
+    /**
+     * Changes the fast refresh usage policy and display regeneration minimal frequency
+     * (ePaper displays only). These settings jointly determine when the screen should be
+     * updated using a fast update versus or regenerated using a slower, flickering full
+     * refresh.
+     *
+     * @param fastRefresh : a value among the YDisplay.FASTREFRESH enumeration
+     *         (YDisplay.FASTREFRESH_WHENEVER_POSSIBLE,
+     *         YDisplay.FASTREFRESH_WHENEVER_SUPPORTED,
+     *         YDisplay.FASTREFRESH_NEVER),
+     *         corresponding to the policy for using fast refresh.
+     * @param regenerate : a value among the enumeration YRefFrame.REGENERATE
+     *         (YDisplay.REGENERATE_ON_REQUEST_ONLY,
+     *         YDisplay.REGENERATE_EVERY_DAY, YDisplay.REGENERATE_EVERY_12H,
+     *         YDisplay.REGENERATE_EVERY_6H, YDisplay.REGENERATE_EVERY_3H,
+     *         YDisplay.REGENERATE_EVERY_2H, YDisplay.REGENERATE_EVERY_HOUR,
+     *         YDisplay.REGENERATE_EVERY_30MIN, YDisplay.REGENERATE_EVERY_15MIN,
+     *         YDisplay.REGENERATE_EVERY_480, YDisplay.REGENERATE_EVERY_432,
+     *         YDisplay.REGENERATE_EVERY_360, YDisplay.REGENERATE_EVERY_288,
+     *         YDisplay.REGENERATE_EVERY_240, YDisplay.REGENERATE_EVERY_192,
+     *         YDisplay.REGENERATE_EVERY_144, YDisplay.REGENERATE_EVERY_96,
+     *         YDisplay.REGENERATE_EVERY_48, YDisplay.REGENERATE_EVERY_36,
+     *         YDisplay.REGENERATE_EVERY_24, YDisplay.REGENERATE_EVERY_12,
+     *         YDisplay.REGENERATE_EVERY_10, YDisplay.REGENERATE_EVERY_8,
+     *         YDisplay.REGENERATE_EVERY_6, YDisplay.REGENERATE_EVERY_4,
+     *         YDisplay.REGENERATE_ALWAYS),
+     *         corresponding to the display minimal regeneration frequency.
+     *
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int set_fastRefreshPolicy(FASTREFRESH fastRefresh,REGENERATE regenerate) throws YAPI_Exception
+    {
+        int combined;
+        int fmod;
+        int fval;
+        fmod = fastRefresh.value;
+        fval = regenerate.value;
+        if ((fval == 25) || (fmod == 2)) {
+            combined = 100;
+        } else {
+            combined = 50 + fmod * 25 + fval;
+        }
+        return set_brightness(combined);
+    }
+
+    /**
      * Clears the display screen and resets all display layers to their default state.
-     * Using this function in a sequence will kill the sequence play-back. Don't use that
+     * Using this function in a sequence will kill the sequence play-back. Do not use that
      * function to reset the display at sequence start-up.
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -1191,7 +1442,7 @@ public class YDisplay extends YFunction
     }
 
     /**
-     * Trigger an immediate screen refresh. The combination of
+     * Triggers an immediate screen refresh. The combination of
      * postponeRefresh and triggerRefresh can be used as an
      * alternative to double-buffering to avoid flickering during display updates.
      *
@@ -1594,6 +1845,208 @@ public class YDisplay extends YFunction
             srcpos = srcpos + 1;
         }
         return rotmap;
+    }
+
+    public byte[] gifEncode(byte[] pixmap,ArrayList<Integer> palette,int w,boolean shortHdr) throws YAPI_Exception
+    {
+        int minCodeSize;
+        int LZW_CLRCODE;
+        int LZW_ENDCODE;
+        int LZW_1STCODE;
+        int codeSize;
+        int maxCode;
+        ArrayList<Integer> codes = new ArrayList<>();
+        int nCodes;
+        int pixmapSize;
+        byte[] dataStream;
+        int blockStart;
+        int blockEnd;
+        int prevCode;
+        int pixPos;
+        int wrBits;
+        int wrBitCnt;
+        int outPos;
+        int nextVal;
+        int i;
+        int hdrSize;
+        byte[] res;
+        int h;
+
+        if (palette.size() > 8) {
+            _throw(YAPI.INVALID_ARGUMENT, "Palette should have no more than 8 colors");
+            res = new byte[0];
+            return res;
+        }
+        if (palette.size() <= 4) {
+            minCodeSize = 2;
+        } else {
+            minCodeSize = 3;
+        }
+        LZW_CLRCODE = (1 << minCodeSize);
+        LZW_ENDCODE = LZW_CLRCODE + 1;
+        LZW_1STCODE = LZW_ENDCODE + 1;
+        codeSize = minCodeSize + 1;
+        maxCode = (1 << codeSize) - 1 - LZW_1STCODE;
+        codes.clear();
+        nCodes = 0;
+        pixmapSize = (pixmap).length;
+        dataStream = new byte[((2 * pixmapSize) / 3) + 8];
+        outPos = 0;
+        wrBits = LZW_CLRCODE;
+        wrBitCnt = 3;
+        // prefetch first byte
+        prevCode = (pixmap[0] & 0xff);
+        pixPos = 1;
+        while (pixPos < pixmapSize + 3) {
+            blockStart = outPos;
+            outPos = blockStart + 1;
+            blockEnd = blockStart + 256;
+            // flush any carry-over output byte from previous data sub-block
+            while (wrBitCnt >= 8) {
+                dataStream[outPos] = (byte)((wrBits & 0xff) & 0xff);
+                outPos = outPos + 1;
+                wrBits = (wrBits >> 8);
+                wrBitCnt = wrBitCnt - 8;
+            }
+            while ((outPos < blockEnd) && (pixPos < pixmapSize)) {
+                // search for an existing code matching the running input segment
+                // printf("[%d] ", rdBits >> 12);
+                nextVal = (prevCode | ((pixmap[pixPos] & 0xff) << 12));
+                pixPos = pixPos + 1;
+                if (prevCode < LZW_1STCODE) {
+                    i = 0;
+                } else {
+                    i = prevCode - LZW_ENDCODE;
+                }
+                while ((i < nCodes) && (codes.get(i).intValue() != nextVal)) {
+                    i = i + 1;
+                }
+                if (i >= nCodes) {
+                    // not found, emit prevCode and create new code
+                    wrBits = (wrBits | (prevCode << wrBitCnt));
+                    wrBitCnt = wrBitCnt + codeSize;
+                    if (nCodes <= maxCode) {
+                        //fprintf(stderr, "#%d: #%d + %d\n", nextCode, nextVal & 63, nextVal >> 6);
+                        codes.add(nextVal);
+                        nCodes = nCodes + 1;
+                    } else {
+                        codeSize = codeSize + 1;
+                        if (codeSize <= 12) {
+                            //fprintf(stderr, "#%d: #%d + %d\n", nextCode, nextVal & 63, nextVal >> 6);
+                            codes.add(nextVal);
+                            nCodes = nCodes + 1;
+                        } else {
+                            wrBits = (wrBits | (LZW_CLRCODE << wrBitCnt));
+                            wrBitCnt = wrBitCnt + codeSize;
+                            codes.clear();
+                            nCodes = 0;
+                            codeSize = minCodeSize + 1;
+                        }
+                        maxCode = (1 << codeSize) - 1 - LZW_1STCODE;
+                    }
+                    // flush one (or two) codes to output stream
+                    while ((wrBitCnt >= 8) && (outPos < blockEnd)) {
+                        dataStream[outPos] = (byte)((wrBits & 0xff) & 0xff);
+                        outPos = outPos + 1;
+                        wrBits = (wrBits >> 8);
+                        wrBitCnt = wrBitCnt - 8;
+                    }
+                    prevCode = (nextVal >> 12);
+                } else {
+                    prevCode = i + LZW_1STCODE;
+                }
+            }
+            if (pixPos >= pixmapSize) {
+                if ((outPos < blockEnd) && (pixPos == pixmapSize)) {
+                    // append code for last run
+                    wrBits = (wrBits | (prevCode << wrBitCnt));
+                    wrBitCnt = wrBitCnt + codeSize;
+                    while ((wrBitCnt >= 8) && (outPos < blockEnd)) {
+                        dataStream[outPos] = (byte)((wrBits & 0xff) & 0xff);
+                        outPos = outPos + 1;
+                        wrBits = (wrBits >> 8);
+                        wrBitCnt = wrBitCnt - 8;
+                    }
+                    pixPos = pixPos + 1;
+                }
+                if ((outPos < blockEnd) && (pixPos == pixmapSize + 1)) {
+                    // append end code
+                    wrBits = (wrBits | (LZW_ENDCODE << wrBitCnt));
+                    wrBitCnt = wrBitCnt + codeSize;
+                    while ((wrBitCnt >= 8) && (outPos < blockEnd)) {
+                        dataStream[outPos] = (byte)((wrBits & 0xff) & 0xff);
+                        outPos = outPos + 1;
+                        wrBits = (wrBits >> 8);
+                        wrBitCnt = wrBitCnt - 8;
+                    }
+                    pixPos = pixPos + 1;
+                }
+                if ((outPos < blockEnd) && (pixPos == pixmapSize + 2)) {
+                    // flush last 0-7 bits
+                    if (wrBitCnt > 0) {
+                        dataStream[outPos] = (byte)((wrBits & 0xff) & 0xff);
+                        outPos = outPos + 1;
+                        wrBitCnt = 0;
+                    }
+                    pixPos = pixPos + 1;
+                }
+            }
+            dataStream[blockStart] = (byte)(outPos - (blockStart + 1) & 0xff);
+        }
+        blockEnd = outPos;
+        // Now write final buffer
+        hdrSize = 24 + LZW_CLRCODE * 3;
+        res = new byte[hdrSize + outPos + 2];
+        // GIF89a header
+        res[0x00] = (byte)(0x47 & 0xff);
+        res[0x01] = (byte)(0x49 & 0xff);
+        res[0x02] = (byte)(0x46 & 0xff);
+        res[0x03] = (byte)(0x38 & 0xff);
+        res[0x04] = (byte)(0x39 & 0xff);
+        res[0x05] = (byte)(0x61 & 0xff);
+        // Logical screen descriptor
+        h = (((pixmap).length) / w);
+        res[0x06] = (byte)((w & 0xff) & 0xff);
+        res[0x07] = (byte)((w >> 8) & 0xff);
+        res[0x08] = (byte)((h & 0xff) & 0xff);
+        res[0x09] = (byte)((h >> 8) & 0xff);
+        res[0x0a] = (byte)(0xf0 + minCodeSize - 1 & 0xff);
+        res[0x0b] = 0;
+        res[0x0c] = 0;
+        // Palette
+        outPos = 0x0d;
+        i = 0;
+        while (i < LZW_CLRCODE) {
+            if (i < palette.size()) {
+                wrBits = palette.get(i).intValue();
+                res[outPos] = (byte)(((wrBits >> 16) & 0xff) & 0xff);
+                res[outPos + 1] = (byte)(((wrBits >> 8) & 0xff) & 0xff);
+                res[outPos + 2] = (byte)((wrBits & 0xff) & 0xff);
+            }
+            outPos = outPos + 3;
+            i = i + 1;
+        }
+        // Image descriptor
+        res[outPos] = (byte)(0x2c & 0xff);
+        res[outPos + 5] = (byte)((w & 0xff) & 0xff);
+        res[outPos + 6] = (byte)((w >> 8) & 0xff);
+        res[outPos + 7] = (byte)((h & 0xff) & 0xff);
+        res[outPos + 8] = (byte)((h >> 8) & 0xff);
+        outPos = outPos + 10;
+        // Prepare to append Image data
+        res[outPos] = (byte)(minCodeSize & 0xff);
+        i = 0;
+        while (i < blockEnd) {
+            outPos = outPos + 1;
+            res[outPos] = (byte)((dataStream[i] & 0xff) & 0xff);
+            i = i + 1;
+        }
+        // Append zero-block and trailer
+        outPos = outPos + 1;
+        res[outPos] = 0;
+        outPos = outPos + 1;
+        res[outPos] = (byte)(0x3b & 0xff);
+        return res;
     }
 
     /**

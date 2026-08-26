@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 74504 2026-06-01 14:50:23Z seb $
+ * $Id: YDisplayLayer.java 75624 2026-08-19 08:17:06Z seb $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *
@@ -39,6 +39,7 @@
 
 package com.yoctopuce.YoctoAPI;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 //--- (generated code: YDisplayLayer class start)
@@ -128,11 +129,13 @@ public class YDisplayLayer
     //--- (end of generated code: YDisplayLayer definitions)
 
     private YDisplay _display;
+    private final YAPIContext _yapi;
     private int _id;
 
     public YDisplayLayer(YDisplay parent, int id)
     {
         this._display = parent;
+        this._yapi = parent._yapi;
         this._id = id;
         this._hidden = false;
     }
@@ -165,7 +168,7 @@ public class YDisplayLayer
     {
         int res;
         res = YAPI.SUCCESS;
-        if (_cmdbuff.length() + cmd.length() >= 100) {
+        if (_cmdbuff.length() + cmd.length() >= 64) {
             // force flush before, to prevent overflow
             flush_now();
         }
@@ -498,6 +501,18 @@ public class YDisplayLayer
      */
     public int drawText(int x,int y,ALIGN anchor,String text) throws YAPI_Exception
     {
+        int textlen;
+        String destname;
+        textlen = text.length();
+        if (textlen > 60) {
+            if (textlen > 1000) {
+                _display._throw(YAPI.INVALID_ARGUMENT, "text too large (max 1000 characters)");
+                return YAPI.INVALID_ARGUMENT;
+            }
+            _display.flushLayers();
+            destname = String.format(Locale.US, "layer%d:T%d,%d,%d,",_id,x,y,anchor.value);
+            return _display.upload(destname,(text).getBytes(_yapi._deviceCharset));
+        }
         return command_flush(String.format(Locale.US, "T%d,%d,%d,%s%c",x,y,anchor.value,text,27));
     }
 
@@ -521,33 +536,6 @@ public class YDisplayLayer
     }
 
     /**
-     * Draws a bitmap at the specified position. The bitmap is provided as a binary object,
-     * where each pixel maps to a bit, from left to right and from top to bottom.
-     * The most significant bit of each byte maps to the leftmost pixel, and the least
-     * significant bit maps to the rightmost pixel. Bits set to 1 are drawn using the
-     * layer selected pen color. Bits set to 0 are drawn using the specified background
-     * gray level, unless -1 is specified, in which case they are not drawn at all
-     * (as if transparent).
-     *
-     * @param x : the distance from left of layer to the left of the bitmap, in pixels
-     * @param y : the distance from top of layer to the top of the bitmap, in pixels
-     * @param w : the width of the bitmap, in pixels
-     * @param bitmap : a binary object
-     * @param bgcol : the background gray level to use for zero bits (0 = black,
-     *         255 = white), or -1 to leave the pixels unchanged
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int drawBitmap(int x,int y,int w,byte[] bitmap,int bgcol) throws YAPI_Exception
-    {
-        String destname;
-        destname = String.format(Locale.US, "layer%d:%d,%d@%d,%d",_id,w,bgcol,x,y);
-        return _display.upload(destname,bitmap);
-    }
-
-    /**
      * Draws a GIF image provided as a binary buffer at the specified position.
      * If the image drawing must be included in an animation sequence, save it
      * in the device filesystem first and use drawImage instead.
@@ -563,8 +551,89 @@ public class YDisplayLayer
     public int drawGIF(int x,int y,byte[] gifimage) throws YAPI_Exception
     {
         String destname;
+        _display.flushLayers();
         destname = String.format(Locale.US, "layer%d:G,-1@%d,%d",_id,x,y);
         return _display.upload(destname,gifimage);
+    }
+
+    /**
+     * Draws a bitmap at the specified position. The bitmap is provided as a binary object,
+     * where each pixel maps to a bit, from left to right and from top to bottom.
+     * The most significant bit of each byte maps to the leftmost pixel, and the least
+     * significant bit maps to the rightmost pixel. Bits set to 1 are drawn using the
+     * layer selected pen color. Bits set to 0 are drawn using the specified background
+     * color, unless NO_INK (-1) is specified, in which case they are not
+     * drawn at all (as if transparent).
+     *
+     * @param x : the distance from left of layer to the left of the bitmap, in pixels
+     * @param y : the distance from top of layer to the top of the bitmap, in pixels
+     * @param w : the width of the bitmap, in pixels
+     * @param bitmap : a binary object
+     * @param bgcol : the RGB background color to use for zero bits, as a 24-bit RGB value,
+     *         or one of the constants NO_INK, FG_INK or BG_INK
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int drawBitmap(int x,int y,int w,byte[] bitmap,int bgcol) throws YAPI_Exception
+    {
+        String destname;
+        int r;
+        int g;
+        int b;
+        String rgbcol;
+        if ((w < 0) || (w > 512)) {
+            _display._throw(YAPI.INVALID_ARGUMENT, "bitmap width must be in range 1..512");
+            return YAPI.INVALID_ARGUMENT;
+        }
+        _display.flushLayers();
+        if (bgcol <= 255) {
+            if (bgcol >= -1) {
+                // backward-compatible behaviour (gray level)
+                rgbcol = String.format(Locale.US, "%d",bgcol);
+            } else {
+                // background color or foreground color
+                if (bgcol <= -3) {
+                    rgbcol = "#.";
+                } else {
+                    rgbcol = "#-";
+                }
+            }
+        } else {
+            // RGB color
+            r = ((bgcol >> 20) & 15);
+            g = ((bgcol >> 12) & 15);
+            b = ((bgcol >> 4) & 15);
+            rgbcol = String.format(Locale.US, "#%x%x%x",r,g,b);
+        }
+        destname = String.format(Locale.US, "layer%d:%d,%s@%d,%d",_id,w,rgbcol,x,y);
+        return _display.upload(destname,bitmap);
+    }
+
+    /**
+     * Draws a color pixmap at the specified position. The pixmap is provided as a binary
+     * object, where each byte maps to one pixel. The 24 bit RGB value corresponding to each
+     * byte value is defined in the palette provided as extra argument.
+     * The palette maximal size is 8, and it is recommended to use the smallest possible
+     * palette size to optimize the size of data to be sent to the display.
+     * The height of the pixmap is implicitely given by the pixmap buffer size.
+     *
+     * @param x : the distance from left of layer to the left of the pixmap, in pixels
+     * @param y : the distance from top of layer to the top of the pixmap, in pixels
+     * @param w : the width of the pixmap, in pixels
+     * @param pixmap : a binary buffer where each byte maps to one pixel
+     * @param palette : an array of 24-bit RGB values, defining the color for each byte value in pixmap
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int drawPixmap(int x,int y,int w,byte[] pixmap,ArrayList<Integer> palette) throws YAPI_Exception
+    {
+        byte[] gifimage;
+        gifimage = _display.gifEncode(pixmap, palette, w, false);
+        return drawGIF(x, y, gifimage);
     }
 
     /**
@@ -639,7 +708,7 @@ public class YDisplayLayer
     }
 
     /**
-     * Close the currently open polygon, fill its content the fill color currently
+     * Closes the currently open polygon, fill its content the fill color currently
      * selected for the layer, and draw its outline using the selected line color.
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -666,6 +735,18 @@ public class YDisplayLayer
      */
     public int consoleOut(String text) throws YAPI_Exception
     {
+        int textlen;
+        String destname;
+        textlen = text.length();
+        if (textlen > 60) {
+            if (textlen > 1000) {
+                _display._throw(YAPI.INVALID_ARGUMENT, "text too large (max 1000 characters)");
+                return YAPI.INVALID_ARGUMENT;
+            }
+            _display.flushLayers();
+            destname = String.format(Locale.US, "layer%d:!",_id);
+            return _display.upload(destname,(text).getBytes(_yapi._deviceCharset));
+        }
         return command_flush(String.format(Locale.US, "!%s%c",text,27));
     }
 

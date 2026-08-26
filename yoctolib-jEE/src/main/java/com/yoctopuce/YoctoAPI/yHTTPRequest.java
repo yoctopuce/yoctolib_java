@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 74799 2026-06-22 06:45:40Z seb $
+ * $Id: yHTTPRequest.java 75294 2026-07-27 16:22:08Z seb $
  *
  * internal yHTTPRequest object
  *
@@ -83,7 +83,8 @@ class yHTTPRequest implements Runnable
             }
             return res;
         }
-        public  String getAsString()
+
+        public String getAsString()
         {
             return new String(this.getAllBytes());
         }
@@ -468,7 +469,8 @@ class yHTTPRequest implements Runnable
                         }
                     }
                     if (_reuse_socket) {
-                        if (_result.toString().endsWith("\r\n")) {
+                        String resultString = _result.getAsString();
+                        if (resultString.endsWith("\r\n")) {
                             _eof = true;
                         }
                     }

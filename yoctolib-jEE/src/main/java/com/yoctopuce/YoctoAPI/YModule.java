@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 72057 2026-02-17 09:44:53Z mvuilleu $
+ * $Id: YModule.java 75351 2026-08-02 19:45:07Z mvuilleu $
  *
  * YModule Class: Module control interface
  *
@@ -1169,7 +1169,13 @@ public class YModule extends YFunction
      */
     public int revertFromFlash() throws YAPI_Exception
     {
-        return set_persistentSettings(PERSISTENTSETTINGS_LOADED);
+        int res;
+
+        res = set_persistentSettings(PERSISTENTSETTINGS_LOADED);
+        //noinspection DoubleNegation
+        if (!(res==YAPI.SUCCESS)) { throw new YAPI_Exception(res, "unable to trigger revert settings");}
+        _clearLazyCache();
+        return res;
     }
 
     /**

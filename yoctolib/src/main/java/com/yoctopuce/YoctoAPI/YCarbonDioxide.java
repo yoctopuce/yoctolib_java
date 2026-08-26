@@ -61,7 +61,7 @@ public class YCarbonDioxide extends YSensor
     /**
      * invalid abcPeriod value
      */
-    public static final int ABCPERIOD_INVALID = YAPI.INVALID_UINT;
+    public static final int ABCPERIOD_INVALID = YAPI.INVALID_INT;
     /**
      * invalid command value
      */
@@ -409,7 +409,7 @@ public class YCarbonDioxide extends YSensor
      */
     public int triggerForcedCalibration(double refVal) throws YAPI_Exception
     {
-        return set_command(String.format(Locale.US, "F%dC",(int) (double)Math.round(1000*refVal)));
+        return set_command(String.format(Locale.US, "F%dC",(int) (double)Math.round(refVal)));
     }
 
     /**
