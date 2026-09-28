@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YOrientation.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindOrientation(), the high-level API for Orientation functions
  *

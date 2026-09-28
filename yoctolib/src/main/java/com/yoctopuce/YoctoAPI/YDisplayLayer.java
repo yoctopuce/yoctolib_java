@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java 75624 2026-08-19 08:17:06Z seb $
+ * $Id: YDisplayLayer.java version 2.1.16087 (build 76087) $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *

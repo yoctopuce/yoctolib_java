@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YPowerSupply.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindPowerSupply(), the high-level API for PowerSupply functions
  *

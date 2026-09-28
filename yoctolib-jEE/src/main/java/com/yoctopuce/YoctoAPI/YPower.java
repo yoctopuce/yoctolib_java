@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YPower.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindPower(), the high-level API for Power functions
  *

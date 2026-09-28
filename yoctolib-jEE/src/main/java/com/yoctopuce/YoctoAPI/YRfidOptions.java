@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YRfidOptions.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindRfidOptions(), the high-level API for RfidOptions functions
  *

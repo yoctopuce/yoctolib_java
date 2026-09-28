@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YSegmentedDisplay.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindSegmentedDisplay(), the high-level API for SegmentedDisplay functions
  *

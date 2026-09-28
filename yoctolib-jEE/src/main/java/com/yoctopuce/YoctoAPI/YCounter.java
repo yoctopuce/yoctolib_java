@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YCounter.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindCounter(), the high-level API for Counter functions
  *

@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YSms.java 72410 2026-03-11 07:18:41Z mvuilleu $
+ * $Id: YSms.java version 2.1.16087 (build 76087) $
  *
  * Implements FindSms(), the high-level API for Sms functions
  *

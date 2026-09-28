@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YAccelerometer.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YDualPower.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindDualPower(), the high-level API for DualPower functions
  *

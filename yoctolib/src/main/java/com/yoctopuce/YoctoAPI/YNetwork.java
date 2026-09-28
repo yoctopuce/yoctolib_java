@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YNetwork.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindNetwork(), the high-level API for Network functions
  *

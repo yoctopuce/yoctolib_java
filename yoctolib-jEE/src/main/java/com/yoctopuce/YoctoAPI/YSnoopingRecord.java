@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSnoopingRecord.java 69225 2025-09-23 07:25:53Z seb $
+ * $Id: YSnoopingRecord.java version 2.1.16087 (build 76087) $
  *
  * Implements FindSnoopingRecord(), the high-level API for SnoopingRecord functions
  *

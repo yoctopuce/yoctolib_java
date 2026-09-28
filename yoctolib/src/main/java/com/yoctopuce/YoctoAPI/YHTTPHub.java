@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YHTTPHub.java 74799 2026-06-22 06:45:40Z seb $
+ * $Id: YHTTPHub.java version 2.1.16087 (build 76087) $
  *
  * Internal YHTTPHUB object
  *

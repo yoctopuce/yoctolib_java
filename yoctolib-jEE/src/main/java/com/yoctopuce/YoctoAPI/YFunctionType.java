@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunctionType.java 52311 2022-12-12 17:22:28Z seb $
+ * $Id: YFunctionType.java version 2.1.16087 (build 76087) $
  *
  * Internal YFunctionType object
  *

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YOsControl.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindOsControl(), the high-level API for OsControl functions
  *

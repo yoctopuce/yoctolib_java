@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YPEntry.java 28108 2017-07-24 13:53:13Z seb $
+ * $Id: YPEntry.java version 2.1.16087 (build 76087) $
  *
  * Yellow page implementation
  *

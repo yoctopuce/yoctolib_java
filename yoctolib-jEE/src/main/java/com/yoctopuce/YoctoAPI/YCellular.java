@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellular.java 72057 2026-02-17 09:44:53Z mvuilleu $
+ * $Id: YCellular.java version 2.1.16087 (build 76087) $
  *
  * Implements FindCellular(), the high-level API for Cellular functions
  *

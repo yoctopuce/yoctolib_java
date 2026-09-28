@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFirmwareUpdate.java 70568 2025-12-04 08:55:25Z seb $
+ * $Id: YFirmwareUpdate.java version 2.1.16087 (build 76087) $
  *
  * Implements yFindFirmwareUpdate(), the high-level API for FirmwareUpdate functions
  *

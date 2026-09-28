@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YSerialPort.java 75514 2026-08-13 07:24:08Z mvuilleu $
+ * $Id: YSerialPort.java version 2.1.16087 (build 76087) $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *
@@ -146,9 +146,14 @@ public class YSerialPort extends YFunction
     protected YSnoopingCallback _eventCallback;
     protected String _xyproto = "";
     protected String _xyfname = "";
+    protected String _xyfattr = "";
     protected byte[] _xyfdata = new byte[0];
     protected int _xytotal = 0;
-    protected int _xysent = 0;
+    protected byte[] _xyblock = new byte[0];
+    protected int _xyavail = 0;
+    protected int _xyready = 0;
+    protected int _xyacked = 0;
+    protected boolean _xyclose;
 
     /**
      * Deprecated UpdateCallback for SerialPort
@@ -2558,184 +2563,250 @@ public class YSerialPort extends YFunction
         return res;
     }
 
-    public int _xymodemQueue(String proto,String fname,byte[] buff,int timeoutSec) throws YAPI_Exception
+    public int _xymodemQueue(String proto,byte[] buff,String fname,String attributes,boolean closeBatch) throws YAPI_Exception
     {
+        byte[] datablock;
+
         if (_xyproto.length() > 0) {
             _throw(YAPI.DEVICE_BUSY, "file transfer already in progress");
             return YAPI.DEVICE_BUSY;
         }
+        datablock = new byte[1024];
         _xyproto = proto;
         _xyfname = fname;
+        _xyfattr = attributes;
         _xyfdata = buff;
         _xytotal = (buff).length;
-        _xysent = 0;
-        return _xymodemProcess(timeoutSec);
+        _xyblock = datablock;
+        _xyavail = 4096;
+        _xyready = 0;
+        _xyacked = 0;
+        _xyclose = closeBatch;
+        return _xymodemProcess(proto);
     }
 
-    public int _xymodemProcess(int timeoutSec) throws YAPI_Exception
+    public int _xymodemProcess(String proto) throws YAPI_Exception
     {
-        String proto;
+        int maxblocks;
         int blksize;
-        int cnt;
         byte[] datablock;
+        int cnt;
         String namesuffix;
         String fullproto;
         byte[] json;
         String jsonStr;
         String errStr;
-        int sentBytes;
+        String state;
         byte[] empty;
-        proto = _xyproto;
-        if (proto.length() == 0) {
+        if (_xyproto.length() == 0) {
             _throw(YAPI.INVALID_ARGUMENT, "no file transfer in progress");
             return YAPI.INVALID_ARGUMENT;
         }
-        // create a data block up to 1k
-        blksize = _xytotal - _xysent;
-        if (blksize > 1024) {
-            blksize = 1024;
+        if (proto.length() > 6) {
+            proto = (proto).substring(0, 6);
         }
-        datablock = new byte[blksize];
-        cnt = 0;
-        while (cnt < blksize) {
-            datablock[cnt] = (byte)((_xyfdata[_xysent + cnt] & 0xff) & 0xff);
-            cnt = cnt + 1;
+        if (!((_xyproto).substring(0, 6).equals(proto))) {
+            _throw(YAPI.INVALID_ARGUMENT, "file transfer protocol mismatch");
+            return YAPI.INVALID_ARGUMENT;
         }
-        namesuffix = "";
-        if (_xysent == 0) {
-            if ((proto).substring(0, 6).equals("ymodem")) {
-                namesuffix = String.format(Locale.US, ":%s",_xyfname);
+        if (_xyready == 0) {
+            if (proto.equals("ymodem")) {
+                if (_xyfattr.length() == 0) {
+                    namesuffix = String.format(Locale.US, ":%s %d",_xyfname,_xytotal);
+                } else {
+                    namesuffix = String.format(Locale.US, ":%s %d %s",_xyfname,_xytotal,_xyfattr);
+                }
+            } else {
+                namesuffix = "";
             }
         } else {
             namesuffix = "+";
         }
-        if (_xytotal > _xysent + blksize) {
-            fullproto = String.format(Locale.US, "%s-t%d-m%s",proto,timeoutSec,namesuffix);
-        } else {
-            fullproto = String.format(Locale.US, "%s-t%d%s",proto,timeoutSec,namesuffix);
+        maxblocks = 5;
+        while ((_xyready < _xytotal) && (_xyavail >= 1040) && (maxblocks > 0)) {
+            // create a data block up to 1k
+            maxblocks = maxblocks - 1;
+            blksize = _xytotal - _xyready;
+            if (blksize >= 1024) {
+                blksize = 1024;
+                datablock = _xyblock;
+            } else {
+                datablock = new byte[blksize];
+            }
+            cnt = 0;
+            while (cnt < blksize) {
+                datablock[cnt] = (byte)((_xyfdata[_xyready + cnt] & 0xff) & 0xff);
+                cnt = cnt + 1;
+            }
+            if (_xytotal > _xyready + blksize) {
+                fullproto = String.format(Locale.US, "%s-m%s",_xyproto,namesuffix);
+            } else {
+                fullproto = String.format(Locale.US, "%s%s",_xyproto,namesuffix);
+            }
+            // backup _xyproto and clear it, to drop transfer in case of exception
+            proto = _xyproto;
+            _xyproto = "";
+            json = _uploadEx(fullproto, datablock);
+            if ((json).length == 0) {
+                _throw(YAPI.IO_ERROR, "failed to receive result from device");
+                return YAPI.IO_ERROR;
+            }
+            jsonStr = new String(json, _yapi._deviceCharset);
+            if ((jsonStr).substring(2, 2 + 3).equals("err")) {
+                // will get error message and full status from json URL below
+                maxblocks = 0;
+            } else {
+                _xyready = _xyready + blksize;
+                _xyavail = YAPIContext._atoi(_json_get_key(json, "rts"));
+                namesuffix = "+";
+            }
+            _xyproto = proto;
         }
-
-        // backup _xyproto and clear it, to drop transfer in case of exception
-        _xyproto = "";
-        json = _uploadEx(fullproto, datablock);
-        if ((json).length == 0) {
-            _throw(YAPI.IO_ERROR, "failed to receive result from device");
-            return YAPI.IO_ERROR;
+        if ((_xyready == _xytotal) && (_xyavail >= 262) && (maxblocks > 0)) {
+            _xyready = _xyready + 1;
+            if (_xyclose) {
+                // schedule transfer of NUL file to end YModem batch
+                empty = new byte[0];
+                _uploadEx("ymodem:", empty);
+            }
         }
-        jsonStr = new String(json, _yapi._deviceCharset);
-        errStr = _json_get_key(json, "err");
-        if (errStr.length() > 0) {
-            _throw(YAPI.IO_ERROR, errStr);
-            return YAPI.IO_ERROR;
+        YAPI.Sleep(100);
+        json = _download(String.format(Locale.US, "%s.json",(proto).substring(0, 6)));
+        state = (_json_get_key(json, "st")).substring(0, 2);
+        _xyavail = YAPIContext._atoi(_json_get_key(json, "rts"));
+        _xyacked = YAPIContext._atoi(_json_get_key(json, "ack"));
+        // Only report 100% or an error when the state machine has reached a final state
+        // But we must detect individual file completion within a multi-file batch transfer
+        if (!(_xyclose) && state.equals("BR") && (_xyacked > 1024)) {
+            state = "ZZ";
         }
-        sentBytes = YAPIContext._atoi(_json_get_key(json, "sent"));
-        if (sentBytes >= _xytotal) {
-            // done, free binary buffer
+        if (state.equals("ZZ")) {
+            // transfer completed, free binary buffer
             empty = new byte[0];
+            _xyproto = "";
             _xyfdata = empty;
+            _xyblock = empty;
+            // if transfer did not end successfully, report error
+            errStr = _json_get_key(json, "err");
+            if (errStr.length() > 0) {
+                _throw(YAPI.IO_ERROR, errStr);
+                return YAPI.IO_ERROR;
+            }
             return 100;
         }
-        _xyproto = proto;
-        _xysent = sentBytes;
-        return ((100 * sentBytes) / _xytotal);
+        // Stay at 0% unless receiver receives at least one header block
+        if (_xyacked == 0) {
+            return 0;
+        }
+        // Move to 1-99% as progress unfolds
+        cnt = _xytotal;
+        if (proto.equals("ymodem")) {
+            cnt = cnt + 256;
+        }
+        cnt = 1 + ((99 * _xyacked) / cnt);
+        if (cnt > 99) {
+            cnt = 99;
+        }
+        return cnt;
+    }
+
+    public int _xymodemAbort() throws YAPI_Exception
+    {
+        byte[] empty;
+        int res;
+        empty = new byte[0];
+        _xyproto = "";
+        _xyfname = "";
+        _xyfdata = empty;
+        _xyblock = empty;
+
+        res = _upload("xmodem!", empty);
+        // give some extra time for the state machine to abort
+        YAPI.Sleep(10);
+        return res;
     }
 
     /**
      * Initiates a buffer transmit to the serial port using the standard XMODEM protocol.
-     * The function will block until the XMODEM receiver triggers the transfer,
-     * up to the specified timeout.
-     * Once the transfer is started, the function returns the current percentage
-     * of completion. The caller should then invoke method
-     * xmodemUploadMore() until it returns 100 (percent).
+     * The function will return almost immediately, but the transfer only starts when
+     * the XMODEM receiver requests it. A few kilobytes of data are buffered within the
+     * device, ready to be sent, but the caller should repeatedly invoke method
+     * xmodemUploadMore() until it returns 100 (percent) to ensure that the
+     * file transfer completes.
      *
      * @param buff : the binary buffer to send
      * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     * @param use1kBlocks : whether to use 1KB data blocks for faster transfer
+     *         (relatively standard XMODEM protocol extension)
      *
      * @return an integer in the range 0 to 100 (percentage of completion),
      *         or a negative error code in case of failure.
      *
      * @throws YAPI_Exception on error
      */
-    public int xmodemUpload(byte[] buff,int timeoutSec) throws YAPI_Exception
+    public int xmodemUpload(byte[] buff,int timeoutSec,boolean use1kBlocks) throws YAPI_Exception
     {
-        return _xymodemQueue("xmodem", "", buff, timeoutSec);
+        String proto;
+        if (use1kBlocks) {
+            proto = String.format(Locale.US, "xmodem-1k-t%d",timeoutSec);
+        } else {
+            proto = String.format(Locale.US, "xmodem-t%d",timeoutSec);
+        }
+
+        return _xymodemQueue(proto, buff, "", "", false);
     }
 
     /**
-     * Continues a standard XMODEM upload previously started with xmodemUpload.
+     * Continues a XMODEM upload previously started with xmodemUpload.
      * The function will block until the data sent has been acknowledged by receiver,
      * up to the specified timeout, and return the current percentage of completion.
      * It should be called continuously until it returns the 100 (percent).
      *
-     * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
-     *
      * @return an integer in the range 0 to 100 (percentage of completion),
      *         or a negative error code in case of failure.
      *
      * @throws YAPI_Exception on error
      */
-    public int xmodemUploadMore(int timeoutSec) throws YAPI_Exception
+    public int xmodemUploadMore() throws YAPI_Exception
     {
-        return _xymodemProcess(timeoutSec);
+        return _xymodemProcess("xmodem");
     }
 
     /**
-     * Initiates a buffer transmit to the serial port using the standard XMODEM-1k protocol.
-     * The function will block until the XMODEM receiver triggers the transfer,
-     * up to the specified timeout.
-     * Once the transfer is started, the function returns the current percentage
-     * of completion. The caller should then invoke method
-     * xmodem1kUploadMore() until it returns 100 (percent).
-     *
-     * @param buff : the binary buffer to send
-     * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
-     *
-     * @return YAPI.SUCCESS if the call succeeds.
-     *
+     * Abort any XMODEM or YMODEM data transfer previously started.
      * @throws YAPI_Exception on error
      */
-    public int xmodem1kUpload(byte[] buff,int timeoutSec) throws YAPI_Exception
+    public int xmodemAbort() throws YAPI_Exception
     {
-        return _xymodemQueue("xmodem-1k", "", buff, timeoutSec);
-    }
-
-    /**
-     * Continues a XMODEM-1k upload previously started with xmodem1kUpload.
-     * The function will block until the data sent has been acknowledged by receiver,
-     * up to the specified timeout, and return the current percentage of completion.
-     * It should be called continuously until it returns the 100 (percent).
-     *
-     * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
-     *
-     * @return an integer in the range 0 to 100 (percentage of completion),
-     *         or a negative error code in case of failure.
-     *
-     * @throws YAPI_Exception on error
-     */
-    public int xmodem1kUploadMore(int timeoutSec) throws YAPI_Exception
-    {
-        return _xymodemProcess(timeoutSec);
+        return _xymodemAbort();
     }
 
     /**
      * Initiates a buffer transmit to the serial port using the standard YMODEM protocol.
-     * The function will block until the YMODEM receiver triggers the transfer,
-     * up to the specified timeout.
-     * Once the transfer is started, the function returns the current percentage
-     * of completion. The caller should then invoke method
-     * ymodemUploadMore() until it returns 100 (percent).
+     * The function will return almost immediately, but the transfer only starts when
+     * the XMODEM receiver requests it. A few kilobytes of data are buffered within the
+     * device, ready to be sent, but the caller should repeatedly invoke method
+     * xmodemUploadMore() until it returns 100 (percent) to ensure that the
+     * file transfer completes.
      *
-     * @param filename : the filename associated with the data in the buffer
      * @param buff : the binary buffer to send
      * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     * @param filename : the filename associated with the data in the buffer
+     * @param attributes : optional file attributes (eg. modif date timestamp in octal form),
+     *         or an empty string if no further attribute is required
+     * @param lastFile : TRUE to end the YMODEM batch session after this file,
+     *         or FALSE if more files will be sent in the same batch session
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int ymodemUpload(String filename,byte[] buff,int timeoutSec) throws YAPI_Exception
+    public int ymodemUpload(byte[] buff,int timeoutSec,String filename,String attributes,boolean lastFile) throws YAPI_Exception
     {
-        return _xymodemQueue("ymodem", filename, buff, timeoutSec);
+        String proto;
+        proto = String.format(Locale.US, "ymodem-t%d",timeoutSec);
+
+        return _xymodemQueue(proto, buff, filename, attributes, lastFile);
     }
 
     /**
@@ -2744,16 +2815,23 @@ public class YSerialPort extends YFunction
      * up to the specified timeout, and return the current percentage of completion.
      * It should be called continuously until it returns the 100 (percent).
      *
-     * @param timeoutSec : the timeout before aborting send (e.g. 60 sec)
-     *
      * @return an integer in the range 0 to 100 (percentage of completion),
      *         or a negative error code in case of failure.
      *
      * @throws YAPI_Exception on error
      */
-    public int ymodemUploadMore(int timeoutSec) throws YAPI_Exception
+    public int ymodemUploadMore() throws YAPI_Exception
     {
-        return _xymodemProcess(timeoutSec);
+        return _xymodemProcess("ymodem");
+    }
+
+    /**
+     * Abort any XMODEM or YMODEM data transfer previously started.
+     * @throws YAPI_Exception on error
+     */
+    public int ymodemAbort() throws YAPI_Exception
+    {
+        return _xymodemAbort();
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YColorLedCluster.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindColorLedCluster(), the high-level API for ColorLedCluster functions
  *

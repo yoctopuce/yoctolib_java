@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YVoc.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindVoc(), the high-level API for Voc functions
  *

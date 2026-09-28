@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: yHTTPRequest.java 75294 2026-07-27 16:22:08Z seb $
+ * $Id: yHTTPRequest.java version 2.1.16087 (build 76087) $
  *
  * internal yHTTPRequest object
  *

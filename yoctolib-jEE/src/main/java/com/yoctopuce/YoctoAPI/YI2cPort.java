@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YI2cPort.java 72057 2026-02-17 09:44:53Z mvuilleu $
+ *  $Id: YI2cPort.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindI2cPort(), the high-level API for I2cPort functions
  *

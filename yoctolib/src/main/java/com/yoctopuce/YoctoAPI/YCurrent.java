@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YCurrent.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindCurrent(), the high-level API for Current functions
  *

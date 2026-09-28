@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java 75351 2026-08-02 19:45:07Z mvuilleu $
+ * $Id: YModule.java version 2.1.16087 (build 76087) $
  *
  * YModule Class: Module control interface
  *

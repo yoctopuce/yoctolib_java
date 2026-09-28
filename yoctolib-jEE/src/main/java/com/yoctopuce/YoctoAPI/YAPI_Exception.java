@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YAPI_Exception.java 69316 2025-10-03 09:24:07Z seb $
+ * $Id: YAPI_Exception.java version 2.1.16087 (build 76087) $
  *
  * Class used to report exceptions within Yocto-API
  *

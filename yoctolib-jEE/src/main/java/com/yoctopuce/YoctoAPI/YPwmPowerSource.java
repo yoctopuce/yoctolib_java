@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YPwmPowerSource.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindPwmPowerSource(), the high-level API for PwmPowerSource functions
  *

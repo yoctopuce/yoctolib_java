@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YRangeFinder.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindRangeFinder(), the high-level API for RangeFinder functions
  *

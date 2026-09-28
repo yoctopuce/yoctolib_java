@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YMotor.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindMotor(), the high-level API for Motor functions
  *

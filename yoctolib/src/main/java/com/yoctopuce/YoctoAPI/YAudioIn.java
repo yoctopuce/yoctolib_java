@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YAudioIn.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindAudioIn(), the high-level API for AudioIn functions
  *

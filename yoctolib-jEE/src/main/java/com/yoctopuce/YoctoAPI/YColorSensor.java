@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YColorSensor.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindColorSensor(), the high-level API for ColorSensor functions
  *

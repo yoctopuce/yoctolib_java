@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YHub.java 68388 2025-08-18 06:51:32Z seb $
+ * $Id: YHub.java version 2.1.16087 (build 76087) $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *

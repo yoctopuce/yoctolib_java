@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: WPEntry.java 26934 2017-03-28 08:00:42Z seb $
+ * $Id: WPEntry.java version 2.1.16087 (build 76087) $
  *
  * White page implementation
  *

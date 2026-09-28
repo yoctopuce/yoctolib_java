@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YStepperMotor.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindStepperMotor(), the high-level API for StepperMotor functions
  *

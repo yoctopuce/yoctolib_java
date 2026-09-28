@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YCellRecord.java 69225 2025-09-23 07:25:53Z seb $
+ * $Id: YCellRecord.java version 2.1.16087 (build 76087) $
  *
  * Implements FindCellRecord(), the high-level API for CellRecord functions
  *

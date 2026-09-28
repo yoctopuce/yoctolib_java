@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YCallbackHub.java 69323 2025-10-06 12:40:24Z seb $
+ * $Id: YCallbackHub.java version 2.1.16087 (build 76087) $
  *
  * Internal YHTTPHUB object
  *

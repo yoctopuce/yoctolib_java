@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YDevice.java 69316 2025-10-03 09:24:07Z seb $
+ * $Id: YDevice.java version 2.1.16087 (build 76087) $
  *
  * Internal YDevice class
  *

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YPowerOutput.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindPowerOutput(), the high-level API for PowerOutput functions
  *

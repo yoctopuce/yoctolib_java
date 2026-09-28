@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YRealTimeClock.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindRealTimeClock(), the high-level API for RealTimeClock functions
  *

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YSpectralChannel.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindSpectralChannel(), the high-level API for SpectralChannel functions
  *

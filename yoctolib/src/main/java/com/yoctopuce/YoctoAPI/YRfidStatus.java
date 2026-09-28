@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YRfidStatus.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindRfidStatus(), the high-level API for RfidStatus functions
  *

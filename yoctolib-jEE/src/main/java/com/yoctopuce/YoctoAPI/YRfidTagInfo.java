@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YRfidTagInfo.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindRfidTagInfo(), the high-level API for RfidTagInfo functions
  *

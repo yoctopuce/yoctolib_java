@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFileRecord.java 69225 2025-09-23 07:25:53Z seb $
+ * $Id: YFileRecord.java version 2.1.16087 (build 76087) $
  *
  * YFileRecord Class: Description of a file on the device filesystem
  *

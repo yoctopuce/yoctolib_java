@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YFunction.java 75362 2026-08-03 12:50:58Z seb $
+ * $Id: YFunction.java version 2.1.16087 (build 76087) $
  *
  * YFunction Class (virtual class, used internally)
  *

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YRfidReader.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindRfidReader(), the high-level API for RfidReader functions
  *

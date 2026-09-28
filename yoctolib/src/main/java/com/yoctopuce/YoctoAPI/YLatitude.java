@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YLatitude.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindLatitude(), the high-level API for Latitude functions
  *

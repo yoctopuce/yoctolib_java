@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDataStream.java 70416 2025-11-21 08:13:12Z mvuilleu $
+ * $Id: YDataStream.java version 2.1.16087 (build 76087) $
  *
  * YDataStream Class: Sequence of measured data, stored by the data logger
  *

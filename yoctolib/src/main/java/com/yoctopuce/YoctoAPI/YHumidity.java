@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YHumidity.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindHumidity(), the high-level API for Humidity functions
  *

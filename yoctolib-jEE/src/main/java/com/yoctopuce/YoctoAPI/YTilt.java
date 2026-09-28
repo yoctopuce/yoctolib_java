@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YTilt.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindTilt(), the high-level API for Tilt functions
  *

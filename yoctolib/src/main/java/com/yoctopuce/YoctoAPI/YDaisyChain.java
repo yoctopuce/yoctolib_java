@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YDaisyChain.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindDaisyChain(), the high-level API for DaisyChain functions
  *

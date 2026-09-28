@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWlanRecord.java 69225 2025-09-23 07:25:53Z seb $
+ * $Id: YWlanRecord.java version 2.1.16087 (build 76087) $
  *
  * YWlanRecord Class: Description of a wireless network detected
  *

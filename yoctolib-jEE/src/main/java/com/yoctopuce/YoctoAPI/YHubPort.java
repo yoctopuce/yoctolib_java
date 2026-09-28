@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YHubPort.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindHubPort(), the high-level API for HubPort functions
  *

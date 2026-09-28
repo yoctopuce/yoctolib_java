@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: svn_id $
+ *  $Id: YAudioOut.java version 2.1.16087 (build 76087) $
  *
  *  Implements FindAudioOut(), the high-level API for AudioOut functions
  *
