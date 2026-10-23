@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YWireless.java version 2.1.16087 (build 76087) $
+ * $Id:YWireless.java version 2.1.16635 (build 76635) $
  *
  * Implements yFindWireless(), the high-level API for Wireless functions
  *

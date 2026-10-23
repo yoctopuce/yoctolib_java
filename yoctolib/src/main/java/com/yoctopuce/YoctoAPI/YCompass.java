@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YCompass.java version 2.1.16087 (build 76087) $
+ *  $Id:YCompass.java version 2.1.16635 (build 76635) $
  *
  *  Implements FindCompass(), the high-level API for Compass functions
  *

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLatitude.java version 2.1.16087 (build 76087) $
+ *  $Id:YLatitude.java version 2.1.16635 (build 76635) $
  *
  *  Implements FindLatitude(), the high-level API for Latitude functions
  *

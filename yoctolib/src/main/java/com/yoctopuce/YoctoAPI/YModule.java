@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YModule.java version 2.1.16087 (build 76087) $
+ * $Id:YModule.java version 2.1.16635 (build 76635) $
  *
  * YModule Class: Module control interface
  *
@@ -1434,7 +1434,7 @@ public class YModule extends YFunction
             sep = "";
             for (byte[] ii_1:filelist) {
                 name = _json_get_key(ii_1, "name");
-                if ((name.length() > 0) && !(name.equals("startupConf.json"))) {
+                if ((name.length() > 0) && !(name.equals("startupConf.json")) && !((name).substring(0, 1).equals("."))) {
                     if ((name).substring(name.length()-1, name.length()-1 + 1).equals("/")) {
                         file_data = "";
                     } else {

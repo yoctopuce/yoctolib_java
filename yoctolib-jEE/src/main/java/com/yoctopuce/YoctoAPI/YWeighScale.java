@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YWeighScale.java version 2.1.16087 (build 76087) $
+ *  $Id:YWeighScale.java version 2.1.16635 (build 76635) $
  *
  *  Implements FindWeighScale(), the high-level API for WeighScale functions
  *

@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMagnetometer.java version 2.1.16087 (build 76087) $
+ *  $Id:YMagnetometer.java version 2.1.16635 (build 76635) $
  *
  *  Implements FindMagnetometer(), the high-level API for Magnetometer functions
  *

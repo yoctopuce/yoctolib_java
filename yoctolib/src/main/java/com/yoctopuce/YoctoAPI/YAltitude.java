@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YAltitude.java version 2.1.16087 (build 76087) $
+ *  $Id:YAltitude.java version 2.1.16635 (build 76635) $
  *
  *  Implements FindAltitude(), the high-level API for Altitude functions
  *

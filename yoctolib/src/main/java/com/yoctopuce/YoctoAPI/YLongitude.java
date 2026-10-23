@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YLongitude.java version 2.1.16087 (build 76087) $
+ *  $Id:YLongitude.java version 2.1.16635 (build 76635) $
  *
  *  Implements FindLongitude(), the high-level API for Longitude functions
  *

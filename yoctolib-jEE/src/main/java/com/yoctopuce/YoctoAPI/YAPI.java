@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YAPI.java version 2.1.16087 (build 76087) $
+ * $Id:YAPI.java version 2.1.16635 (build 76635) $
  *
  * High-level programming interface, common to all modules
  *
@@ -60,7 +60,7 @@ public class YAPI
     public static final long INVALID_LONG = -9223372036854775807L;
     public static final int INVALID_UINT = -1;
     public static final String YOCTO_API_VERSION_STR = "2.1";
-    public static final String YOCTO_API_BUILD_STR = "76087";
+    public static final String YOCTO_API_BUILD_STR = "76635";
     public static final int YOCTO_VENDORID = 0x24e0;
     public static final int YOCTO_DEVID_FACTORYBOOT = 1;
     public static final int YOCTO_DEVID_BOOTLOADER = 2;
@@ -375,7 +375,7 @@ public class YAPI
      */
     public static String GetAPIVersion()
     {
-        return "2.1.16087" + YUSBHub.getAPIVersion();
+        return "2.1.16635" + YUSBHub.getAPIVersion();
     }
 
     /**
@@ -845,10 +845,9 @@ public class YAPI
         return GetYCtx(true).GetDeviceListValidity();
     }
     /**
-     * Returns the path to the dynamic YAPI library. This function is useful for debugging problems loading the
-     *  dynamic library YAPI. This function is supported by the C#, Python and VB languages. The other
-     * libraries return an
-     * empty string.
+     * Returns the path to the dynamic YAPI library. This function is useful for debugging
+     * problems loading the dynamic library YAPI. This function is supported by the C#,
+     * Python and VB languages. The other libraries return an empty string.
      *
      * @return a string containing the path of the YAPI dynamic library.
      */

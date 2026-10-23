@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplay.java version 2.1.16087 (build 76087) $
+ * $Id:YDisplay.java version 2.1.16635 (build 76635) $
  *
  * Implements yFindDisplay(), the high-level API for Display functions
  *
@@ -804,6 +804,7 @@ public class YDisplay extends YFunction
 
     /**
      * Changes the model of display to match the connected display panel.
+     * Value examples:  "E2_266_KS0_C1" , "E2_290_QS_0F22 , "E2_370_KS_0C1", "E2_417_KS_0D0" etc..
      * This function has no effect if the module does not support the selected
      * display panel. Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
@@ -827,6 +828,7 @@ public class YDisplay extends YFunction
 
     /**
      * Changes the model of display to match the connected display panel.
+     * Value examples:  "E2_266_KS0_C1" , "E2_290_QS_0F22 , "E2_370_KS_0C1", "E2_417_KS_0D0" etc..
      * This function has no effect if the module does not support the selected
      * display panel. Remember to call the saveToFlash()
      * method of the module if the modification must be kept.

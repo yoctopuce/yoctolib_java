@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YDisplayLayer.java version 2.1.16087 (build 76087) $
+ * $Id:YDisplayLayer.java version 2.1.16635 (build 76635) $
  *
  * YDisplayLayer Class: Image layer containing data to display
  *
@@ -113,6 +113,44 @@ public class YDisplayLayer
                 return BASELINE_RIGHT;
             case 15:
                 return BOTTOM_RIGHT;
+            }
+            return null;
+        }
+    }
+
+    public enum QRMODE {
+        UPCASE_ECCL(0),
+        UPCASE_ECCM(1),
+        UPCASE_ECCQ(2),
+        UPCASE_ECCH(3),
+        BYTES_ECCL(4),
+        BYTES_ECCM(5),
+        BYTES_ECCQ(6),
+        BYTES_ECCH(7);
+        public final int value;
+        QRMODE(int val)
+        {
+            this.value = val;
+        }
+        public static QRMODE fromInt(int intval)
+        {
+            switch(intval) {
+            case 0:
+                return UPCASE_ECCL;
+            case 1:
+                return UPCASE_ECCM;
+            case 2:
+                return UPCASE_ECCQ;
+            case 3:
+                return UPCASE_ECCH;
+            case 4:
+                return BYTES_ECCL;
+            case 5:
+                return BYTES_ECCM;
+            case 6:
+                return BYTES_ECCQ;
+            case 7:
+                return BYTES_ECCH;
             }
             return null;
         }
@@ -554,6 +592,58 @@ public class YDisplayLayer
         _display.flushLayers();
         destname = String.format(Locale.US, "layer%d:G,-1@%d,%d",_id,x,y);
         return _display.upload(destname,gifimage);
+    }
+
+    /**
+     * Displays a QR code at the specified position on the layer. You can choose from several
+     * QR code representation modes, depending on the desired content type (restricted alphabet
+     * vs. all characters) and the error correction level (ECC level, which can be Low, Medium,
+     * Quartile, or High). A code with a full character set and a higher error correction level is
+     * larger than a code with a limited character set and a low error correction level. You can
+     * precalculate the size of the QR code before displaying it by calling this function with
+     * a zoom factor of zero.
+     *
+     * @param x : the distance in pixels from the left edge of the layer to the left edge of the QR code
+     * @param y : the distance in pixels from the top edge of the layer to the top edge of the QR code
+     * @param mode : the QR code encoding mode, selected from the enumeration YDisplayLayer.QRMODE:
+     *         YDisplayLayer.QRMODE_BYTES_ECCH, YDisplayLayer.QRMODE_BYTES_ECCQ,
+     *         YDisplayLayer.QRMODE_BYTES_ECCM, YDisplayLayer.QRMODE_BYTES_ECCL,
+     *         YDisplayLayer.QRMODE_UPCASE_ECCH, YDisplayLayer.QRMODE_UPCASE_ECCQ,
+     *         YDisplayLayer.QRMODE_UPCASE_ECCM, YDisplayLayer.QRMODE_UPCASE_ECCL.
+     * @param zoom : the magnification factor, between 0 (not displayed) and 16
+     *         (each point of the QR code is represented by 16x16 pixels on the screen).
+     * @param text : the text to encode in the QR code
+     *
+     * @return the size of one side of the QR code in pixels if successful.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int drawQRCode(int x,int y,QRMODE mode,int zoom,String text) throws YAPI_Exception
+    {
+        byte[] content;
+        int contentLen;
+        String destname;
+        byte[] json;
+        int qrSize;
+        content = (text).getBytes(_yapi._deviceCharset);
+        contentLen = (content).length;
+        if (zoom == 0) {
+            // no need to send actual content for computing QR code size
+            content = new byte[0];
+        }
+        _display.flushLayers();
+        destname = String.format(Locale.US, "layer%d:Q%d*%d,%d@%d,%d",_id,mode.value,zoom,contentLen,x,y);
+        json = _display._uploadEx(destname,content);
+        if ((json).length == 0) {
+            _display._throw(YAPI.IO_ERROR, "failed to receive size");
+            return YAPI.IO_ERROR;
+        }
+        qrSize = YAPIContext._atoi(_display._json_get_key(json, "size"));
+        if (qrSize >= 999) {
+            _display._throw(YAPI.INVALID_ARGUMENT, "text is too large");
+            return YAPI.INVALID_ARGUMENT;
+        }
+        return qrSize;
     }
 
     /**

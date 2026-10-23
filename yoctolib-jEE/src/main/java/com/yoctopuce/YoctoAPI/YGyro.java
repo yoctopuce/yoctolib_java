@@ -1,5 +1,5 @@
 /*********************************************************************
- * $Id: YGyro.java version 2.1.16087 (build 76087) $
+ * $Id:YGyro.java version 2.1.16635 (build 76635) $
  *
  * Implements yFindGyro(), the high-level API for Gyro functions
  *

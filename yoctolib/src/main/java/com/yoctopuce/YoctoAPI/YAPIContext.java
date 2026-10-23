@@ -1144,10 +1144,9 @@ public class YAPIContext
     //cannot be generated for Java:
     //public int GetDeviceListValidity_internal()
     /**
-     * Returns the path to the dynamic YAPI library. This function is useful for debugging problems loading the
-     *  dynamic library YAPI. This function is supported by the C#, Python and VB languages. The other
-     * libraries return an
-     * empty string.
+     * Returns the path to the dynamic YAPI library. This function is useful for debugging
+     * problems loading the dynamic library YAPI. This function is supported by the C#,
+     * Python and VB languages. The other libraries return an empty string.
      *
      * @return a string containing the path of the YAPI dynamic library.
      */

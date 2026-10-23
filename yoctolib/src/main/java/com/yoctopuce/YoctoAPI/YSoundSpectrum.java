@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YSoundSpectrum.java version 2.1.16087 (build 76087) $
+ *  $Id:YSoundSpectrum.java version 2.1.16635 (build 76635) $
  *
  *  Implements FindSoundSpectrum(), the high-level API for SoundSpectrum functions
  *

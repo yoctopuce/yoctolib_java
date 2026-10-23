@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMultiCellWeighScale.java version 2.1.16087 (build 76087) $
+ *  $Id:YMultiCellWeighScale.java version 2.1.16635 (build 76635) $
  *
  *  Implements FindMultiCellWeighScale(), the high-level API for MultiCellWeighScale functions
  *

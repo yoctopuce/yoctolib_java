@@ -1,6 +1,6 @@
 /*
  *
- *  $Id: YMicroPython.java version 2.1.16087 (build 76087) $
+ *  $Id:YMicroPython.java version 2.1.16635 (build 76635) $
  *
  *  Implements FindMicroPython(), the high-level API for MicroPython functions
  *
@@ -79,6 +79,17 @@ public class YMicroPython extends YFunction
      */
     public static final int STACKUSAGE_INVALID = YAPI.INVALID_UINT;
     /**
+     * invalid vmState value
+     */
+    public static final int VMSTATE_UNAVAILABLE = 0;
+    public static final int VMSTATE_RESET = 1;
+    public static final int VMSTATE_PENDING = 2;
+    public static final int VMSTATE_RUNNING = 3;
+    public static final int VMSTATE_PAUSED = 4;
+    public static final int VMSTATE_IDLE = 5;
+    public static final int VMSTATE_ERROR = 6;
+    public static final int VMSTATE_INVALID = -1;
+    /**
      * invalid currentScript value
      */
     public static final String CURRENTSCRIPT_INVALID = YAPI.INVALID_STRING;
@@ -105,6 +116,7 @@ public class YMicroPython extends YFunction
     protected int _heapFrag = HEAPFRAG_INVALID;
     protected int _xheapUsage = XHEAPUSAGE_INVALID;
     protected int _stackUsage = STACKUSAGE_INVALID;
+    protected int _vmState = VMSTATE_INVALID;
     protected String _currentScript = CURRENTSCRIPT_INVALID;
     protected String _startupScript = STARTUPSCRIPT_INVALID;
     protected double _startupDelay = STARTUPDELAY_INVALID;
@@ -206,6 +218,9 @@ public class YMicroPython extends YFunction
         }
         if (json_val.has("stackUsage")) {
             _stackUsage = json_val.getInt("stackUsage");
+        }
+        if (json_val.has("vmState")) {
+            _vmState = json_val.getInt("vmState");
         }
         if (json_val.has("currentScript")) {
             _currentScript = json_val.getString("currentScript");
@@ -404,6 +419,45 @@ public class YMicroPython extends YFunction
     public int getStackUsage() throws YAPI_Exception
     {
         return get_stackUsage();
+    }
+
+    /**
+     * Returns the current state of the virtual machine.
+     *
+     *  @return a value among YMicroPython.VMSTATE_UNAVAILABLE, YMicroPython.VMSTATE_RESET,
+     *  YMicroPython.VMSTATE_PENDING, YMicroPython.VMSTATE_RUNNING, YMicroPython.VMSTATE_PAUSED,
+     *  YMicroPython.VMSTATE_IDLE and YMicroPython.VMSTATE_ERROR corresponding to the current state of the
+     * virtual machine
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int get_vmState() throws YAPI_Exception
+    {
+        int res;
+        synchronized (this) {
+            if (_cacheExpiration <= YAPIContext.GetTickCount()) {
+                if (load(_yapi._defaultCacheValidity) != YAPI.SUCCESS) {
+                    return VMSTATE_INVALID;
+                }
+            }
+            res = _vmState;
+        }
+        return res;
+    }
+
+    /**
+     * Returns the current state of the virtual machine.
+     *
+     *  @return a value among YMicroPython.VMSTATE_UNAVAILABLE, YMicroPython.VMSTATE_RESET,
+     *  YMicroPython.VMSTATE_PENDING, YMicroPython.VMSTATE_RUNNING, YMicroPython.VMSTATE_PAUSED,
+     *  YMicroPython.VMSTATE_IDLE and YMicroPython.VMSTATE_ERROR corresponding to the current state of the
+     * virtual machine
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int getVmState() throws YAPI_Exception
+    {
+        return get_vmState();
     }
 
     /**
@@ -845,10 +899,86 @@ public class YMicroPython extends YFunction
     }
 
     /**
-     * Submit MicroPython code for execution in the interpreter.
+     * Submit a short expression to MicroPython interpreter, and return
+     * the output produced by its evaluation.
+     *
+     * There is no implicit reset of the MicroPython virtual machine
+     * with this function: all global symbols defined by code that
+     * has run since last reset can be accessed freely. But if the
+     * interpreter is not at rest when the function is invoked, the
+     * call will fail.
+     *
+     * Use method reset() if you need to start
+     * from a fresh environment before starting the evaluation.
+     *
+     * The expression is limited to about 120 ASCII characters.
+     * If you need to evaluate more complex code, use the exec()
+     * method to define it as a function, check for exec completion
+     * using get_vmState() and then use eval()
+     * actually run that function and capture its output.
+     *
+     * @param pythonExpr : Short Python expression to be evaluated
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public String eval(String pythonExpr) throws YAPI_Exception
+    {
+        String state;
+        byte[] content;
+        int endPos;
+        int lenLen;
+        String lenStr;
+        int res;
+        String url;
+        String contentStr;
+        // Make sure the VM is ready to handle the evaluation
+
+        state = (get_advertisedValue()).substring(0, 1);
+        //noinspection DoubleNegation
+        if (!(("zix").indexOf(state) >= 0)) { throw new YAPI_Exception(YAPI.DEVICE_BUSY, "MicroPython VM is not at rest");}
+        // Retrieve current MicroPython console position (avoid transmitting current content if possible)
+        content = _download("mpy.txt?pos=2111222333");
+        endPos = (content).length - 1;
+        while ((endPos >= 0) && ((content[endPos] & 0xff) != 64)) {
+            endPos = endPos - 1;
+        }
+        //noinspection DoubleNegation
+        if (!(endPos > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "failed to download MicroPython logs");}
+        lenLen = (content).length - endPos - 1;
+        lenStr = new String(content, endPos + 1, lenLen, java.nio.charset.StandardCharsets.UTF_8);
+        // trigger the evaluation
+        res = set_command(String.format(Locale.US, "?%s",pythonExpr));
+        //noinspection DoubleNegation
+        if (!(res == YAPI.SUCCESS)) { throw new YAPI_Exception(res, "failed to trigger evaluation");}
+        // wait for the evaluation to complete
+        state = (get_advertisedValue()).substring(0, 1);
+        while (("ix").indexOf(state) < 0) {
+            YAPI.Sleep(50);
+            state = (get_advertisedValue()).substring(0, 1);
+        }
+        // download the logs after the evaluation
+        url = String.format(Locale.US, "mpy.txt?pos=%s",lenStr);
+        content = _download(url);
+        endPos = (content).length - 1;
+        while ((endPos >= 0) && ((content[endPos] & 0xff) != 64)) {
+            endPos = endPos - 1;
+        }
+        //noinspection DoubleNegation
+        if (!(endPos > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "failed to download MicroPython logs");}
+        contentStr = new String(content, 0, endPos - 1, java.nio.charset.StandardCharsets.UTF_8);
+        return contentStr;
+    }
+
+    /**
+     * Submit Python code for execution in the MicroPython interpreter.
      * If the MicroPython interpreter is busy, this function will
      * block until it becomes available. The code is then uploaded,
-     * compiled and executed on the fly, without beeing stored on the device filesystem.
+     * compiled unless it is already a MicroPython precompiled file,
+     * and executed on the fly, without beeing stored on the device
+     * filesystem. This method does not wait for the completion
+     * if the code execution.
      *
      * There is no implicit reset of the MicroPython interpreter with
      * this function. Use method reset() if you need to start
@@ -859,19 +989,20 @@ public class YMicroPython extends YFunction
      * in particular regarding the libraries that can be used. Please refer to
      * the documentation for more details.
      *
-     * @param codeName : name of the code file (used for error reporting only)
-     * @param mpyCode : MicroPython code to compile and execute
+     * @param codeName : name of the code buffer, with a .py extension
+     *         for source code and a .mpy extension for a precompiled file.
+     * @param mpyCode : binary buffer containing MicroPython code to execute
      *
      * @return YAPI.SUCCESS if the call succeeds.
      *
      * @throws YAPI_Exception on error
      */
-    public int eval(String codeName,String mpyCode) throws YAPI_Exception
+    public int exec(String codeName,byte[] mpyCode) throws YAPI_Exception
     {
         String fullname;
         int res;
         fullname = String.format(Locale.US, "mpy:%s",codeName);
-        res = _upload(fullname, (mpyCode).getBytes(_yapi._deviceCharset));
+        res = _upload(fullname, mpyCode);
         return res;
     }
 
@@ -901,6 +1032,29 @@ public class YMicroPython extends YFunction
     }
 
     /**
+     * Reset the MicroPython interpreter to its initial state, and start the specified
+     * program, which must have been previously uploaded to the device.
+     *
+     * @param codeFileName : filename of the MicroPython code to run
+     *
+     * @return YAPI.SUCCESS if the call succeeds.
+     *
+     * @throws YAPI_Exception on error
+     */
+    public int run(String codeFileName) throws YAPI_Exception
+    {
+        String currentScript;
+
+        currentScript = get_currentScript();
+        if (currentScript.equals(codeFileName)) {
+            // set_currentScript does nothing when the script name is unchanged,
+            // so in this case we need to force a VM reset
+            set_command("Z");
+        }
+        return set_currentScript(codeFileName);
+    }
+
+    /**
      * Clears MicroPython interpreter console log buffer.
      *
      * @return YAPI.SUCCESS if the call succeeds.
@@ -926,15 +1080,13 @@ public class YMicroPython extends YFunction
     {
         byte[] buff;
         int bufflen;
-        String res;
 
         buff = _download("mpy.txt");
         bufflen = (buff).length - 1;
         while ((bufflen > 0) && ((buff[bufflen] & 0xff) != 64)) {
             bufflen = bufflen - 1;
         }
-        res = (new String(buff, _yapi._deviceCharset)).substring(0, bufflen);
-        return res;
+        return new String(buff, 0, bufflen, java.nio.charset.StandardCharsets.UTF_8);
     }
 
     /**
@@ -977,11 +1129,10 @@ public class YMicroPython extends YFunction
         String url;
         byte[] content;
         int endPos;
-        String contentStr;
-        ArrayList<String> msgArr = new ArrayList<>();
-        int arrLen;
+        int lenLen;
         String lenStr;
-        int arrPos;
+        int msgPos;
+        int msgEnd;
         String logMsg;
         // detect possible power cycle of the reader to clear event pointer
         cbPos = Integer.valueOf((cbVal).substring(1, 1 + cbVal.length()-1),16);
@@ -1005,15 +1156,15 @@ public class YMicroPython extends YFunction
         }
 
         content = _download(url);
-        contentStr = new String(content, _yapi._deviceCharset);
         // look for new position indicator at end of logs
         endPos = (content).length - 1;
         while ((endPos >= 0) && ((content[endPos] & 0xff) != 64)) {
             endPos = endPos - 1;
         }
         //noinspection DoubleNegation
-        if (!(endPos > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "fail to download micropython logs");}
-        lenStr = (contentStr).substring(endPos+1, endPos+1 + contentStr.length()-(endPos+1));
+        if (!(endPos > 0)) { throw new YAPI_Exception(YAPI.IO_ERROR, "fail to download MicroPython logs");}
+        lenLen = (content).length - endPos - 1;
+        lenStr = new String(content, endPos + 1, lenLen, java.nio.charset.StandardCharsets.UTF_8);
         // update processed event position pointer
         _logPos = YAPIContext._atoi(lenStr);
         if (_isFirstCb) {
@@ -1021,29 +1172,42 @@ public class YMicroPython extends YFunction
             _isFirstCb = false;
             return YAPI.SUCCESS;
         }
-        // now generate callbacks for each complete log line
         endPos = endPos - 1;
         //noinspection DoubleNegation
-        if (!((content[endPos] & 0xff) == 10)) { throw new YAPI_Exception(YAPI.IO_ERROR, "fail to download micropython logs");}
-        contentStr = (contentStr).substring(0, endPos);
-        msgArr = new ArrayList<>(Arrays.asList(contentStr.split("\n")));
-        arrLen = msgArr.size() - 1;
-        if (arrLen > 0) {
-            logMsg = String.format(Locale.US, "%s%s",_prevPartialLog,msgArr.get(0));
+        if (!((content[endPos] & 0xff) == 10)) { throw new YAPI_Exception(YAPI.IO_ERROR, "fail to download MicroPython logs");}
+        if (endPos == 0) {
+            return YAPI.SUCCESS;
+        }
+        // now generate callbacks for each complete log line
+        msgPos = 0;
+        msgEnd = 0;
+        while ((msgEnd < endPos) && ((content[msgEnd] & 0xff) != 10)) {
+            msgEnd = msgEnd + 1;
+        }
+        logMsg = new String(content, msgPos, msgEnd - msgPos, java.nio.charset.StandardCharsets.UTF_8);
+        logMsg = String.format(Locale.US, "%s%s",_prevPartialLog,logMsg);
+        if (msgEnd < endPos) {
             if (_logCallback != null) {
                 _logCallback.logCallback(this, logMsg);
             }
-            _prevPartialLog = "";
-            arrPos = 1;
-            while (arrPos < arrLen) {
-                logMsg = msgArr.get(arrPos);
+        } else {
+            _prevPartialLog = logMsg;
+        }
+        while (msgEnd < endPos) {
+            msgPos = msgEnd + 1;
+            msgEnd = msgPos;
+            while ((msgEnd < endPos) && ((content[msgEnd] & 0xff) != 10)) {
+                msgEnd = msgEnd + 1;
+            }
+            logMsg = new String(content, msgPos, msgEnd - msgPos, java.nio.charset.StandardCharsets.UTF_8);
+            if (msgEnd < endPos) {
                 if (_logCallback != null) {
                     _logCallback.logCallback(this, logMsg);
                 }
-                arrPos = arrPos + 1;
+            } else {
+                _prevPartialLog = logMsg;
             }
         }
-        _prevPartialLog = String.format(Locale.US, "%s%s",_prevPartialLog,msgArr.get(arrLen));
         return YAPI.SUCCESS;
     }
 

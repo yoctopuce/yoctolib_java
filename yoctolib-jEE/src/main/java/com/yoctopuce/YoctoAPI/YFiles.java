@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: YFiles.java version 2.1.16087 (build 76087) $
+ * $Id:YFiles.java version 2.1.16635 (build 76635) $
  *
  * Implements yFindFiles(), the high-level API for Files functions
  *
@@ -39,7 +39,7 @@
 
 package com.yoctopuce.YoctoAPI;
 
-
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -425,6 +425,19 @@ public class YFiles extends YFunction
      */
     public byte[] download(String pathname) throws YAPI_Exception
     {
+        int idx;
+        int plen;
+        byte[] res;
+        plen = pathname.length();
+        idx = 0;
+        while ((idx < plen) && (pathname).substring(idx, idx + 1).equals("/")) {
+            idx = idx + 1;
+        }
+        if ((idx < plen) && (pathname).substring(idx, idx + 1).equals(".")) {
+            _throw(YAPI.INVALID_ARGUMENT, "Remote file access forbidden");
+            res = new byte[0];
+            return res;
+        }
         return _download(pathname);
     }
 
@@ -517,6 +530,43 @@ public class YFiles extends YFunction
         res = (YAPI._bincrc(meta, 0, 4 * blkcnt) ^ ((int) 0xffffffff));
         res = ((res & 0x7fffffff) - 2 * ((res >> 1) & 0x40000000));
         return res;
+    }
+
+    /**
+     * Returns true if the path given as argument meets the requirements
+     * for use on a Yoctopuce device. This method checks for the
+     * maximum file name length, total path length and forbidden
+     * characters.
+     *
+     * @param path : a string representing a path
+     *
+     * @return a boolean
+     */
+    public boolean isValidPath(String path)
+    {
+        ArrayList<String> parts = new ArrayList<>();
+        int pathLen;
+        int i;
+        String allowedChars;
+        pathLen = path.length();
+        if (pathLen > 250) {
+            return false;
+        }
+        parts = new ArrayList<>(Arrays.asList(path.split("/")));
+        for (String ii_0:parts) {
+            if (ii_0.length() > 31) {
+                return false;
+            }
+        }
+        allowedChars = "abcdefghijklmnopqrstuvwxyz./ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789_-[]()@";
+        i = 0;
+        while (i < pathLen) {
+            if (allowedChars.indexOf((path).substring(i, i + 1)) < 0) {
+                return false;
+            }
+            i = i + 1;
+        }
+        return true;
     }
 
     /**
