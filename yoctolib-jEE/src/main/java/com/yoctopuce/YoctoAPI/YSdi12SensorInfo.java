@@ -1,6 +1,6 @@
 /*
  *
- *  $Id:YSdi12SensorInfo.java version 2.1.16635 (build 76635) $
+ *  $Id: YSdi12SensorInfo.java version 2.1.16695 (build 76695) $
  *
  *  Implements FindSdi12SensorInfo(), the high-level API for Sdi12SensorInfo functions
  *

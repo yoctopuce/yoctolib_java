@@ -1,6 +1,6 @@
 /*
  *
- *  $Id:YRfidTagInfo.java version 2.1.16635 (build 76635) $
+ *  $Id: YRfidTagInfo.java version 2.1.16695 (build 76695) $
  *
  *  Implements FindRfidTagInfo(), the high-level API for RfidTagInfo functions
  *

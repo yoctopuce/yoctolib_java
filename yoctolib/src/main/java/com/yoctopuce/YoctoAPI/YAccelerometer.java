@@ -1,6 +1,6 @@
 /*
  *
- *  $Id:YAccelerometer.java version 2.1.16635 (build 76635) $
+ *  $Id: YAccelerometer.java version 2.1.16695 (build 76695) $
  *
  *  Implements FindAccelerometer(), the high-level API for Accelerometer functions
  *

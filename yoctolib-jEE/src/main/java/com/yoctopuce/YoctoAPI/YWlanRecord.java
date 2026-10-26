@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id:YWlanRecord.java version 2.1.16635 (build 76635) $
+ * $Id: YWlanRecord.java version 2.1.16695 (build 76695) $
  *
  * YWlanRecord Class: Description of a wireless network detected
  *

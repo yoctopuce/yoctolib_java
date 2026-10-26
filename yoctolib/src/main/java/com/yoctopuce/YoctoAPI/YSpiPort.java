@@ -1,6 +1,6 @@
 /*
  *
- *  $Id:YSpiPort.java version 2.1.16635 (build 76635) $
+ *  $Id: YSpiPort.java version 2.1.16695 (build 76695) $
  *
  *  Implements FindSpiPort(), the high-level API for SpiPort functions
  *

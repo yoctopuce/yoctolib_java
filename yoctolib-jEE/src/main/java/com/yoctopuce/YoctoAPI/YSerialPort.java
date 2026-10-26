@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id:YSerialPort.java version 2.1.16635 (build 76635) $
+ * $Id: YSerialPort.java version 2.1.16695 (build 76695) $
  *
  * Implements FindSerialPort(), the high-level API for SerialPort functions
  *

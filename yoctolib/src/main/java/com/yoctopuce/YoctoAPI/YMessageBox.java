@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id:YMessageBox.java version 2.1.16635 (build 76635) $
+ * $Id: YMessageBox.java version 2.1.16695 (build 76695) $
  *
  * Implements FindMessageBox(), the high-level API for MessageBox functions
  *

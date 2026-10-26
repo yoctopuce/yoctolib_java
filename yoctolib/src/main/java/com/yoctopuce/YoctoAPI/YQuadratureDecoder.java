@@ -1,6 +1,6 @@
 /*
  *
- *  $Id:YQuadratureDecoder.java version 2.1.16635 (build 76635) $
+ *  $Id: YQuadratureDecoder.java version 2.1.16695 (build 76695) $
  *
  *  Implements FindQuadratureDecoder(), the high-level API for QuadratureDecoder functions
  *

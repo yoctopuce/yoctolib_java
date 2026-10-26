@@ -1,6 +1,6 @@
 /*
  *
- *  $Id:YSdi12Port.java version 2.1.16635 (build 76635) $
+ *  $Id: YSdi12Port.java version 2.1.16695 (build 76695) $
  *
  *  Implements FindSdi12Port(), the high-level API for Sdi12Port functions
  *
